@@ -189,4 +189,5 @@ Based on this representation, we successfully integrated millions of single-cell
 3. email: developer@boseq.com
 
  ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  
- communication group ![communication group](imgs/weixinqun.png)
+  communication group 
+ ![communication group](imgs/weixinqun.png)
