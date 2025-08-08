@@ -188,4 +188,4 @@ Based on this representation, we successfully integrated millions of single-cell
 2. **Boson Quantum Official Assistant**: Inquire about real-machine access and collaborations.  
 3. email: developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png) ![](imgs/weixinqun.png)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png) ![communication group](imgs/weixinqun.png)
