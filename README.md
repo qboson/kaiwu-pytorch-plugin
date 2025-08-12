@@ -67,7 +67,7 @@ The above image shows the project file structure:
 
 2. **Clone this repository locally**:
    ```bash
-   git clone https://github.com/QBosonCommunity/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin
    ```
 
