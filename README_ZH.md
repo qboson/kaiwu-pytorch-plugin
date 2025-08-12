@@ -70,7 +70,7 @@ graph TD
 
 2. **克隆本仓库到本地**：
    ```bash
-   git clone https://github.com/QBosonCommunity/kaiwu-pytorch-plugin.git
+   git clone https://github.com/QBoson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin
    ```
 
