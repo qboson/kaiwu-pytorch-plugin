@@ -25,8 +25,18 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
 
         bm = RBM(self.num_visible, self.num_hidden)
         bm.linear_bias.data = torch.FloatTensor([0.0, 1, 2, 3])
-        bm.quadratic_coef.data = torch.FloatTensor([[0., -1., ],
-                                                    [-1., 0., ]])
+        bm.quadratic_coef.data = torch.FloatTensor(
+            [
+                [
+                    0.0,
+                    -1.0,
+                ],
+                [
+                    -1.0,
+                    0.0,
+                ],
+            ]
+        )
         self.bm = bm
         return super().setUp()
 
@@ -41,13 +51,27 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
     def test_get_ising_matrix(self):
         with self.subTest("Unbounded weight range"):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
-            J_true = torch.FloatTensor([[0., -1., ],
-                                        [-1., 0., ]])
-            ising_mat_std = np.array([[0.0, 0.0, 0.0, -0.25, -0.875],
-                                      [0.0, 0.0, -0.25, 0.0, -0.125],
-                                      [0.0, -0.25, 0.0, 0.0, 0.125],
-                                      [-0.25, 0.0, 0.0, 0.0, 0.375],
-                                      [-0.875, -0.125, 0.125, 0.375, 0.0]])
+            J_true = torch.FloatTensor(
+                [
+                    [
+                        0.0,
+                        -1.0,
+                    ],
+                    [
+                        -1.0,
+                        0.0,
+                    ],
+                ]
+            )
+            ising_mat_std = np.array(
+                [
+                    [0.0, 0.0, 0.0, -0.25, -0.875],
+                    [0.0, 0.0, -0.25, 0.0, -0.125],
+                    [0.0, -0.25, 0.0, 0.0, 0.125],
+                    [-0.25, 0.0, 0.0, 0.0, 0.375],
+                    [-0.875, -0.125, 0.125, 0.375, 0.0],
+                ]
+            )
             self.bm.linear_bias.data = h_true
             self.bm.quadratic_coef.data = J_true
             ising_mat = self.bm.get_ising_matrix()

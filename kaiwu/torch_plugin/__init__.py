@@ -3,6 +3,4 @@
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 from .full_boltzmann_machine import BoltzmannMachine
 
-__all__ = [
-    "RestrictedBoltzmannMachine",
-    "BoltzmannMachine"]
+__all__ = ["RestrictedBoltzmannMachine", "BoltzmannMachine"]

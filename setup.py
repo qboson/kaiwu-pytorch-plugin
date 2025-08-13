@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 
+
 # 读取README文件
 def read_readme():
     with open("Readme.md", "r", encoding="utf-8") as fh:
@@ -9,7 +10,9 @@ def read_readme():
 # 读取requirements文件
 def read_requirements():
     with open("requirements/requirements.txt", "r", encoding="utf-8") as fh:
-        return [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+        return [
+            line.strip() for line in fh if line.strip() and not line.startswith("#")
+        ]
 
 
 setup(
@@ -18,7 +21,7 @@ setup(
     author="QBoson Inc",
     author_email="developer@boseq.com",
     description="A PyTorch plugin for training and evaluating Restricted Boltzmann Machines (RBM) and "
-                "Boltzmann Machines (BM) with quantum computing support",
+    "Boltzmann Machines (BM) with quantum computing support",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/QBosonCommunity/kaiwu-pytorch-plugin",
@@ -57,7 +60,7 @@ setup(
         ],
     },
     keywords="quantum computing, boltzmann machine, restricted boltzmann machine, pytorch, "
-             "machine learning, deep learning",
+    "machine learning, deep learning",
     license="Apache License 2.0",
     zip_safe=False,
 )

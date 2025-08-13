@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Instantiate the model
     rbm = RestrictedBoltzmannMachine(
         num_visible,
-        num_nodes-num_visible,
+        num_nodes - num_visible,
     )
 
     # Instantiate the optimizer
@@ -29,8 +29,6 @@ if __name__ == "__main__":
 
     # Example of one iteration in a training loop
     # Generate a sample set from the model
-    # s = rbm.sample(sampler)
-    # Reset the gradients of the model weights
     x = rbm.get_hidden(x)
     s = rbm.sample(sampler)
     opt_rbm.zero_grad()

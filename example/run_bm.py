@@ -4,6 +4,7 @@ from torch.optim import SGD
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import BoltzmannMachine
+
 #  这里添加licence认证
 
 
@@ -21,17 +22,14 @@ if __name__ == "__main__":
     x = 1 - 2.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
 
     # Instantiate the model
-    rbm = BoltzmannMachine(
-        num_nodes
-    )
+    rbm = BoltzmannMachine(num_nodes)
 
     # Instantiate the optimizer
     opt_rbm = SGD(rbm.parameters())
 
     # Example of one iteration in a training loop
     # Generate a sample set from the model
-    # s = rbm.sample(sampler)
-    # Reset the gradients of the model weights
+
     x = rbm.condition_sample(sampler, x)
     s = rbm.sample(sampler)
     opt_rbm.zero_grad()
