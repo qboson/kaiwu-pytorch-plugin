@@ -18,16 +18,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         如果为``None``，使用CPU。
     """
 
-    def __init__(
-            self,
-            num_nodes: int,
-            h_range=None,
-            j_range=None
-    ):
+    def __init__(self, num_nodes: int, h_range=None, j_range=None):
         super().__init__(h_range=h_range, j_range=j_range)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
-            torch.randn((self.num_nodes, self.num_nodes)) * 0.01)
+            torch.randn((self.num_nodes, self.num_nodes)) * 0.01
+        )
         self.linear_bias = torch.nn.Parameter(torch.zeros(self.num_nodes))
 
     def clip_parameters(self) -> None:
@@ -70,8 +66,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """
         n_vis = s_visible.shape[-1]
         sub_quadratic = self.quadratic_coef[n_vis:, n_vis:]
-        sub_quadratic_vh = (self.quadratic_coef[n_vis:, :n_vis] +
-                            self.quadratic_coef[:n_vis, n_vis:].t())
+        sub_quadratic_vh = (
+            self.quadratic_coef[n_vis:, :n_vis]
+            + self.quadratic_coef[:n_vis, n_vis:].t()
+        )
         sub_linear = sub_quadratic_vh @ s_visible + self.linear_bias[n_vis:]
         sub_linear = sub_linear.detach().cpu().numpy()
         sub_quadratic = sub_quadratic.detach().cpu().numpy()
@@ -83,8 +81,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         ising_mat[-1, :-1] = ising_bias / 2
         return ising_mat
 
-    def gibbs_sample(self, num_steps: int = 100, s_visible: torch.Tensor = None,
-                     num_sample=None) -> torch.Tensor:
+    def gibbs_sample(
+        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
+    ) -> torch.Tensor:
         """从玻尔兹曼机中采样。
         Args:
             num_steps (int): Gibbs采样的步数。
@@ -101,9 +100,11 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             num_sample = s_visible.size(0) if num_sample is None else num_sample
             if s_visible is not None:
                 # 初始化所有单元（可见+隐含）为0.5概率的伯努利分布
-                s_all = torch.bernoulli(torch.full((s_visible.size(0), self.num_nodes), 0.5))
+                s_all = torch.bernoulli(
+                    torch.full((s_visible.size(0), self.num_nodes), 0.5)
+                )
                 # 将前面可见单元部分替换为给定的可见单元状态
-                s_all[:, :s_visible.size(1)] = s_visible.clone()
+                s_all[:, : s_visible.size(1)] = s_visible.clone()
             else:
                 # 如果没有可见单元，全部随机初始化
                 s_all = torch.bernoulli(torch.full((num_sample, self.num_nodes), 0.5))
@@ -118,8 +119,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                         # 跳过可见单元（只采样隐含单元）
                         continue
                     # 计算当前单元的激活值（条件概率的logit）
-                    activation = torch.matmul(s_all, self.quadratic_coef[:, unit]) \
-                                + self.linear_bias[unit]
+                    activation = (
+                        torch.matmul(s_all, self.quadratic_coef[:, unit])
+                        + self.linear_bias[unit]
+                    )
                     # 通过sigmoid得到激活概率
                     prob = torch.sigmoid(activation)
                     # 按概率采样当前单元的状态
@@ -143,8 +146,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
             solution = sampler.solve(ising_mat)
             solution = (solution[:, :-1] + 1) / 2
-            solution = torch.cat([s_visible[i].unsqueeze(0).expand(solution.shape[0], -1),
-                                  torch.FloatTensor(solution)], dim=-1)
+            solution = torch.cat(
+                [
+                    s_visible[i].unsqueeze(0).expand(solution.shape[0], -1),
+                    torch.FloatTensor(solution),
+                ],
+                dim=-1,
+            )
             solutions.append(solution)
         solutions = torch.cat(solutions, dim=0)
         solutions = torch.FloatTensor(solutions)

@@ -19,18 +19,13 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         如果为``None``，使用CPU。
     """
 
-    def __init__(
-            self,
-            num_visible: int,
-            num_hidden: int,
-            h_range=None,
-            j_range=None
-    ):
+    def __init__(self, num_visible: int, num_hidden: int, h_range=None, j_range=None):
         super().__init__(h_range=h_range, j_range=j_range)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.quadratic_coef = torch.nn.Parameter(
-            torch.randn((num_visible, num_hidden)) * 0.01)
+            torch.randn((num_visible, num_hidden)) * 0.01
+        )
         self.linear_bias = torch.nn.Parameter(torch.zeros(num_hidden + num_visible))
 
     def clip_parameters(self) -> None:
@@ -38,8 +33,9 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         self.get_parameter("linear_bias").data.clamp_(*self.h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*self.j_range)
 
-    def get_hidden(self, s_visible: torch.Tensor,
-                   requires_grad: bool = False) -> torch.Tensor:
+    def get_hidden(
+        self, s_visible: torch.Tensor, requires_grad: bool = False
+    ) -> torch.Tensor:
         """将隐藏自旋传播到观测层。
         Args:
             s_visible: 可见层张量
@@ -47,24 +43,30 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
-            s_all = torch.zeros(s_visible.size(0),
-                                self.num_hidden + self.num_visible, device=self.device)
-            s_all[:, :self.num_visible] = s_visible
+            s_all = torch.zeros(
+                s_visible.size(0),
+                self.num_hidden + self.num_visible,
+                device=self.device,
+            )
+            s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
-                s_visible @ self.quadratic_coef + self.linear_bias[self.num_visible:])
-            s_all[:, self.num_visible:] = prob
+                s_visible @ self.quadratic_coef + self.linear_bias[self.num_visible :]
+            )
+            s_all[:, self.num_visible :] = prob
             return s_all
 
     def get_visible(self, s_hidden: torch.Tensor) -> torch.Tensor:
         """将观测自旋传播到隐藏层。"""
         with torch.no_grad():
-            s_all = torch.zeros(s_hidden.size(0),
-                                self.num_hidden + self.num_visible).to(self.device)
-            s_all[:, self.num_visible:] = s_hidden
+            s_all = torch.zeros(
+                s_hidden.size(0), self.num_hidden + self.num_visible
+            ).to(self.device)
+            s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
-                s_hidden @ self.quadratic_coef.t() +
-                self.linear_bias[:self.num_visible])
-            s_all[:, :self.num_visible] = prob
+                s_hidden @ self.quadratic_coef.t()
+                + self.linear_bias[: self.num_visible]
+            )
+            s_all[:, : self.num_visible] = prob
             return s_all
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
@@ -77,8 +79,10 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: 形状为(B,)的哈密顿量。
         """
-        tmp = s_all[:, :self.num_visible].matmul(self.quadratic_coef)
-        return s_all @ self.linear_bias + torch.sum(tmp * s_all[:, self.num_visible:], dim=-1)
+        tmp = s_all[:, : self.num_visible].matmul(self.quadratic_coef)
+        return s_all @ self.linear_bias + torch.sum(
+            tmp * s_all[:, self.num_visible :], dim=-1
+        )
 
     def _to_ising_matrix(self):
         """将受限玻尔兹曼机转换为伊辛格式"""
@@ -88,8 +92,8 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         ising_mat = np.zeros((num_nodes + 1, num_nodes + 1))
         # 限制玻尔兹曼机：只有可见层和隐藏层之间有连接
-        ising_mat[:self.num_visible, self.num_visible:-1] = quadratic_coef / 4
-        ising_mat[self.num_visible:-1, :self.num_visible] = quadratic_coef.T / 4
+        ising_mat[: self.num_visible, self.num_visible : -1] = quadratic_coef / 4
+        ising_mat[self.num_visible : -1, : self.num_visible] = quadratic_coef.T / 4
         ising_bias = linear_bias / 2 + np.sum(ising_mat, axis=0)[:-1]
         ising_mat[:num_nodes, -1] = ising_bias / 2
         ising_mat[-1, :num_nodes] = ising_bias / 2

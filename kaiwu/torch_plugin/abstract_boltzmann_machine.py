@@ -3,7 +3,7 @@
 import torch
 
 
-def clip_parameters_hook(module, *args): # pylint:disable=unused-argument
+def clip_parameters_hook(module, *args):  # pylint:disable=unused-argument
     """用于自动裁剪参数的钩子函数。"""
     module.clip_parameters()
 
@@ -19,11 +19,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         device (torch.device, optional): 构造张量的设备。
     """
 
-    def __init__(
-            self,
-            h_range=None,
-            j_range=None
-    ) -> None:
+    def __init__(self, h_range=None, j_range=None) -> None:
         super().__init__()
         self.register_buffer(
             "h_range",
@@ -42,10 +38,10 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """计算哈密顿量。
-        
+
         Args:
             s_all (torch.Tensor): 输入张量
-            
+
         Returns:
             torch.Tensor: 哈密顿量
         """
@@ -63,7 +59,9 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         raise NotImplementedError("Subclasses must implement _ising method")
 
     def objective(
-            self, s_positive: torch.Tensor, s_negtive: torch.Tensor,
+        self,
+        s_positive: torch.Tensor,
+        s_negtive: torch.Tensor,
     ) -> torch.Tensor:
         """一个目标函数，其梯度等价于负对数似然的梯度。
 
@@ -77,7 +75,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             torch.Tensor: 数据和模型平均能量的标量差。
         """
         self.clip_parameters()
-        return - (self(s_positive).mean() - self(s_negtive).mean())
+        return -(self(s_positive).mean() - self(s_negtive).mean())
 
     def sample(self, sampler) -> torch.Tensor:
         """从玻尔兹曼机中采样。
