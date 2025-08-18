@@ -177,6 +177,9 @@ In single-cell transcriptomics analysis (a technique revealing cellular heteroge
 
 Based on this representation, we successfully integrated millions of single-cell transcriptomic data points and achieved superior performance in downstream tasks (e.g., cell clustering, classification, trajectory inference) compared to existing methods, validating the excellence of this latent representation.  
 
+If you are interested in this work, please check out our paper:  
+[Quantum-Boosted High-Fidelity Deep Learning](ttps://arxiv.org/pdf/2508.11190)
+
 ---  
 
 ## Acknowledgments  

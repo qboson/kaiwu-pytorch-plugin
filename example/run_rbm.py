@@ -1,8 +1,14 @@
+import os
 import torch
 
+import kaiwu as kw
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from torch.optim import SGD
+
+# 添加licence认证
+# print("User ID:", os.getenv("USER_ID"), "SDK Code:", os.getenv("SDK_CODE"))
+# kw.license.init(os.getenv("USER_ID"), os.getenv("SDK_CODE"))
 
 
 if __name__ == "__main__":
