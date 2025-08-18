@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 
 # 读取README文件
@@ -30,8 +30,7 @@ setup(
         "Source": "https://github.com/QBosonCommunity/kaiwu-pytorch-plugin",
         "Documentation": "https://github.com/QBosonCommunity/kaiwu-pytorch-plugin#readme",
     },
-    packages=["kaiwu.torch_plugin"],
-    package_dir={"kaiwu.torch_plugin": "kaiwu/torch_plugin"},
+    packages=find_namespace_packages(include=["kaiwu.*"]),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
