@@ -27,7 +27,7 @@ setup(
         "Source": "https://github.com/QBoson/kaiwu-pytorch-plugin",
         "Documentation": "https://github.com/QBoson/kaiwu-pytorch-plugin#readme",
     },
-    packages=["kaiwu.torch_plugin"],
+    packages=find_packages(where=".", include=["kaiwu*"]),
     package_dir={"kaiwu.torch_plugin": "kaiwu/torch_plugin"},
     classifiers=[
         "Development Status :: 4 - Beta",
