@@ -3,7 +3,7 @@ from setuptools import setup, find_namespace_packages
 
 # 读取README文件
 def read_readme():
-    with open("Readme.md", "r", encoding="utf-8") as fh:
+    with open("README.md", "r", encoding="utf-8") as fh:
         return fh.read()
 
 
@@ -24,11 +24,11 @@ setup(
     "Boltzmann Machines (BM) with quantum computing support",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/QBosonCommunity/kaiwu-pytorch-plugin",
+    url="https://github.com/QBoson/kaiwu-pytorch-plugin",
     project_urls={
-        "Bug Reports": "https://github.com/QBosonCommunity/kaiwu-pytorch-plugin/issues",
-        "Source": "https://github.com/QBosonCommunity/kaiwu-pytorch-plugin",
-        "Documentation": "https://github.com/QBosonCommunity/kaiwu-pytorch-plugin#readme",
+        "Bug Reports": "https://github.com/QBoson/kaiwu-pytorch-plugin/issues",
+        "Source": "https://github.com/QBoson/kaiwu-pytorch-plugin",
+        "Documentation": "https://github.com/QBoson/kaiwu-pytorch-plugin#readme",
     },
     packages=find_namespace_packages(include=["kaiwu.*"]),
     classifiers=[
