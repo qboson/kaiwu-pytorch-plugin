@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.8%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
+<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
 # Kaiwu-Pytorch-Plugin
 
@@ -12,8 +12,9 @@ A Restricted Boltzmann Machine is an energy-based unsupervised learning model co
 
 ```mermaid
 graph TD
-    subgraph Kaiwu-torch-plugin
-        bm[full_boltzmann_machine.py] --> rbm[restricted_boltzmann_machine.py]
+    subgraph kaiwu-torch-plugin
+        bm[full_boltzmann_machine.py] -->abm[abstract_boltzmann_machine.py]
+        rbm[restricted_boltzmann_machine.py] -->abm
     end
     subgraph example
         rbm_example_d1[rbm_digits.py] --> rbm
@@ -23,8 +24,8 @@ graph TD
         rbm_example_v2[train_qvae.ipynb] --> rbm_example_v1
     end
     subgraph test
-        test_rbm[test_rbm.py] --> rbm
         test_bm[test_bm.py] --> bm
+        test_rbm[test_rbm.py] --> rbm
     end
 ```
 The above image shows the project file structure:

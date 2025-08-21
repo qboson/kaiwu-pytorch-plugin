@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.8%2B-blue" alt="Python Version">
+<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version">
 <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
 # Kaiwu-Pytorch-Plugin
