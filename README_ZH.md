@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.8%2B-blue" alt="Python Version">
+<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version">
 <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
 # Kaiwu-Pytorch-Plugin
@@ -170,7 +170,7 @@ if __name__ == "__main__":
 
 运行该实例可以运行`example/qvae/train_qvae.ipynb`
 
-## 相关工作
+## 科研成果
 
 ### QBM inside VAE = 更强的数据表征生成器（QBM-VAE）
 生物、化学、材料等自然世界产生的数据极其复杂，基于独立同分布的高斯假设往往造成模型表示的“失真”。
