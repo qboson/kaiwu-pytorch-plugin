@@ -24,6 +24,5 @@ scipy
 
 **安装要求**
 
-
 torchvision==0.22.0
 torchmetrics[image]
