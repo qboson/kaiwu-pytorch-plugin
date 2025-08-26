@@ -46,16 +46,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
     def _to_ising_matrix(self):
         """将玻尔兹曼机转换为伊辛矩阵"""
-        linear_bias = self.linear_bias.detach().cpu().numpy()
-        quadratic_coef = self.quadratic_coef.detach().cpu().numpy()
         num_nodes = self.linear_bias.shape[-1]
-
-        ising_mat = np.zeros((num_nodes + 1, num_nodes + 1))
-        ising_mat[:-1, :-1] = quadratic_coef / 4
-        ising_bias = linear_bias / 2 + np.sum(ising_mat, axis=0)[:-1]
+        ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+        ising_mat[:-1, :-1] = self.quadratic_coef / 4
+        ising_bias = self.linear_bias / 2 + np.sum(ising_mat, axis=0)[:-1]
         ising_mat[:num_nodes, -1] = ising_bias / 2
         ising_mat[-1, :num_nodes] = ising_bias / 2
-        return ising_mat
+        return ising_mat.detach().cpu().numpy()
 
     def _hidden_to_ising_matrix(self, s_visible: torch.Tensor) -> np.ndarray:
         """给定可见节点的情况，将模型转换为伊辛格式的子矩阵。
@@ -70,16 +67,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             self.quadratic_coef[n_vis:, :n_vis]
             + self.quadratic_coef[:n_vis, n_vis:].t()
         )
-        sub_linear = sub_quadratic_vh @ s_visible + self.linear_bias[n_vis:]
-        sub_linear = sub_linear.detach().cpu().numpy()
-        sub_quadratic = sub_quadratic.detach().cpu().numpy()
 
-        ising_mat = np.zeros((sub_quadratic.shape[0] + 1, sub_quadratic.shape[0] + 1))
+        sub_linear = sub_quadratic_vh @ s_visible + self.linear_bias[n_vis:]
+        ising_mat = torch.zeros(
+            (sub_quadratic.size(0) + 1, sub_quadratic.size(0) + 1), device=self.device
+        )
         ising_mat[:-1, :-1] = sub_quadratic / 4
         ising_bias = sub_linear / 2 + np.sum(ising_mat, axis=0)[:-1]
         ising_mat[:-1, -1] = ising_bias / 2
         ising_mat[-1, :-1] = ising_bias / 2
-        return ising_mat
+        return ising_mat.detach().cpu().numpy()
 
     def gibbs_sample(
         self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
@@ -101,19 +98,23 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             if s_visible is not None:
                 # 初始化所有单元（可见+隐含）为0.5概率的伯努利分布
                 s_all = torch.bernoulli(
-                    torch.full((s_visible.size(0), self.num_nodes), 0.5)
+                    torch.full(
+                        (s_visible.size(0), self.num_nodes), 0.5, device=self.device
+                    )
                 )
                 # 将前面可见单元部分替换为给定的可见单元状态
                 s_all[:, : s_visible.size(1)] = s_visible.clone()
             else:
                 # 如果没有可见单元，全部随机初始化
-                s_all = torch.bernoulli(torch.full((num_sample, self.num_nodes), 0.5))
+                s_all = torch.bernoulli(
+                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
+                )
 
             # 可见单元数量
             n_vis = s_visible.shape[-1] if s_visible is not None else 0
             for _ in range(num_steps):
                 # 随机更新顺序（Gibbs采样）
-                update_order = torch.randperm(self.num_nodes)
+                update_order = torch.randperm(self.num_nodes, device=self.device)
                 for unit in update_order:
                     if unit < n_vis:
                         # 跳过可见单元（只采样隐含单元）
