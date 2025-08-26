@@ -1,0 +1,5 @@
+scikit-learn
+matplotlib
+scipy
+torchvision==0.22.0
+torchmetrics[image]
