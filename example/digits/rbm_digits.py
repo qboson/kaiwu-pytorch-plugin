@@ -76,14 +76,12 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         image = np.hstack(digits)  # 形状：(8, 160)
         return image
 
-    def fit(self, X, Y_train, X_test, Y_test):
+    def fit(self, X, y=None):  # 修改接口以符合scikit-learn约定
         """
         训练RBM模型
         Args:
             X: 训练数据，形状为 (n_samples, n_features)
-            Y_train: 训练标签，形状为 (n_samples,)
-            X_test: 测试数据，形状为 (n_samples, n_features)
-            Y_test: 测试标签，形状为 (n_samples,)
+            y: 忽略，为兼容scikit-learn接口
         """
         rbm = RestrictedBoltzmannMachine(
             X.shape[1],
@@ -92,7 +90,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             j_range=[-1, 1],
         )
         rbm.to(self.device)
-        self.rbm = rbm  # 保存RBM模型
+        self.rbm = rbm
 
         opt_rbm = SGD(rbm.parameters(), lr=self.learning_rate)
 
@@ -101,10 +99,8 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         batch_slices = list(
             gen_even_slices(n_batches * self.batch_size, n_batches, n_samples=n_samples)
         )
-        predic = []
         X_torch = torch.FloatTensor(X).to(self.device)
         idx = 0
-        X_test_torch = torch.FloatTensor(X_test).to(self.device)
 
         for iteration in range(1, self.n_iter + 1):
             for batch_slice in batch_slices:
@@ -114,29 +110,17 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 x = rbm.get_hidden(x)  # positive phase
                 s = rbm.sample(self.sampler)  # negative phase
                 opt_rbm.zero_grad()
-                # Compute the objective---this objective yields the same gradient as the negative
-                # log likelihood of the model
+                # Compute the objective
                 w_weight_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)
                 b_weight_decay = 0.05 * torch.sum(rbm.linear_bias**2)
                 objective = rbm.objective(x, s) + w_weight_decay + b_weight_decay
                 # Backpropgate gradients
                 objective.backward()
                 opt_rbm.step()
-                print(f"Iteration {idx}, Objective: {objective.item():.6f}")
+                
                 if self.verbose:
-                    if (idx - 1) % 5 == 0:
-                        rf = linear_model.LogisticRegression(
-                            solver="newton-cholesky", tol=1e-5, max_iter=1000, C=500
-                        )
-                        predic.append(
-                            rf.fit(
-                                (rbm.get_hidden(X_torch)[:, rbm.num_visible :]), Y_train
-                            ).score(
-                                (rbm.get_hidden(X_test_torch)[:, rbm.num_visible :]),
-                                Y_test,
-                            )
-                        )
-                        print(f"Accuracy: {predic[-1]:.4f}")
+                    print(f"Iteration {idx}, Objective: {objective.item():.6f}")
+                    
                     if (idx - 1) % 20 == 0:
                         print(
                             f"jmean {torch.abs(rbm.quadratic_coef).mean()}"
@@ -146,13 +130,13 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                             f"hmean {torch.abs(rbm.linear_bias).mean()}"
                             f" hmax {torch.abs(rbm.linear_bias).max()}"
                         )
-                        display_samples = (
-                            rbm.sample(self.sampler)
-                            .cpu()
-                            .numpy()[:20, : rbm.num_visible]
-                        )
-
+                        
                         if self.plot_img:
+                            display_samples = (
+                                rbm.sample(self.sampler)
+                                .cpu()
+                                .numpy()[:20, : rbm.num_visible]
+                            )
                             # 生成样本
                             plt.figure(figsize=(16, 2))
                             plt.imshow(self.gen_digits_image(display_samples, 8))
@@ -163,7 +147,9 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                             axes[1].imshow(rbm.quadratic_coef.grad.detach().cpu().numpy())
                             plt.tight_layout()
                             plt.show()
-
+        
+        return self 
+    
     def translate_image(self, image, direction):
         "图片转换"
         if direction == "up":
@@ -225,7 +211,8 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         return X_train, X_test, y_train, y_test
 
     # 在RBMRunner类中添加特征提取方法
-    def extract_features(self, X):
+    # def extract_features(self, X):
+    def transform(self, X):
         """
         提取隐藏层特征
         Args:
