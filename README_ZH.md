@@ -196,7 +196,7 @@ if __name__ == "__main__":
 2. 玻色量子官方助手，真机申请及合作咨询
 3. 邮箱联系方式：developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png) ![](https://github.com/user-attachments/assets/9ff81d3b-1763-4319-b6e2-8f5965a74abe)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png) ![](https://github.com/user-attachments/assets/f5faa334-8be4-44df-96b8-81fc24bc8e65)
 
 
 
