@@ -215,7 +215,6 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         return X_train, X_test, y_train, y_test
 
     # 在RBMRunner类中添加特征提取方法
-    # def extract_features(self, X):
     def transform(self, X):
         """
         提取隐藏层特征
@@ -229,7 +228,6 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         X_torch = torch.FloatTensor(X).to(self.device)
         with torch.no_grad():
             hidden_output = self.rbm.get_hidden(X_torch)
-            # 假设hidden_output的形状为 (n_samples, n_visible + n_hidden)
             features = hidden_output[:, self.rbm.num_visible:]
         return features.cpu().numpy()
 
