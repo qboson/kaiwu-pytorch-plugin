@@ -238,8 +238,6 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         """
         if self.rbm is None:
             raise ValueError("RBM model not trained yet. Call fit first.")
-            
-        # self.rbm.eval()
     
         # 重构
         with torch.no_grad():
