@@ -83,25 +83,29 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             X: 训练数据，形状为 (n_samples, n_features)
             y: 忽略，为兼容scikit-learn接口
         """
+        # 初始化受限玻尔兹曼机（RBM）模型
         rbm = RestrictedBoltzmannMachine(
-            X.shape[1],
-            self.n_components,
-            h_range=[-1, 1],
-            j_range=[-1, 1],
+            X.shape[1],  # 可见层单元数（特征维度）
+            self.n_components,  # 隐层单元数
+            h_range=[-1, 1],  # 隐层偏置范围
+            j_range=[-1, 1],  # 权重范围
         )
         rbm.to(self.device)  # 将模型移动到指定设备（CPU/GPU）
         self.rbm = rbm
 
+        # 初始化优化器
         opt_rbm = SGD(rbm.parameters(), lr=self.learning_rate)
 
-        n_samples = X.shape[0]
-        n_batches = int(np.ceil(float(n_samples) / self.batch_size))
+        n_samples = X.shape[0]  # 样本数量
+        n_batches = int(np.ceil(float(n_samples) / self.batch_size))  # 批次数量
+        # 生成每个batch的切片索引
         batch_slices = list(
             gen_even_slices(n_batches * self.batch_size, n_batches, n_samples=n_samples)
         )
         X_torch = torch.FloatTensor(X).to(self.device)  # 转为torch张量并移动到设备
         idx = 0
 
+        # 训练循环
         for iteration in range(1, self.n_iter + 1):
             for batch_slice in batch_slices:
                 idx += 1
@@ -110,12 +114,12 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 x = rbm.get_hidden(x)  # 正相（计算隐层激活）
                 s = rbm.sample(self.sampler)  # 负相（采样重构数据）
                 opt_rbm.zero_grad()  # 梯度清零
-                
+
                 # 计算目标函数（等价于负对数似然），并加权衰减项
                 w_weight_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)  # 权重衰减
                 b_weight_decay = 0.05 * torch.sum(rbm.linear_bias**2)  # 偏置衰减
                 objective = rbm.objective(x, s) + w_weight_decay + b_weight_decay
-                
+
                 # 反向传播并更新参数
                 objective.backward()
                 opt_rbm.step()
@@ -134,7 +138,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                             f"hmean {torch.abs(rbm.linear_bias).mean()}"
                             f" hmax {torch.abs(rbm.linear_bias).max()}"
                         )
-                        
+        
                         if self.plot_img:
                             display_samples = (
                                 rbm.sample(self.sampler)
@@ -153,7 +157,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                             plt.show()
         
         return self 
-    
+
     def translate_image(self, image, direction):
         "图片转换"
         if direction == "up":
