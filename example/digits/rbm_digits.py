@@ -89,7 +89,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             h_range=[-1, 1],
             j_range=[-1, 1],
         )
-        rbm.to(self.device)
+        rbm.to(self.device)  # 将模型移动到指定设备（CPU/GPU）
         self.rbm = rbm
 
         opt_rbm = SGD(rbm.parameters(), lr=self.learning_rate)
@@ -99,29 +99,33 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         batch_slices = list(
             gen_even_slices(n_batches * self.batch_size, n_batches, n_samples=n_samples)
         )
-        X_torch = torch.FloatTensor(X).to(self.device)
+        X_torch = torch.FloatTensor(X).to(self.device)  # 转为torch张量并移动到设备
         idx = 0
 
         for iteration in range(1, self.n_iter + 1):
             for batch_slice in batch_slices:
                 idx += 1
-                x = X_torch[batch_slice]
+                x = X_torch[batch_slice]  # 获取当前batch数据
 
-                x = rbm.get_hidden(x)  # positive phase
-                s = rbm.sample(self.sampler)  # negative phase
-                opt_rbm.zero_grad()
-                # Compute the objective
-                w_weight_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)
-                b_weight_decay = 0.05 * torch.sum(rbm.linear_bias**2)
+                x = rbm.get_hidden(x)  # 正相（计算隐层激活）
+                s = rbm.sample(self.sampler)  # 负相（采样重构数据）
+                opt_rbm.zero_grad()  # 梯度清零
+                
+                # 计算目标函数（等价于负对数似然），并加权衰减项
+                w_weight_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)  # 权重衰减
+                b_weight_decay = 0.05 * torch.sum(rbm.linear_bias**2)  # 偏置衰减
                 objective = rbm.objective(x, s) + w_weight_decay + b_weight_decay
-                # Backpropgate gradients
+                
+                # 反向传播并更新参数
                 objective.backward()
                 opt_rbm.step()
                 
+                # 如果verbose，定期评估模型性能和可视化参数
                 if self.verbose:
                     print(f"Iteration {idx}, Objective: {objective.item():.6f}")
                     
                     if (idx - 1) % 20 == 0:
+                        # 打印权重和偏置的均值与最大值
                         print(
                             f"jmean {torch.abs(rbm.quadratic_coef).mean()}"
                             f" jmax {torch.abs(rbm.quadratic_coef).max()}"
