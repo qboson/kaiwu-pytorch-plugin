@@ -46,13 +46,29 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
     def _to_ising_matrix(self):
         """将玻尔兹曼机转换为伊辛矩阵"""
-        num_nodes = self.linear_bias.shape[-1]
-        ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
-        ising_mat[:-1, :-1] = self.quadratic_coef / 4
-        ising_bias = self.linear_bias / 2 + np.sum(ising_mat, axis=0)[:-1]
-        ising_mat[:num_nodes, -1] = ising_bias / 2
-        ising_mat[-1, :num_nodes] = ising_bias / 2
-        return ising_mat.detach().cpu().numpy()
+        with torch.no_grad():
+            linear_bias = self.linear_bias.detach()
+            quadratic_coef = self.quadratic_coef.detach()
+            num_nodes = self.linear_bias.shape[-1]
+            # 使用torch进行所有计算
+            ising_mat = torch.zeros(
+                (num_nodes + 1, num_nodes + 1),
+                device=self.device,
+                dtype=linear_bias.dtype,
+            )
+
+            # 填充quadratic部分
+            ising_mat[:-1, :-1] = quadratic_coef / 4
+            # 计算ising_bias
+            diag_elements = torch.diag(ising_mat)[:-1]
+            column_sums = torch.sum(ising_mat, dim=0)[:-1]
+            ising_bias = linear_bias / 2 + diag_elements + column_sums
+            # 填充bias部分
+            ising_mat[:num_nodes, -1] = ising_bias / 2
+            ising_mat[-1, :num_nodes] = ising_bias / 2
+            # 对角线置零
+            ising_mat.fill_diagonal_(0)
+            return ising_mat.cpu().numpy()
 
     def _hidden_to_ising_matrix(self, s_visible: torch.Tensor) -> np.ndarray:
         """给定可见节点的情况，将模型转换为伊辛格式的子矩阵。
@@ -61,22 +77,30 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             np.ndarray: 伊辛格式的子矩阵。
         """
-        n_vis = s_visible.shape[-1]
-        sub_quadratic = self.quadratic_coef[n_vis:, n_vis:]
-        sub_quadratic_vh = (
-            self.quadratic_coef[n_vis:, :n_vis]
-            + self.quadratic_coef[:n_vis, n_vis:].t()
-        )
+        with torch.no_grad():
+            n_vis = s_visible.shape[-1]
+            sub_quadratic = self.quadratic_coef[n_vis:, n_vis:]
+            sub_quadratic_vh = (
+                self.quadratic_coef[n_vis:, :n_vis]
+                + self.quadratic_coef[:n_vis, n_vis:].t()
+            )
 
-        sub_linear = sub_quadratic_vh @ s_visible + self.linear_bias[n_vis:]
-        ising_mat = torch.zeros(
-            (sub_quadratic.size(0) + 1, sub_quadratic.size(0) + 1), device=self.device
-        )
-        ising_mat[:-1, :-1] = sub_quadratic / 4
-        ising_bias = sub_linear / 2 + np.sum(ising_mat, axis=0)[:-1]
-        ising_mat[:-1, -1] = ising_bias / 2
-        ising_mat[-1, :-1] = ising_bias / 2
-        return ising_mat.detach().cpu().numpy()
+            sub_linear = sub_quadratic_vh @ s_visible + self.linear_bias[n_vis:]
+            ising_mat = torch.zeros(
+                (sub_quadratic.size(0) + 1, sub_quadratic.size(0) + 1),
+                device=self.device,
+                dtype=sub_quadratic.dtype,
+            )
+            ising_mat[:-1, :-1] = sub_quadratic / 4
+            ising_bias = (
+                sub_linear / 2
+                + torch.diag(ising_mat)[:-1]
+                + torch.sum(ising_mat, dim=0)[:-1]
+            )
+            ising_mat[:-1, -1] = ising_bias / 2
+            ising_mat[-1, :-1] = ising_bias / 2
+            ising_mat.fill_diagonal_(0)
+            return ising_mat.detach().cpu().numpy()
 
     def gibbs_sample(
         self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None

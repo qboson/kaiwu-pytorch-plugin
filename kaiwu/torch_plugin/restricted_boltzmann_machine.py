@@ -87,11 +87,16 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def _to_ising_matrix(self):
         """将受限玻尔兹曼机转换为伊辛格式"""
         num_nodes = self.linear_bias.shape[-1]
-        ising_mat = np.zeros((num_nodes + 1, num_nodes + 1))
-        # 限制玻尔兹曼机：只有可见层和隐藏层之间有连接
-        ising_mat[: self.num_visible, self.num_visible : -1] = self.quadratic_coef / 4
-        ising_mat[self.num_visible : -1, : self.num_visible] = self.quadratic_coef.T / 4
-        ising_bias = self.linear_bias / 2 + np.sum(ising_mat, axis=0)[:-1]
-        ising_mat[:num_nodes, -1] = ising_bias / 2
-        ising_mat[-1, :num_nodes] = ising_bias / 2
-        return ising_mat.detach().cpu().numpy()
+        with torch.no_grad():
+            ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+            # 限制玻尔兹曼机：只有可见层和隐藏层之间有连接
+            ising_mat[: self.num_visible, self.num_visible : -1] = (
+                self.quadratic_coef / 4
+            )
+            ising_mat[self.num_visible : -1, : self.num_visible] = (
+                self.quadratic_coef.t() / 4
+            )
+            ising_bias = self.linear_bias / 2 + ising_mat.sum(dim=0)[:-1]
+            ising_mat[:num_nodes, -1] = ising_bias / 2
+            ising_mat[-1, :num_nodes] = ising_bias / 2
+            return ising_mat.detach().cpu().numpy()
