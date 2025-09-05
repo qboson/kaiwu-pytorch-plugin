@@ -94,7 +94,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 self.quadratic_coef / 4
             )
             ising_mat[self.num_visible : -1, : self.num_visible] = (
-                self.quadratic_coef.T / 4
+                self.quadratic_coef.t() / 4
             )
             ising_bias = self.linear_bias / 2 + ising_mat.sum(dim=0)[:-1]
             ising_mat[:num_nodes, -1] = ising_bias / 2

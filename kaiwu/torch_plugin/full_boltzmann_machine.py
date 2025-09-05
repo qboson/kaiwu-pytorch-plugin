@@ -99,6 +99,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             )
             ising_mat[:-1, -1] = ising_bias / 2
             ising_mat[-1, :-1] = ising_bias / 2
+            ising_mat.fill_diagonal_(0)
             return ising_mat.detach().cpu().numpy()
 
     def gibbs_sample(
