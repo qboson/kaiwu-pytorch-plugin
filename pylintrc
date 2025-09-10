@@ -7,4 +7,4 @@ max-branches=15
 
 [TYPECHECK]
 ignored-classes=torch.nn.parameter.Parameter
-disable=not-callable
+disable=not-callable,R0917

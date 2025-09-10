@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""quantum variational autoencoder QVAE模型"""
+
 import torch
 import numpy as np
 
@@ -8,7 +11,7 @@ from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 class QVAE(torch.nn.Module):
     """量子变分自编码器（QVAE）模型
 
-    Attributes:
+    Args:
         encoder: 编码器模块
         decoder: 解码器模块
         rbm (AbstractBoltzmannMachine): 玻尔兹曼机
@@ -27,6 +30,7 @@ class QVAE(torch.nn.Module):
         dist_beta,
         mean_x: float,
     ):
+        super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
@@ -38,20 +42,6 @@ class QVAE(torch.nn.Module):
             -np.log(1.0 / np.clip(mean_x, 0.001, 0.999) - 1.0).astype(np.float32)
         )
         self.is_training = True
-
-    def to(self, device):
-        """重写to方法，确保所有组件都移动到正确的设备上
-
-        Args:
-            device: 目标设备（如'cuda'或'cpu'）
-
-        Returns:
-            QVAE: 移动到目标设备的模型自身
-        """
-        super().to(device)
-        self.rbm.device = device
-        self.train_bias = self.train_bias.to(device)
-        return self
 
     def posterior(self, q_logits, beta):
         """计算后验分布及其重参数化采样
@@ -153,7 +143,7 @@ class QVAE(torch.nn.Module):
         output = torch.sigmoid(output_dist.logit_mu)
 
         # 计算KL
-        total_kl = self._kl_dist_from(posterior, zeta, self.is_training)
+        total_kl = self._kl_dist_from(posterior, zeta)
         total_kl = torch.mean(total_kl)
         # expected log prob p(x| z)
         cost = -output_dist.log_prob_per_var(x)  # [256, 784]

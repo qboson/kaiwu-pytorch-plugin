@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
+"""QVAE模型中使用的分布工具类"""
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 
@@ -133,34 +134,11 @@ class DistUtil:
         """
         raise NotImplementedError
 
-    def kl_dist_from(self, dist_util_obj, aux):
-        """KL 散度计算。
-
-        Args:
-            dist_util_obj (DistUtil): 另一个分布工具对象。
-            aux: 辅助参数。
-
-        Returns:
-            torch.Tensor: KL 散度。
-        """
-        raise NotImplementedError
-
     def entropy(self):
         """熵计算。
 
         Returns:
             torch.Tensor: 熵值。
-        """
-        raise NotImplementedError
-
-    def log_prob(self, samples):
-        """对数概率。
-
-        Args:
-            samples (torch.Tensor): 样本。
-
-        Returns:
-            torch.Tensor: 对数概率值。
         """
         raise NotImplementedError
 
@@ -184,12 +162,11 @@ class FactorialBernoulliUtil(DistUtil):
     用于处理二值随机变量的概率分布。
     """
 
-    def __init__(self, param, smoothing_dist_beta=None):
+    def __init__(self, param):
         """初始化阶乘伯努利分布。
 
         Args:
             param (torch.Tensor): 分布参数。
-            smoothing_dist_beta (float, optional): 平滑分布的 beta 参数。
         """
         super().__init__()
         self.logit_mu = param
@@ -210,12 +187,11 @@ class FactorialBernoulliUtil(DistUtil):
         """
         if is_training:
             raise NotImplementedError("伯努利分布的重参数化在训练时不可微分")
-        else:
-            device = self.logit_mu.device
-            q = torch.sigmoid(self.logit_mu)
-            rho = torch.rand_like(q, device=device)
-            z = (rho < q).float()
-            return z
+        device = self.logit_mu.device
+        q = torch.sigmoid(self.logit_mu)
+        rho = torch.rand_like(q, device=device)
+        z = (rho < q).float()
+        return z
 
     def entropy(self):
         """计算伯努利分布的熵。
@@ -316,19 +292,6 @@ class MixtureGeneric(FactorialBernoulliUtil):
         pdf_1 = self.smoothing_dist.pdf(1.0 - samples)
         log_prob = torch.log(q * pdf_1 + (1 - q) * pdf_0)
         return log_prob
-
-    def log_prob(self, samples: torch.Tensor) -> torch.Tensor:
-        """计算所有变量的对数概率之和。
-
-        Args:
-            samples (torch.Tensor): 样本矩阵，形状为 (num_samples, num_vars)。
-
-        Returns:
-            torch.Tensor: 每个样本的对数概率向量。
-        """
-        log_p = self.log_prob_per_var(samples)
-        log_p = torch.sum(log_p, dim=1)
-        return log_p
 
     def log_ratio(self, zeta: torch.Tensor) -> torch.Tensor:
         """计算 KL 梯度所需的 log_ratio（在 DVAE++ 中提出）。
