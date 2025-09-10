@@ -17,8 +17,7 @@ class QVAE(torch.nn.Module):
         rbm (AbstractBoltzmannMachine): 玻尔兹曼机
         sampler: 采样器
         dist_beta: 分布的beta参数
-        train_bias (torch.Tensor): 训练数据的偏置
-        is_training (bool): 是否处于训练模式
+        mean_x (torch.Tensor): 训练数据的偏置
     """
 
     def __init__(

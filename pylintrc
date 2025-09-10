@@ -1,10 +1,11 @@
 [MISCELLANEOUS]
 # 接受的最大参数数量
 max-args=15
+max-positional-arguments=15
 max-attributes=30
 max-locals=30
 max-branches=15
 
 [TYPECHECK]
 ignored-classes=torch.nn.parameter.Parameter
-disable=not-callable,R0917
+disable=not-callable
