@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """受限玻尔兹曼机"""
 import torch
-import numpy as np
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
