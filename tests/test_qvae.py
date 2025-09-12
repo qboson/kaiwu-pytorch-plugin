@@ -2,9 +2,12 @@ import unittest
 import torch
 import numpy as np
 
-from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin.qvae import QVAE
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../kaiwu")))
+from torch_plugin.qvae import QVAE
+from torch_plugin import RestrictedBoltzmannMachine
 
 
 class DummyEncoder(torch.nn.Module):
@@ -17,6 +20,12 @@ class DummyDecoder(torch.nn.Module):
         return torch.randn_like(z)
 
 
+class DummySampler:
+    def solve(self, ising_matrix):
+        num_solution = 10
+        return np.random.randint(0, 2, size=(num_solution, ising_matrix.shape[0]))
+
+
 class TestQVAE(unittest.TestCase):
     def setUp(self):
         self.num_var1 = 4
@@ -24,17 +33,18 @@ class TestQVAE(unittest.TestCase):
         self.encoder = DummyEncoder()
         self.decoder = DummyDecoder()
         self.rbm = RestrictedBoltzmannMachine(self.num_var1, self.num_var2)
-        self.sampler = SimulatedAnnealingOptimizer()
+        self.sampler = DummySampler()
         self.dist_beta = 1.0
         self.mean_x = np.ones(self.num_var1 + self.num_var2) * 0.5
 
         self.qvae = QVAE(
             encoder=self.encoder,
             decoder=self.decoder,
-            rbm=self.rbm,
+            bm=self.rbm,
             sampler=self.sampler,
             dist_beta=self.dist_beta,
             mean_x=self.mean_x,
+            num_vis=self.num_var1,
         )
         # 设置num_var1属性，供_cross_entropy使用
         self.qvae.num_var1 = self.num_var1

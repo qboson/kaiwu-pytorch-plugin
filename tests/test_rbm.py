@@ -2,10 +2,11 @@ import unittest
 
 import torch
 import numpy as np
+import sys
+import os
 
-from kaiwu.torch_plugin import (
-    RestrictedBoltzmannMachine as RBM,
-)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../kaiwu")))
+from torch_plugin import RestrictedBoltzmannMachine as RBM
 
 
 class TestRestrictedBoltzmannMachine(unittest.TestCase):
