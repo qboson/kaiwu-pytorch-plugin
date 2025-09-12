@@ -152,7 +152,7 @@ Demonstrates feature learning and classification on the Digits dataset using Res
 - **Feature Extraction & Classification**: After RBM training, use its hidden layer outputs as features for classification evaluation via logistic regression.  
 - **Visual Analysis**: Enable sample generation and weight visualization during training to monitor and assess model learning.  
 
-To run this example, execute `example/digits/rbm_digits.ipynb`.  
+To run this example, execute `example/rbm_digits/rbm_digits.ipynb`.  
 
 ---  
 
@@ -163,7 +163,7 @@ Demonstrates how to train and evaluate a Quantum Variational Autoencoder (Q-VAE)
 - **Training Process**: Design and execute the full training loop, tracking metrics (e.g., loss, ELBO, KL divergence) with support for checkpoint saving.  
 - **Visualization & Generation**: Provide comparative visualization of original, reconstructed, and generated images for intuitive model assessment.  
 
-To run this example, execute `example/qvae/train_qvae.ipynb`.  
+To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.  
 
 ---  
 
