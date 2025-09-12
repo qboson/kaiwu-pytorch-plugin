@@ -14,26 +14,28 @@ class QVAE(torch.nn.Module):
     Args:
         encoder: 编码器模块
         decoder: 解码器模块
-        rbm (AbstractBoltzmannMachine): 玻尔兹曼机
+        bm (AbstractBoltzmannMachine): 玻尔兹曼机
         sampler: 采样器
         dist_beta: 分布的beta参数
         mean_x (torch.Tensor): 训练数据的偏置
+        num_vis (int): 玻尔兹曼机可见层变量数量
     """
 
     def __init__(
         self,
         encoder,
         decoder,
-        rbm: AbstractBoltzmannMachine,
+        bm: AbstractBoltzmannMachine,
         sampler,
         dist_beta,
         mean_x: float,
+        num_vis: int,
     ):
         super().__init__()
         self.encoder = encoder
         self.decoder = decoder
 
-        self.rbm = rbm
+        self.bm = bm
         self.sampler = sampler
         self.dist_beta = dist_beta
         # 将train_bias转换为PyTorch张量
@@ -41,6 +43,7 @@ class QVAE(torch.nn.Module):
             -np.log(1.0 / np.clip(mean_x, 0.001, 0.999) - 1.0).astype(np.float32)
         )
         self.is_training = True
+        self.num_var1 = num_vis
 
     def posterior(self, q_logits, beta):
         """计算后验分布及其重参数化采样
@@ -69,6 +72,11 @@ class QVAE(torch.nn.Module):
             torch.Tensor: 每个ζ的交叉熵张量
         """
         # 分割logit_q为两部分
+        if self.bm.num_nodes != logit_q.shape[1]:
+            raise ValueError(
+                f"The number of variables in the Boltzmann machine {self.bm.num_nodes}"
+                f" does not match the shape of logit_q {logit_q.shape[1]}."
+            )
         logit_q1 = logit_q[:, : self.num_var1]
         logit_q2 = logit_q[:, self.num_var1 :]
 
@@ -80,13 +88,13 @@ class QVAE(torch.nn.Module):
 
         # 计算交叉熵
         cross_entropy = -torch.matmul(
-            torch.cat([q1, q2], dim=-1), self.rbm.linear_bias
+            torch.cat([q1, q2], dim=-1), self.bm.linear_bias
         ) + -torch.sum(
-            torch.matmul(q1_pert, self.rbm.quadratic_coef) * q2, dim=1, keepdim=True
+            torch.matmul(q1_pert, self.bm.quadratic_coef) * q2, dim=1, keepdim=True
         )
         cross_entropy = cross_entropy.squeeze(dim=1)
-        s_neg = self.rbm.sample(self.sampler)
-        cross_entropy = cross_entropy - self.rbm(s_neg).mean()
+        s_neg = self.bm.sample(self.sampler)
+        cross_entropy = cross_entropy - self.bm(s_neg).mean()
         return cross_entropy
 
     def _kl_dist_from(self, posterior, post_samples):
@@ -153,8 +161,8 @@ class QVAE(torch.nn.Module):
         neg_elbo = total_kl * kl_beta + cost  # 标量
 
         # weight decay loss
-        w_weight_decay = 0.01 * torch.sum(self.rbm.quadratic_coef**2)
-        b_weight_decay = 0.005 * torch.sum(self.rbm.linear_bias**2)
+        w_weight_decay = 0.01 * torch.sum(self.bm.quadratic_coef**2)
+        b_weight_decay = 0.005 * torch.sum(self.bm.linear_bias**2)
         wd_loss = w_weight_decay + b_weight_decay
 
         return output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta
@@ -173,9 +181,7 @@ class QVAE(torch.nn.Module):
                 zeta: 后验采样结果
         """
         q = self.encoder(x)
-
         posterior, zeta = self.posterior(q, self.dist_beta)
-
         recon_x = self.decoder(zeta)
 
         return recon_x, posterior, q, zeta
