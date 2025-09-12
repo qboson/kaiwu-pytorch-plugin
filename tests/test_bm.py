@@ -1,11 +1,11 @@
 import unittest
-
 import torch
-import numpy as np
 
-from kaiwu.torch_plugin import (
-    BoltzmannMachine as BM,
-)
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../kaiwu")))
+from torch_plugin import BoltzmannMachine as BM
 
 
 class TestBoltzmannMachine(unittest.TestCase):
