@@ -22,6 +22,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         super().__init__(h_range=h_range, j_range=j_range)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
+        self.num_nodes = num_visible + num_hidden
         self.quadratic_coef = torch.nn.Parameter(
             torch.randn((num_visible, num_hidden)) * 0.01
         )
