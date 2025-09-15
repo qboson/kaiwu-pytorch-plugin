@@ -39,8 +39,11 @@ class QVAE(torch.nn.Module):
         self.sampler = sampler
         self.dist_beta = dist_beta
         # 将train_bias转换为PyTorch张量
-        self.train_bias = torch.tensor(
-            -np.log(1.0 / np.clip(mean_x, 0.001, 0.999) - 1.0).astype(np.float32)
+        self.register_buffer(
+            "train_bias",
+            torch.tensor(
+                -np.log(1.0 / np.clip(mean_x, 0.001, 0.999) - 1.0).astype(np.float32)
+            ),
         )
         self.is_training = True
         self.num_var1 = num_vis

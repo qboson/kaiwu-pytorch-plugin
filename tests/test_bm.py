@@ -1,5 +1,6 @@
 import unittest
 import torch
+import numpy as np
 
 import sys
 import os
@@ -99,6 +100,48 @@ class TestBoltzmannMachine(unittest.TestCase):
                 test_input = self.ones.to(device)
                 energy = self.bm(test_input)
                 self.assertEqual(energy.device, device)
+
+    def test_gibbs_sample(self):
+        """测试gibbs_sample采样功能"""
+        with self.subTest("采样输出形状与类型"):
+            samples = self.bm.gibbs_sample(num_steps=10, s_visible=self.ones)
+            self.assertEqual(samples.shape, self.ones.shape)
+            self.assertTrue(torch.all((samples == 0) | (samples == 1)))
+            self.assertIsInstance(samples, torch.Tensor)
+
+        with self.subTest("采样无s_visible参数"):
+            samples = self.bm.gibbs_sample(num_steps=5, num_sample=2)
+            self.assertEqual(samples.shape, (2, self.num_nodes))
+
+        with self.subTest("采样异常情况"):
+            with self.assertRaises(ValueError):
+                self.bm.gibbs_sample(num_steps=5)
+
+    def test_hidden_to_ising_matrix(self):
+        """测试_hidden_to_ising_matrix功能"""
+        with self.subTest("输出形状与类型"):
+            # 取前2个节点为可见层
+            s_visible = torch.ones(1, 2)
+            ising_submat = self.bm._hidden_to_ising_matrix(s_visible[0])
+            # 隐含层数量为2，输出应为(3, 3)
+            self.assertEqual(ising_submat.shape, (3, 3))
+            self.assertIsInstance(ising_submat, np.ndarray)
+
+    def test_condition_sample(self):
+        """测试condition_sample功能"""
+
+        class DummySampler:
+            def solve(self, ising_mat):
+                # 返回一个 shape (2, n) 的全1矩阵，模拟采样器
+                return np.ones((2, ising_mat.shape[0]))
+
+        with self.subTest("采样输出形状与类型"):
+            sampler = DummySampler()
+            s_visible = torch.ones(1, 2)
+            result = self.bm.condition_sample(sampler, s_visible)
+            # 采样器返回2个样本，每个样本长度为可见层+隐含层
+            self.assertEqual(result.shape, (2, self.num_nodes))
+            self.assertIsInstance(result, torch.Tensor)
 
 
 if __name__ == "__main__":

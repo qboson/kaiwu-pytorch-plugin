@@ -6,12 +6,13 @@
 - 可视化分析：支持训练过程中的样本生成与权重可视化功能，便于观察和判断模型学习效果。
 
 **安装要求**
-
+```
 scikit-learn
 matplotlib
 scipy
+```
 
-运行该实例可以运行`example/digits/rbm_digits.ipynb`
+运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
 
 ### 生成任务：Q-VAE的MNIST图像生成
 展示如何在MNIST手写数字数据集上训练和评估量子变分自编码器（Q-VAE）模型。该示例适用于希望理解Q-VAE模型训练、生成与评估流程的使用者，可作为生成模型后续研究的基础。主要内容包括：
@@ -20,9 +21,10 @@ scipy
 - 训练过程：设计和实现完整的训练循环，记录损失、证据下界（ELBO）、KL散度等指标，同时支持模型断点保存；
 - 可视化与生成：提供原始图像、重构图像和生成图像的可视化对比方法，便于直观评估模型效果。
 
-运行该实例可以运行`example/qvae/train_qvae.ipynb`
+运行该实例可以运行`example/qvae_mnist/train_qvae.ipynb`
 
 **安装要求**
-
+```
 torchvision==0.22.0
 torchmetrics[image]
+```
