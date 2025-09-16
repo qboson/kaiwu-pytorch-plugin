@@ -18,6 +18,7 @@ from sklearn.metrics import confusion_matrix
 
 import torch
 from torch.optim import SGD
+from torch.utils.data import DataLoader, TensorDataset
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 
@@ -32,49 +33,46 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         n_components (int): 隐层单元的数量。
         learning_rate (float): 学习率。
         batch_size (int): 批处理大小。
-        n_iter (int): 迭代次数。
+        n_epochs (int): 迭代次数。
         verbose (int): 是否打印训练过程中的信息。
         random_state (int, optional): 随机种子，用于结果的可重复性。
     """
 
     def __init__(
         self,
+        n_visible=64,
         n_components=256,
         *,
         learning_rate=0.1,
         batch_size=100,
-        n_iter=30,
+        n_epochs=30,
         verbose=False,
+        shuffle=True,
+        drop_last=False,
         plot_img=False,
         random_state=None,
     ):
+        self.n_visible = n_visible
         self.n_components = n_components
         self.learning_rate = learning_rate
         self.batch_size = batch_size
-        self.n_iter = n_iter
+        self.n_epochs = n_epochs
         self.verbose = verbose
+        self.shuffle = shuffle
+        self.drop_last = drop_last
         self.plot_img = plot_img
         self.random_state = random_state
 
         self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.rbm = None  # 用于存储训练好的RBM模型
-
-    def gen_digits_image(self, X, size=8):
-        """
-        生成图片
-        Args:
-            X: 形状为 (20, size * size) 的数组
-        Returns：
-            拼接后的大图像，形状为 (8, 20 * size)
-        """
-
-        plt.rcParams["image.cmap"] = "gray"
-        # 先将每个数字的特征向量还原为8x8图像
-        digits = X.reshape(20, size, size)  # 形状：(20, 8, 8)
-        # 将20个8x8的图片横向拼接
-        image = np.hstack(digits)  # 形状：(8, 160)
-        return image
+        # 用于存储RBM模型
+        self.rbm = RestrictedBoltzmannMachine(
+            n_visible, 
+            n_components,
+            h_range=[-1, 1],
+            j_range=[-1, 1]
+            ).to(self.device) # 将模型移动到指定设备（CPU/GPU）
+        self.optimizer = SGD(self.rbm.parameters(), lr=self.learning_rate)
 
     def fit(self, X, y=None):  # 修改接口以符合scikit-learn约定
         """
@@ -83,80 +81,103 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             X: 训练数据，形状为 (n_samples, n_features)
             y: 忽略，为兼容scikit-learn接口
         """
-        # 初始化受限玻尔兹曼机（RBM）模型
-        rbm = RestrictedBoltzmannMachine(
-            X.shape[1],  # 可见层单元数（特征维度）
-            self.n_components,  # 隐层单元数
-            h_range=[-1, 1],  # 隐层偏置范围
-            j_range=[-1, 1],  # 权重范围
-        )
-        rbm.to(self.device)  # 将模型移动到指定设备（CPU/GPU）
-        self.rbm = rbm
+        # 设置随机种子
+        if self.random_state is not None:
+            torch.manual_seed(self.random_state)
+            np.random.seed(self.random_state)
+            # 如果使用CUDA，还需要设置CUDA随机种子
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed(self.random_state)
+                torch.cuda.manual_seed_all(self.random_state)
 
-        # 初始化优化器
-        opt_rbm = SGD(rbm.parameters(), lr=self.learning_rate)
-
-        n_samples = X.shape[0]  # 样本数量
-        n_batches = int(np.ceil(float(n_samples) / self.batch_size))  # 批次数量
-        # 生成每个batch的切片索引
-        batch_slices = list(
-            gen_even_slices(n_batches * self.batch_size, n_batches, n_samples=n_samples)
-        )
         X_torch = torch.FloatTensor(X).to(self.device)  # 转为torch张量并移动到设备
-        idx = 0
 
+        dataset = TensorDataset(X_torch)
+        loader = DataLoader(
+            dataset,
+            batch_size=self.batch_size,
+            shuffle=self.shuffle,
+            drop_last=self.drop_last,
+        )
+
+        print("[RBM] Pre-training start:")
         # 训练循环
-        for iteration in range(1, self.n_iter + 1):
-            for batch_slice in batch_slices:
-                idx += 1
-                x = X_torch[batch_slice]  # 获取当前batch数据
+        for epoch in range(self.n_epochs):
+            total_objective = 0.0  # 当前epoch的总目标值
+            for idx, (batch_x,) in enumerate(loader): # # 获取batch数据, batch_x: size=[batch, n_visible]
 
-                x = rbm.get_hidden(x)  # 正相（计算隐层激活）
-                s = rbm.sample(self.sampler)  # 负相（采样重构数据）
-                opt_rbm.zero_grad()  # 梯度清零
+                x = self.rbm.get_hidden(batch_x)  # 正相（计算隐层激活）, size=[batch, n_hidden]
+                s = self.rbm.sample(self.sampler)  # 负相（采样重构数据）, size=[[batch, n_visible + n_hidden]
+                self.optimizer.zero_grad()  # 梯度清零
 
                 # 计算目标函数（等价于负对数似然），并加权衰减项
-                w_weight_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)  # 权重衰减
-                b_weight_decay = 0.05 * torch.sum(rbm.linear_bias**2)  # 偏置衰减
-                objective = rbm.objective(x, s) + w_weight_decay + b_weight_decay
+                w_weight_decay = 0.02 * torch.sum(self.rbm.quadratic_coef**2)  # 权重衰减
+                b_weight_decay = 0.05 * torch.sum(self.rbm.linear_bias**2)  # 偏置衰减
+                objective = self.rbm.objective(x, s) + w_weight_decay + b_weight_decay
 
                 # 反向传播并更新参数
                 objective.backward()
-                opt_rbm.step()
+                self.optimizer.step()
+
+                # 累加目标值
+                total_objective += objective.item()
+
+                 # 计算当前epoch的平均目标值
+                avg_objective = total_objective / len(loader)
                 
                 # 如果verbose，定期评估模型性能和可视化参数
                 if self.verbose:
-                    print(f"Iteration {idx}, Objective: {objective.item():.6f}")
+                    print(f"Iteration {idx+1}, Average Objective: {avg_objective:.6f}")
                     
-                    if (idx - 1) % 20 == 0:
+                    if idx % 20 == 0:
                         # 打印权重和偏置的均值与最大值
                         print(
-                            f"jmean {torch.abs(rbm.quadratic_coef).mean()}"
-                            f" jmax {torch.abs(rbm.quadratic_coef).max()}"
+                            f"jmean {torch.abs(self.rbm.quadratic_coef).mean()}"
+                            f" jmax {torch.abs(self.rbm.quadratic_coef).max()}"
                         )
                         print(
-                            f"hmean {torch.abs(rbm.linear_bias).mean()}"
-                            f" hmax {torch.abs(rbm.linear_bias).max()}"
+                            f"hmean {torch.abs(self.rbm.linear_bias).mean()}"
+                            f" hmax {torch.abs(self.rbm.linear_bias).max()}"
                         )
         
                         if self.plot_img:
                             display_samples = (
-                                rbm.sample(self.sampler)
+                                self.rbm.sample(self.sampler)
                                 .cpu()
-                                .numpy()[:20, : rbm.num_visible]
+                                .numpy()[:20, : self.rbm.num_visible]
                             )
                             # 生成样本
                             plt.figure(figsize=(16, 2))
                             plt.imshow(self.gen_digits_image(display_samples, 8))
-                            plt.title(f"Generated samples at iteration {iteration}")
+                            plt.title(f"Generated samples at epoch {epoch+1}, batch {idx+1}")
                             plt.show()
                             _, axes = plt.subplots(1, 2)
-                            axes[0].imshow(rbm.quadratic_coef.detach().cpu().numpy())
-                            axes[1].imshow(rbm.quadratic_coef.grad.detach().cpu().numpy())
+                            axes[0].imshow(self.rbm.quadratic_coef.detach().cpu().numpy())
+                            axes[1].imshow(self.rbm.quadratic_coef.grad.detach().cpu().numpy())
                             plt.tight_layout()
                             plt.show()
         
-        return self 
+            print(f"[RBM] Epoch {epoch+1}/{self.n_epochs} \tAverage Objective: {avg_objective:.6f}\n")
+        print("[RBM] Pre-training finished")
+        
+        return self
+
+    # 在RBMRunner类中添加特征提取方法
+    def transform(self, X):
+        """
+        提取隐藏层特征
+        Args:
+            X: 输入数据，形状为 (n_samples, n_features)
+        Returns:
+            隐藏层特征，形状为 (n_samples, n_components)
+        """
+        if self.rbm is None:
+            raise ValueError("RBM model not trained yet. Call fit first.")
+        X_torch = torch.FloatTensor(X).to(self.device)
+        with torch.no_grad():
+            hidden_output = self.rbm.get_hidden(X_torch)
+            features = hidden_output[:, self.rbm.num_visible:]
+        return features.cpu().numpy()
 
     def translate_image(self, image, direction):
         "图片转换"
@@ -218,22 +239,21 @@ class RBMRunner(TransformerMixin, BaseEstimator):
 
         return X_train, X_test, y_train, y_test
 
-    # 在RBMRunner类中添加特征提取方法
-    def transform(self, X):
+    def gen_digits_image(self, X, size=8):
         """
-        提取隐藏层特征
+        生成图片
         Args:
-            X: 输入数据，形状为 (n_samples, n_features)
-        Returns:
-            隐藏层特征，形状为 (n_samples, n_components)
+            X: 形状为 (20, size * size) 的数组
+        Returns：
+            拼接后的大图像，形状为 (8, 20 * size)
         """
-        if self.rbm is None:
-            raise ValueError("RBM model not trained yet. Call fit first.")
-        X_torch = torch.FloatTensor(X).to(self.device)
-        with torch.no_grad():
-            hidden_output = self.rbm.get_hidden(X_torch)
-            features = hidden_output[:, self.rbm.num_visible:]
-        return features.cpu().numpy()
+
+        plt.rcParams["image.cmap"] = "gray"
+        # 先将每个数字的特征向量还原为8x8图像
+        digits = X.reshape(20, size, size)  # 形状：(20, 8, 8)
+        # 将20个8x8的图片横向拼接
+        image = np.hstack(digits)  # 形状：(8, 160)
+        return image
 
     # 绘制原始和重构图像
     def plot_images(self, images, labels, title='Reconstructed Images', save_as="qbm_reconstructed_images", save_pdf=False):
