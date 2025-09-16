@@ -91,6 +91,33 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertEqual(1, self.bm.objective(s1, s2).item())
         self.assertEqual(1, self.bm.objective(s1, s3))
 
+    def test_get_hidden(self):
+        # 输入可见层，输出应为(batch_size, num_visible + num_hidden)
+        s_visible = torch.rand(5, self.num_visible)
+        s_all = self.bm.get_hidden(s_visible)
+        self.assertEqual(s_all.shape, (5, self.num_visible + self.num_hidden))
+        # 检查隐藏层概率范围
+        hidden_probs = s_all[:, self.num_visible :]
+        self.assertTrue(torch.all((hidden_probs >= 0) & (hidden_probs <= 1)))
+
+        # 测试requires_grad=True
+        s_visible_grad = torch.rand(2, self.num_visible, requires_grad=True)
+        s_all_grad = self.bm.get_hidden(s_visible_grad, requires_grad=True)
+        self.assertTrue(s_all_grad.requires_grad)
+
+    def test_get_visible(self):
+        # 输入隐藏层，输出应为(batch_size, num_visible + num_hidden)
+        s_hidden = torch.rand(6, self.num_hidden)
+        s_all = self.bm.get_visible(s_hidden)
+        self.assertEqual(s_all.shape, (6, self.num_visible + self.num_hidden))
+        # 检查可见层概率范围
+        visible_probs = s_all[:, : self.num_visible]
+        self.assertTrue(torch.all((visible_probs >= 0) & (visible_probs <= 1)))
+        # 输出不应允许梯度
+        s_hidden_grad = torch.rand(3, self.num_hidden, requires_grad=True)
+        s_all_nograd = self.bm.get_visible(s_hidden_grad)
+        self.assertFalse(s_all_nograd.requires_grad)
+
 
 if __name__ == "__main__":
     unittest.main()
