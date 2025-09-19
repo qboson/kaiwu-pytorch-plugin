@@ -162,6 +162,9 @@ if __name__ == "__main__":
 运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
 
 ### 生成任务：Q-VAE的MNIST图像生成
+
+<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/602802d9-0d5f-4304-a151-5b921b10ba4a" />
+
 展示如何在MNIST手写数字数据集上训练和评估量子变分自编码器（Q-VAE）模型。该示例适用于希望理解Q-VAE模型训练、生成与评估流程的使用者，可作为生成模型后续研究的基础。主要内容包括：
 - 数据加载与预处理：通过自定义数据集类实现支持批次索引，并结合ToTensor转换和展平操作；
 - 模型构建：构建Q-VAE模型架构，包括编码器、解码器模块及RBM隐变量建模过程；
