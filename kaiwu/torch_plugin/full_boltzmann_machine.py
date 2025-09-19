@@ -26,6 +26,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         )
         self.linear_bias = torch.nn.Parameter(torch.zeros(self.num_nodes))
 
+    def hidden_bias(self, num_hidden: int) -> torch.Tensor:
+        num_visible = self.num_nodes - num_hidden
+        return self.linear_bias[num_visible:]
+
+    def visible_bias(self, num_visible) -> torch.Tensor:
+        return self.linear_bias[:num_visible]
+
     def clip_parameters(self) -> None:
         """原地裁剪线性和二次偏置权重。"""
         self.get_parameter("linear_bias").data.clamp_(*self.h_range)
