@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
-"""受限玻尔兹曼机"""
+"""Restricted Boltzmann Machine"""
 import torch
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
 class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
-    """创建限制玻尔兹曼机。
+    """Create a Restricted Boltzmann Machine.
 
     Args:
-        num_visible (int): 模型中的可见节点
-        num_hidden (int): 模型中的隐藏节点
-        h_range (tuple[float, float], optional): 线性权重的范围。
-            如果为``None``，使用无限范围。
-        j_range (tuple[float, float], optional): 二次权重的范围。
-            如果为``None``，使用无限范围。
-        device (torch.device, optional): 构造张量的设备。
-        如果为``None``，使用CPU。
+        num_visible (int): Number of visible nodes in the model.
+        num_hidden (int): Number of hidden nodes in the model.
+        h_range (tuple[float, float], optional): Range for linear weights.
+            If ``None``, an infinite range is used.
+        j_range (tuple[float, float], optional): Range for quadratic weights.
+            If ``None``, an infinite range is used.
+        device (torch.device, optional): Device to construct tensors.
     """
 
-    def __init__(self, num_visible: int, num_hidden: int, h_range=None, j_range=None):
+    def __init__(self, num_visible, num_hidden, h_range=None, j_range=None):
         super().__init__(h_range=h_range, j_range=j_range)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
@@ -28,24 +27,29 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         )
         self.linear_bias = torch.nn.Parameter(torch.zeros(num_hidden + num_visible))
 
+    @property
     def hidden_bias(self) -> torch.Tensor:
+        """Return the hidden bias."""
         return self.linear_bias[self.num_visible :]
 
+    @property
     def visible_bias(self) -> torch.Tensor:
+        """Return the visible bias."""
         return self.linear_bias[: self.num_visible]
 
     def clip_parameters(self) -> None:
-        """原地裁剪线性和二次偏置权重。"""
+        """Clip the linear and quadratic bias weights in place."""
         self.get_parameter("linear_bias").data.clamp_(*self.h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*self.j_range)
 
     def get_hidden(
         self, s_visible: torch.Tensor, requires_grad: bool = False
     ) -> torch.Tensor:
-        """将隐藏自旋传播到观测层。
+        """Propagate hidden spins to the visible layer.
+
         Args:
-            s_visible: 可见层张量
-            requires_grad: 是否允许梯度反向传播
+            s_visible: Visible layer tensor.
+            requires_grad: Whether to allow gradient backpropagation.
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
@@ -62,7 +66,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             return s_all
 
     def get_visible(self, s_hidden: torch.Tensor) -> torch.Tensor:
-        """将观测自旋传播到隐藏层。"""
+        """Propagate visible spins to the hidden layer."""
         with torch.no_grad():
             s_all = torch.zeros(
                 s_hidden.size(0), self.num_hidden + self.num_visible
@@ -76,14 +80,14 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             return s_all
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
-        """计算哈密顿量。
+        """Compute the Hamiltonian.
 
         Args:
-            s_all (torch.tensor): 形状为(B, N)的张量，其中B表示批大小，
-                N表示模型中的变量数。
+            s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,
+                and N is the number of variables in the model.
 
         Returns:
-            torch.tensor: 形状为(B,)的哈密顿量。
+            torch.tensor: Hamiltonian of shape (B,).
         """
         tmp = s_all[:, : self.num_visible].matmul(self.quadratic_coef)
         return s_all @ self.linear_bias + torch.sum(
@@ -91,11 +95,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         )
 
     def _to_ising_matrix(self):
-        """将受限玻尔兹曼机转换为伊辛格式"""
+        """Convert the Restricted Boltzmann Machine to Ising format."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
             ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
-            # 限制玻尔兹曼机：只有可见层和隐藏层之间有连接
+            # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
                 self.quadratic_coef / 4
             )
