@@ -1,38 +1,53 @@
-### BoltzmannMachine 与 RestrictedBoltzmannMachine 示例
+**Language Versions**: [中文](example/README_ZH.md) | [English](example/README.md)
 
-- `run_bm.py`：演示如何使用 `BoltzmannMachine` 类进行模型实例化、采样、目标函数计算及参数优化。适合了解玻尔兹曼机的基本训练流程，包括采样与梯度反向传播。
-- `run_rbm.py`：演示如何使用 `RestrictedBoltzmannMachine` 类进行受限玻尔兹曼机的训练，包括隐层特征提取、采样、目标函数计算及参数优化。适合理解受限玻尔兹曼机的典型应用流程。
+### Examples of BoltzmannMachine and RestrictedBoltzmannMachine
 
-两个脚本均展示了模型初始化、采样、目标函数计算、反向传播和参数更新的完整步骤，可作为快速上手玻尔兹曼机相关模型的参考。
+* `run_bm.py`: Demonstrates how to use the `BoltzmannMachine` class for model instantiation, sampling, objective function calculation, and parameter optimization. This is suitable for understanding the basic training workflow of a Boltzmann Machine, including sampling and gradient backpropagation.
+* `run_rbm.py`: Demonstrates how to use the `RestrictedBoltzmannMachine` class for training, including hidden feature extraction, sampling, objective function calculation, and parameter optimization. This is suitable for understanding the typical application workflow of Restricted Boltzmann Machines.
 
+Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, backpropagation, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
-### 分类任务：手写数字识别
-展示利用受限玻尔兹曼机对手写数字数据集（Digits）进行特征学习与分类任务。该示例适用于初学者理解受限玻尔兹曼机在图像特征提取及分类场景中的应用流程，可作为后续进阶实验与功能扩展的基础。主要内容包括：
-- 数据扩增与预处理：针对原始 8x8 像素的手写数字图像，通过上下左右平移操作扩展数据集，并使用 MinMaxScaler 进行归一化特征处理；
-- RBM模型训练：实现 RBMRunner 类，对 RBM 的训练流程进行封装，训练过程中支持可视化生成样本与权重矩阵；
-- 特征提取与分类：RBM训练完成后，利用其隐层输出的特征表示，通过逻辑回归进行分类评估；
-- 可视化分析：支持训练过程中的样本生成与权重可视化功能，便于观察和判断模型学习效果。
+---
 
-**安装要求**
+### Classification Task: Handwritten Digit Recognition
+
+This example demonstrates how to use a Restricted Boltzmann Machine (RBM) for feature learning and classification on the handwritten digits dataset (Digits). It is intended for beginners to understand the application workflow of RBMs in image feature extraction and classification, and can serve as a foundation for more advanced experiments and extensions. The main contents include:
+
+* **Data augmentation and preprocessing**: Expanding the dataset of original 8x8 handwritten digit images by shifting them up, down, left, and right, followed by feature normalization using MinMaxScaler;
+* **RBM model training**: Implementing the `RBMRunner` class to encapsulate the RBM training process, with support for visualizing generated samples and weight matrices during training;
+* **Feature extraction and classification**: After training, using the hidden-layer representations from the RBM as features for classification with logistic regression;
+* **Visualization and analysis**: Supporting sample generation and weight visualization during training to help observe and evaluate the learning effects of the model.
+
+**Dependencies**
+
 ```
 scikit-learn
 matplotlib
 scipy
 ```
 
-运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
+Run the example via `example/rbm_digits/rbm_digits.ipynb`.
 
-### 生成任务：Q-VAE的MNIST图像生成
-展示如何在MNIST手写数字数据集上训练和评估量子变分自编码器（Q-VAE）模型。该示例适用于希望理解Q-VAE模型训练、生成与评估流程的使用者，可作为生成模型后续研究的基础。主要内容包括：
-- 数据加载与预处理：通过自定义数据集类实现支持批次索引，并结合ToTensor转换和展平操作；
-- 模型构建：构建Q-VAE模型架构，包括编码器、解码器模块及RBM隐变量建模过程；
-- 训练过程：设计和实现完整的训练循环，记录损失、证据下界（ELBO）、KL散度等指标，同时支持模型断点保存；
-- 可视化与生成：提供原始图像、重构图像和生成图像的可视化对比方法，便于直观评估模型效果。
+---
 
-运行该实例可以运行`example/qvae_mnist/train_qvae.ipynb`
+### Generation Task: Q-VAE for MNIST Image Generation
 
-**安装要求**
+This example demonstrates how to train and evaluate a Quantum Variational Autoencoder (Q-VAE) model on the MNIST handwritten digit dataset. It is intended for those who wish to understand the training, generation, and evaluation workflow of Q-VAE models, and can serve as a foundation for further research on generative models. The main contents include:
+
+* **Data loading and preprocessing**: Implementing a custom dataset class that supports batch indexing, combined with `ToTensor` transformation and flattening operations;
+* **Model construction**: Building the Q-VAE architecture, including encoder and decoder modules, as well as RBM-based latent variable modeling;
+* **Training process**: Designing and implementing a full training loop with tracking of loss, Evidence Lower Bound (ELBO), KL divergence, and other metrics, along with checkpoint saving;
+* **Visualization and generation**: Providing side-by-side visualization of original, reconstructed, and generated images for intuitive model evaluation.
+
+Run the example via `example/qvae_mnist/train_qvae.ipynb`.
+
+**Dependencies**
+
 ```
 torchvision==0.22.0
 torchmetrics[image]
 ```
+
+---
+
+要不要我帮你整理成一个 **README.md** 模板（中英文对照），这样直接放到项目里就可以用了？
