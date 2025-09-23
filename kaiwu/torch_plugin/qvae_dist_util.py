@@ -174,7 +174,8 @@ class FactorialBernoulliUtil(DistUtil):
     def reparameterize(self, is_training: bool) -> torch.Tensor:
         """Sample from Bernoulli distribution.
 
-        Only used in test mode, as reparameterization of Bernoulli distribution is not differentiable during training.
+        Only used in test mode, as reparameterization of Bernoulli distribution
+        is not differentiable during training.
 
         Args:
             is_training (bool): Whether in training mode.
@@ -223,7 +224,8 @@ class FactorialBernoulliUtil(DistUtil):
 class MixtureGeneric(FactorialBernoulliUtil):
     """Mixture distribution class.
 
-    Creates a mixture of two overlapping distributions by setting the logits of the factorial Bernoulli distribution defined on the z component.
+    Creates a mixture of two overlapping distributions by setting the logits of
+    the factorial Bernoulli distribution defined on the z component.
     Can work with any smoothing distribution inheriting from SmoothingDist.
     """
 
@@ -244,7 +246,8 @@ class MixtureGeneric(FactorialBernoulliUtil):
 
         Uses the implicit gradient idea to compute the gradient of samples with respect to logit_q.
         This idea is proposed in DVAE# sec 3.4.
-        This function does not implement gradients of samples with respect to beta or other parameters of the smoothing transformation.
+        This function does not implement gradients of samples with respect to beta or other
+        parameters of the smoothing transformation.
 
         Args:
             is_training (bool): Whether in training mode.

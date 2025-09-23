@@ -27,10 +27,19 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         self.linear_bias = torch.nn.Parameter(torch.zeros(self.num_nodes))
 
     def hidden_bias(self, num_hidden: int) -> torch.Tensor:
+        """Get the hidden bias.
+
+        Args:
+            num_hidden (int): Number of hidden nodes.
+        """
         num_visible = self.num_nodes - num_hidden
         return self.linear_bias[num_visible:]
 
     def visible_bias(self, num_visible) -> torch.Tensor:
+        """Get the visible bias.
+        Args:
+            num_visible (int): Number of visible nodes.
+        """
         return self.linear_bias[:num_visible]
 
     def clip_parameters(self) -> None:
@@ -124,7 +133,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 If ``None``, uses batch size of s_visible.
         """
         with torch.no_grad():
-            # Initialization: If neither visible unit state nor sample number is provided, raise error
+            # Initialization: If neither visible unit state nor sample number is provided,
+            # raise error
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
             # If sample number is not specified, use batch size of visible units

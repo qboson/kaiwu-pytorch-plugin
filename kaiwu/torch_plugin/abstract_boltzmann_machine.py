@@ -84,11 +84,14 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         s_positive: torch.Tensor,
         s_negtive: torch.Tensor,
     ) -> torch.Tensor:
-        """Objective function whose gradient is equivalent to the gradient of negative log-likelihood.
+        """Objective function whose gradient is equivalent to the gradient of
+        negative log-likelihood.
 
         Args:
-            s_positive (torch.Tensor): Tensor of observed spins (data), shape (b1, N), where b1 is batch size and N is the number of variables.
-            s_negtive (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N), where b2 is batch size and N is the number of variables.
+            s_positive (torch.Tensor): Tensor of observed spins (data), shape (b1, N),
+                            where b1 is batch size and N is the number of variables.
+            s_negtive (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N),
+                            where b2 is batch size and N is the number of variables.
 
         Returns:
             torch.Tensor: Scalar difference between data and model average energy.
@@ -100,7 +103,8 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Samples from the Boltzmann Machine.
 
         Args:
-            sampler: Optimizer used for sampling from the model. The sampler can be kaiwuSDK's CIM or other solvers.
+            sampler: Optimizer used for sampling from the model. The sampler
+            can be kaiwuSDK's CIM or other solvers.
 
         Returns:
             torch.Tensor: Spins sampled from the model.
