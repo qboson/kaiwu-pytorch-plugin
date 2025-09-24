@@ -154,6 +154,8 @@ Demonstrates feature learning and classification on the Digits dataset using Res
 
 To run this example, execute `example/rbm_digits/rbm_digits.ipynb`.  
 
+![](imgs/qvae.png)
+
 ---  
 
 ### Generation Task: Q-VAE for MNIST Image Generation  

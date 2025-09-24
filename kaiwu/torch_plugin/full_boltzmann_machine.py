@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-"""玻尔兹曼机"""
+"""Boltzmann Machine"""
 import torch
 import numpy as np
 from .restricted_boltzmann_machine import AbstractBoltzmannMachine
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
-    """创建玻尔兹曼机。
+    """Boltzmann Machine.
 
     Args:
-        num_nodes (int): 模型中的节点总数
-        h_range (tuple[float, float], optional): 线性权重的范围。
-            如果为``None``，使用无限范围。
-        j_range (tuple[float, float], optional): 二次权重的范围。
-            如果为``None``，使用无限范围。
-        device (torch.device, optional): 构造张量的设备。
-        如果为``None``，使用CPU。
+        num_nodes (int): Total number of nodes in the model.
+        h_range (tuple[float, float], optional): Range for linear weights.
+            If ``None``, uses infinite range.
+        j_range (tuple[float, float], optional): Range for quadratic weights.
+            If ``None``, uses infinite range.
+        device (torch.device, optional): Device for tensor construction.
+            If ``None``, uses CPU.
     """
 
     def __init__(self, num_nodes: int, h_range=None, j_range=None):
@@ -26,56 +26,74 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         )
         self.linear_bias = torch.nn.Parameter(torch.zeros(self.num_nodes))
 
+    def hidden_bias(self, num_hidden: int) -> torch.Tensor:
+        """Get the hidden bias.
+
+        Args:
+            num_hidden (int): Number of hidden nodes.
+        """
+        num_visible = self.num_nodes - num_hidden
+        return self.linear_bias[num_visible:]
+
+    def visible_bias(self, num_visible) -> torch.Tensor:
+        """Get the visible bias.
+        Args:
+            num_visible (int): Number of visible nodes.
+        """
+        return self.linear_bias[:num_visible]
+
     def clip_parameters(self) -> None:
-        """原地裁剪线性和二次偏置权重。"""
+        """Clip linear and quadratic bias weights in-place."""
         self.get_parameter("linear_bias").data.clamp_(*self.h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*self.j_range)
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
-        """计算哈密顿量。
+        """Compute the Hamiltonian.
 
         Args:
-            s_all (torch.tensor): 形状为(B, N)的张量，其中B表示批大小，
-                N表示模型中的变量数。
+            s_all (torch.tensor): Tensor of shape (B, N), where B is batch size,
+                N is the number of variables in the model.
 
         Returns:
-            torch.tensor: 形状为(B,)的哈密顿量。
+            torch.tensor: Hamiltonian of shape (B,).
         """
         tmp = s_all.matmul(self.quadratic_coef)
         return s_all @ self.linear_bias + torch.sum(tmp * s_all, dim=-1)
 
     def _to_ising_matrix(self):
-        """将玻尔兹曼机转换为伊辛矩阵"""
+        """Convert Boltzmann Machine to Ising matrix."""
         with torch.no_grad():
             linear_bias = self.linear_bias.detach()
             quadratic_coef = self.quadratic_coef.detach()
             num_nodes = self.linear_bias.shape[-1]
-            # 使用torch进行所有计算
+            # Use torch for all calculations
             ising_mat = torch.zeros(
                 (num_nodes + 1, num_nodes + 1),
                 device=self.device,
                 dtype=linear_bias.dtype,
             )
 
-            # 填充quadratic部分
+            # Fill quadratic part
             ising_mat[:-1, :-1] = quadratic_coef / 4
-            # 计算ising_bias
+            # Calculate ising_bias
             diag_elements = torch.diag(ising_mat)[:-1]
             column_sums = torch.sum(ising_mat, dim=0)[:-1]
             ising_bias = linear_bias / 2 + diag_elements + column_sums
-            # 填充bias部分
+            # Fill bias part
             ising_mat[:num_nodes, -1] = ising_bias / 2
             ising_mat[-1, :num_nodes] = ising_bias / 2
-            # 对角线置零
+            # Set diagonal to zero
             ising_mat.fill_diagonal_(0)
             return ising_mat.cpu().numpy()
 
     def _hidden_to_ising_matrix(self, s_visible: torch.Tensor) -> np.ndarray:
-        """给定可见节点的情况，将模型转换为伊辛格式的子矩阵。
+        """Given visible nodes, convert the model to a submatrix in Ising format.
+
         Args:
-            s_visible (torch.Tensor): 可见层的状态，形状为(B, num_visible)。
+            s_visible (torch.Tensor): State of the visible layer, shape (B, num_visible).
+
         Returns:
-            np.ndarray: 伊辛格式的子矩阵。
+            np.ndarray: Submatrix in Ising format.
         """
         with torch.no_grad():
             n_vis = s_visible.shape[-1]
@@ -105,66 +123,68 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
     def gibbs_sample(
         self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
     ) -> torch.Tensor:
-        """从玻尔兹曼机中采样。
+        """Sample from the Boltzmann Machine.
+
         Args:
-            num_steps (int): Gibbs采样的步数。
-            s_visible (torch.Tensor, optional): 可见层的状态，
-                形状为(B, num_visible)。如果为``None``，则随机初始化可见层。
-            num_sample (int, optional): 采样的数量。
-                如果为``None``，则使用s_visible的批大小。
+            num_steps (int): Number of Gibbs sampling steps.
+            s_visible (torch.Tensor, optional): State of the visible layer,
+                shape (B, num_visible). If ``None``, randomly initialize visible layer.
+            num_sample (int, optional): Number of samples.
+                If ``None``, uses batch size of s_visible.
         """
         with torch.no_grad():
-            # 初始化：如果没有提供可见单元状态且没有指定采样数，则报错
+            # Initialization: If neither visible unit state nor sample number is provided,
+            # raise error
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
-            # 如果没有指定采样数，则用可见单元的 batch size
+            # If sample number is not specified, use batch size of visible units
             num_sample = s_visible.size(0) if num_sample is None else num_sample
             if s_visible is not None:
-                # 初始化所有单元（可见+隐含）为0.5概率的伯努利分布
+                # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
                         (s_visible.size(0), self.num_nodes), 0.5, device=self.device
                     )
                 )
-                # 将前面可见单元部分替换为给定的可见单元状态
+                # Replace visible part with given visible unit state
                 s_all[:, : s_visible.size(1)] = s_visible.clone()
             else:
-                # 如果没有可见单元，全部随机初始化
+                # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
                     torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
                 )
 
-            # 可见单元数量
+            # Number of visible units
             n_vis = s_visible.shape[-1] if s_visible is not None else 0
             for _ in range(num_steps):
-                # 随机更新顺序（Gibbs采样）
+                # Random update order (Gibbs sampling)
                 update_order = torch.randperm(self.num_nodes, device=self.device)
                 for unit in update_order:
                     if unit < n_vis:
-                        # 跳过可见单元（只采样隐含单元）
+                        # Skip visible units (only sample hidden units)
                         continue
-                    # 计算当前单元的激活值（条件概率的logit）
+                    # Compute activation value (logit of conditional probability)
                     activation = (
                         torch.matmul(s_all, self.quadratic_coef[:, unit])
                         + self.linear_bias[unit]
                     )
-                    # 通过sigmoid得到激活概率
+                    # Get activation probability via sigmoid
                     prob = torch.sigmoid(activation)
-                    # 按概率采样当前单元的状态
+                    # Sample current unit state according to probability
                     s_all[:, unit] = (prob > torch.rand_like(prob)).float()
-            # 返回采样后的所有单元状态
+            # Return sampled states of all units
             return s_all
 
     def condition_sample(self, sampler, s_visible) -> torch.Tensor:
-        """给定部分节点后，从玻尔兹曼机中采样。
+        """Sample from the Boltzmann Machine given some nodes.
 
         Args:
-            sampler: 用于从模型中采样的优化器。
-            s_visible: 可见层状态。
+            sampler: Optimizer used for sampling from the model.
+            s_visible: State of the visible layer.
 
         Returns:
-            torch.Tensor: 从模型中采样的自旋
-                (形状由``sampler``和``sample_params``规定)。
+            torch.Tensor: Spins sampled from the model
+                (shape determined by ``sampler`` and ``sample_params``).
         """
         solutions = []
         for i in range(s_visible.size(0)):

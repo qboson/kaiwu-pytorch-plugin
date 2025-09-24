@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-"""玻尔兹曼机基类"""
+"""Abstract base class for Boltzmann Machines."""
 import torch
 
 
 def clip_parameters_hook(module, *args):  # pylint:disable=unused-argument
-    """用于自动裁剪参数的钩子函数。"""
+    """Hook function for automatically clipping parameters."""
     module.clip_parameters()
 
 
 class AbstractBoltzmannMachine(torch.nn.Module):
-    """玻尔兹曼机的抽象基类。
+    """Abstract base class for Boltzmann Machines.
 
     Args:
-        h_range (tuple[float, float], optional): 线性权重的范围。
-            如果为``None``，使用无限范围。
-        j_range (tuple[float, float], optional): 二次权重的范围。
-            如果为``None``，使用无限范围。
-        device (torch.device, optional): 构造张量的设备。
+        h_range (tuple[float, float], optional): Range for linear weights.
+            If ``None``, uses infinite range.
+        j_range (tuple[float, float], optional): Range for quadratic weights.
+            If ``None``, uses infinite range.
+        device (torch.device, optional): Device for tensor construction.
     """
 
     def __init__(self, h_range=None, j_range=None) -> None:
@@ -33,29 +33,50 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def to(self, device=..., dtype=..., non_blocking=...):
+        """Moves the model to the specified device.
+
+        Args:
+            device: Target device.
+            dtype: Target data type.
+            non_blocking: Whether the operation should be non-blocking.
+
+        Returns:
+            AbstractBoltzmannMachine: The model on the target device.
+        """
         self.device = device
         return super().to(device)
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
-        """计算哈密顿量。
+        """Computes the Hamiltonian.
 
         Args:
-            s_all (torch.Tensor): 输入张量
+            s_all (torch.Tensor): Input tensor.
 
         Returns:
-            torch.Tensor: 哈密顿量
+            torch.Tensor: Hamiltonian.
         """
 
     def clip_parameters(self) -> None:
-        """原地裁剪线性和二次偏置权重。"""
+        """Clips linear and quadratic bias weights in-place."""
 
     def get_ising_matrix(self):
-        """将模型转换为伊辛格式。"""
+        """Converts the model to Ising format.
+
+        Returns:
+            torch.Tensor: Ising matrix.
+        """
         self.clip_parameters()
         return self._to_ising_matrix()
 
     def _to_ising_matrix(self):
-        """将模型转换为伊辛格式。"""
+        """Converts the model to Ising format.
+
+        Returns:
+            torch.Tensor: Ising matrix.
+
+        Raises:
+            NotImplementedError: If not implemented in subclass.
+        """
         raise NotImplementedError("Subclasses must implement _ising method")
 
     def objective(
@@ -63,28 +84,30 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         s_positive: torch.Tensor,
         s_negtive: torch.Tensor,
     ) -> torch.Tensor:
-        """一个目标函数，其梯度等价于负对数似然的梯度。
+        """Objective function whose gradient is equivalent to the gradient of
+        negative log-likelihood.
 
         Args:
-            s_positive (torch.Tensor): 观测自旋(数据)的张量，形状为
-                (b1, N)，其中b1表示批大小，N表示模型中的变量数。
-            s_negtive (torch.Tensor): 从模型中抽取的自旋张量，形状为
-                (b2, N)，其中b2表示批大小，N表示模型中的变量数。
+            s_positive (torch.Tensor): Tensor of observed spins (data), shape (b1, N),
+                            where b1 is batch size and N is the number of variables.
+            s_negtive (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N),
+                            where b2 is batch size and N is the number of variables.
 
         Returns:
-            torch.Tensor: 数据和模型平均能量的标量差。
+            torch.Tensor: Scalar difference between data and model average energy.
         """
         self.clip_parameters()
         return -(self(s_positive).mean() - self(s_negtive).mean())
 
     def sample(self, sampler) -> torch.Tensor:
-        """从玻尔兹曼机中采样。
+        """Samples from the Boltzmann Machine.
 
         Args:
-            sampler: 用于从模型中采样的优化器。采样器可以是kaiwuSDK的CIM或者其他求解器。
+            sampler: Optimizer used for sampling from the model. The sampler
+            can be kaiwuSDK's CIM or other solvers.
 
         Returns:
-            torch.Tensor: 从模型中采样的自旋
+            torch.Tensor: Spins sampled from the model.
         """
         ising_mat = self.get_ising_matrix()
         solution = sampler.solve(ising_mat)

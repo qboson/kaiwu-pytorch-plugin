@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""quantum variational autoencoder QVAE模型"""
+"""Quantum Variational Autoencoder (QVAE) Model"""
 
 import torch
 import numpy as np
@@ -9,16 +9,16 @@ from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
 class QVAE(torch.nn.Module):
-    """量子变分自编码器（QVAE）模型
+    """Quantum Variational Autoencoder (QVAE) Model
 
     Args:
-        encoder: 编码器模块
-        decoder: 解码器模块
-        bm (AbstractBoltzmannMachine): 玻尔兹曼机
-        sampler: 采样器
-        dist_beta: 分布的beta参数
-        mean_x (torch.Tensor): 训练数据的偏置
-        num_vis (int): 玻尔兹曼机可见层变量数量
+        encoder: Encoder module
+        decoder: Decoder module
+        bm (AbstractBoltzmannMachine): Boltzmann machine
+        sampler: Sampler
+        dist_beta: Beta parameter for the distribution
+        mean_x (torch.Tensor): Bias of training data
+        num_vis (int): Number of visible variables in the Boltzmann machine
     """
 
     def __init__(
@@ -38,7 +38,7 @@ class QVAE(torch.nn.Module):
         self.bm = bm
         self.sampler = sampler
         self.dist_beta = dist_beta
-        # 将train_bias转换为PyTorch张量
+        # Convert train_bias to PyTorch tensor
         self.register_buffer(
             "train_bias",
             torch.tensor(
@@ -49,14 +49,14 @@ class QVAE(torch.nn.Module):
         self.num_var1 = num_vis
 
     def posterior(self, q_logits, beta):
-        """计算后验分布及其重参数化采样
+        """Compute posterior distribution and its reparameterized sample
 
         Args:
-            q_logits (torch.Tensor): 编码器的输出，对数几率
-            beta: 分布的beta参数
+            q_logits (torch.Tensor): Encoder output, log-odds
+            beta: Beta parameter for the distribution
 
         Returns:
-            tuple: (后验分布对象, 采样结果zeta)
+            tuple: (Posterior distribution object, Sampled result zeta)
         """
         posterior_dist = MixtureGeneric(q_logits, beta)
         zeta = posterior_dist.reparameterize(self.is_training)
@@ -65,16 +65,16 @@ class QVAE(torch.nn.Module):
     def _cross_entropy(
         self, logit_q: torch.Tensor, log_ratio: torch.Tensor
     ) -> torch.Tensor:
-        """计算DVAE++中提出的重叠分布的交叉熵项
+        """Compute the cross-entropy term for the overlap distribution proposed in DVAE++
 
         Args:
-            logit_q (torch.Tensor): 为每个变量定义的伯努利分布的对数几率
-            log_ratio (torch.Tensor): 每个ζ的log(r(ζ|z=1)/r(ζ|z=0))
+            logit_q (torch.Tensor): Log-odds of Bernoulli distribution defined for each variable
+            log_ratio (torch.Tensor): Log(r(ζ|z=1)/r(ζ|z=0)) for each ζ
 
         Returns:
-            torch.Tensor: 每个ζ的交叉熵张量
+            torch.Tensor: Cross-entropy tensor for each ζ
         """
-        # 分割logit_q为两部分
+        # Split logit_q into two parts
         if self.bm.num_nodes != logit_q.shape[1]:
             raise ValueError(
                 f"The number of variables in the Boltzmann machine {self.bm.num_nodes}"
@@ -83,13 +83,13 @@ class QVAE(torch.nn.Module):
         logit_q1 = logit_q[:, : self.num_var1]
         logit_q2 = logit_q[:, self.num_var1 :]
 
-        # 计算概率
+        # Compute probabilities
         q1 = torch.sigmoid(logit_q1)
         q2 = torch.sigmoid(logit_q2)
         log_ratio1 = log_ratio[:, : self.num_var1]
         q1_pert = torch.sigmoid(logit_q1 + log_ratio1)
 
-        # 计算交叉熵
+        # Compute cross-entropy
         cross_entropy = -torch.matmul(
             torch.cat([q1, q2], dim=-1), self.bm.linear_bias
         ) + -torch.sum(
@@ -101,14 +101,14 @@ class QVAE(torch.nn.Module):
         return cross_entropy
 
     def _kl_dist_from(self, posterior, post_samples):
-        """计算KL散度
+        """Compute KL divergence
 
         Args:
-            posterior: 后验分布对象
-            post_samples: 后验分布采样结果
+            posterior: Posterior distribution object
+            post_samples: Posterior distribution samples
 
         Returns:
-            torch.Tensor: KL散度张量
+            torch.Tensor: KL divergence tensor
         """
         entropy = 0
         logit_q = 0
@@ -123,47 +123,47 @@ class QVAE(torch.nn.Module):
         return kl
 
     def neg_elbo(self, x, kl_beta):
-        """计算负ELBO损失
+        """Compute negative ELBO loss
 
         Args:
-            x (torch.Tensor): 输入数据
-            kl_beta (float): KL项的权重系数
+            x (torch.Tensor): Input data
+            kl_beta (float): Weight coefficient for KL term
 
         Returns:
             tuple: (output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta)
-                output: 重构输出（sigmoid激活）
-                recon_x: 重构数据
-                neg_elbo: 负ELBO损失
-                wd_loss: 权重衰减损失
-                total_kl: KL散度
-                cost: 重构损失
-                q: 编码器输出
-                zeta: 后验采样结果
+                output: Reconstructed output (sigmoid activated)
+                recon_x: Reconstructed data
+                neg_elbo: Negative ELBO loss
+                wd_loss: Weight decay loss
+                total_kl: KL divergence
+                cost: Reconstruction loss
+                q: Encoder output
+                zeta: Posterior sample
         """
-        # subtract mean from input
+        # Subtract mean from input
         encoder_x = x - self.train_bias
         recon_x, posterior, q, zeta = self(encoder_x)
 
-        # 添加数据偏置
+        # Add data bias
         recon_x = recon_x + self.train_bias
 
         output_dist = FactorialBernoulliUtil(recon_x)
 
-        # 经过sigmod
+        # Apply sigmoid
         output = torch.sigmoid(output_dist.logit_mu)
 
-        # 计算KL
+        # Compute KL
         total_kl = self._kl_dist_from(posterior, zeta)
         total_kl = torch.mean(total_kl)
-        # expected log prob p(x| z)
+        # Expected log prob p(x| z)
         cost = -output_dist.log_prob_per_var(x)  # [256, 784]
-        cost = torch.sum(cost, dim=1)  # [256]，每个样本的重构损失
+        cost = torch.sum(cost, dim=1)  # [256], reconstruction loss per sample
         cost = torch.mean(cost)
 
-        # 计算每个样本的负ELBO，然后取平均
-        neg_elbo = total_kl * kl_beta + cost  # 标量
+        # Compute negative ELBO per sample, then average
+        neg_elbo = total_kl * kl_beta + cost  # scalar
 
-        # weight decay loss
+        # Weight decay loss
         w_weight_decay = 0.01 * torch.sum(self.bm.quadratic_coef**2)
         b_weight_decay = 0.005 * torch.sum(self.bm.linear_bias**2)
         wd_loss = w_weight_decay + b_weight_decay
@@ -171,17 +171,17 @@ class QVAE(torch.nn.Module):
         return output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta
 
     def forward(self, x):
-        """前向传播
+        """Forward propagation
 
         Args:
-            x (torch.Tensor): 输入数据
+            x (torch.Tensor): Input data
 
         Returns:
             tuple: (recon_x, posterior, q, zeta)
-                recon_x: 重构数据
-                posterior: 后验分布对象
-                q: 编码器输出
-                zeta: 后验采样结果
+                recon_x: Reconstructed data
+                posterior: Posterior distribution object
+                q: Encoder output
+                zeta: Posterior sample
         """
         q = self.encoder(x)
         posterior, zeta = self.posterior(q, self.dist_beta)
