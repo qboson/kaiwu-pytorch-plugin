@@ -161,11 +161,8 @@ if __name__ == "__main__":
 
 运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
 
-![](imgs/qvae.png)
 
 ### 生成任务：Q-VAE的MNIST图像生成
-
-<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/602802d9-0d5f-4304-a151-5b921b10ba4a" />
 
 展示如何在MNIST手写数字数据集上训练和评估量子变分自编码器（Q-VAE）模型。该示例适用于希望理解Q-VAE模型训练、生成与评估流程的使用者，可作为生成模型后续研究的基础。主要内容包括：
 - 数据加载与预处理：通过自定义数据集类实现支持批次索引，并结合ToTensor转换和展平操作；
@@ -174,6 +171,8 @@ if __name__ == "__main__":
 - 可视化与生成：提供原始图像、重构图像和生成图像的可视化对比方法，便于直观评估模型效果。
 
 运行该实例可以运行`example/qvae_mnist/train_qvae.ipynb`
+
+![](imgs/qvae.png)
 
 ## 科研成果
 
@@ -189,6 +188,8 @@ if __name__ == "__main__":
 如果你对该方法感兴趣，可以参考论文:  
 [Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/pdf/2508.11190)
 
+<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/602802d9-0d5f-4304-a151-5b921b10ba4a" />
+
 
 ## 致谢
 
@@ -201,7 +202,7 @@ if __name__ == "__main__":
 2. 玻色量子官方助手，真机申请及合作咨询
 3. 邮箱联系方式：developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png) ![](https://github.com/user-attachments/assets/c6d02ae9-b401-4df9-9cfc-25c3ddd2b24a)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png) ![](https://github.com/user-attachments/assets/0b700dc3-8f32-476c-b63b-c553dedb72d8)
 
 
 
