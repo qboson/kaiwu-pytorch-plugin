@@ -160,5 +160,7 @@ cython_debug/
 tmp
 example/data/
 example/qvae_mnist/models/
+example/bm_generation/log/
+example/bm_generation/test/
 data
 tmp.sh
