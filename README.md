@@ -159,6 +159,9 @@ To run this example, execute `example/rbm_digits/rbm_digits.ipynb`.
 ---  
 
 ### Generation Task: Q-VAE for MNIST Image Generation  
+
+<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
+
 Demonstrates how to train and evaluate a Quantum Variational Autoencoder (Q-VAE) model on the MNIST handwritten digits dataset. This example is designed for users seeking to understand Q-VAE training, generation, and evaluation workflows, providing a foundation for generative model research. Key steps include:  
 - **Data Loading & Preprocessing**: Implement a custom dataset class with batch indexing, combined with ToTensor conversion and flattening operations.  
 - **Model Architecture**: Construct the Q-VAE framework, including encoder/decoder modules and RBM-based latent variable modeling.  
