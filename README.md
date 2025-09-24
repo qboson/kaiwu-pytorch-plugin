@@ -154,13 +154,9 @@ Demonstrates feature learning and classification on the Digits dataset using Res
 
 To run this example, execute `example/rbm_digits/rbm_digits.ipynb`.  
 
-![](imgs/qvae.png)
-
 ---  
 
 ### Generation Task: Q-VAE for MNIST Image Generation  
-
-<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
 
 Demonstrates how to train and evaluate a Quantum Variational Autoencoder (Q-VAE) model on the MNIST handwritten digits dataset. This example is designed for users seeking to understand Q-VAE training, generation, and evaluation workflows, providing a foundation for generative model research. Key steps include:  
 - **Data Loading & Preprocessing**: Implement a custom dataset class with batch indexing, combined with ToTensor conversion and flattening operations.  
@@ -169,6 +165,8 @@ Demonstrates how to train and evaluate a Quantum Variational Autoencoder (Q-VAE)
 - **Visualization & Generation**: Provide comparative visualization of original, reconstructed, and generated images for intuitive model assessment.  
 
 To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.  
+
+![](imgs/qvae.png)
 
 ---  
 
@@ -186,6 +184,8 @@ Based on this representation, we successfully integrated millions of single-cell
 If you are interested in this work, please check out our paper:  
 [Quantum-Boosted High-Fidelity Deep Learning](ttps://arxiv.org/pdf/2508.11190)
 
+<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
+
 ---  
 
 ## Acknowledgments  
@@ -197,5 +197,4 @@ If you are interested in this work, please check out our paper:
 2. **Boson Quantum Official Assistant**: Inquire about real-machine access and collaborations.  
 3. email: developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/8f5ceb30-2ed6-4756-95f3-d91c72fa31e5)
-
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/1d5bad1c-6881-4222-ba2f-06f777ebad44)
