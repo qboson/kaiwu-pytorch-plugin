@@ -112,7 +112,6 @@ class RBMVisualizer:
     
         # 保存结果
         if save_pdf:
-            _ensure_result_dir()
             plt.savefig(f'{self.result_dir}/{save_as}.pdf', 
                         dpi=300, bbox_inches='tight', format='pdf')
         plt.show()
@@ -140,3 +139,79 @@ class RBMVisualizer:
                         dpi=300, bbox_inches='tight', format='pdf')
         plt.tight_layout()
         plt.show()
+
+    def plot_reconstructed_images(self, rbm, X, y, layer_index=0, n_images=10, 
+                                  title_suffix="", save_pdf=False, img_shape=None):
+        """
+        绘制原始和重构图像的对比
+        
+        Args:
+            X: 输入图像数据
+            y: 图像标签
+            layer_index: 使用的RBM层索引
+            n_images: 要显示的图像数量
+            title_suffix: 标题后缀
+            save_pdf: 是否保存为PDF
+            img_shape: 图像形状，如(8,8)。如果为None，则尝试自动推断
+        """
+        
+        # 限制图像数量
+        n_images = min(n_images, X.shape[0])
+        X_sample = X[:n_images]
+        y_sample = y[:n_images]
+        
+        # 重构图像
+        X_recon, recon_errors = rbm.reconstruct_get_hidden(X_sample, layer_index)
+        
+        # 推断图像形状
+        if img_shape is None:
+            n_features = X_sample.shape[1]
+            img_size = int(np.sqrt(n_features))
+            if img_size * img_size == n_features:
+                img_shape = (img_size, img_size)
+        
+        # 创建图形
+        fig, axes = plt.subplots(2, n_images, figsize=(2*n_images, 4))
+        if n_images == 1:
+            axes = axes.reshape(2, 1)
+        
+        # 设置标题
+        plt.suptitle(f'Original vs Reconstructed Images ({title_suffix})', fontsize=16)
+        
+        # 绘制图像
+        for i in range(n_images):
+            # 原始图像
+            if img_shape[0] * img_shape[1] == X_sample.shape[1]:
+                axes[0, i].imshow(X_sample[i].reshape(img_shape), cmap='gray')
+            else:
+                # 如果形状不匹配，显示前img_shape[0]*img_shape[1]个像素
+                axes[0, i].imshow(X_sample[i][:img_shape[0]*img_shape[1]].reshape(img_shape), cmap='gray')
+            axes[0, i].set_title(f'Label: {y_sample[i]}', fontsize=10)
+            axes[0, i].axis('off')
+            
+            # 重构图像
+            if img_shape[0] * img_shape[1] == X_recon.shape[1]:
+                axes[1, i].imshow(X_recon[i].reshape(img_shape), cmap='gray')
+            else:
+                axes[1, i].imshow(X_recon[i][:img_shape[0]*img_shape[1]].reshape(img_shape), cmap='gray')
+            axes[1, i].set_title(f'Recon (err: {recon_errors[i]:.4f})', fontsize=10)
+            axes[1, i].axis('off')
+        
+        # 添加y轴标签
+        axes[0, 0].set_ylabel('Original', rotation=90, size=12)
+        axes[1, 0].set_ylabel('Reconstructed', rotation=90, size=12)
+        
+        plt.tight_layout()
+        
+        # 保存结果
+        if save_pdf:
+            plt.savefig(f'results/reconstructed_images_{title_suffix}.pdf', 
+                        dpi=300, bbox_inches='tight', format='pdf')
+        
+        plt.show()
+        
+        # 打印平均重构误差
+        avg_error = np.mean(recon_errors)
+        print(f"Average reconstruction error: {avg_error:.4f}")
+        
+        return recon_errors
