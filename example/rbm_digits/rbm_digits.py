@@ -5,9 +5,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from sklearn.datasets import load_digits
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import confusion_matrix
+
+from kaiwu.torch_plugin import UnsupervisedDBN, DBNTrainer
 
 def translate_image(image, direction):
     "图片转换"
@@ -66,6 +69,55 @@ def load_data(plot_img=False):
     X_test = scaler.transform(X_test)
 
     return X_train, X_test, y_train, y_test
+
+class ScikitUnsupervisedDBN(BaseEstimator, TransformerMixin):
+    """
+    Scikit-learn兼容的DBN接口
+    """
+    def __init__(
+        self,
+        hidden_layers_structure=[100, 100],
+        learning_rate_rbm=0.1,
+        n_epochs_rbm=10,
+        batch_size=100,
+        verbose=True,
+        shuffle=True,
+        drop_last=False,
+        plot_img=False,
+        random_state=None
+    ):
+        self.hidden_layers_structure = hidden_layers_structure
+        self.learning_rate_rbm = learning_rate_rbm
+        self.n_epochs_rbm = n_epochs_rbm
+        self.batch_size = batch_size
+        self.verbose = verbose
+        self.shuffle = shuffle
+        self.drop_last = drop_last
+        self.plot_img = plot_img
+        self.random_state = random_state
+        
+        # 创建模型和训练器
+        self._dbn = UnsupervisedDBN(hidden_layers_structure)
+        self._trainer = DBNTrainer(
+            learning_rate_rbm=learning_rate_rbm,
+            n_epochs_rbm=n_epochs_rbm,
+            batch_size=batch_size,
+            verbose=verbose,
+            shuffle=shuffle,
+            drop_last=drop_last,
+            plot_img=plot_img,
+            random_state=random_state
+        )
+
+    def fit(self, X, y=None):
+        """训练模型"""
+        self._dbn._create_rbm_layer(X.shape[1])
+        self._trainer.train(self._dbn, X)
+        return self
+
+    def transform(self, X):
+        """特征变换"""
+        return self._dbn.transform(X)
 
 class RBMVisualizer:
     def __init__(self, result_dir='results'):

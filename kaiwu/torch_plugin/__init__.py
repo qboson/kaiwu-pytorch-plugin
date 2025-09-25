@@ -3,6 +3,6 @@
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 from .full_boltzmann_machine import BoltzmannMachine
 from .qvae import QVAE
-from .dbn import UnsupervisedDBN
+from .dbn import UnsupervisedDBN, DBNTrainer
 
 __all__ = ["RestrictedBoltzmannMachine", "BoltzmannMachine"]
