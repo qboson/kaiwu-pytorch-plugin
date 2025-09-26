@@ -76,9 +76,9 @@ def load_data(plot_img=False):
 
     return X_train, X_test, y_train, y_test
 
-class ScikitUnsupervisedDBN(BaseEstimator, TransformerMixin):
+class DBNPretrainer(BaseEstimator, TransformerMixin):
     """
-    Scikit-learn兼容的DBN接口
+    Scikit-learn兼容的DBN预训练
     """
     def __init__(
         self,
@@ -169,7 +169,7 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         self.classifier = None
         self.label_encoder = LabelEncoder()
         # self.unsupervised_dbn = UnsupervisedDBN(
-        self.unsupervised_dbn = ScikitUnsupervisedDBN(
+        self.unsupervised_dbn = DBNPretrainer(
             hidden_layers_structure=self.hidden_layers_structure,
             learning_rate_rbm=self.learning_rate_rbm,
             n_epochs_rbm=self.n_epochs_rbm,

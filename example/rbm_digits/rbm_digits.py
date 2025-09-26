@@ -70,13 +70,13 @@ def load_data(plot_img=False):
 
     return X_train, X_test, y_train, y_test
 
-class ScikitUnsupervisedDBN(BaseEstimator, TransformerMixin):
+class RBMPretrainer(BaseEstimator, TransformerMixin):
     """
-    Scikit-learn兼容的DBN接口
+    Scikit-learn兼容的RBM预训练
     """
     def __init__(
         self,
-        hidden_layers_structure=[100, 100],
+        hidden_layers_structure=[100],
         learning_rate_rbm=0.1,
         n_epochs_rbm=10,
         batch_size=100,
