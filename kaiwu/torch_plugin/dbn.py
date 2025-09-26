@@ -2,25 +2,12 @@
 """deep belief network DBN模型
 包含DBN的类  以及训练DBN+model/仅训练model的函数 训练DBN+model会保存训练过程中的似然值和预测准确率
 """
-import os
 import numpy as np
-from scipy.ndimage import shift
 import matplotlib.pyplot as plt
-import seaborn as sns
-
-from abc import ABC, abstractmethod
-from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin
-from sklearn.linear_model import LogisticRegression
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
-# from sklearn.utils.multiclass import unique_labels
-from sklearn.datasets import load_digits
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, LabelEncoder
-from sklearn.metrics import confusion_matrix
 
 import torch
 import torch.nn as nn
-from torch.optim import SGD, Adam
+from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
@@ -109,9 +96,9 @@ class UnsupervisedDBN(nn.Module):
             )
             
             # 计算重建误差
-            recon_error = torch.mean((X_tensor - visible_recon) ** 2, dim=1).cpu().numpy()
+            recon_errors = torch.mean((X_tensor - visible_recon) ** 2, dim=1).cpu().numpy()
             
-        return visible_recon.cpu().numpy(), recon_error
+        return visible_recon.cpu().numpy(), recon_errors
 
     def mark_as_trained(self):
         """标记模型为已训练状态"""
@@ -414,11 +401,11 @@ class DBNTrainer:
                     torch.matmul(hidden_part, rbm.quadratic_coef.t()) + 
                     rbm.linear_bias[:rbm.num_visible]
                 )
-                recon_error = torch.mean(
+                recon_errors = torch.mean(
                     (torch.FloatTensor(eval_data).to(rbm.device) - visible_recon) ** 2
                 )
     
-        print(f"[RBM] Layer {layer_idx+1}, Epoch {epoch+1}: Reconstruction Error = {recon_error.item():.6f}\n")
+        print(f"[RBM] Layer {layer_idx+1}, Epoch {epoch+1}: Reconstruction Error = {recon_errors.item():.6f}\n")
 
     def _gen_digits_image(self, X, size=8):
         """生成数字图像"""
