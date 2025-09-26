@@ -48,6 +48,3 @@ torchvision==0.22.0
 torchmetrics[image]
 ```
 
----
-
-要不要我帮你整理成一个 **README.md** 模板（中英文对照），这样直接放到项目里就可以用了？
