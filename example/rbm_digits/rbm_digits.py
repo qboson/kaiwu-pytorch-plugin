@@ -76,7 +76,7 @@ class RBMPretrainer(BaseEstimator, TransformerMixin):
     """
     def __init__(
         self,
-        hidden_layers_structure=[100],
+        n_components=100,
         learning_rate_rbm=0.1,
         n_epochs_rbm=10,
         batch_size=100,
@@ -86,7 +86,7 @@ class RBMPretrainer(BaseEstimator, TransformerMixin):
         plot_img=False,
         random_state=None
     ):
-        self.hidden_layers_structure = hidden_layers_structure
+        self.n_components = n_components
         self.learning_rate_rbm = learning_rate_rbm
         self.n_epochs_rbm = n_epochs_rbm
         self.batch_size = batch_size
@@ -97,7 +97,7 @@ class RBMPretrainer(BaseEstimator, TransformerMixin):
         self.random_state = random_state
         
         # 创建模型和训练器
-        self._dbn = UnsupervisedDBN(hidden_layers_structure)
+        self._rbm = UnsupervisedDBN([n_components])
         self._trainer = DBNTrainer(
             learning_rate_rbm=learning_rate_rbm,
             n_epochs_rbm=n_epochs_rbm,
@@ -111,13 +111,18 @@ class RBMPretrainer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """训练模型"""
-        self._dbn._create_rbm_layer(X.shape[1])
-        self._trainer.train(self._dbn, X)
+        self._rbm._create_rbm_layer(X.shape[1])
+        self._trainer.train(self._rbm, X)
         return self
 
     def transform(self, X):
         """特征变换"""
-        return self._dbn.transform(X)
+        return self._rbm.transform(X)
+
+    # 提供访问RBM层的方法
+    def rbm_layer(self, index):
+        """获取指定RBM层"""
+        return self._rbm.get_rbm_layer(index)
 
 class RBMVisualizer:
     def __init__(self, result_dir='results'):
@@ -213,7 +218,8 @@ class RBMVisualizer:
         y_sample = y[:n_images]
         
         # 重构图像
-        X_recon, recon_errors = rbm.reconstruct_get_hidden(X_sample, layer_index)
+        X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
+        # X_recon, recon_errors = rbm.reconstruct_get_hidden(X_sample, layer_index)
         
         # 推断图像形状
         if img_shape is None:
