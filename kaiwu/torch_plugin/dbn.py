@@ -70,8 +70,8 @@ class UnsupervisedDBN(nn.Module):
         """sklearn兼容的transform方法"""
         return self.forward(X)
 
-    def reconstruct_get_hidden(self, X, layer_index=0):
-        """使用get_hidden方法进行重建"""
+    def reconstruct(self, X, layer_index=0):
+        """从指定层重建输入"""
         if self.rbm_layers is None or len(self.rbm_layers) == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
 
@@ -79,26 +79,7 @@ class UnsupervisedDBN(nn.Module):
             raise ValueError(f"Layer index {layer_index} out of range.")
         
         rbm = self.rbm_layers[layer_index]
-        rbm.eval()
-        
-        # 转换为PyTorch张量
-        X_tensor = torch.FloatTensor(X).to(self.device)
-        
-        with torch.no_grad():
-            # 使用RBM的get_hidden获取隐藏层表示
-            hidden_act = rbm.get_hidden(X_tensor)
-            hidden_part = hidden_act[:, rbm.num_visible:]   # 只取隐藏层部分
-            
-            # 重建可见层(使用权重转置)
-            visible_recon = torch.sigmoid(
-                torch.matmul(hidden_part, rbm.quadratic_coef.t()) + 
-                rbm.linear_bias[:rbm.num_visible]
-            )
-            
-            # 计算重建误差
-            recon_errors = torch.mean((X_tensor - visible_recon) ** 2, dim=1).cpu().numpy()
-            
-        return visible_recon.cpu().numpy(), recon_errors
+        return self.reconstruct_with_rbm(rbm, X, self.device)
 
     def mark_as_trained(self):
         """标记模型为已训练状态"""
@@ -110,6 +91,33 @@ class UnsupervisedDBN(nn.Module):
         if index < len(self.rbm_layers):
             return self.rbm_layers[index]
         return None
+
+    @staticmethod
+    def reconstruct_with_rbm(rbm, X, device=None):
+        """
+        使用单个RBM重建数据
+        """
+        if device is None:
+            device = rbm.device
+        
+                # 转换为PyTorch张量
+        X_tensor = torch.FloatTensor(X).to(device)
+        
+        with torch.no_grad():
+            # 使用RBM的get_hidden获取隐藏层表示
+            hidden_act = rbm.get_hidden(X_tensor)
+            hidden_part = hidden_act[:, rbm.num_visible:]   # 只取隐藏层部分
+            
+            # 重建可见层（使用权重转置）
+            visible_recon = torch.sigmoid(
+                torch.matmul(hidden_part, rbm.quadratic_coef.t()) + 
+                rbm.linear_bias[:rbm.num_visible]
+            )
+            
+            # 计算重建误差
+            recon_errors = torch.mean((X_tensor - visible_recon) ** 2, dim=1).cpu().numpy()
+            
+        return visible_recon.cpu().numpy(), recon_errors
 
     @property
     def num_layers(self):
@@ -123,9 +131,10 @@ class UnsupervisedDBN(nn.Module):
             return self.rbm_layers[-1].num_hidden
         return self.input_dim
 
+# =================== 无监督DBN训练器 =====================
 class DBNTrainer:
     """
-    DBN训练器，包含训练逻辑
+    DBN训练器，包含训练模块
     """
     def __init__(
         self,
@@ -136,7 +145,8 @@ class DBNTrainer:
         shuffle=True,
         drop_last=False,
         plot_img=False,
-        random_state=None
+        random_state=None,
+        dbn_ref=None
     ):
         self.learning_rate_rbm = learning_rate_rbm
         self.n_epochs_rbm = n_epochs_rbm
@@ -148,6 +158,7 @@ class DBNTrainer:
         self.random_state = random_state
         
         self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+        self.dbn_ref = dbn_ref
 
     def train(self, dbn, X):
         """
@@ -161,23 +172,25 @@ class DBNTrainer:
         if not isinstance(dbn, UnsupervisedDBN):
             raise ValueError("dbn must be an instance of UnsupervisedDBN")
 
+        # 保存DBN
+        self.dbn_ref = dbn
+
         # 设置随机种子
         if self.random_state is not None:
             self._set_random_seed()
 
         input_data = X.astype(np.float32)
-
-        # 清空之前的RBM
-        dbn.rbm_layers = None
         
         # 创建RBM层
-        dbn._create_rbm_layer(X.shape[1])
+        if dbn.num_layers == 0:
+            dbn._create_rbm_layer(X.shape[1])
 
-        for idx, rbm in enumerate(dbn.rbm_layers):
+        for idx in range(dbn.num_layers):  # 使用 num_layers 和 get_rbm_layer 属性
+            rbm = dbn.get_rbm_layer(idx)
             if self.verbose:
                 n_visible = rbm.num_visible
                 n_hidden = rbm.num_hidden
-                print(f"\n[DBN] Pre-training RBM layer {idx+1}/{len(dbn.rbm_layers)}: "
+                print(f"\n[DBN] Pre-training RBM layer {idx+1}/{dbn.num_layers}: "
                       f"{n_visible} -> {n_hidden}")
 
             # 训练当前RBM层
@@ -224,11 +237,6 @@ class DBNTrainer:
                     # 样本和权重可视化
                     if self.plot_img:
                         self._visualize_training_progress(rbm, i, epoch, batch_x)
-
-                    # 样本和权重可视化
-                    if self.plot_img:
-                        self._visualize_training_progress(rbm, i, epoch, batch_x)
-                        # self._print_display_samples(rbm, i, epoch)
 
                     # 记录样本
                     if i % 50 == 0:  # 每50个batch记录一次
@@ -358,12 +366,13 @@ class DBNTrainer:
         """可视化当前batch的重建效果"""
 
         batch_numpy = batch_data.cpu().numpy()
-        recon_imgs, recon_errors = dbn.reconstruct_get_hidden(batch_numpy, layer_index)
+
+        # 使用静态重建方法
+        recon_imgs, recon_errors = UnsupervisedDBN.reconstruct_with_rbm(rbm, batch_numpy)
     
         # 选择前几个样本显示
-        n_show = min(4, batch_data.shape[0])
+        n_show = min(8, batch_data.shape[0])
         original_imgs = batch_data[:n_show].cpu().numpy()
-        # recon_imgs = visible_recon[:n_show].cpu().numpy()
     
         fig, axes = plt.subplots(2, n_show, figsize=(3*n_show, 6))
         if n_show == 1:
@@ -389,23 +398,19 @@ class DBNTrainer:
         plt.show()
 
     def _evaluate_reconstruction_quality(self, rbm, input_data, epoch, layer_idx):
-        """定期评估重建质量"""
+        """定期评估重建质量 - 使用静态方法"""
         n_eval = min(100, input_data.shape[0])
         eval_data = input_data[:n_eval]
-    
-        with torch.no_grad():
-            if hasattr(rbm, 'get_hidden'):
-                hidden_act = rbm.get_hidden(torch.FloatTensor(eval_data).to(rbm.device))
-                hidden_part = hidden_act[:, rbm.num_visible:]   # 只取隐藏层部分
-                visible_recon = torch.sigmoid(
-                    torch.matmul(hidden_part, rbm.quadratic_coef.t()) + 
-                    rbm.linear_bias[:rbm.num_visible]
-                )
-                recon_errors = torch.mean(
-                    (torch.FloatTensor(eval_data).to(rbm.device) - visible_recon) ** 2
-                )
-    
-        print(f"[RBM] Layer {layer_idx+1}, Epoch {epoch+1}: Reconstruction Error = {recon_errors.item():.6f}\n")
+        
+        # 使用静态重建方法
+        _, recon_errors = UnsupervisedDBN.reconstruct_with_rbm(
+            rbm, eval_data
+        )
+        
+        avg_recon_error = np.mean(recon_errors)
+        print(f"[RBM] Layer {layer_idx+1}, Epoch {epoch+1}: "
+              f"Reconstruction Error = {avg_recon_error:.6f}\n")
+
 
     def _gen_digits_image(self, X, size=8):
         """生成数字图像"""
