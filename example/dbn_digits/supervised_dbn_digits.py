@@ -125,6 +125,26 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
         """特征变换"""
         return self._dbn.transform(X)
 
+    # 提供访问RBM层的方法
+    def get_rbm_layer(self, index):
+        """获取指定RBM层"""
+        return self._dbn.get_rbm_layer(index)
+
+    @property
+    def device(self):
+        """返回device - 使用底层模型的属性"""
+        return self._dbn.device
+    
+    @property
+    def _n_layers(self):
+        """返回层数 - 使用底层模型的属性"""
+        return self._dbn.num_layers
+
+    @property
+    def _output_dim(self):
+        """返回输出维度 - 使用底层模型的属性"""
+        return self._dbn.output_dim
+        
 # =================== 抽象监督DBN =====================
 class AbstractSupervisedDBN(BaseEstimator, ABC):
     """
@@ -168,7 +188,6 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         self.fine_tune_network = None
         self.classifier = None
         self.label_encoder = LabelEncoder()
-        # self.unsupervised_dbn = UnsupervisedDBN(
         self.unsupervised_dbn = DBNPretrainer(
             hidden_layers_structure=self.hidden_layers_structure,
             learning_rate_rbm=self.learning_rate_rbm,
@@ -271,13 +290,14 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         os.makedirs("data", exist_ok=True)
         
         # 保存预训练参数（两种模式都需要）
-        if self.unsupervised_dbn and self.unsupervised_dbn._dbn.rbm_layers:
-            for i, rbm in enumerate(self.unsupervised_dbn._dbn.rbm_layers):
+        if self.unsupervised_dbn and self.unsupervised_dbn._n_layers > 0:
+            for i in range(self.unsupervised_dbn._n_layers):
+                rbm = self.unsupervised_dbn.get_rbm_layer(i)  # 使用 get_rbm_layer
                 weights = rbm.quadratic_coef.detach().cpu().numpy()
                 h_bias = rbm.linear_bias[rbm.num_visible:].detach().cpu().numpy()
                 np.save(f"data/{file_prefix}_pretrain_layer{i}_weights.npy", weights)
                 np.save(f"data/{file_prefix}_pretrain_layer{i}_bias.npy", h_bias)
-            print(f"Pre-trained parameters saved for {len(self.unsupervised_dbn._dbn.rbm_layers)} layers")
+            print(f"Pre-trained parameters saved for {self.unsupervised_dbn._n_layers} layers")
         
         # 保存微调参数（仅微调模式）
         if self.fine_tuning and hasattr(self, 'fine_tune_network') and self.fine_tune_network is not None:
@@ -300,7 +320,7 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
 
 class PyTorchAbstractSupervisedDBN(AbstractSupervisedDBN):
     """
-    PyTorch实现的抽象监督DBN，提供PyTorch相关的通用实现
+    抽象监督DBN，提供下游分类器训练和PyTorch相关的通用工具
     """
     def __init__(
         self, 
@@ -415,29 +435,47 @@ class PyTorchAbstractSupervisedDBN(AbstractSupervisedDBN):
             print("Feature importance is only available in classifier mode")
             return None
 
-    def get_layer_activations(self, X, layer_idx=-1):
-        """获取指定层的激活值"""
-        if self.unsupervised_dbn is None or self.unsupervised_dbn._dbn.rbm_layers is None:
-            raise ValueError("Model not fitted")
+    def get_layer_activations(self, X, layer_index=None, return_all_layers=False):
+        """
+        获取指定层或所有层的激活值
+        """
+        if self.unsupervised_dbn is None or self.unsupervised_dbn._n_layers == 0:
+            raise ValueError("No RBM layers found. Please fit the model first.")
         
         X_data = X.astype(np.float32)
+        all_activations = {}
         
-        # 逐层前向传播，直到指定层
-        for i, rbm in enumerate(self.unsupervised_dbn._dbn.rbm_layers):
-            if layer_idx == i:
-                with torch.no_grad():
-                    hidden_output = rbm.get_hidden(
-                        torch.FloatTensor(X_data).to(self.unsupervised_dbn._dbn.device)
-                    )
-                    return hidden_output[:, rbm.num_visible:].cpu().numpy()
-            
+        # 逐层前向传播计算激活值，直到指定层
+        for i in range(self.unsupervised_dbn._n_layers):
+            rbm = self.unsupervised_dbn.get_rbm_layer(i)
             with torch.no_grad():
-                hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(X_data).to(self.unsupervised_dbn._dbn.device)
-                )
-                X_data = hidden_output[:, rbm.num_visible:].cpu().numpy()
+                X_tensor = torch.FloatTensor(X_data).to(self.unsupervised_dbn.device)
+                hidden_output = rbm.get_hidden(X_tensor)
+                
+                # 提取隐藏层激活值（去掉可见层部分）
+                layer_activation = hidden_output[:, rbm.num_visible:].cpu().numpy()
+                all_activations[i] = layer_activation
+                
+                # 更新输入数据为当前层输出，用于下一层
+                X_data = layer_activation
+            
+            # 如果只需要特定层，且已经到达该层，可以提前终止
+            if layer_index is not None and i == layer_index and not return_all_layers:
+                return layer_activation
         
-        return X_data  # 如果layer_idx超出范围，返回最后一层的输出
+        if return_all_layers:
+            return all_activations
+        else:
+            # 返回指定层或最后一层
+            if layer_index is not None:
+                if layer_index in all_activations:
+                    return all_activations[layer_index]
+                else:
+                    raise ValueError(f"Layer index {layer_index} out of range. Model has {self.unsupervised_dbn._n_layers} layers.")
+            else:
+                # 返回最后一层
+                return all_activations[self.unsupervised_dbn._n_layers - 1]
+
 
 # =================== 具体的分类DBN实现 =====================
 class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin):
@@ -455,20 +493,25 @@ class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin)
         self._build_fine_tune_network()
         
         # 转换为PyTorch张量
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn._dbn.device)
-        y_tensor = torch.LongTensor(y).to(self.unsupervised_dbn._dbn.device)
+        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
+        y_tensor = torch.LongTensor(y).to(self.unsupervised_dbn.device)
         
         # 训练微调网络
         self._train_fine_tune_network(X_tensor, y_tensor)
-
+    
     def _build_fine_tune_network(self):
         """构建微调网络"""
         layers = []
-        input_size = self.unsupervised_dbn._dbn.rbm_layers[0].num_visible
+        
+        if self.unsupervised_dbn._n_layers > 0:
+            first_rbm = self.unsupervised_dbn.get_rbm_layer(0)
+            input_size = first_rbm.num_visible
         
         # 构建隐藏层（使用预训练权重初始化）
-        for i, (rbm, hidden_size) in enumerate(zip(self.unsupervised_dbn._dbn.rbm_layers, 
-                                                 self.hidden_layers_structure)):
+        for i in range(self.unsupervised_dbn._n_layers):  # 使用新的接口方法遍历层
+            rbm = self.unsupervised_dbn.get_rbm_layer(i)
+            hidden_size = self.hidden_layers_structure[i]
+            
             linear_layer = nn.Linear(input_size, hidden_size)
             self._initialize_layer_with_pretrained(linear_layer, rbm)
             layers.append(linear_layer)
@@ -487,7 +530,7 @@ class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin)
         
         if self.verbose:
             print(f"Built fine-tuning network with {len(layers)} layers")
-            print(f"Input size: {self.unsupervised_dbn._dbn.rbm_layers[0].num_visible}")
+            print(f"Input size: {self.unsupervised_dbn.get_rbm_layer(0).num_visible}")
             print(f"Output size: {len(self.classes_)}")
 
     def _train_fine_tune_network(self, X_tensor, y_tensor):
@@ -529,7 +572,7 @@ class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin)
 
     def _predict_with_fine_tuning(self, X):
         """使用微调网络预测 - 具体实现"""
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn._dbn.device)
+        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
         self.fine_tune_network.eval()
         
         with torch.no_grad():
@@ -539,7 +582,7 @@ class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin)
 
     def _predict_proba_fine_tuning(self, X):
         """使用微调网络预测概率 - 具体实现"""
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn._dbn.device)
+        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
         self.fine_tune_network.eval()
         
         with torch.no_grad():
@@ -549,7 +592,7 @@ class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin)
     def get_network_structure(self):
         """获取网络结构信息"""
         structure = {
-            'pretrain_layers': len(self.unsupervised_dbn._dbn.rbm_layers),
+            'pretrain_layers': self.unsupervised_dbn._n_layers,
             'fine_tune_layers': len(list(self.fine_tune_network)) if hasattr(self, 'fine_tune_network') and self.fine_tune_network else 0,
             'hidden_units': self.hidden_layers_structure,
             'num_classes': len(self.classes_),
@@ -651,7 +694,7 @@ class RBMVisualizer:
         y_sample = y[:n_images]
         
         # 重构图像
-        X_recon, recon_errors = rbm.reconstruct_get_hidden(X_sample, layer_index)
+        X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
         
         # 推断图像形状
         if img_shape is None:
