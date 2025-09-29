@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import torch
-import torch.nn as nn
+from torch import nn
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
@@ -24,7 +24,7 @@ class UnsupervisedDBN(nn.Module):
         self, 
         hidden_layers_structure=[100, 100]
         ):
-        super(UnsupervisedDBN, self).__init__()
+        super().__init__()
         self.hidden_layers_structure = hidden_layers_structure
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,7 +33,7 @@ class UnsupervisedDBN(nn.Module):
         self.input_dim = None
         self._is_trained = False
 
-    def _create_rbm_layer(self, input_dim):
+    def create_rbm_layer(self, input_dim):
         """创建RBM层"""
         self.input_dim = input_dim
         self.rbm_layers = nn.ModuleList()
@@ -55,7 +55,7 @@ class UnsupervisedDBN(nn.Module):
     def forward(self, X):
         """前向传播 - 特征变换"""
         if self.rbm_layers is None:
-            raise ValueError("Model not built yet. Call _create_rbm_layer first.")
+            raise ValueError("Model not built yet. Call create_rbm_layer first.")
         if not self._is_trained:
             raise ValueError("Model not trained yet. Call mark_as_trained() after training.")
         
@@ -183,7 +183,7 @@ class DBNTrainer:
         
         # 创建RBM层
         if dbn.num_layers == 0:
-            dbn._create_rbm_layer(X.shape[1])
+            dbn.create_rbm_layer(X.shape[1])
 
         for idx in range(dbn.num_layers):  # 使用 num_layers 和 get_rbm_layer 属性
             rbm = dbn.get_rbm_layer(idx)
@@ -199,6 +199,20 @@ class DBNTrainer:
         # 标记模型为已训练
         dbn.mark_as_trained()
         return dbn
+
+    def get_training_config(self):
+        """获取训练配置"""
+        return {
+            'learning_rate_rbm': self.learning_rate_rbm,
+            'n_epochs_rbm': self.n_epochs_rbm,
+            'batch_size': self.batch_size,
+            'verbose': self.verbose,
+            'shuffle': self.shuffle,
+            'drop_last': self.drop_last,
+            'plot_img': self.plot_img,
+            'random_state': self.random_state,
+            'device': str(getattr(self.dbn_ref, 'device', 'unknown'))
+        }
 
     def _train_rbm_layer(self, rbm, input_data, layer_idx):
         """训练单个RBM层"""
@@ -232,7 +246,7 @@ class DBNTrainer:
                 
                 # 每隔20个batch打印一次权重和偏置的统计信息
                 if self.verbose and i % 20 == 0:
-                    self._print_layer_stats(rbm, i, epoch)
+                    self._print_layer_stats(rbm)
 
                     # 样本和权重可视化
                     if self.plot_img:
@@ -291,9 +305,8 @@ class DBNTrainer:
         optimizer.step()
         return loss
 
-    def _print_layer_stats(self, rbm, batch_idx, epoch):
+    def _print_layer_stats(self, rbm):
         """打印统计信息"""
-        # print(f"Batch {batch_idx+1}: \n"
         print(f"jmean {torch.abs(rbm.quadratic_coef).mean().item():.6f}"
               f"jmax {torch.abs(rbm.quadratic_coef).max().item():.6f}")
         print(f"hmean {torch.abs(rbm.linear_bias).mean().item():.6f}"
@@ -333,7 +346,7 @@ class DBNTrainer:
 
     def _visualize_weights_gradients(self, rbm, batch_idx, epoch):
         """可视化权重和梯度"""
-        fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+        _, axes = plt.subplots(1, 3, figsize=(15, 4))
     
         # 权重矩阵
         weights = rbm.quadratic_coef.detach().cpu().numpy()
@@ -362,19 +375,19 @@ class DBNTrainer:
         #                dpi=150, bbox_inches='tight')
         plt.show()
 
-    def _visualize_current_reconstruction(self, rbm, batch_data, batch_idx, epoch, layer_index=0):
+    def _visualize_current_reconstruction(self, rbm, batch_data, batch_idx, epoch):
         """可视化当前batch的重建效果"""
 
         batch_numpy = batch_data.cpu().numpy()
 
         # 使用静态重建方法
-        recon_imgs, recon_errors = UnsupervisedDBN.reconstruct_with_rbm(rbm, batch_numpy)
+        recon_imgs, _ = UnsupervisedDBN.reconstruct_with_rbm(rbm, batch_numpy)
     
         # 选择前几个样本显示
         n_show = min(8, batch_data.shape[0])
         original_imgs = batch_data[:n_show].cpu().numpy()
     
-        fig, axes = plt.subplots(2, n_show, figsize=(3*n_show, 6))
+        _, axes = plt.subplots(2, n_show, figsize=(3*n_show, 6))
         if n_show == 1:
             axes = axes.reshape(2, 1)
     
