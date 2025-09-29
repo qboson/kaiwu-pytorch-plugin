@@ -1,337 +1,275 @@
-"""
-Restricted Boltzmann Machine
-包含RBM的类  以及训练RBM+model/仅训练model的函数 训练RBM+model会保存训练过程中的似然值和预测准确率
-"""
 import os
 import numpy as np
 from scipy.ndimage import shift
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn import linear_model
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils import gen_even_slices
 from sklearn.datasets import load_digits
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import confusion_matrix
 
-import torch
-from torch.optim import SGD
-from torch.utils.data import DataLoader, TensorDataset
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine
-from kaiwu.classical import SimulatedAnnealingOptimizer
+from kaiwu.torch_plugin import UnsupervisedDBN, DBNTrainer
 
-def _ensure_result_dir():
-    """确保 result 文件夹存在"""
-    os.makedirs('results', exist_ok=True)
+def translate_image(image, direction):
+    "图片转换"
+    if direction == "up":
+        return shift(image, [-1, 0], mode="constant", cval=0)
+    elif direction == "down":
+        return shift(image, [1, 0], mode="constant", cval=0)
+    elif direction == "left":
+        return shift(image, [0, -1], mode="constant", cval=0)
+    elif direction == "right":
+        return shift(image, [0, 1], mode="constant", cval=0)
+    else:
+        raise ValueError("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
 
-class RBMRunner(TransformerMixin, BaseEstimator):
+def load_data(plot_img=False):
+    "载入图片数据"
+    digits = load_digits()
+    images = digits.images  # 8x8 的图像矩阵
+    labels = digits.target  # 对应的标签
+
+    # 扩展数据集
+    expanded_images = []
+    expanded_labels = []
+    for image, label in zip(images, labels):
+        # 原始图像
+        expanded_images.append(image)
+        expanded_labels.append(label)
+        # 向四个方向平移
+        for direction in ["up", "down", "left", "right"]:
+            translated_image = translate_image(image, direction)
+            expanded_images.append(translated_image)
+            expanded_labels.append(label)
+            # 将列表转换为 NumPy 数组
+    expanded_images = np.array(expanded_images)
+    expanded_labels = np.array(expanded_labels)
+
+    # 可视化图像数据和标签
+    if plot_img:
+        plt.figure(figsize=(16,9))
+        for index in range(5):
+            plt.subplot(1,5, index + 1)
+            plt.imshow(expanded_images[index], origin="lower", cmap="gray")
+            plt.title('Training: %i\n' % expanded_labels[index], fontsize = 18)
+
+    # 将图像数据展平为二维数组 (n_samples, 64)
+    n_samples = expanded_images.shape[0]
+    data = expanded_images.reshape((n_samples, -1))
+    # 划分训练集和测试集
+    X_train, X_test, y_train, y_test = train_test_split(
+        data, expanded_labels, test_size=0.2, random_state=42
+    )
+
+    # 使用sklearn的MinMaxScaler进行归一化
+    scaler = MinMaxScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    return X_train, X_test, y_train, y_test
+
+class RBMPretrainer(BaseEstimator, TransformerMixin):
     """
-    RBMRunner类用于训练和使用受限玻尔兹曼机（RBM）模型。
-    Args:
-        n_components (int): 隐层单元的数量。
-        learning_rate (float): 学习率。
-        batch_size (int): 批处理大小。
-        n_epochs (int): 迭代次数。
-        verbose (int): 是否打印训练过程中的信息。
-        random_state (int, optional): 随机种子，用于结果的可重复性。
+    Scikit-learn兼容的RBM预训练
     """
-
     def __init__(
         self,
-        n_visible=64,
-        n_components=256,
-        *,
-        learning_rate=0.1,
+        n_components=100,
+        learning_rate_rbm=0.1,
+        n_epochs_rbm=10,
         batch_size=100,
-        n_epochs=30,
-        verbose=False,
+        verbose=True,
         shuffle=True,
         drop_last=False,
         plot_img=False,
-        random_state=None,
+        random_state=None
     ):
-        self.n_visible = n_visible
         self.n_components = n_components
-        self.learning_rate = learning_rate
+        self.learning_rate_rbm = learning_rate_rbm
+        self.n_epochs_rbm = n_epochs_rbm
         self.batch_size = batch_size
-        self.n_epochs = n_epochs
         self.verbose = verbose
         self.shuffle = shuffle
         self.drop_last = drop_last
         self.plot_img = plot_img
         self.random_state = random_state
-
-        self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # 用于存储RBM模型
-        self.rbm = RestrictedBoltzmannMachine(
-            n_visible, 
-            n_components,
-            h_range=[-1, 1],
-            j_range=[-1, 1]
-            ).to(self.device) # 将模型移动到指定设备（CPU/GPU）
-        self.optimizer = SGD(self.rbm.parameters(), lr=self.learning_rate)
-
-    def fit(self, X, y=None):  # 修改接口以符合scikit-learn约定
-        """
-        训练RBM模型
-        Args:
-            X: 训练数据，形状为 (n_samples, n_features)
-            y: 忽略，为兼容scikit-learn接口
-        """
-        # 设置随机种子
-        if self.random_state is not None:
-            torch.manual_seed(self.random_state)
-            np.random.seed(self.random_state)
-            # 如果使用CUDA，还需要设置CUDA随机种子
-            if torch.cuda.is_available():
-                torch.cuda.manual_seed(self.random_state)
-                torch.cuda.manual_seed_all(self.random_state)
-
-        X_torch = torch.FloatTensor(X).to(self.device)  # 转为torch张量并移动到设备
-
-        dataset = TensorDataset(X_torch)
-        loader = DataLoader(
-            dataset,
-            batch_size=self.batch_size,
-            shuffle=self.shuffle,
-            drop_last=self.drop_last,
+        
+        # 创建模型和训练器
+        self._rbm = UnsupervisedDBN([n_components])
+        self._trainer = DBNTrainer(
+            learning_rate_rbm=learning_rate_rbm,
+            n_epochs_rbm=n_epochs_rbm,
+            batch_size=batch_size,
+            verbose=verbose,
+            shuffle=shuffle,
+            drop_last=drop_last,
+            plot_img=plot_img,
+            random_state=random_state
         )
 
-        print("[RBM] Pre-training start:")
-        # 训练循环
-        for epoch in range(self.n_epochs):
-            total_objective = 0.0  # 当前epoch的总目标值
-            for idx, (batch_x,) in enumerate(loader): # # 获取batch数据, batch_x: size=[batch, n_visible]
-
-                x = self.rbm.get_hidden(batch_x)  # 正相（计算隐层激活）, size=[batch, n_hidden]
-                s = self.rbm.sample(self.sampler)  # 负相（采样重构数据）, size=[[batch, n_visible + n_hidden]
-                self.optimizer.zero_grad()  # 梯度清零
-
-                # 计算目标函数（等价于负对数似然），并加权衰减项
-                w_weight_decay = 0.02 * torch.sum(self.rbm.quadratic_coef**2)  # 权重衰减
-                b_weight_decay = 0.05 * torch.sum(self.rbm.linear_bias**2)  # 偏置衰减
-                objective = self.rbm.objective(x, s) + w_weight_decay + b_weight_decay
-
-                # 反向传播并更新参数
-                objective.backward()
-                self.optimizer.step()
-
-                # 累加目标值
-                total_objective += objective.item()
-
-                 # 计算当前epoch的平均目标值
-                avg_objective = total_objective / len(loader)
-                
-                # 如果verbose，定期评估模型性能和可视化参数
-                if self.verbose:
-                    print(f"Iteration {idx+1}, Average Objective: {avg_objective:.6f}")
-                    
-                    if idx % 20 == 0:
-                        # 打印权重和偏置的均值与最大值
-                        print(
-                            f"jmean {torch.abs(self.rbm.quadratic_coef).mean()}"
-                            f" jmax {torch.abs(self.rbm.quadratic_coef).max()}"
-                        )
-                        print(
-                            f"hmean {torch.abs(self.rbm.linear_bias).mean()}"
-                            f" hmax {torch.abs(self.rbm.linear_bias).max()}"
-                        )
-        
-                        if self.plot_img:
-                            display_samples = (
-                                self.rbm.sample(self.sampler)
-                                .cpu()
-                                .numpy()[:20, : self.rbm.num_visible]
-                            )
-                            # 生成样本
-                            plt.figure(figsize=(16, 2))
-                            plt.imshow(self.gen_digits_image(display_samples, 8))
-                            plt.title(f"Generated samples at epoch {epoch+1}, batch {idx+1}")
-                            plt.show()
-                            _, axes = plt.subplots(1, 2)
-                            axes[0].imshow(self.rbm.quadratic_coef.detach().cpu().numpy())
-                            axes[1].imshow(self.rbm.quadratic_coef.grad.detach().cpu().numpy())
-                            plt.tight_layout()
-                            plt.show()
-        
-            print(f"[RBM] Epoch {epoch+1}/{self.n_epochs} \tAverage Objective: {avg_objective:.6f}\n")
-        print("[RBM] Pre-training finished")
-        
+    def fit(self, X, y=None):
+        """训练模型"""
+        self._rbm.create_rbm_layer(X.shape[1])
+        self._trainer.train(self._rbm, X)
         return self
 
-    # 在RBMRunner类中添加特征提取方法
     def transform(self, X):
-        """
-        提取隐藏层特征
+        """特征变换"""
+        return self._rbm.transform(X)
+
+    # 提供访问RBM层的方法
+    def rbm_layer(self, index):
+        """获取指定RBM层"""
+        return self._rbm.get_rbm_layer(index)
+
+class RBMVisualizer:
+    def __init__(self, result_dir='results'):
+        """可视化工具类
+        
         Args:
-            X: 输入数据，形状为 (n_samples, n_features)
-        Returns:
-            隐藏层特征，形状为 (n_samples, n_components)
+            result_dir (str): 结果保存目录
         """
-        if self.rbm is None:
-            raise ValueError("RBM model not trained yet. Call fit first.")
-        X_torch = torch.FloatTensor(X).to(self.device)
-        with torch.no_grad():
-            hidden_output = self.rbm.get_hidden(X_torch)
-            features = hidden_output[:, self.rbm.num_visible:]
-        return features.cpu().numpy()
-
-    def translate_image(self, image, direction):
-        "图片转换"
-        if direction == "up":
-            return shift(image, [-1, 0], mode="constant", cval=0)
-        elif direction == "down":
-            return shift(image, [1, 0], mode="constant", cval=0)
-        elif direction == "left":
-            return shift(image, [0, -1], mode="constant", cval=0)
-        elif direction == "right":
-            return shift(image, [0, 1], mode="constant", cval=0)
-        else:
-            raise ValueError("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
-
-    def load_data(self, plot_img=False):
-        "载入图片数据"
-        digits = load_digits()
-        images = digits.images  # 8x8 的图像矩阵
-        labels = digits.target  # 对应的标签
+        self.result_dir = result_dir
+        self._ensure_result_dir()
         
-        # 获取图像数据和标签
-        # 扩展数据集
-        expanded_images = []
-        expanded_labels = []
-        for image, label in zip(images, labels):
-            # 原始图像
-            expanded_images.append(image)
-            expanded_labels.append(label)
-            # 向四个方向平移
-            for direction in ["up", "down", "left", "right"]:
-                translated_image = self.translate_image(image, direction)
-                expanded_images.append(translated_image)
-                expanded_labels.append(label)
-                # 将列表转换为 NumPy 数组
-        expanded_images = np.array(expanded_images)
-        expanded_labels = np.array(expanded_labels)
-
-        # 可视化图像数据和标签
-        if plot_img:
-            plt.figure(figsize=(16,9))
-            for index in range(5):
-                plt.subplot(1,5, index + 1)
-                plt.imshow(expanded_images[index], origin="lower", cmap="gray")
-                plt.title('Training: %i\n' % expanded_labels[index], fontsize = 18)
-            
-        # 将图像数据展平为二维数组 (n_samples, 64)
-        n_samples = expanded_images.shape[0]
-        data = expanded_images.reshape((n_samples, -1))
-        
-        # 划分训练集和测试集
-        X_train, X_test, y_train, y_test = train_test_split(
-            data, expanded_labels, test_size=0.2, random_state=42
-        )
-
-        # 使用sklearn的MinMaxScaler进行归一化
-        scaler = MinMaxScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
-
-        return X_train, X_test, y_train, y_test
-
-    def gen_digits_image(self, X, size=8):
-        """
-        生成图片
-        Args:
-            X: 形状为 (20, size * size) 的数组
-        Returns：
-            拼接后的大图像，形状为 (8, 20 * size)
-        """
-
-        plt.rcParams["image.cmap"] = "gray"
-        # 先将每个数字的特征向量还原为8x8图像
-        digits = X.reshape(20, size, size)  # 形状：(20, 8, 8)
-        # 将20个8x8的图片横向拼接
-        image = np.hstack(digits)  # 形状：(8, 160)
-        return image
-
-    # 绘制原始和重构图像
-    def plot_images(self, images, labels, title='Reconstructed Images', save_as="qbm_reconstructed_images", save_pdf=False):
-        """
-        绘制原始和重构图像
-        """
-        if self.rbm is None:
-            raise ValueError("RBM model not trained yet. Call fit first.")
-    
-        # 重构
-        with torch.no_grad():
-            images = images.to(self.device)
-            images_binary = (images > 0.5).float()
-            hidden_activations = self.rbm.get_hidden(images_binary)
-            reconstructions = self.rbm.sample(self.sampler)[:, :self.rbm.num_visible]
-    
-        # 显示原始和重构图像
-        num_samples = len(images)
-    
-        fig, axes = plt.subplots(2, num_samples, gridspec_kw={'wspace':0, 'hspace':0.1}, figsize=(2*num_samples, 4))
-        
-        # 添加文本标签
-        if num_samples > 0:
-            axes[0, 0].text(-2, 3, "original", size=15,
-                           verticalalignment='center', rotation=-270)
-            axes[1, 0].text(-2, 2, "reconstructed", size=15,
-                           verticalalignment='center', rotation=-270)
-    
-        for n in range(num_samples):
-            axes[0, n].imshow(images[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray)
-            axes[1, n].imshow(reconstructions[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray)
-            axes[0, n].set_title(f'Label: {labels[n]}', fontsize=18)
-            axes[0, n].axis('off')
-            axes[1, n].axis('off')
-    
-        # 保存结果
-        if save_pdf:
-            _ensure_result_dir()
-            plt.savefig(f'results/{save_as}.pdf', 
-                    dpi=300, bbox_inches='tight', format='pdf')
-        plt.show()
+    def _ensure_result_dir(self):
+        """确保结果目录存在"""
+        os.makedirs(self.result_dir, exist_ok=True)
 
     # 绘制权重
-    def plot_weights(self, save_as="qbm_weights", save_pdf=False):
-        """绘制权重"""
-        weights = self.rbm.quadratic_coef.detach().cpu().numpy()
+    def plot_weights(self, rbm, n_visible=64, grid_shape=(8, 16), figsize=(16, 7), 
+                     title_suffix="RBM Weights", save_as="qbm_weights", save_pdf=False):
+        """绘制RBM权重
+        
+        Args:
+            rbm: RBM模型
+            n_visible (int): 可见单元数量
+            grid_shape (tuple): 网格形状 (rows, cols)
+            figsize (tuple): 图形大小
+            title_suffix (str): 标题后缀
+            save_as (str): 保存文件名
+            save_pdf (bool): 是否保存为PDF
+        """
+        weights = rbm.quadratic_coef.detach().cpu().numpy()
     
-        fig, axes = plt.subplots(8, 16, gridspec_kw={'wspace':0.1, 'hspace':0.1}, figsize=(16, 7))
-        fig.suptitle(f'{self.n_components} components extracted by QBM', fontsize=16)
+        fig, axes = plt.subplots(grid_shape[0], grid_shape[1], 
+                                 gridspec_kw={'wspace':0.1, 'hspace':0.1}, 
+                                 figsize=figsize)
+        fig.suptitle(f'{rbm.num_hidden} components extracted by RBM - {title_suffix}', fontsize=16)
         fig.subplots_adjust()
     
         for i, ax in enumerate(axes.flatten()):
             if i < weights.shape[1]:
-                ax.imshow(weights[:, i].reshape(8, 8), cmap=plt.cm.gray)
+                # 重塑权重为图像形状
+                weight_img = weights[:, i].reshape(int(np.sqrt(n_visible)), int(np.sqrt(n_visible)))
+                ax.imshow(weight_img, cmap=plt.cm.gray)
             ax.axis('off')
     
         # 保存结果
         if save_pdf:
-            _ensure_result_dir()
-            plt.savefig(f'results/{save_as}.pdf', 
+            plt.savefig(f'{self.result_dir}/{save_as}.pdf', 
                         dpi=300, bbox_inches='tight', format='pdf')
         plt.show()
     
-    # 绘制混淆矩阵
-    def plot_confusion_matrix(self, y_true, y_pred, title_suffix="", save_pdf=False):
-        """绘制混淆矩阵"""
+    def plot_confusion_matrix(self, y_true, y_pred, 
+                              title_suffix="", save_as="confusion_matrix", save_pdf=False):
+        """绘制混淆矩阵
+        
+        Args:
+            y_true: 真实标签
+            y_pred: 预测标签
+            title_suffix (str): 标题后缀
+            save_as (str): 保存文件名
+            save_pdf (bool): 是否保存为PDF
+        """
         cm = confusion_matrix(y_true, y_pred)
         plt.figure(figsize=(10, 8))
         sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
         plt.title(f'Confusion Matrix ({title_suffix})', fontsize=18)
         plt.xlabel('Predicted Label', fontsize=16)
         plt.ylabel('True Label', fontsize=16)
-        # plt.xticks(rotation=45)
-
-        # 保存结果
+        
         if save_pdf:
-            _ensure_result_dir()
-            plt.savefig(f'results/rbm_confusion_matrix_{title_suffix}.pdf', 
+            plt.savefig(f'{self.result_dir}/{save_as}_{title_suffix}.pdf', 
                         dpi=300, bbox_inches='tight', format='pdf')
         plt.tight_layout()
         plt.show()
+
+    def plot_reconstructed_images(self, rbm, X, y, layer_index=0, n_images=10, 
+                                  title_suffix="", save_pdf=False, img_shape=None):
+        """
+        绘制原始和重构图像的对比
+        
+        Args:
+            X: 输入图像数据
+            y: 图像标签
+            layer_index: 使用的RBM层索引
+            n_images: 要显示的图像数量
+            title_suffix: 标题后缀
+            save_pdf: 是否保存为PDF
+            img_shape: 图像形状，如(8,8)。如果为None，则尝试自动推断
+        """
+        
+        # 限制图像数量
+        n_images = min(n_images, X.shape[0])
+        X_sample = X[:n_images]
+        y_sample = y[:n_images]
+        
+        # 重构图像
+        X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
+        # X_recon, recon_errors = rbm.reconstruct_get_hidden(X_sample, layer_index)
+        
+        # 推断图像形状
+        if img_shape is None:
+            n_features = X_sample.shape[1]
+            img_size = int(np.sqrt(n_features))
+            if img_size * img_size == n_features:
+                img_shape = (img_size, img_size)
+        
+        # 创建图形
+        fig, axes = plt.subplots(2, n_images, figsize=(2*n_images, 4))
+        if n_images == 1:
+            axes = axes.reshape(2, 1)
+        
+        # 设置标题
+        plt.suptitle(f'Original vs Reconstructed Images ({title_suffix})', fontsize=16)
+        
+        # 绘制图像
+        for i in range(n_images):
+            # 原始图像
+            if img_shape[0] * img_shape[1] == X_sample.shape[1]:
+                axes[0, i].imshow(X_sample[i].reshape(img_shape), cmap='gray')
+            else:
+                # 如果形状不匹配，显示前img_shape[0]*img_shape[1]个像素
+                axes[0, i].imshow(X_sample[i][:img_shape[0]*img_shape[1]].reshape(img_shape), cmap='gray')
+            axes[0, i].set_title(f'Label: {y_sample[i]}', fontsize=10)
+            axes[0, i].axis('off')
+            
+            # 重构图像
+            if img_shape[0] * img_shape[1] == X_recon.shape[1]:
+                axes[1, i].imshow(X_recon[i].reshape(img_shape), cmap='gray')
+            else:
+                axes[1, i].imshow(X_recon[i][:img_shape[0]*img_shape[1]].reshape(img_shape), cmap='gray')
+            axes[1, i].set_title(f'Recon (err: {recon_errors[i]:.4f})', fontsize=10)
+            axes[1, i].axis('off')
+        
+        # 添加y轴标签
+        axes[0, 0].set_ylabel('Original', rotation=90, size=12)
+        axes[1, 0].set_ylabel('Reconstructed', rotation=90, size=12)
+        
+        plt.tight_layout()
+        
+        # 保存结果
+        if save_pdf:
+            plt.savefig(f'results/reconstructed_images_{title_suffix}.pdf', 
+                        dpi=300, bbox_inches='tight', format='pdf')
+        
+        plt.show()
+        
+        # 打印平均重构误差
+        avg_error = np.mean(recon_errors)
+        print(f"Average reconstruction error: {avg_error:.4f}")
+        
+        return recon_errors
