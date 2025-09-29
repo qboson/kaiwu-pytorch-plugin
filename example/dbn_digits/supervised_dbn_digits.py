@@ -117,7 +117,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """训练模型"""
-        self._dbn._create_rbm_layer(X.shape[1])
+        self._dbn.create_rbm_layer(X.shape[1])
         self._trainer.train(self._dbn, X)
         return self
 
