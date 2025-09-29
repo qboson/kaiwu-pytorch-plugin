@@ -318,9 +318,9 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         
         print("All parameters saved successfully!")
 
-class PyTorchAbstractSupervisedDBN(AbstractSupervisedDBN):
+class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
     """
-    抽象监督DBN，提供下游分类器训练和PyTorch相关的通用工具
+    抽象监督DBN，提供下游分类器训练和fine-tuning相关的通用工具
     """
     def __init__(
         self, 
@@ -374,8 +374,8 @@ class PyTorchAbstractSupervisedDBN(AbstractSupervisedDBN):
         self.classifier.fit(X_features, y)
         
         if self.verbose:
-            train_accuracy = self.classifier.score(X_features, y)
-            print(f"Classifier training accuracy: {train_accuracy:.4f}")
+            train_accuracy = self.classifier.score(X_features, y)*100
+            print(f"Classifier training accuracy: {train_accuracy:.2f}%")
 
     def _predict_with_classifier(self, X):
         """使用分类器预测"""
@@ -478,7 +478,7 @@ class PyTorchAbstractSupervisedDBN(AbstractSupervisedDBN):
 
 
 # =================== 具体的分类DBN实现 =====================
-class SupervisedDBNClassification(PyTorchAbstractSupervisedDBN, ClassifierMixin):
+class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMixin):
     """
     PyTorch实现的监督DBN分类器
     """
