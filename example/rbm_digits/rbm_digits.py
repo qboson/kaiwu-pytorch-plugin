@@ -111,7 +111,7 @@ class RBMPretrainer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """训练模型"""
-        self._rbm._create_rbm_layer(X.shape[1])
+        self._rbm.create_rbm_layer(X.shape[1])
         self._trainer.train(self._rbm, X)
         return self
 
