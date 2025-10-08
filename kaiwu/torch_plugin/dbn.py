@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-"""deep belief network DBN模型
-包含DBN的类  以及训练DBN+model/仅训练model的函数 训练DBN+model会保存训练过程中的似然值和预测准确率
+"""Deep Belief Network (DBN) model.
+
+This module contains the DBN class and functions for training the DBN+model
+or only the model. Training the DBN+model will save the likelihood values
+and prediction accuracy during the training process.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,13 +16,16 @@ from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 
 
-# =================== 无监督DBN通用模型 =====================
+# =================== Unsupervised DBN General Model =====================
 class UnsupervisedDBN(nn.Module):
-    """
-    无监督DBN（堆叠RBM）通用模型架构
-    参数:
-        hidden_layers_structure (list): 每层隐藏单元个数
-        device (torch.device): 计算设备
+    """A general unsupervised Deep Belief Network (DBN) architecture.
+
+    This model is a stack of Restricted Boltzmann Machines (RBMs).
+
+    Args:
+        hidden_layers_structure (list, optional): A list of integers
+            representing the number of hidden units in each layer.
+            Defaults to [100, 100].
     """
 
     def __init__(self, hidden_layers_structure=None):
@@ -37,20 +43,27 @@ class UnsupervisedDBN(nn.Module):
         self._is_trained = False
 
     def create_rbm_layer(self, input_dim):
-        """创建RBM层"""
+        """Creates the layers of RBMs for the DBN.
+
+        Args:
+            input_dim (int): The dimension of the input data (number of visible units).
+
+        Returns:
+            UnsupervisedDBN: The instance itself with the RBM layers created.
+        """
         self.input_dim = input_dim
         self.rbm_layers = nn.ModuleList()
 
         current_dim = input_dim
         for n_hidden in self.hidden_layers_structure:
             rbm = RestrictedBoltzmannMachine(
-                num_visible=current_dim,  # 可见层单元数（特征维度）
-                num_hidden=n_hidden,  # 隐层单元数
-                h_range=[-1, 1],  # 隐层偏置范围
-                j_range=[-1, 1],  # 权重范围
+                num_visible=current_dim,  # Number of visible units (feature dimension)
+                num_hidden=n_hidden,  # Number of hidden units
+                h_range=[-1, 1],  # Range for hidden biases
+                j_range=[-1, 1],  # Range for weights
             ).to(
                 self.device
-            )  # 将模型移动到指定设备（CPU/GPU）
+            )  # Move model to specified device (CPU/GPU)
             self.rbm_layers.append(rbm)
             current_dim = n_hidden
 
@@ -58,7 +71,17 @@ class UnsupervisedDBN(nn.Module):
         return self
 
     def forward(self, data_in):
-        """前向传播 - 特征变换"""
+        """Performs a forward pass to transform the input data.
+
+        Args:
+            data_in (numpy.ndarray): The input data.
+
+        Returns:
+            numpy.ndarray: The transformed data after passing through all RBM layers.
+
+        Raises:
+            ValueError: If the model has not been built or trained yet.
+        """
         if self.rbm_layers is None:
             raise ValueError("Model not built yet. Call create_rbm_layer first.")
         if not self._is_trained:
@@ -74,15 +97,34 @@ class UnsupervisedDBN(nn.Module):
                 )
                 data_in = (
                     hidden_output[:, rbm.num_visible :].cpu().numpy()
-                )  # 只取隐藏层部分
+                )  # Extract only the hidden part
         return data_in
 
     def transform(self, data_in):
-        """sklearn兼容的transform方法"""
+        """An sklearn-compatible transform method.
+
+        Args:
+            data_in (numpy.ndarray): The input data.
+
+        Returns:
+            numpy.ndarray: The transformed data.
+        """
         return self.forward(data_in)
 
     def reconstruct(self, data_in, layer_index=0):
-        """从指定层重建输入"""
+        """Reconstructs the input from a specified RBM layer.
+
+        Args:
+            data_in (numpy.ndarray): The input data to be reconstructed.
+            layer_index (int, optional): The index of the RBM layer to use for reconstruction.
+                Defaults to 0.
+
+        Returns:
+            numpy.ndarray: The reconstructed data.
+
+        Raises:
+            ValueError: If the model has no RBM layers or the layer index is out of range.
+        """
         if self.rbm_layers is None or len(self.rbm_layers) == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
 
@@ -93,39 +135,62 @@ class UnsupervisedDBN(nn.Module):
         return self.reconstruct_with_rbm(rbm, data_in, self.device)
 
     def mark_as_trained(self):
-        """标记模型为已训练状态"""
+        """Marks the model as trained.
+
+        Returns:
+            UnsupervisedDBN: The instance itself.
+        """
         self._is_trained = True
         return self
 
     def get_rbm_layer(self, index):
-        """获取指定索引的RBM层"""
+        """Gets the RBM layer at the specified index.
+
+        Args:
+            index (int): The index of the RBM layer.
+
+        Returns:
+            RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise None.
+        """
         if index < len(self.rbm_layers):
             return self.rbm_layers[index]
         return None
 
     @staticmethod
     def reconstruct_with_rbm(rbm, data_in, device=None):
-        """
-        使用单个RBM重建数据
+        """Reconstructs data using a single RBM.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The trained RBM model.
+            data_in (numpy.ndarray): The input data.
+            device (torch.device, optional): The device to perform computation on.
+                If None, uses the RBM's device. Defaults to None.
+
+        Returns:
+            tuple[numpy.ndarray, numpy.ndarray]: A tuple containing:
+                - The reconstructed visible layer data.
+                - The reconstruction error for each sample.
         """
         if device is None:
             device = rbm.device
 
-            # 转换为PyTorch张量
+        # Convert to PyTorch tensor
         data_in = torch.FloatTensor(data_in).to(device)
 
         with torch.no_grad():
-            # 使用RBM的get_hidden获取隐藏层表示
+            # Get hidden representation using RBM's get_hidden
             hidden_act = rbm.get_hidden(data_in)
-            hidden_part = hidden_act[:, rbm.num_visible :]  # 只取隐藏层部分
+            hidden_part = hidden_act[
+                :, rbm.num_visible :
+            ]  # Extract only the hidden part
 
-            # 重建可见层（使用权重转置）
+            # Reconstruct visible layer (using transposed weights)
             visible_recon = torch.sigmoid(
                 torch.matmul(hidden_part, rbm.quadratic_coef.t())
                 + rbm.linear_bias[: rbm.num_visible]
             )
 
-            # 计算重建误差
+            # Calculate reconstruction error
             recon_errors = (
                 torch.mean((data_in - visible_recon) ** 2, dim=1).cpu().numpy()
             )
@@ -134,21 +199,30 @@ class UnsupervisedDBN(nn.Module):
 
     @property
     def num_layers(self):
-        """返回RBM层数"""
+        """Returns the number of RBM layers.
+
+        Returns:
+            int: The number of layers.
+        """
         return len(self.rbm_layers)
 
     @property
     def output_dim(self):
-        """返回输出维度"""
+        """Returns the output dimension of the DBN.
+
+        Returns:
+            int: The dimension of the final hidden layer.
+        """
         if len(self.rbm_layers) > 0:
             return self.rbm_layers[-1].num_hidden
         return self.input_dim
 
 
-# =================== 无监督DBN训练器 =====================
+# =================== Unsupervised DBN Trainer =====================
 class DBNTrainer:
-    """
-    DBN训练器，包含训练模块
+    """A trainer for the DBN model.
+
+    This class handles the layer-wise pre-training of the DBN.
     """
 
     def __init__(
@@ -163,6 +237,28 @@ class DBNTrainer:
         random_state=None,
         dbn_ref=None,
     ):
+        """Initializes the DBNTrainer.
+
+        Args:
+            learning_rate_rbm (float, optional): Learning rate for RBM training.
+                Defaults to 0.1.
+            n_epochs_rbm (int, optional): Number of training epochs for each RBM.
+                Defaults to 10.
+            batch_size (int, optional): The batch size for training.
+                Defaults to 100.
+            verbose (bool, optional): If True, prints training progress.
+                Defaults to True.
+            shuffle (bool, optional): If True, shuffles the training data.
+                Defaults to True.
+            drop_last (bool, optional): If True, drops the last incomplete batch.
+                Defaults to False.
+            plot_img (bool, optional): If True, plots training progress images.
+                Defaults to False.
+            random_state (int, optional): Seed for random number generators.
+                Defaults to None.
+            dbn_ref (UnsupervisedDBN, optional): A reference to the DBN model.
+                Defaults to None.
+        """
         self.learning_rate_rbm = learning_rate_rbm
         self.n_epochs_rbm = n_epochs_rbm
         self.batch_size = batch_size
@@ -176,31 +272,35 @@ class DBNTrainer:
         self.dbn_ref = dbn_ref
 
     def train(self, dbn, data_in):
-        """
-        预训练DBN模型
+        """Pre-trains the DBN model layer by layer.
+
         Args:
-            dbn: UnsupervisedDBN实例
-            data_in: 训练数据，形状为 (n_samples, n_features)
+            dbn (UnsupervisedDBN): An instance of the UnsupervisedDBN model.
+            data_in (numpy.ndarray): The training data, shape (n_samples, n_features).
+
         Returns:
-            训练后的DBN模型
+            UnsupervisedDBN: The trained DBN model.
+
+        Raises:
+            ValueError: If `dbn` is not an instance of UnsupervisedDBN.
         """
         if not isinstance(dbn, UnsupervisedDBN):
             raise ValueError("dbn must be an instance of UnsupervisedDBN")
 
-        # 保存DBN
+        # Save DBN reference
         self.dbn_ref = dbn
 
-        # 设置随机种子
+        # Set random seed
         if self.random_state is not None:
             self._set_random_seed()
 
         input_data = data_in.astype(np.float32)
 
-        # 创建RBM层
+        # Create RBM layers if they don't exist
         if dbn.num_layers == 0:
             dbn.create_rbm_layer(data_in.shape[1])
 
-        for idx in range(dbn.num_layers):  # 使用 num_layers 和 get_rbm_layer 属性
+        for idx in range(dbn.num_layers):  # Use num_layers and get_rbm_layer
             rbm = dbn.get_rbm_layer(idx)
             if self.verbose:
                 n_visible = rbm.num_visible
@@ -210,15 +310,19 @@ class DBNTrainer:
                     f"{n_visible} -> {n_hidden}"
                 )
 
-            # 训练当前RBM层
+            # Train the current RBM layer
             input_data = self._train_rbm_layer(rbm, input_data, idx)
 
-        # 标记模型为已训练
+        # Mark the model as trained
         dbn.mark_as_trained()
         return dbn
 
     def get_training_config(self):
-        """获取训练配置"""
+        """Gets the training configuration.
+
+        Returns:
+            dict: A dictionary containing the training configuration.
+        """
         return {
             "learning_rate_rbm": self.learning_rate_rbm,
             "n_epochs_rbm": self.n_epochs_rbm,
@@ -232,10 +336,19 @@ class DBNTrainer:
         }
 
     def _train_rbm_layer(self, rbm, data_in, layer_idx):
-        """训练单个RBM层"""
+        """Trains a single RBM layer.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer to train.
+            data_in (numpy.ndarray): The input data for this layer.
+            layer_idx (int): The index of the current layer.
+
+        Returns:
+            numpy.ndarray: The output of the trained RBM layer (hidden activations).
+        """
         optimizer = SGD(rbm.parameters(), lr=self.learning_rate_rbm)
 
-        # 使用当前层的输入数据，而不是原始数据
+        # Use the input data for the current layer, not the original data
         data_in = torch.FloatTensor(data_in).to(rbm.device)
 
         dataset = TensorDataset(data_in)
@@ -249,37 +362,37 @@ class DBNTrainer:
         if self.verbose:
             print("[DBN] Pre-training start:")
 
-        # 记录训练过程中的样本
+        # Record samples during training
         training_samples = []
 
-        # 训练循环
+        # Training loop
         for epoch in range(self.n_epochs_rbm):
-            total_loss = 0.0  # 当前epoch的总目标值
+            total_loss = 0.0  # Total objective value for the current epoch
             for i, (batch_x,) in enumerate(
                 loader
-            ):  # 获取batch数据, batch_x: size=[batch, n_visible]
+            ):  # Get batch data, batch_x: size=[batch, n_visible]
                 loss = self._train_batch(rbm, optimizer, batch_x)
 
-                # 累加目标值
+                # Accumulate objective value
                 total_loss += loss.item()
 
-                # 每隔20个batch打印一次权重和偏置的统计信息
+                # Print weight and bias statistics every 20 batches
                 if self.verbose and i % 20 == 0:
                     self._print_layer_stats(rbm)
 
-                    # 样本和权重可视化
+                    # Sample and weight visualization
                     if self.plot_img:
                         self._visualize_training_progress(rbm, i, epoch, batch_x)
 
-                    # 记录样本
-                    if i % 50 == 0:  # 每50个batch记录一次
+                    # Record samples
+                    if i % 50 == 0:  # Record every 50 batches
                         training_samples.append(
                             {
                                 "batch": i,
                                 "epoch": epoch,
                                 "original": batch_x[:5]
                                 .cpu()
-                                .numpy(),  # 保存几个原始样本
+                                .numpy(),  # Save a few original samples
                                 "weights": rbm.quadratic_coef.detach()
                                 .cpu()
                                 .numpy()
@@ -287,56 +400,73 @@ class DBNTrainer:
                             }
                         )
 
-                # 计算当前epoch的平均目标值
+                # Calculate average objective value for the current epoch
                 avg_loss = total_loss / len(loader)
 
-                # 每隔5个batch打印一次epoch的平均损失
+                # Print epoch average loss every 5 batches
                 if self.verbose and i % 5 == 0:
                     print(f"Iteration {i+1}, Average Loss: {avg_loss:.6f}")
 
-            # 打印每层RBM的平均损失以及数据形状
+            # Print average loss and data shape for each RBM layer
             if self.verbose:
                 print(f"Layer {layer_idx+1}, Epoch {epoch+1}: Loss {avg_loss:.6f}")
                 print(f"Output shape after layer {layer_idx+1}: {data_in.shape}")
 
-            # 打印每个epoch的平均损失
+            # Print average loss for each epoch
             if self.verbose:
                 print(
                     f"[RBM] Epoch {epoch+1}/{self.n_epochs_rbm} \tAverage Loss: {avg_loss:.6f}"
                 )
 
-            # 每个epoch结束后的重建评估
-            if self.verbose and epoch % 1 == 0:  # 每个epoch评估一次
+            # Reconstruction evaluation at the end of each epoch
+            if self.verbose and epoch % 1 == 0:  # Evaluate every epoch
                 self._evaluate_reconstruction_quality(rbm, data_in, epoch, layer_idx)
 
         if self.verbose:
             print("[DBN] Pre-training finished")
 
-        # 提取特征作为下一层输入
+        # Extract features as input for the next layer
         with torch.no_grad():
             hidden_output = rbm.get_hidden(data_in)
-            return hidden_output[:, rbm.num_visible :].cpu().numpy()  # 只取隐藏层部分
+            return (
+                hidden_output[:, rbm.num_visible :].cpu().numpy()
+            )  # Extract only the hidden part
 
     def _train_batch(self, rbm, optimizer, batch_x):
-        """训练单个batch"""
-        h_prob = rbm.get_hidden(batch_x)  # 正相（计算隐层激活）, size=[batch, n_hidden]
+        """Trains a single batch.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+            optimizer (torch.optim.Optimizer): The optimizer.
+            batch_x (torch.Tensor): The input batch.
+
+        Returns:
+            torch.Tensor: The loss value for the batch.
+        """
+        h_prob = rbm.get_hidden(
+            batch_x
+        )  # Positive phase (compute hidden activations), size=[batch, n_hidden]
         s = rbm.sample(
             self.sampler
-        )  # 负相（采样重构数据）, size=[[batch, n_visible + n_hidden]
-        optimizer.zero_grad()  # 梯度清零
+        )  # Negative phase (sample to reconstruct data), size=[[batch, n_visible + n_hidden]
+        optimizer.zero_grad()  # Clear gradients
 
-        # 计算损失函数（负对数似然）+正则项
-        w_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)  # 权重衰减
-        b_decay = 0.05 * torch.sum(rbm.linear_bias**2)  # 偏置衰减
+        # Calculate loss function (negative log-likelihood) + regularization terms
+        w_decay = 0.02 * torch.sum(rbm.quadratic_coef**2)  # Weight decay
+        b_decay = 0.05 * torch.sum(rbm.linear_bias**2)  # Bias decay
         loss = rbm.objective(h_prob, s) + w_decay + b_decay
 
-        # 反向传播并更新参数
+        # Backpropagation and parameter update
         loss.backward()
         optimizer.step()
         return loss
 
     def _print_layer_stats(self, rbm):
-        """打印统计信息"""
+        """Prints statistical information about the RBM layer.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+        """
         print(
             f"jmean {torch.abs(rbm.quadratic_coef).mean().item():.6f}"
             f"jmax {torch.abs(rbm.quadratic_coef).max().item():.6f}"
@@ -347,20 +477,33 @@ class DBNTrainer:
         )
 
     def _visualize_training_progress(self, rbm, batch_idx, epoch, current_batch):
-        """训练过程中的综合可视化"""
-        # 生成新样本（模型学到了什么）
+        """Comprehensive visualization during training.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+            batch_idx (int): The current batch index.
+            epoch (int): The current epoch.
+            current_batch (torch.Tensor): The current batch data.
+        """
+        # Generate new samples (what the model has learned)
         self._visualize_generated_samples(rbm, batch_idx, epoch)
 
-        # 权重和梯度可视化（模型如何学习）
+        # Weights and gradients visualization (how the model learns)
         self._visualize_weights_gradients(rbm, batch_idx, epoch)
 
-        # 当前batch的重建效果（实时重建能力）
+        # Reconstruction of the current batch (real-time reconstruction ability)
         self._visualize_current_reconstruction(rbm, current_batch, batch_idx, epoch)
 
     def _visualize_generated_samples(self, rbm, batch_idx, epoch):
-        """可视化生成的样本"""
+        """Visualizes samples generated from the model.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+            batch_idx (int): The current batch index.
+            epoch (int): The current epoch.
+        """
         with torch.no_grad():
-            # 从模型分布中生成新样本
+            # Generate new samples from the model's distribution
             display_samples = (
                 rbm.sample(self.sampler).cpu().numpy()[:20, : rbm.num_visible]
             )
@@ -370,29 +513,31 @@ class DBNTrainer:
         plt.title(f"Generated Samples - Epoch {epoch+1}, Batch {batch_idx+1}")
         plt.axis("off")
 
-        # # 保存生成样本图像
-        # if self.save_training_plots:
-        #     plt.savefig(f'results/generated_epoch{epoch+1}_batch{batch_idx}.png',
-        #                dpi=150, bbox_inches='tight')
         plt.show()
 
     def _visualize_weights_gradients(self, rbm, batch_idx, epoch):
-        """可视化权重和梯度"""
+        """Visualizes the weight matrix and its gradients.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+            batch_idx (int): The current batch index.
+            epoch (int): The current epoch.
+        """
         _, axes = plt.subplots(1, 3, figsize=(15, 4))
 
-        # 权重矩阵
+        # Weight matrix
         weights = rbm.quadratic_coef.detach().cpu().numpy()
         im0 = axes[0].imshow(weights, cmap="RdBu_r", aspect="auto")
         axes[0].set_title("Weight Matrix")
         plt.colorbar(im0, ax=axes[0])
 
-        # 权重梯度
+        # Weight gradients
         grad = rbm.quadratic_coef.grad.detach().cpu().numpy()
         im1 = axes[1].imshow(grad, cmap="RdBu_r", aspect="auto")
         axes[1].set_title("Weight Gradients")
         plt.colorbar(im1, ax=axes[1])
 
-        # 隐藏单元偏置
+        # Hidden unit biases
         h_bias = rbm.linear_bias[rbm.num_visible :].detach().cpu().numpy()
         axes[2].bar(range(len(h_bias)), h_bias)
         axes[2].set_title("Hidden Unit Biases")
@@ -402,20 +547,23 @@ class DBNTrainer:
         plt.suptitle(f"Model Parameters - Epoch {epoch+1}, Batch {batch_idx+1}")
         plt.tight_layout()
 
-        # if self.save_training_plots:
-        #     plt.savefig(f'results/weights_epoch{epoch+1}_batch{batch_idx}.png',
-        #                dpi=150, bbox_inches='tight')
         plt.show()
 
     def _visualize_current_reconstruction(self, rbm, batch_data, batch_idx, epoch):
-        """可视化当前batch的重建效果"""
+        """Visualizes the reconstruction quality of the current batch.
 
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+            batch_data (torch.Tensor): The current batch data.
+            batch_idx (int): The current batch index.
+            epoch (int): The current epoch.
+        """
         batch_numpy = batch_data.cpu().numpy()
 
-        # 使用静态重建方法
+        # Use static reconstruction method
         recon_imgs, _ = UnsupervisedDBN.reconstruct_with_rbm(rbm, batch_numpy)
 
-        # 选择前几个样本显示
+        # Select a few samples to display
         n_show = min(8, batch_data.shape[0])
         original_imgs = batch_data[:n_show].cpu().numpy()
 
@@ -424,12 +572,12 @@ class DBNTrainer:
             axes = axes.reshape(2, 1)
 
         for i in range(n_show):
-            # 原始图像
+            # Original image
             axes[0, i].imshow(original_imgs[i].reshape(8, 8), cmap="gray")
             axes[0, i].set_title(f"Original {i+1}")
             axes[0, i].axis("off")
 
-            # 重建图像
+            # Reconstructed image
             axes[1, i].imshow(recon_imgs[i].reshape(8, 8), cmap="gray")
             axes[1, i].set_title(f"Reconstructed {i+1}")
             axes[1, i].axis("off")
@@ -437,17 +585,21 @@ class DBNTrainer:
         plt.suptitle(f"Real-time Reconstruction - Epoch {epoch+1}, Batch {batch_idx+1}")
         plt.tight_layout()
 
-        # if self.save_training_plots:
-        #     plt.savefig(f'results/recon_epoch{epoch+1}_batch{batch_idx}.png',
-        #                dpi=150, bbox_inches='tight')
         plt.show()
 
     def _evaluate_reconstruction_quality(self, rbm, input_data, epoch, layer_idx):
-        """定期评估重建质量 - 使用静态方法"""
+        """Periodically evaluates reconstruction quality using a static method.
+
+        Args:
+            rbm (RestrictedBoltzmannMachine): The RBM layer.
+            input_data (torch.Tensor): The data to evaluate on.
+            epoch (int): The current epoch.
+            layer_idx (int): The index of the current layer.
+        """
         n_eval = min(100, input_data.shape[0])
         eval_data = input_data[:n_eval]
 
-        # 使用静态重建方法
+        # Use static reconstruction method
         _, recon_errors = UnsupervisedDBN.reconstruct_with_rbm(rbm, eval_data)
 
         avg_recon_error = np.mean(recon_errors)
@@ -457,13 +609,22 @@ class DBNTrainer:
         )
 
     def _gen_digits_image(self, data_in, size=8):
-        """生成数字图像"""
+        """Generates an image from digit data.
+
+        Args:
+            data_in (numpy.ndarray): The digit data.
+            size (int, optional): The size of each digit image (size x size).
+                Defaults to 8.
+
+        Returns:
+            numpy.ndarray: A horizontally stacked image of digits.
+        """
         digits = data_in.reshape(20, size, size)
         image = np.hstack(digits)
         return image
 
     def _set_random_seed(self):
-        """设置随机种子"""
+        """Sets the random seed for reproducibility."""
         torch.manual_seed(self.random_state)
         np.random.seed(self.random_state)
         if torch.cuda.is_available():
