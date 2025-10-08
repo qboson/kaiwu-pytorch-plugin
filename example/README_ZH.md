@@ -1,4 +1,4 @@
-**语言版本**: [中文](example/README_ZH.md) | [English](example/README.md)
+**语言版本**: [中文](README_ZH.md) | [English](README.md)
 
 ### BoltzmannMachine 与 RestrictedBoltzmannMachine 示例
 
