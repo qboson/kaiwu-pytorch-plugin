@@ -5,4 +5,10 @@ from .full_boltzmann_machine import BoltzmannMachine
 from .qvae import QVAE
 from .dbn import UnsupervisedDBN, DBNTrainer
 
-__all__ = ["RestrictedBoltzmannMachine", "BoltzmannMachine"]
+__all__ = [
+    "RestrictedBoltzmannMachine",
+    "BoltzmannMachine",
+    "QVAE",
+    "UnsupervisedDBN",
+    "DBNTrainer",
+]
