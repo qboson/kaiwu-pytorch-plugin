@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-`Kaiwu-PyTorch-Plugin` is a quantum computing programming suite based on PyTorch and the Kaiwu SDK. It enables the training and evaluation of Restricted Boltzmann Machines (RBMs) and Boltzmann Machines (BMs) on coherent optical quantum computers. The plugin provides easy-to-use interfaces, allowing researchers and developers to quickly implement the training and validation of energy-based neural network models and apply them to various machine learning development tasks.
+`Kaiwu-PyTorch-Plugin` is a quantum computing programming suite based on PyTorch and the Kaiwu SDK. It enables the training and evaluation of Restricted Boltzmann Machines (RBMs) and Boltzmann Machines (BMs) on coherent photonic quantum computers. The plugin provides easy-to-use interfaces, allowing researchers and developers to quickly implement the training and validation of energy-based neural network models and apply them to various machine learning development tasks.
 
 A Restricted Boltzmann Machine is an energy-based unsupervised learning model consisting of a visible layer and a hidden layer, with full connections between layers but no connections within a layer. Its core idea is to model the probability distribution of data through an energy function and train weights using algorithms such as Contrastive Divergence (CD), allowing the model to learn hidden features of input data. RBMs are commonly used for feature extraction, dimensionality reduction, or collaborative filtering, and are also the foundation for building more complex models. A Boltzmann Machine is a fully connected stochastic neural network where all neurons can be interconnected (including within the visible and hidden layers). Traditional sampling methods for BMs are inefficient, and quantum computing provides a new approach.
 
@@ -34,7 +34,7 @@ The above image shows the project file structure:
 - The test section contains unit tests.
 
 ### Main Features
-- Quantum Support: Inherits from Kaiwu SDK, supports calling optical quantum computers
+- Quantum Support: Inherits from Kaiwu SDK, supports calling photonic quantum computers
 - Native PyTorch Support: Seamless integration with the PyTorch ecosystem, supports GPU acceleration
 - Flexible Architecture: Supports custom visible and hidden layer dimensions
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
@@ -175,7 +175,7 @@ To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.
 ### QBM Inside VAE = A More Powerful Generative Data Representer (QBM-VAE)  
 Data from natural domains (e.g., biology, chemistry, materials science) exhibits extreme complexity, where traditional Gaussian i.i.d. assumptions often lead to distorted representations.  
 
-By leveraging the native Boltzmann distribution sampler of coherent optical quantum computers, we developed a Quantum Boltzmann Machine (QBM)-enhanced Deep Variational Autoencoder (QBM-VAE). This significantly improves the VAE’s encoding capability, enabling it to capture previously unrecognized deep data features.  
+By leveraging the native Boltzmann distribution sampler of coherent photonic quantum computers, we developed a Quantum Boltzmann Machine (QBM)-enhanced Deep Variational Autoencoder (QBM-VAE). This significantly improves the VAE’s encoding capability, enabling it to capture previously unrecognized deep data features.  
 
 In single-cell transcriptomics analysis (a technique revealing cellular heterogeneity and functional differences by measuring gene expression at single-cell resolution), QBM-VAE markedly enhances clustering accuracy, identifying novel cell subtypes (new pathogenic factors with unique signatures) undetectable by conventional methods—providing new clues for target discovery.  
 
