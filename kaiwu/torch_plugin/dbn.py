@@ -12,11 +12,10 @@ import torch
 from torch import nn
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine
-from kaiwu.classical import SimulatedAnnealingOptimizer
+from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
 
-# =================== Unsupervised DBN General Model =====================
+# =================== Unsupervised DBN General Model ====================
 class UnsupervisedDBN(nn.Module):
     """A general unsupervised Deep Belief Network (DBN) architecture.
 
