@@ -97,7 +97,7 @@ class QVAE(torch.nn.Module):
         )
         cross_entropy = cross_entropy.squeeze(dim=1)
         s_neg = self.bm.sample(self.sampler)
-        cross_entropy = cross_entropy - self.bm(s_neg).mean()
+        cross_entropy = -(cross_entropy - self.bm(s_neg).mean())
         return cross_entropy
 
     def _kl_dist_from(self, posterior, post_samples):

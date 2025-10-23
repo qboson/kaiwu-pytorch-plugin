@@ -235,6 +235,7 @@ class DBNTrainer:
         plot_img=False,
         random_state=None,
         dbn_ref=None,
+        sampler=None,
     ):
         """Initializes the DBNTrainer.
 
@@ -257,6 +258,7 @@ class DBNTrainer:
                 Defaults to None.
             dbn_ref (UnsupervisedDBN, optional): A reference to the DBN model.
                 Defaults to None.
+            sampler (kaiwu.Optimizer): A sampler for RBM training.
         """
         self.learning_rate_rbm = learning_rate_rbm
         self.n_epochs_rbm = n_epochs_rbm
@@ -267,7 +269,7 @@ class DBNTrainer:
         self.plot_img = plot_img
         self.random_state = random_state
 
-        self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+        self.sampler = sampler
         self.dbn_ref = dbn_ref
 
     def train(self, dbn, data_in):
