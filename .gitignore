@@ -165,3 +165,4 @@ example/bm_generation/test/
 data
 tmp.sh
 example/rbm_digits/results/
+example/dbn_digits/results/

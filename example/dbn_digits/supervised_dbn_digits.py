@@ -6,7 +6,8 @@ import seaborn as sns
 
 from sklearn.datasets import load_digits
 from abc import ABC, abstractmethod
-from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin
+
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.metrics import confusion_matrix
@@ -16,7 +17,7 @@ import torch
 import torch.nn as nn
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
-from kaiwu.torch_plugin import UnsupervisedDBN, DBNTrainer
+from dbn_trainer import DBNPretrainer
 
 def translate_image(image, direction):
     "图片转换"
@@ -76,74 +77,7 @@ def load_data(plot_img=False):
 
     return X_train, X_test, y_train, y_test
 
-class DBNPretrainer(BaseEstimator, TransformerMixin):
-    """
-    Scikit-learn兼容的DBN预训练
-    """
-    def __init__(
-        self,
-        hidden_layers_structure=[100, 100],
-        learning_rate_rbm=0.1,
-        n_epochs_rbm=10,
-        batch_size=100,
-        verbose=True,
-        shuffle=True,
-        drop_last=False,
-        plot_img=False,
-        random_state=None
-    ):
-        self.hidden_layers_structure = hidden_layers_structure
-        self.learning_rate_rbm = learning_rate_rbm
-        self.n_epochs_rbm = n_epochs_rbm
-        self.batch_size = batch_size
-        self.verbose = verbose
-        self.shuffle = shuffle
-        self.drop_last = drop_last
-        self.plot_img = plot_img
-        self.random_state = random_state
-        
-        # 创建模型和训练器
-        self._dbn = UnsupervisedDBN(hidden_layers_structure)
-        self._trainer = DBNTrainer(
-            learning_rate_rbm=learning_rate_rbm,
-            n_epochs_rbm=n_epochs_rbm,
-            batch_size=batch_size,
-            verbose=verbose,
-            shuffle=shuffle,
-            drop_last=drop_last,
-            plot_img=plot_img,
-            random_state=random_state
-        )
 
-    def fit(self, X, y=None):
-        """训练模型"""
-        self._dbn.create_rbm_layer(X.shape[1])
-        self._trainer.train(self._dbn, X)
-        return self
-
-    def transform(self, X):
-        """特征变换"""
-        return self._dbn.transform(X)
-
-    # 提供访问RBM层的方法
-    def get_rbm_layer(self, index):
-        """获取指定RBM层"""
-        return self._dbn.get_rbm_layer(index)
-
-    @property
-    def device(self):
-        """返回device - 使用底层模型的属性"""
-        return self._dbn.device
-    
-    @property
-    def _n_layers(self):
-        """返回层数 - 使用底层模型的属性"""
-        return self._dbn.num_layers
-
-    @property
-    def _output_dim(self):
-        """返回输出维度 - 使用底层模型的属性"""
-        return self._dbn.output_dim
         
 # =================== 抽象监督DBN =====================
 class AbstractSupervisedDBN(BaseEstimator, ABC):
