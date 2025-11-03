@@ -197,4 +197,5 @@ If you are interested in this work, please check out our paper:
 2. **Boson Quantum Official Assistant**: Inquire about real-machine access and collaborations.  
 3. email: developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/ed699947-6df9-4cb1-8578-2bc13fc14d46)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/77bf80f4-d71e-4645-ad2d-b59b9af8163c)
+
