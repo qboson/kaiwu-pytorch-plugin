@@ -97,7 +97,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             torch.Tensor: Scalar difference between data and model average energy.
         """
         self.clip_parameters()
-        return -(self(s_positive).mean() - self(s_negtive).mean())
+        return self(s_positive).mean() - self(s_negtive).mean()
 
     def sample(self, sampler) -> torch.Tensor:
         """Samples from the Boltzmann Machine.

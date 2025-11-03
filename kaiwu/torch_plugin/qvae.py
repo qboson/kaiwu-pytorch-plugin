@@ -90,14 +90,14 @@ class QVAE(torch.nn.Module):
         q1_pert = torch.sigmoid(logit_q1 + log_ratio1)
 
         # Compute cross-entropy
-        cross_entropy = torch.matmul(
+        cross_entropy = - torch.matmul(
             torch.cat([q1, q2], dim=-1), self.bm.linear_bias
-        ) + torch.sum(
+        ) - torch.sum(
             torch.matmul(q1_pert, self.bm.quadratic_coef) * q2, dim=1, keepdim=True
         )
         cross_entropy = cross_entropy.squeeze(dim=1)
         s_neg = self.bm.sample(self.sampler)
-        cross_entropy = -(cross_entropy - self.bm(s_neg).mean())
+        cross_entropy = cross_entropy - self.bm(s_neg).mean()
         return cross_entropy
 
     def _kl_dist_from(self, posterior, post_samples):

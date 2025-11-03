@@ -90,7 +90,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Hamiltonian of shape (B,).
         """
         tmp = s_all[:, : self.num_visible].matmul(self.quadratic_coef)
-        return s_all @ self.linear_bias + torch.sum(
+        return - s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
         )
 
