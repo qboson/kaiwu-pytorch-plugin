@@ -43,11 +43,11 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
 
     def test_forward(self):
         with self.subTest("Manually-computed energies"):
-            self.assertEqual(4, self.bm(self.ones).item())
-            self.assertEqual(-8, self.bm(self.mones).item())
+            self.assertEqual(-4, self.bm(self.ones).item())
+            self.assertEqual(8, self.bm(self.mones).item())
             self.assertEqual(0, self.bm(self.pmones).item())
-            self.assertEqual(4, self.bm(self.mpones).item())
-            self.assertListEqual([4, 4, 4, 0], self.bm(self.sample_1).tolist())
+            self.assertEqual(-4, self.bm(self.mpones).item())
+            self.assertListEqual([-4, -4, -4, 0], self.bm(self.sample_1).tolist())
 
     def test_get_ising_matrix(self):
         with self.subTest("Unbounded weight range"):
@@ -82,7 +82,7 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
     def test_register_forward_pre_hook(self):
         self.bm.h_range = torch.tensor([-0.1, 0.1])
         self.bm.j_range = torch.tensor([-0.1, 0.2])
-        self.assertEqual(-0.1 * 3 + 4 * 0.2, -self.bm(self.mones).item())
+        self.assertEqual(-0.1 * 3 + 4 * 0.2, self.bm(self.mones).item())
 
     def test_objective(self):
         s1 = self.sample_1

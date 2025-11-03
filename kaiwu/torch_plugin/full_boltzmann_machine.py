@@ -58,7 +58,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Hamiltonian of shape (B,).
         """
         tmp = s_all.matmul(self.quadratic_coef)
-        return s_all @ self.linear_bias + torch.sum(tmp * s_all, dim=-1)
+        return - s_all @ self.linear_bias - torch.sum(tmp * s_all, dim=-1)
 
     def _to_ising_matrix(self):
         """Convert Boltzmann Machine to Ising matrix."""
