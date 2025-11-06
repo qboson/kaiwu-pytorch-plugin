@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
 
 # =================== Unsupervised DBN General Model =====================
@@ -214,4 +214,3 @@ class UnsupervisedDBN(nn.Module):
         if len(self.rbm_layers) > 0:
             return self.rbm_layers[-1].num_hidden
         return self.input_dim
-
