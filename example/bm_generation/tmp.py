@@ -1,1 +1,0 @@
-pip install kaiwu==1.0.27a --index-url http://__token__:glpat-7g5zHisFz1iK7Db77s_P@10.0.0.239:5005/api/v4/projects/114/packages/pypi/simple --trusted-host 10.0.0.239 --extra-index-url https://pypi.tuna.tsinghua.edu.cn/simple

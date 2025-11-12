@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
 import os
 import numpy as np
 from scipy.ndimage import shift

@@ -1,3 +1,6 @@
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
 from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 import matplotlib.pyplot as plt
