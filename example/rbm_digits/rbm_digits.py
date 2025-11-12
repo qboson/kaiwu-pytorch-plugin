@@ -1,3 +1,6 @@
+# Copyright (C) 2025-present Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
 """
 Restricted Boltzmann Machine
 包含RBM的类  以及训练RBM+model/仅训练model的函数 训练RBM+model会保存训练过程中的似然值和预测准确率

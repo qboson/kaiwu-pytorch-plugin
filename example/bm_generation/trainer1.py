@@ -1,4 +1,7 @@
 """训练器"""
+# Copyright (C) 2025-present Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
 
 import time
 import math

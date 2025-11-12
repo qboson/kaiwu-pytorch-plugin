@@ -1,3 +1,6 @@
+# Copyright (C) 2025-present Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
 import torch
 from torch import nn
 import torch.nn.functional as F
