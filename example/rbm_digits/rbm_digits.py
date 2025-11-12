@@ -1,4 +1,4 @@
-# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd.
+# Copyright (C) 2025-present Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
 """
