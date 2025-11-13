@@ -45,16 +45,6 @@ setup(
     ],
     python_requires=">=3.10",
     install_requires=read_requirements(),
-    extras_require={
-        "dev": [
-            "torchvision",
-            "pylint>=2.17.5",
-            "pytest>=7.0.0",
-            "pytest-cov>=4.1.0",
-            "matplotlib>=3.5.0",
-            "scikit-learn>=1.0.0",
-        ],
-    },
     keywords="quantum computing, boltzmann machine, restricted boltzmann machine, pytorch, "
     "machine learning, deep learning",
     license="Apache License 2.0",
