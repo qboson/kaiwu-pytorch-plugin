@@ -1,5 +1,5 @@
 """训练器"""
-# Copyright (C) 2022-present Beijing QBoson Quantum Technology Co., Ltd.
+# Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
 
