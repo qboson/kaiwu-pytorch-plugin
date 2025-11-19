@@ -266,7 +266,7 @@ def show_confusion_matrix(test_loader, qvae_model, classifier, device, save_path
            ylabel='True label',
            xlabel='Predicted label')
     
-    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    # plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
     
     # 添加文本标注
     fmt = '.2f'
