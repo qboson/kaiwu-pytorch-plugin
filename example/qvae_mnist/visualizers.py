@@ -47,7 +47,6 @@ def plot_flattened_images_grid(features: torch.Tensor, grid_size: int = 8, save_
         plt.show()  # 没有保存路径时显示图像
         plt.close()
 
-# def t_SNE(test_loader, qvae_model, use_std=True, point_size=20, alpha=0.6, epochs=None, save_path=None):
 def t_SNE(test_loader, qvae_model, use_std=True, point_size=20, alpha=0.6, 
           epochs=None, save_path=None, show=True):
     """
@@ -179,25 +178,6 @@ def create_tsne_animation(frame_paths, output_path, duration=500):
         print(f"Animation contains {len(uniform_images)} frames, all with shape {target_shape}")
     else:
         print("No frames found to create animation")
-# def create_tsne_animation(frame_paths, output_path, duration=500):
-#     """
-#     从t-SNE帧创建GIF动画
-    
-#     Args:
-#         frame_paths: 帧图像路径列表
-#         output_path: 输出GIF路径
-#         duration: 每帧持续时间(ms)
-#     """
-#     images = []
-#     for path in frame_paths:
-#         if os.path.exists(path):
-#             images.append(imageio.imread(path))
-    
-#     if images:
-#         imageio.mimsave(output_path, images, duration=duration)
-#         print(f"Training evolution animation saved to: {output_path}")
-#     else:
-#         print("No frames found to create animation")
 
 # ============ 统计信息分析 ============
 def describe_statistic_per_label(test_loader, qvae_model):
@@ -234,7 +214,7 @@ def describe_statistic_per_label(test_loader, qvae_model):
     return df
 
 # ============ 混淆矩阵 ============
-def show_confusion_matrix(test_loader, qvae_model, classifier, device):
+def show_confusion_matrix(test_loader, qvae_model, classifier, device, save_path=None, show=True):
     """
     显示混淆矩阵
     
@@ -243,6 +223,8 @@ def show_confusion_matrix(test_loader, qvae_model, classifier, device):
         qvae_model: QVAE模型，用于提取潜变量
         classifier: 分类器模型
         device: 设备
+        save_path: 保存路径
+        show: 是否显示图像
     """
     y_test = []
     y_pred = []
@@ -296,6 +278,22 @@ def show_confusion_matrix(test_loader, qvae_model, classifier, device):
                     color="white" if cm[i, j] > thresh else "black")
     
     fig.tight_layout()
+    # plt.show()
+    # 自动保存
+
+    if save_path is None:
+        # 生成默认保存路径
+        # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = f"results/confusion_matrix_{training_status}_{timestamp}.png"
+    
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"t-SNE plot saved to: {save_path}")
     plt.show()
+    
+    if show:
+        plt.show()
+    else:
+        plt.close()  # 不显示时关闭图像，节省内存
     
     return cm
