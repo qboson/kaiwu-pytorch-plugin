@@ -58,7 +58,7 @@ def plot_training_curves(train_loss_history, val_loss_history,
         save_path = f"results/mlp_training_curves_{timestamp}.png"
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"t-SNE plot saved to: {save_path}")
+    print(f"Training curves saved to: {save_path}")
     plt.show()
     
     if show:
