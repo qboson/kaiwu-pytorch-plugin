@@ -12,6 +12,60 @@ from plotnine import ggplot, aes, geom_point, ggtitle
 from sklearn.manifold import TSNE
 from sklearn.metrics import confusion_matrix
 
+def plot_training_curves(train_loss_history, val_loss_history, 
+                        train_acc_history, val_acc_history, 
+                        save_path=None, show=True):
+    """
+    绘制训练和验证的损失及准确率曲线
+    
+    Args:
+        train_loss_history: 训练损失历史
+        val_loss_history: 验证损失历史  
+        train_acc_history: 训练准确率历史
+        val_acc_history: 验证准确率历史
+        save_path: 图像保存路径
+    """
+    plt.figure(figsize=(12, 5))
+    
+    # 损失曲线
+    plt.subplot(1, 2, 1)
+    plt.plot(train_loss_history, label='Training Loss', color='blue', alpha=0.7)
+    plt.plot(val_loss_history, label='Validation Loss', color='red', alpha=0.7)
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    # 准确率曲线
+    plt.subplot(1, 2, 2)
+    plt.plot(train_acc_history, label='Training Accuracy', color='blue', alpha=0.7)
+    plt.plot(val_acc_history, label='Validation Accuracy', color='red', alpha=0.7)
+    plt.title('Training and Validation Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy (%)')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    # plt.close()
+
+    # 自动保存
+    if save_path is None:
+        # 生成默认保存路径
+        # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = f"results/mlp_training_curves_{timestamp}.png"
+    
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"t-SNE plot saved to: {save_path}")
+    plt.show()
+    
+    if show:
+        plt.show()
+    else:
+        plt.close()  # 不显示时关闭图像，节省内存
+
 def plot_flattened_images_grid(features: torch.Tensor, grid_size: int = 8, save_path: str = None):
     """
     显示并可选保存前 grid_size * grid_size 个 28x28 灰度图像。
