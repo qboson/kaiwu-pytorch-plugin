@@ -342,7 +342,7 @@ def show_confusion_matrix(test_loader, qvae_model, classifier, device, save_path
         save_path = f"results/confusion_matrix_{training_status}_{timestamp}.png"
     
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"t-SNE plot saved to: {save_path}")
+    print(f"confusion matrix saved to: {save_path}")
     plt.show()
     
     if show:
