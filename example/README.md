@@ -45,6 +45,30 @@ matplotlib
 scipy
 ```
 
+### Generation Task: Distribution Sampling Based on Boltzmann Machines (BM)
+
+Boltzmann Machines (BMs) consist of fully connected units and can be trained in an unsupervised manner using methods such as Contrastive Divergence (CD). They are capable of generating new samples that closely match the statistical characteristics of the training data.
+
+**Model Construction**:  
+Train the BM jointly using Kullback–Leibler (KL) divergence and Noise-Contrastive Likelihood (NCL).
+
+**Training Pipeline**:  
+- Implement a `Trainer` class.  
+- Integrate a learning rate scheduler.  
+- Support distinct sampling strategies tailored to different phases of the sampling process (e.g., initial burn-in vs. final generation).
+
+**Data Visualization**:  
+Visualize the distribution of the generated samples to assess fidelity to the original data distribution.
+
+Run the training script via `example/bm_generation/train_bm.ipynb`, and execute the sampling/testing script via `example/bm_generation/sample_bm.ipynb`.
+
+**Dependencies**:
+```text
+kaiwu==1.3.0
+pandas
+matplotlib
+```
+
 ---
 
 ### Generation Task: Q-VAE for MNIST Image Generation

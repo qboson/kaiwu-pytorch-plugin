@@ -45,6 +45,20 @@ matplotlib
 scipy
 ```
 
+### 生成任务: 基于BM的分布采样
+玻尔兹曼机各单元之间全连接，利用对比散度等方法进行无监督训练，可用于生成与训练数据统计特性相似的新样本
+**模型构建**: 使用KL散度和NCL共同训练BM
+**训练流程**: 实现Trainer，实现学习率的scheduler和不同采样阶段的分别采样
+**数据可视化**：对采样结果的分布进行可视化
+
+通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
+**依赖**
+```
+kaiwu==1.3.0
+pandas
+matplotlib
+```
+
 ---
 
 ### 生成任务：基于Q-VAE的MNIST图像生成
