@@ -81,10 +81,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Calculate ising_bias
             diag_elements = torch.diag(ising_mat)[:-1]
             column_sums = torch.sum(ising_mat, dim=0)[:-1]
-            ising_bias = linear_bias / 2 + diag_elements + column_sums
+            ising_bias = linear_bias / 4  + column_sums
             # Fill bias part
-            ising_mat[:num_nodes, -1] = ising_bias / 2
-            ising_mat[-1, :num_nodes] = ising_bias / 2
+            ising_mat[:num_nodes, -1] = ising_bias
+            ising_mat[-1, :num_nodes] = ising_bias
             # Set diagonal to zero
             ising_mat.fill_diagonal_(0)
             return ising_mat.cpu().numpy()
@@ -113,13 +113,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 dtype=sub_quadratic.dtype,
             )
             ising_mat[:-1, :-1] = sub_quadratic / 4
-            ising_bias = (
-                sub_linear / 2
-                + torch.diag(ising_mat)[:-1]
-                + torch.sum(ising_mat, dim=0)[:-1]
-            )
-            ising_mat[:-1, -1] = ising_bias / 2
-            ising_mat[-1, :-1] = ising_bias / 2
+            ising_bias = sub_linear / 4 + torch.sum(ising_mat, dim=0)[:-1]
+            ising_mat[:-1, -1] = ising_bias
+            ising_mat[-1, :-1] = ising_bias
             ising_mat.fill_diagonal_(0)
             return ising_mat.detach().cpu().numpy()
 

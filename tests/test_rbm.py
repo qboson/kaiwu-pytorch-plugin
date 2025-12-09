@@ -64,20 +64,16 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
                     ],
                 ]
             )
-            ising_mat_std = np.array(
-                [
-                    [0.0, 0.0, 0.0, -0.25, -0.875],
-                    [0.0, 0.0, -0.25, 0.0, -0.125],
-                    [0.0, -0.25, 0.0, 0.0, 0.125],
-                    [-0.25, 0.0, 0.0, 0.0, 0.375],
-                    [-0.875, -0.125, 0.125, 0.375, 0.0],
-                ]
-            )
             self.bm.linear_bias.data = h_true
             self.bm.quadratic_coef.data = J_true
             ising_mat = self.bm.get_ising_matrix()
-
-            self.assertListEqual(ising_mat.tolist(), ising_mat_std.tolist())
+            s = torch.tensor([[1, 1, 1, 0]], dtype=torch.float32)
+            s2 = torch.tensor([[0, 1, 1, 1]], dtype=torch.float32)
+            x = np.array([[1,1,1,-1,1]],dtype=np.float32)
+            x2 = np.array([[-1,1,1,1,1]],dtype=np.float32)
+            print(self.bm(s),self.bm(s2),-x @ ising_mat @ x.T ,(-x2@  ising_mat @ x2.T))
+            print(self.bm(s)-self.bm(s2), -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T))
+            assert self.bm(s)-self.bm(s2)== -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T)
 
     def test_register_forward_pre_hook(self):
         self.bm.h_range = torch.tensor([-0.1, 0.1])
@@ -117,6 +113,7 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         s_hidden_grad = torch.rand(3, self.num_hidden, requires_grad=True)
         s_all_nograd = self.bm.get_visible(s_hidden_grad)
         self.assertFalse(s_all_nograd.requires_grad)
+
 
 
 if __name__ == "__main__":
