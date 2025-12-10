@@ -79,7 +79,6 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Fill quadratic part
             ising_mat[:-1, :-1] = quadratic_coef / 4
             # Calculate ising_bias
-            diag_elements = torch.diag(ising_mat)[:-1]
             column_sums = torch.sum(ising_mat, dim=0)[:-1]
             ising_bias = linear_bias / 4  + column_sums
             # Fill bias part
