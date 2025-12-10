@@ -20,8 +20,8 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         device (torch.device, optional): Device to construct tensors.
     """
 
-    def __init__(self, num_visible, num_hidden, h_range=None, j_range=None):
-        super().__init__(h_range=h_range, j_range=j_range)
+    def __init__(self, num_visible, num_hidden, h_range=None, j_range=None, device=None):
+        super().__init__(h_range=h_range, j_range=j_range, device=device)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
