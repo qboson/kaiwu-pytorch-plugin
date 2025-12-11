@@ -142,6 +142,74 @@ class TestBoltzmannMachine(unittest.TestCase):
             # 采样器返回2个样本，每个样本长度为可见层+隐含层
             self.assertEqual(result.shape, (2, self.num_nodes))
             self.assertIsInstance(result, torch.Tensor)
+    
+    def test_get_ising_matrix(self):
+        with self.subTest("Unbounded weight range"):
+            h_true = torch.FloatTensor([-3, 0, 1, 2])
+            J_true = torch.FloatTensor(
+                [
+                    [
+                        1, 2, 4, 3
+                    ],
+                    [
+                        2, 0, 1.5, 0,
+                    ],
+                    [
+                        4, 1.5, 0, -1,
+                    ],
+                    [
+                        3, 0, -1, 0,
+                    ]
+                ]
+            )
+            self.bm.linear_bias.data = h_true
+            self.bm.parametrizations.quadratic_coef.original.data.copy_(J_true)
+            print("bm.quadratic_coef", self.bm.quadratic_coef)
+            ising_mat = self.bm.get_ising_matrix()
+            print("ising mat:", ising_mat)
+            s = torch.tensor([[1, 1, 1, 1]], dtype=torch.float32)
+            s2 = torch.tensor([[0, 1, 1, 0]], dtype=torch.float32)
+            x = np.array([[1,1,1,1, 1]],dtype=np.float32)
+            x2 = np.array([[-1,1,1,-1,1]],dtype=np.float32)
+            print(self.bm(s),self.bm(s2),-x @ ising_mat @ x.T ,(-x2@  ising_mat @ x2.T))
+            print(self.bm(s)-self.bm(s2), -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T))
+            assert self.bm(s)-self.bm(s2)== -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T)
+
+    def test_hidden_to_ising(self):
+        with self.subTest("Unbounded weight range"):
+            h_true = torch.FloatTensor([-3, 0, 1, 2])
+            J_true = torch.FloatTensor(
+                [
+                    [
+                        1, 2, 4, 3
+                    ],
+                    [
+                        2, 0, 1.5, 0,
+                    ],
+                    [
+                        4, 1.5, 0, -1,
+                    ],
+                    [
+                        3, 0, -1, 0,
+                    ]
+                ]
+            )
+            self.bm.linear_bias.data = h_true
+            self.bm.parametrizations.quadratic_coef.original.data.copy_(J_true)
+            print("bm.quadratic_coef", self.bm.quadratic_coef)
+            ising_mat = self.bm._hidden_to_ising_matrix(torch.FloatTensor([1, 1]))
+            print("ising mat:", ising_mat)
+            s = torch.tensor([[1, 1, 0, 1]], dtype=torch.float32)
+            s2 = torch.tensor([[1, 1, 1, 0]], dtype=torch.float32)
+            # x = np.array([[1,1,-1,1, 1]],dtype=np.float32)
+            # x2 = np.array([[1,1,1,-1,1]],dtype=np.float32)
+            x = np.array([[-1, 1, 1]])
+            x2 = np.array([[1, -1, 1]])
+            print(self.bm(s),self.bm(s2),-x @ ising_mat @ x.T ,(-x2@  ising_mat @ x2.T))
+            print(self.bm(s)-self.bm(s2), -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T))
+            assert self.bm(s)-self.bm(s2)== -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T)
+
+
 
 
 if __name__ == "__main__":

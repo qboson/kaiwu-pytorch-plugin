@@ -1,11 +1,27 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
-#
-# SPDX-License-Identifier: Apache-2.0
 """Boltzmann Machine"""
-import torch
+
 import numpy as np
+import torch
+from torch import nn
+from torch.nn.utils import parametrize
+
 from .restricted_boltzmann_machine import AbstractBoltzmannMachine
+
+
+class BoltzmannMachineQuadraticCoef(nn.Module):
+    """
+    Parametrization to ensure the quadratic coefficient matrix is symmetric and has zero diagonal.
+    """
+    def forward(self, x):
+        """
+        Args:
+            x (torch.Tensor): Input quadratic coefficient matrix.
+        Returns:
+            torch.Tensor: Symmetric quadratic coefficient matrix with zero diagonal.
+        """
+        x_triu = x.triu(1)
+        return x_triu + x_triu.transpose(0, 1)
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -21,11 +37,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             If ``None``, uses CPU.
     """
 
-    def __init__(self, num_nodes: int, h_range=None, j_range=None):
-        super().__init__(h_range=h_range, j_range=j_range)
+    def __init__(
+        self, num_nodes: int, h_range=None, j_range=None, device=None
+    ):  # 对源码进行了device参数的改动，以及二次项系数的改动
+        super().__init__(h_range=h_range, j_range=j_range, device=device)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
             torch.randn((self.num_nodes, self.num_nodes)) * 0.01
+        )
+        parametrize.register_parametrization(
+            self, "quadratic_coef", BoltzmannMachineQuadraticCoef()
         )
         self.linear_bias = torch.nn.Parameter(torch.zeros(self.num_nodes))
 
@@ -48,7 +69,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
     def clip_parameters(self) -> None:
         """Clip linear and quadratic bias weights in-place."""
         self.get_parameter("linear_bias").data.clamp_(*self.h_range)
-        self.get_parameter("quadratic_coef").data.clamp_(*self.j_range)
+        self.get_parameter("parametrizations.quadratic_coef.original").data.clamp_(
+            *self.j_range
+        )
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
@@ -60,33 +83,31 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
         """
-        tmp = s_all.matmul(self.quadratic_coef)
-        return - s_all @ self.linear_bias - torch.sum(tmp * s_all, dim=-1)
+        return -s_all @ self.linear_bias - 0.5 * torch.sum(
+            s_all.matmul(self.quadratic_coef) * s_all, dim=-1
+        )
 
     def _to_ising_matrix(self):
         """Convert Boltzmann Machine to Ising matrix."""
         with torch.no_grad():
-            linear_bias = self.linear_bias.detach()
-            quadratic_coef = self.quadratic_coef.detach()
-            num_nodes = self.linear_bias.shape[-1]
-            # Use torch for all calculations
+            linear_bias = self.linear_bias
+            quadratic_coef = self.quadratic_coef
+            print(linear_bias.size(), quadratic_coef.size())
+            column_sums = torch.sum(quadratic_coef, dim=0)
+            num_nodes = self.num_nodes
+
             ising_mat = torch.zeros(
                 (num_nodes + 1, num_nodes + 1),
                 device=self.device,
                 dtype=linear_bias.dtype,
             )
-
             # Fill quadratic part
-            ising_mat[:-1, :-1] = quadratic_coef / 4
+            ising_mat[:-1, :-1] = quadratic_coef / 8
             # Calculate ising_bias
-            diag_elements = torch.diag(ising_mat)[:-1]
-            column_sums = torch.sum(ising_mat, dim=0)[:-1]
-            ising_bias = linear_bias / 2 + diag_elements + column_sums
+            ising_bias = linear_bias / 4 + column_sums / 8
             # Fill bias part
-            ising_mat[:num_nodes, -1] = ising_bias / 2
-            ising_mat[-1, :num_nodes] = ising_bias / 2
-            # Set diagonal to zero
-            ising_mat.fill_diagonal_(0)
+            ising_mat[:num_nodes, -1] = ising_bias
+            ising_mat[-1, :num_nodes] = ising_bias
             return ising_mat.cpu().numpy()
 
     def _hidden_to_ising_matrix(self, s_visible: torch.Tensor) -> np.ndarray:
@@ -99,29 +120,26 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             np.ndarray: Submatrix in Ising format.
         """
         with torch.no_grad():
+            linear_bias = self.linear_bias
+            quadratic_coef = self.quadratic_coef
             n_vis = s_visible.shape[-1]
-            sub_quadratic = self.quadratic_coef[n_vis:, n_vis:]
-            sub_quadratic_vh = (
-                self.quadratic_coef[n_vis:, :n_vis]
-                + self.quadratic_coef[:n_vis, n_vis:].t()
-            )
+            num_nodes = self.num_nodes
+            n_hid = num_nodes - n_vis
+            sub_quadratic = quadratic_coef[n_vis:, n_vis:]
+            sub_column_sums = torch.sum(sub_quadratic, dim=0)
+            sub_quadratic_vh = quadratic_coef[n_vis:, :n_vis]
+            sub_linear = sub_quadratic_vh @ s_visible + linear_bias[n_vis:]
 
-            sub_linear = sub_quadratic_vh @ s_visible + self.linear_bias[n_vis:]
             ising_mat = torch.zeros(
-                (sub_quadratic.size(0) + 1, sub_quadratic.size(0) + 1),
+                (n_hid + 1, n_hid + 1),
                 device=self.device,
-                dtype=sub_quadratic.dtype,
+                dtype=sub_linear.dtype,
             )
-            ising_mat[:-1, :-1] = sub_quadratic / 4
-            ising_bias = (
-                sub_linear / 2
-                + torch.diag(ising_mat)[:-1]
-                + torch.sum(ising_mat, dim=0)[:-1]
-            )
-            ising_mat[:-1, -1] = ising_bias / 2
-            ising_mat[-1, :-1] = ising_bias / 2
-            ising_mat.fill_diagonal_(0)
-            return ising_mat.detach().cpu().numpy()
+            ising_mat[:-1, :-1] = sub_quadratic / 8
+            ising_bias = sub_linear / 4 + sub_column_sums / 4
+            ising_mat[:-1, -1] = ising_bias
+            ising_mat[-1, :-1] = ising_bias
+            return ising_mat.cpu().numpy()
 
     def gibbs_sample(
         self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
@@ -140,8 +158,6 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # raise error
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
-            # If sample number is not specified, use batch size of visible units
-            num_sample = s_visible.size(0) if num_sample is None else num_sample
             if s_visible is not None:
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
@@ -178,7 +194,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Return sampled states of all units
             return s_all
 
-    def condition_sample(self, sampler, s_visible) -> torch.Tensor:
+    def condition_sample(
+        self, sampler, s_visible, dtype=torch.float32
+    ) -> torch.Tensor:  # 对源码进行了dtype和device的改动
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
@@ -194,15 +212,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
             solution = sampler.solve(ising_mat)
             solution = (solution[:, :-1] + 1) / 2
+            solution = torch.tensor(
+                solution, dtype=dtype, device=self.device
+            )  # 对源码进行了dtype和device的改动
             solution = torch.cat(
-                [
-                    s_visible[i].unsqueeze(0).expand(solution.shape[0], -1),
-                    torch.FloatTensor(solution),
-                ],
+                [s_visible[i].unsqueeze(0).expand(solution.shape[0], -1), solution],
                 dim=-1,
             )
             solutions.append(solution)
         solutions = torch.cat(solutions, dim=0)
-        solutions = torch.FloatTensor(solutions)
-        solutions = solutions.to(self.device)
         return solutions

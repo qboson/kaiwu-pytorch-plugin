@@ -24,7 +24,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         device (torch.device, optional): Device for tensor construction.
     """
 
-    def __init__(self, h_range=None, j_range=None) -> None:
+    def __init__(self, h_range=None, j_range=None, device=None) -> None:
         super().__init__()
         self.register_buffer(
             "h_range",
@@ -35,7 +35,10 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             torch.tensor(j_range if j_range is not None else [-torch.inf, torch.inf]),
         )
         self.register_forward_pre_hook(clip_parameters_hook)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if device is None:
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        else:
+            self.device = device
 
     def to(self, device=..., dtype=..., non_blocking=...):
         """Moves the model to the specified device.

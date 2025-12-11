@@ -20,8 +20,8 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         device (torch.device, optional): Device to construct tensors.
     """
 
-    def __init__(self, num_visible, num_hidden, h_range=None, j_range=None):
-        super().__init__(h_range=h_range, j_range=j_range)
+    def __init__(self, num_visible, num_hidden, h_range=None, j_range=None, device=None):
+        super().__init__(h_range=h_range, j_range=j_range, device=device)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
@@ -104,12 +104,12 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
             # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
-                self.quadratic_coef / 4
+                self.quadratic_coef / 8
             )
             ising_mat[self.num_visible : -1, : self.num_visible] = (
-                self.quadratic_coef.t() / 4
+                self.quadratic_coef.t() /8
             )
-            ising_bias = self.linear_bias / 2 + ising_mat.sum(dim=0)[:-1]
-            ising_mat[:num_nodes, -1] = ising_bias / 2
-            ising_mat[-1, :num_nodes] = ising_bias / 2
+            ising_bias = self.linear_bias / 4 + ising_mat.sum(dim=0)[:-1]
+            ising_mat[:num_nodes, -1] = ising_bias
+            ising_mat[-1, :num_nodes] = ising_bias
             return ising_mat.detach().cpu().numpy()
