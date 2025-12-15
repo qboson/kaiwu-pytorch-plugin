@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文 Figure 2 复现 | Paper Figure Reproduction</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .figure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .figure-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .figure-card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .figure-card h3 {
+            margin-bottom: 1rem;
+            color: #f8fafc;
+            font-size: 1.1rem;
+        }
+
+        .figure-card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .figure-image {
+            width: 100%;
+            border-radius: 12px;
+            background: #1a1a2e;
+        }
+
+        .paper-summary {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .paper-summary h2 {
+            background: linear-gradient(135deg, #818cf8, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .paper-summary ul {
+            color: #94a3b8;
+            padding-left: 1.5rem;
+        }
+
+        .paper-summary li {
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #818cf8;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: #a5b4fc;
+        }
+
+        .combined-figure {
+            grid-column: 1 / -1;
+        }
+
+        .qubo-formula {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            color: #22d3ee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">⚛</div>
+                    <div class="logo-text">
+                        <h1>论文 Figure 2 复现</h1>
+                        <span>A novel quantum realization of jet clustering</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <a href="/" class="back-link">← 返回主仪表板</a>
+
+            <section class="paper-summary glass-card">
+                <h2>📄 论文核心内容</h2>
+                <p><strong>标题:</strong> A novel quantum realization of jet clustering in high-energy physics experiments
+                </p>
+                <p><strong>作者:</strong> Qing-Yu Men, Teng-Fei Li, Ping Ao, Xin Shi, Liang-Liang Wang</p>
+
+                <h3 style="color: #f8fafc; margin-top: 1.5rem;">QUBO 建模 (公式 7-10)</h3>
+                <div class="qubo-formula">
+                    <p>决策变量: x_{ij} ∈ {0, 1} — 粒子i是否属于喷注j</p>
+                    <p>目标函数: H_obj = Σ_k Σ_{i<j} d_{ij} × x_{ik} × x_{jk}</p>
+                            <p>约束条件: Σ_j x_{ij} = 1, ∀i (每个粒子只属于一个喷注)</p>
+                            <p>距离度量: d_{ij} = min(k_Ti^{-2}, k_Tj^{-2}) × ΔR_{ij}² / R²</p>
+                </div>
+
+                <h3 style="color: #f8fafc; margin-top: 1.5rem;">关键发现</h3>
+                <ul>
+                    <li>首次将喷注聚类问题转化为 QUBO 优化问题</li>
+                    <li>QAOA 深度增加可以改善聚类效果 (depth=5 最优)</li>
+                    <li>适当的 k 值选择（k=7）可获得最佳结果</li>
+                    <li>在真实量子硬件 (Quafu) 上成功验证</li>
+                </ul>
+            </section>
+
+            <h2 class="section-title" style="margin-bottom: 1rem;">
+                <span class="icon">📊</span>
+                Figure 2 完整复现
+            </h2>
+
+            <div class="figure-grid">
+                <div class="figure-card">
+                    <h3>📈 Figure 2(a): QAOA 深度对比</h3>
+                    <p>固定 k=6 jets，比较 QAOA depth = 1, 3, 5 的效果。深度越大，平均角度越小（效果越好）。</p>
+                    <img src="/api/figure/fig2a_depth_comparison.png" alt="Figure 2a" class="figure-image">
+                </div>
+
+                <div class="figure-card">
+                    <h3>📊 Figure 2(b): k值对比</h3>
+                    <p>固定 QAOA depth=3，比较 k = 2, 4, 6, 7, 8。k=7 时效果最优。</p>
+                    <img src="/api/figure/fig2b_k_comparison.png" alt="Figure 2b" class="figure-image">
+                </div>
+
+                <div class="figure-card">
+                    <h3>⚖️ Figure 2(c): 算法对比</h3>
+                    <p>最优参数下 (depth=5, k=7)，QAOA 与传统算法 (e+e- kt, k-Means) 的对比。</p>
+                    <img src="/api/figure/fig2c_algorithm_comparison.png" alt="Figure 2c" class="figure-image">
+                </div>
+
+                <div class="figure-card">
+                    <h3>🔬 Figure 2(e): 量子硬件对比</h3>
+                    <p>在 Quafu 量子计算机上的实际运行结果对比（1217个事件，6个粒子）。</p>
+                    <img src="/api/figure/fig2e_hardware_comparison.png" alt="Figure 2e" class="figure-image">
+                </div>
+
+                <div class="figure-card">
+                    <h3>🔄 Figure 2(d): QAOA 量子电路</h3>
+                    <p>编译后的 QAOA 量子电路示意图：6 qubits, 34 CNOT gates, 深度 27。</p>
+                    <img src="/api/figure/fig2d_quantum_circuit.png" alt="Figure 2d" class="figure-image">
+                </div>
+
+                <div class="figure-card combined-figure">
+                    <h3>🖼️ 完整 Figure 2 组合图</h3>
+                    <p>论文 Figure 2 的完整复现，包含所有子图。</p>
+                    <img src="/api/figure/fig2_combined.png" alt="Figure 2 Combined" class="figure-image">
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>开源贡献季 #74 | Kaiwu SDK | 玻色量子</p>
+        </footer>
+    </div>
+</body>
+
+</html>
