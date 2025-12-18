@@ -1,0 +1,34 @@
+div.math, span.math {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* 去掉默认的列表符号（如果还没去掉的话） */
+.navbar .nav-item.dropdown {
+    list-style: none !important;
+  }
+  
+  /* 给下拉按钮加框 */
+  #versionDropdown {
+    display: inline-block;          /* 保证 padding 生效 */
+    padding: 0.2em 0.5em;           /* 你可以根据喜好调节内边距 */
+    border: 1px solid #ccc;         /* 边框颜色 */
+    border-radius: 0.25rem;         /* 圆角 */
+    background-color: #f9f9f9;      /* 背景色 */
+    line-height: 1.2;               /* 行高，保证垂直居中 */
+  }
+  
+  /* 可选：给下拉箭头留点间距 */
+  #versionDropdown .dropdown-toggle::after {
+    margin-left: 0.4em;
+  }
+
+.bd-header .navbar-nav {
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+}
+  
