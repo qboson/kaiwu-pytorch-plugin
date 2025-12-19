@@ -90,7 +90,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
     def objective(
         self,
         s_positive: torch.Tensor,
-        s_negtive: torch.Tensor,
+        s_negative: torch.Tensor,
     ) -> torch.Tensor:
         """Objective function whose gradient is equivalent to the gradient of
         negative log-likelihood.
@@ -98,14 +98,14 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         Args:
             s_positive (torch.Tensor): Tensor of observed spins (data), shape (b1, N),
                             where b1 is batch size and N is the number of variables.
-            s_negtive (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N),
+            s_negative (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N),
                             where b2 is batch size and N is the number of variables.
 
         Returns:
             torch.Tensor: Scalar difference between data and model average energy.
         """
         self.clip_parameters()
-        return self(s_positive).mean() - self(s_negtive).mean()
+        return self(s_positive).mean() - self(s_negative).mean()
 
     def sample(self, sampler) -> torch.Tensor:
         """Samples from the Boltzmann Machine.
