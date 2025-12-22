@@ -111,7 +111,7 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
     请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的 `Kaiwu SDK 页面 <https://platform.qboson.com/>`_ 获取。
 
 4. 验证安装（review）
------------
+----------------------
 
 安装完成后，运行以下代码验证安装是否成功：
 

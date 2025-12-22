@@ -35,11 +35,12 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.jquery',
     'sphinx.ext.imgmath',
-    'myst_parser'
+    'myst_parser',
+    'sphinxcontrib.mermaid'
 ]
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.md', 'source/getting_started/start.rst']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
