@@ -48,7 +48,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def get_hidden(
         self, s_visible: torch.Tensor, requires_grad: bool = False
     ) -> torch.Tensor:
-        """Propagate hidden spins to the visible layer.
+        """Propagate visible spins to the hidden layer.
 
         Args:
             s_visible: Visible layer tensor.
@@ -69,7 +69,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             return s_all
 
     def get_visible(self, s_hidden: torch.Tensor) -> torch.Tensor:
-        """Propagate visible spins to the hidden layer."""
+        """Propagate hidden spins to the visible layer."""
         with torch.no_grad():
             s_all = torch.zeros(
                 s_hidden.size(0), self.num_hidden + self.num_visible
