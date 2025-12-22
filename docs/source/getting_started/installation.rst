@@ -92,9 +92,9 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
 3.1 获取 SDK
 ^^^^^^^^^^^^
 
-1. 访问 `Kaiwu SDK 下载页面 <https://platform.qboson.com/sdkDownload>`_（需要注册账号）
+1. 访问 `Kaiwu SDK 下载页面 <https://platform.qboson.com/sdkDownload>`_
 2. 下载适合您系统的 SDK 安装包
-3. 参考 `Kaiwu SDK 安装说明 <https://kaiwu-sdk-docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html>`_
+3. 参考 `Kaiwu SDK 安装说明 <https://kaiwu-sdk-docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html>`_ 以完成安装
 
 3.2 配置授权信息
 ^^^^^^^^^^^^^^^^
@@ -108,9 +108,9 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
 
 .. note::
 
-    请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的个人中心获取。
+    请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的 `Kaiwu SDK 页面 <https://platform.qboson.com/>`_ 获取。
 
-4. 验证安装
+4. 验证安装（review）
 -----------
 
 安装完成后，运行以下代码验证安装是否成功：
@@ -133,7 +133,7 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
     rbm = RestrictedBoltzmannMachine(num_visible=10, num_hidden=5)
     print(f"RBM created with {rbm.num_visible} visible and {rbm.num_hidden} hidden units")
 
-如果没有报错，说明安装成功。
+如果没有报错，至此您已经安装成功。后续您可以根据需求进行模型的构建，并使用经典计算器进行模型验证，验证通过后再根据如下步骤切换到量子计算器以利用量子计算资源。
 
 5. 获取量子计算机访问
 ---------------------
@@ -142,11 +142,10 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
 
 1. 在 `QBoson 平台 <https://platform.qboson.com/>`_ 注册账号
 2. 通过平台联系官方工作人员获取真机配额
-3. 联系邮箱：developer@boseq.com
 
 .. note::
 
-    在获取真机访问权限之前，您可以使用模拟器进行开发和测试。Kaiwu SDK 提供了多种经典优化器（如模拟退火优化器）作为采样器的替代方案。
+    在获取真机访问权限之前，您可以使用模拟器进行开发和测试验证。Kaiwu SDK 提供了多种经典优化器（如模拟退火优化器）作为量子采样器的经典替代方案。
 
 6. 开发环境设置（可选）
 -----------------------

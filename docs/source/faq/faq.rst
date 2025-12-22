@@ -42,7 +42,7 @@ A: Kaiwu SDK 需要单独安装。请：
 2. 下载对应系统的安装包
 3. 按照页面说明进行安装
 
-模型相关
+模型相关（review）
 --------
 
 Q: RBM 和 BM 有什么区别？应该使用哪个？
@@ -94,7 +94,7 @@ A: 尝试以下方法：
 3. **检查数据预处理**：确保数据已归一化到合适范围
 4. **增加训练轮次**：某些情况下需要更长的训练时间
 
-采样相关
+采样相关（review）
 --------
 
 Q: 如何获取量子计算机访问权限？
@@ -126,7 +126,7 @@ A: ``SimulatedAnnealingOptimizer`` 的主要参数：
     # 高质量采样（速度较慢）
     quality_sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
 
-性能相关
+性能相关（review）
 --------
 
 Q: 如何加速训练？
@@ -168,7 +168,7 @@ A: 尝试以下方法：
             optimizer.step()
             optimizer.zero_grad()
 
-其他问题
+其他问题（review）
 --------
 
 Q: 如何引用这个项目？

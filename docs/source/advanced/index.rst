@@ -8,4 +8,3 @@
    :maxdepth: 2
 
    advanced_features
-   research_applications
