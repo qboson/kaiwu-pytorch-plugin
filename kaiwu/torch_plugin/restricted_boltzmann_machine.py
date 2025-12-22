@@ -12,11 +12,15 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
     Args:
         num_visible (int): Number of visible nodes in the model.
+
         num_hidden (int): Number of hidden nodes in the model.
+
         h_range (tuple[float, float], optional): Range for linear weights.
             If ``None``, an infinite range is used.
+
         j_range (tuple[float, float], optional): Range for quadratic weights.
             If ``None``, an infinite range is used.
+
         device (torch.device, optional): Device to construct tensors.
     """
 
