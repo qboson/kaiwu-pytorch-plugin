@@ -41,7 +41,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             If ``None``, uses CPU.
     """
 
-    def __init__(self, num_nodes: int, h_range=None, j_range=None, device=None):  # 对源码进行了device参数的改动，以及二次项系数的改动
+    # 对源码进行了device参数的改动，以及二次项系数的改动
+    def __init__(self, num_nodes: int, h_range=None, j_range=None, device=None):
         super().__init__(h_range=h_range, j_range=j_range, device=device)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
@@ -144,7 +145,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat[-1, :-1] = ising_bias
             return ising_mat.cpu().numpy()
 
-    def gibbs_sample(self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None) -> torch.Tensor:
+    def gibbs_sample(self, num_steps: int = 100, s_visible: torch.Tensor = None,
+                     num_sample=None) -> torch.Tensor:
         """Sample from the Boltzmann Machine.
 
         Args:
