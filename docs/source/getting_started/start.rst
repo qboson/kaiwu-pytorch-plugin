@@ -119,11 +119,11 @@ Installation Steps
       pip install .
 
 Kaiwu SDK Installation Instructions (Required)
-=============================================
+==============================================
 
 Download link and installation steps for Kaiwu SDK:
 
-.. image:: ../../imgs/image.png
+.. image:: ../../../imgs/image.png
    :alt: Kaiwu SDK Download Page
    :target: https://platform.qboson.com/sdkDownload
 
@@ -218,16 +218,16 @@ Demonstrates how to train and evaluate a Quantum Variational Autoencoder (Q-VAE)
 
 To run this example, execute ``example/qvae_mnist/train_qvae.ipynb``.
 
-.. image:: ../../imgs/qvae.png
+.. image:: ../../../imgs/qvae.png
    :alt: Q-VAE Example Output
    :align: center
 
-------------------------
+--------------------------------
 Scientific Research Achievements
-------------------------
+--------------------------------
 
 QBM Inside VAE = A More Powerful Generative Data Representer (QBM-VAE)
-=====================================================================
+======================================================================
 
 Data from natural domains (e.g., biology, chemistry, materials science) exhibits extreme complexity, where traditional Gaussian i.i.d. assumptions often lead to distorted representations.
 
@@ -262,11 +262,11 @@ Contact
 2. **Boson Quantum Official Assistant**: Inquire about real-machine access and collaborations.
 3. Email: developer@boseq.com
 
-.. image:: ../../imgs/qrcode.png
+.. image:: ../../../imgs/qrcode.png
    :alt: WeChat Group QR Code
    :target: https://github.com/user-attachments/assets/77bf80f4-d71e-4645-ad2d-b59b9af8163c
 
-.. image:: ../../imgs/qrcode3.png
+.. image:: ../../../imgs/qrcode3.png
    :alt: Another Contact QR Code
    :target: https://github.com/user-attachments/assets/77bf80f4-d71e-4645-ad2d-b59b9af8163c
 

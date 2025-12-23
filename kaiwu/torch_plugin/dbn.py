@@ -117,6 +117,7 @@ class UnsupervisedDBN(nn.Module):
 
         Args:
             data_in (numpy.ndarray): The input data to be reconstructed.
+
             layer_index (int, optional): The index of the RBM layer to use for reconstruction.
                 Defaults to 0.
 
@@ -163,7 +164,9 @@ class UnsupervisedDBN(nn.Module):
 
         Args:
             rbm (RestrictedBoltzmannMachine): The trained RBM model.
+
             data_in (numpy.ndarray): The input data.
+
             device (torch.device, optional): The device to perform computation on.
                 If None, uses the RBM's device. Defaults to None.
 

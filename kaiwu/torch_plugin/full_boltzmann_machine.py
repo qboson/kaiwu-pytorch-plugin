@@ -13,6 +13,7 @@ class BoltzmannMachineQuadraticCoef(nn.Module):
     """
     Parametrization to ensure the quadratic coefficient matrix is symmetric and has zero diagonal.
     """
+
     def forward(self, x):
         """
         Args:
@@ -29,17 +30,19 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
     Args:
         num_nodes (int): Total number of nodes in the model.
+
         h_range (tuple[float, float], optional): Range for linear weights.
             If ``None``, uses infinite range.
+
         j_range (tuple[float, float], optional): Range for quadratic weights.
             If ``None``, uses infinite range.
+
         device (torch.device, optional): Device for tensor construction.
             If ``None``, uses CPU.
     """
 
-    def __init__(
-        self, num_nodes: int, h_range=None, j_range=None, device=None
-    ):  # 对源码进行了device参数的改动，以及二次项系数的改动
+    # 对源码进行了device参数的改动，以及二次项系数的改动
+    def __init__(self, num_nodes: int, h_range=None, j_range=None, device=None):
         super().__init__(h_range=h_range, j_range=j_range, device=device)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
@@ -61,6 +64,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
     def visible_bias(self, num_visible) -> torch.Tensor:
         """Get the visible bias.
+
         Args:
             num_visible (int): Number of visible nodes.
         """
@@ -141,15 +145,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat[-1, :-1] = ising_bias
             return ising_mat.cpu().numpy()
 
-    def gibbs_sample(
-        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
-    ) -> torch.Tensor:
+    def gibbs_sample(self, num_steps: int = 100, s_visible: torch.Tensor = None,
+                     num_sample=None) -> torch.Tensor:
         """Sample from the Boltzmann Machine.
 
         Args:
             num_steps (int): Number of Gibbs sampling steps.
+
             s_visible (torch.Tensor, optional): State of the visible layer,
                 shape (B, num_visible). If ``None``, randomly initialize visible layer.
+
             num_sample (int, optional): Number of samples.
                 If ``None``, uses batch size of s_visible.
         """
@@ -184,8 +189,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                         continue
                     # Compute activation value (logit of conditional probability)
                     activation = (
-                        torch.matmul(s_all, self.quadratic_coef[:, unit])
-                        + self.linear_bias[unit]
+                            torch.matmul(s_all, self.quadratic_coef[:, unit])
+                            + self.linear_bias[unit]
                     )
                     # Get activation probability via sigmoid
                     prob = torch.sigmoid(activation)
@@ -195,7 +200,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             return s_all
 
     def condition_sample(
-        self, sampler, s_visible, dtype=torch.float32
+            self, sampler, s_visible, dtype=torch.float32
     ) -> torch.Tensor:  # 对源码进行了dtype和device的改动
         """Sample from the Boltzmann Machine given some nodes.
 
