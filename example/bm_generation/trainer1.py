@@ -10,11 +10,9 @@ import torch
 from torch.optim.lr_scheduler import LambdaLR
 
 import numpy as np
-import kaiwu as kw
 from kaiwu.torch_plugin import BoltzmannMachine
 
 # from torch_plugin import BoltzmannMachine
-import pickle
 import matplotlib.pyplot as plt
 
 # from graph import Graph

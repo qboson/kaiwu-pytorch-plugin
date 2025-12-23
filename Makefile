@@ -1,4 +1,4 @@
-CHECK_DIRS=kaiwu
+CHECK_DIRS=src
 
 all_tests: test_install pylint pytest
 
@@ -6,7 +6,7 @@ test_install:
 	pip3 install -i https://mirrors.aliyun.com/pypi/simple -r requirements/devel.txt
 
 pylint:
-	pylint kaiwu/torch_plugin
+	pylint src/
 
 pytest:
 	coverage run --source=$(CHECK_DIRS) -m pytest tests --ignore=tests/

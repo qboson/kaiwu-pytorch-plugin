@@ -1,7 +1,6 @@
 import torch
 
 from torch.optim import SGD
-import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import BoltzmannMachine
 

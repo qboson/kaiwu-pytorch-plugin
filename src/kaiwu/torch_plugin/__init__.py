@@ -5,6 +5,8 @@ from .full_boltzmann_machine import BoltzmannMachine
 from .qvae import QVAE
 from .dbn import UnsupervisedDBN
 
+__version__ = "0.1.0"
+
 __all__ = [
     "RestrictedBoltzmannMachine",
     "BoltzmannMachine",

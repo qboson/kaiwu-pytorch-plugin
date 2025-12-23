@@ -11,7 +11,6 @@ from scipy.ndimage import shift
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn import linear_model
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
 from sklearn.datasets import load_digits

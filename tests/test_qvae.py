@@ -5,9 +5,9 @@ import numpy as np
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../kaiwu")))
-from torch_plugin.qvae import QVAE
-from torch_plugin import RestrictedBoltzmannMachine
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+from kaiwu.torch_plugin.qvae import QVAE
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 
 
 class DummyEncoder(torch.nn.Module):

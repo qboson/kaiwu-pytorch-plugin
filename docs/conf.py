@@ -9,16 +9,14 @@
 import os
 import sys
 
-
-sys.path.insert(0, os.path.abspath('..'))
-# sdk所在目录
-sys.path.insert(0, os.path.abspath('../kaiwu/torch_plugin'))
+sys.path.insert(0, os.path.abspath("../src"))
+from kaiwu.torch_plugin import __version__
 
 project = 'Kaiwu Pytorch Plugin'
-copyright = '2025, QBoson Inc'
+copyright = '2025 Beijing QBoson Quantum Technology Co., Ltd'
 author = 'QBoson Inc'
-release = '0.0.1'
-version = '0.0.1'
+release = __version__
+version = __version__
 
 # language 默认语言
 language = 'zh_CN'
@@ -58,12 +56,12 @@ html_theme_options = {
         "image_light": ""
     },
     # 导航栏配置
-    "navbar_center": ["navbar-nav"],    # 中间导航链接
+    "navbar_center": ["navbar-nav"],  # 中间导航链接
     "navbar_persistent": ["search-button"],  # 常驻元素（如搜索按钮）
     # 页脚配置
-    "footer_start": ["copyright"],      # 页脚开头
-    "footer_end": ["theme-version"],     # 页脚结尾
-    "show_toc_level": 2,               # 侧边栏目录显示层级
+    "footer_start": ["copyright"],  # 页脚开头
+    "footer_end": ["theme-version"],  # 页脚结尾
+    "show_toc_level": 2,  # 侧边栏目录显示层级
 }
 
 html_show_sourcelink = False

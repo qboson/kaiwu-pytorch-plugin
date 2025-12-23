@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "kaiwu-torch-plugin"
+description = "A PyTorch plugin for training and evaluating Restricted Boltzmann Machines (RBM) and Boltzmann Machines (BM) with quantum computing support"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+
+authors = [
+    { name = "QBoson Inc", email = "developer@boseq.com" }
+]
+
+keywords = [
+    "quantum computing",
+    "boltzmann machine",
+    "restricted boltzmann machine",
+    "pytorch",
+    "machine learning",
+    "deep learning"
+]
+
+requires-python = ">=3.8"
+
+dynamic = ["dependencies", "version"]
+
+
+[project.urls]
+Homepage = "https://github.com/QBoson/kaiwu-pytorch-plugin"
+Source = "https://github.com/QBoson/kaiwu-pytorch-plugin"
+Documentation = "https://github.com/QBoson/kaiwu-pytorch-plugin#readme"
+"Issue Tracker" = "https://github.com/QBoson/kaiwu-pytorch-plugin/issues"
+
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["kaiwu.*"]
+namespaces = true
+
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements/requirements.txt"] }
+version = { attr = "kaiwu.torch_plugin.__version__" }
