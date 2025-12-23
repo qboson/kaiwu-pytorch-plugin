@@ -88,8 +88,8 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Samples from the Boltzmann Machine.
 
         Args:
-            sampler (kaiwu.core.OptimizerBase): Optimizer used for sampling from the model. The sampler
-            can be kaiwuSDK's CIM or other solvers.
+            sampler (kaiwu.core.OptimizerBase): Optimizer used for sampling from the model.
+                The sampler can be kaiwuSDK's CIM or other solvers.
 
         Returns:
             torch.Tensor: Spins sampled from the model.
