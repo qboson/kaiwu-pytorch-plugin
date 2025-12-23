@@ -5,8 +5,8 @@ import numpy as np
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../kaiwu")))
-from torch_plugin import RestrictedBoltzmannMachine as RBM
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine as RBM
 
 
 class TestRestrictedBoltzmannMachine(unittest.TestCase):
@@ -69,11 +69,11 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
             ising_mat = self.bm.get_ising_matrix()
             s = torch.tensor([[1, 1, 1, 0]], dtype=torch.float32)
             s2 = torch.tensor([[0, 1, 1, 1]], dtype=torch.float32)
-            x = np.array([[1,1,1,-1,1]],dtype=np.float32)
-            x2 = np.array([[-1,1,1,1,1]],dtype=np.float32)
-            print(self.bm(s),self.bm(s2),-x @ ising_mat @ x.T ,(-x2@  ising_mat @ x2.T))
-            print(self.bm(s)-self.bm(s2), -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T))
-            assert self.bm(s)-self.bm(s2)== -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T)
+            x = np.array([[1, 1, 1, -1, 1]], dtype=np.float32)
+            x2 = np.array([[-1, 1, 1, 1, 1]], dtype=np.float32)
+            print(self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T))
+            print(self.bm(s) - self.bm(s2), -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T))
+            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
 
     def test_register_forward_pre_hook(self):
         self.bm.h_range = torch.tensor([-0.1, 0.1])
@@ -93,7 +93,7 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         s_all = self.bm.get_hidden(s_visible)
         self.assertEqual(s_all.shape, (5, self.num_visible + self.num_hidden))
         # 检查隐藏层概率范围
-        hidden_probs = s_all[:, self.num_visible :]
+        hidden_probs = s_all[:, self.num_visible:]
         self.assertTrue(torch.all((hidden_probs >= 0) & (hidden_probs <= 1)))
 
         # 测试requires_grad=True
@@ -113,7 +113,6 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         s_hidden_grad = torch.rand(3, self.num_hidden, requires_grad=True)
         s_all_nograd = self.bm.get_visible(s_hidden_grad)
         self.assertFalse(s_all_nograd.requires_grad)
-
 
 
 if __name__ == "__main__":

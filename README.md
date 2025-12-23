@@ -125,7 +125,7 @@ if __name__ == "__main__":
     # Instantiate the model
     rbm = RestrictedBoltzmannMachine(
         num_visible,
-        num_nodes-num_visible,
+        num_nodes - num_visible,
     )
     # Instantiate the optimizer
     opt_rbm = SGD(rbm.parameters())

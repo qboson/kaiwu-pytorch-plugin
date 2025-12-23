@@ -119,7 +119,6 @@ from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 
-
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
     sampler = SimulatedAnnealingOptimizer()
@@ -130,7 +129,7 @@ if __name__ == "__main__":
     # Instantiate the model
     rbm = RestrictedBoltzmannMachine(
         num_visible,
-        num_nodes-num_visible,
+        num_nodes - num_visible,
     )
     # Instantiate the optimizer
     opt_rbm = SGD(rbm.parameters())

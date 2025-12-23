@@ -5,8 +5,8 @@ import numpy as np
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../kaiwu")))
-from torch_plugin import BoltzmannMachine as BM
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+from kaiwu.torch_plugin import BoltzmannMachine as BM
 
 
 class TestBoltzmannMachine(unittest.TestCase):
@@ -142,7 +142,7 @@ class TestBoltzmannMachine(unittest.TestCase):
             # 采样器返回2个样本，每个样本长度为可见层+隐含层
             self.assertEqual(result.shape, (2, self.num_nodes))
             self.assertIsInstance(result, torch.Tensor)
-    
+
     def test_get_ising_matrix(self):
         with self.subTest("Unbounded weight range"):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
@@ -169,11 +169,11 @@ class TestBoltzmannMachine(unittest.TestCase):
             print("ising mat:", ising_mat)
             s = torch.tensor([[1, 1, 1, 1]], dtype=torch.float32)
             s2 = torch.tensor([[0, 1, 1, 0]], dtype=torch.float32)
-            x = np.array([[1,1,1,1, 1]],dtype=np.float32)
-            x2 = np.array([[-1,1,1,-1,1]],dtype=np.float32)
-            print(self.bm(s),self.bm(s2),-x @ ising_mat @ x.T ,(-x2@  ising_mat @ x2.T))
-            print(self.bm(s)-self.bm(s2), -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T))
-            assert self.bm(s)-self.bm(s2)== -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T)
+            x = np.array([[1, 1, 1, 1, 1]], dtype=np.float32)
+            x2 = np.array([[-1, 1, 1, -1, 1]], dtype=np.float32)
+            print(self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T))
+            print(self.bm(s) - self.bm(s2), -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T))
+            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
 
     def test_hidden_to_ising(self):
         with self.subTest("Unbounded weight range"):
@@ -205,11 +205,9 @@ class TestBoltzmannMachine(unittest.TestCase):
             # x2 = np.array([[1,1,1,-1,1]],dtype=np.float32)
             x = np.array([[-1, 1, 1]])
             x2 = np.array([[1, -1, 1]])
-            print(self.bm(s),self.bm(s2),-x @ ising_mat @ x.T ,(-x2@  ising_mat @ x2.T))
-            print(self.bm(s)-self.bm(s2), -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T))
-            assert self.bm(s)-self.bm(s2)== -x @ ising_mat @ x.T -(-x2@  ising_mat @ x2.T)
-
-
+            print(self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T))
+            print(self.bm(s) - self.bm(s2), -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T))
+            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
 
 
 if __name__ == "__main__":
