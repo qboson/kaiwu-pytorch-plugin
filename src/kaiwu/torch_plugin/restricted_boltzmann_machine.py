@@ -14,25 +14,33 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         num_visible (int): Number of visible nodes in the model.
 
         num_hidden (int): Number of hidden nodes in the model.
-
-        h_range (tuple[float, float], optional): Range for linear weights.
-            If ``None``, an infinite range is used.
-
-        j_range (tuple[float, float], optional): Range for quadratic weights.
-            If ``None``, an infinite range is used.
-
+        quadratic_coef (torch.FloatTensor, optional): quadratic coefficent, shape is [num_visible, num_hidden]
+        linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_hidden]
         device (torch.device, optional): Device to construct tensors.
     """
 
-    def __init__(self, num_visible, num_hidden, h_range=None, j_range=None, device=None):
-        super().__init__(h_range=h_range, j_range=j_range, device=device)
+    def __init__(
+        self,
+        num_visible: int,
+        num_hidden: int,
+        quadratic_coef: torch.FloatTensor = None,
+        linear_bias: torch.FloatTensor = None,
+        device=None,
+    ):
+        super().__init__(device=device)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
         self.quadratic_coef = torch.nn.Parameter(
-            torch.randn((num_visible, num_hidden)) * 0.01
+            quadratic_coef
+            if quadratic_coef is not None
+            else torch.randn((num_visible, num_hidden)) * 0.01
         )
-        self.linear_bias = torch.nn.Parameter(torch.zeros(num_hidden + num_visible))
+        self.linear_bias = torch.nn.Parameter(
+            linear_bias
+            if linear_bias is not None
+            else torch.zeros(num_hidden + num_visible)
+        )
 
     @property
     def hidden_bias(self) -> torch.Tensor:
@@ -44,13 +52,21 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Return the visible bias."""
         return self.linear_bias[: self.num_visible]
 
-    def clip_parameters(self) -> None:
-        """Clip the linear and quadratic bias weights in place."""
-        self.get_parameter("linear_bias").data.clamp_(*self.h_range)
-        self.get_parameter("quadratic_coef").data.clamp_(*self.j_range)
+    def clip_parameters(self, h_range, j_range) -> None:
+        """Clip linear and quadratic bias weights in-place.
+
+        Args:
+            h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
+            j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
+        """
+        self.get_parameter("linear_bias").data.clamp_(*h_range)
+        self.get_parameter("quadratic_coef").data.clamp_(*j_range)
 
     def get_hidden(
-        self, s_visible: torch.Tensor, requires_grad: bool = False
+        self,
+        s_visible: torch.Tensor,
+        requires_grad: bool = False,
+        bernoulli: bool = False,
     ) -> torch.Tensor:
         """Propagate visible spins to the hidden layer.
 
@@ -69,10 +85,15 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             prob = torch.sigmoid(
                 s_visible @ self.quadratic_coef + self.linear_bias[self.num_visible :]
             )
-            s_all[:, self.num_visible :] = prob
+            if bernoulli:
+                s_all[:, self.num_visible :] = (prob > torch.rand_like(prob)).float()
+            else:
+                s_all[:, self.num_visible :] = prob
             return s_all
 
-    def get_visible(self, s_hidden: torch.Tensor) -> torch.Tensor:
+    def get_visible(
+        self, s_hidden: torch.Tensor, bernoulli: bool = False
+    ) -> torch.Tensor:
         """Propagate hidden spins to the visible layer."""
         with torch.no_grad():
             s_all = torch.zeros(
@@ -83,7 +104,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_hidden @ self.quadratic_coef.t()
                 + self.linear_bias[: self.num_visible]
             )
-            s_all[:, : self.num_visible] = prob
+
+            if bernoulli:
+                s_all[:, : self.num_visible] = (prob > torch.rand_like(prob)).float()
+            else:
+                s_all[:, : self.num_visible] = prob
             return s_all
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
@@ -97,7 +122,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Hamiltonian of shape (B,).
         """
         tmp = s_all[:, : self.num_visible].matmul(self.quadratic_coef)
-        return - s_all @ self.linear_bias - torch.sum(
+        return -s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
         )
 
@@ -111,7 +136,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 self.quadratic_coef / 8
             )
             ising_mat[self.num_visible : -1, : self.num_visible] = (
-                self.quadratic_coef.t() /8
+                self.quadratic_coef.t() / 8
             )
             ising_bias = self.linear_bias / 4 + ising_mat.sum(dim=0)[:-1]
             ising_mat[:num_nodes, -1] = ising_bias

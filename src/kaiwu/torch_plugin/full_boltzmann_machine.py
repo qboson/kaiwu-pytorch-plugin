@@ -3,26 +3,8 @@
 
 import numpy as np
 import torch
-from torch import nn
-from torch.nn.utils import parametrize
 
-from .restricted_boltzmann_machine import AbstractBoltzmannMachine
-
-
-class BoltzmannMachineQuadraticCoef(nn.Module):
-    """
-    Parametrization to ensure the quadratic coefficient matrix is symmetric and has zero diagonal.
-    """
-
-    def forward(self, x):
-        """
-        Args:
-            x (torch.Tensor): Input quadratic coefficient matrix.
-        Returns:
-            torch.Tensor: Symmetric quadratic coefficient matrix with zero diagonal.
-        """
-        x_triu = x.triu(1)
-        return x_triu + x_triu.transpose(0, 1)
+from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -30,28 +12,44 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
     Args:
         num_nodes (int): Total number of nodes in the model.
-
-        h_range (tuple[float, float], optional): Range for linear weights.
-            If ``None``, uses infinite range.
-
-        j_range (tuple[float, float], optional): Range for quadratic weights.
-            If ``None``, uses infinite range.
-
+        quadratic_coef (torch.FloatTensor, optional): quadratic coefficent, shape is [num_nodes, num_nodes]
+        linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_nodes]
         device (torch.device, optional): Device for tensor construction.
             If ``None``, uses CPU.
     """
 
-    # 对源码进行了device参数的改动，以及二次项系数的改动
-    def __init__(self, num_nodes: int, h_range=None, j_range=None, device=None):
-        super().__init__(h_range=h_range, j_range=j_range, device=device)
+    def __init__(
+        self,
+        num_nodes: int,
+        quadratic_coef: torch.FloatTensor = None,
+        linear_bias: torch.FloatTensor = None,
+        device=None,
+    ):  # 对源码进行了device参数的改动，以及二次项系数的改动
+        super().__init__(device=device)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
-            torch.randn((self.num_nodes, self.num_nodes)) * 0.01
+            quadratic_coef
+            if quadratic_coef is not None
+            else torch.randn((self.num_nodes, self.num_nodes)) * 0.01
         )
-        parametrize.register_parametrization(
-            self, "quadratic_coef", BoltzmannMachineQuadraticCoef()
+        self.linear_bias = torch.nn.Parameter(
+            linear_bias if linear_bias is not None else torch.zeros(self.num_nodes)
         )
-        self.linear_bias = torch.nn.Parameter(torch.zeros(self.num_nodes))
+
+    def symmetrized_quadratic_coef(self):
+        """Quadratic coefficient"""
+        quadratic_coef = self.quadratic_coef.triu(1)
+        return quadratic_coef + quadratic_coef.transpose(0, 1)
+
+    def clip_parameters(self, h_range, j_range) -> None:
+        """Clip linear and quadratic bias weights in-place.
+
+        Args:
+            h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
+            j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
+        """
+        self.get_parameter("linear_bias").data.clamp_(*h_range)
+        self.get_parameter("quadratic_coef").data.clamp_(*j_range)
 
     def hidden_bias(self, num_hidden: int) -> torch.Tensor:
         """Get the hidden bias.
@@ -70,13 +68,6 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """
         return self.linear_bias[:num_visible]
 
-    def clip_parameters(self) -> None:
-        """Clip linear and quadratic bias weights in-place."""
-        self.get_parameter("linear_bias").data.clamp_(*self.h_range)
-        self.get_parameter("parametrizations.quadratic_coef.original").data.clamp_(
-            *self.j_range
-        )
-
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
 
@@ -88,15 +79,14 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Hamiltonian of shape (B,).
         """
         return -s_all @ self.linear_bias - 0.5 * torch.sum(
-            s_all.matmul(self.quadratic_coef) * s_all, dim=-1
+            s_all.matmul(self.symmetrized_quadratic_coef()) * s_all, dim=-1
         )
 
     def _to_ising_matrix(self):
         """Convert Boltzmann Machine to Ising matrix."""
         with torch.no_grad():
             linear_bias = self.linear_bias
-            quadratic_coef = self.quadratic_coef
-            print(linear_bias.size(), quadratic_coef.size())
+            quadratic_coef = self.symmetrized_quadratic_coef()  # quadratic_coef
             column_sums = torch.sum(quadratic_coef, dim=0)
             num_nodes = self.num_nodes
 
@@ -125,7 +115,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """
         with torch.no_grad():
             linear_bias = self.linear_bias
-            quadratic_coef = self.quadratic_coef
+            quadratic_coef = self.symmetrized_quadratic_coef()
             n_vis = s_visible.shape[-1]
             num_nodes = self.num_nodes
             n_hid = num_nodes - n_vis
@@ -145,8 +135,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat[-1, :-1] = ising_bias
             return ising_mat.cpu().numpy()
 
-    def gibbs_sample(self, num_steps: int = 100, s_visible: torch.Tensor = None,
-                     num_sample=None) -> torch.Tensor:
+    def gibbs_sample(
+        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
+    ) -> torch.Tensor:
         """Sample from the Boltzmann Machine.
 
         Args:
@@ -180,6 +171,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             # Number of visible units
             n_vis = s_visible.shape[-1] if s_visible is not None else 0
+            q_coef = self.symmetrized_quadratic_coef()
             for _ in range(num_steps):
                 # Random update order (Gibbs sampling)
                 update_order = torch.randperm(self.num_nodes, device=self.device)
@@ -189,8 +181,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                         continue
                     # Compute activation value (logit of conditional probability)
                     activation = (
-                            torch.matmul(s_all, self.quadratic_coef[:, unit])
-                            + self.linear_bias[unit]
+                        torch.matmul(s_all, q_coef[:, unit]) + self.linear_bias[unit]
                     )
                     # Get activation probability via sigmoid
                     prob = torch.sigmoid(activation)
@@ -200,12 +191,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             return s_all
 
     def condition_sample(
-            self, sampler, s_visible, dtype=torch.float32
+        self, sampler, s_visible, dtype=torch.float32
     ) -> torch.Tensor:  # 对源码进行了dtype和device的改动
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
-            sampler: Optimizer used for sampling from the model.
+            sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
             s_visible: State of the visible layer.
 
         Returns:
@@ -217,9 +208,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
             solution = sampler.solve(ising_mat)
             solution = (solution[:, :-1] + 1) / 2
-            solution = torch.tensor(
-                solution, dtype=dtype, device=self.device
-            )  # 对源码进行了dtype和device的改动
+            solution = torch.tensor(solution, dtype=dtype, device=self.device)
             solution = torch.cat(
                 [s_visible[i].unsqueeze(0).expand(solution.shape[0], -1), solution],
                 dim=-1,

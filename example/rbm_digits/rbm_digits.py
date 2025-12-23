@@ -23,9 +23,11 @@ from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 
+
 def _ensure_result_dir():
     """确保 result 文件夹存在"""
-    os.makedirs('results', exist_ok=True)
+    os.makedirs("results", exist_ok=True)
+
 
 class RBMRunner(TransformerMixin, BaseEstimator):
     """
@@ -89,8 +91,6 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         rbm = RestrictedBoltzmannMachine(
             X.shape[1],  # 可见层单元数（特征维度）
             self.n_components,  # 隐层单元数
-            h_range=[-1, 1],  # 隐层偏置范围
-            j_range=[-1, 1],  # 权重范围
         )
         rbm.to(self.device)  # 将模型移动到指定设备（CPU/GPU）
         self.rbm = rbm
@@ -129,11 +129,11 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 # 反向传播并更新参数
                 objective.backward()
                 opt_rbm.step()
-                
+
                 # 如果verbose，定期评估模型性能和可视化参数
                 if self.verbose:
                     print(f"Iteration {idx}, Objective: {objective.item():.6f}")
-                    
+
                     if (idx - 1) % 20 == 0:
                         # 打印权重和偏置的均值与最大值
                         print(
@@ -144,7 +144,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                             f"hmean {torch.abs(rbm.linear_bias).mean()}"
                             f" hmax {torch.abs(rbm.linear_bias).max()}"
                         )
-        
+
                         if self.plot_img:
                             display_samples = (
                                 rbm.sample(self.sampler)
@@ -158,11 +158,13 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                             plt.show()
                             _, axes = plt.subplots(1, 2)
                             axes[0].imshow(rbm.quadratic_coef.detach().cpu().numpy())
-                            axes[1].imshow(rbm.quadratic_coef.grad.detach().cpu().numpy())
+                            axes[1].imshow(
+                                rbm.quadratic_coef.grad.detach().cpu().numpy()
+                            )
                             plt.tight_layout()
                             plt.show()
-        
-        return self 
+
+        return self
 
     def translate_image(self, image, direction):
         "图片转换"
@@ -182,7 +184,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         digits = load_digits()
         images = digits.images  # 8x8 的图像矩阵
         labels = digits.target  # 对应的标签
-        
+
         # 获取图像数据和标签
         # 扩展数据集
         expanded_images = []
@@ -202,16 +204,16 @@ class RBMRunner(TransformerMixin, BaseEstimator):
 
         # 可视化图像数据和标签
         if plot_img:
-            plt.figure(figsize=(16,9))
+            plt.figure(figsize=(16, 9))
             for index in range(5):
-                plt.subplot(1,5, index + 1)
+                plt.subplot(1, 5, index + 1)
                 plt.imshow(expanded_images[index], origin="lower", cmap="gray")
-                plt.title('Training: %i\n' % expanded_labels[index], fontsize = 18)
-            
+                plt.title("Training: %i\n" % expanded_labels[index], fontsize=18)
+
         # 将图像数据展平为二维数组 (n_samples, 64)
         n_samples = expanded_images.shape[0]
         data = expanded_images.reshape((n_samples, -1))
-        
+
         # 划分训练集和测试集
         X_train, X_test, y_train, y_test = train_test_split(
             data, expanded_labels, test_size=0.2, random_state=42
@@ -238,86 +240,115 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         X_torch = torch.FloatTensor(X).to(self.device)
         with torch.no_grad():
             hidden_output = self.rbm.get_hidden(X_torch)
-            features = hidden_output[:, self.rbm.num_visible:]
+            features = hidden_output[:, self.rbm.num_visible :]
         return features.cpu().numpy()
 
     # 绘制原始和重构图像
-    def plot_images(self, images, labels, title='Reconstructed Images', save_as="qbm_reconstructed_images", save_pdf=False):
+    def plot_images(
+        self,
+        images,
+        labels,
+        title="Reconstructed Images",
+        save_as="qbm_reconstructed_images",
+        save_pdf=False,
+    ):
         """
         绘制原始和重构图像
         """
         if self.rbm is None:
             raise ValueError("RBM model not trained yet. Call fit first.")
-    
+
         # 重构
         with torch.no_grad():
             images = images.to(self.device)
             images_binary = (images > 0.5).float()
             hidden_activations = self.rbm.get_hidden(images_binary)
-            reconstructions = self.rbm.sample(self.sampler)[:, :self.rbm.num_visible]
-    
+            reconstructions = self.rbm.sample(self.sampler)[:, : self.rbm.num_visible]
+
         # 显示原始和重构图像
         num_samples = len(images)
-    
-        fig, axes = plt.subplots(2, num_samples, gridspec_kw={'wspace':0, 'hspace':0.1}, figsize=(2*num_samples, 4))
-        
+
+        fig, axes = plt.subplots(
+            2,
+            num_samples,
+            gridspec_kw={"wspace": 0, "hspace": 0.1},
+            figsize=(2 * num_samples, 4),
+        )
+
         # 添加文本标签
         if num_samples > 0:
-            axes[0, 0].text(-2, 3, "original", size=15,
-                           verticalalignment='center', rotation=-270)
-            axes[1, 0].text(-2, 2, "reconstructed", size=15,
-                           verticalalignment='center', rotation=-270)
-    
+            axes[0, 0].text(
+                -2, 3, "original", size=15, verticalalignment="center", rotation=-270
+            )
+            axes[1, 0].text(
+                -2,
+                2,
+                "reconstructed",
+                size=15,
+                verticalalignment="center",
+                rotation=-270,
+            )
+
         for n in range(num_samples):
             axes[0, n].imshow(images[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray)
-            axes[1, n].imshow(reconstructions[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray)
-            axes[0, n].set_title(f'Label: {labels[n]}', fontsize=18)
-            axes[0, n].axis('off')
-            axes[1, n].axis('off')
-    
+            axes[1, n].imshow(
+                reconstructions[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray
+            )
+            axes[0, n].set_title(f"Label: {labels[n]}", fontsize=18)
+            axes[0, n].axis("off")
+            axes[1, n].axis("off")
+
         # 保存结果
         if save_pdf:
             _ensure_result_dir()
-            plt.savefig(f'results/{save_as}.pdf', 
-                    dpi=300, bbox_inches='tight', format='pdf')
+            plt.savefig(
+                f"results/{save_as}.pdf", dpi=300, bbox_inches="tight", format="pdf"
+            )
         plt.show()
 
     # 绘制权重
     def plot_weights(self, save_as="qbm_weights", save_pdf=False):
         """绘制权重"""
         weights = self.rbm.quadratic_coef.detach().cpu().numpy()
-    
-        fig, axes = plt.subplots(8, 16, gridspec_kw={'wspace':0.1, 'hspace':0.1}, figsize=(16, 7))
-        fig.suptitle(f'{self.n_components} components extracted by QBM', fontsize=16)
+
+        fig, axes = plt.subplots(
+            8, 16, gridspec_kw={"wspace": 0.1, "hspace": 0.1}, figsize=(16, 7)
+        )
+        fig.suptitle(f"{self.n_components} components extracted by QBM", fontsize=16)
         fig.subplots_adjust()
-    
+
         for i, ax in enumerate(axes.flatten()):
             if i < weights.shape[1]:
                 ax.imshow(weights[:, i].reshape(8, 8), cmap=plt.cm.gray)
-            ax.axis('off')
-    
+            ax.axis("off")
+
         # 保存结果
         if save_pdf:
             _ensure_result_dir()
-            plt.savefig(f'results/{save_as}.pdf', 
-                        dpi=300, bbox_inches='tight', format='pdf')
+            plt.savefig(
+                f"results/{save_as}.pdf", dpi=300, bbox_inches="tight", format="pdf"
+            )
         plt.show()
-    
+
     # 绘制混淆矩阵
     def plot_confusion_matrix(self, y_true, y_pred, title_suffix="", save_pdf=False):
         """绘制混淆矩阵"""
         cm = confusion_matrix(y_true, y_pred)
         plt.figure(figsize=(10, 8))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-        plt.title(f'Confusion Matrix ({title_suffix})', fontsize=18)
-        plt.xlabel('Predicted Label', fontsize=16)
-        plt.ylabel('True Label', fontsize=16)
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+        plt.title(f"Confusion Matrix ({title_suffix})", fontsize=18)
+        plt.xlabel("Predicted Label", fontsize=16)
+        plt.ylabel("True Label", fontsize=16)
         # plt.xticks(rotation=45)
 
         # 保存结果
         if save_pdf:
             _ensure_result_dir()
-            plt.savefig(f'results/rbm_confusion_matrix_{title_suffix}.pdf', 
-                        dpi=300, bbox_inches='tight', format='pdf')
+            plt.savefig(
+                f"results/rbm_confusion_matrix_{title_suffix}.pdf",
+                dpi=300,
+                bbox_inches="tight",
+                format="pdf",
+            )
         plt.tight_layout()
         plt.show()

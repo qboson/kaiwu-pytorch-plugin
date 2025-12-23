@@ -60,8 +60,6 @@ class UnsupervisedDBN(nn.Module):
             rbm = RestrictedBoltzmannMachine(
                 num_visible=current_dim,  # Number of visible units (feature dimension)
                 num_hidden=n_hidden,  # Number of hidden units
-                h_range=[-1, 1],  # Range for hidden biases
-                j_range=[-1, 1],  # Range for weights
             ).to(
                 self.device
             )  # Move model to specified device (CPU/GPU)

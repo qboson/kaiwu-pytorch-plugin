@@ -28,14 +28,8 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         bm.linear_bias.data = torch.FloatTensor([0.0, 1, 2, 3])
         bm.quadratic_coef.data = torch.FloatTensor(
             [
-                [
-                    0.0,
-                    -1.0,
-                ],
-                [
-                    -1.0,
-                    0.0,
-                ],
+                [0.0, -1.0],
+                [-1.0, 0.0],
             ]
         )
         self.bm = bm
@@ -54,14 +48,8 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
             J_true = torch.FloatTensor(
                 [
-                    [
-                        0.0,
-                        -1.0,
-                    ],
-                    [
-                        -1.0,
-                        0.0,
-                    ],
+                    [0.0, -1.0],
+                    [-1.0, 0.0],
                 ]
             )
             self.bm.linear_bias.data = h_true
@@ -71,14 +59,32 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
             s2 = torch.tensor([[0, 1, 1, 1]], dtype=torch.float32)
             x = np.array([[1, 1, 1, -1, 1]], dtype=np.float32)
             x2 = np.array([[-1, 1, 1, 1, 1]], dtype=np.float32)
-            print(self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T))
-            print(self.bm(s) - self.bm(s2), -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T))
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
+            print(
+                self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T)
+            )
+            print(
+                self.bm(s) - self.bm(s2),
+                -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
+            )
+            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
+                -x2 @ ising_mat @ x2.T
+            )
 
     def test_register_forward_pre_hook(self):
-        self.bm.h_range = torch.tensor([-0.1, 0.1])
-        self.bm.j_range = torch.tensor([-0.1, 0.2])
-        self.assertEqual(-0.1 * 3 + 4 * 0.2, self.bm(self.mones).item())
+        with self.subTest("forward"):
+            h_true = torch.FloatTensor([-3, 0, 1, 2])
+            J_true = torch.FloatTensor(
+                [
+                    [0.0, -1.0],
+                    [-1.0, 0.0],
+                ]
+            )
+            self.bm.linear_bias.data = h_true
+            self.bm.quadratic_coef.data = J_true
+            self.assertEqual(
+                -(-1 * (-1 * -1) + -1 * (-1 * -1)) - (-3 + 0 + 1 + 2) * -1,
+                self.bm(self.mones).item(),
+            )
 
     def test_objective(self):
         s1 = self.sample_1
@@ -93,7 +99,7 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         s_all = self.bm.get_hidden(s_visible)
         self.assertEqual(s_all.shape, (5, self.num_visible + self.num_hidden))
         # 检查隐藏层概率范围
-        hidden_probs = s_all[:, self.num_visible:]
+        hidden_probs = s_all[:, self.num_visible :]
         self.assertTrue(torch.all((hidden_probs >= 0) & (hidden_probs <= 1)))
 
         # 测试requires_grad=True
