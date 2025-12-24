@@ -45,4 +45,3 @@ if __name__ == "__main__":
     objective = rbm.objective(x, s)
     # Update model weights with a step of stochastic gradient descent
     objective.backward()
-    opt_rbm.step()
