@@ -59,7 +59,7 @@ jobs:
 #    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/kaiwu_pytorch_plugin
+      url: https://test.pypi.org/p/kaiwu-torch-plugin
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
