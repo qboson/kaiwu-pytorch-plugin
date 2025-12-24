@@ -8,33 +8,15 @@
 import torch
 
 
-def clip_parameters_hook(module, *args):  # pylint:disable=unused-argument
-    """Hook function for automatically clipping parameters."""
-    module.clip_parameters()
-
-
 class AbstractBoltzmannMachine(torch.nn.Module):
     """Abstract base class for Boltzmann Machines.
 
     Args:
-        h_range (tuple[float, float], optional): Range for linear weights.
-            If ``None``, uses infinite range.
-        j_range (tuple[float, float], optional): Range for quadratic weights.
-            If ``None``, uses infinite range.
         device (torch.device, optional): Device for tensor construction.
     """
 
-    def __init__(self, h_range=None, j_range=None, device=None) -> None:
+    def __init__(self, device=None) -> None:
         super().__init__()
-        self.register_buffer(
-            "h_range",
-            torch.tensor(h_range if h_range is not None else [-torch.inf, torch.inf]),
-        )
-        self.register_buffer(
-            "j_range",
-            torch.tensor(j_range if j_range is not None else [-torch.inf, torch.inf]),
-        )
-        self.register_forward_pre_hook(clip_parameters_hook)
         if device is None:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
@@ -64,16 +46,12 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             torch.Tensor: Hamiltonian.
         """
 
-    def clip_parameters(self) -> None:
-        """Clips linear and quadratic bias weights in-place."""
-
     def get_ising_matrix(self):
         """Converts the model to Ising format.
 
         Returns:
             torch.Tensor: Ising matrix.
         """
-        self.clip_parameters()
         return self._to_ising_matrix()
 
     def _to_ising_matrix(self):
@@ -104,15 +82,14 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         Returns:
             torch.Tensor: Scalar difference between data and model average energy.
         """
-        self.clip_parameters()
         return self(s_positive).mean() - self(s_negative).mean()
 
     def sample(self, sampler) -> torch.Tensor:
         """Samples from the Boltzmann Machine.
 
         Args:
-            sampler: Optimizer used for sampling from the model. The sampler
-            can be kaiwuSDK's CIM or other solvers.
+            sampler (kaiwu.core.OptimizerBase): Optimizer used for sampling from the model.
+                The sampler can be kaiwuSDK's CIM or other solvers.
 
         Returns:
             torch.Tensor: Spins sampled from the model.

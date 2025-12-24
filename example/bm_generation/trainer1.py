@@ -1,4 +1,5 @@
 """训练器"""
+
 # Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -150,11 +151,7 @@ class Trainer:
 
         # 权重的最大值
         self.learning_parameters = {"Momentum": {"Lambda": None}}
-        self.bm_net = BoltzmannMachine(
-            num_nodes=self.num_visible + self.num_hidden,
-            # h_range=[-1, 1],
-            # j_range=[-1, 1],
-        )
+        self.bm_net = BoltzmannMachine(num_nodes=self.num_visible + self.num_hidden)
         self.cost_param = {"alpha": 0.5, "beta": 0.5}
 
     def set_cost_parameter(self, alpha, beta):

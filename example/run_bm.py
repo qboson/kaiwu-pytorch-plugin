@@ -9,16 +9,13 @@ from kaiwu.torch_plugin import BoltzmannMachine
 
 if __name__ == "__main__":
     USE_QPU = False
-    NUM_READS = 100
-    SAMPLE_SIZE = 17
+    SAMPLE_SIZE = 5
 
-    sampler = SimulatedAnnealingOptimizer(alpha=0.99)
+    sampler = SimulatedAnnealingOptimizer(alpha=0.99, size_limit=5)
     sample_kwargs = {}
-    h_range = j_range = None
-    num_nodes = 50
-    num_visible = 20
-    num_edges = 100
-    x = 1 - 2.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
+    num_nodes = 5
+    num_visible = 2
+    x = 1.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
 
     # Instantiate the model
     rbm = BoltzmannMachine(num_nodes)

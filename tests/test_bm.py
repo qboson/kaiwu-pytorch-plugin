@@ -57,17 +57,6 @@ class TestBoltzmannMachine(unittest.TestCase):
             # 验证矩阵是对称的
             self.assertListEqual(ising_mat.tolist(), ising_mat.T.tolist())
 
-    def test_register_forward_pre_hook(self):
-        """测试权重范围限制"""
-        with self.subTest("测试权重范围限制功能"):
-            # 设置权重范围
-            self.bm.h_range = torch.tensor([-0.1, 0.1])
-            self.bm.j_range = torch.tensor([-0.1, 0.2])
-
-            # 测试能量计算仍然正常工作
-            energy = self.bm(self.mones)
-            self.assertIsInstance(energy.item(), float)
-
     def test_objective(self):
         """测试目标函数计算"""
         with self.subTest("测试目标函数"):
@@ -148,22 +137,15 @@ class TestBoltzmannMachine(unittest.TestCase):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
             J_true = torch.FloatTensor(
                 [
-                    [
-                        1, 2, 4, 3
-                    ],
-                    [
-                        2, 0, 1.5, 0,
-                    ],
-                    [
-                        4, 1.5, 0, -1,
-                    ],
-                    [
-                        3, 0, -1, 0,
-                    ]
+                    [1, 2, 4, 3],
+                    [2, 0, 1.5, 0],
+                    [4, 1.5, 0, -1],
+                    [3, 0, -1, 0],
                 ]
             )
             self.bm.linear_bias.data = h_true
-            self.bm.parametrizations.quadratic_coef.original.data.copy_(J_true)
+            # self.bm.parametrizations.quadratic_coef.original.data.copy_(J_true)
+            self.bm.quadratic_coef = torch.nn.Parameter(J_true)
             print("bm.quadratic_coef", self.bm.quadratic_coef)
             ising_mat = self.bm.get_ising_matrix()
             print("ising mat:", ising_mat)
@@ -171,31 +153,31 @@ class TestBoltzmannMachine(unittest.TestCase):
             s2 = torch.tensor([[0, 1, 1, 0]], dtype=torch.float32)
             x = np.array([[1, 1, 1, 1, 1]], dtype=np.float32)
             x2 = np.array([[-1, 1, 1, -1, 1]], dtype=np.float32)
-            print(self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T))
-            print(self.bm(s) - self.bm(s2), -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T))
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
+            print(
+                self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T)
+            )
+            print(
+                self.bm(s) - self.bm(s2),
+                -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
+            )
+            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
+                -x2 @ ising_mat @ x2.T
+            )
 
     def test_hidden_to_ising(self):
         with self.subTest("Unbounded weight range"):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
             J_true = torch.FloatTensor(
                 [
-                    [
-                        1, 2, 4, 3
-                    ],
-                    [
-                        2, 0, 1.5, 0,
-                    ],
-                    [
-                        4, 1.5, 0, -1,
-                    ],
-                    [
-                        3, 0, -1, 0,
-                    ]
+                    [1, 2, 4, 3],
+                    [2, 0, 1.5, 0],
+                    [4, 1.5, 0, -1],
+                    [3, 0, -1, 0],
                 ]
             )
             self.bm.linear_bias.data = h_true
-            self.bm.parametrizations.quadratic_coef.original.data.copy_(J_true)
+            # self.bm.parametrizations.quadratic_coef.original.data.copy_(J_true)
+            self.bm.quadratic_coef = torch.nn.Parameter(J_true)
             print("bm.quadratic_coef", self.bm.quadratic_coef)
             ising_mat = self.bm._hidden_to_ising_matrix(torch.FloatTensor([1, 1]))
             print("ising mat:", ising_mat)
@@ -205,9 +187,16 @@ class TestBoltzmannMachine(unittest.TestCase):
             # x2 = np.array([[1,1,1,-1,1]],dtype=np.float32)
             x = np.array([[-1, 1, 1]])
             x2 = np.array([[1, -1, 1]])
-            print(self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T))
-            print(self.bm(s) - self.bm(s2), -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T))
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
+            print(
+                self.bm(s), self.bm(s2), -x @ ising_mat @ x.T, (-x2 @ ising_mat @ x2.T)
+            )
+            print(
+                self.bm(s) - self.bm(s2),
+                -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
+            )
+            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
+                -x2 @ ising_mat @ x2.T
+            )
 
 
 if __name__ == "__main__":
