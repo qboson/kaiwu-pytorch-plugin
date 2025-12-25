@@ -22,7 +22,7 @@ Q: 无法导入 kaiwu.torch_plugin 模块？
 
 A: 请检查以下几点：
 
-1. 确认已安装 Kaiwu-PyTorch-Plugin：``pip install -e .``
+1. 确认已安装 Kaiwu-PyTorch-Plugin：``pip install .``
 2. 确认当前环境已激活：``conda activate quantum_env``
 3. 确认 Kaiwu SDK 已正确安装
 
@@ -31,7 +31,7 @@ A: 请检查以下几点：
 .. code-block:: bash
 
     pip uninstall kaiwu-torch-plugin
-    pip install -e .
+    pip install .
 
 Q: Kaiwu SDK 安装失败？
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -43,7 +43,7 @@ A: Kaiwu SDK 需要单独安装。请：
 3. 按照页面说明进行安装
 
 模型相关（review）
-------------------
+-------------------
 
 Q: RBM 和 BM 有什么区别？应该使用哪个？
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -121,10 +121,10 @@ A: ``SimulatedAnnealingOptimizer`` 的主要参数：
     from kaiwu.classical import SimulatedAnnealingOptimizer
 
     # 快速采样（质量较低）
-    fast_sampler = SimulatedAnnealingOptimizer(alpha=0.9, size_limit=50)
+    sampler = SimulatedAnnealingOptimizer(alpha=0.9, size_limit=5)
 
     # 高质量采样（速度较慢）
-    quality_sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+    sampler = SimulatedAnnealingOptimizer(alpha=0.995, size_limit=100)
 
 性能相关（review）
 ------------------
@@ -134,18 +134,11 @@ Q: 如何加速训练？
 
 A: 几种加速方法：
 
-1. **使用 GPU**：
+1. **增大批大小**：在 GPU 内存允许的情况下增大 batch_size
 
-   .. code-block:: python
+2. **减少采样次数**：可以适当减少采样的部署（如调整SimulatedAnnealingOptimizer的alpha参数等）
 
-       device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-       model = model.to(device)
-
-2. **增大批大小**：在 GPU 内存允许的情况下增大 batch_size
-
-3. **减少采样次数**：在训练初期可以减少采样步数
-
-Q: 内存不足怎么办？
+Q: 显存不足怎么办？
 ^^^^^^^^^^^^^^^^^^^
 
 A: 尝试以下方法：
@@ -153,20 +146,6 @@ A: 尝试以下方法：
 1. 减小批大小（batch_size）
 2. 减少隐藏层节点数
 3. 使用梯度累积
-
-.. code-block:: python
-
-    # 梯度累积示例
-    accumulation_steps = 4
-    optimizer.zero_grad()
-
-    for i, batch in enumerate(loader):
-        loss = model(batch) / accumulation_steps
-        loss.backward()
-
-        if (i + 1) % accumulation_steps == 0:
-            optimizer.step()
-            optimizer.zero_grad()
 
 其他问题（review）
 ------------------

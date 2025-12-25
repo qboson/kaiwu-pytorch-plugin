@@ -71,34 +71,30 @@ BM 生成：玻尔兹曼机数据生成（review）
 
 .. code-block:: python
 
-    import numpy as np
-    import pandas as pd
-    import torch
+    from torch.utils.data import Dataset
 
-    class DataLoader:
-        """数据加载器"""
+    class CSVDataset(Dataset):
+        def __init__(self, data):
+            """
+            初始化函数
+            :param data: 输入数据，形状为 (numcol, numrow)
+            """
+            self.data = data
 
-        def __init__(self, data_path):
-            self.data_path = data_path
+        def __len__(self):
+            """
+            返回数据集的大小
+            """
+            return len(self.data)
 
-        def load(self):
-            """加载数据"""
-            # 假设数据是 CSV 格式
-            df = pd.read_csv(self.data_path)
-            data = df.values.astype(np.float32)
-            return data
+        def __getitem__(self, idx):
+            """
+            根据索引获取数据
+            :param idx: 索引
+            :return: 数据
+            """
+            return torch.tensor(self.data[idx], dtype=torch.float32)
 
-        def preprocess(self, data):
-            """预处理：二值化"""
-            # 将数据转换为 {-1, 1}
-            binary_data = np.sign(data)
-            binary_data[binary_data == 0] = 1
-            return binary_data
-
-    # 加载示例数据
-    # loader = DataLoader('data_input/your_data.csv')
-    # data = loader.load()
-    # data = loader.preprocess(data)
 
 2.2 生成模拟数据
 ^^^^^^^^^^^^^^^^
