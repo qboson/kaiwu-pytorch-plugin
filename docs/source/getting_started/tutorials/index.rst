@@ -34,7 +34,6 @@
 
 1. 先完成 :doc:`../quickstart` 了解基本 API
 2. 学习 :doc:`rbm_classification` 理解 RBM 的应用流程
-3. 进阶到 :doc:`dbn_classification` 学习多层网络
 
 **生成模型路径**：
 

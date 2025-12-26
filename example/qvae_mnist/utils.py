@@ -10,10 +10,12 @@ from torchvision import transforms
 from torchmetrics.image.fid import FrechetInceptionDistance
 from kaiwu.classical import SimulatedAnnealingOptimizer
 
+
 def save_list_to_txt(filename, data):
     with open(filename, "w") as f:
         for value in data:
             f.write(f"{value:.6f}\n")
+
 
 def get_real_images(dataloader, n_images=10000):
     images = []
@@ -22,6 +24,7 @@ def get_real_images(dataloader, n_images=10000):
         if sum(img.shape[0] for img in images) >= n_images:
             break
     return torch.cat(images, dim=0)[:n_images]
+
 
 def generate_images_original_vae(model, latent_dim, n_images=10000, batch_size=64):
     model.eval()
@@ -32,6 +35,7 @@ def generate_images_original_vae(model, latent_dim, n_images=10000, batch_size=6
             img = model.decoder(z).cpu()
             imgs.append(img)
     return torch.cat(imgs, dim=0)[:n_images]
+
 
 def generate_images_qvae(model, latent_dim, dist_beta, n_images=10000, batch_size=64):
     model.eval()
@@ -45,28 +49,22 @@ def generate_images_qvae(model, latent_dim, dist_beta, n_images=10000, batch_siz
             # 从平滑分布采样
             zeta = smoothing_dist.sample(shape)
             zeta = zeta.to(z.device)
-            zeta = torch.where(z == 0., zeta, 0)
+            zeta = torch.where(z == 0.0, zeta, 0)
             # zeta = torch.randn(256, 256).to(device)
             generated_x = model.decoder(zeta)
-            
+
             generated_x = generated_x + model.train_bias
 
             generated_x = torch.sigmoid(generated_x)
-            
+
             imgs.append(generated_x)
     return torch.cat(imgs, dim=0)[:n_images]
 
-# resize = transforms.Resize((299, 299))
-
-# def preprocess(images):
-#     if images.max() > 1.0:
-#         images = images / 255.0
-#     return resize(images)
 
 def compute_fid_in_batches(fake_imgs, real_imgs, device, batch_size=64):
     """
     计算 FID 分数，适用于输入为 (N, 784) 的展平图像（如 MNIST）
-    
+
     参数:
         fake_imgs: 生成图像，shape = (N, 784)
         real_imgs: 真实图像，shape = (M, 784)
@@ -98,12 +96,12 @@ def compute_fid_in_batches(fake_imgs, real_imgs, device, batch_size=64):
 
     # 转换为图像并更新 FID
     for i in range(0, len(real_imgs), batch_size):
-        batch = real_imgs[i:i+batch_size]
+        batch = real_imgs[i : i + batch_size]
         batch = preprocess(batch)
         fid.update(batch.to(device), real=True)
 
     for i in range(0, len(fake_imgs), batch_size):
-        batch = fake_imgs[i:i+batch_size]
+        batch = fake_imgs[i : i + batch_size]
         batch = preprocess(batch)
         fid.update(batch.to(device), real=False)
 

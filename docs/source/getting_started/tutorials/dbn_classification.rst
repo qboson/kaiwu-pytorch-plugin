@@ -1,402 +1,188 @@
-==================================
-DBN 分类：深度信念网络（review）
-==================================
+Restricted Boltzmann Machine Stacking and Implementation Summary
+===============================================================
 
-本教程在 RBM 分类的基础上，进一步构建深度信念网络（Deep Belief Network, DBN），通过堆叠多层 RBM 实现更强大的特征学习能力。
+一、RBM 原理概述
+-----------------
 
-教程目标
---------
+受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。
 
-完成本教程后，您将学会：
+1. 模型结构
+~~~~~~~~~~~~
 
-- 理解深度信念网络的层次化特征学习
-- 实现逐层贪婪的无监督预训练
-- 使用两种训练策略：微调模式和分类器模式
-- 比较 DBN 与单层 RBM 的性能差异
+- **可见层（v）**：输入数据的显式表示（如像素值）。
+- **隐层（h）**：提取的潜在特征。
+- **权重矩阵（W）**：连接可见层与隐层的权重。
+- **偏置**：可见层偏置（b）和隐层偏置（c）。
 
-运行环境
---------
+2. 能量函数与概率分布
+~~~~~~~~~~~~~~~~~~~~~~~
 
-**示例位置**: ``example/dbn_digits/supervised_dbn_digits.ipynb``
+RBM 的能量函数定义为：
 
-**依赖项**:
+.. math::
 
-.. code-block:: bash
+   E(\mathbf{v}, \mathbf{h}) = -\mathbf{v}^T W \mathbf{h} - \mathbf{b}^T \mathbf{v} - \mathbf{c}^T \mathbf{h}
 
-    pip install scikit-learn matplotlib scipy
+联合概率分布通过玻尔兹曼分布给出：
 
-1. 深度信念网络简介
--------------------
+.. math::
 
-1.1 什么是 DBN
-^^^^^^^^^^^^^^
+   P(\mathbf{v}, \mathbf{h}) = \frac{ e^{-E(\mathbf{v}, \mathbf{h})} }{Z}
 
-深度信念网络是由多层受限玻尔兹曼机堆叠而成的深度生成模型：
+其中 :math:`Z` 为配分函数（归一化因子）。可见层的边缘分布为：
 
-::
+.. math::
 
-    输入层 (可见层)
-        ↓
-    RBM 第1层 → 隐藏层1
-        ↓
-    RBM 第2层 → 隐藏层2
-        ↓
-       ...
-        ↓
-    RBM 第N层 → 输出层
+   P(\mathbf{v}) = \sum_{\mathbf{h}} P(\mathbf{v}, \mathbf{h})
 
-1.2 DBN 的优势
-^^^^^^^^^^^^^^
+3. 条件独立性
+~~~~~~~~~~~~~~
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 1
+由于层内无连接，给定可见层时隐层条件独立，反之亦然：
 
-   * - 特性
-     - 说明
-   * - **层次化特征抽象**
-     - 每层学习越来越抽象的特征表示
-   * - **无监督预训练**
-     - 可以利用大量无标签数据
-   * - **避免梯度消失**
-     - 逐层训练避免了深度网络的梯度问题
-   * - **灵活的训练策略**
-     - 支持微调和分类器两种模式
+.. math::
 
-2. 数据准备
------------
+   P(h_j=1|\mathbf{v}) = \sigma\left(\sum_i W_{ij} v_i + c_j\right)
 
-与 RBM 教程相同，使用 Digits 数据集：
+.. math::
 
-.. code-block:: python
+   P(v_i=1|\mathbf{h}) = \sigma\left(\sum_j W_{ij} h_j + b_i\right)
 
-    from sklearn.datasets import load_digits
-    from sklearn.model_selection import train_test_split
-    from sklearn.preprocessing import MinMaxScaler
-    from scipy.ndimage import shift
-    import numpy as np
+其中 :math:`\sigma(x) = \frac{1}{1+e^{-x}}` 为 Sigmoid 激活函数。
 
-    def translate_image(image, direction):
-        """图像平移"""
-        shifts = {"up": [-1, 0], "down": [1, 0], "left": [0, -1], "right": [0, 1]}
-        return shift(image, shifts[direction], mode="constant", cval=0)
+4. 训练目标
+~~~~~~~~~~~~
 
-    def load_and_augment_data():
-        """加载并增强数据"""
-        digits = load_digits()
-        images, labels = digits.images, digits.target
+通过最大化似然函数学习参数（W, b, c）。目标函数为负对数似然：
 
-        # 数据增强
-        expanded_images, expanded_labels = [], []
-        for image, label in zip(images, labels):
-            expanded_images.append(image)
-            expanded_labels.append(label)
-            for direction in ["up", "down", "left", "right"]:
-                expanded_images.append(translate_image(image, direction))
-                expanded_labels.append(label)
+.. math::
 
-        data = np.array(expanded_images).reshape(len(expanded_images), -1)
-        labels = np.array(expanded_labels)
+   \mathcal{L} = -\sum_{\mathbf{v}} \log P(\mathbf{v})
 
-        # 划分数据集
-        X_train, X_test, y_train, y_test = train_test_split(
-            data, labels, test_size=0.2, random_state=42
-        )
+采用对比散度（CD）算法近似梯度，更新规则为：
 
-        # 归一化
-        scaler = MinMaxScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+.. math::
 
-        return X_train, X_test, y_train, y_test
+   \Delta W_{ij} = \epsilon \left(\langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{recon}}\right)
 
-    X_train, X_test, y_train, y_test = load_and_augment_data()
-    print(f"训练集: {X_train.shape}, 测试集: {X_test.shape}")
+其中 :math:`\epsilon` 为学习率，:math:`\langle \cdot \rangle_{\text{data}}` 和 :math:`\langle \cdot \rangle_{\text{recon}}` 分别为数据分布和重构分布的期望。
 
-3. 构建 DBN 模型
-----------------
+二、整体模块架构与训练模式
+-----------------------------
 
-3.1 定义 DBN 架构
-^^^^^^^^^^^^^^^^^
+代码实现了基于 PyTorch 的深度信念网络（DBN），采用分层架构设计，支持从无监督预训练到有监督学习的完整流程。
 
-.. code-block:: python
+- **模块架构**：
 
-    from kaiwu.torch_plugin.dbn import UnsupervisedDBN
+  - **DBNPretrainer**  
+    实现多层 RBM 的堆叠与逐层无监督预训练，提供特征提取接口。
 
-    # 定义 DBN 架构
-    # 输入: 64 → 隐藏层1: 128 → 隐藏层2: 64 → 隐藏层3: 32
-    hidden_layers = [128, 64, 32]
+  - **AbstractSupervisedDBN**  
+    定义 DBN 监督学习的通用接口，用于支持多模式训练策略，包括预训练、微调、分类器训练与预测等抽象方法。
 
-    # 创建 DBN
-    dbn = UnsupervisedDBN(hidden_layers)
-    print(f"DBN 架构: 64 → {' → '.join(map(str, hidden_layers))}")
+  - **AbstractSupervisedDBNClassifier**  
+    基于 ``AbstractSupervisedDBN``，实现 PyTorch 下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。
 
-3.2 DBN 训练器
-^^^^^^^^^^^^^^
+  - **SupervisedDBNClassification**  
+    具体分类任务实现、微调网络构建以及训练。
 
-使用 ``DBNTrainer`` 进行逐层预训练：
+- **训练模式**：
 
-.. code-block:: python
+  1. **无监督模式**：仅预训练，用于特征提取。
+  2. **分类器模式**：预训练 + 下游分类器训练。
+  3. **微调网络模式**：预训练 + 网络反向传播微调。
 
-    import torch
-    from torch.optim import SGD
-    from torch.utils.data import DataLoader, TensorDataset
-    from kaiwu.classical import SimulatedAnnealingOptimizer
+三、核心类功能和接口概述
+-------------------------
 
-    class DBNTrainer:
-        """DBN 逐层预训练器"""
+1. 核心类 ``DBNPretrainer``（无监督预训练 DBN）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        def __init__(
-            self,
-            learning_rate=0.1,
-            n_epochs=10,
-            batch_size=100,
-            verbose=True,
-        ):
-            self.learning_rate = learning_rate
-            self.n_epochs = n_epochs
-            self.batch_size = batch_size
-            self.verbose = verbose
-            self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+- **关键参数**：
 
-        def train(self, dbn, data):
-            """逐层预训练 DBN"""
-            input_data = data.astype(np.float32)
+  - ``hidden_layers_structure``：隐层单元数（默认两层 ``[100, 100]``）
+  - ``learning_rate_rbm``：RBM 学习率（默认 0.1）
+  - ``n_epochs_rbm``：每层 RBM 训练轮数（默认 10）
+  - ``batch_size``：批大小（默认 100）
+  - ``verbose``：打印训练信息（默认 True）
+  - ``shuffle``：数据打乱（默认 True）
+  - ``drop_last``：是否丢弃最后不足 batch 的样本（默认 False）
+  - ``random_state``：随机种子
 
-            # 创建第一层 RBM
-            if dbn.num_layers == 0:
-                dbn.create_rbm_layer(data.shape[1])
+- **设备支持**：自动选择 GPU（``cuda``）或 CPU
 
-            # 逐层训练
-            for idx in range(dbn.num_layers):
-                rbm = dbn.get_rbm_layer(idx)
+- **核心方法**：
 
-                if self.verbose:
-                    print(f"\n[DBN] 预训练第 {idx+1}/{dbn.num_layers} 层: "
-                          f"{rbm.num_visible} → {rbm.num_hidden}")
+  - **创建 RBM 层（``create_rbm_layer`` 方法）**  
+    初始化 RBM：使用 ``RestrictedBoltzmannMachine`` 定义可见层与隐层维度。
 
-                # 训练当前层
-                input_data = self._train_layer(rbm, input_data, idx)
+  - **单批次训练步骤（``_train_batch`` 方法）**
 
-            dbn.mark_as_trained()
-            return dbn
+    1. **正相（Positive Phase）**：计算隐层激活概率 :math:`P(\mathbf{h}|\mathbf{v})`。
+    2. **负相（Negative Phase）**：通过模拟退火采样器（``SimulatedAnnealingOptimizer``）生成重构样本。
+    3. **目标函数**：最小化能量函数加权重衰减（L2 正则化）。
+    4. **反向传播**：更新权重和偏置。
 
-        def _train_layer(self, rbm, data, layer_idx):
-            """训练单层 RBM"""
-            optimizer = SGD(rbm.parameters(), lr=self.learning_rate)
-            data_tensor = torch.FloatTensor(data).to(rbm.device)
+  - **单层 RBM 训练（``_train_rbm_layer`` 方法）**  
+    - 初始化优化器：采用随机梯度下降（SGD）优化参数。
+    - DataLoader 处理批量数据。
 
-            dataset = TensorDataset(data_tensor)
-            loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
+  - **预训练堆叠 RBM（``fit`` 方法）**
+  - **特征变换，逐层提取特征（``transform`` 方法）**
 
-            for epoch in range(self.n_epochs):
-                epoch_loss = 0
-                for batch in loader:
-                    x = batch[0]
+2. 核心类 ``AbstractSupervisedDBN``（抽象接口定义）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                    # 正相
-                    h = rbm.get_hidden(x)
-                    # 负相
-                    s = rbm.get_visible(h[:, rbm.num_visible:])
+- **关键参数**：
 
-                    # 更新参数
-                    optimizer.zero_grad()
-                    loss = rbm.objective(h, s)
-                    loss.backward()
-                    optimizer.step()
+  - ``fine_tuning``：模式选择（默认 False）
+  - ``learning_rate``：微调学习率（默认 0.1）
+  - ``n_iter_backprop``：反向传播迭代次数（默认 100）
+  - ``l2_regularization``：L2 正则化（默认 1e-4）
+  - ``activation_function``：激活函数（默认 ``'sigmoid'``）
+  - ``dropout_p``：Dropout 概率（默认 0.0）
 
-                    epoch_loss += loss.item()
+3. 核心类 ``AbstractSupervisedDBNClassifier``（分类器模式具体实现，以及微调网络构建工具）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                if self.verbose and (epoch + 1) % 5 == 0:
-                    print(f"  Epoch {epoch+1}/{self.n_epochs}, Loss: {epoch_loss/len(loader):.4f}")
+- **关键参数**：
 
-            # 返回隐藏层输出作为下一层输入
-            with torch.no_grad():
-                hidden = rbm.get_hidden(data_tensor)
-                output = hidden[:, rbm.num_visible:].cpu().numpy()
+  - ``classifier_type``：支持多种分类器（默认逻辑回归）
+  - ``clf_C``：正则化强度（默认 1.0）
+  - ``clf_iter``：迭代次数（默认 100）
 
-            return output
+4. 核心类 ``SupervisedDBNClassification``（具体分类实现）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-4. 训练策略
------------
+- **微调网络构建**：使用预训练的权重来初始化（默认两层 RBM，以及无 Dropout 层）
 
-DBN 支持两种训练策略：
+  - 网络结构：输入层 → [线性层 + 激活函数 + Dropout] × N → 输出层
+  - 线性层：使用对应的 RBM 的权重初始化
+  - 输出层：随机初始化，在微调阶段学习
 
-4.1 策略一：微调模式（Fine-tuning）
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- **训练策略**：
 
-预训练后，对整个网络进行端到端的反向传播微调：
+  - 使用预训练权重初始化
+  - ``CrossEntropyLoss`` 损失函数
+  - SGD 优化器 + L2 正则化
+  - 支持 Dropout 防止过拟合
 
-.. code-block:: python
+5. 其他内容
+~~~~~~~~~~~~
 
-    from kaiwu.torch_plugin.dbn import SupervisedDBNClassification
+- **数据加载（``load_data`` 方法）**
 
-    # 创建监督式 DBN 分类器
-    dbn_classifier = SupervisedDBNClassification(
-        hidden_layers_structure=[128, 64, 32],
-        n_classes=10,
-        learning_rate=0.1,
-        n_epochs_rbm=10,      # 预训练轮次
-        n_epochs_finetune=50, # 微调轮次
-        batch_size=100,
-    )
+  - 数据集：使用 ``sklearn.datasets.load_digits``（8×8 手写数字图像）。
+  - 增强：对原始图像进行上下左右平移，扩展数据集。
 
-    # 训练（自动完成预训练 + 微调）
-    dbn_classifier.fit(X_train, y_train)
+- **训练过程可视化（``_visualize_training_progress`` 方法，设置 ``plot_img=True``）**
 
-    # 预测
-    y_pred = dbn_classifier.predict(X_test)
+  - 权重与梯度：实时监控权重矩阵及其梯度变化。
+  - 生成样本：实时展示模型“生成”新样本的能力。
+  - 重建样本：可视化重建误差的演变。
 
-    # 评估
-    from sklearn.metrics import accuracy_score
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"微调模式准确率: {accuracy:.4f}")
+- **结果可视化（``RBMVisualizer`` 类）**
 
-4.2 策略二：分类器模式（Classifier）
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-在 DBN 提取的特征上使用传统分类器：
-
-.. code-block:: python
-
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.svm import SVC
-
-    # 训练 DBN（无监督预训练）
-    trainer = DBNTrainer(
-        learning_rate=0.1,
-        n_epochs=10,
-        batch_size=100,
-        verbose=True
-    )
-
-    dbn = UnsupervisedDBN([128, 64, 32])
-    dbn = trainer.train(dbn, X_train)
-
-    # 提取特征
-    X_train_features = dbn.transform(X_train)
-    X_test_features = dbn.transform(X_test)
-
-    print(f"原始维度: {X_train.shape[1]} → DBN 特征维度: {X_train_features.shape[1]}")
-
-    # 使用逻辑回归
-    lr_classifier = LogisticRegression(max_iter=1000)
-    lr_classifier.fit(X_train_features, y_train)
-    y_pred_lr = lr_classifier.predict(X_test_features)
-    print(f"逻辑回归准确率: {accuracy_score(y_test, y_pred_lr):.4f}")
-
-    # 使用 SVM
-    svm_classifier = SVC(kernel='rbf')
-    svm_classifier.fit(X_train_features, y_train)
-    y_pred_svm = svm_classifier.predict(X_test_features)
-    print(f"SVM 准确率: {accuracy_score(y_test, y_pred_svm):.4f}")
-
-5. 与 RBM 的比较
-----------------
-
-比较单层 RBM 和多层 DBN 的性能：
-
-.. code-block:: python
-
-    from sklearn.metrics import classification_report
-    import matplotlib.pyplot as plt
-
-    def compare_models(X_train, X_test, y_train, y_test):
-        """比较 RBM 和 DBN 的性能"""
-        results = {}
-
-        # 单层 RBM (128 hidden units)
-        from kaiwu.torch_plugin import RestrictedBoltzmannMachine
-        rbm = RestrictedBoltzmannMachine(64, 128)
-        # ... 训练 RBM 并提取特征
-        # results['RBM-128'] = accuracy
-
-        # 两层 DBN (128 → 64)
-        dbn_2layer = UnsupervisedDBN([128, 64])
-        # ... 训练并评估
-        # results['DBN-2层'] = accuracy
-
-        # 三层 DBN (128 → 64 → 32)
-        dbn_3layer = UnsupervisedDBN([128, 64, 32])
-        # ... 训练并评估
-        # results['DBN-3层'] = accuracy
-
-        # 可视化比较
-        plt.figure(figsize=(10, 6))
-        plt.bar(results.keys(), results.values())
-        plt.ylabel('准确率')
-        plt.title('RBM vs DBN 性能比较')
-        plt.ylim(0.8, 1.0)
-        plt.show()
-
-        return results
-
-6. 可视化层次化特征
--------------------
-
-观察 DBN 各层学到的特征：
-
-.. code-block:: python
-
-    def visualize_layer_features(dbn):
-        """可视化 DBN 各层的特征"""
-        n_layers = dbn.num_layers
-
-        fig, axes = plt.subplots(1, n_layers, figsize=(5*n_layers, 5))
-
-        for idx in range(n_layers):
-            rbm = dbn.get_rbm_layer(idx)
-            weights = rbm.quadratic_coef.detach().cpu().numpy()
-
-            # 显示权重矩阵
-            ax = axes[idx] if n_layers > 1 else axes
-            im = ax.imshow(weights, cmap='coolwarm', aspect='auto')
-            ax.set_title(f'第 {idx+1} 层权重\n({rbm.num_visible}→{rbm.num_hidden})')
-            ax.set_xlabel('隐藏单元')
-            ax.set_ylabel('输入单元')
-            plt.colorbar(im, ax=ax)
-
-        plt.tight_layout()
-        plt.show()
-
-    visualize_layer_features(dbn)
-
-7. 完整代码
------------
-
-运行完整示例：
-
-.. code-block:: bash
-
-    cd example/dbn_digits
-    jupyter notebook supervised_dbn_digits.ipynb
-
-8. 总结
--------
-
-.. list-table:: RBM vs DBN
-   :widths: 25 35 40
-   :header-rows: 1
-
-   * - 方面
-     - 单层 RBM
-     - 深度 DBN
-   * - 特征抽象层次
-     - 单一层次
-     - 多层次，逐层抽象
-   * - 训练复杂度
-     - 较低
-     - 较高，需要逐层训练
-   * - 特征表达能力
-     - 有限
-     - 更强大，能捕获复杂模式
-   * - 适用场景
-     - 简单特征提取
-     - 复杂模式识别
-
-9. 下一步
----------
-
-- 尝试不同的层数和隐藏单元配置
-- 学习 :doc:`bm_generation` 了解全连接玻尔兹曼机的生成能力
-- 探索 :doc:`qvae_mnist` 了解更先进的生成模型
+  - 训练后 RBM 权重可视化
+  - 分类任务结果：混淆矩阵可视化
+  - 重建样本：训练完成后对测试图像进行编码-解码得到的重建

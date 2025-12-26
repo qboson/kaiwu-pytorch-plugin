@@ -12,9 +12,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
     Args:
         num_nodes (int): Total number of nodes in the model.
+
         quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,
             shape is [num_nodes, num_nodes]
+
         linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_nodes]
+
         device (torch.device, optional): Device for tensor construction.
             If ``None``, uses CPU.
     """

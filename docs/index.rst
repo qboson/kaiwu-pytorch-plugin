@@ -14,7 +14,7 @@
 .. toctree::
    :maxdepth: 2
 
-   source/modules/index
+   source/modules/kaiwu.torch_plugin
 
 .. toctree::
    :maxdepth: 2
