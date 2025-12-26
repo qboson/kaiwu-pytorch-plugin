@@ -7,14 +7,14 @@ Kaiwu-PyTorch-Plugin (KPP)
 Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子计算机上训练和评估玻尔兹曼机（Boltzmann Machine, BM）及其受限形式（Restricted Boltzmann Machine, RBM）。它通过 Kaiwu SDK 调用量子硬件执行玻尔兹曼分布采样，其余计算（如参数更新）在标准 PyTorch 流程中完成。
 
 1. 设计目标
---------
+-----------
 
 - 在保持 PyTorch 原生编程体验的前提下，接入光量子采样能力。
 - 支持标准 BM/RBM 模型的定义、训练与推理。
 - 提供可扩展接口，便于替换采样方法或能量函数。
 
 2. 功能特性
---------
+-----------
 
 .. list-table::
    :widths: 25 75
@@ -30,7 +30,7 @@ Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子
      - 模型参数为 ``torch.nn.Parameter``，支持自动微分、GPU 加速，并可与其他 PyTorch 模块组合使用。
 
 3. 扩展机制
---------
+-----------
 
 - 能量函数（如 Ising 形式）与采样器解耦。
 - 用户可通过实现标准接口替换采样策略（例如切换为经典 MCMC 或其他后端）。
@@ -38,13 +38,13 @@ Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子
 
 
 4. 示例用例
---------
+-----------
 
 - 手写数字生成（基于 MNIST 的 RBM 训练）
 - Q-VAE（量子变分自编码器）训练流程
 
 5. 适用用户
---------
+-----------
 
 .. list-table::
    :widths: 20 80
