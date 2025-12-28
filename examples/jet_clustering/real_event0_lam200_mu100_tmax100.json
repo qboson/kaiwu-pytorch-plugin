@@ -1,0 +1,11 @@
+{
+  "event_idx": 0,
+  "N": 13,
+  "n_vars": 26,
+  "lambda_constraint": 200.0,
+  "mu_balance": 100.0,
+  "energy": null,
+  "elapsed_sec": 4.526267051696777,
+  "max_abs_Q": 1300.0,
+  "note": "No solution found by CIM solver."
+}
