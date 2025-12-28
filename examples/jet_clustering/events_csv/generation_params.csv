@@ -1,0 +1,9 @@
+Parameter,Value
+seed,2025
+n_particles_min,12
+n_particles_max,15
+pT_min,1.0
+pT_max,100.0
+eta_min,-2.5
+eta_max,2.5
+n_events,50
