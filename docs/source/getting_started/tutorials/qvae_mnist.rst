@@ -1,5 +1,5 @@
 ======================================
-Q-VAE：量子变分自编码器（review）
+Q-VAE：量子变分自编码器
 ======================================
 
 本教程演示如何训练和评估量子变分自编码器（Quantum Variational Autoencoder, Q-VAE）模型。Q-VAE 结合了变分自编码器和量子玻尔兹曼机，能够实现更强大的生成和表征学习能力。
@@ -51,7 +51,7 @@ QVAE 包括以下关键组件：
       \mathcal{H}_\theta = \sum_l \Gamma_l \sigma_l^x + \sum_l h_l \sigma_l^z + \sum_{l<m} W_{lm} \sigma_l^z \sigma_m^z
 
 3. **解码器（Decoder）**  
-   将潜变量 :math:`\mathbf{z}`（或其连续松弛变量 :math:`\boldsymbol{\zeta}`）映射回数据空间，并使用解码器重建原始数据：
+   将潜变量 :math:`\mathbf{z}` （或其连续松弛变量 :math:`\boldsymbol{\zeta}` ）映射回数据空间，并使用解码器重建原始数据：
 
    .. math::
 

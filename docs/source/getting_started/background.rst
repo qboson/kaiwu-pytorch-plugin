@@ -36,7 +36,7 @@ RBM 的能量函数定义为：
 
    P(\mathbf{v}) = \sum_{\mathbf{h}} P(\mathbf{v}, \mathbf{h})
 
-通过最大化似然函数学习参数（w, b, c）。目标函数为负对数似然：
+通过最大化似然函数学习参数:math:`W, b, c`。目标函数为负对数似然：
 
 .. math::
 
@@ -59,6 +59,14 @@ RBM 的能量函数定义为：
 
    p(x; \theta) = \frac{1}{Z} \tilde{p}(x; \theta)
 
+其梯度为：
+
+.. math::
+
+   \nabla_\theta \log p(x; \theta) = \nabla_\theta \log \tilde{p}(x; \theta) - \nabla_\theta \log Z
+
+配分函数的梯度难以直接计算
+
 .. math::
 
    \nabla_\theta \log Z
@@ -77,8 +85,9 @@ RBM 的能量函数定义为：
    &= \mathbb{E}_{x \sim p(x)} \nabla_\theta \log \tilde{p}(x)
 
 综上，
+
 .. math::
-   \nabla_\theta \log p(x; \theta) = \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p(x; \theta)} \nabla_\theta \log \hat{p}(x; \theta)
+    \nabla_\theta \log p(x; \theta) = \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p(x; \theta)} \nabla_\theta \log \hat{p}(x; \theta)
 
 第二项中 :math:`p(x; \theta)` 实际上是模型预测的 :math:`\mathbf{x}` 的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成
 
@@ -90,7 +99,9 @@ RBM 的能量函数定义为：
 .. math::
    \nabla_W \log \hat{p}(x; W) = v h^\mathrm{T}
 
-只要分别得到 :math:`p_{\text{data}}`, :math:`p_{\text{model}}` 分布下的 :math:`v` 和 :math:`h` 的值即可计算梯度。
+只要分别得到 :math:`p_{\text{data}}`, :math:`p_{\text{model}}` 分布下的 :math:`v` 和 :math:`h` 的值即可计算梯度。即为：
+
 
 .. math::
-   \Delta W \propto v h^\mathrm{T} - v' h'^\mathrm{T}
+
+   \Delta W_{ij} = \epsilon \left( \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{recon}} \right)
