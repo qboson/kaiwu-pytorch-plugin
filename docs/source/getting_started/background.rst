@@ -5,16 +5,72 @@
 受限玻尔兹曼机（Restricted Boltzmann Machine）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。
 其核心是通过无监督学习学习数据的潜在特征分布。
 
-1. 模型结构
-============
+
+1. 神经网络基础
+========================================
+
+1.1 神经元模型
+--------------
+
+人工神经元是神经网络的基本计算单元。给定输入向量 :math:`\mathbf{x} \in \mathbb{R}^n`，其输出为：
+
+.. math::
+
+   a = \phi\left( \mathbf{w}^\top \mathbf{x} + b \right)
+
+其中 :math:`\mathbf{w} \in \mathbb{R}^n` 为权重向量，:math:`b \in \mathbb{R}` 为偏置项，:math:`\phi(\cdot)` 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数：
+
+.. math::
+
+   \sigma(z) = \frac{1}{1 + e^{-z}}
+
+1.2 基于能量的模型
+-------------------
+
+与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 :math:`E(\mathbf{x}; \theta)` 定义数据的概率分布：
+
+.. math::
+
+   P(\mathbf{x}; \theta) = \frac{\exp(-E(\mathbf{x}; \theta))}{Z(\theta)}
+
+其中配分函数（partition function）:
+
+.. math::
+
+   Z(\theta) = \sum_{\mathbf{x}} \exp(-E(\mathbf{x}; \theta))
+
+确保概率归一化。低能量状态对应高概率。
+
+
+
+2. 玻尔兹曼机结构
+=======================
 
 - 可见层（**v**）：输入数据的显式表示（如像素值）。
-- 隐层（**h**）：提取的潜在特征。
+- 隐藏层（**h**）：提取的潜在特征。
 - 权重矩阵（**w**）：连接可见层与隐层的权重。
 - 偏置：可见层偏置（**b**）和隐层偏置（**c**）。
 
-2. 能量函数与概率分布
+玻尔兹曼机（BM)的拓扑结构是全连接的，而受限玻尔兹曼机通过去掉了可见层和隐藏层内部的链接，
+让Gibbs采样的过程更加高效。
+
+由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为：
+
+.. math::
+
+   P(h_j = 1 \mid \mathbf{v}) = \sigma\left( \sum_i w_{ij} v_i + c_j \right)
+
+同理，
+
+.. math::
+
+   P(v_i = 1 \mid \mathbf{h}) = \sigma\left( \sum_j w_{ij} h_j + b_i \right)
+
+3. 能量函数与概率分布
 =====================
+
+3.1 能量函数
+--------------
 
 RBM 的能量函数定义为：
 
@@ -36,7 +92,7 @@ RBM 的能量函数定义为：
 
    P(\mathbf{v}) = \sum_{\mathbf{h}} P(\mathbf{v}, \mathbf{h})
 
-通过最大化似然函数学习参数:math:`W, b, c`。目标函数为负对数似然：
+通过最大化似然函数学习参数 :math:`W,b,c` 。目标函数为负对数似然：
 
 .. math::
 
@@ -50,8 +106,8 @@ RBM 的能量函数定义为：
 
 其中 :math:`\epsilon` 为学习率，:math:`\langle \cdot \rangle_{\text{data}}` 和 :math:`\langle \cdot \rangle_{\text{recon}}` 分别为数据分布和重构分布的期望。
 
-梯度的计算：
-------------
+3.2 梯度的推导
+-----------------
 
 能量模型的概率可以写成：
 
