@@ -16,11 +16,17 @@ class QVAE(torch.nn.Module):
 
     Args:
         encoder: Encoder module
+
         decoder: Decoder module
+
         bm (AbstractBoltzmannMachine): Boltzmann machine
+
         sampler: Sampler
+
         dist_beta: Beta parameter for the distribution
+
         mean_x (torch.Tensor): Bias of training data
+
         num_vis (int): Number of visible variables in the Boltzmann machine
     """
 
@@ -56,6 +62,7 @@ class QVAE(torch.nn.Module):
 
         Args:
             q_logits (torch.Tensor): Encoder output, log-odds
+
             beta: Beta parameter for the distribution
 
         Returns:
@@ -72,6 +79,7 @@ class QVAE(torch.nn.Module):
 
         Args:
             logit_q (torch.Tensor): Log-odds of Bernoulli distribution defined for each variable
+
             log_ratio (torch.Tensor): Log(r(ζ|z=1)/r(ζ|z=0)) for each ζ
 
         Returns:
@@ -93,7 +101,7 @@ class QVAE(torch.nn.Module):
         q1_pert = torch.sigmoid(logit_q1 + log_ratio1)
 
         # Compute cross-entropy
-        cross_entropy = - torch.matmul(
+        cross_entropy = -torch.matmul(
             torch.cat([q1, q2], dim=-1), self.bm.linear_bias
         ) - torch.sum(
             torch.matmul(q1_pert, self.bm.quadratic_coef) * q2, dim=1, keepdim=True
@@ -108,6 +116,7 @@ class QVAE(torch.nn.Module):
 
         Args:
             posterior: Posterior distribution object
+
             post_samples: Posterior distribution samples
 
         Returns:
@@ -130,6 +139,7 @@ class QVAE(torch.nn.Module):
 
         Args:
             x (torch.Tensor): Input data
+
             kl_beta (float): Weight coefficient for KL term
 
         Returns:

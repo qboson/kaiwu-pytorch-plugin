@@ -110,9 +110,6 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         # 训练循环
         for iteration in range(1, self.n_iter + 1):
             for step, batch_slice in enumerate(batch_slices):
-                if step == 25:
-                    print("step", step)
-                    break
                 idx += 1
                 x = X_torch[batch_slice]  # 获取当前batch数据
 

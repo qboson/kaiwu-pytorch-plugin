@@ -16,7 +16,7 @@
    * - 依赖项
      - 版本要求
    * - Python
-     - 3.10（暂不支持其他版本）
+     - 3.10
    * - PyTorch
      - 2.7.0
    * - NumPy
@@ -72,14 +72,6 @@
 2.4 安装插件
 ^^^^^^^^^^^^
 
-以可编辑模式安装插件（推荐用于开发）：
-
-.. code-block:: bash
-
-    pip install -e .
-
-或者直接安装：
-
 .. code-block:: bash
 
     pip install .
@@ -110,7 +102,7 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
 
     请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的 `Kaiwu SDK 页面 <https://platform.qboson.com/>`_ 获取。
 
-4. 验证安装（review）
+4. 验证安装
 ----------------------
 
 安装完成后，运行以下代码验证安装是否成功：
@@ -121,14 +113,21 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
     import torch
     print(f"PyTorch version: {torch.__version__}")
 
-    # 验证 Kaiwu-PyTorch-Plugin
-    from kaiwu.torch_plugin import RestrictedBoltzmannMachine
-    print("Kaiwu-PyTorch-Plugin imported successfully!")
+
 
     # 验证 Kaiwu SDK
     import kaiwu
+    import numpy as np
+    from kaiwu.classical import SimulatedAnnealingOptimizer
+    opt = SimulatedAnnealingOptimizer()
+    mat = np.array([[1, -1], [-1, 1]])
+    result = opt.solve(mat)
     print(f"Kaiwu SDK version: {kaiwu.__version__}")
+    print(result)
 
+    # 验证 Kaiwu-PyTorch-Plugin
+    from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+    print("Kaiwu-PyTorch-Plugin imported successfully!")
     # 简单测试
     rbm = RestrictedBoltzmannMachine(num_visible=10, num_hidden=5)
     print(f"RBM created with {rbm.num_visible} visible and {rbm.num_hidden} hidden units")
@@ -178,7 +177,7 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
 Q: 安装时提示 Python 版本不兼容？
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A: Kaiwu-PyTorch-Plugin 目前仅支持 Python 3.10。请使用 conda 创建 Python 3.10 环境：
+A: Kaiwu-PyTorch-Plugin 目前基于 Python 3.10。请使用 conda 创建 Python 3.10 环境：
 
 .. code-block:: bash
 
@@ -190,9 +189,11 @@ Q: 无法导入 kaiwu.torch_plugin？
 
 A: 请确保：
 
-1. 已正确安装 Kaiwu-PyTorch-Plugin（``pip install -e .``）
-2. 当前环境已激活（``conda activate quantum_env``）
-3. Kaiwu SDK 已正确安装
+1. 当前环境已激活（``conda activate quantum_env``）
+2. Kaiwu SDK 已正确安装
+3. 已正确安装 Kaiwu-PyTorch-Plugin（``pip install .``），检查是否已经安装可以使用
+    ``pip list`` 或者 ``pip show kaiwu-torch-plugin``
+
 
 Q: 如何更新到最新版本？
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -203,20 +204,5 @@ A: 进入项目目录并拉取最新代码：
 
     cd kaiwu-pytorch-plugin
     git pull origin main
-    pip install -e .
+    pip install .
 
-8. 卸载
--------
-
-如需卸载 Kaiwu-PyTorch-Plugin：
-
-.. code-block:: bash
-
-    pip uninstall kaiwu-torch-plugin
-
-如需同时删除 conda 环境：
-
-.. code-block:: bash
-
-    conda deactivate
-    conda remove -n quantum_env --all
