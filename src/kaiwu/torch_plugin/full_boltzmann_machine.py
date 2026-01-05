@@ -196,9 +196,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Return sampled states of all units
             return s_all
 
-    def condition_sample(
-        self, sampler, s_visible, dtype=torch.float32
-    ) -> torch.Tensor:  # 对源码进行了dtype和device的改动
+    def condition_sample(self, sampler, s_visible, dtype=torch.float32) -> torch.Tensor:
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
