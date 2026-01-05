@@ -38,12 +38,12 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef
             if quadratic_coef is not None
-            else torch.randn((num_visible, num_hidden)) * 0.01
+            else torch.randn((num_visible, num_hidden)).to(self.device) * 0.01
         )
         self.linear_bias = torch.nn.Parameter(
             linear_bias
             if linear_bias is not None
-            else torch.zeros(num_hidden + num_visible)
+            else torch.zeros(num_hidden + num_visible).to(self.device)
         )
 
     @property

@@ -1,15 +1,15 @@
 """构建模型的参数和工具"""
 
-import numpy as np
-import pandas as pd
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 
 class CSVDataset(Dataset):
     """
     数据集
-    :param data: 输入数据，形状为 (numcol, numrow)
+
+    Args:
+        data: 输入数据，形状为 (numcol, numrow)
     """
 
     def __init__(self, data):
@@ -24,7 +24,10 @@ class CSVDataset(Dataset):
     def __getitem__(self, idx):
         """
         根据索引获取数据
-        :param idx: 索引
-        :return: 数据
+        Args:
+            idx: 索引
+
+        Return:
+            torch.Tensor: 数据
         """
         return torch.tensor(self.data[idx], dtype=torch.float32)
