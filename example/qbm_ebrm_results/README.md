@@ -68,8 +68,14 @@ Pairwise_set效果可视化结果
 
 ```bash
 git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+```
+
+安装KPP:
+
+```bash
 cd kaiwu-pytorch-plugin
 pip3 install -r requirements/requirements.txt
+pip3 install .
 ```
 
 ### 数据集转化
