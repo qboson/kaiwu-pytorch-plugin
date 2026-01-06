@@ -6,7 +6,7 @@
 
 详情见[issue #78](https://github.com/qboson/kaiwu-pytorch-plugin/issues/78)。
 
-项目文件夹：
+项目文件：
 
 ```
 ├── README.md
@@ -54,13 +54,56 @@
 
 我们分别对[RMB-Reward-Model-Benchmark](https://github.com/Zhou-Zoey/RMB-Reward-Model-Benchmark)数据集中的BoN_set以及Pairwise_set分别训练五个epochs进行测试。测试结果可视化如下：
 
-![BoN_set](example/qbm_ebrm_results/imgs/training_plots.png)
+![BoN_set](https://github.com/YuzeHao2023/kaiwu-pytorch-plugin/blob/main/example/qbm_ebrm_results/imgs/training_plots.png "BoN_set效果可视化结果")
 
 BoN_set效果可视化结果
 
-[Pairwise_set](example/qbm_ebrm_results/imgs/pairwire-training_plots.png)
+![Pairwise_set](https://github.com/YuzeHao2023/kaiwu-pytorch-plugin/blob/main/example/qbm_ebrm_results/imgs/pairwire-training_plots.png "Pairwise_set效果可视化结果")
 
 Pairwise_set效果可视化结果
+
+## 快速开始
+
+### 安装
+
+首先将kaiwu-pytorch-plugin项目fork，然后再您本地运行下面代码将其下载到本地：
+
+```bash
+git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+cd kaiwu-pytorch-plugin
+pip3 install requirements/requirements.txt
+```
+
+### 数据集转化
+
+使用下面指令下载数据集：
+
+```bash
+git clone https://github.com/Zhou-Zoey/RMB-Reward-Model-Benchmark.git
+```
+
+将[prepare_rmb_dataset.py](example/qbm_ebrm_results/prepare_rmb_dataset.py)中的路径修改为实际需要的路径：
+
+```python
+src = os.path.join(repo_root, 'RMB-Reward-Model-Benchmark', 'RMB_dataset', 'BoN_set', 'Harmlessness', 'S2.json')
+```
+
+然后运行：
+
+```bash
+python3 example/qbm_ebrm_results/prepare_rmb_dataset.py
+```
+
+即可生成对应的pt格式数据集文件。
+
+### 训练及可视化
+
+```bash
+python3 example/qbm_ebrm_results/run_train_qbm_ebm.py
+python3 example/qbm_ebrm_results/save_and_plot_results.py
+```
+
+可视化部分见[上图](训练及验证结果)
 
 如果这篇论文对您的研究有帮助，请引用下面的论文：
 
