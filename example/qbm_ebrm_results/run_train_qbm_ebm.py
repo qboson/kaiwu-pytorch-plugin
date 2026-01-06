@@ -59,9 +59,9 @@ def split_dataset(pt_path, train_pt, val_pt, val_frac=0.2):
 
 def main(json_path=None):
     here = os.path.dirname(__file__)
-    pt_out = os.path.join(here, 'rmb_dataset.pt')
+    pt_out = os.path.join(here, 'rmb_dataset2.pt')
     if json_path is None:
-        json_path = os.path.join(os.path.abspath(os.path.join(here, '..', '..')), 'RMB-Reward-Model-Benchmark', 'RMB_dataset', 'BoN_set', 'Harmlessness', 'S1.json')
+        json_path = os.path.join(os.path.abspath(os.path.join(here, '..', '..')), 'RMB-Reward-Model-Benchmark', 'RMB_dataset', 'BoN_set', 'Harmlessness', 'S5.json')
     prepare_from_json(json_path, pt_out)
     train_pt = os.path.join(here, 'rmb_dataset_train.pt')
     val_pt = os.path.join(here, 'rmb_dataset_val.pt')

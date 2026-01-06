@@ -94,7 +94,7 @@ def main():
         ax[1].set_xlabel('Epoch')
         ax[1].set_ylabel('Accuracy')
         plt.tight_layout()
-        fig_path = out_dir / 'training_plots.png'
+        fig_path = out_dir / 'training_plots5.png'
         fig.savefig(fig_path)
         print('Saved plot to', fig_path)
     except Exception as e:
