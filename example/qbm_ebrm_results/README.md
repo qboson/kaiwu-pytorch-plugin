@@ -10,8 +10,6 @@
 
 ```
 ├── README.md
-├── __pycache__
-│   └── prepare_rmb_dataset.cpython-312.pyc
 ├── imgs
 │   ├── pairwire-training_plots.png
 │   └── training_plots.png
