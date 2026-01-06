@@ -28,16 +28,18 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         quadratic_coef: torch.FloatTensor = None,
         linear_bias: torch.FloatTensor = None,
         device=None,
-    ):  # 对源码进行了device参数的改动，以及二次项系数的改动
+    ):
         super().__init__(device=device)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef
             if quadratic_coef is not None
-            else torch.randn((self.num_nodes, self.num_nodes)) * 0.01
+            else torch.randn((self.num_nodes, self.num_nodes)).to(self.device) * 0.01
         )
         self.linear_bias = torch.nn.Parameter(
-            linear_bias if linear_bias is not None else torch.zeros(self.num_nodes)
+            linear_bias
+            if linear_bias is not None
+            else torch.zeros(self.num_nodes).to(self.device)
         )
 
     def symmetrized_quadratic_coef(self):
@@ -194,9 +196,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Return sampled states of all units
             return s_all
 
-    def condition_sample(
-        self, sampler, s_visible, dtype=torch.float32
-    ) -> torch.Tensor:  # 对源码进行了dtype和device的改动
+    def condition_sample(self, sampler, s_visible, dtype=torch.float32) -> torch.Tensor:
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
