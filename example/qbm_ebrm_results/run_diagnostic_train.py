@@ -33,7 +33,7 @@ from EBRM.src.reward_modeling.ebm_training import ebm_nce_plus as ebm
 
 
 def main():
-    data_path = Path(__file__).parent / 'rmb_dataset.pt'
+    data_path = Path(__file__).parent / 'rmb_dataset2.pt'
     val_path = data_path  # reuse as val for diagnostic
     if not data_path.exists():
         print('Dataset not found:', data_path)
