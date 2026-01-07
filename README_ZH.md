@@ -5,6 +5,8 @@
 
 **语言版本**: [中文](README_ZH.md) | [English](README.md)
 
+Kaiwu-Pytorch-Plugin使用请参考[**文档**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/) 
+
 ## 项目简介
 
 `Kaiwu-PyTorch-Plugin` 是一个基于PyTorch和Kaiwu SDK的量子计算编程套件，可基于玻色量子的相干光量子计算机来训练和评估受限玻尔兹曼机(Restricted Boltzmann Machines, RBM)和玻尔兹曼机(Boltzmann Machines, BM)。该插件提供了简单易用的接口，使研究人员和开发者能够快速实现能量神经网络模型的训练与验证，并应用于各种机器学习开发任务。
