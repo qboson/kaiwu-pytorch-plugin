@@ -158,5 +158,5 @@ Q: 在哪里可以获取更多帮助？
 A: 您可以通过以下渠道获取帮助：
 
 1. **GitHub Issues**：`提交问题 <https://github.com/QBoson/Kaiwu-pytorch-plugin/issues>`_
-2. **开发者社区**：玻声量子开发者社区
+2. **开发者社区**：玻色量子开发者社区
 3. **联系邮箱**：developer@boseq.com
