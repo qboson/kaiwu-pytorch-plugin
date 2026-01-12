@@ -29,7 +29,7 @@
 .. code-block:: bash
 
     python --version
-    # 或
+    # or
     python3 --version
 
 如果需要安装 Python 3.10，请访问 `Python 3.10 下载页面 <https://www.python.org/downloads/release/python-31011/>`_。
@@ -44,10 +44,10 @@
 
 .. code-block:: bash
 
-    # 创建新环境
+    # Create a new environment
     conda create -n quantum_env python=3.10
 
-    # 激活环境
+    # Activate the environment
     conda activate quantum_env
 
 2.2 克隆仓库
@@ -159,10 +159,10 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独
 
 .. code-block:: bash
 
-    # 运行所有测试
+    # Run all tests
     pytest tests/
 
-    # 运行特定测试
+    # Run specific tests
     pytest tests/test_rbm.py
 
 代码风格检查：

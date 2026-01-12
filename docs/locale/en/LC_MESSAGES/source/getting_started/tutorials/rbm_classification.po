@@ -1,0 +1,150 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:3
+msgid "RBM 分类：手写数字识别"
+msgstr "RBM Classification: Handwritten Digit Recognition"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:5
+msgid "本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。"
+msgstr "This tutorial demonstrates how to use a Restricted Boltzmann Machine (RBM) for feature learning and classification on the handwritten-digit dataset. It is suitable for beginners to understand the workflow of applying RBM to image feature extraction and classification."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:8
+msgid "教程目标"
+msgstr "Tutorial Objectives"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:10
+msgid "完成本教程后，您将学会："
+msgstr "After finishing this tutorial you will know how to:"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:12
+msgid "使用 RBM 从图像数据中提取特征"
+msgstr "Use an RBM to extract features from image data"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:13
+msgid "将 RBM 作为特征提取器与传统分类器结合"
+msgstr "Combine an RBM feature extractor with a traditional classifier"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:14
+msgid "可视化 RBM 学到的权重和生成的样本"
+msgstr "Visualize the weights learned by the RBM and the samples it generates"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:15
+msgid "评估分类模型的性能"
+msgstr "Evaluate the performance of the classification model"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:18
+msgid "运行环境"
+msgstr "Runtime Environment"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:20
+msgid "**示例位置**: ``example/rbm_digits/rbm_digits.ipynb``"
+msgstr "**Example location**: ``example/rbm_digits/rbm_digits.ipynb``"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:22
+msgid "**依赖项**:"
+msgstr "**Dependencies**:"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:29
+msgid "1. 数据准备"
+msgstr "1. Data Preparation"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:31
+msgid "此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。"
+msgstr "This section shows how to load the classic handwritten-digit dataset and expand it with simple data-augmentation techniques (e.g., shifting images in four directions) to improve the model’s generalization ability."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:33
+msgid ""
+"首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。 "
+"接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。 "
+"最后，将所有图像数据展平为二维数组，并划分成训练集和测试集，同时进行归一化处理，确保各特征值位于[0, 1]区间内，为后续模型训练做好准备。"
+msgstr ""
+"First, we use `load_digits` from `sklearn` to load the data, obtaining 8×8-pixel handwritten-digit images and their labels. "
+"Next, each original image is shifted up, down, left, and right to create additional training samples. "
+"Finally, all images are flattened into a 2-D array, split into training and test sets, and normalized so that every feature value lies in the interval [0, 1], readying the data for subsequent model training."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:42
+msgid "2. 模型训练"
+msgstr "2. Model Training"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:44
+msgid "此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。"
+msgstr "This section shows how to train a Restricted Boltzmann Machine (RBM) model."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:46
+msgid ""
+"首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。 "
+"接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数， "
+"该函数包括了负对数似然估计以及权重和偏置的衰减项。"
+msgstr ""
+"First, the RBM model is initialized according to the input feature dimension and the chosen number of hidden units, and the model is placed on the desired device (CPU or GPU). "
+"Then, a stochastic-gradient-descent (SGD) optimizer is defined to update the model parameters. The entire training process uses mini-batch gradient descent to gradually adjust parameters so as to minimize an objective function that includes the negative log-likelihood plus weight- and bias-decay terms."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:50
+msgid ""
+"在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息， "
+"并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。"
+msgstr ""
+"If `verbose` mode is enabled, the current iteration’s objective value and parameter statistics are printed periodically, and generated sample images together with model parameters are visualized, making it easy to monitor learning progress and effectiveness in real time."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:57
+msgid "3. 特征提取与分类"
+msgstr "3. Feature Extraction and Classification"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:60
+msgid "3.1 训练分类器"
+msgstr "3.1 Training the Classifier"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:62
+msgid "本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。"
+msgstr "This subsection shows how to build and train a two-stage classification pipeline consisting of an RBM followed by logistic regression, and compares its performance with a logistic-regression model that uses only the raw pixel features."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:64
+msgid ""
+"首先，通过 ``RBMRunner`` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 ``Pipeline`` "
+"中，再接上逻辑回归分类器。 训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
+msgstr ""
+"First, the handwritten-digit dataset is loaded and pre-processed via ``RBMRunner``. The RBM is then embedded as a feature extractor inside a ``Pipeline``, followed by a logistic-regression classifier. Training time for both approaches is recorded, and accuracy together with a classification report are evaluated on the test set."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:67
+msgid "该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。"
+msgstr "The experiment aims to verify whether the high-level features learned by the RBM can improve the performance of a downstream classifier, and also provides an intuitive example for understanding the role of unsupervised pre-training in deep learning."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:75
+msgid "3.2 可视化权重"
+msgstr "3.2 Visualizing Weights"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:77
+msgid "该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。"
+msgstr "This function visualizes the weights associated with each hidden unit of the RBM as 8×8 images, giving an intuitive view of the feature patterns learned from the data. The result can be saved as a high-resolution PDF."
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:84
+msgid "3.2 可视化混淆矩阵"
+msgstr "3.2 Visualizing the Confusion Matrix"
+
+#: ../../source/getting_started/tutorials/rbm_classification.rst:86
+msgid ""
+"该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。 "
+"支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。"
+msgstr ""
+"This function visualizes the model’s confusion matrix on the test set as a heat-map, clearly showing prediction accuracy and confusion among classes. "
+"A custom suffix can be added to the title, and the figure can be saved as a high-resolution PDF."

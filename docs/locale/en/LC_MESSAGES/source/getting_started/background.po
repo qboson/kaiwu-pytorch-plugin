@@ -1,0 +1,386 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/background.rst:3
+msgid "预备知识"
+msgstr "Prerequisites"
+
+#: ../../source/getting_started/background.rst:5
+msgid ""
+"受限玻尔兹曼机（Restricted Boltzmann Machine）是一种基于能量的概率图模型，由可见层（Visible "
+"Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。 其核心是通过无监督学习学习数据的潜在特征分布。"
+msgstr ""
+"A Restricted Boltzmann Machine (RBM) is an energy-based probabilistic "
+"graphical model composed of a visible layer and a hidden layer, with no "
+"intra-layer connections but full inter-layer connections.  Its core idea "
+"is to learn the latent feature distribution of data through unsupervised "
+"learning."
+
+#: ../../source/getting_started/background.rst:10
+msgid "1. 神经网络基础"
+msgstr "1. Neural Network Basics"
+
+#: ../../source/getting_started/background.rst:13
+msgid "1.1 神经元模型"
+msgstr "1.1 Neuron Model"
+
+#: ../../source/getting_started/background.rst:15
+#, python-brace-format
+msgid "人工神经元是神经网络的基本计算单元。给定输入向量 :math:`\\mathbf{x} \\in \\mathbb{R}^n`，其输出为："
+msgstr ""
+"The artificial neuron is the basic computing unit of a neural network. "
+"Given an input vector :math:`\\mathbf{x} \\in \\mathbb{R}^n`, its output "
+"is:"
+
+#: ../../source/getting_started/background.rst:17
+#, python-brace-format
+msgid "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)"
+msgstr "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)"
+
+#: ../../source/getting_started/background.rst:21
+#, python-brace-format
+msgid ""
+"其中 :math:`\\mathbf{w} \\in \\mathbb{R}^n` 为权重向量，:math:`b \\in "
+"\\mathbb{R}` 为偏置项，:math:`\\phi(\\cdot)` 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数："
+msgstr ""
+"where :math:`\\mathbf{w} \\in \\mathbb{R}^n` is the weight vector, "
+":math:`b \\in \\mathbb{R}` is the bias term, and :math:`\\phi(\\cdot)` "
+"is the activation function.  In probabilistic generative models the "
+"Sigmoid activation is commonly used:"
+
+#: ../../source/getting_started/background.rst:23
+msgid "\\sigma(z) = \\frac{1}{1 + e^{-z}}"
+msgstr "\\sigma(z) = \\frac{1}{1 + e^{-z}}"
+
+#: ../../source/getting_started/background.rst:28
+msgid "1.2 基于能量的模型"
+msgstr "1.2 Energy-Based Models"
+
+#: ../../source/getting_started/background.rst:30
+#, python-brace-format
+msgid ""
+"与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 :math:`E(\\mathbf{x}; "
+"\\theta)` 定义数据的概率分布："
+msgstr ""
+"Unlike feed-forward networks, Energy-Based Models (EBMs) define a "
+"probability distribution over data through a scalar energy function "
+":math:`E(\\mathbf{x}; \\theta)`:"
+
+#: ../../source/getting_started/background.rst:32
+msgid ""
+"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; "
+"\\theta))}{Z(\\theta)}"
+msgstr ""
+"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; "
+"\\theta))}{Z(\\theta)}"
+
+#: ../../source/getting_started/background.rst:36
+msgid "其中配分函数（partition function）:"
+msgstr "where the partition function is:"
+
+#: ../../source/getting_started/background.rst:38
+msgid "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))"
+msgstr "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))"
+
+#: ../../source/getting_started/background.rst:42
+msgid "确保概率归一化。低能量状态对应高概率。"
+msgstr ""
+"It ensures proper normalization.  States with lower energy correspond to "
+"higher probability."
+
+#: ../../source/getting_started/background.rst:47
+msgid "2. 玻尔兹曼机结构"
+msgstr "2. Boltzmann Machine Structure"
+
+#: ../../source/getting_started/background.rst:49
+msgid "可见层（**v**）：输入数据的显式表示（如像素值）。"
+msgstr ""
+"Visible layer (**v**): the explicit representation of input data (e.g. "
+"pixel values)."
+
+#: ../../source/getting_started/background.rst:50
+msgid "隐藏层（**h**）：提取的潜在特征。"
+msgstr "Hidden layer (**h**): extracted latent features."
+
+#: ../../source/getting_started/background.rst:51
+msgid "权重矩阵（**w**）：连接可见层与隐层的权重。"
+msgstr "Weight matrix (**w**): weights connecting visible and hidden layers."
+
+#: ../../source/getting_started/background.rst:52
+msgid "偏置：可见层偏置（**b**）和隐层偏置（**c**）。"
+msgstr ""
+"Biases: visible-layer bias (**b**) and hidden-layer bias (**c**)."
+
+#: ../../source/getting_started/background.rst:54
+msgid "玻尔兹曼机（BM)的拓扑结构是全连接的，而受限玻尔兹曼机通过去掉了可见层和隐藏层内部的链接， 让Gibbs采样的过程更加高效。"
+msgstr ""
+"A Boltzmann Machine (BM) is fully connected, whereas the Restricted "
+"Boltzmann Machine removes intra-layer connections, making Gibbs sampling "
+"far more efficient."
+
+#: ../../source/getting_started/background.rst:57
+msgid "由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为："
+msgstr ""
+"Thanks to the restricted structure, hidden variables are mutually "
+"independent given the visible variables, with conditional probability:"
+
+#: ../../source/getting_started/background.rst:59
+#, python-brace-format
+msgid ""
+"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j "
+"\\right)"
+msgstr ""
+"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j "
+"\\right)"
+
+#: ../../source/getting_started/background.rst:63
+msgid "同理，"
+msgstr "Similarly,"
+
+#: ../../source/getting_started/background.rst:65
+#, python-brace-format
+msgid ""
+"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i "
+"\\right)"
+msgstr ""
+"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i "
+"\\right)"
+
+#: ../../source/getting_started/background.rst:70
+msgid "3. 能量函数与概率分布"
+msgstr "3. Energy Function and Probability Distribution"
+
+#: ../../source/getting_started/background.rst:73
+msgid "3.1 能量函数"
+msgstr "3.1 Energy Function"
+
+#: ../../source/getting_started/background.rst:75
+msgid "RBM 的能量函数定义为："
+msgstr "The RBM energy function is defined as:"
+
+#: ../../source/getting_started/background.rst:77
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
+"\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
+msgstr ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
+"\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
+
+#: ../../source/getting_started/background.rst:81
+#, python-brace-format
+msgid ""
+"其中，:math:`\\mathbf{v}, \\mathbf{h}` 分别是可见层和隐层的状态，:math:`\\mathbf{W}` "
+"是连接的权重，:math:`\\mathbf{b}, \\mathbf{c}` 是一次项系数。"
+msgstr ""
+"where :math:`\\mathbf{v}, \\mathbf{h}` are the states of the visible and "
+"hidden layers, :math:`\\mathbf{W}` is the connection weight matrix, and "
+":math:`\\mathbf{b}, \\mathbf{c}` are the first-order coefficients."
+
+#: ../../source/getting_started/background.rst:83
+msgid "联合概率分布通过玻尔兹曼分布给出："
+msgstr "The joint probability distribution is given by the Boltzmann distribution:"
+
+#: ../../source/getting_started/background.rst:85
+msgid "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
+msgstr "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
+
+#: ../../source/getting_started/background.rst:89
+msgid "其中 :math:`Z` 为配分函数（归一化因子）。可见层的边缘分布为："
+msgstr ""
+"where :math:`Z` is the partition function (normalization factor).  The "
+"marginal distribution over the visible layer is:"
+
+#: ../../source/getting_started/background.rst:91
+msgid "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})"
+msgstr "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})"
+
+#: ../../source/getting_started/background.rst:95
+msgid "通过最大化似然函数学习参数 :math:`W,b,c` 。目标函数为负对数似然："
+msgstr ""
+"Parameters :math:`W,b,c` are learned by maximizing the likelihood.  The "
+"objective is the negative log-likelihood:"
+
+#: ../../source/getting_started/background.rst:97
+msgid "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
+msgstr "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
+
+#: ../../source/getting_started/background.rst:101
+msgid "采用对比散度（CD）算法近似梯度，更新规则为："
+msgstr ""
+"Contrastive Divergence (CD) is used to approximate the gradient; the "
+"update rule is:"
+
+#: ../../source/getting_started/background.rst:103
+#: ../../source/getting_started/background.rst:161
+msgid ""
+"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
+"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
+"\\right)"
+msgstr ""
+"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
+"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
+"\\right)"
+
+#: ../../source/getting_started/background.rst:107
+msgid ""
+"其中 :math:`\\epsilon` 为学习率，:math:`\\langle \\cdot \\rangle_{\\text{data}}`"
+" 和 :math:`\\langle \\cdot \\rangle_{\\text{recon}}` 分别为数据分布和重构分布的期望。"
+msgstr ""
+"where :math:`\\epsilon` is the learning rate, and :math:`\\langle \\cdot "
+"\\rangle_{\\text{data}}`, :math:`\\langle \\cdot "
+"\\rangle_{\\text{recon}}` denote expectations under the data and "
+"reconstruction distributions, respectively."
+
+#: ../../source/getting_started/background.rst:110
+msgid "3.2 梯度的推导"
+msgstr "3.2 Gradient Derivation"
+
+#: ../../source/getting_started/background.rst:112
+msgid "能量模型的概率可以写成："
+msgstr "The probability of an energy model can be written as:"
+
+#: ../../source/getting_started/background.rst:114
+#, python-brace-format
+msgid "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)"
+msgstr "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)"
+
+#: ../../source/getting_started/background.rst:118
+msgid "其梯度为："
+msgstr "Its gradient is:"
+
+#: ../../source/getting_started/background.rst:120
+#, python-brace-format
+msgid ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; "
+"\\theta) - \\nabla_\\theta \\log Z"
+msgstr ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; "
+"\\theta) - \\nabla_\\theta \\log Z"
+
+#: ../../source/getting_started/background.rst:124
+msgid "配分函数的梯度难以直接计算"
+msgstr ""
+"The gradient of the partition function is hard to compute directly:"
+
+#: ../../source/getting_started/background.rst:126
+msgid ""
+"\\nabla_\\theta \\log Z\n"
+"&= \\frac{\\nabla_\\theta Z}{Z} \\\\\n"
+"&= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\sum_x \\frac{\\nabla_\\theta \\tilde{p}(x)}{Z}"
+msgstr ""
+"\\nabla_\\theta \\log Z\n"
+"&= \\frac{\\nabla_\\theta Z}{Z} \\\\\n"
+"&= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\sum_x \\frac{\\nabla_\\theta \\tilde{p}(x)}{Z}"
+
+#: ../../source/getting_started/background.rst:133
+#, python-brace-format
+msgid ""
+"对于保证所有的 :math:`x` 都有 :math:`p(x) > 0` 的模型，我们可以用 :math:`\\exp(\\log "
+"\\tilde{p}(x))` 代替 :math:`\\tilde{p}(x)`。"
+msgstr ""
+"For models that guarantee :math:`p(x) > 0` for every :math:`x`, we can "
+"replace :math:`\\tilde{p}(x)` with :math:`\\exp(\\log \\tilde{p}(x))`."
+
+#: ../../source/getting_started/background.rst:135
+msgid ""
+"\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
+"&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log "
+"\\tilde{p}(x)}{Z} \\\\\n"
+"&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} "
+"\\\\\n"
+"&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
+"&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)"
+msgstr ""
+"\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
+"&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log "
+"\\tilde{p}(x)}{Z} \\\\\n"
+"&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} "
+"\\\\\n"
+"&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
+"&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)"
+
+#: ../../source/getting_started/background.rst:143
+msgid "综上，"
+msgstr "Putting it together,"
+
+#: ../../source/getting_started/background.rst:145
+#, python-brace-format
+msgid ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
+"\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
+"\\hat{p}(x; \\theta)\n"
+"\n"
+msgstr ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
+"\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
+"\\hat{p}(x; \\theta)\n"
+"\n"
+
+#: ../../source/getting_started/background.rst:148
+#, python-brace-format
+msgid ""
+"第二项中 :math:`p(x; \\theta)` 实际上是模型预测的 :math:`\\mathbf{x}` "
+"的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
+msgstr ""
+"In the second term :math:`p(x; \\theta)` is the distribution predicted "
+"by the model, while the first term in training is under the real data "
+"distribution.  Thus the equation can be rewritten as:"
+
+#: ../../source/getting_started/background.rst:150
+msgid ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
+"p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - "
+"\\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; "
+"\\theta)\n"
+"\n"
+msgstr ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
+"p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - "
+"\\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; "
+"\\theta)\n"
+"\n"
+
+#: ../../source/getting_started/background.rst:153
+msgid "这里我们考虑玻尔兹曼机的能量函数，容易求得"
+msgstr ""
+"Considering the Boltzmann-machine energy function, we can easily obtain:"
+
+#: ../../source/getting_started/background.rst:155
+#, python-brace-format
+msgid ""
+"\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
+"\n"
+msgstr ""
+"\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
+"\n"
+
+#: ../../source/getting_started/background.rst:158
+msgid ""
+"只要分别得到 :math:`p_{\\text{data}}`, :math:`p_{\\text{model}}` 分布下的 :math:`v`"
+" 和 :math:`h` 的值即可计算梯度。即为："
+msgstr ""
+"One only needs to obtain the values of :math:`v` and :math:`h` under "
+":math:`p_{\\text{data}}` and :math:`p_{\\text{model}}` respectively to "
+"compute the gradient, namely:"

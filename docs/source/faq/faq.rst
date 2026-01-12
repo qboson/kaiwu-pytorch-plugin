@@ -108,10 +108,10 @@ A: ``SimulatedAnnealingOptimizer`` 的主要参数：
 
     from kaiwu.classical import SimulatedAnnealingOptimizer
 
-    # 快速采样（质量较低）
+    # Fast sampling (lower quality)
     sampler = SimulatedAnnealingOptimizer(alpha=0.9, size_limit=5)
 
-    # 高质量采样（速度较慢）
+    # High-quality sampling (slower)
     sampler = SimulatedAnnealingOptimizer(alpha=0.995, size_limit=100)
 
 性能相关

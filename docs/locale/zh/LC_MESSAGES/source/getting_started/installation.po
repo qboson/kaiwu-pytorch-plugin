@@ -1,0 +1,255 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/installation.rst:3
+msgid "安装指南"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:5
+msgid "本章介绍如何安装 Kaiwu-PyTorch-Plugin 及其依赖项。"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:8
+msgid "1. 环境要求"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:10
+msgid "在安装之前，请确保您的系统满足以下要求："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:16
+msgid "依赖项"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:17
+msgid "版本要求"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:18
+msgid "Python"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:19
+msgid "3.10"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:20
+msgid "PyTorch"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:21
+msgid "2.7.0"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:22
+msgid "NumPy"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:23
+msgid "2.2.6"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:24
+msgid "Kaiwu SDK"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:25
+msgid "v1.2.0+"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:27
+msgid "检查 Python 版本："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:35
+msgid ""
+"如果需要安装 Python 3.10，请访问 `Python 3.10 下载页面 "
+"<https://www.python.org/downloads/release/python-31011/>`_。"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:38
+msgid "2. 安装 Kaiwu-PyTorch-Plugin"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:41
+msgid "2.1 创建并激活环境"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:43
+msgid "推荐使用 conda 创建独立的 Python 环境："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:54
+msgid "2.2 克隆仓库"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:56
+msgid "从 GitHub 克隆项目到本地："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:64
+msgid "2.3 安装依赖"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:66
+msgid "安装项目依赖："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:73
+msgid "2.4 安装插件"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:80
+msgid "3. 安装 Kaiwu SDK（必需）"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:82
+msgid "Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独安装 Kaiwu SDK。"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:85
+msgid "3.1 获取 SDK"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:87
+msgid "访问 `Kaiwu SDK 下载页面 <https://platform.qboson.com/sdkDownload>`_"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:88
+msgid "下载适合您系统的 SDK 安装包"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:89
+msgid ""
+"参考 `Kaiwu SDK 安装说明 <https://kaiwu-sdk-"
+"docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html>`_"
+" 以完成安装"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:92
+msgid "3.2 配置授权信息"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:94
+msgid "安装完成后，您需要配置 SDK 授权信息："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:103
+msgid ""
+"请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的 `Kaiwu SDK 页面 "
+"<https://platform.qboson.com/>`_ 获取。"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:106
+msgid "4. 验证安装"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:108
+msgid "安装完成后，运行以下代码验证安装是否成功："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:135
+msgid "如果没有报错，至此您已经安装成功。后续您可以根据需求进行模型的构建，并使用经典计算器进行模型验证，验证通过后再根据如下步骤切换到量子计算器以利用量子计算资源。"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:138
+msgid "5. 获取量子计算机访问"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:140
+msgid "要体验真正的量子计算能力，您需要获取量子计算机的访问权限："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:142
+msgid "在 `QBoson 平台 <https://platform.qboson.com/>`_ 注册账号"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:143
+msgid "通过平台联系官方工作人员获取真机配额"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:147
+msgid ""
+"在获取真机访问权限之前，您可以使用模拟器进行开发和测试验证。Kaiwu SDK "
+"提供了多种经典优化器（如模拟退火优化器）作为量子采样器的经典替代方案。"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:150
+msgid "6. 开发环境设置（可选）"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:152
+msgid "如果您计划参与插件的开发，可以安装开发依赖："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:158
+msgid "运行测试："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:168
+msgid "代码风格检查："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:175
+msgid "7. 常见问题"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:178
+msgid "Q: 安装时提示 Python 版本不兼容？"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:180
+msgid "A: Kaiwu-PyTorch-Plugin 目前基于 Python 3.10。请使用 conda 创建 Python 3.10 环境："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:188
+msgid "Q: 无法导入 kaiwu.torch_plugin？"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:190
+msgid "A: 请确保："
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:192
+msgid "当前环境已激活（``conda activate quantum_env``）"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:193
+msgid "Kaiwu SDK 已正确安装"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:194
+msgid "已正确安装 Kaiwu-PyTorch-Plugin（``pip install .``），检查是否已经安装可以使用"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:195
+msgid "``pip list`` 或者 ``pip show kaiwu-torch-plugin``"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:199
+msgid "Q: 如何更新到最新版本？"
+msgstr ""
+
+#: ../../source/getting_started/installation.rst:201
+msgid "A: 进入项目目录并拉取最新代码："
+msgstr ""
+
