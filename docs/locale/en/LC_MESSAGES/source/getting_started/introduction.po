@@ -1,0 +1,225 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/introduction.rst:3
+msgid "概述"
+msgstr "Overview"
+
+#: ../../source/getting_started/introduction.rst:5
+msgid "Kaiwu-PyTorch-Plugin (KPP)"
+msgstr "Kaiwu-PyTorch-Plugin (KPP)"
+
+#: ../../source/getting_started/introduction.rst:7
+msgid ""
+"Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子计算机上训练和评估玻尔兹曼机（Boltzmann "
+"Machine, BM）及其受限形式（Restricted Boltzmann Machine, RBM）。它通过 Kaiwu SDK "
+"调用量子硬件执行玻尔兹曼分布采样，其余计算（如参数更新）在标准 PyTorch 流程中完成。"
+msgstr ""
+"Kaiwu-PyTorch-Plugin (KPP) is a PyTorch plugin for training and evaluating "
+"Boltzmann Machines (BM) and their restricted variant (RBM) on coherent "
+"photonic quantum computers.  It uses the Kaiwu SDK to offload Boltzmann-"
+"distribution sampling to quantum hardware, while all remaining computations "
+"(e.g. parameter updates) stay within the standard PyTorch workflow."
+
+#: ../../source/getting_started/introduction.rst:10
+msgid "1. 设计目标"
+msgstr "1. Design Goals"
+
+#: ../../source/getting_started/introduction.rst:12
+msgid "在保持 PyTorch 原生编程体验的前提下，接入光量子采样能力。"
+msgstr ""
+"Provide native PyTorch programming experience while seamlessly integrating "
+"photonic quantum-sampling capabilities."
+
+#: ../../source/getting_started/introduction.rst:13
+msgid "支持标准 BM/RBM 模型的定义、训练与推理。"
+msgstr "Support definition, training and inference of standard BM/RBM models."
+
+#: ../../source/getting_started/introduction.rst:14
+msgid "提供可扩展接口，便于替换采样方法或能量函数。"
+msgstr "Offer extensible interfaces for swapping samplers or energy functions."
+
+#: ../../source/getting_started/introduction.rst:17
+msgid "2. 功能特性"
+msgstr "2. Features"
+
+#: ../../source/getting_started/introduction.rst:23
+msgid "模型支持"
+msgstr "Model Support"
+
+#: ../../source/getting_started/introduction.rst:24
+msgid "标准 RBM 和全连接 BM。"
+msgstr "Standard RBM and fully-connected BM."
+
+#: ../../source/getting_started/introduction.rst:25
+msgid "层配置"
+msgstr "Layer Configuration"
+
+#: ../../source/getting_started/introduction.rst:26
+msgid "可见层与隐藏层维度可自定义。"
+msgstr "Visible and hidden layer sizes are customizable."
+
+#: ../../source/getting_started/introduction.rst:27
+msgid "采样方式"
+msgstr "Sampling Method"
+
+#: ../../source/getting_started/introduction.rst:28
+msgid "负相采样通过 Kaiwu SDK 在相干光量子计算机上执行。"
+msgstr ""
+"Negative-phase sampling is executed on coherent photonic quantum hardware "
+"via the Kaiwu SDK."
+
+#: ../../source/getting_started/introduction.rst:29
+msgid "PyTorch 集成"
+msgstr "PyTorch Integration"
+
+#: ../../source/getting_started/introduction.rst:30
+msgid "模型参数为 ``torch.nn.Parameter``，支持自动微分、GPU 加速，并可与其他 PyTorch 模块组合使用。"
+msgstr ""
+"Model parameters are ``torch.nn.Parameter`` objects, enabling automatic "
+"differentiation, GPU acceleration and seamless composition with other "
+"PyTorch modules."
+
+#: ../../source/getting_started/introduction.rst:33
+msgid "3. 扩展机制"
+msgstr "3. Extension Mechanisms"
+
+#: ../../source/getting_started/introduction.rst:35
+msgid "能量函数（如 Ising 形式）与采样器解耦。"
+msgstr "Energy functions (e.g. Ising form) are decoupled from samplers."
+
+#: ../../source/getting_started/introduction.rst:36
+msgid "用户可通过实现标准接口替换采样策略（例如切换为经典 MCMC 或其他后端）。"
+msgstr ""
+"Users can replace sampling strategies (e.g. switch to classical MCMC or "
+"another backend) by implementing standard interfaces."
+
+#: ../../source/getting_started/introduction.rst:37
+msgid "支持自定义能量项，适用于非标准 BM 变体。"
+msgstr "Custom energy terms are supported for non-standard BM variants."
+
+#: ../../source/getting_started/introduction.rst:41
+msgid "4. 示例用例"
+msgstr "4. Example Use-Cases"
+
+#: ../../source/getting_started/introduction.rst:43
+msgid "手写数字生成（基于 MNIST 的 RBM 训练）"
+msgstr "Hand-written digit generation (RBM trained on MNIST)"
+
+#: ../../source/getting_started/introduction.rst:44
+msgid "Q-VAE（量子变分自编码器）训练流程"
+msgstr "Q-VAE (quantum variational auto-encoder) training pipeline"
+
+#: ../../source/getting_started/introduction.rst:47
+msgid "5. 适用用户"
+msgstr "5. Target Users"
+
+#: ../../source/getting_started/introduction.rst:53
+msgid "研究人员"
+msgstr "Researchers"
+
+#: ../../source/getting_started/introduction.rst:54
+msgid "验证量子采样对能量模型训练的影响。"
+msgstr "Investigate the impact of quantum sampling on energy-based model training."
+
+#: ../../source/getting_started/introduction.rst:55
+msgid "开发者"
+msgstr "Developers"
+
+#: ../../source/getting_started/introduction.rst:56
+msgid "构建混合经典-量子生成模型。"
+msgstr "Build hybrid classical-quantum generative models."
+
+#: ../../source/getting_started/introduction.rst:57
+msgid "教育者与学生"
+msgstr "Educators & Students"
+
+#: ../../source/getting_started/introduction.rst:58
+msgid "教学玻尔兹曼机原理与量子采样实践。"
+msgstr "Teach Boltzmann-machine principles and hands-on quantum sampling."
+
+#: ../../source/getting_started/introduction.rst:61
+msgid "6. 典型使用流程"
+msgstr "6. Typical Workflow"
+
+#: ../../source/getting_started/introduction.rst:63
+msgid "使用 Kaiwu-PyTorch-Plugin 进行能量神经网络训练的典型流程如下："
+msgstr ""
+"The typical workflow for training energy-based neural networks with "
+"Kaiwu-PyTorch-Plugin is:"
+
+#: ../../source/getting_started/introduction.rst:65
+msgid "**数据准备**：加载并预处理训练数据，转换为模型输入格式"
+msgstr ""
+"**Data preparation**: load and preprocess training data, convert to model "
+"input format"
+
+#: ../../source/getting_started/introduction.rst:66
+msgid "**模型定义**：实例化 RBM 或 BM 模型，设置可见层和隐藏层维度"
+msgstr ""
+"**Model definition**: instantiate an RBM or BM and set visible/hidden "
+"layer sizes"
+
+#: ../../source/getting_started/introduction.rst:67
+msgid "**优化器配置**：使用 PyTorch 优化器（如 SGD、Adam）管理模型参数"
+msgstr ""
+"**Optimizer setup**: use a PyTorch optimizer (SGD, Adam, etc.) to manage "
+"model parameters"
+
+#: ../../source/getting_started/introduction.rst:68
+msgid "**训练循环**："
+msgstr "**Training loop**:"
+
+#: ../../source/getting_started/introduction.rst:70
+msgid "从训练数据计算隐藏层表示（正相）"
+msgstr "Compute hidden representations from training data (positive phase)"
+
+#: ../../source/getting_started/introduction.rst:71
+msgid "使用采样器从模型分布生成样本（负相）"
+msgstr "Generate samples from the model distribution with the sampler (negative phase)"
+
+#: ../../source/getting_started/introduction.rst:72
+msgid "计算目标函数并反向传播梯度"
+msgstr "Compute the objective and back-propagate gradients"
+
+#: ../../source/getting_started/introduction.rst:73
+msgid "更新模型参数"
+msgstr "Update model parameters"
+
+#: ../../source/getting_started/introduction.rst:75
+msgid "**模型评估**：使用训练好的模型进行特征提取、分类或生成任务"
+msgstr ""
+"**Model evaluation**: use the trained model for feature extraction, "
+"classification or generation tasks"
+
+#: ../../source/getting_started/introduction.rst:105
+msgid "7. 引用方式"
+msgstr "7. Citation"
+
+#: ../../source/getting_started/introduction.rst:107
+msgid "如果 Kaiwu-PyTorch-Plugin 对您的学术研究有帮助，欢迎引用："
+msgstr ""
+"If Kaiwu-PyTorch-Plugin is useful for your research, please cite:"
+
+#: ../../source/getting_started/introduction.rst:118
+msgid "相关研究论文："
+msgstr "Related papers:"

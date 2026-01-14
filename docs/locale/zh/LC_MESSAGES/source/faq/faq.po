@@ -1,0 +1,288 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/faq/faq.rst:3
+msgid "常见问题"
+msgstr ""
+
+#: ../../source/faq/faq.rst:5
+msgid "本章汇总了使用 Kaiwu-PyTorch-Plugin 时的常见问题和解决方案。"
+msgstr ""
+
+#: ../../source/faq/faq.rst:8
+msgid "安装相关"
+msgstr ""
+
+#: ../../source/faq/faq.rst:11
+msgid "Q: 安装时提示 Python 版本不兼容？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:13
+msgid "A: Kaiwu-PyTorch-Plugin 目前仅支持 **Python 3.10**。请使用 conda 创建对应版本的环境："
+msgstr ""
+
+#: ../../source/faq/faq.rst:21
+msgid "Q: 无法导入 kaiwu.torch_plugin 模块？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:23
+msgid "A: 请检查以下几点："
+msgstr ""
+
+#: ../../source/faq/faq.rst:25
+msgid "确认已安装 Kaiwu-PyTorch-Plugin：``pip install .``"
+msgstr ""
+
+#: ../../source/faq/faq.rst:26
+msgid "确认当前环境已激活：``conda activate quantum_env``"
+msgstr ""
+
+#: ../../source/faq/faq.rst:27
+msgid "确认 Kaiwu SDK 已正确安装"
+msgstr ""
+
+#: ../../source/faq/faq.rst:29
+msgid "如果问题仍然存在，尝试重新安装："
+msgstr ""
+
+#: ../../source/faq/faq.rst:37
+msgid "Q: Kaiwu SDK 安装失败？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:39
+msgid "A: Kaiwu SDK 需要单独安装。请："
+msgstr ""
+
+#: ../../source/faq/faq.rst:41
+msgid "访问 `Kaiwu SDK 下载页面 <https://platform.qboson.com/sdkDownload>`_"
+msgstr ""
+
+#: ../../source/faq/faq.rst:42
+msgid "下载对应系统的安装包"
+msgstr ""
+
+#: ../../source/faq/faq.rst:43
+msgid "按照页面说明进行安装"
+msgstr ""
+
+#: ../../source/faq/faq.rst:46
+msgid "模型相关"
+msgstr ""
+
+#: ../../source/faq/faq.rst:49
+msgid "Q: RBM 和 BM 有什么区别？应该使用哪个？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:51
+msgid "A: 主要区别如下："
+msgstr ""
+
+#: ../../source/faq/faq.rst:57
+msgid "特性"
+msgstr ""
+
+#: ../../source/faq/faq.rst:58
+msgid "RBM（受限玻尔兹曼机）"
+msgstr ""
+
+#: ../../source/faq/faq.rst:59
+msgid "BM（全连接玻尔兹曼机）"
+msgstr ""
+
+#: ../../source/faq/faq.rst:60
+msgid "连接结构"
+msgstr ""
+
+#: ../../source/faq/faq.rst:61
+msgid "层内无连接"
+msgstr ""
+
+#: ../../source/faq/faq.rst:62
+msgid "全连接"
+msgstr ""
+
+#: ../../source/faq/faq.rst:63
+msgid "推荐场景"
+msgstr ""
+
+#: ../../source/faq/faq.rst:64
+msgid "简单场景"
+msgstr ""
+
+#: ../../source/faq/faq.rst:65
+msgid "生成任务以及需要建模复杂依赖时"
+msgstr ""
+
+#: ../../source/faq/faq.rst:68
+msgid "Q: 如何选择隐藏层节点数？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:70
+msgid "A: 隐藏层节点数的选择取决于："
+msgstr ""
+
+#: ../../source/faq/faq.rst:72
+msgid "**数据复杂度**：复杂数据需要更多隐藏节点"
+msgstr ""
+
+#: ../../source/faq/faq.rst:73
+msgid "**计算资源**：节点越多，计算量越大"
+msgstr ""
+
+#: ../../source/faq/faq.rst:76
+msgid "Q: 训练损失不下降怎么办？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:78 ../../source/faq/faq.rst:132
+msgid "A: 尝试以下方法："
+msgstr ""
+
+#: ../../source/faq/faq.rst:80
+msgid "**调整学习率**：尝试更小（如 0.001）或更大（如 0.1）的学习率"
+msgstr ""
+
+#: ../../source/faq/faq.rst:81
+msgid "**增加权重衰减**：添加 L2 正则化防止过拟合"
+msgstr ""
+
+#: ../../source/faq/faq.rst:82
+msgid "**检查数据预处理**：确保数据已归一化到合适范围"
+msgstr ""
+
+#: ../../source/faq/faq.rst:83
+msgid "**增加训练轮次**：某些情况下需要更长的训练时间"
+msgstr ""
+
+#: ../../source/faq/faq.rst:86
+msgid "采样相关"
+msgstr ""
+
+#: ../../source/faq/faq.rst:89
+msgid "Q: 如何获取量子计算机访问权限？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:91
+msgid "A: 请按以下步骤操作："
+msgstr ""
+
+#: ../../source/faq/faq.rst:93
+msgid "在 `QBoson 平台 <https://platform.qboson.com/>`_ 注册账号"
+msgstr ""
+
+#: ../../source/faq/faq.rst:94
+msgid "通过平台联系官方工作人员"
+msgstr ""
+
+#: ../../source/faq/faq.rst:95
+msgid "联系邮箱：developer@boseq.com"
+msgstr ""
+
+#: ../../source/faq/faq.rst:97
+msgid "在获取真机权限前，您可以使用模拟退火优化器进行开发和测试。"
+msgstr ""
+
+#: ../../source/faq/faq.rst:100
+msgid "Q: 模拟退火采样器参数如何调整？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:102
+msgid "A: ``SimulatedAnnealingOptimizer`` 的主要参数："
+msgstr ""
+
+#: ../../source/faq/faq.rst:104
+msgid "``alpha``：退火系数（0.9-0.999），越接近 1 收敛越慢但结果越优"
+msgstr ""
+
+#: ../../source/faq/faq.rst:105
+msgid "``size_limit``：每次采样返回的样本数"
+msgstr ""
+
+#: ../../source/faq/faq.rst:118
+msgid "性能相关"
+msgstr ""
+
+#: ../../source/faq/faq.rst:121
+msgid "Q: 如何加速训练？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:123
+msgid "A: 几种加速方法："
+msgstr ""
+
+#: ../../source/faq/faq.rst:125
+msgid "**增大批大小**：在 GPU 内存允许的情况下增大 batch_size"
+msgstr ""
+
+#: ../../source/faq/faq.rst:127
+msgid "**减少采样次数**：可以适当减少采样的部署（如调整SimulatedAnnealingOptimizer的alpha参数等）"
+msgstr ""
+
+#: ../../source/faq/faq.rst:130
+msgid "Q: 显存不足怎么办？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:134
+msgid "减小批大小（batch_size）"
+msgstr ""
+
+#: ../../source/faq/faq.rst:135
+msgid "减少隐藏层节点数"
+msgstr ""
+
+#: ../../source/faq/faq.rst:136
+msgid "使用梯度累积"
+msgstr ""
+
+#: ../../source/faq/faq.rst:139
+msgid "其他问题"
+msgstr ""
+
+#: ../../source/faq/faq.rst:142
+msgid "Q: 如何引用这个项目？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:144
+msgid "A: 请使用以下 BibTeX 格式："
+msgstr ""
+
+#: ../../source/faq/faq.rst:156
+msgid "Q: 在哪里可以获取更多帮助？"
+msgstr ""
+
+#: ../../source/faq/faq.rst:158
+msgid "A: 您可以通过以下渠道获取帮助："
+msgstr ""
+
+#: ../../source/faq/faq.rst:160
+msgid ""
+"**GitHub Issues**：`提交问题 <https://github.com/QBoson/Kaiwu-pytorch-"
+"plugin/issues>`_"
+msgstr ""
+
+#: ../../source/faq/faq.rst:161
+msgid "**开发者社区**：玻声量子开发者社区"
+msgstr ""
+
+#: ../../source/faq/faq.rst:162
+msgid "**联系邮箱**：developer@boseq.com"
+msgstr ""
+

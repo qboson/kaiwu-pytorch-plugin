@@ -4,6 +4,8 @@
 
 **Language Versions**: [Chinese](README_ZH.md) | [English](README.md)
 
+For using Kaiwu-Pytorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/).
+
 ## Project Overview
 
 `Kaiwu-PyTorch-Plugin` is a quantum computing programming suite based on PyTorch and the Kaiwu SDK. It enables the training and evaluation of Restricted Boltzmann Machines (RBMs) and Boltzmann Machines (BMs) on coherent photonic quantum computers. The plugin provides easy-to-use interfaces, allowing researchers and developers to quickly implement the training and validation of energy-based neural network models and apply them to various machine learning development tasks.

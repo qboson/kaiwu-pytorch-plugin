@@ -1,0 +1,304 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/background.rst:3
+msgid "预备知识"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:5
+msgid ""
+"受限玻尔兹曼机（Restricted Boltzmann Machine）是一种基于能量的概率图模型，由可见层（Visible "
+"Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。 其核心是通过无监督学习学习数据的潜在特征分布。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:10
+msgid "1. 神经网络基础"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:13
+msgid "1.1 神经元模型"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:15
+#, python-brace-format
+msgid "人工神经元是神经网络的基本计算单元。给定输入向量 :math:`\\mathbf{x} \\in \\mathbb{R}^n`，其输出为："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:17
+#, python-brace-format
+msgid "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:21
+#, python-brace-format
+msgid ""
+"其中 :math:`\\mathbf{w} \\in \\mathbb{R}^n` 为权重向量，:math:`b \\in "
+"\\mathbb{R}` 为偏置项，:math:`\\phi(\\cdot)` 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:23
+msgid "\\sigma(z) = \\frac{1}{1 + e^{-z}}"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:28
+msgid "1.2 基于能量的模型"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:30
+#, python-brace-format
+msgid ""
+"与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 :math:`E(\\mathbf{x}; "
+"\\theta)` 定义数据的概率分布："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:32
+msgid ""
+"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; "
+"\\theta))}{Z(\\theta)}"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:36
+msgid "其中配分函数（partition function）:"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:38
+msgid "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:42
+msgid "确保概率归一化。低能量状态对应高概率。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:47
+msgid "2. 玻尔兹曼机结构"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:49
+msgid "可见层（**v**）：输入数据的显式表示（如像素值）。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:50
+msgid "隐藏层（**h**）：提取的潜在特征。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:51
+msgid "权重矩阵（**w**）：连接可见层与隐层的权重。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:52
+msgid "偏置：可见层偏置（**b**）和隐层偏置（**c**）。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:54
+msgid "玻尔兹曼机（BM)的拓扑结构是全连接的，而受限玻尔兹曼机通过去掉了可见层和隐藏层内部的链接， 让Gibbs采样的过程更加高效。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:57
+msgid "由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:59
+#, python-brace-format
+msgid ""
+"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j "
+"\\right)"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:63
+msgid "同理，"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:65
+#, python-brace-format
+msgid ""
+"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i "
+"\\right)"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:70
+msgid "3. 能量函数与概率分布"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:73
+msgid "3.1 能量函数"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:75
+msgid "RBM 的能量函数定义为："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:77
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
+"\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:81
+#, python-brace-format
+msgid ""
+"其中，:math:`\\mathbf{v}, \\mathbf{h}` 分别是可见层和隐层的状态，:math:`\\mathbf{W}` "
+"是连接的权重，:math:`\\mathbf{b}, \\mathbf{c}` 是一次项系数。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:83
+msgid "联合概率分布通过玻尔兹曼分布给出："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:85
+msgid "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:89
+msgid "其中 :math:`Z` 为配分函数（归一化因子）。可见层的边缘分布为："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:91
+msgid "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:95
+msgid "通过最大化似然函数学习参数 :math:`W,b,c` 。目标函数为负对数似然："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:97
+msgid "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:101
+msgid "采用对比散度（CD）算法近似梯度，更新规则为："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:103
+#: ../../source/getting_started/background.rst:161
+msgid ""
+"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
+"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
+"\\right)"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:107
+msgid ""
+"其中 :math:`\\epsilon` 为学习率，:math:`\\langle \\cdot \\rangle_{\\text{data}}`"
+" 和 :math:`\\langle \\cdot \\rangle_{\\text{recon}}` 分别为数据分布和重构分布的期望。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:110
+msgid "3.2 梯度的推导"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:112
+msgid "能量模型的概率可以写成："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:114
+#, python-brace-format
+msgid "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:118
+msgid "其梯度为："
+msgstr ""
+
+#: ../../source/getting_started/background.rst:120
+#, python-brace-format
+msgid ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x;"
+" \\theta) - \\nabla_\\theta \\log Z"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:124
+msgid "配分函数的梯度难以直接计算"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:126
+msgid ""
+"\\nabla_\\theta \\log Z\n"
+"&= \\frac{\\nabla_\\theta Z}{Z} \\\\\n"
+"&= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\sum_x \\frac{\\nabla_\\theta \\tilde{p}(x)}{Z}"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:133
+#, python-brace-format
+msgid ""
+"对于保证所有的 :math:`x` 都有 :math:`p(x) > 0` 的模型，我们可以用 :math:`\\exp(\\log "
+"\\tilde{p}(x))` 代替 :math:`\\tilde{p}(x)`。"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:135
+msgid ""
+"\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
+"&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log "
+"\\tilde{p}(x)}{Z} \\\\\n"
+"&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} "
+"\\\\\n"
+"&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
+"&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:143
+msgid "综上，"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:145
+#, python-brace-format
+msgid ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
+"\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
+"\\hat{p}(x; \\theta)\n"
+"\n"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:148
+#, python-brace-format
+msgid ""
+"第二项中 :math:`p(x; \\theta)` 实际上是模型预测的 :math:`\\mathbf{x}` "
+"的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:150
+msgid ""
+"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
+"p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - "
+"\\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x;"
+" \\theta)\n"
+"\n"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:153
+msgid "这里我们考虑玻尔兹曼机的能量函数，容易求得"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:155
+#, python-brace-format
+msgid ""
+"\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
+"\n"
+msgstr ""
+
+#: ../../source/getting_started/background.rst:158
+msgid ""
+"只要分别得到 :math:`p_{\\text{data}}`, :math:`p_{\\text{model}}` 分布下的 :math:`v`"
+" 和 :math:`h` 的值即可计算梯度。即为："
+msgstr ""
+

@@ -1,0 +1,97 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/quickstart.rst:3
+msgid "快速开始"
+msgstr "Quick Start"
+
+#: ../../source/getting_started/quickstart.rst:5
+msgid "本章通过简单的代码示例，帮助您快速上手 Kaiwu-PyTorch-Plugin。"
+msgstr "This chapter gets you up and running with Kaiwu-PyTorch-Plugin through short, self-contained examples."
+
+#: ../../source/getting_started/quickstart.rst:8
+msgid "1. 基本示例"
+msgstr "1. Basic Examples"
+
+#: ../../source/getting_started/quickstart.rst:11
+msgid "1.1 受限玻尔兹曼机（RBM）"
+msgstr "1.1 Restricted Boltzmann Machine (RBM)"
+
+#: ../../source/getting_started/quickstart.rst:13
+msgid ""
+"以下示例展示了如何使用 ``RestrictedBoltzmannMachine`` 类进行基本的模型训练。 "
+"可以定义可见节点、隐藏节点的个数，以及自定义二次项和一次项的初始化。"
+msgstr ""
+"The snippet below shows basic training with the ``RestrictedBoltzmannMachine`` class. "
+"You can set the number of visible and hidden units and optionally supply custom initial values for the quadratic and linear terms."
+
+#: ../../source/getting_started/quickstart.rst:19
+msgid "1.2 玻尔兹曼机（BM）"
+msgstr "1.2 Boltzmann Machine (BM)"
+
+#: ../../source/getting_started/quickstart.rst:21
+msgid "以下示例展示了如何使用 ``BoltzmannMachine`` 类："
+msgstr "The next example demonstrates the ``BoltzmannMachine`` class:"
+
+#: ../../source/getting_started/quickstart.rst:27
+msgid "3. 使用不同的采样器"
+msgstr "3. Using Different Samplers"
+
+#: ../../source/getting_started/quickstart.rst:29
+msgid "Kaiwu SDK 提供多种采样器，您可以根据需求选择："
+msgstr "Kaiwu SDK offers several samplers; pick the one that best fits your needs:"
+
+#: ../../source/getting_started/quickstart.rst:42
+msgid "4. 下一步"
+msgstr "4. Next Steps"
+
+#: ../../source/getting_started/quickstart.rst:44
+msgid "恭喜您完成了快速开始！接下来，您可以："
+msgstr "Congratulations—you have finished the quick-start!  Where to go next:"
+
+#: ../../source/getting_started/quickstart.rst:46
+msgid "**学习教程**：查看 :doc:`tutorials/index` 了解更多实际应用案例"
+msgstr "**Tutorials**: read :doc:`tutorials/index` for more real-world cases"
+
+#: ../../source/getting_started/quickstart.rst:47
+msgid "**RBM 分类**：:doc:`tutorials/rbm_classification` - 使用 RBM 进行手写数字分类"
+msgstr "**RBM classification**: :doc:`tutorials/rbm_classification` – classify handwritten digits with an RBM"
+
+#: ../../source/getting_started/quickstart.rst:48
+msgid "**DBN 分类**：:doc:`tutorials/dbn_classification` - 使用深度信念网络进行分类"
+msgstr "**DBN classification**: :doc:`tutorials/dbn_classification` – classify with a Deep Belief Network"
+
+#: ../../source/getting_started/quickstart.rst:49
+msgid "**BM 生成**：:doc:`tutorials/bm_generation` - 使用玻尔兹曼机生成数据"
+msgstr "**BM generation**: :doc:`tutorials/bm_generation` – generate data with a Boltzmann Machine"
+
+#: ../../source/getting_started/quickstart.rst:50
+msgid "**Q-VAE**：:doc:`tutorials/qvae_mnist` - 量子变分自编码器生成与表征学习"
+msgstr "**Q-VAE**: :doc:`tutorials/qvae_mnist` – quantum variational auto-encoder for generation and representation learning"
+
+#: ../../source/getting_started/quickstart.rst:52
+msgid "**查阅 API 文档**：了解各模块的详细接口和参数"
+msgstr "**API docs**: explore every module’s interface and parameters"
+
+#: ../../source/getting_started/quickstart.rst:53
+msgid "**探索示例代码**：项目 ``example/`` 目录包含更多完整示例"
+msgstr "**Example code**: the ``example/`` folder contains additional complete examples"

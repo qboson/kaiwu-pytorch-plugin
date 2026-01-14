@@ -32,10 +32,10 @@ Kaiwu SDK 提供多种采样器，您可以根据需求选择：
 
     from kaiwu.classical import SimulatedAnnealingOptimizer
 
-    # 模拟退火优化器（推荐，适用于大多数场景）
+    # Simulated-annealing optimizer (recommended for most scenarios)
     sampler_sa = SimulatedAnnealingOptimizer()
 
-    # 使用量子采样器（需要真机访问权限）
+    # To use the quantum sampler (requires real-machine access)
     # from kaiwu.cim import CIMOptimizer
 
 4. 下一步

@@ -1,0 +1,526 @@
+#: ../../source/modules/kaiwu.torch_plugin.rst:3
+msgid "模块手册"
+msgstr ""
+
+#: ../../source/modules/kaiwu.torch_plugin.rst:6
+msgid "Module contents"
+msgstr ""
+
+#: kaiwu.torch_plugin:1 of
+msgid "玻尔兹曼机"
+msgstr ""
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1
+#: of
+msgid "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
+msgstr "Base class: :py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1 of
+msgid "Boltzmann Machine."
+msgstr "玻尔兹曼机"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:5
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:3
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:3
+#: kaiwu.torch_plugin.qvae.QVAE:3 kaiwu.torch_plugin.qvae.QVAE.forward:3
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:3
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:3
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:3
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:3
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:3
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:3
+#: of
+msgid "Args:"
+msgstr ""
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:4 of
+msgid "num_nodes (int): Total number of nodes in the model."
+msgstr "num_nodes (int)：模型中节点总数。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:6
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:8
+#: of
+msgid "quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,"
+msgstr "quadratic_coef (torch.FloatTensor, optional)：二次项系数，"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:7 of
+msgid "shape is [num_nodes, num_nodes]"
+msgstr "形状为 [num_nodes, num_nodes]"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:9 of
+msgid ""
+"linear_bias (torch.FloatTensor, optional): linear bias, shape is "
+"[num_nodes]"
+msgstr "linear_bias (torch.FloatTensor, optional)：线性偏置，形状为 [num_nodes]"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:11 of
+msgid "device (torch.device, optional): Device for tensor construction."
+msgstr "device (torch.device, optional)：用于张量构建的设备。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:12 of
+msgid "If ``None``, uses CPU."
+msgstr "若为 ``None``，则使用 CPU。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:1
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:1
+#: of
+msgid "Clip linear and quadratic bias weights in-place."
+msgstr "就地裁剪线性与二次偏置权重。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:4
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:4
+#: of
+msgid ""
+"h_range (tuple[float, float]): Range for quadratic weights. for example, "
+"[-1, 1] j_range (tuple[float, float]): Range for linear weights. for "
+"example, [-1, 1]"
+msgstr ""
+"h_range (tuple[float, float])：二次权重的取值范围，例如 [-1, 1]\n"
+"j_range (tuple[float, float])：线性权重的取值范围，例如 [-1, 1]"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:1 of
+msgid "Sample from the Boltzmann Machine given some nodes."
+msgstr "在给定部分节点状态下对玻尔兹曼机进行采样。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:4 of
+msgid ""
+"sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the "
+"model. s_visible: State of the visible layer."
+msgstr ""
+"sampler (kaiwu.core.Optimizer)：用于从模型采样的优化器。\n"
+"s_visible：可见层状态。"
+
+#: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:3
+#: kaiwu.torch_plugin.UnsupervisedDBN.output_dim:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:6
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:6
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:6
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:9
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:11
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:6
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:7
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:7
+#: kaiwu.torch_plugin.qvae.QVAE.forward:6
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:8
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:8
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:7
+#: of
+msgid "Returns:"
+msgstr ""
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:8 of
+msgid "torch.Tensor: Spins sampled from the model"
+msgstr "torch.Tensor：从模型采样得到的自旋状态"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:9 of
+msgid "(shape determined by ``sampler`` and ``sample_params``)."
+msgstr "（形状由 ``sampler`` 与 ``sample_params`` 决定）。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:1
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:1
+#: of
+msgid "Compute the Hamiltonian."
+msgstr "计算哈密顿量。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:4 of
+msgid "s_all (torch.tensor): Tensor of shape (B, N), where B is batch size,"
+msgstr "s_all (torch.tensor)：形状为 (B, N) 的张量，B 为批次大小，"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:5 of
+msgid "N is the number of variables in the model."
+msgstr "N 为模型变量数。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:8
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:8
+#: of
+msgid "torch.tensor: Hamiltonian of shape (B,)."
+msgstr "torch.tensor：形状为 (B,) 的哈密顿量。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:1 of
+msgid "Sample from the Boltzmann Machine."
+msgstr "对玻尔兹曼机进行吉布斯采样。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:4 of
+msgid "num_steps (int): Number of Gibbs sampling steps."
+msgstr "num_steps (int)：吉布斯采样步数。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:6 of
+msgid "s_visible (torch.Tensor, optional): State of the visible layer,"
+msgstr "s_visible (torch.Tensor, optional)：可见层状态，"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:7 of
+msgid "shape (B, num_visible). If ``None``, randomly initialize visible layer."
+msgstr "形状为 (B, num_visible)。若为 ``None``，则随机初始化可见层。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:9 of
+msgid "num_sample (int, optional): Number of samples."
+msgstr "num_sample (int, optional)：采样数量。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:10
+#: of
+msgid "If ``None``, uses batch size of s_visible."
+msgstr "若为 ``None``，则使用 s_visible 的批次大小。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:1 of
+msgid "Get the hidden bias."
+msgstr "获取隐藏层偏置。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:4 of
+msgid "num_hidden (int): Number of hidden nodes."
+msgstr "num_hidden (int)：隐藏节点数。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.symmetrized_quadratic_coef:1
+#: of
+msgid "Quadratic coefficient"
+msgstr "二次项系数"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:1 of
+msgid "Get the visible bias."
+msgstr "获取可见层偏置。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:4 of
+msgid "num_visible (int): Number of visible nodes."
+msgstr "num_visible (int)：可见节点数。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1 kaiwu.torch_plugin.qvae.QVAE:1 of
+msgid "基类：:py:class:`~torch.nn.modules.module.Module`"
+msgstr "Base class: :py:class:`~torch.nn.modules.module.Module`"
+
+#: kaiwu.torch_plugin.qvae.QVAE:1 of
+msgid "Quantum Variational Autoencoder (QVAE) Model"
+msgstr "量子变分自编码器（QVAE）模型"
+
+#: kaiwu.torch_plugin.qvae.QVAE:4 of
+msgid "encoder: Encoder module"
+msgstr "encoder：编码器模块"
+
+#: kaiwu.torch_plugin.qvae.QVAE:6 of
+msgid "decoder: Decoder module"
+msgstr "decoder：解码器模块"
+
+#: kaiwu.torch_plugin.qvae.QVAE:8 of
+msgid "bm (AbstractBoltzmannMachine): Boltzmann machine"
+msgstr "bm (AbstractBoltzmannMachine)：玻尔兹曼机"
+
+#: kaiwu.torch_plugin.qvae.QVAE:10 of
+msgid "sampler: Sampler"
+msgstr "sampler：采样器"
+
+#: kaiwu.torch_plugin.qVAE:12 of
+msgid "dist_beta: Beta parameter for the distribution"
+msgstr "dist_beta：分布的 Beta 参数"
+
+#: kaiwu.torch_plugin.qvae.QVAE:14 of
+msgid "mean_x (torch.Tensor): Bias of training data"
+msgstr "mean_x (torch.Tensor)：训练数据的偏置"
+
+#: kaiwu.torch_plugin.qvae.QVAE:16 of
+msgid "num_vis (int): Number of visible variables in the Boltzmann machine"
+msgstr "num_vis (int)：玻尔兹曼机中可见变量数"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:1 of
+msgid "Forward propagation"
+msgstr "前向传播"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:4
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:4 of
+msgid "x (torch.Tensor): Input data"
+msgstr "x (torch.Tensor)：输入数据"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:7 of
+msgid "tuple: (recon_x, posterior, q, zeta)"
+msgstr "tuple：(recon_x, posterior, q, zeta)"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:8 of
+msgid ""
+"recon_x: Reconstructed data posterior: Posterior distribution object q: "
+"Encoder output zeta: Posterior sample"
+msgstr ""
+"recon_x：重构数据\n"
+"posterior：后验分布对象\n"
+"q：编码器输出\n"
+"zeta：后验样本"
+
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:1 of
+msgid "Compute negative ELBO loss"
+msgstr "计算负 ELBO 损失"
+
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:6 of
+msgid "kl_beta (float): Weight coefficient for KL term"
+msgstr "kl_beta (float)：KL 项权重系数"
+
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:9 of
+msgid "tuple: (output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta)"
+msgstr ""
+"tuple：(output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta)"
+
+#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:10 of
+msgid ""
+"output: Reconstructed output (sigmoid activated) recon_x: Reconstructed "
+"data neg_elbo: Negative ELBO loss wd_loss: Weight decay loss total_kl: KL"
+" divergence cost: Reconstruction loss q: Encoder output zeta: Posterior "
+"sample"
+msgstr ""
+"output：重构输出（经 sigmoid 激活）\n"
+"recon_x：重构数据\n"
+"neg_elbo：负 ELBO 损失\n"
+"wd_loss：权重衰减损失\n"
+"total_kl：KL 散度\n"
+"cost：重构损失\n"
+"q：编码器输出\n"
+"zeta：后验样本"
+
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:1 of
+msgid "Compute posterior distribution and its reparameterized sample"
+msgstr "计算后验分布及其重参数化样本"
+
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:4 of
+msgid "q_logits (torch.Tensor): Encoder output, log-odds"
+msgstr "q_logits (torch.Tensor)：编码器输出，log-odds"
+
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:6 of
+msgid "beta: Beta parameter for the distribution"
+msgstr "beta：分布的 Beta 参数"
+
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:9 of
+msgid "tuple: (Posterior distribution object, Sampled result zeta)"
+msgstr "tuple：(后验分布对象, 采样结果 zeta)"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1
+#: of
+msgid "Create a Restricted Boltzmann Machine."
+msgstr "创建受限玻尔兹曼机。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:4
+#: of
+msgid "num_visible (int): Number of visible nodes in the model."
+msgstr "num_visible (int)：模型中可见节点数。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:6
+#: of
+msgid "num_hidden (int): Number of hidden nodes in the model."
+msgstr "num_hidden (int)：模型中隐藏节点数。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:9
+#: of
+msgid "shape is [num_visible, num_hidden]"
+msgstr "形状为 [num_visible, num_hidden]"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:11
+#: of
+msgid ""
+"linear_bias (torch.FloatTensor, optional): linear bias, shape is "
+"[num_hidden]"
+msgstr "linear_bias (torch.FloatTensor, optional)：线性偏置，形状为 [num_hidden]"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:13
+#: of
+msgid "device (torch.device, optional): Device to construct tensors."
+msgstr "device (torch.device, optional)：用于构建张量的设备。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:4
+#: of
+msgid "s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,"
+msgstr "s_all (torch.tensor)：形状为 (B, N) 的张量，B 为批次大小，"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:5
+#: of
+msgid "and N is the number of variables in the model."
+msgstr "N 为模型变量数。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:1
+#: of
+msgid "Propagate visible spins to the hidden layer."
+msgstr "将可见自旋传播至隐藏层。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:4
+#: of
+msgid ""
+"s_visible: Visible layer tensor. requires_grad: Whether to allow gradient"
+" backpropagation."
+msgstr ""
+"s_visible：可见层张量。\n"
+"requires_grad：是否允许梯度反向传播。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_visible:1
+#: of
+msgid "Propagate hidden spins to the visible layer."
+msgstr "将隐藏自旋传播至可见层。"
+
+#: kaiwu.torch_plugin.RestrictedBoltzmannMachine.hidden_bias:1 of
+msgid "Return the hidden bias."
+msgstr "返回隐藏层偏置。"
+
+#: kaiwu.torch_plugin.RestrictedBoltzmannMachine.visible_bias:1 of
+msgid "Return the visible bias."
+msgstr "返回可见层偏置。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1 of
+msgid "A general unsupervised Deep Belief Network (DBN) architecture."
+msgstr "通用的无监督深度信念网络（DBN）架构。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:3 of
+msgid "This model is a stack of Restricted Boltzmann Machines (RBMs)."
+msgstr "该模型由多层受限玻尔兹曼机（RBM）堆叠而成。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:6 of
+msgid "hidden_layers_structure (list, optional): A list of integers"
+msgstr "hidden_layers_structure (list, optional)：整数列表，"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:7 of
+msgid ""
+"representing the number of hidden units in each layer. Defaults to [100, "
+"100]."
+msgstr "表示每层的隐藏单元数，默认为 [100, 100]。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:1 of
+msgid "Creates the layers of RBMs for the DBN."
+msgstr "为 DBN 创建 RBM 层。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:4 of
+msgid ""
+"input_dim (int): The dimension of the input data (number of visible "
+"units)."
+msgstr "input_dim (int)：输入数据维度（可见单元数）。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:7 of
+msgid "UnsupervisedDBN: The instance itself with the RBM layers created."
+msgstr "UnsupervisedDBN：已创建 RBM 层的实例自身。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:1 of
+msgid "Performs a forward pass to transform the input data."
+msgstr "执行前向传播以转换输入数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:4
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:6
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:4 of
+msgid "data_in (numpy.ndarray): The input data."
+msgstr "data_in (numpy.ndarray)：输入数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:7 of
+msgid "numpy.ndarray: The transformed data after passing through all RBM layers."
+msgstr "numpy.ndarray：经过所有 RBM 层后的转换数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:9
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:12 of
+msgid "Raises:"
+msgstr "异常："
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:10 of
+msgid "ValueError: If the model has not been built or trained yet."
+msgstr "ValueError：模型尚未构建或训练。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:1 of
+msgid "Gets the RBM layer at the specified index."
+msgstr "获取指定索引处的 RBM 层。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:4 of
+msgid "index (int): The index of the RBM layer."
+msgstr "index (int)：RBM 层索引。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:7 of
+msgid ""
+"RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise "
+"None."
+msgstr "RestrictedBoltzmannMachine 或 None：若找到则返回 RBM 层，否则返回 None。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:1 of
+msgid "Marks the model as trained."
+msgstr "将模型标记为已训练。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:4 of
+msgid "UnsupervisedDBN: The instance itself."
+msgstr "UnsupervisedDBN：实例自身。"
+
+#: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:1 of
+msgid "Returns the number of RBM layers."
+msgstr "返回 RBM 层数。"
+
+#: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:4 of
+msgid "int: The number of layers."
+msgstr "int：层数。"
+
+#: kaiwu.torch_plugin.UnsupervisedDBN.output_dim:1 of
+msgid "Returns the output dimension of the DBN."
+msgstr "返回 DBN 的输出维度。"
+
+#: kaiwu.torch_plugin.UnsupervisedDBN.output_dim:4 of
+msgid "int: The dimension of the final hidden layer."
+msgstr "int：最终隐藏层维度。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:1 of
+msgid "Reconstructs the input from a specified RBM layer."
+msgstr "从指定 RBM 层重构输入。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:4 of
+msgid "data_in (numpy.ndarray): The input data to be reconstructed."
+msgstr "data_in (numpy.ndarray)：待重构的输入数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:6 of
+msgid ""
+"layer_index (int, optional): The index of the RBM layer to use for "
+"reconstruction."
+msgstr "layer_index (int, optional)：用于重构的 RBM 层索引。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:7 of
+msgid "Defaults to 0."
+msgstr "默认为 0。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:10 of
+msgid "numpy.ndarray: The reconstructed data."
+msgstr "numpy.ndarray：重构后的数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:13 of
+msgid ""
+"ValueError: If the model has no RBM layers or the layer index is out of "
+"range."
+msgstr "ValueError：模型无 RBM 层或层索引越界。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:1 of
+msgid "Reconstructs data using a single RBM."
+msgstr "使用单个 RBM 重构数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:4 of
+msgid "rbm (RestrictedBoltzmannMachine): The trained RBM model."
+msgstr "rbm (RestrictedBoltzmannMachine)：已训练的 RBM 模型。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:8 of
+msgid "device (torch.device, optional): The device to perform computation on."
+msgstr "device (torch.device, optional)：执行计算所用的设备。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:9 of
+msgid "If None, uses the RBM's device. Defaults to None."
+msgstr "若为 None，则使用 RBM 的设备，默认为 None。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:12 of
+msgid "tuple[numpy.ndarray, numpy.ndarray]: A tuple containing:"
+msgstr "tuple[numpy.ndarray, numpy.ndarray]：包含以下内容的元组："
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:13 of
+msgid "The reconstructed visible layer data."
+msgstr "重构后的可见层数据。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:14 of
+msgid "The reconstruction error for each sample."
+msgstr "每个样本的重构误差。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:1 of
+msgid "An sklearn-compatible transform method."
+msgstr "兼容 sklearn 的转换方法。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:7 of
+msgid "numpy.ndarray: The transformed data."
+msgstr "numpy.ndarray：转换后的数据。"

@@ -1,0 +1,126 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/tutorials/index.rst:3
+msgid "新手教程"
+msgstr "Tutorials for Beginners"
+
+#: ../../source/getting_started/tutorials/index.rst:5
+msgid "本章提供详细的实践教程，帮助您深入了解 Kaiwu-PyTorch-Plugin 的各种应用场景。"
+msgstr "This chapter provides hands-on tutorials to help you explore various use-cases of Kaiwu-PyTorch-Plugin in depth."
+
+#: ../../source/getting_started/tutorials/index.rst:8
+msgid "教程概览"
+msgstr "Tutorial Overview"
+
+#: ../../source/getting_started/tutorials/index.rst:14
+msgid "教程名称"
+msgstr "Tutorial Name"
+
+#: ../../source/getting_started/tutorials/index.rst:15
+msgid "任务类型"
+msgstr "Task Type"
+
+#: ../../source/getting_started/tutorials/index.rst:16
+msgid "描述"
+msgstr "Description"
+
+#: ../../source/getting_started/tutorials/index.rst:17
+msgid ":doc:`rbm_classification`"
+msgstr ":doc:`rbm_classification`"
+
+#: ../../source/getting_started/tutorials/index.rst:18
+#: ../../source/getting_started/tutorials/index.rst:21
+msgid "分类"
+msgstr "Classification"
+
+#: ../../source/getting_started/tutorials/index.rst:19
+msgid "使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类"
+msgstr "Feature learning and classification on handwritten digits with Restricted Boltzmann Machines (RBMs)"
+
+#: ../../source/getting_started/tutorials/index.rst:20
+msgid ":doc:`dbn_classification`"
+msgstr ":doc:`dbn_classification`"
+
+#: ../../source/getting_started/tutorials/index.rst:22
+msgid "使用深度信念网络（DBN）构建层次化特征表示并进行分类"
+msgstr "Building hierarchical feature representations and performing classification with Deep Belief Networks (DBNs)"
+
+#: ../../source/getting_started/tutorials/index.rst:23
+msgid ":doc:`bm_generation`"
+msgstr ":doc:`bm_generation`"
+
+#: ../../source/getting_started/tutorials/index.rst:24
+msgid "生成"
+msgstr "Generation"
+
+#: ../../source/getting_started/tutorials/index.rst:25
+msgid "使用全连接玻尔兹曼机（BM）进行数据生成"
+msgstr "Data generation using fully-connected Boltzmann Machines (BMs)"
+
+#: ../../source/getting_started/tutorials/index.rst:26
+msgid ":doc:`qvae_mnist`"
+msgstr ":doc:`qvae_mnist`"
+
+#: ../../source/getting_started/tutorials/index.rst:27
+msgid "生成/表征"
+msgstr "Generation / Representation"
+
+#: ../../source/getting_started/tutorials/index.rst:28
+msgid "使用量子变分自编码器（Q-VAE）进行图像生成与表征学习"
+msgstr "Image generation and representation learning with Quantum Variational Auto-Encoders (Q-VAEs)"
+
+#: ../../source/getting_started/tutorials/index.rst:31
+msgid "推荐学习顺序"
+msgstr "Recommended Learning Path"
+
+#: ../../source/getting_started/tutorials/index.rst:33
+msgid "**初学者路径**："
+msgstr "**Beginner Track**:"
+
+#: ../../source/getting_started/tutorials/index.rst:35
+msgid "先完成 :doc:`../quickstart` 了解基本 API"
+msgstr "Start with :doc:`../quickstart` to grasp the basic APIs"
+
+#: ../../source/getting_started/tutorials/index.rst:36
+msgid "学习 :doc:`rbm_classification` 理解 RBM 的应用流程"
+msgstr "Proceed to :doc:`rbm_classification` to understand the RBM workflow"
+
+#: ../../source/getting_started/tutorials/index.rst:38
+msgid "**生成模型路径**："
+msgstr "**Generative-Model Track**:"
+
+#: ../../source/getting_started/tutorials/index.rst:40
+msgid "学习 :doc:`bm_generation` 了解玻尔兹曼机的生成能力"
+msgstr "Study :doc:`bm_generation` to see the generative power of Boltzmann Machines"
+
+#: ../../source/getting_started/tutorials/index.rst:41
+msgid "进阶到 :doc:`qvae_mnist` 学习更强大的生成模型"
+msgstr "Advance to :doc:`qvae_mnist` for more powerful generative models"
+
+#: ../../source/getting_started/tutorials/index.rst:43
+msgid "**完整学习路径**："
+msgstr "**Complete Track**:"
+
+#: ../../source/getting_started/tutorials/index.rst:45
+msgid "按顺序完成所有教程，全面掌握 Kaiwu-PyTorch-Plugin 的功能。"
+msgstr "Work through every tutorial in order to master all features of Kaiwu-PyTorch-Plugin."

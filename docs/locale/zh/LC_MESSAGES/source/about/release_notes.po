@@ -1,0 +1,196 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/about/release_notes.rst:3
+msgid "发行说明"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:5
+msgid "本页记录 Kaiwu-PyTorch-Plugin 各版本的更新内容。"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:8
+msgid "版本 0.1.0（2025-12-24）"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:10
+#: ../../source/about/release_notes.rst:25
+msgid "**新功能**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:12
+msgid "依赖许可证检查"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:13
+msgid "PyPI 发布流水线"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:16
+#: ../../source/about/release_notes.rst:31
+msgid "**改进**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:18
+msgid "文档与说明更新"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:19
+msgid "调整BM接口和矩阵转换逻辑"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:23
+msgid "版本 0.0.2（2025-11-06）"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:27
+msgid "新增文档框架，支持 Sphinx 构建"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:28
+msgid "新增 DBN（深度信念网络）模块，支持多层 RBM 堆叠"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:29
+msgid "新增 Q-VAE 示例，支持量子变分自编码器训练"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:33
+msgid "恢复并优化 RBM 模块实现"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:34
+msgid "更新示例代码 README 文档"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:35
+msgid "改进代码注释，提升可读性"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:37
+msgid "**文档**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:39
+msgid "更新中英文 README 文档"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:40
+msgid "添加更详细的安装说明"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:41
+msgid "补充示例代码说明"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:43
+msgid "**修复**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:45
+msgid "修复 DBN 模块中的已知问题"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:46
+msgid "修复 pylint 检查发现的代码问题"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:49
+msgid "版本 0.0.1（2025-10-15）"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:51
+msgid "**初始版本**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:53
+msgid "Kaiwu-PyTorch-Plugin 的首个正式发布版本，提供以下核心功能："
+msgstr ""
+
+#: ../../source/about/release_notes.rst:55
+msgid "**核心模块**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:57
+msgid "``RestrictedBoltzmannMachine``：受限玻尔兹曼机实现"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:58
+msgid "``BoltzmannMachine``：全连接玻尔兹曼机实现"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:59
+msgid "``AbstractBoltzmannMachine``：抽象基类，支持自定义扩展"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:61
+msgid "**主要特性**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:63
+msgid "支持 PyTorch 原生接口，可使用标准优化器（SGD、Adam 等）"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:64
+msgid "支持 Kaiwu SDK 采样器，包括模拟退火和量子采样"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:65
+msgid "支持 GPU 加速训练"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:66
+msgid "提供完整的示例代码"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:68
+msgid "**示例**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:70
+msgid "``rbm_digits``：手写数字识别示例"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:71
+msgid "``qvae_mnist``：Q-VAE MNIST 生成示例"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:72
+msgid "``bm_generation``：玻尔兹曼机数据生成示例"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:74
+msgid "**环境要求**"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:76
+msgid "Python 3.10"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:77
+msgid "PyTorch 2.7.0"
+msgstr ""
+
+#: ../../source/about/release_notes.rst:78
+msgid "Kaiwu SDK v1.2.0+"
+msgstr ""
+
