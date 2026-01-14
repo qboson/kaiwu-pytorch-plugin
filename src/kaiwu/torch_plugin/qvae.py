@@ -97,16 +97,8 @@ class QVAE(torch.nn.Module):
         # Compute probabilities
         q1 = torch.sigmoid(logit_q1)
         q2 = torch.sigmoid(logit_q2)
-        log_ratio1 = log_ratio[:, : self.num_var1]
-        q1_pert = torch.sigmoid(logit_q1 + log_ratio1)
 
-        # Compute cross-entropy
-        cross_entropy = -torch.matmul(
-            torch.cat([q1, q2], dim=-1), self.bm.linear_bias
-        ) - torch.sum(
-            torch.matmul(q1_pert, self.bm.quadratic_coef) * q2, dim=1, keepdim=True
-        )
-        cross_entropy = cross_entropy.squeeze(dim=1)
+        cross_entropy = self.bm(torch.cat[q1, q2])
         s_neg = self.bm.sample(self.sampler)
         cross_entropy = cross_entropy - self.bm(s_neg).mean()
         return cross_entropy
