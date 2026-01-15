@@ -91,14 +91,7 @@ class QVAE(torch.nn.Module):
                 f"The number of variables in the Boltzmann machine {self.bm.num_nodes}"
                 f" does not match the shape of logit_q {logit_q.shape[1]}."
             )
-        logit_q1 = logit_q[:, : self.num_var1]
-        logit_q2 = logit_q[:, self.num_var1 :]
-
-        # Compute probabilities
-        q1 = torch.sigmoid(logit_q1)
-        q2 = torch.sigmoid(logit_q2)
-
-        cross_entropy = self.bm(torch.cat[q1, q2])
+        cross_entropy = self.bm(torch.sigmoid(logit_q)).mean()
         s_neg = self.bm.sample(self.sampler)
         cross_entropy = cross_entropy - self.bm(s_neg).mean()
         return cross_entropy

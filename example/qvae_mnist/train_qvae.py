@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine, QVAE
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
 from utils import save_list_to_txt
 from models import Encoder, Decoder, MLP
 from visualizers import t_SNE, plot_training_curves, create_tsne_animation
@@ -46,17 +46,18 @@ def train_qvae_with_tsne(
     decoder = Decoder(latent_dim, hidden_dim, input_dim, weight_decay=0.01)
 
     # 初始化bm和sampler
-    rbm = RestrictedBoltzmannMachine(
+    bm = RestrictedBoltzmannMachine(
         num_visible=num_var1,
         num_hidden=num_var2,
     )
+    # bm = BoltzmannMachine(num_nodes=num_var1 + num_var2)
     sampler = SimulatedAnnealingOptimizer(alpha=0.95)
 
     # 创建Q-VAE模型
     model = QVAE(
         encoder=encoder,
         decoder=decoder,
-        bm=rbm,
+        bm=bm,
         sampler=sampler,
         dist_beta=dist_beta,
         mean_x=mean_x,
