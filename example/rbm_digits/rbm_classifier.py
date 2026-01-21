@@ -25,7 +25,7 @@ import kaiwu as kw
 
 # 添加license相关信息
 # kw.license.init(user_id="", sdk_code="")
-def train_classifier():
+def train_classifier(n_iter=2):
     logistic = LogisticRegression(random_state=42)
 
     # 初始化RBM
@@ -33,7 +33,7 @@ def train_classifier():
         n_components=128,
         learning_rate=0.1,
         batch_size=32,
-        n_iter=2,
+        n_iter=n_iter,
         verbose=True,
         plot_img=False,
         random_state=seed,
