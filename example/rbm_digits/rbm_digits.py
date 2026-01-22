@@ -115,7 +115,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
 
                 x = rbm.get_hidden(x)  # 正相（计算隐层激活）
                 # s = rbm.sample(self.sampler)  # 负相（采样重构数据）
-                s = rbm.get_visible(x[:, rbm.num_visible :])  # 使用可见层重构
+                s = rbm.get_visible(x[:, rbm.num_visible :])  # 使用隐藏层重构可见层
                 opt_rbm.zero_grad()  # 梯度清零
 
                 # 计算目标函数（等价于负对数似然），并加权衰减项
