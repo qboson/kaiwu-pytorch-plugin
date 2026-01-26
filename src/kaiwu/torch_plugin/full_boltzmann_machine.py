@@ -211,7 +211,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
             solution = sampler.solve(ising_mat)
-            solution = (solution[:, :-1] + 1) / 2
+            solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
             solution = torch.tensor(solution, dtype=dtype, device=self.device)
             solution = torch.cat(
                 [s_visible[i].unsqueeze(0).expand(solution.shape[0], -1), solution],

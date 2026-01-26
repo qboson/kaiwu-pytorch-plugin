@@ -96,7 +96,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """
         ising_mat = self.get_ising_matrix()
         solution = sampler.solve(ising_mat)
-        solution = (solution[:, :-1] + 1) / 2
+        solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
         solution = torch.FloatTensor(solution)
         solution = solution.to(self.device)
         return solution

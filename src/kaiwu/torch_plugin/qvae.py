@@ -72,15 +72,11 @@ class QVAE(torch.nn.Module):
         zeta = posterior_dist.reparameterize(self.is_training)
         return posterior_dist, zeta
 
-    def _cross_entropy(
-        self, logit_q: torch.Tensor, log_ratio: torch.Tensor
-    ) -> torch.Tensor:
+    def _cross_entropy(self, logit_q: torch.Tensor) -> torch.Tensor:
         """Compute the cross-entropy term for the overlap distribution proposed in DVAE++
 
         Args:
             logit_q (torch.Tensor): Log-odds of Bernoulli distribution defined for each variable
-
-            log_ratio (torch.Tensor): Log(r(ζ|z=1)/r(ζ|z=0)) for each ζ
 
         Returns:
             torch.Tensor: Cross-entropy tensor for each ζ
@@ -91,45 +87,26 @@ class QVAE(torch.nn.Module):
                 f"The number of variables in the Boltzmann machine {self.bm.num_nodes}"
                 f" does not match the shape of logit_q {logit_q.shape[1]}."
             )
-        logit_q1 = logit_q[:, : self.num_var1]
-        logit_q2 = logit_q[:, self.num_var1 :]
-
-        # Compute probabilities
-        q1 = torch.sigmoid(logit_q1)
-        q2 = torch.sigmoid(logit_q2)
-        log_ratio1 = log_ratio[:, : self.num_var1]
-        q1_pert = torch.sigmoid(logit_q1 + log_ratio1)
-
-        # Compute cross-entropy
-        cross_entropy = -torch.matmul(
-            torch.cat([q1, q2], dim=-1), self.bm.linear_bias
-        ) - torch.sum(
-            torch.matmul(q1_pert, self.bm.quadratic_coef) * q2, dim=1, keepdim=True
-        )
-        cross_entropy = cross_entropy.squeeze(dim=1)
+        cross_entropy = self.bm(torch.sigmoid(logit_q)).mean()
         s_neg = self.bm.sample(self.sampler)
         cross_entropy = cross_entropy - self.bm(s_neg).mean()
         return cross_entropy
 
-    def _kl_dist_from(self, posterior, post_samples):
+    def _kl_dist_from(self, posterior):
         """Compute KL divergence
 
         Args:
             posterior: Posterior distribution object
-
-            post_samples: Posterior distribution samples
 
         Returns:
             torch.Tensor: KL divergence tensor
         """
         entropy = 0
         logit_q = 0
-        log_ratio = 0
         entropy += torch.sum(posterior.entropy(), dim=1)
 
         logit_q = posterior.logit_mu
-        log_ratio = posterior.log_ratio(post_samples)
-        cross_entropy = self._cross_entropy(logit_q, log_ratio)
+        cross_entropy = self._cross_entropy(logit_q)
         kl = cross_entropy - entropy
 
         return kl
@@ -166,7 +143,7 @@ class QVAE(torch.nn.Module):
         output = torch.sigmoid(output_dist.logit_mu)
 
         # Compute KL
-        total_kl = self._kl_dist_from(posterior, zeta)
+        total_kl = self._kl_dist_from(posterior)
         total_kl = torch.mean(total_kl)
         # Expected log prob p(x| z)
         cost = -output_dist.log_prob_per_var(x)  # [256, 784]
