@@ -50,15 +50,23 @@
 
 ### 训练及验证结果
 
-我们分别对[RMB-Reward-Model-Benchmark](https://github.com/Zhou-Zoey/RMB-Reward-Model-Benchmark)数据集中的BoN_set以及Pairwise_set分别训练五个epochs进行测试。测试结果可视化如下：
+#### 数据训练结果
+
+| Method | Chat | Chat-Hard | Safety | Reasoning | Average |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Base RM (Pythia 70M)** | 52.30 | 36.40 | 44.50 | 61.68 | 48.72 |
+| **Ensemble (Mean)** | 55.40 | 38.60 | 45.45 | 61.34 | 50.19 |
+| **Ensemble (WCO)** | 55.40 | 38.60 | 48.33 | 63.74 | 51.52 |
+| **EBRM (Original Paper)** | 60.50 | 41.23 | 55.42 | 67.49 | 56.16 |
+| **Q-EBRM (QBM Refined)** | 50.34 | 40.10 | 61.93 | 54.16 | 51.63 |
+
+我们对[RMB-Reward-Model-Benchmark](https://github.com/Zhou-Zoey/RMB-Reward-Model-Benchmark)数据集中的BoN_set以及Pairwise_set部分训练五个epochs进行可视化。可视化结果如下：
 
 ![BoN_set](https://github.com/YuzeHao2023/kaiwu-pytorch-plugin/blob/main/example/qbm_ebrm_results/imgs/training_plots.png "BoN_set效果可视化结果")
 
-BoN_set效果可视化结果
 
 ![Pairwise_set](https://github.com/YuzeHao2023/kaiwu-pytorch-plugin/blob/main/example/qbm_ebrm_results/imgs/pairwire-training_plots.png "Pairwise_set效果可视化结果")
 
-Pairwise_set效果可视化结果
 
 ## 快速开始
 
