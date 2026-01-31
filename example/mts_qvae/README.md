@@ -5,6 +5,30 @@
 - 在相同数据集与相同输入表示下，将论文中的 **VAE 先验（标准正态）** 替换为本仓库实现的 **QVAE（以 Boltzmann Machine/QBM 作为潜变量先验）**
 - 输出 **可重复运行** 的训练日志与基础对比指标（不做学术造假：不会宣称复现了论文中依赖外部闭源/在线服务的所有结果）
 
+## ⚠️ 重要限制说明（使用前必读）
+
+> **RandomIsingSampler 是占位采样器**
+>
+> 本示例默认使用的 `RandomIsingSampler` **仅返回随机二值解**，并不会真正求解 Ising 优化问题。
+> 它的存在仅为了让示例代码在没有安装 Kaiwu 真实求解器的情况下也能运行通过。
+>
+> ⚠️ **如果您需要科学上有效的 QVAE vs VAE 性能对比，必须使用真实的 Ising 求解器！**
+
+### 如何使用真实的 Ising 求解器
+
+1. **安装 Kaiwu SDK**：请参考 [玻色量子开发者平台](https://github.com/qboson) 获取完整的 Kaiwu SDK
+2. **替换采样器**：在 `train_qvae.py` 中将 `RandomIsingSampler` 替换为 Kaiwu 提供的真实采样器，例如：
+   ```python
+   # 使用 Kaiwu SDK 的模拟退火采样器
+   from kaiwu import SimulatedAnnealingSampler
+   sampler = SimulatedAnnealingSampler(...)
+   
+   # 或使用量子退火采样器（需连接量子硬件）
+   from kaiwu import QuantumAnnealingSampler
+   sampler = QuantumAnnealingSampler(...)
+   ```
+3. **重新训练**：使用真实采样器重新训练 QVAE 模型以获得有效的对比结果
+
 ## 数据来源（论文官方）
 - 代码：https://github.com/Zhao-Group/MTS-VAE
 - 数据集（Zenodo）：https://zenodo.org/records/14590156

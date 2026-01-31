@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -28,13 +29,24 @@ def find_repo_root(start: Path) -> Path:
 
 @dataclass
 class RandomIsingSampler:
-    """A minimal sampler compatible with AbstractBoltzmannMachine.sample().
+    """A minimal **placeholder** sampler compatible with AbstractBoltzmannMachine.sample().
 
     The library expects `solve(ising_matrix)` returning a numpy array of shape (K, N+1)
     with spins in {-1, +1}.
 
-    This sampler is *not* a good sampler; it is only to make the example runnable
-    without external Kaiwu solvers.
+    ⚠️ IMPORTANT LIMITATION ⚠️
+    ─────────────────────────
+    This sampler returns RANDOM binary solutions and does NOT actually solve
+    the Ising optimization problem. It is provided ONLY to make this example
+    runnable without external Kaiwu quantum/classical solvers.
+
+    For scientifically valid results when comparing QVAE vs VAE performance,
+    you MUST replace this with a real Ising solver such as:
+    - Kaiwu SDK's quantum annealing sampler
+    - Kaiwu SDK's simulated annealing sampler
+    - Other QUBO/Ising solvers
+
+    See the README.md for instructions on using real solvers.
     """
 
     num_solutions: int = 64
@@ -196,4 +208,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

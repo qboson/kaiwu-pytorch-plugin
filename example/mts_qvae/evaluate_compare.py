@@ -30,6 +30,9 @@ def find_repo_root(start: Path) -> Path:
 
 
 def load_vae_ckpt(path: Path, device: torch.device) -> VAEBaseline:
+    # Note: weights_only=False is required because the checkpoint contains
+    # config dict that may have Path objects. We trust our own checkpoints.
+    # For untrusted checkpoints, convert config to use only primitive types.
     ckpt = torch.load(path, map_location=device, weights_only=False)
     model = VAEBaseline().to(device)
     model.load_state_dict(ckpt["model_state_dict"])
@@ -40,6 +43,8 @@ def load_vae_ckpt(path: Path, device: torch.device) -> VAEBaseline:
 def load_qvae_ckpt(path: Path, device: torch.device):
     from kaiwu.torch_plugin import RestrictedBoltzmannMachine  # noqa: E402
     from kaiwu.torch_plugin.qvae import QVAE  # noqa: E402
+    # Note: weights_only=False is required because the checkpoint contains
+    # config dict that may have Path objects. We trust our own checkpoints.
     ckpt = torch.load(path, map_location=device, weights_only=False)
     cfg = ckpt.get("config")
     if not cfg:
@@ -431,4 +436,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

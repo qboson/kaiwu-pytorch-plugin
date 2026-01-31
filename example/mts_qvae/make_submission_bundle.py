@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import fnmatch
 import os
+import sys
 import zipfile
 from pathlib import Path
 
@@ -80,4 +81,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

@@ -1,6 +1,5 @@
 import argparse
 import hashlib
-import os
 import sys
 import urllib.request
 import zipfile
@@ -198,4 +197,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

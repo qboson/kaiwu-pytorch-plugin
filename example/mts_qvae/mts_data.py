@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import argparse
 import pickle
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import torch
@@ -114,4 +115,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
