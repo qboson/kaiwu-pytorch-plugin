@@ -28,25 +28,103 @@ def find_repo_root(start: Path) -> Path:
 
 
 @dataclass
+class SimulatedAnnealingSampler:
+    """Simulated Annealing sampler for solving Ising optimization problems.
+
+    This sampler implements the Simulated Annealing algorithm to find
+    approximate solutions to the Ising model energy minimization problem.
+    Unlike RandomIsingSampler, this actually solves the optimization problem.
+
+    The Ising Hamiltonian is: H(s) = s^T * J * s
+    where s ∈ {-1, +1}^N and J is the Ising matrix.
+
+    Args:
+        num_solutions: Number of independent SA runs (returns best solutions).
+        num_sweeps: Number of Monte Carlo sweeps per run.
+        beta_start: Initial inverse temperature (low = high T = more exploration).
+        beta_end: Final inverse temperature (high = low T = more exploitation).
+        seed: Random seed for reproducibility.
+    """
+
+    num_solutions: int = 64
+    num_sweeps: int = 1000
+    beta_start: float = 0.1
+    beta_end: float = 10.0
+    seed: int = 0
+
+    def _compute_energy(self, s: np.ndarray, J: np.ndarray) -> float:
+        """Compute Ising energy: E = s^T * J * s"""
+        return float(s @ J @ s)
+
+    def _single_run(self, J: np.ndarray, rng: np.random.Generator) -> tuple:
+        """Single simulated annealing run."""
+        n = J.shape[0]
+        # Random initial state
+        s = rng.integers(0, 2, size=n) * 2 - 1  # {-1, +1}
+        s = s.astype(np.float64)
+        
+        energy = self._compute_energy(s, J)
+        best_s = s.copy()
+        best_energy = energy
+
+        # Exponential cooling schedule
+        betas = np.geomspace(self.beta_start, self.beta_end, self.num_sweeps)
+
+        for beta in betas:
+            # One sweep: try flipping each spin once
+            for i in rng.permutation(n):
+                # Compute energy delta for flipping spin i
+                # ΔE = -2 * s_i * (sum_j J_ij * s_j)
+                delta_e = -2.0 * s[i] * np.dot(J[i, :], s)
+                
+                # Metropolis acceptance
+                if delta_e < 0 or rng.random() < np.exp(-beta * delta_e):
+                    s[i] = -s[i]
+                    energy += delta_e
+                    
+                    if energy < best_energy:
+                        best_energy = energy
+                        best_s = s.copy()
+
+        return best_s, best_energy
+
+    def solve(self, ising_matrix: np.ndarray) -> np.ndarray:
+        """Solve the Ising problem using Simulated Annealing.
+
+        Args:
+            ising_matrix: (N+1, N+1) Ising matrix from BoltzmannMachine.
+
+        Returns:
+            np.ndarray: Shape (num_solutions, N+1), spins in {-1, +1}.
+        """
+        if isinstance(ising_matrix, torch.Tensor):
+            J = ising_matrix.detach().cpu().numpy()
+        else:
+            J = np.asarray(ising_matrix)
+        
+        n = J.shape[0]
+        solutions = []
+        energies = []
+
+        # Run independent SA runs with different random seeds
+        for i in range(self.num_solutions):
+            rng = np.random.default_rng(self.seed + i)
+            s, e = self._single_run(J, rng)
+            solutions.append(s)
+            energies.append(e)
+
+        # Sort by energy (best first) and return
+        order = np.argsort(energies)
+        result = np.array([solutions[i] for i in order], dtype=np.int8)
+        return result
+
+
+@dataclass
 class RandomIsingSampler:
-    """A minimal **placeholder** sampler compatible with AbstractBoltzmannMachine.sample().
+    """A minimal **placeholder** sampler (FOR TESTING ONLY).
 
-    The library expects `solve(ising_matrix)` returning a numpy array of shape (K, N+1)
-    with spins in {-1, +1}.
-
-    ⚠️ IMPORTANT LIMITATION ⚠️
-    ─────────────────────────
-    This sampler returns RANDOM binary solutions and does NOT actually solve
-    the Ising optimization problem. It is provided ONLY to make this example
-    runnable without external Kaiwu quantum/classical solvers.
-
-    For scientifically valid results when comparing QVAE vs VAE performance,
-    you MUST replace this with a real Ising solver such as:
-    - Kaiwu SDK's quantum annealing sampler
-    - Kaiwu SDK's simulated annealing sampler
-    - Other QUBO/Ising solvers
-
-    See the README.md for instructions on using real solvers.
+    ⚠️ WARNING: This returns RANDOM solutions, not optimized ones.
+    Use SimulatedAnnealingSampler for actual training.
     """
 
     num_solutions: int = 64
@@ -126,6 +204,16 @@ def main() -> int:
     parser.add_argument("--kl-beta", type=float, default=1.0)
 
     parser.add_argument("--sampler-solutions", type=int, default=64)
+    parser.add_argument(
+        "--sampler",
+        type=str,
+        choices=["sa", "random"],
+        default="sa",
+        help="Sampler type: 'sa' (SimulatedAnnealing, default) or 'random' (for fast testing only)"
+    )
+    parser.add_argument("--sa-sweeps", type=int, default=1000, help="Number of SA sweeps per run")
+    parser.add_argument("--sa-beta-start", type=float, default=0.1, help="SA initial inverse temperature")
+    parser.add_argument("--sa-beta-end", type=float, default=10.0, help="SA final inverse temperature")
     args = parser.parse_args()
 
     repo_root = find_repo_root(Path(__file__).resolve())
@@ -154,7 +242,20 @@ def main() -> int:
     decoder = MTSQVAEDecoderLogits(latent_dim=args.latent_dim, hidden_dim=512, output_dim=1540)
 
     bm = RestrictedBoltzmannMachine(num_visible=args.num_vis, num_hidden=args.num_hid)
-    sampler = RandomIsingSampler(num_solutions=args.sampler_solutions, seed=args.seed)
+    
+    # Select sampler: SimulatedAnnealing (real solver) or Random (placeholder)
+    if args.sampler == "sa":
+        print(f"Using SimulatedAnnealingSampler (sweeps={args.sa_sweeps}, beta={args.sa_beta_start}→{args.sa_beta_end})")
+        sampler = SimulatedAnnealingSampler(
+            num_solutions=args.sampler_solutions,
+            num_sweeps=args.sa_sweeps,
+            beta_start=args.sa_beta_start,
+            beta_end=args.sa_beta_end,
+            seed=args.seed,
+        )
+    else:
+        print("⚠️ Using RandomIsingSampler (placeholder - NOT for scientific results!)")
+        sampler = RandomIsingSampler(num_solutions=args.sampler_solutions, seed=args.seed)
 
     model = QVAE(
         encoder=encoder,
