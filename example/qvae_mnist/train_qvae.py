@@ -1,3 +1,14 @@
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
+"""
+QVAE训练模块
+该模块实现了一个量子启发的变分自编码器，包含训练、可视化以及下游分类任务。
+主要功能：
+1. QVAE模型的训练和保存
+2. 训练过程中的t-SNE可视化
+3. 基于QVAE特征的MLP分类器训练
+"""
 import os
 import torch
 import torch.nn as nn
@@ -10,7 +21,176 @@ from utils import save_list_to_txt
 from models import Encoder, Decoder, MLP
 from visualizers import t_SNE, plot_training_curves, create_tsne_animation
 
+def create_model(train_loader, input_dim, hidden_dim, latent_dim,
+                 weight_decay, dist_beta, num_var1, num_var2,
+                 lr, device):
+    """创建QVAE模型
+    
+    Args:
+        train_loader: 训练数据加载器
+        input_dim: 输入维度
+        hidden_dim: 隐藏层维度
+        latent_dim: 潜在空间维度
+        weight_decay: 权重衰减系数
+        dist_beta: 分布beta参数
+        num_var1: RBM可见层维度
+        num_var2: RBM隐藏层维度
+        lr: 学习率
+        device: 计算设备
+        
+    Returns:
+        tuple: (模型, 优化器)
+    """
+    # 计算数据均值
+    mean_x = 0
+    for x, _ in train_loader:
+        mean_x += x.mean(dim=0)
+    mean_x = mean_x / len(train_loader)
+    mean_x = mean_x.cpu().numpy()
 
+    # 重新创建编码器、解码器
+    encoder = Encoder(input_dim, hidden_dim, latent_dim, weight_decay)
+    decoder = Decoder(latent_dim, hidden_dim, input_dim, weight_decay)
+
+    # 初始化bm和sampler
+    rbm = RestrictedBoltzmannMachine(
+        num_visible=num_var1,
+        num_hidden=num_var2,
+        h_range=[-1, 1],
+        j_range=[-1, 1]
+    )
+    sampler = SimulatedAnnealingOptimizer(alpha=0.95)
+
+    # 创建QVAE模型（参数与训练时完全一致）
+    model = QVAE(
+        encoder=encoder,
+        decoder=decoder,
+        bm=rbm,
+        sampler=sampler,
+        dist_beta=dist_beta,
+        mean_x=mean_x,
+        num_vis=num_var1
+    ).to(device)
+
+    # 优化器
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    return model, optimizer
+
+def _train_epoch(model, train_loader, optimizer, kl_beta, device):
+    """训练单个epoch
+    
+    Args:
+        model: QVAE模型
+        train_loader: 训练数据加载器
+        optimizer: 优化器
+        kl_beta: KL散度权重
+        device: 计算设备
+        
+    Returns:
+        tuple: (平均损失, 平均负ELBO, 平均KL散度, 平均代价)
+    """
+    total_loss, total_elbo, total_kl, total_cost = 0.0, 0.0, 0.0, 0.0  # 初始化本轮累计损失等指标
+    model.train()
+
+    for batch_idx, (data, _) in enumerate(train_loader):
+        data = data.to(device)  # 将输入数据移动到指定设备（CPU/GPU）
+        optimizer.zero_grad()  # 梯度清零
+
+        # 前向传播，计算负ELBO、权重衰减、KL散度等
+        # output, recon_x, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(
+        _, _, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(
+            data, kl_beta
+        )
+        loss = neg_elbo + wd_loss  # 总损失 = 负ELBO + 权重衰减
+        loss.backward()  # 反向传播，计算梯度
+
+        optimizer.step()  # 更新模型参数
+
+        # 累加本批次的各项指标
+        total_loss += loss.item()
+        total_elbo += neg_elbo.item()
+        total_kl += kl.item()
+        total_cost += cost.item()
+
+    # 计算平均指标
+    n_batches = len(train_loader)
+    return (
+        total_loss / n_batches,
+        total_elbo / n_batches,
+        total_kl / n_batches,
+        total_cost / n_batches
+    )
+
+def _train_mlp_epoch(model, data_loader, optimizer, criterion, device):
+    """训练单个epoch
+    
+    Args:
+        model: MLP模型
+        data_loader: 训练数据加载器
+        optimizer: 优化器
+        criterion: 损失函数
+        device: 计算设备
+        
+    Returns:
+        tuple: (训练准确率, 平均训练损失)
+    """
+    train_loss, train_correct, train_total = 0, 0, 0
+    model.train()
+
+    for batch_x, batch_y in data_loader:
+        batch_x, batch_y = batch_x.to(device), batch_y.to(device)
+        optimizer.zero_grad()
+
+        outputs = model(batch_x)
+        loss = criterion(outputs, batch_y)
+        loss.backward()
+        optimizer.step()
+
+        train_loss += loss.item()
+        _, predicted = torch.max(outputs.data, 1)
+        train_total += batch_y.size(0)
+        train_correct += (predicted == batch_y).sum().item()
+
+    # 计算训练集准确率
+    train_acc = 100 * train_correct / train_total
+    avg_train_loss = train_loss / len(data_loader)
+
+    return train_acc, avg_train_loss
+
+def _eval_mlp_epoch(model, data_loader, criterion, device):
+    """验证单个epoch
+    
+    Args:
+        model: MLP模型
+        data_loader: 验证数据加载器
+        criterion: 损失函数
+        device: 计算设备
+    Returns:
+        tuple: (验证准确率, 平均验证损失)
+    """
+    val_loss, val_correct, val_total = 0, 0, 0
+    model.eval()
+
+    with torch.no_grad():
+        for batch_x, batch_y in data_loader:
+            batch_x, batch_y = batch_x.to(device), batch_y.to(device)
+
+            outputs = model(batch_x)
+            loss = criterion(outputs, batch_y)  # 计算验证损失
+            val_loss += loss.item()
+
+            _, predicted = torch.max(outputs.data, 1)
+            val_total += batch_y.size(0)
+            val_correct += (predicted == batch_y).sum().item()
+
+        # 计算测试集准确率
+        val_acc = 100 * val_correct / val_total
+        avg_val_loss = val_loss / len(data_loader)
+
+    return val_acc, avg_val_loss
+
+# ============ 训练Q-VAE模型 ============
 def train_qvae_with_tsne(
     train_loader,  # 用于训练QVAE
     test_loader,  # 用于t-SNE可视化测试数据
@@ -24,6 +204,7 @@ def train_qvae_with_tsne(
     num_var1=128,  # RBM可见层维度
     num_var2=128,  # RBM藏层维度
     dist_beta=10,  # 重叠分布的beta
+    weight_decay=0.01,
     batch_size=256,
     epochs=20,
     lr=1e-3,
@@ -34,38 +215,19 @@ def train_qvae_with_tsne(
     os.makedirs("temp_tsne_frames", exist_ok=True)
     tsne_frames = []
 
-    # 计算数据均值
-    mean_x = 0
-    for x, _ in train_loader:
-        mean_x += x.mean(dim=0)
-    mean_x = mean_x / len(train_loader)
-    mean_x = mean_x.cpu().numpy()
-
-    # 创建编码器、解码器
-    encoder = Encoder(input_dim, hidden_dim, latent_dim, weight_decay=0.01)
-    decoder = Decoder(latent_dim, hidden_dim, input_dim, weight_decay=0.01)
-
-    # 初始化bm和sampler
-    bm = RestrictedBoltzmannMachine(
-        num_visible=num_var1,
-        num_hidden=num_var2,
-    )
-    # bm = BoltzmannMachine(num_nodes=num_var1 + num_var2)
-    sampler = SimulatedAnnealingOptimizer(alpha=0.95)
-
-    # 创建Q-VAE模型
-    model = QVAE(
-        encoder=encoder,
-        decoder=decoder,
-        bm=bm,
-        sampler=sampler,
+    # 创建模型
+    model, optimizer = create_model(
+        train_loader,
+        input_dim=input_dim,
+        hidden_dim=hidden_dim,
+        latent_dim=latent_dim,
+        weight_decay=weight_decay,
         dist_beta=dist_beta,
-        mean_x=mean_x,
-        num_vis=num_var1,
-    ).to(device)
-
-    # 优化器
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        num_var1=num_var1,
+        num_var2=num_var2,
+        lr=lr,
+        device=device
+    )
 
     # 训练循环
     loss_history = []
@@ -74,37 +236,11 @@ def train_qvae_with_tsne(
     cost_history = []
 
     model.train()  # 设置模型为训练模式
-    for epoch in tqdm(range(1, epochs + 1)):  # 遍历每个训练轮次
-        total_loss, total_elbo, total_kl, total_cost = (
-            0,
-            0,
-            0,
-            0,
-        )  # 初始化本轮累计损失等指标
-        for batch_idx, (data, _) in enumerate(train_loader):
-            data = data.to(device)  # 将输入数据移动到指定设备（CPU/GPU）
-            optimizer.zero_grad()  # 梯度清零
-
-            # 前向传播，计算负ELBO、权重衰减、KL散度等
-            output, recon_x, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(
-                data, kl_beta
-            )
-            loss = neg_elbo + wd_loss  # 总损失 = 负ELBO + 权重衰减
-            loss.backward()  # 反向传播，计算梯度
-
-            optimizer.step()  # 更新模型参数
-
-            # 累加本批次的各项指标
-            total_loss += loss.item()
-            total_elbo += neg_elbo.item()
-            total_kl += kl.item()
-            total_cost += cost.item()
-
-        # 计算本轮各项指标的平均值
-        avg_loss = total_loss / len(train_loader)
-        avg_elbo = total_elbo / len(train_loader)
-        avg_kl = total_kl / len(train_loader)
-        avg_cost = total_cost / len(train_loader)
+    for epoch in tqdm(range(1, epochs + 1), desc="Training QVAE"):  # 遍历每个训练轮次
+        # 训练一个epoch
+        avg_loss, avg_elbo, avg_kl, avg_cost = _train_epoch(
+            model, train_loader, optimizer, kl_beta, device
+        )
 
         # 记录历史指标
         loss_history.append(avg_loss)
@@ -122,9 +258,11 @@ def train_qvae_with_tsne(
         # torch.save(model.state_dict(), model_save_path)
 
         # 打印本轮训练结果
-        print(
-            f"Epoch {epoch}/{epochs}: Loss: {avg_loss:.4f}, elbo: {avg_elbo:.4f}, KL: {avg_kl:.4f}, Cost: {avg_cost:.4f}"
-        )
+        print(f"Epoch {epoch}/{epochs}: "
+              f"Loss: {avg_loss:.4f}, "
+              f"elbo: {avg_elbo:.4f}, "
+              f"KL: {avg_kl:.4f}, "
+              f"Cost: {avg_cost:.4f}")
 
         # 每隔tsne_interval个epoch做一次t-SNE
         if epoch % tsne_interval == 0 or epoch == epochs:
@@ -167,40 +305,26 @@ def train_qvae(
     num_var1=128,  # RBM可见层维度
     num_var2=128,  # RBM藏层维度
     dist_beta=10,  # 重叠分布的beta
+    weight_decay=0.01,
     batch_size=256,
     epochs=20,
     lr=1e-3,
     kl_beta=0.000001,
     save_path="./models/",
 ):
-    # 计算数据均值
-    mean_x = 0
-    for x, _ in train_loader:
-        mean_x += x.mean(dim=0)
-    mean_x = mean_x / len(train_loader)
-    mean_x = mean_x.cpu().numpy()
-
-    # 创建编码器、解码器
-    encoder = Encoder(input_dim, hidden_dim, latent_dim, weight_decay=0.01)
-    decoder = Decoder(latent_dim, hidden_dim, input_dim, weight_decay=0.01)
-
-    # 初始化bm和sampler
-    rbm = RestrictedBoltzmannMachine(num_visible=num_var1, num_hidden=num_var2)
-    sampler = SimulatedAnnealingOptimizer(alpha=0.95)
-
-    # 创建Q-VAE模型
-    model = QVAE(
-        encoder=encoder,
-        decoder=decoder,
-        bm=rbm,
-        sampler=sampler,
+    # 创建模型
+    model, optimizer = create_model(
+        train_loader,
+        input_dim=input_dim,
+        hidden_dim=hidden_dim,
+        latent_dim=latent_dim,
+        weight_decay=weight_decay,
         dist_beta=dist_beta,
-        mean_x=mean_x,
-        num_vis=num_var1,
-    ).to(device)
-
-    # 优化器
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        num_var1=num_var1,
+        num_var2=num_var2,
+        lr=lr,
+        device=device
+    )
 
     # 训练循环
     loss_history = []
@@ -209,37 +333,11 @@ def train_qvae(
     cost_history = []
 
     model.train()  # 设置模型为训练模式
-    for epoch in tqdm(range(1, epochs + 1)):  # 遍历每个训练轮次
-        total_loss, total_elbo, total_kl, total_cost = (
-            0,
-            0,
-            0,
-            0,
-        )  # 初始化本轮累计损失等指标
-        for batch_idx, (data, _) in enumerate(train_loader):
-            data = data.to(device)  # 将输入数据移动到指定设备（CPU/GPU）
-            optimizer.zero_grad()  # 梯度清零
-
-            # 前向传播，计算负ELBO、权重衰减、KL散度等
-            output, recon_x, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(
-                data, kl_beta
-            )
-            loss = neg_elbo + wd_loss  # 总损失 = 负ELBO + 权重衰减
-            loss.backward()  # 反向传播，计算梯度
-
-            optimizer.step()  # 更新模型参数
-
-            # 累加本批次的各项指标
-            total_loss += loss.item()
-            total_elbo += neg_elbo.item()
-            total_kl += kl.item()
-            total_cost += cost.item()
-
-        # 计算本轮各项指标的平均值
-        avg_loss = total_loss / len(train_loader)
-        avg_elbo = total_elbo / len(train_loader)
-        avg_kl = total_kl / len(train_loader)
-        avg_cost = total_cost / len(train_loader)
+    for epoch in tqdm(range(1, epochs + 1), desc="Training QVAE"):  # 遍历每个训练轮次
+        # 训练一个epoch
+        avg_loss, avg_elbo, avg_kl, avg_cost = _train_epoch(
+            model, train_loader, optimizer, kl_beta, device
+        )
 
         # 记录历史指标
         loss_history.append(avg_loss)
@@ -257,9 +355,11 @@ def train_qvae(
         # torch.save(model.state_dict(), model_save_path)
 
         # 打印本轮训练结果
-        print(
-            f"Epoch {epoch}/{epochs}: Loss: {avg_loss:.4f}, elbo: {avg_elbo:.4f}, KL: {avg_kl:.4f}, Cost: {avg_cost:.4f}"
-        )
+        print(f"Epoch {epoch}/{epochs}: "
+              f"Loss: {avg_loss:.4f}, "
+              f"elbo: {avg_elbo:.4f}, "
+              f"KL: {avg_kl:.4f}, "
+              f"Cost: {avg_cost:.4f}")
 
     # 保存模型
     model_save_path = os.path.join(save_path, f"qvae_mnist.pth")
@@ -281,8 +381,9 @@ def extract_qvae_latent_features(qvae, dataloader):
 
             # Q-VAE前向传播，获取潜变量zeta
             # Q-VAE的forward返回: (recon_x, posterior, q, zeta)
-            _, _, _, zeta = qvae(data)
+            _, _, q, zeta = qvae(data)
 
+            # all_features.append(zeta.cpu())
             all_features.append(zeta.cpu())
             all_labels.append(labels)
 
@@ -334,50 +435,23 @@ def train_mlp_classifier(
 
     # 训练循环
     best_acc = 0
-    for epoch in range(epochs):
+    for epoch in tqdm(range(1, epochs + 1), desc="Training MLP"):
         # 训练阶段
-        mlp.train()
-        train_loss = 0
-        train_correct = 0
-        train_total = 0
-        for batch_x, batch_y in train_loader:
-            batch_x, batch_y = batch_x.to(device), batch_y.to(device)
-            optimizer.zero_grad()
-
-            outputs = mlp(batch_x)
-            loss = criterion(outputs, batch_y)
-            loss.backward()
-            optimizer.step()
-
-            train_loss += loss.item()
-            _, predicted = torch.max(outputs.data, 1)
-            train_total += batch_y.size(0)
-            train_correct += (predicted == batch_y).sum().item()
-
-        # 计算训练集准确率
-        train_acc = 100 * train_correct / train_total
-        avg_train_loss = train_loss / len(train_loader)
+        train_acc, avg_train_loss = _train_mlp_epoch(
+            model=mlp,
+            data_loader=train_loader,
+            optimizer=optimizer,
+            criterion=criterion,
+            device=device
+        )
 
         # 验证阶段
-        mlp.eval()
-        val_loss = 0
-        val_correct = 0
-        val_total = 0
-        with torch.no_grad():
-            for batch_x, batch_y in val_loader:
-                batch_x, batch_y = batch_x.to(device), batch_y.to(device)
-
-                outputs = mlp(batch_x)
-                loss = criterion(outputs, batch_y)  # 计算验证损失
-                val_loss += loss.item()
-
-                _, predicted = torch.max(outputs.data, 1)
-                val_total += batch_y.size(0)
-                val_correct += (predicted == batch_y).sum().item()
-
-        # 计算测试集准确率
-        val_acc = 100 * val_correct / val_total
-        avg_val_loss = val_loss / len(val_loader)
+        val_acc, avg_val_loss = _eval_mlp_epoch(
+            model=mlp,
+            data_loader=val_loader,
+            criterion=criterion,
+            device=device
+        )
 
         # 记录历史
         train_loss_history.append(avg_train_loss)
@@ -402,6 +476,8 @@ def train_mlp_classifier(
 
     print(f"Best Validation Accuracy: {best_acc:.2f}%")
 
+    # 绘制训练曲线
+    curves_save_path = ""
     if not smoke_test:
         curves_save_path = os.path.join(
             save_path, f"mlp_training_curves_epochs_{epochs}.png"
