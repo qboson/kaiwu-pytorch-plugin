@@ -53,19 +53,18 @@ def create_model(train_loader, input_dim, hidden_dim, latent_dim,
     decoder = Decoder(latent_dim, hidden_dim, input_dim, weight_decay)
 
     # 初始化bm和sampler
-    rbm = RestrictedBoltzmannMachine(
+    bm = RestrictedBoltzmannMachine(
         num_visible=num_var1,
         num_hidden=num_var2,
-        h_range=[-1, 1],
-        j_range=[-1, 1]
     )
+    # bm = BoltzmannMachine(num_nodes=num_var1 + num_var2)
     sampler = SimulatedAnnealingOptimizer(alpha=0.95)
 
     # 创建QVAE模型（参数与训练时完全一致）
     model = QVAE(
         encoder=encoder,
         decoder=decoder,
-        bm=rbm,
+        bm=bm,
         sampler=sampler,
         dist_beta=dist_beta,
         mean_x=mean_x,
@@ -294,7 +293,6 @@ def train_qvae_with_tsne(
     model_save_path = os.path.join(save_path, f"qvae_mnist.pth")
     torch.save(model.state_dict(), model_save_path)
     return model
-
 
 def train_qvae(
     train_loader,  # 用于训练QVAE
