@@ -1,4 +1,4 @@
-<img width="300" height="299" alt="交流群" src="https://github.com/user-attachments/assets/3d2f554e-98ca-4596-9fa4-51aad649ca81" /><img width="300" height="299" alt="交流群" src="https://github.com/user-attachments/assets/3d2f554e-98ca-4596-9fa4-51aad649ca81" /><img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
+<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
 # Kaiwu-Pytorch-Plugin
 
