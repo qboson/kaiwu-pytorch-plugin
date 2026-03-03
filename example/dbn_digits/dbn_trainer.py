@@ -11,6 +11,8 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin.dbn import UnsupervisedDBN
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
 
 # =================== Unsupervised DBN Trainer =====================
 class DBNTrainer:
@@ -30,6 +32,7 @@ class DBNTrainer:
         plot_img=False,
         random_state=None,
         dbn_ref=None,
+        use_cim=False,
     ):
         """Initializes the DBNTrainer.
 
@@ -62,7 +65,17 @@ class DBNTrainer:
         self.plot_img = plot_img
         self.random_state = random_state
 
-        self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+        if use_cim:
+            sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+            self.sampler = PrecisionReducer(
+                sampler,
+                precision=8,
+                truncated_precision=10,
+                target_bits=550,
+                only_feasible_solution=False,
+            )
+        else:
+            self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
         self.dbn_ref = dbn_ref
 
     def train(self, dbn, data_in):
@@ -429,6 +442,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
     """
     Scikit-learn兼容的DBN预训练
     """
+
     def __init__(
         self,
         hidden_layers_structure=[100, 100],
@@ -439,7 +453,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
         shuffle=True,
         drop_last=False,
         plot_img=False,
-        random_state=None
+        random_state=None,
     ):
         self.hidden_layers_structure = hidden_layers_structure
         self.learning_rate_rbm = learning_rate_rbm
@@ -450,7 +464,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
         self.drop_last = drop_last
         self.plot_img = plot_img
         self.random_state = random_state
-        
+
         # 创建模型和训练器
         self._dbn = UnsupervisedDBN(hidden_layers_structure)
         self._trainer = DBNTrainer(
@@ -461,7 +475,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
             shuffle=shuffle,
             drop_last=drop_last,
             plot_img=plot_img,
-            random_state=random_state
+            random_state=random_state,
         )
 
     def fit(self, X, y=None):
@@ -483,7 +497,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
     def device(self):
         """返回device - 使用底层模型的属性"""
         return self._dbn.device
-    
+
     @property
     def _n_layers(self):
         """返回层数 - 使用底层模型的属性"""

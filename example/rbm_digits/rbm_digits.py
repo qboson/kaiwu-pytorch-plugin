@@ -22,6 +22,7 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 
 def _ensure_result_dir():
@@ -51,6 +52,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         verbose=False,
         plot_img=False,
         random_state=None,
+        use_cim=False,
     ):
         self.n_components = n_components
         self.learning_rate = learning_rate
@@ -61,6 +63,17 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         self.random_state = random_state
 
         self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+        if use_cim:
+            sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+            sampler = PrecisionReducer(
+                sampler,
+                precision=8,
+                truncated_precision=10,
+                target_bits=550,
+                only_feasible_solution=False,
+            )
+        else:
+            sampler = SimulatedAnnealingOptimizer()
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.rbm = None  # 用于存储训练好的RBM模型
 
