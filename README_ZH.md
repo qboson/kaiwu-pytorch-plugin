@@ -53,7 +53,7 @@ graph TD
 
 ### 安装要求
 - python == 3.10
-- kaiwu == v1.2.0
+- kaiwu == v1.3.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
