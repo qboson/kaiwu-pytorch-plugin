@@ -454,6 +454,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
         drop_last=False,
         plot_img=False,
         random_state=None,
+        use_cim=False,
     ):
         self.hidden_layers_structure = hidden_layers_structure
         self.learning_rate_rbm = learning_rate_rbm
@@ -476,6 +477,7 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
             drop_last=drop_last,
             plot_img=plot_img,
             random_state=random_state,
+            use_cim=use_cim,
         )
 
     def fit(self, X, y=None):

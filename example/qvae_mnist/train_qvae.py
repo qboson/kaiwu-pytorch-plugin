@@ -238,6 +238,7 @@ def train_qvae_with_tsne(
     lr=1e-3,
     kl_beta=0.000001,
     save_path="./models/",
+    sampler_type="sa",
 ):
     # 创建保存临时图像的文件夹
     os.makedirs("temp_tsne_frames", exist_ok=True)
@@ -255,6 +256,7 @@ def train_qvae_with_tsne(
         num_var2=num_var2,
         lr=lr,
         device=device,
+        sampler_type=sampler_type,
     )
 
     # 训练循环
@@ -341,6 +343,7 @@ def train_qvae(
     lr=1e-3,
     kl_beta=0.000001,
     save_path="./models/",
+    sampler_type="sa",
 ):
     # 创建模型
     model, optimizer = create_model(
@@ -354,6 +357,7 @@ def train_qvae(
         num_var2=num_var2,
         lr=lr,
         device=device,
+        sampler_type=sampler_type,
     )
 
     # 训练循环
