@@ -9,6 +9,7 @@ import torch
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
 
+import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin.dbn import UnsupervisedDBN
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
@@ -66,6 +67,7 @@ class DBNTrainer:
         self.random_state = random_state
 
         if use_cim:
+            kw.common.CheckpointManager.save_dir = './tmp'
             sampler = CIMOptimizer(task_name="test_kpp", wait=True)
             self.sampler = PrecisionReducer(
                 sampler,

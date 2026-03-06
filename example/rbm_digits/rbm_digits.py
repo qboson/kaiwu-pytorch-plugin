@@ -20,6 +20,7 @@ from sklearn.metrics import confusion_matrix
 
 import torch
 from torch.optim import SGD
+import kaiwu as kw
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
@@ -64,6 +65,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
 
         self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
         if use_cim:
+            kw.common.CheckpointManager.save_dir = './tmp'
             sampler = CIMOptimizer(task_name="test_kpp", wait=True)
             sampler = PrecisionReducer(
                 sampler,

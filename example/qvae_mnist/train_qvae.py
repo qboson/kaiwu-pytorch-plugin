@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
+import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
@@ -73,6 +74,7 @@ def create_model(
     )
     # bm = BoltzmannMachine(num_nodes=num_var1 + num_var2)
     if sampler_type == "cim":
+        kw.common.CheckpointManager.save_dir = './tmp'
         sampler = CIMOptimizer(task_name="test_kpp", wait=True)
         sampler = PrecisionReducer(
             sampler,
