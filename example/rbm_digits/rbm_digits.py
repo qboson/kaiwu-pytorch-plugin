@@ -63,19 +63,20 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         self.plot_img = plot_img
         self.random_state = random_state
 
-        self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
         if use_cim:
             kw.common.CheckpointManager.save_dir = './tmp'
             sampler = CIMOptimizer(task_name="test_kpp", wait=True)
-            sampler = PrecisionReducer(
+            self.sampler = PrecisionReducer(
                 sampler,
                 precision=8,
                 truncated_precision=10,
                 target_bits=550,
                 only_feasible_solution=False,
             )
+            print("Using CIM optimizer")
         else:
-            sampler = SimulatedAnnealingOptimizer()
+            self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+            print("Using Simulated Annealing optimizer")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.rbm = None  # 用于存储训练好的RBM模型
 
@@ -129,8 +130,8 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 x = X_torch[batch_slice]  # 获取当前batch数据
 
                 x = rbm.get_hidden(x)  # 正相（计算隐层激活）
-                # s = rbm.sample(self.sampler)  # 负相（采样重构数据）
-                s = rbm.get_visible(x[:, rbm.num_visible :])  # 使用隐藏层重构可见层
+                s = rbm.sample(self.sampler)  # 负相（采样重构数据）
+                # s = rbm.get_visible(x[:, rbm.num_visible :])  # 使用隐藏层重构可见层
                 opt_rbm.zero_grad()  # 梯度清零
 
                 # 计算目标函数（等价于负对数似然），并加权衰减项
