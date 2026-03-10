@@ -1,9 +1,11 @@
 import torch
 
 import kaiwu as kw
+from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from torch.optim import SGD
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
 
 # 添加licence认证
 # print("User ID:", os.getenv("USER_ID"), "SDK Code:", os.getenv("SDK_CODE"))
@@ -14,8 +16,20 @@ if __name__ == "__main__":
     USE_QPU = False
     NUM_READS = 1
     SAMPLE_SIZE = 1
+    USE_CIM = False
 
-    sampler = SimulatedAnnealingOptimizer(size_limit=NUM_READS)
+    if USE_CIM:
+        kw.common.CheckpointManager.save_dir = './tmp'
+        sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+        sampler = PrecisionReducer(
+            sampler,
+            precision=8,
+            truncated_precision=10,
+            target_bits=550,
+            only_feasible_solution=False,
+        )
+    else:
+        sampler = SimulatedAnnealingOptimizer()
     num_nodes = 5
     num_visible = 2
     x = 1.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))

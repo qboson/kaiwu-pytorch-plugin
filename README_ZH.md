@@ -53,7 +53,7 @@ graph TD
 
 ### 安装要求
 - python == 3.10
-- kaiwu == v1.2.0
+- kaiwu == v1.3.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -123,7 +123,19 @@ from kaiwu.classical import SimulatedAnnealingOptimizer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
-    sampler = SimulatedAnnealingOptimizer()
+    USE_CIM = False
+
+    if USE_CIM:
+        sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+        sampler = PrecisionReducer(
+            sampler,
+            precision=8,
+            truncated_precision=10,
+            target_bits=550,
+            only_feasible_solution=False
+        )
+    else:
+        sampler = SimulatedAnnealingOptimizer()
     num_nodes = 50
     num_visible = 20
     x = 1 - 2.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))

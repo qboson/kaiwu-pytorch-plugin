@@ -15,17 +15,32 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
+
+import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
 from utils import save_list_to_txt
 from models import Encoder, Decoder, MLP
 from visualizers import t_SNE, plot_training_curves, create_tsne_animation
 
-def create_model(train_loader, input_dim, hidden_dim, latent_dim,
-                 weight_decay, dist_beta, num_var1, num_var2,
-                 lr, device):
+
+def create_model(
+    train_loader,
+    input_dim,
+    hidden_dim,
+    latent_dim,
+    weight_decay,
+    dist_beta,
+    num_var1,
+    num_var2,
+    lr,
+    device,
+    sampler_type="sa",
+):
     """创建QVAE模型
-    
+
     Args:
         train_loader: 训练数据加载器
         input_dim: 输入维度
@@ -37,7 +52,7 @@ def create_model(train_loader, input_dim, hidden_dim, latent_dim,
         num_var2: RBM隐藏层维度
         lr: 学习率
         device: 计算设备
-        
+        sampler_type: 采样器类型，包括"sampler", "cim"
     Returns:
         tuple: (模型, 优化器)
     """
@@ -58,7 +73,20 @@ def create_model(train_loader, input_dim, hidden_dim, latent_dim,
         num_hidden=num_var2,
     )
     # bm = BoltzmannMachine(num_nodes=num_var1 + num_var2)
-    sampler = SimulatedAnnealingOptimizer(alpha=0.95)
+    if sampler_type == "cim":
+        kw.common.CheckpointManager.save_dir = './tmp'
+        sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+        sampler = PrecisionReducer(
+            sampler,
+            precision=8,
+            truncated_precision=10,
+            target_bits=550,
+            only_feasible_solution=False,
+        )
+    elif sampler_type == "sa":
+        sampler = SimulatedAnnealingOptimizer(alpha=0.95)
+    else:
+        raise ValueError(f"Unsupported sampler type: {sampler_type}")
 
     # 创建QVAE模型（参数与训练时完全一致）
     model = QVAE(
@@ -68,7 +96,7 @@ def create_model(train_loader, input_dim, hidden_dim, latent_dim,
         sampler=sampler,
         dist_beta=dist_beta,
         mean_x=mean_x,
-        num_vis=num_var1
+        num_vis=num_var1,
     ).to(device)
 
     # 优化器
@@ -76,20 +104,22 @@ def create_model(train_loader, input_dim, hidden_dim, latent_dim,
 
     return model, optimizer
 
+
 def _train_epoch(model, train_loader, optimizer, kl_beta, device):
     """训练单个epoch
-    
+
     Args:
         model: QVAE模型
         train_loader: 训练数据加载器
         optimizer: 优化器
         kl_beta: KL散度权重
         device: 计算设备
-        
+
     Returns:
         tuple: (平均损失, 平均负ELBO, 平均KL散度, 平均代价)
     """
-    total_loss, total_elbo, total_kl, total_cost = 0.0, 0.0, 0.0, 0.0  # 初始化本轮累计损失等指标
+    total_loss, total_elbo, total_kl, total_cost = 0.0, 0.0, 0.0, 0.0
+    # 初始化本轮累计损失等指标
     model.train()
 
     for batch_idx, (data, _) in enumerate(train_loader):
@@ -98,9 +128,7 @@ def _train_epoch(model, train_loader, optimizer, kl_beta, device):
 
         # 前向传播，计算负ELBO、权重衰减、KL散度等
         # output, recon_x, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(
-        _, _, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(
-            data, kl_beta
-        )
+        _, _, neg_elbo, wd_loss, kl, cost, _, _ = model.neg_elbo(data, kl_beta)
         loss = neg_elbo + wd_loss  # 总损失 = 负ELBO + 权重衰减
         loss.backward()  # 反向传播，计算梯度
 
@@ -118,19 +146,20 @@ def _train_epoch(model, train_loader, optimizer, kl_beta, device):
         total_loss / n_batches,
         total_elbo / n_batches,
         total_kl / n_batches,
-        total_cost / n_batches
+        total_cost / n_batches,
     )
+
 
 def _train_mlp_epoch(model, data_loader, optimizer, criterion, device):
     """训练单个epoch
-    
+
     Args:
         model: MLP模型
         data_loader: 训练数据加载器
         optimizer: 优化器
         criterion: 损失函数
         device: 计算设备
-        
+
     Returns:
         tuple: (训练准确率, 平均训练损失)
     """
@@ -157,9 +186,10 @@ def _train_mlp_epoch(model, data_loader, optimizer, criterion, device):
 
     return train_acc, avg_train_loss
 
+
 def _eval_mlp_epoch(model, data_loader, criterion, device):
     """验证单个epoch
-    
+
     Args:
         model: MLP模型
         data_loader: 验证数据加载器
@@ -189,6 +219,7 @@ def _eval_mlp_epoch(model, data_loader, criterion, device):
 
     return val_acc, avg_val_loss
 
+
 # ============ 训练Q-VAE模型 ============
 def train_qvae_with_tsne(
     train_loader,  # 用于训练QVAE
@@ -209,6 +240,7 @@ def train_qvae_with_tsne(
     lr=1e-3,
     kl_beta=0.000001,
     save_path="./models/",
+    sampler_type="sa",
 ):
     # 创建保存临时图像的文件夹
     os.makedirs("temp_tsne_frames", exist_ok=True)
@@ -225,7 +257,8 @@ def train_qvae_with_tsne(
         num_var1=num_var1,
         num_var2=num_var2,
         lr=lr,
-        device=device
+        device=device,
+        sampler_type=sampler_type,
     )
 
     # 训练循环
@@ -257,11 +290,13 @@ def train_qvae_with_tsne(
         # torch.save(model.state_dict(), model_save_path)
 
         # 打印本轮训练结果
-        print(f"Epoch {epoch}/{epochs}: "
-              f"Loss: {avg_loss:.4f}, "
-              f"elbo: {avg_elbo:.4f}, "
-              f"KL: {avg_kl:.4f}, "
-              f"Cost: {avg_cost:.4f}")
+        print(
+            f"Epoch {epoch}/{epochs}: "
+            f"Loss: {avg_loss:.4f}, "
+            f"elbo: {avg_elbo:.4f}, "
+            f"KL: {avg_kl:.4f}, "
+            f"Cost: {avg_cost:.4f}"
+        )
 
         # 每隔tsne_interval个epoch做一次t-SNE
         if epoch % tsne_interval == 0 or epoch == epochs:
@@ -294,6 +329,7 @@ def train_qvae_with_tsne(
     torch.save(model.state_dict(), model_save_path)
     return model
 
+
 def train_qvae(
     train_loader,  # 用于训练QVAE
     device,
@@ -309,6 +345,7 @@ def train_qvae(
     lr=1e-3,
     kl_beta=0.000001,
     save_path="./models/",
+    sampler_type="sa",
 ):
     # 创建模型
     model, optimizer = create_model(
@@ -321,7 +358,8 @@ def train_qvae(
         num_var1=num_var1,
         num_var2=num_var2,
         lr=lr,
-        device=device
+        device=device,
+        sampler_type=sampler_type,
     )
 
     # 训练循环
@@ -353,11 +391,13 @@ def train_qvae(
         # torch.save(model.state_dict(), model_save_path)
 
         # 打印本轮训练结果
-        print(f"Epoch {epoch}/{epochs}: "
-              f"Loss: {avg_loss:.4f}, "
-              f"elbo: {avg_elbo:.4f}, "
-              f"KL: {avg_kl:.4f}, "
-              f"Cost: {avg_cost:.4f}")
+        print(
+            f"Epoch {epoch}/{epochs}: "
+            f"Loss: {avg_loss:.4f}, "
+            f"elbo: {avg_elbo:.4f}, "
+            f"KL: {avg_kl:.4f}, "
+            f"Cost: {avg_cost:.4f}"
+        )
 
     # 保存模型
     model_save_path = os.path.join(save_path, f"qvae_mnist.pth")
@@ -440,15 +480,12 @@ def train_mlp_classifier(
             data_loader=train_loader,
             optimizer=optimizer,
             criterion=criterion,
-            device=device
+            device=device,
         )
 
         # 验证阶段
         val_acc, avg_val_loss = _eval_mlp_epoch(
-            model=mlp,
-            data_loader=val_loader,
-            criterion=criterion,
-            device=device
+            model=mlp, data_loader=val_loader, criterion=criterion, device=device
         )
 
         # 记录历史
