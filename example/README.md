@@ -91,6 +91,14 @@ torchmetrics[image]
 
 ---
 
+### Paper Reproduction: MTS-VAE (VAE vs QBM-VAE/QVAE)
+
+This example targets Issue #26: reproducing the MTS-VAE paper pipeline and replacing the VAE prior with the QBM-VAE (QVAE) implementation in this repo, using the paper's official Zenodo dataset.
+
+Run instructions and scripts live under `example/mts_qvae/README.md`.
+
+---
+
 ### Representation Learning: Latent Feature Extraction and Classification
 
 This extended example demonstrates how pre-trained Q-VAE representations can be leveraged for downstream classification tasks, embodying the core principle that "learning representations of the data that make it easier to extract useful information when building classifiers or other predictors" (Bengio, 2013). The main contents include:
