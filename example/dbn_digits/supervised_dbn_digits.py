@@ -22,6 +22,7 @@ from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
 from dbn_trainer import DBNPretrainer
 
+
 def translate_image(image, direction):
     "图片转换"
     if direction == "up":
@@ -34,6 +35,7 @@ def translate_image(image, direction):
         return shift(image, [0, 1], mode="constant", cval=0)
     else:
         raise ValueError("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
+
 
 def load_data(plot_img=False):
     "载入图片数据"
@@ -59,11 +61,11 @@ def load_data(plot_img=False):
 
     # 可视化图像数据和标签
     if plot_img:
-        plt.figure(figsize=(16,9))
+        plt.figure(figsize=(16, 9))
         for index in range(5):
-            plt.subplot(1,5, index + 1)
+            plt.subplot(1, 5, index + 1)
             plt.imshow(expanded_images[index], origin="lower", cmap="gray")
-            plt.title('Training: %i\n' % expanded_labels[index], fontsize = 18)
+            plt.title("Training: %i\n" % expanded_labels[index], fontsize=18)
 
     # 将图像数据展平为二维数组 (n_samples, 64)
     n_samples = expanded_images.shape[0]
@@ -81,14 +83,14 @@ def load_data(plot_img=False):
     return X_train, X_test, y_train, y_test
 
 
-        
 # =================== 抽象监督DBN =====================
 class AbstractSupervisedDBN(BaseEstimator, ABC):
     """
     抽象监督DBN类，传递练无监督预训以及定义接口用于下游任务(微调网络和分类器)
     """
+
     def __init__(
-        self, 
+        self,
         hidden_layers_structure=[100, 100],
         learning_rate_rbm=0.1,
         n_epochs_rbm=10,
@@ -97,13 +99,14 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         plot_img=False,
         random_state=None,
         # 新增微调参数
-        fine_tuning=False,             # 是否进行微调
-        learning_rate=0.1,             # 微调学习率
-        n_iter_backprop=100,           # 反向传播迭代次数
-        l2_regularization=1e-4,        # L2正则化
-        activation_function='sigmoid', # 激活函数
-        dropout_p=0.0                  # Dropout概率
-        ):
+        fine_tuning=False,  # 是否进行微调
+        learning_rate=0.1,  # 微调学习率
+        n_iter_backprop=100,  # 反向传播迭代次数
+        l2_regularization=1e-4,  # L2正则化
+        activation_function="sigmoid",  # 激活函数
+        dropout_p=0.0,  # Dropout概率
+        use_cim=False,
+    ):
         # 无监督网络配置
         self.hidden_layers_structure = hidden_layers_structure
         self.learning_rate_rbm = learning_rate_rbm
@@ -112,7 +115,7 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         self.verbose = verbose
         self.plot_img = plot_img
         self.random_state = random_state
-        
+
         # 监督微调配置
         self.fine_tuning = fine_tuning
         self.learning_rate = learning_rate
@@ -120,7 +123,7 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         self.l2_regularization = l2_regularization
         self.activation_function = activation_function
         self.dropout_p = dropout_p
-        
+
         # 网络组件
         self.fine_tune_network = None
         self.classifier = None
@@ -131,8 +134,9 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
             n_epochs_rbm=self.n_epochs_rbm,
             verbose=self.verbose,
             plot_img=self.plot_img,
-            random_state=self.random_state
-            )
+            random_state=self.random_state,
+            use_cim=use_cim,
+        )
 
     def pre_train(self, X):
         """预训练无监督网络"""
@@ -144,11 +148,11 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         X, y = check_X_y(X, y)
         y_encoded = self.label_encoder.fit_transform(y)
         self.classes_ = self.label_encoder.classes_
-        
+
         # 预训练阶段
         if pre_train:
             self.pre_train(X)
-        
+
         # 根据模式选择训练方式
         if self.fine_tuning:
             # 微调阶段
@@ -168,19 +172,19 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         """预测 - 根据模式选择预测方法"""
         check_is_fitted(self)
         X = check_array(X)
-        
+
         if self.fine_tuning:
             predictions = self._predict_with_fine_tuning(X)
         else:
             predictions = self._predict_with_classifier(X)
-            
+
         return self.label_encoder.inverse_transform(predictions)
 
     def predict_proba(self, X):
         """预测概率"""
         check_is_fitted(self)
         X = check_array(X)
-        
+
         if self.fine_tuning:
             return self._predict_proba_fine_tuning(X)
         else:
@@ -225,51 +229,63 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
     def save_parameters(self, file_prefix="dbn_model"):
         """保存模型参数"""
         os.makedirs("data", exist_ok=True)
-        
+
         # 保存预训练参数（两种模式都需要）
         if self.unsupervised_dbn and self.unsupervised_dbn._n_layers > 0:
             for i in range(self.unsupervised_dbn._n_layers):
                 rbm = self.unsupervised_dbn.get_rbm_layer(i)  # 使用 get_rbm_layer
                 weights = rbm.quadratic_coef.detach().cpu().numpy()
-                h_bias = rbm.linear_bias[rbm.num_visible:].detach().cpu().numpy()
+                h_bias = rbm.linear_bias[rbm.num_visible :].detach().cpu().numpy()
                 np.save(f"data/{file_prefix}_pretrain_layer{i}_weights.npy", weights)
                 np.save(f"data/{file_prefix}_pretrain_layer{i}_bias.npy", h_bias)
-            print(f"Pre-trained parameters saved for {self.unsupervised_dbn._n_layers} layers")
-        
+            print(
+                f"Pre-trained parameters saved for {self.unsupervised_dbn._n_layers} layers"
+            )
+
         # 保存微调参数（仅微调模式）
-        if self.fine_tuning and hasattr(self, 'fine_tune_network') and self.fine_tune_network is not None:
+        if (
+            self.fine_tuning
+            and hasattr(self, "fine_tune_network")
+            and self.fine_tune_network is not None
+        ):
             for i, layer in enumerate(self.fine_tune_network):
                 if isinstance(layer, nn.Linear):
                     weights = layer.weight.detach().cpu().numpy()
                     bias = layer.bias.detach().cpu().numpy()
-                    np.save(f"data/{file_prefix}_finetune_layer{i}_weights.npy", weights)
+                    np.save(
+                        f"data/{file_prefix}_finetune_layer{i}_weights.npy", weights
+                    )
                     np.save(f"data/{file_prefix}_finetune_layer{i}_bias.npy", bias)
-            print(f"Fine-tuned parameters saved for {len([l for l in self.fine_tune_network if isinstance(l, nn.Linear)])} layers")
-        
+            print(
+                "Fine-tuned parameters saved for "
+                f"{len([l for l in self.fine_tune_network if isinstance(l, nn.Linear)])} layers"
+            )
+
         # 保存分类器参数（仅分类器模式）
-        if not self.fine_tuning and hasattr(self, 'classifier') and self.classifier is not None:
+        if (
+            not self.fine_tuning
+            and hasattr(self, "classifier")
+            and self.classifier is not None
+        ):
             import joblib
+
             classifier_path = f"data/{file_prefix}_classifier.pkl"
             joblib.dump(self.classifier, classifier_path)
             print(f"Classifier parameters saved to {classifier_path}")
-        
+
         print("All parameters saved successfully!")
+
 
 class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
     """
     抽象监督DBN，提供下游分类器训练和fine-tuning相关的通用工具
     """
-    def __init__(
-        self, 
-        classifier_type='logistic',
-        clf_C=1.0, 
-        clf_iter=100, 
-        **kwargs
-        ):
+
+    def __init__(self, classifier_type="logistic", clf_C=1.0, clf_iter=100, **kwargs):
         # 确保fine_tuning参数有默认值
-        if 'fine_tuning' not in kwargs:
-            kwargs['fine_tuning'] = True
-            
+        if "fine_tuning" not in kwargs:
+            kwargs["fine_tuning"] = True
+
         super().__init__(**kwargs)
         self.classifier_type = classifier_type
         self.clf_C = clf_C
@@ -279,39 +295,37 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         """训练下游分类器"""
         if self.verbose:
             print(f"Training pipline classifier: {self.classifier_type}")
-        
+
         # 提取特征
         X_features = self.transform(X)
-        
+
         # 初始化分类器
-        if self.classifier_type == 'logistic':
+        if self.classifier_type == "logistic":
             from sklearn.linear_model import LogisticRegression
+
             self.classifier = LogisticRegression(
-                C=self.clf_C,
-                max_iter=self.clf_iter,
-                random_state=self.random_state
+                C=self.clf_C, max_iter=self.clf_iter, random_state=self.random_state
             )
-        elif self.classifier_type == 'svm':
+        elif self.classifier_type == "svm":
             from sklearn.svm import SVC
+
             self.classifier = SVC(
-                C=self.clf_C,
-                probability=True,
-                random_state=self.random_state
+                C=self.clf_C, probability=True, random_state=self.random_state
             )
-        elif self.classifier_type == 'random_forest':
+        elif self.classifier_type == "random_forest":
             from sklearn.ensemble import RandomForestClassifier
+
             self.classifier = RandomForestClassifier(
-                n_estimators=100,
-                random_state=self.random_state
+                n_estimators=100, random_state=self.random_state
             )
         else:
             raise ValueError(f"Unsupported classifier type: {self.classifier_type}")
 
         # 训练分类器
         self.classifier.fit(X_features, y)
-        
+
         if self.verbose:
-            train_accuracy = self.classifier.score(X_features, y)*100
+            train_accuracy = self.classifier.score(X_features, y) * 100
             print(f"Classifier training accuracy: {train_accuracy:.2f}%")
 
     def _predict_with_classifier(self, X):
@@ -329,44 +343,38 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         """使用预训练权重初始化层"""
         with torch.no_grad():
             weights = rbm.quadratic_coef.detach().cpu().numpy()
-            h_bias = rbm.linear_bias[rbm.num_visible:].detach().cpu().numpy()
+            h_bias = rbm.linear_bias[rbm.num_visible :].detach().cpu().numpy()
             layer.weight.data = torch.FloatTensor(weights.T)
             layer.bias.data = torch.FloatTensor(h_bias)
 
     def _get_activation_layer(self):
         """获取激活函数层"""
         activation_map = {
-            'sigmoid': nn.Sigmoid(),
-            'relu': nn.ReLU(),
+            "sigmoid": nn.Sigmoid(),
+            "relu": nn.ReLU(),
             # 'tanh': nn.Tanh(),
             # 'leaky_relu': nn.LeakyReLU(),
         }
-        
+
         if self.activation_function not in activation_map:
             raise ValueError(f"Unsupported activation: {self.activation_function}")
-        
+
         return activation_map[self.activation_function]
 
     def _create_optimizer(self, parameters):
         """创建优化器"""
         return SGD(
-            parameters,
-            lr=self.learning_rate,
-            weight_decay=self.l2_regularization
+            parameters, lr=self.learning_rate, weight_decay=self.l2_regularization
         )
 
     def _create_data_loader(self, X_tensor, y_tensor, shuffle=True):
         """创建数据加载器"""
         dataset = TensorDataset(X_tensor, y_tensor)
-        return DataLoader(
-            dataset, 
-            batch_size=self.batch_size, 
-            shuffle=shuffle
-        )
+        return DataLoader(dataset, batch_size=self.batch_size, shuffle=shuffle)
 
     def get_feature_importance(self):
         """获取特征重要性（适用于分类器模式）"""
-        if not self.fine_tuning and hasattr(self.classifier, 'coef_'):
+        if not self.fine_tuning and hasattr(self.classifier, "coef_"):
             return np.abs(self.classifier.coef_[0])
         else:
             print("Feature importance is only available in classifier mode")
@@ -378,28 +386,28 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         """
         if self.unsupervised_dbn is None or self.unsupervised_dbn._n_layers == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
-        
+
         X_data = X.astype(np.float32)
         all_activations = {}
-        
+
         # 逐层前向传播计算激活值，直到指定层
         for i in range(self.unsupervised_dbn._n_layers):
             rbm = self.unsupervised_dbn.get_rbm_layer(i)
             with torch.no_grad():
                 X_tensor = torch.FloatTensor(X_data).to(self.unsupervised_dbn.device)
                 hidden_output = rbm.get_hidden(X_tensor)
-                
+
                 # 提取隐藏层激活值（去掉可见层部分）
-                layer_activation = hidden_output[:, rbm.num_visible:].cpu().numpy()
+                layer_activation = hidden_output[:, rbm.num_visible :].cpu().numpy()
                 all_activations[i] = layer_activation
-                
+
                 # 更新输入数据为当前层输出，用于下一层
                 X_data = layer_activation
-            
+
             # 如果只需要特定层，且已经到达该层，可以提前终止
             if layer_index is not None and i == layer_index and not return_all_layers:
                 return layer_activation
-        
+
         if return_all_layers:
             return all_activations
         else:
@@ -408,7 +416,9 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
                 if layer_index in all_activations:
                     return all_activations[layer_index]
                 else:
-                    raise ValueError(f"Layer index {layer_index} out of range. Model has {self.unsupervised_dbn._n_layers} layers.")
+                    raise ValueError(
+                        f"Layer index {layer_index} out of range. Model has {self.unsupervised_dbn._n_layers} layers."
+                    )
             else:
                 # 返回最后一层
                 return all_activations[self.unsupervised_dbn._n_layers - 1]
@@ -419,6 +429,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
     """
     PyTorch实现的监督DBN分类器
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -426,45 +437,45 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         """微调实现"""
         if self.verbose:
             print("Starting fine-tuning...")
-        
+
         self._build_fine_tune_network()
-        
+
         # 转换为PyTorch张量
         X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
         y_tensor = torch.LongTensor(y).to(self.unsupervised_dbn.device)
-        
+
         # 训练微调网络
         self._train_fine_tune_network(X_tensor, y_tensor)
-    
+
     def _build_fine_tune_network(self):
         """构建微调网络"""
         layers = []
-        
+
         if self.unsupervised_dbn._n_layers > 0:
             first_rbm = self.unsupervised_dbn.get_rbm_layer(0)
             input_size = first_rbm.num_visible
-        
+
         # 构建隐藏层（使用预训练权重初始化）
         for i in range(self.unsupervised_dbn._n_layers):  # 使用新的接口方法遍历层
             rbm = self.unsupervised_dbn.get_rbm_layer(i)
             hidden_size = self.hidden_layers_structure[i]
-            
+
             linear_layer = nn.Linear(input_size, hidden_size)
             self._initialize_layer_with_pretrained(linear_layer, rbm)
             layers.append(linear_layer)
             layers.append(self._get_activation_layer())
-            
+
             if self.dropout_p > 0:
                 layers.append(nn.Dropout(self.dropout_p))
-                
+
             input_size = hidden_size
-        
+
         # 输出层
         output_layer = nn.Linear(input_size, len(self.classes_))
         layers.append(output_layer)
-        
+
         self.fine_tune_network = nn.Sequential(*layers)
-        
+
         if self.verbose:
             print(f"Built fine-tuning network with {len(layers)} layers")
             print(f"Input size: {self.unsupervised_dbn.get_rbm_layer(0).num_visible}")
@@ -475,33 +486,35 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         criterion = nn.CrossEntropyLoss()
         optimizer = self._create_optimizer(self.fine_tune_network.parameters())
         loader = self._create_data_loader(X_tensor, y_tensor, shuffle=True)
-        
+
         self.fine_tune_network.train()
-        
+
         for epoch in range(self.n_iter_backprop):
             running_loss = 0.0
             correct = 0
             total = 0
-            
+
             for batch_X, batch_y in loader:
                 optimizer.zero_grad()
                 outputs = self.fine_tune_network(batch_X)
                 loss = criterion(outputs, batch_y)
                 loss.backward()
                 optimizer.step()
-                
+
                 running_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
                 total += batch_y.size(0)
                 correct += (predicted == batch_y).sum().item()
-            
+
             # 打印训练信息
             if self.verbose and (epoch + 1) % 10 == 0:
                 accuracy = 100 * correct / total
                 avg_loss = running_loss / len(loader)
-                print(f"Fine-tuning Epoch {epoch+1}/{self.n_iter_backprop}, "
-                      f"Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%")
-        
+                print(
+                    f"Fine-tuning Epoch {epoch+1}/{self.n_iter_backprop}, "
+                    f"Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%"
+                )
+
         if self.verbose:
             final_accuracy = 100 * correct / total
             print("Fine-tuning completed. ")
@@ -511,7 +524,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         """使用微调网络预测 - 具体实现"""
         X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
         self.fine_tune_network.eval()
-        
+
         with torch.no_grad():
             outputs = self.fine_tune_network(X_tensor)
             _, predicted = torch.max(outputs, 1)
@@ -521,7 +534,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         """使用微调网络预测概率 - 具体实现"""
         X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
         self.fine_tune_network.eval()
-        
+
         with torch.no_grad():
             outputs = self.fine_tune_network(X_tensor)
             return torch.softmax(outputs, dim=1).cpu().numpy()
@@ -529,33 +542,46 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
     def get_network_structure(self):
         """获取网络结构信息"""
         structure = {
-            'pretrain_layers': self.unsupervised_dbn._n_layers,
-            'fine_tune_layers': len(list(self.fine_tune_network)) if hasattr(self, 'fine_tune_network') and self.fine_tune_network else 0,
-            'hidden_units': self.hidden_layers_structure,
-            'num_classes': len(self.classes_),
-            'mode': 'fine_tuning' if self.fine_tuning else 'classifier'
+            "pretrain_layers": self.unsupervised_dbn._n_layers,
+            "fine_tune_layers": (
+                len(list(self.fine_tune_network))
+                if hasattr(self, "fine_tune_network") and self.fine_tune_network
+                else 0
+            ),
+            "hidden_units": self.hidden_layers_structure,
+            "num_classes": len(self.classes_),
+            "mode": "fine_tuning" if self.fine_tuning else "classifier",
         }
         return structure
 
+
 class RBMVisualizer:
-    def __init__(self, result_dir='results'):
+    def __init__(self, result_dir="results"):
         """可视化工具类
-        
+
         Args:
             result_dir (str): 结果保存目录
         """
         self.result_dir = result_dir
         self._ensure_result_dir()
-        
+
     def _ensure_result_dir(self):
         """确保结果目录存在"""
         os.makedirs(self.result_dir, exist_ok=True)
 
     # 绘制权重
-    def plot_weights(self, rbm, n_visible=64, grid_shape=(8, 16), figsize=(16, 7), 
-                     title_suffix="RBM Weights", save_as="qbm_weights", save_pdf=False):
+    def plot_weights(
+        self,
+        rbm,
+        n_visible=64,
+        grid_shape=(8, 16),
+        figsize=(16, 7),
+        title_suffix="RBM Weights",
+        save_as="qbm_weights",
+        save_pdf=False,
+    ):
         """绘制RBM权重
-        
+
         Args:
             rbm: RBM模型
             n_visible (int): 可见单元数量
@@ -566,30 +592,48 @@ class RBMVisualizer:
             save_pdf (bool): 是否保存为PDF
         """
         weights = rbm.quadratic_coef.detach().cpu().numpy()
-    
-        fig, axes = plt.subplots(grid_shape[0], grid_shape[1], 
-                                 gridspec_kw={'wspace':0.1, 'hspace':0.1}, 
-                                 figsize=figsize)
-        fig.suptitle(f'{rbm.num_hidden} components extracted by RBM - {title_suffix}', fontsize=16)
+
+        fig, axes = plt.subplots(
+            grid_shape[0],
+            grid_shape[1],
+            gridspec_kw={"wspace": 0.1, "hspace": 0.1},
+            figsize=figsize,
+        )
+        fig.suptitle(
+            f"{rbm.num_hidden} components extracted by RBM - {title_suffix}",
+            fontsize=16,
+        )
         fig.subplots_adjust()
-    
+
         for i, ax in enumerate(axes.flatten()):
             if i < weights.shape[1]:
                 # 重塑权重为图像形状
-                weight_img = weights[:, i].reshape(int(np.sqrt(n_visible)), int(np.sqrt(n_visible)))
+                weight_img = weights[:, i].reshape(
+                    int(np.sqrt(n_visible)), int(np.sqrt(n_visible))
+                )
                 ax.imshow(weight_img, cmap=plt.cm.gray)
-            ax.axis('off')
-    
+            ax.axis("off")
+
         # 保存结果
         if save_pdf:
-            plt.savefig(f'{self.result_dir}/{save_as}.pdf', 
-                        dpi=300, bbox_inches='tight', format='pdf')
+            plt.savefig(
+                f"{self.result_dir}/{save_as}.pdf",
+                dpi=300,
+                bbox_inches="tight",
+                format="pdf",
+            )
         plt.show()
-    
-    def plot_confusion_matrix(self, y_true, y_pred, 
-                              title_suffix="", save_as="confusion_matrix", save_pdf=False):
+
+    def plot_confusion_matrix(
+        self,
+        y_true,
+        y_pred,
+        title_suffix="",
+        save_as="confusion_matrix",
+        save_pdf=False,
+    ):
         """绘制混淆矩阵
-        
+
         Args:
             y_true: 真实标签
             y_pred: 预测标签
@@ -599,22 +643,35 @@ class RBMVisualizer:
         """
         cm = confusion_matrix(y_true, y_pred)
         plt.figure(figsize=(10, 8))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-        plt.title(f'Confusion Matrix ({title_suffix})', fontsize=18)
-        plt.xlabel('Predicted Label', fontsize=16)
-        plt.ylabel('True Label', fontsize=16)
-        
+        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+        plt.title(f"Confusion Matrix ({title_suffix})", fontsize=18)
+        plt.xlabel("Predicted Label", fontsize=16)
+        plt.ylabel("True Label", fontsize=16)
+
         if save_pdf:
-            plt.savefig(f'{self.result_dir}/{save_as}_{title_suffix}.pdf', 
-                        dpi=300, bbox_inches='tight', format='pdf')
+            plt.savefig(
+                f"{self.result_dir}/{save_as}_{title_suffix}.pdf",
+                dpi=300,
+                bbox_inches="tight",
+                format="pdf",
+            )
         plt.tight_layout()
         plt.show()
 
-    def plot_reconstructed_images(self, rbm, X, y, layer_index=0, n_images=10, 
-                                  title_suffix="", save_pdf=False, img_shape=None):
+    def plot_reconstructed_images(
+        self,
+        rbm,
+        X,
+        y,
+        layer_index=0,
+        n_images=10,
+        title_suffix="",
+        save_pdf=False,
+        img_shape=None,
+    ):
         """
         绘制原始和重构图像的对比
-        
+
         Args:
             X: 输入图像数据
             y: 图像标签
@@ -624,64 +681,74 @@ class RBMVisualizer:
             save_pdf: 是否保存为PDF
             img_shape: 图像形状，如(8,8)。如果为None，则尝试自动推断
         """
-        
+
         # 限制图像数量
         n_images = min(n_images, X.shape[0])
         X_sample = X[:n_images]
         y_sample = y[:n_images]
-        
+
         # 重构图像
         X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
-        
+
         # 推断图像形状
         if img_shape is None:
             n_features = X_sample.shape[1]
             img_size = int(np.sqrt(n_features))
             if img_size * img_size == n_features:
                 img_shape = (img_size, img_size)
-        
+
         # 创建图形
-        fig, axes = plt.subplots(2, n_images, figsize=(2*n_images, 4))
+        fig, axes = plt.subplots(2, n_images, figsize=(2 * n_images, 4))
         if n_images == 1:
             axes = axes.reshape(2, 1)
-        
+
         # 设置标题
-        plt.suptitle(f'Original vs Reconstructed Images ({title_suffix})', fontsize=16)
-        
+        plt.suptitle(f"Original vs Reconstructed Images ({title_suffix})", fontsize=16)
+
         # 绘制图像
         for i in range(n_images):
             # 原始图像
             if img_shape[0] * img_shape[1] == X_sample.shape[1]:
-                axes[0, i].imshow(X_sample[i].reshape(img_shape), cmap='gray')
+                axes[0, i].imshow(X_sample[i].reshape(img_shape), cmap="gray")
             else:
                 # 如果形状不匹配，显示前img_shape[0]*img_shape[1]个像素
-                axes[0, i].imshow(X_sample[i][:img_shape[0]*img_shape[1]].reshape(img_shape), cmap='gray')
-            axes[0, i].set_title(f'Label: {y_sample[i]}', fontsize=10)
-            axes[0, i].axis('off')
-            
+                axes[0, i].imshow(
+                    X_sample[i][: img_shape[0] * img_shape[1]].reshape(img_shape),
+                    cmap="gray",
+                )
+            axes[0, i].set_title(f"Label: {y_sample[i]}", fontsize=10)
+            axes[0, i].axis("off")
+
             # 重构图像
             if img_shape[0] * img_shape[1] == X_recon.shape[1]:
-                axes[1, i].imshow(X_recon[i].reshape(img_shape), cmap='gray')
+                axes[1, i].imshow(X_recon[i].reshape(img_shape), cmap="gray")
             else:
-                axes[1, i].imshow(X_recon[i][:img_shape[0]*img_shape[1]].reshape(img_shape), cmap='gray')
-            axes[1, i].set_title(f'Recon (err: {recon_errors[i]:.4f})', fontsize=10)
-            axes[1, i].axis('off')
-        
+                axes[1, i].imshow(
+                    X_recon[i][: img_shape[0] * img_shape[1]].reshape(img_shape),
+                    cmap="gray",
+                )
+            axes[1, i].set_title(f"Recon (err: {recon_errors[i]:.4f})", fontsize=10)
+            axes[1, i].axis("off")
+
         # 添加y轴标签
-        axes[0, 0].set_ylabel('Original', rotation=90, size=12)
-        axes[1, 0].set_ylabel('Reconstructed', rotation=90, size=12)
-        
+        axes[0, 0].set_ylabel("Original", rotation=90, size=12)
+        axes[1, 0].set_ylabel("Reconstructed", rotation=90, size=12)
+
         plt.tight_layout()
-        
+
         # 保存结果
         if save_pdf:
-            plt.savefig(f'results/reconstructed_images_{title_suffix}.pdf', 
-                        dpi=300, bbox_inches='tight', format='pdf')
-        
+            plt.savefig(
+                f"results/reconstructed_images_{title_suffix}.pdf",
+                dpi=300,
+                bbox_inches="tight",
+                format="pdf",
+            )
+
         plt.show()
-        
+
         # 打印平均重构误差
         avg_error = np.mean(recon_errors)
         print(f"Average reconstruction error: {avg_error:.4f}")
-        
+
         return recon_errors
