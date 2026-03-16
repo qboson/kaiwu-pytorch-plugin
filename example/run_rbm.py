@@ -1,9 +1,11 @@
 import torch
 
-import kaiwu as kw
 from torch.optim import SGD
+import kaiwu as kw
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 
@@ -19,7 +21,7 @@ if __name__ == "__main__":
     USE_CIM = False
 
     if USE_CIM:
-        kw.common.CheckpointManager.save_dir = './tmp'
+        kw.common.CheckpointManager.save_dir = "./tmp"
         sampler = CIMOptimizer(task_name="test_kpp", wait=True)
         sampler = PrecisionReducer(
             sampler,

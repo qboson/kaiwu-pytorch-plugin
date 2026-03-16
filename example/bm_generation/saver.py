@@ -1,4 +1,5 @@
 """用于保存信息"""
+
 import os
 from datetime import datetime
 import torch
@@ -6,6 +7,7 @@ import torch
 
 class Saver:
     """用于保存信息"""
+
     def __init__(self, log_path="./log"):
         """初始化"""
         self.log_path = log_path
@@ -21,7 +23,7 @@ class Saver:
             interation_path (str): 二次项系数的路径
             t_run (float): 计算运行时间
         """
-        save_path = os.path.join(save_path,f'rbm_model{output_i}.pth')
+        save_path = os.path.join(save_path, f"rbm_model{output_i}.pth")
         print(f"time: {time}, save_path: {save_path}")
         torch.save(model, save_path)
 
@@ -35,5 +37,5 @@ class Saver:
             output_i (int): 计算步数
         """
         print(f"step:{output_i}, kl_div:{kl_div}, ncl:{ncl}, cost:{func}")
-        with open(os.path.join(self.log_path, 'loss.txt'), 'a', encoding="utf8") as f:
+        with open(os.path.join(self.log_path, "loss.txt"), "a", encoding="utf8") as f:
             f.write(f"step:{output_i}, kl_div:{kl_div}, ncl:{ncl}, cost:{func}\n")
