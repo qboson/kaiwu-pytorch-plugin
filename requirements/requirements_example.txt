@@ -1,6 +1,6 @@
 scikit-learn
 matplotlib
 scipy
-torchvision==0.22.0
+torchvision==0.16.0
 torchmetrics[image]
 seaborn
