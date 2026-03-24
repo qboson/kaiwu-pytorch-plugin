@@ -1,10 +1,10 @@
 <img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
-# Kaiwu-Pytorch-Plugin
+# Kaiwu-PyTorch-Plugin
 
 **Language Versions**: [Chinese](README_ZH.md) | [English](README.md)
 
-For using Kaiwu-Pytorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/).
+For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/).
 
 ## Project Overview
 
