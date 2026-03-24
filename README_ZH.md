@@ -1,11 +1,11 @@
 <img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version">
 <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
-# Kaiwu-Pytorch-Plugin
+# Kaiwu-PyTorch-Plugin
 
 **语言版本**: [中文](README_ZH.md) | [English](README.md)
 
-Kaiwu-Pytorch-Plugin使用请参考[**文档**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/) 
+Kaiwu-PyTorch-Plugin使用请参考[**文档**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/) 
 
 ## 项目简介
 
@@ -215,4 +215,4 @@ if __name__ == "__main__":
 2. 玻色量子官方助手，真机申请及合作咨询
 3. 邮箱联系方式：developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png)   ![communication group](https://github.com/user-attachments/assets/dcf1e7ef-e16c-4be6-a979-d7ccc528b02d)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png)   ![communication group](https://github.com/user-attachments/assets/b6ecb9a3-75cb-4801-b6ea-b436e74c9564)
