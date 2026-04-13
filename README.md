@@ -12,6 +12,13 @@ For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://
 
 A Restricted Boltzmann Machine is an energy-based unsupervised learning model consisting of a visible layer and a hidden layer, with full connections between layers but no connections within a layer. Its core idea is to model the probability distribution of data through an energy function and train weights using algorithms such as Contrastive Divergence (CD), allowing the model to learn hidden features of input data. RBMs are commonly used for feature extraction, dimensionality reduction, or collaborative filtering, and are also the foundation for building more complex models. A Boltzmann Machine is a fully connected stochastic neural network where all neurons can be interconnected (including within the visible and hidden layers). Traditional sampling methods for BMs are inefficient, and quantum computing provides a new approach.
 
+The examples containing applications of `kaiwu-pytorch-plugin` can be run via the corresponding Jupyter notebooks:
+
+-   **QVAE for MNIST classification/generation**: `example/qvae_mnist/train_qvae.ipynb`
+-   **BM for RNA sequence generation**: `example/qvae_mnist/train_bm.ipynb`, `example/qvae_mnist/sample_bm.ipynb`
+-   **DBN for digits classification**: `example/qvae_mnist/supervised_dbn_digits.ipynb`
+-   **RBM for digits classification**: `example/qvae_mnist/rbm_digits.ipynb`
+
 ```mermaid
 graph TD
     subgraph kaiwu-torch-plugin
@@ -30,6 +37,8 @@ graph TD
         test_rbm[test_rbm.py] --> rbm
     end
 ```
+
+
 The above image shows the project file structure:
 - The Kaiwu-torch-plugin section of the code includes base class, Restricted Boltzmann Machine, and Boltzmann Machine.
 - The example section of the code includes two examples: qvae for generating digits and digits for digit recognition.

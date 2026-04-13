@@ -13,24 +13,66 @@ Kaiwu-PyTorch-Plugin使用请参考[**文档**](https://kaiwu-pytorch-plugin-doc
 
 受限玻尔兹曼机是一种基于能量的无监督学习模型，由可见层和隐藏层构成，层间全连接但层内无连接。其核心思想是通过能量函数建模数据的概率分布，利用对比散度（Contrastive Divergence，CD）等算法训练权重，使模型能够学习输入数据的隐含特征。受限玻尔兹曼机常用于特征提取、降维或协同过滤，也是构建更复杂模型的基础。玻尔兹曼机是一种全连接的随机神经网络，所有神经元之间都可能存在连接（包括可见层和隐藏层内部），对于BM传统的采样方法效率较低，量子计算提供了一种新的方法。
 
+example中包含kaiwu-pytorch-plugin的应用，运行实例可以运行对应jupyter notebook：
+- **QVAE实现MNIST分类/生成**：`example/qvae_mnist/train_qvae.ipynb`
+- **BM实现RNA序列生成**：`example/qvae_mnist/train_bm.ipynb`,`example/qvae_mnist/sample_bm.ipynb`
+- **DBN实现digits分类**：`example/qvae_mnist/supervised_dbn_digits.ipynb`
+- **RBM实现digits数字分类**：`example/qvae_mnist/rbm_digits.ipynb`
+
+
 ```mermaid
 graph TD
+    %% 定义核心库节点
     subgraph kaiwu-torch-plugin
-        bm[full_boltzmann_machine.py] -->abm[abstract_boltzmann_machine.py]
-        rbm[restricted_boltzmann_machine.py] -->abm
+        dbn_core["dbn.py"]
+        fbm_core["full_boltzmann_machine.py"]
+        qvae_core["qvae.py"]
+        qvae_dist_core["qvae_dist_util.py"]
+        rbm_core["restricted_boltzmann_machine.py"]
+        rbm_abstract["abstract_boltzmann_machine.py"]
     end
-    subgraph example
-        rbm_example_d1[rbm_digits.py] --> rbm
-        rbm_example_d2[rbm_digits.ipynb] --> rbm_example_d1
-        rbm_example_v1[qvae.py] --> rbm
-        rbm_example_v2 --> rbm_example_v3[dist_util.py] 
-        rbm_example_v2[train_qvae.ipynb] --> rbm_example_v1
+
+    %% BM Generation 示例
+    subgraph example_bm["example/bm_generation"]
+        bm_train_py["train_bm.ipynb"] --> bm_trainer_py["trainer.py"]
+        bm_sample_ipynb["sample_bm.ipynb"] --> bm_loader_py["data_loader.py"]
+        bm_trainer_py --> fbm_core
+        bm_loader_py --> fbm_core
+        bm_train_py --> bm_loader_py
     end
-    subgraph test
-        test_bm[test_bm.py] --> bm
-        test_rbm[test_rbm.py] --> rbm
+
+    %% DBN Digits 示例
+    subgraph example_dbn["example/dbn_digits"]
+        dbn_sup_py["supervised_dbn_digits.py"] --> dbn_trainer_py["dbn_trainer.py"]
+        dbn_sup_ipynb["supervised_dbn_digits.ipynb"] --> dbn_sup_py
+        dbn_trainer_py --> dbn_core
+    end
+
+    %% QVAE MNIST 示例
+    subgraph example_qvae["example/qvae_mnist"]
+        qvae_train_py["train_qvae.py"] --> qvae_models_py["models.py"]
+        qvae_train_ipynb["train_qvae.ipynb"] --> qvae_train_py
+        qvae_class_ipynb["train_qvae_classifier.ipynb"] --> qvae_train_py
+        
+        qvae_train_py --> qvae_core
+        qvae_models_py --> qvae_core
+        qvae_train_py --> qvae_utils_py["utils.py"]
+    end
+
+    %% RBM Digits 示例
+    subgraph example_rbm["example/rbm_digits"]
+        rbm_digits_py["rbm_digits.py"] --> rbm_class_py["rbm_classifier.py"]
+        rbm_digits_ipynb["rbm_digits.ipynb"] --> rbm_digits_py
+        rbm_class_py --> rbm_core
+        rbm_core --> rbm_abstract
+        fbm_core --> rbm_abstract
+        qvae_core --> rbm_core
+        qvae_core --> fbm_core
+        qvae_core --> qvae_dist_core
+        dbn_core --> rbm_core
     end
 ```
+
 上图是项目文件结构：
 - kaiwu-torch-plugin部分的代码包含基类，受限玻尔兹曼机和玻尔兹曼机
 - example部分的代码包含qvae生成数字和digits数字识别这两个示例
@@ -172,8 +214,6 @@ if __name__ == "__main__":
 - 特征提取与分类：RBM训练完成后，利用其隐层输出的特征表示，通过逻辑回归进行分类评估；
 - 可视化分析：支持训练过程中的样本生成与权重可视化功能，便于观察和判断模型学习效果。
 
-运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
-
 
 ### 生成任务：Q-VAE的MNIST图像生成
 
@@ -182,8 +222,6 @@ if __name__ == "__main__":
 - 模型构建：构建Q-VAE模型架构，包括编码器、解码器模块及RBM隐变量建模过程；
 - 训练过程：设计和实现完整的训练循环，记录损失、证据下界（ELBO）、KL散度等指标，同时支持模型断点保存；
 - 可视化与生成：提供原始图像、重构图像和生成图像的可视化对比方法，便于直观评估模型效果。
-
-运行该实例可以运行`example/qvae_mnist/train_qvae.ipynb`
 
 ![](imgs/qvae.png)
 
