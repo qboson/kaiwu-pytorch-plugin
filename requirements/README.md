@@ -11,7 +11,7 @@ A quick and easy setup for running Jupyter notebooks in a Dockerized environment
 
 ## Getting Started
 
-Build the the image for the Jupyter Notebook server:
+Build the image for the Jupyter Notebook server:
 
 ```bash
 docker compose build
