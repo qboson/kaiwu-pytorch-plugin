@@ -95,33 +95,32 @@ Project structure required:
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt
-├── kaiwu-1.3.1-py3-none-any.whl   # Downloaded from Kaiwu platform
+├── kaiwu-1.3.1-py3-none-any.whl   # Downloaded from Qboson platform
 └── docker/
     └── Dockerfile
 ```
 
 1. **Clone the repository:**:
    ```bash
-   # It is recommended to use conda to create a new environment
-   conda create -n quantum_env python=3.10
-   conda activate quantum_env
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   cd kaiwu-pytorch-plugin/requirements
    ```
 
 2. **Place the Kaiwu SDK wheel:**:
 Download kaiwu-1.3.1-py3-none-any.whl from the Kaiwu SDK download page and place it in the project root.
 
-3. Build the Docker image:
+3. **Build the Docker image**:
    ```bash
    docker compose build
    ```
 
-4. Start the Jupyter notebook server:
+4. **Start the Jupyter notebook server**:
    ```bash
    docker compose up
    ```
-The notebook will be available at http://localhost:8888 (no token required). Your local ./work folder is mounted inside the container.
+The notebook will be available at http://localhost:8888 (no token required). Your local `./work` folder is mounted inside the container.
 
-5. Stop the server:
+5. **Stop the server**:
 Press Ctrl+C, then run:
    ```bash
    docker compose down
