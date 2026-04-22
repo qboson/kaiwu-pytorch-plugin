@@ -107,7 +107,7 @@ requirements/
    ```
 
 2. **Place the Kaiwu SDK wheel:**:
-Download kaiwu-1.3.1-py3-none-any.whl from the Kaiwu SDK download page and place it in the project root.
+Download `kaiwu-1.3.1-py3-none-any.whl` from the Kaiwu SDK download page and place it in the `requirements` folder.
 
 3. **Build the Docker image**:
    ```bash
@@ -121,7 +121,7 @@ Download kaiwu-1.3.1-py3-none-any.whl from the Kaiwu SDK download page and place
 The notebook will be available at http://localhost:8888 (no token required). Your local `./work` folder is mounted inside the container.
 
 5. **Stop the server**:
-Press Ctrl+C, then run:
+Press `Ctrl+C`, then run:
    ```bash
    docker compose down
    ```
