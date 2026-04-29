@@ -1,6 +1,8 @@
 scikit-learn
 matplotlib
 scipy
+pandas
+requests
 torchvision==0.22.0
 torchmetrics[image]
 seaborn
