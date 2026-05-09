@@ -1,0 +1,13 @@
+services:
+  jupyter:
+    # platform: linux/amd64   # 强制使用 x86_64 架构镜像
+    build: 
+      context: .
+      dockerfile: ./docker/Dockerfile
+    image: jupyter/kpp-notebook
+    volumes:
+      - ./work:/home/jovyan/work
+    ports:
+      - 8888:8888
+    container_name: jupyter_notebook
+    command: "start-notebook.sh --NotebookApp.token="
