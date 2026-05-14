@@ -1,13 +1,17 @@
-# KPP QVAE 单细胞表征学习
+﻿# KPP QVAE 单细胞表征学习
 
 本目录提供一个基于 `kaiwu-pytorch-plugin` 的 QVAE 单细胞表征学习实现。流程包括读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 UMAP、分析能量分布，并用细胞类型标签评估聚类质量。
+
 ## 依赖
 ```
-kaiwu==1.1.0a0
+kaiwu==1.3.1
 kaiwu-torch-plugin==0.1.0
 torch==2.7.0
 anndata
 scanpy
+leidenalg
+scib_metrics
+scgraph
 ```
 
 ## 文件结构
@@ -18,10 +22,12 @@ kpp_qvae/
 ├── trainer.py                 # 数据准备、模型构建、训练循环、表征和 energy 提取
 ├── visualization.py           # 训练曲线、UMAP 和 energy 图
 ├── train_qvae_cell.py         # 命令行入口
-├── evaluate_clustering.py      # Leiden 聚类指标评估
+├── evaluate_clustering.py      # 旧版 Leiden 聚类评估入口
+├── evaluate_benchmark.py       # 统一评估入口
 ├── scripts/
 │   ├── train.sh               # 当前训练命令
-│   └── eval.sh                # 当前评估命令
+│   ├── eval_clustering.sh                # 聚类评估命令
+│   └── eval.sh           # 综合评估命令
 └── README.md
 ```
 
@@ -82,25 +88,66 @@ qvae_energy_umap.png              # energy UMAP
 qvae_energy_by_celltype.png       # cell type energy 分布
 ```
 
-## 聚类评估
+## 评估
+
+统一评估入口为 `evaluate_benchmark.py`，通过 `--metrics` 选择要运行的评估项：
+
+|评估方法|作用|
+|----|----|
+|clustering   |     Leiden 聚类指标：ARI, AMI, NMI, Homogeneity, FMI（越高越好）|
+|classification |   Logistic Regression 下游细胞类型分类 |
+|scib     |         scIB 生物保留和批次校正指标，即是否既保留了细胞类型结构，又消除了不必要的批次效应 |
+|scgraph |          scGraph 图结构评价 |
+|dpt  |             DPT 伪时序和轨迹一致性，即是否能产生合理的细胞发育/状态变化顺序 |
+|all |              运行以上所有评估项 |
+
+只跑聚类评估：
 
 ```bash
-bash scripts/eval.sh
+python evaluate_benchmark.py \
+  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --rep-key X_qvae \
+  --label-key final_annotation \
+  --metrics clustering
 ```
 
+跑分类评估：
 
-评估脚本会扫描多个 Leiden resolution，并输出：
+```bash
+python evaluate_benchmark.py \
+  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --rep-key X_qvae \
+  --label-key final_annotation \
+  --metrics classification
+```
+
+跑多个评估项：
+
+```bash
+python evaluate_benchmark.py \
+  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --rep-key X_qvae \
+  --label-key final_annotation \
+  --batch-key batch \
+  --metrics clustering,classification,scib,scgraph
+```
+
+跑 DPT：
+
+```bash
+python evaluate_benchmark.py \
+  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --rep-key X_qvae \
+  --label-key final_annotation \
+  --metrics dpt \
+  --root-cell-type HSPCs
+```
+
+`bash scripts/eval.sh` 等价于运行 `--metrics clustering`。结果会保存为对应的 CSV，并汇总到：
 
 ```text
-ARI, AMI, NMI, Homogeneity, FMI, n_clusters
+<output_dir>/X_qvae_benchmark_summary.csv
 ```
-
-结果保存为：
-
-```text
-<output_dir>/X_qvae_clustering_metrics.csv
-```
-
 ## 关键参数
 
 ```text

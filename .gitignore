@@ -163,6 +163,9 @@ example/qvae_mnist/models/
 example/bm_generation/log/
 example/bm_generation/test/
 data
-tmp.sh
+tmp*
 example/rbm_digits/results/
 example/dbn_digits/results/
+example/qvae_cell/output*/
+*.h5ad
+

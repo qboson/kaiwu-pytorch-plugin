@@ -15,19 +15,22 @@ from visualization import (
     setup_plotting,
 )
 
-
 DATASET_PARAMS = {
+    # 数据集相关字段集中管理，后续新增数据集时只需要扩展这里。
     "immune": {
         "dataset_name": "immune",
         "batch_key": "batch",
         "labels_key": "final_annotation",
-        "file_path": "../immune_processed.h5ad",
+        "file_path": "./immune_processed.h5ad",
     }
 }
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Train KPP QVAE for single-cell representations.")
+    """解析训练、采样器和输出路径相关参数。"""
+    parser = argparse.ArgumentParser(
+        description="Train KPP QVAE for single-cell representations."
+    )
     parser.add_argument("--dataset", default="immune", choices=sorted(DATASET_PARAMS))
     parser.add_argument("--data-path", default=None)
     parser.add_argument("--output-dir", default="./outputs_immune_sa")
@@ -42,7 +45,9 @@ def parse_args():
     parser.add_argument("--latent-dim", type=int, default=256)
     parser.add_argument("--num-visible", type=int, default=128)
     parser.add_argument("--num-hidden", type=int, default=128)
-    parser.add_argument("--normalization-method", default="layer", choices=["layer", "batch"])
+    parser.add_argument(
+        "--normalization-method", default="layer", choices=["layer", "batch"]
+    )
     parser.add_argument("--dist-beta", type=float, default=10.0)
     parser.add_argument("--kl-beta", type=float, default=1e-5)
     parser.add_argument("--lr", type=float, default=1e-4)
@@ -71,6 +76,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    # 用户指定 GPU 但环境不可用时自动回退 CPU，避免脚本直接失败。
     args.device_obj = torch.device(args.device if torch.cuda.is_available() else "cpu")
     set_seed(args.seed)
     setup_plotting()
@@ -81,6 +87,7 @@ def main():
     if args.data_path is not None:
         params["file_path"] = args.data_path
 
+    # 读取 AnnData，并统一处理 obs_names，避免 scanpy 后续邻接图/UMAP 步骤出现重复索引。
     print(f"Using device: {args.device_obj}")
     print(f"Loading data from: {params['file_path']}")
     adata = anndata.read_h5ad(params["file_path"])
@@ -90,34 +97,45 @@ def main():
     x = trainer.adata_to_array(adata)
     batch_indices = trainer.batch_indices(adata, params["batch_key"])
     train_loader, val_loader, eval_loader = trainer.make_loaders(x, batch_indices)
-    model, vae_optimizer, bm_optimizer = trainer.create_model(adata.n_vars, train_loader)
+    # 模型维度依赖输入基因数和 batch 类别数，因此在数据加载后创建。
+    model, vae_optimizer, bm_optimizer = trainer.create_model(
+        adata.n_vars, train_loader
+    )
 
     weights_path = os.path.join(args.output_dir, f"{args.dataset}_kpp_qvae_best.pth")
     if args.load_weights:
+        # 只加载已训练权重时，跳过训练并直接提取表示。
         model.load_state_dict(torch.load(weights_path, map_location=args.device_obj))
         print(f"Loaded weights from {weights_path}")
     else:
+        # 训练过程会保存最佳验证集权重，同时记录训练曲线用于诊断。
         history = trainer.train(
             model, train_loader, val_loader, vae_optimizer, bm_optimizer, weights_path
         )
         pd.DataFrame(history).to_csv(
             os.path.join(args.output_dir, "training_history.csv"), index=False
         )
-        plot_training_history(history, os.path.join(args.output_dir, "training_curves.png"))
+        plot_training_history(
+            history, os.path.join(args.output_dir, "training_curves.png")
+        )
         print(f"Best weights saved to {weights_path}")
 
+    # 提取 q 或 zeta 表示，写入 AnnData 的 obsm，便于 scanpy 和 benchmark 脚本复用。
     reps = trainer.extract_representation(model, eval_loader)
     adata.obsm["X_qvae"] = reps
     np.save(os.path.join(args.output_dir, "X_qvae.npy"), reps)
     print(f"Representation shape: {reps.shape}")
 
+    # 用 QVAE 表示构图并计算 UMAP，输出按 cell type 和 batch 着色的可视化结果。
     sc.pp.neighbors(adata, use_rep="X_qvae", n_neighbors=15)
     sc.tl.umap(adata, random_state=args.seed)
     save_umap_plots(adata, params["labels_key"], params["batch_key"], args.output_dir)
 
+    # BM 能量可用于观察不同细胞类型在量子/玻尔兹曼潜空间中的分布差异。
     adata.obs["QVAE_Energy"] = trainer.compute_energy(model, eval_loader)
     save_energy_plots(adata, params["labels_key"], args.output_dir)
 
+    # 保存完整 h5ad，包含原始 obs/var、QVAE 表示、UMAP 和能量列。
     adata.write_h5ad(os.path.join(args.output_dir, f"{args.dataset}_kpp_qvae.h5ad"))
     print(f"Outputs saved under: {args.output_dir}")
 
