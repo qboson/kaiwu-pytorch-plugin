@@ -208,7 +208,14 @@ class Trainer:
         best_state = None
         patience = 0
 
-        for epoch in tqdm(range(1, self.args.epochs + 1), desc="Training KPP QVAE"):
+        progress = tqdm(
+            range(1, self.args.epochs + 1),
+            desc="Training KPP QVAE",
+            disable=getattr(self.args, "disable_tqdm", False),
+        )
+        log_every = max(1, int(getattr(self.args, "train_log_every", 1)))
+
+        for epoch in progress:
             train_metrics = self.run_epoch(model, train_loader, vae_optimizer, bm_optimizer, True)
             val_metrics = self.run_epoch(model, val_loader, vae_optimizer, bm_optimizer, False)
 
@@ -217,16 +224,17 @@ class Trainer:
                 history[f"train_{key}"].append(train_metrics[key])
                 history[f"val_{key}"].append(val_metrics[key])
 
-            print(
-                f"[Epoch {epoch}] "
-                f"train_loss={train_metrics['loss']:.4f} "
-                f"val_loss={val_metrics['loss']:.4f} "
-                f"train_recon={train_metrics['recon_loss']:.4f} "
-                f"val_recon={val_metrics['recon_loss']:.4f} "
-                f"train_kl={train_metrics['kl']:.4f} "
-                f"val_kl={val_metrics['kl']:.4f} "
-                f"bm_loss={train_metrics['bm_loss']:.4f}"
-            )
+            if epoch % log_every == 0 or epoch == self.args.epochs:
+                print(
+                    f"[Epoch {epoch}] "
+                    f"train_loss={train_metrics['loss']:.4f} "
+                    f"val_loss={val_metrics['loss']:.4f} "
+                    f"train_recon={train_metrics['recon_loss']:.4f} "
+                    f"val_recon={val_metrics['recon_loss']:.4f} "
+                    f"train_kl={train_metrics['kl']:.4f} "
+                    f"val_kl={val_metrics['kl']:.4f} "
+                    f"bm_loss={train_metrics['bm_loss']:.4f}"
+                )
 
             if val_metrics["loss"] < best_val:
                 # 内存中保存一份最佳状态，同时写 checkpoint 到磁盘。

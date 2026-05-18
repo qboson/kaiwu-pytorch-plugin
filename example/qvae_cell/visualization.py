@@ -15,7 +15,7 @@ def setup_plotting():
     sns.set_theme(style="whitegrid", palette="muted")
 
 
-def plot_training_history(history, out_path):
+def plot_training_history(history, out_path=None):
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
     epochs = np.arange(1, len(history["train_loss"]) + 1)
     plot_kwargs = {"marker": "o", "markersize": 4, "linewidth": 1.5}
@@ -36,8 +36,10 @@ def plot_training_history(history, out_path):
 
     sns.despine()
     plt.tight_layout()
-    fig.savefig(out_path, dpi=300, bbox_inches="tight")
-    plt.close(fig)
+    if out_path is not None:
+        fig.savefig(out_path, dpi=300, bbox_inches="tight")
+        plt.close(fig)
+    return fig
 
 
 def save_umap_plots(adata, labels_key, batch_key, out_dir):
