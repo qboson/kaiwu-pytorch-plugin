@@ -14,26 +14,46 @@ Kaiwu-PyTorch-Plugin使用请参考[**文档**](https://kaiwu-pytorch-plugin-doc
 受限玻尔兹曼机是一种基于能量的无监督学习模型，由可见层和隐藏层构成，层间全连接但层内无连接。其核心思想是通过能量函数建模数据的概率分布，利用对比散度（Contrastive Divergence，CD）等算法训练权重，使模型能够学习输入数据的隐含特征。受限玻尔兹曼机常用于特征提取、降维或协同过滤，也是构建更复杂模型的基础。玻尔兹曼机是一种全连接的随机神经网络，所有神经元之间都可能存在连接（包括可见层和隐藏层内部），对于BM传统的采样方法效率较低，量子计算提供了一种新的方法。
 
 ```mermaid
-graph TD
-    subgraph kaiwu-torch-plugin
-        bm[full_boltzmann_machine.py] -->abm[abstract_boltzmann_machine.py]
-        rbm[restricted_boltzmann_machine.py] -->abm
+flowchart TD
+    torch[PyTorch tensors, modules, autograd]
+    kaiwu[Kaiwu SDK samplers<br/>SA / CIM backend]
+
+    subgraph plugin["src/kaiwu/torch_plugin"]
+        abm["abstract_boltzmann_machine.py<br/>AbstractBoltzmannMachine"]
+        bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
+        rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
+        qvae["qvae.py<br/>QVAE"]
+        dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
+        dbn["dbn.py<br/>UnsupervisedDBN"]
+        qgan["qgan.py<br/>QGAN utilities"]
     end
-    subgraph example
-        rbm_example_d1[rbm_digits.py] --> rbm
-        rbm_example_d2[rbm_digits.ipynb] --> rbm_example_d1
-        rbm_example_v1[qvae.py] --> rbm
-        rbm_example_v2 --> rbm_example_v3[dist_util.py] 
-        rbm_example_v2[train_qvae.ipynb] --> rbm_example_v1
+
+    torch --> abm
+    kaiwu --> abm
+    abm --> bm
+    abm --> rbm
+    abm --> qvae
+    dist --> qvae
+    rbm --> dbn
+
+    subgraph examples["example"]
+        rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
+        dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
+        bm_generation["bm_generation<br/>BM distribution learning and sampling"]
+        qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
+        qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
     end
-    subgraph test
-        test_bm[test_bm.py] --> bm
-        test_rbm[test_rbm.py] --> rbm
-    end
+
+    rbm --> rbm_digits
+    dbn --> dbn_digits
+    bm --> bm_generation
+    qvae --> qvae_mnist
+    qvae --> qvae_cell
+    bm --> qvae_cell
 ```
 上图是项目文件结构：
 - kaiwu-torch-plugin部分的代码包含基类，受限玻尔兹曼机和玻尔兹曼机
-- example部分的代码包含qvae生成数字和digits数字识别这两个示例
+- example部分的代码包含qvae生成数字和digits数字识别等示例
 - test包含了单元测试
 
 
@@ -199,7 +219,7 @@ if __name__ == "__main__":
 基于此表征我们精确地完成了百万量级单细胞转录组数据整合，并基于更优的隐变量表示在细胞聚类，细胞分类，细胞轨迹分析等下游任务中取得了较其他现有方法更优的结果，验证了此隐变量表示的优越性。
 
 如果你对该方法感兴趣，可以参考论文:  
-[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/pdf/2508.11190)
+[**Quantum-Boosted High-Fidelity Deep Learning**](https://arxiv.org/pdf/2508.11190)
 
 <img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/602802d9-0d5f-4304-a151-5b921b10ba4a" />
 
