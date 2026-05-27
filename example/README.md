@@ -7,6 +7,11 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+### QDiffusion
+
+`example/qdiffusion/` contains the public `QDiffusion` examples, including
+minimal train/generate scripts and the larger protein workflow utilities.
+
 ---
 
 ### Classification Task: Handwritten Digit Recognition

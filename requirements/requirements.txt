@@ -1,2 +1,5 @@
 numpy==2.2.6
 torch==2.7.0
+omegaconf>=2.3,<3
+tqdm>=4.66,<5
+transformers==4.39.2

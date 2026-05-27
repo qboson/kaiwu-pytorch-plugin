@@ -22,6 +22,7 @@ flowchart TD
         bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
         rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
         qvae["qvae.py<br/>QVAE"]
+        qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
     end
@@ -31,6 +32,7 @@ flowchart TD
     abm --> bm
     abm --> rbm
     abm --> qvae
+    torch --> qdiff
     dist --> qvae
     rbm --> dbn
 
@@ -38,6 +40,7 @@ flowchart TD
         rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
         dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
         bm_generation["bm_generation<br/>BM distribution learning and sampling"]
+        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
         qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
         qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
     end
@@ -45,6 +48,7 @@ flowchart TD
     rbm --> rbm_digits
     dbn --> dbn_digits
     bm --> bm_generation
+    qdiff --> qdiffusion
     qvae --> qvae_mnist
     qvae --> qvae_cell
     bm --> qvae_cell
@@ -59,6 +63,8 @@ The above image shows the project file structure:
 - Native PyTorch Support: Seamless integration with the PyTorch ecosystem, supports GPU acceleration
 - Flexible Architecture: Supports custom visible and hidden layer dimensions
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
+- QDiffusion Support: Includes a public `QDiffusion` module for energy-guided
+  discrete generation with DPLM backbones
 
 ### Plugin Advantages
 
@@ -179,6 +185,23 @@ if __name__ == "__main__":
     opt_rbm.step()
     print(objective)
 ```
+
+### QDiffusion Quick Start
+
+`QDiffusion` is available from the top-level plugin package:
+
+```python
+from kaiwu.torch_plugin import QDiffusion
+
+model = QDiffusion.from_pretrained(
+    proposal_ckpt="airkingbd/dplm_150m",
+    energy_ckpt="airkingbd/dplm_150m",
+    num_candidates=4,
+)
+```
+
+Runnable workflow examples live under `example/qdiffusion/`.
+
 ### Classification Task: Handwritten Digit Recognition  
 Demonstrates feature learning and classification on the Digits dataset using Restricted Boltzmann Machines (RBM). This example is suitable for beginners to understand the application of RBMs in image feature extraction and classification, serving as a foundation for advanced experiments and functional extensions. Key steps include:  
 - **Data Augmentation & Preprocessing**: Expand the original 8x8-pixel handwritten digit images through shifting (up, down, left, right) and normalize features using MinMaxScaler.  
