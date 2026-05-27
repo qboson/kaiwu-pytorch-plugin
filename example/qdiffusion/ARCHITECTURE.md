@@ -16,12 +16,15 @@ It combines:
 
 - `from kaiwu.torch_plugin import QDiffusion`
 - `from kaiwu.torch_plugin import QDiffusionConfig`
-- `QDiffusion.from_pretrained(...)`
-- `QDiffusion.build(...)`
+- explicit `QDiffusion(...)` construction with token metadata and an energy adapter
+- `build_dplm_qdiffusion(...)` inside `example/qdiffusion/dplm/dplm_factory.py`
 
 ## Example Boundary
 
 Everything in `example/qdiffusion/` is workflow or demo code:
+
+- `simple/` for minimal runnable demos
+- `dplm/` for DPLM-specific adapters and larger workflows
 
 - data reading
 - training loops

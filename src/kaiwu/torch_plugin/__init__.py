@@ -6,10 +6,16 @@ end users. Optional heavy modules are loaded lazily through ``__getattr__`` so
 legacy imports keep working even when extra dependencies are not installed.
 """
 
+from importlib import import_module
+from typing import TYPE_CHECKING, Any
+
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine
 from .qvae import QVAE
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
+
+if TYPE_CHECKING:
+    from .qdiffusion import QDiffusion, QDiffusionConfig
 
 __version__ = "0.1.0"
 
@@ -23,7 +29,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name):
+def __getattr__(name: str) -> Any:
     """Lazily loads optional heavy modules without breaking legacy imports.
 
     Args:
@@ -36,11 +42,8 @@ def __getattr__(name):
         AttributeError: If ``name`` is not a supported public export.
     """
     if name in {"QDiffusion", "QDiffusionConfig"}:
-        from .qdiffusion import QDiffusion, QDiffusionConfig
-
-        exports = {
-            "QDiffusion": QDiffusion,
-            "QDiffusionConfig": QDiffusionConfig,
-        }
-        return exports[name]
+        module = import_module(".qdiffusion", __name__)
+        value = getattr(module, name)
+        globals()[name] = value
+        return value
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

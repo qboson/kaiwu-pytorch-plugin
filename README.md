@@ -188,19 +188,37 @@ if __name__ == "__main__":
 
 ### QDiffusion Quick Start
 
-`QDiffusion` is available from the top-level plugin package:
+`QDiffusion` is available from the top-level plugin package as a generic
+discrete-sequence core:
 
 ```python
-from kaiwu.torch_plugin import QDiffusion
+from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
+from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
 
-model = QDiffusion.from_pretrained(
-    proposal_ckpt="airkingbd/dplm_150m",
-    energy_ckpt="airkingbd/dplm_150m",
-    num_candidates=4,
+# Build your own proposal model, energy model, token spec, and energy adapter.
+model = QDiffusion(
+    proposal_model=proposal_model,
+    energy_model=energy_model,
+    token_spec=SequenceTokenSpec(
+        pad_id=0,
+        bos_id=1,
+        eos_id=2,
+        mask_id=3,
+    ),
+    energy_adapter=energy_adapter,
+    config=QDiffusionConfig(num_candidates=4),
 )
 ```
 
-Runnable workflow examples live under `example/qdiffusion/`.
+Runnable DPLM-based workflow examples live under `example/qdiffusion/`, with
+`simple/` for minimal demos and `dplm/` for DPLM-specific workflows.
+
+If you want to run those DPLM examples, install the extra example-side
+dependencies separately:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
 
 ### Classification Task: Handwritten Digit Recognition  
 Demonstrates feature learning and classification on the Digits dataset using Restricted Boltzmann Machines (RBM). This example is suitable for beginners to understand the application of RBMs in image feature extraction and classification, serving as a foundation for advanced experiments and functional extensions. Key steps include:  

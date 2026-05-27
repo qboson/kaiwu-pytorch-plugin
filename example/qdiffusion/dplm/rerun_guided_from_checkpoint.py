@@ -14,12 +14,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
+from _example_bootstrap import ensure_repo_src_on_path
 import torch
-from kaiwu.torch_plugin import QDiffusion
+
+ensure_repo_src_on_path()
+
+from dplm_factory import build_dplm_qdiffusion
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 
-CASE_ROOT = Path(__file__).resolve().parent
+CASE_ROOT = Path(__file__).resolve().parents[1]
 
 
 def save_json(path: Path, payload: Any) -> None:
@@ -513,7 +517,7 @@ def main() -> None:
     baseline_records = read_fasta_records(previous_run_dir / "baseline" / "proposal_only_generated_sequences.fasta")
 
     generator = (
-        QDiffusion.from_pretrained(
+        build_dplm_qdiffusion(
             proposal_ckpt=source_config["proposal_ckpt"],
             energy_ckpt=source_config["energy_ckpt"],
             num_candidates=config.guided_num_candidates,

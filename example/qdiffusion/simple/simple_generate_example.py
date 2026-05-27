@@ -15,11 +15,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from _example_bootstrap import ensure_repo_src_on_path
 import torch
-from kaiwu.torch_plugin import QDiffusion
+
+ensure_repo_src_on_path()
+
+from dplm_factory import build_dplm_qdiffusion
 
 EXAMPLE_DIR = Path(__file__).resolve().parent
-CASE_ROOT = EXAMPLE_DIR
+CASE_ROOT = EXAMPLE_DIR.parent
 
 
 def default_fasta_path() -> Path:
@@ -104,7 +108,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    generator = QDiffusion.from_pretrained(
+    generator = build_dplm_qdiffusion(
         proposal_ckpt=proposal_ckpt,
         energy_ckpt=energy_ckpt,
         num_candidates=4,

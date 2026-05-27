@@ -5,6 +5,7 @@
 # pip install -r requirements.txt
 
 numpy>=1.24,<3
+torch>=2.0
 omegaconf>=2.3,<3
 tqdm>=4.66,<5
 transformers==4.39.2

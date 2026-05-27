@@ -10,7 +10,7 @@ This script follows one fixed workflow:
 
 Edit the config block inside ``main()`` before running:
 
-    python example/qdiffusion/evaluate_esm2_embedding_distance.py
+    python example/qdiffusion/dplm/evaluate_esm2_embedding_distance.py
 """
 
 from __future__ import annotations
@@ -22,13 +22,17 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
+from _example_bootstrap import ensure_repo_src_on_path
 import torch
 import torch.nn.functional as F
-from kaiwu.torch_plugin import QDiffusion
+
+ensure_repo_src_on_path()
+
+from dplm_factory import build_dplm_qdiffusion
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 
-CASE_ROOT = Path(__file__).resolve().parent
+CASE_ROOT = Path(__file__).resolve().parents[1]
 
 try:
     import esm
@@ -358,7 +362,7 @@ def generate_candidate_fastas(
     # Baseline mode: proposal-only behavior, aligned with the old script family.
     print("Building baseline generator...")
     baseline_generator = (
-        QDiffusion.from_pretrained(
+        build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
             energy_ckpt=config.energy_ckpt,
             num_candidates=1,
@@ -380,7 +384,7 @@ def generate_candidate_fastas(
     # restored from the trained compact checkpoint.
     print("Building guided generator...")
     guided_generator = (
-        QDiffusion.from_pretrained(
+        build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
             energy_ckpt=config.energy_ckpt,
             num_candidates=config.guided_num_candidates,

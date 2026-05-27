@@ -15,16 +15,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
+from _example_bootstrap import ensure_repo_src_on_path
 import torch
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-from kaiwu.torch_plugin import QDiffusion
+
+ensure_repo_src_on_path()
+
+from dplm_factory import build_dplm_qdiffusion
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 
-CASE_ROOT = Path(__file__).resolve().parent
+CASE_ROOT = Path(__file__).resolve().parents[1]
 
 
 def default_fasta_path() -> Path:
@@ -942,7 +946,7 @@ def main() -> None:
     write_fasta_records(splits_dir / "test.fasta", test_records)
 
     validation_generator = (
-        QDiffusion.from_pretrained(
+        build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
             energy_ckpt=config.energy_ckpt,
             num_candidates=1,
@@ -959,7 +963,7 @@ def main() -> None:
     )
     save_json(output_dir / "validation_summary.json", validation_summary)
 
-    train_generator = QDiffusion.from_pretrained(
+    train_generator = build_dplm_qdiffusion(
         proposal_ckpt=config.proposal_ckpt,
         energy_ckpt=config.energy_ckpt,
         num_candidates=config.train_num_candidates,
@@ -1063,7 +1067,7 @@ def main() -> None:
     print(f"Final checkpoint: {final_checkpoint_path}")
 
     baseline_generator = (
-        QDiffusion.from_pretrained(
+        build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
             energy_ckpt=config.energy_ckpt,
             num_candidates=1,
@@ -1082,7 +1086,7 @@ def main() -> None:
     )
 
     guided_generator = (
-        QDiffusion.from_pretrained(
+        build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
             energy_ckpt=config.energy_ckpt,
             num_candidates=config.guided_num_candidates,

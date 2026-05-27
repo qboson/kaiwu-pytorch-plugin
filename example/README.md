@@ -9,8 +9,9 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 ### QDiffusion
 
-`example/qdiffusion/` contains the public `QDiffusion` examples, including
-minimal train/generate scripts and the larger protein workflow utilities.
+`example/qdiffusion/` now splits into:
+- `simple/`: minimal train and generate scripts
+- `dplm/`: DPLM-specific workflow utilities and adapter code
 
 ---
 
