@@ -7,6 +7,12 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+### QDiffusion
+
+`example/qdiffusion/` now splits into:
+- `simple/`: minimal train and generate scripts
+- `dplm/`: DPLM-specific workflow utilities and adapter code
+
 ---
 
 ### Classification Task: Handwritten Digit Recognition

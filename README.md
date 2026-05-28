@@ -22,6 +22,7 @@ flowchart TD
         bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
         rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
         qvae["qvae.py<br/>QVAE"]
+        qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
     end
@@ -31,6 +32,7 @@ flowchart TD
     abm --> bm
     abm --> rbm
     abm --> qvae
+    torch --> qdiff
     dist --> qvae
     rbm --> dbn
 
@@ -38,6 +40,7 @@ flowchart TD
         rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
         dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
         bm_generation["bm_generation<br/>BM distribution learning and sampling"]
+        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
         qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
         qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
     end
@@ -45,6 +48,7 @@ flowchart TD
     rbm --> rbm_digits
     dbn --> dbn_digits
     bm --> bm_generation
+    qdiff --> qdiffusion
     qvae --> qvae_mnist
     qvae --> qvae_cell
     bm --> qvae_cell
@@ -59,6 +63,8 @@ The above image shows the project file structure:
 - Native PyTorch Support: Seamless integration with the PyTorch ecosystem, supports GPU acceleration
 - Flexible Architecture: Supports custom visible and hidden layer dimensions
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
+- QDiffusion Support: Includes a public `QDiffusion` module for energy-guided
+  discrete generation with DPLM backbones
 
 ### Plugin Advantages
 
@@ -179,6 +185,41 @@ if __name__ == "__main__":
     opt_rbm.step()
     print(objective)
 ```
+
+### QDiffusion Quick Start
+
+`QDiffusion` is available from the top-level plugin package as a generic
+discrete-sequence core:
+
+```python
+from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
+from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
+
+# Build your own proposal model, energy model, token spec, and energy adapter.
+model = QDiffusion(
+    proposal_model=proposal_model,
+    energy_model=energy_model,
+    token_spec=SequenceTokenSpec(
+        pad_id=0,
+        bos_id=1,
+        eos_id=2,
+        mask_id=3,
+    ),
+    energy_adapter=energy_adapter,
+    config=QDiffusionConfig(num_candidates=4),
+)
+```
+
+Runnable DPLM-based workflow examples live under `example/qdiffusion/`, with
+`simple/` for minimal demos and `dplm/` for DPLM-specific workflows.
+
+If you want to run those DPLM examples, install the extra example-side
+dependencies separately:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
+
 ### Classification Task: Handwritten Digit Recognition  
 Demonstrates feature learning and classification on the Digits dataset using Restricted Boltzmann Machines (RBM). This example is suitable for beginners to understand the application of RBMs in image feature extraction and classification, serving as a foundation for advanced experiments and functional extensions. Key steps include:  
 - **Data Augmentation & Preprocessing**: Expand the original 8x8-pixel handwritten digit images through shifting (up, down, left, right) and normalize features using MinMaxScaler.  
@@ -203,6 +244,49 @@ To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.
 ![](imgs/qvae.png)
 
 ---  
+
+### Generation Task: Proteomes: Homo sapiens Generation
+
+Demonstrates how to train and evaluate an energy-guided discrete diffusion
+workflow for protein sequence generation using `QDiffusion` with DPLM
+backbones. This example is designed for users who want to understand how the
+generic `QDiffusion` core is connected to practical protein-generation
+experiments, providing a reference workflow for training, guided generation,
+checkpoint reruns, and evaluation. Key steps include:
+
+- **DPLM-backed Model Assembly**: Use
+  `example/qdiffusion/dplm/dplm_builder.py` to load one proposal backbone and
+  one energy backbone, expose token metadata, build the energy adapter, and
+  assemble a generic `QDiffusion(...)` instance.
+- **Training Objective**: In the epoch loop, tokenize FASTA sequences into
+  `targets`, call `generator.objective({"targets": ...})`, corrupt clean
+  sequences into noisy states, sample proposal candidates, and optimize
+  `energy_objective.mean()` to train the energy-guidance branch.
+- **Checkpoint and Rerun Workflow**: Save compact checkpoints containing
+  `energy_model`, `energy_head`, and `vocab_proj`, then rebuild baseline and
+  guided generators for test-time generation and reruns.
+- **Evaluation and Reporting**: Compare baseline and guided outputs with quality
+  metrics such as identity, Jensen-Shannon divergence, uniqueness, repeat
+  ratio, and ESM2-based embedding distances, then write structured reports.
+
+To run the minimal examples, execute:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+python example/qdiffusion/simple/simple_train_example.py
+python example/qdiffusion/simple/simple_generate_example.py
+```
+
+To run the full DPLM workflow, execute:
+
+```bash
+python example/qdiffusion/dplm/train_workflow.py
+```
+
+For a more focused walkthrough of the example tree and its data flow, see
+`example/qdiffusion/README.md`.
+
+---
 
 ## Scientific Research Achievements  
 
