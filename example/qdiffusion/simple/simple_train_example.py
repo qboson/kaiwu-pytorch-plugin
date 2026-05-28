@@ -22,7 +22,9 @@ from torch.optim import AdamW
 
 ensure_repo_src_on_path()
 
-from dplm_factory import build_dplm_qdiffusion
+from dplm.dplm_builder import build_dplm_qdiffusion
+
+# Path and data helpers.
 
 EXAMPLE_DIR = Path(__file__).resolve().parent
 CASE_ROOT = EXAMPLE_DIR.parent
@@ -95,6 +97,8 @@ def select_records(
             break
     return selected
 
+
+# Example entrypoint.
 
 def main() -> None:
     """Runs a tiny example training loop.

@@ -1,4 +1,4 @@
-"""Generate protein sequences, then evaluate them with ESM2 embedding distances.
+"""Evaluate ``QDiffusion`` experiment outputs with ESM2 embedding distances.
 
 This script follows one fixed workflow:
 
@@ -10,7 +10,7 @@ This script follows one fixed workflow:
 
 Edit the config block inside ``main()`` before running:
 
-    python example/qdiffusion/dplm/evaluate_esm2_embedding_distance.py
+    python example/qdiffusion/dplm/eval_esm2_distances.py
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ import torch.nn.functional as F
 
 ensure_repo_src_on_path()
 
-from dplm_factory import build_dplm_qdiffusion
+from dplm_builder import build_dplm_qdiffusion
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 

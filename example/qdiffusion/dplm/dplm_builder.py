@@ -11,11 +11,13 @@ import torch
 
 from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
-from dplm_runtime import (
+from dplm.dplm_modeling import (
     DPLMBackbone,
     DPLMEnergyAdapter,
     build_dplm_token_spec,
 )
+
+# Backbone loading helpers.
 
 
 def load_dplm_backbone(
@@ -25,13 +27,27 @@ def load_dplm_backbone(
     net_override: dict[str, Any] | None = None,
     from_huggingface: bool = True,
 ) -> DPLMBackbone:
-    """Loads one DPLM backbone wrapper for example-only usage."""
+    """Loads one DPLM backbone wrapper for example-only usage.
+
+    Args:
+        model_name_or_path: Hugging Face model id or local checkpoint path.
+        cfg_override: Optional wrapper-config overrides.
+        net_override: Optional keyword overrides forwarded to the network loader.
+        from_huggingface: Whether to treat ``model_name_or_path`` as a Hugging
+            Face identifier instead of a local training artifact.
+
+    Returns:
+        One configured example-side DPLM backbone wrapper.
+    """
     return DPLMBackbone.from_pretrained(
         model_name_or_path,
         cfg_override=cfg_override,
         net_override=net_override,
         from_huggingface=from_huggingface,
     )
+
+
+# Generic QDiffusion construction helpers.
 
 
 def build_dplm_qdiffusion(
@@ -54,7 +70,30 @@ def build_dplm_qdiffusion(
     dtype: torch.dtype = torch.float32,
     device: torch.device | str | None = None,
 ) -> QDiffusion:
-    """Builds one generic ``QDiffusion`` instance from DPLM checkpoints."""
+    """Builds one generic ``QDiffusion`` instance from DPLM checkpoints.
+
+    Args:
+        proposal_ckpt: Proposal backbone checkpoint or model id.
+        energy_ckpt: Energy backbone checkpoint or model id.
+        num_candidates: Number of proposal candidates sampled per decode step.
+        proposal_temperature: Temperature used for proposal-side sampling.
+        proposal_noise_scale: Gumbel noise scale used during proposal sampling.
+        energy_temperature: Temperature used for energy-based reranking.
+        disable_resample: Whether to disable repetition-collapse resampling.
+        resample_ratio: Frequency threshold that triggers resampling.
+        resample_top_p: Top-p cutoff used during resampling.
+        freeze_proposal: Whether to freeze proposal-model parameters.
+        proposal_cfg_override: Optional config overrides for the proposal wrapper.
+        energy_cfg_override: Optional config overrides for the energy wrapper.
+        proposal_net_override: Optional network overrides for the proposal loader.
+        energy_net_override: Optional network overrides for the energy loader.
+        from_huggingface: Whether checkpoints should be loaded from Hugging Face.
+        dtype: Floating-point dtype tracked by the resulting ``QDiffusion``.
+        device: Optional target device for the resulting ``QDiffusion``.
+
+    Returns:
+        One generic ``QDiffusion`` instance backed by DPLM adapters.
+    """
     proposal_model = load_dplm_backbone(
         proposal_ckpt,
         cfg_override=proposal_cfg_override,

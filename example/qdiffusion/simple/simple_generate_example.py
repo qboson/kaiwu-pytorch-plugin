@@ -20,7 +20,9 @@ import torch
 
 ensure_repo_src_on_path()
 
-from dplm_factory import build_dplm_qdiffusion
+from dplm.dplm_builder import build_dplm_qdiffusion
+
+# Path and sequence helpers.
 
 EXAMPLE_DIR = Path(__file__).resolve().parent
 CASE_ROOT = EXAMPLE_DIR.parent
@@ -93,6 +95,8 @@ def decode_tokens(generator, tokens: torch.Tensor) -> str:
     decoded = generator.tokenizer.batch_decode(tokens, skip_special_tokens=True)[0]
     return decoded.replace(" ", "").strip()
 
+
+# Example entrypoint.
 
 def main() -> None:
     """Runs a tiny example generation loop.

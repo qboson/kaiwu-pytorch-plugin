@@ -245,6 +245,49 @@ To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.
 
 ---  
 
+### Generation Task: Proteomes: Homo sapiens Generation
+
+Demonstrates how to train and evaluate an energy-guided discrete diffusion
+workflow for protein sequence generation using `QDiffusion` with DPLM
+backbones. This example is designed for users who want to understand how the
+generic `QDiffusion` core is connected to practical protein-generation
+experiments, providing a reference workflow for training, guided generation,
+checkpoint reruns, and evaluation. Key steps include:
+
+- **DPLM-backed Model Assembly**: Use
+  `example/qdiffusion/dplm/dplm_builder.py` to load one proposal backbone and
+  one energy backbone, expose token metadata, build the energy adapter, and
+  assemble a generic `QDiffusion(...)` instance.
+- **Training Objective**: In the epoch loop, tokenize FASTA sequences into
+  `targets`, call `generator.objective({"targets": ...})`, corrupt clean
+  sequences into noisy states, sample proposal candidates, and optimize
+  `objective_ebm.mean()` to train the energy-guidance branch.
+- **Checkpoint and Rerun Workflow**: Save compact checkpoints containing
+  `energy_model`, `energy_head`, and `vocab_proj`, then rebuild baseline and
+  guided generators for test-time generation and reruns.
+- **Evaluation and Reporting**: Compare baseline and guided outputs with quality
+  metrics such as identity, Jensen-Shannon divergence, uniqueness, repeat
+  ratio, and ESM2-based embedding distances, then write structured reports.
+
+To run the minimal examples, execute:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+python example/qdiffusion/simple/simple_train_example.py
+python example/qdiffusion/simple/simple_generate_example.py
+```
+
+To run the full DPLM workflow, execute:
+
+```bash
+python example/qdiffusion/dplm/train_workflow.py
+```
+
+For a more focused walkthrough of the example tree and its data flow, see
+`example/qdiffusion/README.md`.
+
+---
+
 ## Scientific Research Achievements  
 
 ### QBM Inside VAE = A More Powerful Generative Data Representer (QBM-VAE)  

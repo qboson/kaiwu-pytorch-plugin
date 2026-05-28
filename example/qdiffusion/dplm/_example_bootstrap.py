@@ -6,8 +6,14 @@ from pathlib import Path
 import sys
 
 
+# Path bootstrap helper.
+
 def ensure_repo_src_on_path() -> None:
-    """Adds the repository ``src`` directory to ``sys.path`` when needed."""
+    """Adds the repository ``src`` directory to ``sys.path`` when needed.
+
+    This keeps the DPLM workflow examples runnable directly from a repository
+    checkout without requiring an editable install first.
+    """
     example_root = Path(__file__).resolve().parents[1]
     repo_root = example_root.parents[1]
     src_path = repo_root / "src"

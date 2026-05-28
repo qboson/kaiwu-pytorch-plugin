@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
-"""Real full-corpus workflow example for the public ``QDiffusion`` module."""
+"""Training workflow for running full-corpus ``QDiffusion`` experiments."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ from tqdm import tqdm
 
 ensure_repo_src_on_path()
 
-from dplm_factory import build_dplm_qdiffusion
+from dplm_builder import build_dplm_qdiffusion
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 

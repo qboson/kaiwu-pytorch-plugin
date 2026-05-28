@@ -23,6 +23,7 @@ flowchart TD
         bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
         rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
         qvae["qvae.py<br/>QVAE"]
+        qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
         qgan["qgan.py<br/>QGAN utilities"]
@@ -33,6 +34,7 @@ flowchart TD
     abm --> bm
     abm --> rbm
     abm --> qvae
+    abm --> qdiff
     dist --> qvae
     rbm --> dbn
 
@@ -40,6 +42,7 @@ flowchart TD
         rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
         dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
         bm_generation["bm_generation<br/>BM distribution learning and sampling"]
+        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
         qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
         qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
     end
@@ -47,6 +50,7 @@ flowchart TD
     rbm --> rbm_digits
     dbn --> dbn_digits
     bm --> bm_generation
+    qdiff --> qdiffusion
     qvae --> qvae_mnist
     qvae --> qvae_cell
     bm --> qvae_cell
@@ -194,7 +198,6 @@ if __name__ == "__main__":
 
 运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
 
-
 ### 生成任务：Q-VAE的MNIST图像生成
 
 展示如何在MNIST手写数字数据集上训练和评估量子变分自编码器（Q-VAE）模型。该示例适用于希望理解Q-VAE模型训练、生成与评估流程的使用者，可作为生成模型后续研究的基础。主要内容包括：
@@ -206,6 +209,33 @@ if __name__ == "__main__":
 运行该实例可以运行`example/qvae_mnist/train_qvae.ipynb`
 
 ![](imgs/qvae.png)
+
+---  
+
+### 生成任务：Proteomes: Homo sapiens 蛋白序列生成
+
+展示如何使用 `QDiffusion` 配合 DPLM backbone，完成蛋白质序列的能量引导离散扩散训练与生成。该示例适合希望理解通用 `QDiffusion` 核心如何连接到实际蛋白序列实验流程的用户，可作为训练、引导生成、checkpoint rerun 与评估分析的参考工作流。主要内容包括：
+
+- **DPLM 模型组装**：通过 `example/qdiffusion/dplm/dplm_builder.py` 加载 proposal backbone 与 energy backbone，整理 token metadata，构造 energy adapter，并最终组装成一个通用的 `QDiffusion(...)` 实例。
+- **训练目标构建**：在 epoch 循环中先将 FASTA 序列 tokenize 成 `targets`，再调用 `generator.objective({"targets": ...})`，把干净序列腐蚀成 noisy state，基于 proposal logits 采样候选，并优化 `objective_ebm.mean()` 来训练 energy-guidance 分支。
+- **Checkpoint 与复现实验**：保存只包含 `energy_model`、`energy_head` 与 `vocab_proj` 的紧凑 checkpoint，再重新构建 baseline 与 guided generator，用于测试集生成和 rerun。
+- **评估与报告输出**：比较 baseline 与 guided 的生成结果，统计 identity、Jensen-Shannon divergence、uniqueness、repeat ratio 以及基于 ESM2 embedding distance 的指标，并输出结构化报告。
+
+运行最小示例：
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+python example/qdiffusion/simple/simple_train_example.py
+python example/qdiffusion/simple/simple_generate_example.py
+```
+
+运行完整 DPLM workflow：
+
+```bash
+python example/qdiffusion/dplm/train_workflow.py
+```
+
+如果想先顺着 example 目录理解整个数据流和脚本分工，建议先看 `example/qdiffusion/README.md`。
 
 ## 科研成果
 
@@ -237,5 +267,4 @@ if __name__ == "__main__":
 
  ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  
  ![communication group](https://github.com/user-attachments/assets/1931f657-572f-4f10-9e13-9cfdd3af0de9)
-
 

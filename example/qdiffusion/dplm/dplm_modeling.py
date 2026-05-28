@@ -30,6 +30,8 @@ from transformers.models.esm.modeling_esm import (
 
 from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
 
+# Config structures.
+
 
 @dataclass
 class DPLMNetConfig:
@@ -64,22 +66,52 @@ class DPLMConfig:
     rdm_couple: bool = field(default=False)
 
 
+# Config and network loading helpers.
+
+
 def load_yaml_config(fpath: str):
-    """Loads one OmegaConf YAML file and resolves interpolations."""
+    """Loads one OmegaConf YAML file and resolves interpolations.
+
+    Args:
+        fpath: YAML config path.
+
+    Returns:
+        The resolved OmegaConf configuration object.
+    """
     cfg = OmegaConf.load(fpath)
     OmegaConf.resolve(cfg)
     return cfg
 
 
 def get_net_class(dplm_type: str):
-    """Returns the supported masked-LM class for one DPLM type."""
+    """Returns the supported masked-LM class for one DPLM type.
+
+    Args:
+        dplm_type: Runtime type tag stored in the checkpoint config.
+
+    Returns:
+        The masked-LM class used for the requested DPLM type.
+
+    Raises:
+        ValueError: If the DPLM type is unsupported by these examples.
+    """
     if dplm_type != "dplm_esm":
         raise ValueError(f"Unsupported dplm_type for DPLM examples: {dplm_type}")
     return _EsmForDPLM
 
 
 def get_net(cfg):
-    """Builds one underlying masked-LM network from the example config."""
+    """Builds one underlying masked-LM network from the example config.
+
+    Args:
+        cfg: Resolved DPLM example configuration.
+
+    Returns:
+        One configured masked-LM network.
+
+    Raises:
+        NotImplementedError: If the network architecture type is unsupported.
+    """
     if cfg.net.arch_type != "esm":
         raise NotImplementedError(
             f"Unsupported arch_type for DPLM examples: {cfg.net.arch_type}"
@@ -109,12 +141,21 @@ def get_net(cfg):
     return net
 
 
+# Backbone and adapter wrappers.
+
+
 class DPLMBackbone(nn.Module):
     """Minimal DPLM backbone wrapper used by the examples."""
 
     _default_cfg = DPLMConfig()
 
-    def __init__(self, cfg=None, net=None):
+    def __init__(self, cfg: Any | None = None, net: nn.Module | None = None):
+        """Initializes the example-side DPLM backbone wrapper.
+
+        Args:
+            cfg: Optional wrapper configuration or overrides.
+            net: Optional prebuilt masked-LM network.
+        """
         super().__init__()
         self._update_cfg(cfg or {})
 
@@ -139,7 +180,17 @@ class DPLMBackbone(nn.Module):
         net_override=None,
         from_huggingface=True,
     ):
-        """Loads one DPLM backbone wrapper from a checkpoint or model id."""
+        """Loads one DPLM backbone wrapper from a checkpoint or model id.
+
+        Args:
+            net_name: Hugging Face model id or local checkpoint path.
+            cfg_override: Optional wrapper-config overrides.
+            net_override: Optional keyword overrides forwarded to the network loader.
+            from_huggingface: Whether to load through the Hugging Face API.
+
+        Returns:
+            One configured example-side DPLM backbone wrapper.
+        """
         cfg_override = cfg_override or {}
         net_override = net_override or {}
 
@@ -167,11 +218,25 @@ class DPLMBackbone(nn.Module):
         return cls(cfg=cfg_override, net=net)
 
     def _update_cfg(self, cfg):
-        """Merges runtime config overrides onto the default DPLM config."""
+        """Merges runtime config overrides onto the default DPLM config.
+
+        Args:
+            cfg: Runtime config overrides.
+        """
         self.cfg = OmegaConf.merge(self._default_cfg, cfg)
 
     def forward(self, input_ids, return_last_hidden_state=False, **kwargs):
-        """Runs the wrapped DPLM network."""
+        """Runs the wrapped DPLM network.
+
+        Args:
+            input_ids: Input token ids.
+            return_last_hidden_state: Whether to return hidden states together
+                with logits.
+            **kwargs: Unused compatibility keyword arguments.
+
+        Returns:
+            Either logits alone or a tuple ``(logits, last_hidden_state)``.
+        """
         del kwargs
         outputs = self.net(input_ids=input_ids)
         logits = outputs["logits"]
@@ -181,7 +246,14 @@ class DPLMBackbone(nn.Module):
 
 
 def build_dplm_token_spec(backbone: DPLMBackbone) -> SequenceTokenSpec:
-    """Builds one generic token spec from a DPLM backbone wrapper."""
+    """Builds one generic token spec from a DPLM backbone wrapper.
+
+    Args:
+        backbone: Example-side DPLM backbone wrapper.
+
+    Returns:
+        One generic token-spec object for ``QDiffusion``.
+    """
     return SequenceTokenSpec(
         mask_id=backbone.mask_id,
         pad_id=backbone.pad_id,
@@ -196,6 +268,11 @@ class DPLMEnergyAdapter:
     """Adapter that exposes generic energy hooks over one DPLM backbone."""
 
     def __init__(self, backbone: DPLMBackbone) -> None:
+        """Initializes the example-side DPLM energy adapter.
+
+        Args:
+            backbone: Wrapped DPLM backbone used for embedding and encoding.
+        """
         self.backbone = backbone
 
     @property
@@ -222,7 +299,12 @@ class DPLMEnergyAdapter:
         return outputs["last_hidden_state"]
 
 
+# Private ESM implementation details.
+
+
 class _ModifiedEsmSelfAttention(EsmSelfAttention):
+    """Custom ESM attention block using scaled-dot-product attention."""
+
     def forward(
         self,
         hidden_states: torch.Tensor,
@@ -290,13 +372,27 @@ class _ModifiedEsmSelfAttention(EsmSelfAttention):
 
 
 class _ModifiedEsmAttention(EsmAttention):
+    """ESM attention wrapper that swaps in the modified self-attention."""
+
     def __init__(self, config):
+        """Initializes the modified ESM attention block.
+
+        Args:
+            config: Hugging Face ESM configuration object.
+        """
         super().__init__(config)
         self.self = _ModifiedEsmSelfAttention(config)
 
 
 class _ModifiedEsmLayer(EsmLayer):
+    """ESM transformer layer using the modified attention implementation."""
+
     def __init__(self, config):
+        """Initializes the modified ESM transformer layer.
+
+        Args:
+            config: Hugging Face ESM configuration object.
+        """
         super().__init__(config)
         self.attention = _ModifiedEsmAttention(config)
         if self.add_cross_attention:
@@ -304,7 +400,14 @@ class _ModifiedEsmLayer(EsmLayer):
 
 
 class _ModifiedEsmEncoder(EsmEncoder):
+    """ESM encoder composed of modified transformer layers."""
+
     def __init__(self, config):
+        """Initializes the modified ESM encoder.
+
+        Args:
+            config: Hugging Face ESM configuration object.
+        """
         super().__init__(config)
         self.layer = nn.ModuleList(
             [_ModifiedEsmLayer(config) for _ in range(config.num_hidden_layers)]
@@ -312,7 +415,15 @@ class _ModifiedEsmEncoder(EsmEncoder):
 
 
 class _ModifiedEsmModel(EsmPreTrainedModel):
+    """Modified ESM backbone that accepts fused token embeddings."""
+
     def __init__(self, config, add_pooling_layer=True):
+        """Initializes the modified ESM model.
+
+        Args:
+            config: Hugging Face ESM configuration object.
+            add_pooling_layer: Whether to include the optional pooler.
+        """
         super().__init__(config)
         from transformers.models.esm.modeling_esm import (
             EsmEmbeddings,
@@ -339,17 +450,42 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
         return self.embeddings.word_embeddings
 
     def set_input_embeddings(self, value):
-        """Replaces the token embedding layer on the modified ESM model."""
+        """Replaces the token embedding layer on the modified ESM model.
+
+        Args:
+            value: Replacement embedding module.
+        """
         self.embeddings.word_embeddings = value
 
     def resize_position_embeddings(self, new_num_position_embeddings: int):
-        """Raises because the example ESM layout stays fixed."""
+        """Raises because the example ESM layout stays fixed.
+
+        Args:
+            new_num_position_embeddings: Requested position-embedding size.
+
+        Raises:
+            NotImplementedError: Always, because example ESM position embeddings
+                are intentionally fixed.
+        """
         raise NotImplementedError(
             "Example DPLM backbones do not support resizing position embeddings."
         )
 
-    def prepare_inputs_for_generation(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
-        """Builds a minimal generation-compatible input dictionary."""
+    def prepare_inputs_for_generation(
+        self, *args: Any, **kwargs: Any
+    ) -> dict[str, Any]:
+        """Builds a minimal generation-compatible input dictionary.
+
+        Args:
+            *args: Positional generation arguments, with ``input_ids`` first.
+            **kwargs: Keyword generation arguments such as ``attention_mask``.
+
+        Returns:
+            A minimal generation input dictionary.
+
+        Raises:
+            ValueError: If ``input_ids`` is missing.
+        """
         if not args:
             raise ValueError("input_ids must be provided for generation.")
         prepared = dict(kwargs)
@@ -366,7 +502,15 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
         past_key_values: tuple[tuple[torch.Tensor, ...], ...],
         beam_idx: torch.Tensor,
     ) -> tuple[tuple[torch.Tensor, ...], ...]:
-        """Reorders cached states during beam-style generation helpers."""
+        """Reorders cached states during beam-style generation helpers.
+
+        Args:
+            past_key_values: Cached attention states.
+            beam_idx: Beam-selection indices.
+
+        Returns:
+            Reordered cached attention states.
+        """
         return tuple(
             tuple(
                 past_state.index_select(0, beam_idx.to(past_state.device))
@@ -392,7 +536,29 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
     ) -> Union[
         Tuple[torch.Tensor, ...], BaseModelOutputWithPoolingAndCrossAttentions
     ]:
-        """Runs the modified ESM backbone with optional fused embeddings."""
+        """Runs the modified ESM backbone with optional fused embeddings.
+
+        Args:
+            input_ids: Optional token ids.
+            attention_mask: Optional attention mask.
+            position_ids: Optional position ids.
+            head_mask: Optional attention-head mask.
+            inputs_embeds: Optional precomputed input embeddings.
+            encoder_hidden_states: Optional encoder-side hidden states.
+            encoder_attention_mask: Optional encoder-side attention mask.
+            past_key_values: Optional cached attention states.
+            use_cache: Whether to return updated cache entries.
+            output_attentions: Whether to return attention tensors.
+            output_hidden_states: Whether to return hidden states.
+            return_dict: Whether to return Hugging Face model-output objects.
+
+        Returns:
+            Either a tuple or a Hugging Face model-output object containing
+            token-level hidden states.
+
+        Raises:
+            ValueError: If both ``input_ids`` and ``inputs_embeds`` are missing.
+        """
         output_attentions = (
             output_attentions
             if output_attentions is not None
@@ -485,7 +651,15 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
 
 
 class _EsmForDPLM(EsmPreTrainedModel):
+    """Private masked-LM wrapper used by the example-side DPLM runtime."""
+
     def __init__(self, config, dropout=0.1):
+        """Initializes the example-side masked-LM wrapper.
+
+        Args:
+            config: Hugging Face ESM configuration object.
+            dropout: Hidden-dropout override applied before model creation.
+        """
         super().__init__(config)
         tokenizer = AutoTokenizer.from_pretrained(config._name_or_path)
         config.hidden_dropout_prob = dropout
@@ -512,15 +686,39 @@ class _EsmForDPLM(EsmPreTrainedModel):
         return self.esm.get_input_embeddings()
 
     def set_input_embeddings(self, value):
-        """Delegates token embedding replacement to the wrapped ESM."""
+        """Delegates token embedding replacement to the wrapped ESM.
+
+        Args:
+            value: Replacement embedding module.
+        """
         self.esm.set_input_embeddings(value)
 
     def resize_position_embeddings(self, new_num_position_embeddings: int):
-        """Delegates the unsupported resize operation to the wrapped ESM."""
+        """Delegates the unsupported resize operation to the wrapped ESM.
+
+        Args:
+            new_num_position_embeddings: Requested position-embedding size.
+
+        Returns:
+            The wrapped ESM resize result.
+        """
         return self.esm.resize_position_embeddings(new_num_position_embeddings)
 
-    def prepare_inputs_for_generation(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
-        """Builds the minimal generation input payload expected by transformers."""
+    def prepare_inputs_for_generation(
+        self, *args: Any, **kwargs: Any
+    ) -> dict[str, Any]:
+        """Builds the minimal generation input payload expected by transformers.
+
+        Args:
+            *args: Positional generation arguments, with ``input_ids`` first.
+            **kwargs: Keyword generation arguments such as ``attention_mask``.
+
+        Returns:
+            A minimal generation input dictionary.
+
+        Raises:
+            ValueError: If ``input_ids`` is missing.
+        """
         if not args:
             raise ValueError("input_ids must be provided for generation.")
         prepared = dict(kwargs)
@@ -537,7 +735,15 @@ class _EsmForDPLM(EsmPreTrainedModel):
         past_key_values: tuple[tuple[torch.Tensor, ...], ...],
         beam_idx: torch.Tensor,
     ) -> tuple[tuple[torch.Tensor, ...], ...]:
-        """Reorders cached states during beam-style generation helpers."""
+        """Reorders cached states during beam-style generation helpers.
+
+        Args:
+            past_key_values: Cached attention states.
+            beam_idx: Beam-selection indices.
+
+        Returns:
+            Reordered cached attention states.
+        """
         return tuple(
             tuple(
                 past_state.index_select(0, beam_idx.to(past_state.device))
@@ -561,7 +767,28 @@ class _EsmForDPLM(EsmPreTrainedModel):
         return_dict: Optional[bool] = None,
         **kwargs: Any,
     ):
-        """Runs the private masked-LM backbone and returns logits plus hidden states."""
+        """Runs the private masked-LM backbone and returns logits plus hidden states.
+
+        Args:
+            input_ids: Optional token ids.
+            attention_mask: Optional attention mask.
+            position_ids: Optional position ids.
+            head_mask: Optional attention-head mask.
+            inputs_embeds: Optional precomputed input embeddings.
+            encoder_hidden_states: Optional encoder-side hidden states.
+            encoder_attention_mask: Optional encoder-side attention mask.
+            labels: Optional masked-LM labels.
+            output_attentions: Whether to return attention tensors.
+            output_hidden_states: Whether to return hidden states.
+            return_dict: Whether to return Hugging Face model-output objects.
+            **kwargs: Unused compatibility keyword arguments.
+
+        Returns:
+            A dictionary containing logits and token-level hidden states.
+
+        Raises:
+            ValueError: If ``input_ids`` is missing.
+        """
         del (
             attention_mask,
             position_ids,
