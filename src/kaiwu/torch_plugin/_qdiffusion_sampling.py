@@ -53,9 +53,9 @@ def sample_from_categorical(
             argmax decoding.
 
     Returns:
-        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` where ``tokens`` contains sampled token
-        ids and ``scores`` contains the associated log-probability-style
-        scores.
+        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
+        where ``tokens`` contains sampled token ids and ``scores`` contains
+        the associated log-probability-style scores.
     """
     if temperature:
         dist = torch.distributions.Categorical(logits=logits.div(temperature))
@@ -80,8 +80,8 @@ def stochastic_sample_from_categorical(
         noise_scale: Multiplicative scale for the sampled Gumbel noise.
 
     Returns:
-        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` sampled from the perturbed categorical
-        distribution.
+        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
+        sampled from the perturbed categorical distribution.
     """
     gumbel_noise = -torch.log(-torch.log(torch.rand_like(logits) + 1e-8) + 1e-8)
     noisy_logits = logits + noise_scale * gumbel_noise
@@ -105,8 +105,8 @@ def stochastic_sample_from_categorical_n(
         n: Number of independent noisy candidate sets to draw.
 
     Returns:
-        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` whose leading dimension indexes the
-        sampled candidate set.
+        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
+        whose leading dimension indexes the sampled candidate set.
     """
     expanded_logits = logits.unsqueeze(0).expand(n, *logits.shape)
     gumbel_noise = -torch.log(

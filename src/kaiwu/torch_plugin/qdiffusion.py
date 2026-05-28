@@ -291,8 +291,8 @@ class QDiffusion(nn.Module):
             weighting: Per-sample timestep weighting mode.
 
         Returns:
-            dict[str, torch.Tensor]: A dictionary containing proposal logits, supervision masks, loss
-            weights, and the EBM objective term.
+            dict[str, torch.Tensor]: A dictionary containing proposal logits,
+            supervision masks, loss weights, and the EBM objective term.
         """
         target = batch["targets"]
         first_timestep, second_timestep = torch.randint(
@@ -491,8 +491,8 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of fixed positions.
 
         Returns:
-            tuple[torch.Tensor, torch.Tensor]: A tuple ``(output_tokens, output_scores)`` for the initial decode
-            state.
+            tuple[torch.Tensor, torch.Tensor]: A tuple
+            ``(output_tokens, output_scores)`` for the initial decode state.
         """
         output_mask = self.get_non_special_symbol_mask(
             input_tokens, partial_masks=partial_masks
@@ -515,7 +515,8 @@ class QDiffusion(nn.Module):
             maskable_mask: Boolean mask of positions eligible for masking.
 
         Returns:
-            dict[str, torch.Tensor]: A dictionary containing corrupted tokens, timesteps, and loss mask.
+            dict[str, torch.Tensor]: A dictionary containing corrupted tokens,
+            timesteps, and loss mask.
         """
         noise = torch.rand_like(clean_tokens, dtype=torch.float)
         first_timestep_mask = (
@@ -544,7 +545,8 @@ class QDiffusion(nn.Module):
             maskable_mask: Boolean mask of positions eligible for masking.
 
         Returns:
-            dict[str, torch.Tensor]: A dictionary containing paired corruptions, timesteps, and loss mask.
+            dict[str, torch.Tensor]: A dictionary containing paired
+            corruptions, timesteps, and loss mask.
         """
         same_timestep_mask = first_timestep == second_timestep
         first_timestep, second_timestep = (
@@ -708,7 +710,8 @@ class QDiffusion(nn.Module):
             candidate_scores: Proposal-side candidate scores.
 
         Returns:
-            tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` for the selected candidate per sample.
+            tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
+            for the selected candidate per sample.
         """
         energies = self._score_candidates(noisy_tokens, candidate_tokens)
         neg_energies = -energies
@@ -841,8 +844,9 @@ class QDiffusion(nn.Module):
             noise: Mask token id or per-position noise tensor.
 
         Returns:
-            tuple[torch.Tensor, torch.Tensor, torch.Tensor]: A tuple ``(new_mask, new_tokens, new_scores)`` describing the next
-            decode state.
+            tuple[torch.Tensor, torch.Tensor, torch.Tensor]: A tuple
+            ``(new_mask, new_tokens, new_scores)`` describing the next decode
+            state.
         """
         _, condition, topk_mode, schedule = decoding_strategy.split("-")
 
