@@ -7,7 +7,7 @@ from .qdiffusion import QDiffusion, QDiffusionConfig
 from .qvae import QVAE
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "RestrictedBoltzmannMachine",
