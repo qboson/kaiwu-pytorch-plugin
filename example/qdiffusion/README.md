@@ -2,6 +2,10 @@
 
 Examples and workflow scripts for the public `QDiffusion` module.
 
+## Data
+[data used for example/qdiffusion](https://www.uniprot.org/proteomes/UP000005640)
+
+
 ## Quick Start
 
 ```bash
