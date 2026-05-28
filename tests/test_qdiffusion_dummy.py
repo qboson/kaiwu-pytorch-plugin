@@ -71,6 +71,27 @@ class DummyEnergyAdapter:
         return torch.tanh(self.energy_model.hidden(inputs_embeds))
 
 
+class DummyScoringEnergyAdapter(DummyEnergyAdapter):
+    """Adapter that exposes one direct conditional scorer hook."""
+
+    def __init__(self, energy_model: DummyEnergyModel) -> None:
+        super().__init__(energy_model)
+        self.num_score_calls = 0
+
+    def score_conditioned(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        del attention_mask
+        self.num_score_calls += 1
+        return (
+            candidate_tokens.to(torch.float32).sum(dim=1, keepdim=True)
+            - noisy_tokens.to(torch.float32).sum(dim=1, keepdim=True)
+        )
+
+
 class TestQDiffusionDummy(unittest.TestCase):
     """Exercises direct QDiffusion construction without DPLM dependencies."""
 
@@ -118,13 +139,31 @@ class TestQDiffusionDummy(unittest.TestCase):
         energy = self.model.energy(self.targets, self.targets)
         self.assertEqual(energy.shape, (2, 1))
 
+    def test_energy_prefers_adapter_scorer_hook(self):
+        scorer_adapter = DummyScoringEnergyAdapter(self.energy_model)
+        scorer_model = QDiffusion(
+            proposal_model=self.proposal_model,
+            energy_model=self.energy_model,
+            token_spec=self.token_spec,
+            energy_adapter=scorer_adapter,
+            config=self.config,
+            freeze_proposal=False,
+        )
+        expected = (
+            self.targets.to(torch.float32).sum(dim=1, keepdim=True)
+            - self.targets[:, [0, 1, 3, 2, 4]].to(torch.float32).sum(dim=1, keepdim=True)
+        )
+        energy = scorer_model.energy(self.targets[:, [0, 1, 3, 2, 4]], self.targets)
+        self.assertEqual(scorer_adapter.num_score_calls, 1)
+        self.assertTrue(torch.equal(energy, expected))
+
     def test_objective_fields(self):
         outputs = self.model.objective({"targets": self.targets})
         self.assertEqual(outputs["logits"].shape, (2, 5, 8))
         self.assertEqual(outputs["targets"].shape[1], 5)
         self.assertEqual(outputs["loss_mask"].dtype, torch.bool)
         self.assertEqual(outputs["weight"].shape, (2, 1))
-        self.assertEqual(outputs["objective_ebm"].shape, (2, 1))
+        self.assertEqual(outputs["energy_objective"].shape, (2, 1))
 
     def test_generate_one_step(self):
         generated = self.model.generate(self.targets, max_steps=1)

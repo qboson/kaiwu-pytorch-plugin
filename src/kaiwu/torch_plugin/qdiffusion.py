@@ -21,8 +21,6 @@ from ._qdiffusion_sampling import (
     topk_masking,
 )
 
-SOFTPLUS = nn.Softplus()
-
 __all__ = ["QDiffusion", "QDiffusionConfig"]
 
 
@@ -37,8 +35,7 @@ class SequenceTokenSpec:
         eos_id: Token id used for end-of-sequence markers.
         x_id: Optional token id reserved by some backbones and excluded from
             proposal sampling.
-        tokenizer: Optional tokenizer-like helper used by example code for
-            encoding and decoding.
+        tokenizer: Optional tokenization helper used for encoding and decoding.
     """
 
     mask_id: int
@@ -67,6 +64,14 @@ class EnergyBackboneAdapter(Protocol):
     ) -> torch.Tensor:
         """Encodes fused embeddings and returns token-level hidden states."""
 
+    def score_conditioned(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Optionally scores candidates directly without the fallback path."""
+
 
 @dataclass
 class QDiffusionConfig:
@@ -75,7 +80,7 @@ class QDiffusionConfig:
     Attributes:
         num_diffusion_timesteps: Number of discrete noising steps used by the
             training objective.
-        rdm_couple: Whether to use the coupled corruption variant.
+        use_coupled_sampling: Whether to use the coupled corruption variant.
         num_candidates: Number of proposal candidates sampled at each decode step.
         proposal_temperature: Temperature used for proposal-side sampling.
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
@@ -88,7 +93,7 @@ class QDiffusionConfig:
     """
 
     num_diffusion_timesteps: int = 500
-    rdm_couple: bool = False
+    use_coupled_sampling: bool = False
     num_candidates: int = 1
     proposal_temperature: float = 0.0
     proposal_noise_scale: float = 1.0
@@ -166,6 +171,7 @@ class QDiffusion(nn.Module):
         self.bos_id = token_spec.bos_id
         self.eos_id = token_spec.eos_id
         self.x_id = token_spec.x_id
+        self.softplus = nn.Softplus()
 
         if device is None:
             try:
@@ -184,7 +190,7 @@ class QDiffusion(nn.Module):
             **kwargs: Keyword arguments forwarded to ``nn.Module.to``.
 
         Returns:
-            The moved module instance.
+            QDiffusion: The moved module instance.
         """
         module = super().to(*args, **kwargs)
         try:
@@ -194,60 +200,65 @@ class QDiffusion(nn.Module):
             self.device = torch.device("cpu")
         return module
 
-    def forward(self, xt: torch.Tensor, **kwargs: Any) -> torch.Tensor:
+    def forward(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
         """Runs the proposal model on the current noisy state.
 
         Args:
-            xt: Current noisy token tensor.
+            noisy_tokens: Current noisy token tensor.
             **kwargs: Additional keyword arguments forwarded to the proposal
                 model.
 
         Returns:
-            Proposal logits over the token vocabulary.
+            torch.Tensor: Proposal logits over the token vocabulary.
 
         Raises:
             TypeError: If the proposal model does not implement ``forward``.
         """
         if hasattr(self.proposal_model, "forward"):
-            return self.proposal_model.forward(xt, **kwargs)
+            return self.proposal_model.forward(noisy_tokens, **kwargs)
         raise TypeError("proposal_model must implement forward().")
 
-    def proposal(self, xt: torch.Tensor, **kwargs: Any) -> torch.Tensor:
+    def proposal(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
         """Semantic alias around :meth:`forward` for proposal-side calls.
 
         Args:
-            xt: Current noisy token tensor.
+            noisy_tokens: Current noisy token tensor.
             **kwargs: Additional keyword arguments forwarded to the proposal
                 model.
 
         Returns:
-            Proposal logits over the token vocabulary.
+            torch.Tensor: Proposal logits over the token vocabulary.
         """
-        return self.forward(xt, **kwargs)
+        return self.forward(noisy_tokens, **kwargs)
 
     def energy(
         self,
-        xt: torch.Tensor,
-        x0: torch.Tensor,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor | None = None,
-        **kwargs: Any,
     ) -> torch.Tensor:
         """Scores candidate reconstructions conditioned on the noisy state.
 
         Args:
-            xt: Noisy token tensor used as conditioning input.
-            x0: Candidate clean token tensor to score.
+            noisy_tokens: Noisy token tensor used as conditioning input.
+            candidate_tokens: Candidate clean token tensor to score.
             attention_mask: Optional attention mask for the energy model.
-            **kwargs: Reserved for future pair-scoring extensions.
 
         Returns:
-            A tensor of scalar energies with shape ``[batch, 1]``.
+            torch.Tensor: A tensor of scalar energies with shape ``[batch, 1]``.
         """
-        del kwargs
         if attention_mask is None:
-            attention_mask = x0.ne(self.pad_id)
+            attention_mask = candidate_tokens.ne(self.pad_id)
 
-        if xt.device.type == "cuda":
+        score_conditioned = getattr(self.energy_adapter, "score_conditioned", None)
+        if callable(score_conditioned):
+            return score_conditioned(
+                noisy_tokens=noisy_tokens,
+                candidate_tokens=candidate_tokens,
+                attention_mask=attention_mask,
+            )
+
+        if noisy_tokens.device.type == "cuda":
             outer_context = torch.amp.autocast("cuda", dtype=torch.float32)
             inner_context = torch.amp.autocast("cuda", dtype=torch.bfloat16)
         else:
@@ -255,13 +266,15 @@ class QDiffusion(nn.Module):
             inner_context = nullcontext()
 
         with outer_context:
-            xt_embed = self.energy_adapter.embed_tokens(xt)
-            x0_embed = self.energy_adapter.embed_tokens(x0)
-            fused_embed = self.vocab_proj(torch.cat([xt_embed, x0_embed], dim=-1))
+            noisy_embeds = self.energy_adapter.embed_tokens(noisy_tokens)
+            candidate_embeds = self.energy_adapter.embed_tokens(candidate_tokens)
+            fused_embed = self.vocab_proj(
+                torch.cat([noisy_embeds, candidate_embeds], dim=-1)
+            )
 
             with inner_context:
                 hidden = self.energy_adapter.encode_conditioned(
-                    input_ids=xt,
+                    input_ids=noisy_tokens,
                     inputs_embeds=fused_embed,
                     attention_mask=attention_mask,
                 )
@@ -278,45 +291,47 @@ class QDiffusion(nn.Module):
             weighting: Per-sample timestep weighting mode.
 
         Returns:
-            A dictionary containing proposal logits, supervision masks, loss
+            dict[str, torch.Tensor]: A dictionary containing proposal logits, supervision masks, loss
             weights, and the EBM objective term.
         """
         target = batch["targets"]
-        t1, t2 = torch.randint(
+        first_timestep, second_timestep = torch.randint(
             1,
             self.config.num_diffusion_timesteps + 1,
             (2 * target.size(0),),
             device=target.device,
         ).chunk(2)
 
-        if self.config.rdm_couple:
-            q_outputs = self._q_sample_coupled(
+        if self.config.use_coupled_sampling:
+            sample_outputs = self._sample_coupled(
                 target,
-                t1,
-                t2,
+                first_timestep,
+                second_timestep,
                 self.get_non_special_symbol_mask(target),
             )
             target = target.repeat(2, 1)
         else:
-            q_outputs = self._q_sample(
+            sample_outputs = self._sample(
                 target,
-                t1,
+                first_timestep,
                 self.get_non_special_symbol_mask(target),
             )
 
-        x_t = q_outputs["x_t"]
-        timesteps = q_outputs["t"]
-        loss_mask = q_outputs["loss_mask"]
+        noisy_tokens = sample_outputs["x_t"]
+        timesteps = sample_outputs["t"]
+        loss_mask = sample_outputs["loss_mask"]
 
         with torch.no_grad():
-            logits = self.forward(x_t).detach()
+            logits = self.forward(noisy_tokens).detach()
 
         negative_tokens, _ = self._sample_candidates(logits, self.config.num_candidates)
-        positive_energy = self.energy(x_t, target, target.ne(self.pad_id))
-        negative_energy = self._score_candidates(x_t, negative_tokens).mean(
+        positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
+        negative_energy = self._score_candidates(noisy_tokens, negative_tokens).mean(
             dim=1, keepdim=True
         )
-        objective_ebm = SOFTPLUS(positive_energy) + SOFTPLUS(-negative_energy)
+        energy_objective = self.softplus(positive_energy) + self.softplus(
+            -negative_energy
+        )
         weight = self._compute_loss_weight(timesteps, weighting)
 
         return {
@@ -324,7 +339,7 @@ class QDiffusion(nn.Module):
             "targets": target,
             "loss_mask": loss_mask,
             "weight": weight,
-            "objective_ebm": objective_ebm,
+            "energy_objective": energy_objective,
         }
 
     def initialize_state(
@@ -343,7 +358,7 @@ class QDiffusion(nn.Module):
             temperature: Sampling temperature stored in the state payload.
 
         Returns:
-            A mutable state dictionary suitable for repeated :meth:`step` calls.
+            dict[str, Any]: A mutable state dictionary suitable for repeated :meth:`step` calls.
         """
         output_tokens, output_scores = self._initialize_output_tokens(
             input_tokens, partial_masks=partial_masks
@@ -361,30 +376,36 @@ class QDiffusion(nn.Module):
             "partial_masks": partial_masks,
         }
 
-    def step(self, state: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
+    def step(
+        self,
+        state: dict[str, Any],
+        partial_masks: torch.Tensor | None = None,
+    ) -> dict[str, Any]:
         """Runs one denoising/reranking step and returns updated state.
 
         Args:
             state: Current decode state created by :meth:`initialize_state`.
-            **kwargs: Optional overrides such as ``partial_masks``.
+            partial_masks: Optional boolean mask of fixed positions.
 
         Returns:
-            The updated decode state after one iteration.
+            dict[str, Any]: The updated decode state after one iteration.
         """
-        partial_masks = kwargs.get("partial_masks", state.get("partial_masks"))
-        decoder_out = self._decode_step(state, partial_masks=partial_masks)
+        partial_masks = (
+            partial_masks if partial_masks is not None else state.get("partial_masks")
+        )
+        step_outputs = self._decode_step(state, partial_masks=partial_masks)
 
-        non_special_sym_mask = self.get_non_special_symbol_mask(
+        editable_token_mask = self.get_non_special_symbol_mask(
             state["output_tokens"], partial_masks=partial_masks
         )
         output_masks, result_tokens, result_scores = self._reparam_decoding(
             output_tokens=state["output_tokens"].clone(),
             output_scores=state["output_scores"].clone(),
-            cur_tokens=decoder_out["output_tokens"].clone(),
-            cur_scores=decoder_out["output_scores"].clone(),
+            step_tokens=step_outputs["output_tokens"].clone(),
+            step_scores=step_outputs["output_scores"].clone(),
             decoding_strategy=self.config.decoding_strategy,
-            xt_neq_x0=state["output_masks"],
-            non_special_sym_mask=non_special_sym_mask,
+            still_noisy_mask=state["output_masks"],
+            editable_token_mask=editable_token_mask,
             t=state["step"] + 1,
             max_step=state["max_steps"],
             noise=self.mask_id,
@@ -396,7 +417,7 @@ class QDiffusion(nn.Module):
             output_scores=result_scores,
             output_masks=output_masks,
             step=state["step"] + 1,
-            history=decoder_out["history"],
+            history=step_outputs["history"],
             partial_masks=partial_masks,
         )
         return new_state
@@ -409,7 +430,6 @@ class QDiffusion(nn.Module):
         partial_masks: torch.Tensor | None = None,
         temperature: float = 1.0,
         return_state: bool = False,
-        **kwargs: Any,
     ) -> torch.Tensor | dict[str, Any]:
         """Runs a complete iterative decoding loop inside the core class.
 
@@ -419,10 +439,9 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of fixed positions.
             temperature: Sampling temperature stored in the decode state.
             return_state: Whether to return the full final state dictionary.
-            **kwargs: Additional keyword arguments forwarded to :meth:`step`.
 
         Returns:
-            Either the final token tensor or the full decode state.
+            torch.Tensor | dict[str, Any]: Either the final token tensor or the full decode state.
         """
         state = self.initialize_state(
             input_tokens=input_tokens,
@@ -431,7 +450,7 @@ class QDiffusion(nn.Module):
             temperature=temperature,
         )
         for _ in range(max_steps):
-            state = self.step(state, partial_masks=partial_masks, **kwargs)
+            state = self.step(state, partial_masks=partial_masks)
 
         if return_state:
             return state
@@ -451,16 +470,16 @@ class QDiffusion(nn.Module):
                 fixed.
 
         Returns:
-            A boolean mask where ``True`` marks editable non-special positions.
+            torch.Tensor: A boolean mask where ``True`` marks editable non-special positions.
         """
-        non_special_sym_mask = (
+        editable_token_mask = (
             output_tokens.ne(self.pad_id)
             & output_tokens.ne(self.bos_id)
             & output_tokens.ne(self.eos_id)
         )
         if partial_masks is not None:
-            non_special_sym_mask &= ~partial_masks
-        return non_special_sym_mask
+            editable_token_mask &= ~partial_masks
+        return editable_token_mask
 
     def _initialize_output_tokens(
         self, input_tokens: torch.Tensor, partial_masks: torch.Tensor | None = None
@@ -472,7 +491,7 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of fixed positions.
 
         Returns:
-            A tuple ``(output_tokens, output_scores)`` for the initial decode
+            tuple[torch.Tensor, torch.Tensor]: A tuple ``(output_tokens, output_scores)`` for the initial decode
             state.
         """
         output_mask = self.get_non_special_symbol_mask(
@@ -482,65 +501,83 @@ class QDiffusion(nn.Module):
         output_scores = torch.zeros_like(output_tokens, dtype=torch.float)
         return output_tokens, output_scores
 
-    def _q_sample(
-        self, x_0: torch.Tensor, t1: torch.Tensor, maskable_mask: torch.Tensor
+    def _sample(
+        self,
+        clean_tokens: torch.Tensor,
+        first_timestep: torch.Tensor,
+        maskable_mask: torch.Tensor,
     ) -> dict[str, torch.Tensor]:
         """Applies one-step discrete corruption for training.
 
         Args:
-            x_0: Clean target tokens.
-            t1: Sampled diffusion timesteps.
+            clean_tokens: Clean target tokens.
+            first_timestep: Sampled diffusion timesteps.
             maskable_mask: Boolean mask of positions eligible for masking.
 
         Returns:
-            A dictionary containing corrupted tokens, timesteps, and loss mask.
+            dict[str, torch.Tensor]: A dictionary containing corrupted tokens, timesteps, and loss mask.
         """
-        noise = torch.rand_like(x_0, dtype=torch.float)
-        t1_mask = (
-            noise < (t1 / self.config.num_diffusion_timesteps)[:, None]
+        noise = torch.rand_like(clean_tokens, dtype=torch.float)
+        first_timestep_mask = (
+            noise < (first_timestep / self.config.num_diffusion_timesteps)[:, None]
         ) & maskable_mask
-        x_t = x_0.masked_fill(t1_mask, self.mask_id)
-        return {"x_t": x_t, "t": t1, "loss_mask": t1_mask}
+        noisy_tokens = clean_tokens.masked_fill(first_timestep_mask, self.mask_id)
+        return {
+            "x_t": noisy_tokens,
+            "t": first_timestep,
+            "loss_mask": first_timestep_mask,
+        }
 
-    def _q_sample_coupled(
+    def _sample_coupled(
         self,
-        x_0: torch.Tensor,
-        t1: torch.Tensor,
-        t2: torch.Tensor,
+        clean_tokens: torch.Tensor,
+        first_timestep: torch.Tensor,
+        second_timestep: torch.Tensor,
         maskable_mask: torch.Tensor,
     ) -> dict[str, torch.Tensor]:
         """Applies the coupled corruption variant used by RDM-style training.
 
         Args:
-            x_0: Clean target tokens.
-            t1: First sampled timestep tensor.
-            t2: Second sampled timestep tensor.
+            clean_tokens: Clean target tokens.
+            first_timestep: First sampled timestep tensor.
+            second_timestep: Second sampled timestep tensor.
             maskable_mask: Boolean mask of positions eligible for masking.
 
         Returns:
-            A dictionary containing paired corruptions, timesteps, and loss mask.
+            dict[str, torch.Tensor]: A dictionary containing paired corruptions, timesteps, and loss mask.
         """
-        same_t_mask = t1 == t2
-        t1, t2 = torch.maximum(t1, t2).float(), torch.minimum(t1, t2).float()
+        same_timestep_mask = first_timestep == second_timestep
+        first_timestep, second_timestep = (
+            torch.maximum(first_timestep, second_timestep).float(),
+            torch.minimum(first_timestep, second_timestep).float(),
+        )
 
-        noise = torch.rand_like(x_0, dtype=torch.float)
-        t1_mask = (
-            noise < (t1 / self.config.num_diffusion_timesteps)[:, None]
+        noise = torch.rand_like(clean_tokens, dtype=torch.float)
+        first_timestep_mask = (
+            noise < (first_timestep / self.config.num_diffusion_timesteps)[:, None]
         ) & maskable_mask
-        x_t1 = x_0.masked_fill(t1_mask, self.mask_id)
+        first_noisy_tokens = clean_tokens.masked_fill(first_timestep_mask, self.mask_id)
 
-        noise = torch.rand_like(x_0, dtype=torch.float)
-        t2_mask = t1_mask & (noise > ((t1 - t2) / t1)[:, None])
-        noise = torch.rand_like(x_0[same_t_mask], dtype=torch.float)
-        t2_mask[same_t_mask] = (
-            noise < (t1[same_t_mask] / self.config.num_diffusion_timesteps)[:, None]
-        ) & maskable_mask[same_t_mask]
-        x_t2 = x_0.masked_fill(t2_mask, self.mask_id)
+        noise = torch.rand_like(clean_tokens, dtype=torch.float)
+        second_timestep_mask = first_timestep_mask & (
+            noise > ((first_timestep - second_timestep) / first_timestep)[:, None]
+        )
+        noise = torch.rand_like(clean_tokens[same_timestep_mask], dtype=torch.float)
+        second_timestep_mask[same_timestep_mask] = (
+            noise
+            < (
+                first_timestep[same_timestep_mask]
+                / self.config.num_diffusion_timesteps
+            )[:, None]
+        ) & maskable_mask[same_timestep_mask]
+        second_noisy_tokens = clean_tokens.masked_fill(
+            second_timestep_mask, self.mask_id
+        )
 
         return {
-            "x_t": torch.cat([x_t1, x_t2], dim=0),
-            "t": torch.cat([t1, t2]),
-            "loss_mask": torch.cat([t1_mask, t2_mask], dim=0),
+            "x_t": torch.cat([first_noisy_tokens, second_noisy_tokens], dim=0),
+            "t": torch.cat([first_timestep, second_timestep]),
+            "loss_mask": torch.cat([first_timestep_mask, second_timestep_mask], dim=0),
         }
 
     def _compute_loss_weight(
@@ -553,7 +590,7 @@ class QDiffusion(nn.Module):
             weighting: Weighting strategy name.
 
         Returns:
-            A column vector of normalized per-sample weights.
+            torch.Tensor: A column vector of normalized per-sample weights.
         """
         num_timesteps = self.config.num_diffusion_timesteps
         weight = {
@@ -569,7 +606,7 @@ class QDiffusion(nn.Module):
             logits: Raw proposal logits.
 
         Returns:
-            A cloned logits tensor with special-token entries masked out.
+            torch.Tensor: A cloned logits tensor with special-token entries masked out.
         """
         logits = logits.clone()
         logits[..., self.mask_id] = -math.inf
@@ -591,7 +628,7 @@ class QDiffusion(nn.Module):
             num_candidates: Expected candidate count.
 
         Returns:
-            A candidate tensor shaped as ``[batch, num_candidates, seq_len]``.
+            torch.Tensor: A candidate tensor shaped as ``[batch, num_candidates, seq_len]``.
 
         Raises:
             ValueError: If the incoming tensor shape is not recognized.
@@ -614,7 +651,7 @@ class QDiffusion(nn.Module):
             num_candidates: Number of candidates to sample per sequence.
 
         Returns:
-            A tuple ``(tokens, scores)`` shaped as
+            tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` shaped as
             ``[batch, num_candidates, seq_len]``.
         """
         samples, scores = stochastic_sample_from_categorical_n(
@@ -630,51 +667,55 @@ class QDiffusion(nn.Module):
         )
 
     def _score_candidates(
-        self, xt: torch.Tensor, candidate_tokens: torch.Tensor
+        self, noisy_tokens: torch.Tensor, candidate_tokens: torch.Tensor
     ) -> torch.Tensor:
         """Scores a batch of candidate reconstructions with the energy model.
 
         Args:
-            xt: Current noisy token tensor.
+            noisy_tokens: Current noisy token tensor.
             candidate_tokens: Candidate reconstructions shaped as
                 ``[batch, num_candidates, seq_len]``.
 
         Returns:
-            Candidate energies shaped as ``[batch, num_candidates]``.
+            torch.Tensor: Candidate energies shaped as ``[batch, num_candidates]``.
         """
         batch_size, num_candidates, seq_len = candidate_tokens.shape
-        flat_xt = (
-            xt.unsqueeze(1)
+        flat_noisy_tokens = (
+            noisy_tokens.unsqueeze(1)
             .expand(-1, num_candidates, -1)
             .reshape(batch_size * num_candidates, seq_len)
         )
-        flat_x0 = candidate_tokens.reshape(batch_size * num_candidates, seq_len)
-        flat_attention_mask = flat_x0.ne(self.pad_id)
-        energy = self.energy(flat_xt, flat_x0, flat_attention_mask)
+        flat_candidate_tokens = candidate_tokens.reshape(
+            batch_size * num_candidates, seq_len
+        )
+        flat_attention_mask = flat_candidate_tokens.ne(self.pad_id)
+        energy = self.energy(
+            flat_noisy_tokens, flat_candidate_tokens, flat_attention_mask
+        )
         return energy.view(batch_size, num_candidates)
 
     def _select_candidates(
         self,
-        xt: torch.Tensor,
+        noisy_tokens: torch.Tensor,
         candidate_tokens: torch.Tensor,
         candidate_scores: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Selects one candidate per batch element by energy-based reranking.
 
         Args:
-            xt: Current noisy token tensor.
+            noisy_tokens: Current noisy token tensor.
             candidate_tokens: Candidate reconstructions.
             candidate_scores: Proposal-side candidate scores.
 
         Returns:
-            A tuple ``(tokens, scores)`` for the selected candidate per sample.
+            tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` for the selected candidate per sample.
         """
-        energies = self._score_candidates(xt, candidate_tokens)
+        energies = self._score_candidates(noisy_tokens, candidate_tokens)
         neg_energies = -energies
         neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
         weights = torch.softmax(neg_energies / self.config.energy_temperature, dim=-1)
         selected_idx = torch.multinomial(weights, 1).squeeze(-1)
-        batch_idx = torch.arange(xt.size(0), device=xt.device)
+        batch_idx = torch.arange(noisy_tokens.size(0), device=noisy_tokens.device)
         return (
             candidate_tokens[batch_idx, selected_idx],
             candidate_scores[batch_idx, selected_idx],
@@ -739,7 +780,7 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of fixed positions.
 
         Returns:
-            Intermediate decode outputs before skeptical remasking.
+            dict[str, Any]: Intermediate decode outputs before skeptical remasking.
         """
         output_tokens = state["output_tokens"].clone()
         output_scores = state["output_scores"].clone()
@@ -776,11 +817,11 @@ class QDiffusion(nn.Module):
         self,
         output_tokens: torch.Tensor,
         output_scores: torch.Tensor,
-        cur_tokens: torch.Tensor,
-        cur_scores: torch.Tensor,
+        step_tokens: torch.Tensor,
+        step_scores: torch.Tensor,
         decoding_strategy: str,
-        xt_neq_x0: torch.Tensor,
-        non_special_sym_mask: torch.Tensor,
+        still_noisy_mask: torch.Tensor,
+        editable_token_mask: torch.Tensor,
         t: int,
         max_step: int,
         noise: int | float | torch.Tensor,
@@ -790,17 +831,17 @@ class QDiffusion(nn.Module):
         Args:
             output_tokens: Previous-step output tokens.
             output_scores: Previous-step token scores.
-            cur_tokens: Current-step candidate tokens.
-            cur_scores: Current-step candidate scores.
+            step_tokens: Current-step candidate tokens.
+            step_scores: Current-step candidate scores.
             decoding_strategy: Skeptical-remasking strategy string.
-            xt_neq_x0: Boolean mask tracking which positions remain noisy.
-            non_special_sym_mask: Editable non-special-token mask.
+            still_noisy_mask: Boolean mask tracking which positions remain noisy.
+            editable_token_mask: Editable non-special-token mask.
             t: Current decode step index, starting from ``1``.
             max_step: Total decode step count.
             noise: Mask token id or per-position noise tensor.
 
         Returns:
-            A tuple ``(new_mask, new_tokens, new_scores)`` describing the next
+            tuple[torch.Tensor, torch.Tensor, torch.Tensor]: A tuple ``(new_mask, new_tokens, new_scores)`` describing the next
             decode state.
         """
         _, condition, topk_mode, schedule = decoding_strategy.split("-")
@@ -813,9 +854,9 @@ class QDiffusion(nn.Module):
             raise NotImplementedError(f"Unknown schedule: {schedule}")
 
         cutoff_len = (
-            non_special_sym_mask.sum(1, keepdim=True).type_as(output_scores) * rate
+            editable_token_mask.sum(1, keepdim=True).type_as(output_scores) * rate
         ).long()
-        scores_for_topk = cur_scores.masked_fill(~non_special_sym_mask, 1000.0)
+        scores_for_topk = step_scores.masked_fill(~editable_token_mask, 1000.0)
 
         if topk_mode.startswith("stochastic"):
             noise_scale = float(topk_mode.replace("stochastic", ""))
@@ -831,27 +872,35 @@ class QDiffusion(nn.Module):
             raise NotImplementedError(f"Unknown topk mode: {topk_mode}")
 
         if condition == "cond":
-            not_v1_t = (
-                (cur_tokens == output_tokens)
-                & (cur_scores < output_scores)
+            keep_masked_from_previous = (
+                (step_tokens == output_tokens)
+                & (step_scores < output_scores)
                 & lowest_k_mask
             )
         elif condition == "uncond":
-            not_v1_t = lowest_k_mask
+            keep_masked_from_previous = lowest_k_mask
         else:
             raise NotImplementedError(f"Unknown condition mode: {condition}")
 
-        not_v2_t = lowest_k_mask
-        masked_to_noise = (~xt_neq_x0 & not_v1_t) | (xt_neq_x0 & not_v2_t)
+        keep_masked_this_step = lowest_k_mask
+        masked_to_noise = (~still_noisy_mask & keep_masked_from_previous) | (
+            still_noisy_mask & keep_masked_this_step
+        )
         if isinstance(noise, torch.Tensor):
             output_tokens.masked_scatter_(masked_to_noise, noise[masked_to_noise])
         else:
             output_tokens.masked_fill_(masked_to_noise, noise)
         output_scores.masked_fill_(masked_to_noise, -math.inf)
 
-        masked_to_x0 = xt_neq_x0 & ~not_v2_t
-        output_tokens.masked_scatter_(masked_to_x0, cur_tokens[masked_to_x0])
-        output_scores.masked_scatter_(masked_to_x0, cur_scores[masked_to_x0])
+        masked_to_candidate_tokens = still_noisy_mask & ~keep_masked_this_step
+        output_tokens.masked_scatter_(
+            masked_to_candidate_tokens, step_tokens[masked_to_candidate_tokens]
+        )
+        output_scores.masked_scatter_(
+            masked_to_candidate_tokens, step_scores[masked_to_candidate_tokens]
+        )
 
-        new_xt_neq_x0 = (xt_neq_x0 | not_v1_t) & not_v2_t
-        return new_xt_neq_x0, output_tokens, output_scores
+        new_still_noisy_mask = (
+            still_noisy_mask | keep_masked_from_previous
+        ) & keep_masked_this_step
+        return new_still_noisy_mask, output_tokens, output_scores

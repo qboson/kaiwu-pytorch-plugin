@@ -28,6 +28,7 @@ from transformers.models.esm.modeling_esm import (
     EsmSelfAttention,
 )
 
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
 
 # Config structures.
@@ -63,7 +64,7 @@ class DPLMConfig:
     lora: DPLMLoRAConfig = field(default_factory=DPLMLoRAConfig)
     net: DPLMNetConfig = field(default_factory=DPLMNetConfig)
     gradient_ckpt: bool = field(default=False)
-    rdm_couple: bool = field(default=False)
+    use_coupled_sampling: bool = field(default=False)
 
 
 # Config and network loading helpers.
@@ -225,19 +226,17 @@ class DPLMBackbone(nn.Module):
         """
         self.cfg = OmegaConf.merge(self._default_cfg, cfg)
 
-    def forward(self, input_ids, return_last_hidden_state=False, **kwargs):
+    def forward(self, input_ids, return_last_hidden_state=False):
         """Runs the wrapped DPLM network.
 
         Args:
             input_ids: Input token ids.
             return_last_hidden_state: Whether to return hidden states together
                 with logits.
-            **kwargs: Unused compatibility keyword arguments.
 
         Returns:
             Either logits alone or a tuple ``(logits, last_hidden_state)``.
         """
-        del kwargs
         outputs = self.net(input_ids=input_ids)
         logits = outputs["logits"]
         if return_last_hidden_state:
@@ -252,7 +251,7 @@ def build_dplm_token_spec(backbone: DPLMBackbone) -> SequenceTokenSpec:
         backbone: Example-side DPLM backbone wrapper.
 
     Returns:
-        One generic token-spec object for ``QDiffusion``.
+        SequenceTokenSpec: One generic token-spec object for ``QDiffusion``.
     """
     return SequenceTokenSpec(
         mask_id=backbone.mask_id,
@@ -297,6 +296,269 @@ class DPLMEnergyAdapter:
             attention_mask=attention_mask,
         )
         return outputs["last_hidden_state"]
+
+
+class DPLMFeatureEncoder(nn.Module):
+    """Sequence-feature encoder backed by one DPLM backbone."""
+
+    def __init__(self, backbone: DPLMBackbone) -> None:
+        """Initializes the feature encoder.
+
+        Args:
+            backbone: Wrapped DPLM backbone used for hidden-state extraction.
+        """
+        super().__init__()
+        self.backbone = backbone
+
+    @property
+    def hidden_size(self) -> int:
+        """Returns the hidden size of the wrapped encoder.
+
+        Returns:
+            int: Encoder hidden size.
+        """
+        return int(self.backbone.net.config.hidden_size)
+
+    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Embeds token ids with the wrapped DPLM network.
+
+        Args:
+            tokens: Token ids to embed.
+
+        Returns:
+            torch.Tensor: Embedded tokens with shape ``[batch, seq_len, hidden]``.
+        """
+        return self.backbone.net.get_input_embeddings()(tokens)
+
+    def encode_tokens(
+        self,
+        tokens: torch.Tensor,
+        attention_mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Encodes tokens into hidden states.
+
+        Args:
+            tokens: Token ids to encode.
+            attention_mask: Optional boolean or integer attention mask.
+
+        Returns:
+            torch.Tensor: Token-level hidden states.
+        """
+        outputs = self.backbone.net(input_ids=tokens, attention_mask=attention_mask)
+        return outputs["last_hidden_state"]
+
+
+class RBMConditionedEnergyModel(nn.Module):
+    """Conditioned RBM reranker backed by one DPLM feature encoder."""
+
+    def __init__(
+        self,
+        encoder: DPLMFeatureEncoder,
+        rbm_num_visible: int,
+        rbm_num_hidden: int,
+        feature_pooling: str = "mean",
+    ) -> None:
+        """Initializes the RBM-conditioned energy model.
+
+        Args:
+            encoder: Feature encoder used for noisy/candidate representations.
+            rbm_num_visible: Visible-state size fed into the RBM.
+            rbm_num_hidden: Hidden-state size of the RBM.
+            feature_pooling: Pooling strategy used before RBM scoring.
+
+        Raises:
+            ValueError: If the pooling strategy is unsupported.
+        """
+        super().__init__()
+        if feature_pooling != "mean":
+            raise ValueError(
+                f"Unsupported RBM feature_pooling for DPLM examples: {feature_pooling}"
+            )
+
+        self.encoder = encoder
+        self.feature_pooling = feature_pooling
+        self.feature_projector = nn.Linear(2 * encoder.hidden_size, rbm_num_visible)
+        self.energy_rbm = RestrictedBoltzmannMachine(
+            num_visible=rbm_num_visible,
+            num_hidden=rbm_num_hidden,
+        )
+
+    @property
+    def hidden_size(self) -> int:
+        """Returns the feature-encoder hidden size.
+
+        Returns:
+            int: Sequence feature size before RBM projection.
+        """
+        return self.encoder.hidden_size
+
+    @property
+    def tokenizer(self) -> Any:
+        """Returns the tokenizer associated with the wrapped backbone.
+
+        Returns:
+            Any: Tokenizer-like helper from the wrapped DPLM backbone.
+        """
+        return self.encoder.backbone.tokenizer
+
+    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Embeds token ids via the wrapped feature encoder.
+
+        Args:
+            tokens: Token ids to embed.
+
+        Returns:
+            torch.Tensor: Embedded tokens.
+        """
+        return self.encoder.embed_tokens(tokens)
+
+    def encode_conditioned(
+        self,
+        input_ids: torch.Tensor,
+        inputs_embeds: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Preserves fallback compatibility with ``QDiffusion.energy()``.
+
+        Args:
+            input_ids: Noisy token ids.
+            inputs_embeds: Pre-fused token embeddings.
+            attention_mask: Attention mask for the encoder.
+
+        Returns:
+            torch.Tensor: Token-level hidden states from the wrapped encoder.
+        """
+        outputs = self.encoder.backbone.net(
+            input_ids=input_ids,
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+        )
+        return outputs["last_hidden_state"]
+
+    def _masked_mean_pool(
+        self, hidden_states: torch.Tensor, attention_mask: torch.Tensor
+    ) -> torch.Tensor:
+        """Pools token-level hidden states into one sequence feature vector.
+
+        Args:
+            hidden_states: Token-level hidden states.
+            attention_mask: Boolean or integer attention mask.
+
+        Returns:
+            torch.Tensor: Sequence-level pooled features.
+        """
+        mask = attention_mask.to(hidden_states.dtype).unsqueeze(-1)
+        denominator = mask.sum(dim=1).clamp_min(1.0)
+        return (hidden_states * mask).sum(dim=1) / denominator
+
+    def build_visible_state(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Builds one RBM visible state from conditioned DPLM features.
+
+        Args:
+            noisy_tokens: Noisy conditioning tokens.
+            candidate_tokens: Candidate tokens to rerank.
+            attention_mask: Attention mask for pooling.
+
+        Returns:
+            torch.Tensor: Visible-state tensor in ``[0, 1]``.
+        """
+        noisy_hidden = self.encoder.encode_tokens(
+            noisy_tokens, attention_mask=attention_mask
+        )
+        candidate_hidden = self.encoder.encode_tokens(
+            candidate_tokens, attention_mask=attention_mask
+        )
+        noisy_features = self._masked_mean_pool(noisy_hidden, attention_mask)
+        candidate_features = self._masked_mean_pool(candidate_hidden, attention_mask)
+        conditioned_features = torch.cat([noisy_features, candidate_features], dim=-1)
+        return torch.sigmoid(self.feature_projector(conditioned_features))
+
+
+class RBMConditionedEnergyAdapter:
+    """Adapter exposing one DPLM-conditioned RBM scorer to ``QDiffusion``."""
+
+    def __init__(self, energy_model: RBMConditionedEnergyModel) -> None:
+        """Initializes the conditioned RBM energy adapter.
+
+        Args:
+            energy_model: Example-side RBM reranker model.
+        """
+        self.energy_model = energy_model
+
+    @property
+    def hidden_size(self) -> int:
+        """Returns the fallback hidden size expected by ``QDiffusion``.
+
+        Returns:
+            int: Hidden size of the wrapped feature encoder.
+        """
+        return self.energy_model.hidden_size
+
+    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Embeds discrete token ids via the wrapped energy model.
+
+        Args:
+            tokens: Token ids to embed.
+
+        Returns:
+            torch.Tensor: Embedded token representations.
+        """
+        return self.energy_model.embed_tokens(tokens)
+
+    def encode_conditioned(
+        self,
+        input_ids: torch.Tensor,
+        inputs_embeds: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Encodes fused embeddings for the fallback energy path.
+
+        Args:
+            input_ids: Noisy token ids.
+            inputs_embeds: Fused token embeddings.
+            attention_mask: Attention mask for the encoder.
+
+        Returns:
+            torch.Tensor: Token-level hidden states.
+        """
+        return self.energy_model.encode_conditioned(
+            input_ids=input_ids,
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+        )
+
+    def score_conditioned(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Scores candidates with the wrapped RBM reranker.
+
+        Args:
+            noisy_tokens: Noisy conditioning tokens.
+            candidate_tokens: Candidate tokens to rerank.
+            attention_mask: Attention mask for sequence pooling.
+
+        Returns:
+            torch.Tensor: Scalar energies shaped as ``[batch, 1]``.
+        """
+        visible_state = self.energy_model.build_visible_state(
+            noisy_tokens=noisy_tokens,
+            candidate_tokens=candidate_tokens,
+            attention_mask=attention_mask,
+        )
+        rbm_state = self.energy_model.energy_rbm.get_hidden(
+            visible_state,
+            requires_grad=True,
+            bernoulli=False,
+        )
+        return self.energy_model.energy_rbm(rbm_state).unsqueeze(-1)
 
 
 # Private ESM implementation details.
@@ -481,7 +743,7 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
             **kwargs: Keyword generation arguments such as ``attention_mask``.
 
         Returns:
-            A minimal generation input dictionary.
+            dict[str, Any]: A minimal generation input dictionary.
 
         Raises:
             ValueError: If ``input_ids`` is missing.
@@ -509,7 +771,7 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
             beam_idx: Beam-selection indices.
 
         Returns:
-            Reordered cached attention states.
+            tuple[tuple[torch.Tensor, ...], ...]: Reordered cached attention states.
         """
         return tuple(
             tuple(
@@ -553,7 +815,7 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
             return_dict: Whether to return Hugging Face model-output objects.
 
         Returns:
-            Either a tuple or a Hugging Face model-output object containing
+            Union[Tuple[torch.Tensor, ...], BaseModelOutputWithPoolingAndCrossAttentions]: Either a tuple or a Hugging Face model-output object containing
             token-level hidden states.
 
         Raises:
@@ -714,7 +976,7 @@ class _EsmForDPLM(EsmPreTrainedModel):
             **kwargs: Keyword generation arguments such as ``attention_mask``.
 
         Returns:
-            A minimal generation input dictionary.
+            dict[str, Any]: A minimal generation input dictionary.
 
         Raises:
             ValueError: If ``input_ids`` is missing.
@@ -742,7 +1004,7 @@ class _EsmForDPLM(EsmPreTrainedModel):
             beam_idx: Beam-selection indices.
 
         Returns:
-            Reordered cached attention states.
+            tuple[tuple[torch.Tensor, ...], ...]: Reordered cached attention states.
         """
         return tuple(
             tuple(

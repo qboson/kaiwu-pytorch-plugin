@@ -261,7 +261,7 @@ checkpoint reruns, and evaluation. Key steps include:
 - **Training Objective**: In the epoch loop, tokenize FASTA sequences into
   `targets`, call `generator.objective({"targets": ...})`, corrupt clean
   sequences into noisy states, sample proposal candidates, and optimize
-  `objective_ebm.mean()` to train the energy-guidance branch.
+  `energy_objective.mean()` to train the energy-guidance branch.
 - **Checkpoint and Rerun Workflow**: Save compact checkpoints containing
   `energy_model`, `energy_head`, and `vocab_proj`, then rebuild baseline and
   guided generators for test-time generation and reruns.

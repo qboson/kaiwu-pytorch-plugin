@@ -45,7 +45,7 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
         fasta_path: FASTA file to read.
 
     Returns:
-        A list of ``(header, sequence)`` pairs.
+        list[tuple[str, str]]: A list of ``(header, sequence)`` pairs.
     """
     records: list[tuple[str, str]] = []
     header = ""
@@ -88,7 +88,7 @@ def normalize_decoded_sequence(sequence: str) -> str:
         sequence: Raw decoded tokenizer output.
 
     Returns:
-        Normalized sequence text without spaces.
+        str: Normalized sequence text without spaces.
     """
     return sequence.replace(" ", "").strip()
 
@@ -102,7 +102,7 @@ def encode_sequence(generator, sequence: str, max_length: int | None = None) -> 
         max_length: Optional truncation length before tokenization.
 
     Returns:
-        Token tensor on the generator device.
+        torch.Tensor: Token tensor on the generator device.
     """
     if max_length is not None:
         sequence = sequence[:max_length]
@@ -122,7 +122,7 @@ def sequence_identity(reference: str, candidate: str) -> float:
         candidate: Candidate sequence text.
 
     Returns:
-        Shared-prefix identity ratio.
+        float: Shared-prefix identity ratio.
     """
     if not reference or not candidate:
         return 0.0
@@ -140,7 +140,7 @@ def token_distribution(sequences: Iterable[str]) -> dict[str, int]:
         sequences: Sequence collection to summarize.
 
     Returns:
-        Per-token count dictionary.
+        dict[str, int]: Per-token count dictionary.
     """
     counts: dict[str, int] = {}
     for sequence in sequences:
@@ -157,7 +157,7 @@ def kmer_distribution(sequences: Iterable[str], k: int) -> dict[str, int]:
         k: K-mer size.
 
     Returns:
-        Per-k-mer count dictionary.
+        dict[str, int]: Per-k-mer count dictionary.
     """
     counts: dict[str, int] = {}
     for sequence in sequences:
@@ -177,7 +177,7 @@ def jsd_from_counts(reference_counts: dict[str, int], candidate_counts: dict[str
         candidate_counts: Candidate frequency counts.
 
     Returns:
-        Jensen-Shannon divergence value.
+        float: Jensen-Shannon divergence value.
     """
     vocabulary = sorted(set(reference_counts) | set(candidate_counts))
     if not vocabulary:
@@ -306,7 +306,11 @@ def load_trained_energy_weights(generator, checkpoint_path: str, device: str) ->
     """Loads a compact energy-side checkpoint into one generator."""
     checkpoint = torch.load(checkpoint_path, map_location=device)
     state_dict = checkpoint["state_dict"]
-    generator.energy_model.load_state_dict(state_dict["energy_model"])
+    generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
+    generator.energy_model.feature_projector.load_state_dict(
+        state_dict["feature_projector"]
+    )
+    generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
     generator.energy_head.load_state_dict(state_dict["energy_head"])
     generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
 

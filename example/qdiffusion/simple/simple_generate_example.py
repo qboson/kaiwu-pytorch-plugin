@@ -32,7 +32,7 @@ def default_fasta_path() -> Path:
     """Returns the bundled example FASTA path.
 
     Returns:
-        Path to the bundled FASTA file used by this example.
+        Path: Path to the bundled FASTA file used by this example.
     """
     return CASE_ROOT / "data" / "UP000005640_9606.fasta"
 
@@ -51,7 +51,7 @@ def first_usable_sequence(
         max_length: Maximum acceptable sequence length.
 
     Returns:
-        A ``(header, sequence)`` pair.
+        tuple[str, str]: A ``(header, sequence)`` pair.
 
     Raises:
         ValueError: If no usable sequence exists in the FASTA file.
@@ -90,7 +90,7 @@ def decode_tokens(generator, tokens: torch.Tensor) -> str:
         tokens: Generated token tensor.
 
     Returns:
-        Decoded protein sequence text without spaces.
+        str: Decoded protein sequence text without spaces.
     """
     decoded = generator.tokenizer.batch_decode(tokens, skip_special_tokens=True)[0]
     return decoded.replace(" ", "").strip()

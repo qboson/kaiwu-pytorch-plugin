@@ -133,7 +133,7 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
         fasta_path: FASTA file to read.
 
     Returns:
-        A list of ``(header, sequence)`` pairs.
+        list[tuple[str, str]]: A list of ``(header, sequence)`` pairs.
     """
     records: list[tuple[str, str]] = []
     header = ""
@@ -164,7 +164,7 @@ def normalize_sequence(sequence: str) -> str:
         sequence: Raw decoded sequence text.
 
     Returns:
-        Compact FASTA-friendly sequence text.
+        str: Compact FASTA-friendly sequence text.
     """
     return sequence.replace(" ", "").strip()
 
@@ -193,7 +193,7 @@ def maybe_limit_records(
         max_records: Optional limit on record count.
 
     Returns:
-        Either the full record list or its truncated prefix.
+        list[tuple[str, str]]: Either the full record list or its truncated prefix.
     """
     if max_records is None:
         return records
@@ -214,7 +214,7 @@ def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
         sequence_length: Residue length excluding special tokens.
 
     Returns:
-        Input token tensor filled with mask tokens at residue positions.
+        torch.Tensor: Input token tensor filled with mask tokens at residue positions.
     """
     masked_sequence = "".join(["<mask>"] * sequence_length)
     encoded = generator.tokenizer.batch_encode_plus(
@@ -239,7 +239,11 @@ def load_trained_energy_weights(
     print(f"Loading guided checkpoint weights from: {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location=device)
     state_dict = checkpoint["state_dict"]
-    generator.energy_model.load_state_dict(state_dict["energy_model"])
+    generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
+    generator.energy_model.feature_projector.load_state_dict(
+        state_dict["feature_projector"]
+    )
+    generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
     generator.energy_head.load_state_dict(state_dict["energy_head"])
     generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
 
@@ -264,7 +268,7 @@ def run_generation_over_records(
         label: Logging label for the generation run.
 
     Returns:
-        Generated FASTA records aligned to the input order.
+        list[tuple[str, str]]: Generated FASTA records aligned to the input order.
     """
     generated_records: list[tuple[str, str]] = []
     print(
@@ -319,7 +323,7 @@ def generate_candidate_fastas(
         output_dir: Root output directory for generated artifacts.
 
     Returns:
-        A tuple ``(baseline_path, guided_path)`` for the generated FASTA files.
+        tuple[Path, Path]: A tuple ``(baseline_path, guided_path)`` for the generated FASTA files.
 
     Raises:
         SystemExit: If required checkpoint config is missing.

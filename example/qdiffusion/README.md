@@ -26,8 +26,8 @@ This example tree is organized around one simple boundary:
 The main assembly path is:
 
 1. a script calls `build_dplm_qdiffusion(...)`
-2. `dplm/dplm_builder.py` loads one proposal backbone and one energy backbone
-3. `dplm/dplm_modeling.py` wraps those backbones, exposes token metadata, and builds the energy adapter
+2. `dplm/dplm_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
+3. `dplm/dplm_modeling.py` builds one conditioned RBM reranker on top of that feature encoder
 4. the builder constructs one generic `QDiffusion(...)`
 5. the script calls `objective(...)` for training or `generate(...)` for inference
 
@@ -49,7 +49,7 @@ the larger experiment workflow.
 `dplm/` contains the DPLM-specific adapter layer and larger workflows:
 
 - `dplm/dplm_builder.py`: DPLM-to-`QDiffusion` assembly entrypoint
-- `dplm/dplm_modeling.py`: DPLM/ESM modeling and adapter support code
+- `dplm/dplm_modeling.py`: DPLM/ESM modeling, feature encoding, and RBM reranker support code
 - `dplm/train_workflow.py`: full train/eval workflow script
 - `dplm/rerun_from_checkpoint.py`: guided rerun script from saved checkpoints
 - `dplm/eval_esm2_distances.py`: ESM2 distance evaluation script
@@ -60,11 +60,11 @@ Its end-to-end flow is:
 
 1. read and filter FASTA records
 2. split them into train/validation/test sets
-3. build a DPLM-backed `QDiffusion` generator
+3. build a `QDiffusion` generator with a DPLM proposal model and an RBM reranker
 4. tokenize sequences into `targets`
 5. call `generator.objective({"targets": ...})` inside the epoch loop
-6. optimize `objective_ebm.mean()`, mainly training the energy side
-7. save compact checkpoints containing `energy_model`, `energy_head`, and `vocab_proj`
+6. optimize `energy_objective.mean()`, mainly training the RBM reranking path
+7. save compact checkpoints containing `energy_encoder`, `feature_projector`, `energy_rbm`, `energy_head`, and `vocab_proj`
 8. rebuild baseline and guided generators for test-time generation
 9. compare baseline vs guided outputs and write reports
 
@@ -74,8 +74,8 @@ Inside `QDiffusion.objective(...)`, the training path is:
 2. corrupt them into noisy `x_t`
 3. run the proposal model to produce logits
 4. sample negative candidates from those logits
-5. score positive and negative candidates with the energy branch
-6. return `objective_ebm` and related tensors to the outer training loop
+5. score positive and negative candidates with the conditioned RBM reranker
+6. return `energy_objective` and related tensors to the outer training loop
 
 ## Shared Assets
 
@@ -89,5 +89,6 @@ Inside `QDiffusion.objective(...)`, the training path is:
 - Users should import the generic `QDiffusion` core from `kaiwu.torch_plugin`.
 - DPLM loading is no longer part of the formal `src` API; the DPLM factory in
   this directory is the example-side compatibility layer.
+- The guided path in these examples is now `DPLM proposal + RBM reranker`.
 - `simple/` and `dplm/` are designed to be read together:
   `simple/` shows the API surface, while `dplm/` shows the full experiment workflow.

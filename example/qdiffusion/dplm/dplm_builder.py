@@ -13,7 +13,9 @@ from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
 from dplm.dplm_modeling import (
     DPLMBackbone,
-    DPLMEnergyAdapter,
+    DPLMFeatureEncoder,
+    RBMConditionedEnergyAdapter,
+    RBMConditionedEnergyModel,
     build_dplm_token_spec,
 )
 
@@ -37,7 +39,7 @@ def load_dplm_backbone(
             Face identifier instead of a local training artifact.
 
     Returns:
-        One configured example-side DPLM backbone wrapper.
+        DPLMBackbone: One configured example-side DPLM backbone wrapper.
     """
     return DPLMBackbone.from_pretrained(
         model_name_or_path,
@@ -54,6 +56,10 @@ def build_dplm_qdiffusion(
     proposal_ckpt: str,
     energy_ckpt: str,
     *,
+    energy_model_type: str = "rbm",
+    rbm_num_visible: int = 256,
+    rbm_num_hidden: int = 128,
+    feature_pooling: str = "mean",
     num_candidates: int = 1,
     proposal_temperature: float = 0.0,
     proposal_noise_scale: float = 1.0,
@@ -75,6 +81,11 @@ def build_dplm_qdiffusion(
     Args:
         proposal_ckpt: Proposal backbone checkpoint or model id.
         energy_ckpt: Energy backbone checkpoint or model id.
+        energy_model_type: Energy-model backend type. Only ``"rbm"`` is
+            supported by the current examples.
+        rbm_num_visible: Visible-state size for the RBM reranker.
+        rbm_num_hidden: Hidden-state size for the RBM reranker.
+        feature_pooling: Sequence pooling strategy used before RBM scoring.
         num_candidates: Number of proposal candidates sampled per decode step.
         proposal_temperature: Temperature used for proposal-side sampling.
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
@@ -92,7 +103,10 @@ def build_dplm_qdiffusion(
         device: Optional target device for the resulting ``QDiffusion``.
 
     Returns:
-        One generic ``QDiffusion`` instance backed by DPLM adapters.
+        QDiffusion: One generic ``QDiffusion`` instance backed by DPLM adapters.
+
+    Raises:
+        ValueError: If the requested energy backend is unsupported.
     """
     proposal_model = load_dplm_backbone(
         proposal_ckpt,
@@ -100,14 +114,26 @@ def build_dplm_qdiffusion(
         net_override=proposal_net_override,
         from_huggingface=from_huggingface,
     )
-    energy_model = load_dplm_backbone(
+    if energy_model_type != "rbm":
+        raise ValueError(
+            f"Unsupported DPLM example energy_model_type: {energy_model_type}"
+        )
+
+    energy_backbone = load_dplm_backbone(
         energy_ckpt,
         cfg_override=energy_cfg_override,
         net_override=energy_net_override,
         from_huggingface=from_huggingface,
     )
+    energy_encoder = DPLMFeatureEncoder(energy_backbone)
+    energy_model = RBMConditionedEnergyModel(
+        encoder=energy_encoder,
+        rbm_num_visible=rbm_num_visible,
+        rbm_num_hidden=rbm_num_hidden,
+        feature_pooling=feature_pooling,
+    )
     token_spec = build_dplm_token_spec(proposal_model)
-    energy_adapter = DPLMEnergyAdapter(energy_model)
+    energy_adapter = RBMConditionedEnergyAdapter(energy_model)
     config = QDiffusionConfig(
         num_candidates=num_candidates,
         proposal_temperature=proposal_temperature,

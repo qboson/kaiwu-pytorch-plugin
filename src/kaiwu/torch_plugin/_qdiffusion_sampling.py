@@ -8,13 +8,27 @@ from __future__ import annotations
 import torch
 
 
+# Skeptical-remasking helpers.
+
 def topk_masking(
     scores: torch.Tensor,
     cutoff_len: torch.Tensor,
     stochastic: bool = False,
     temp: float = 1.0,
 ) -> torch.Tensor:
-    """Selects the lowest-score positions used by skeptical remasking."""
+    """Selects the lowest-score positions used by skeptical remasking.
+
+    Args:
+        scores: Per-position scores used to rank editable token positions.
+        cutoff_len: Per-sample cutoff lengths that determine how many
+            positions remain masked.
+        stochastic: Whether to perturb the ranking with Gumbel noise.
+        temp: Noise temperature applied when ``stochastic`` is enabled.
+
+    Returns:
+        torch.Tensor: A boolean mask where ``True`` marks positions below the per-sample
+        cutoff.
+    """
     if stochastic:
         gumbel_noise = -torch.log(-torch.log(torch.rand_like(scores) + 1e-8) + 1e-8)
         ranked_scores = scores + temp * gumbel_noise
@@ -25,11 +39,24 @@ def topk_masking(
     return ranked_scores < cutoff
 
 
+# Categorical sampling helpers.
+
 def sample_from_categorical(
     logits: torch.Tensor,
     temperature: float = 1.0,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Samples tokens from categorical logits."""
+    """Samples tokens from categorical logits.
+
+    Args:
+        logits: Unnormalized categorical logits.
+        temperature: Sampling temperature. A falsy value switches to greedy
+            argmax decoding.
+
+    Returns:
+        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` where ``tokens`` contains sampled token
+        ids and ``scores`` contains the associated log-probability-style
+        scores.
+    """
     if temperature:
         dist = torch.distributions.Categorical(logits=logits.div(temperature))
         tokens = dist.sample()
@@ -44,7 +71,18 @@ def stochastic_sample_from_categorical(
     temperature: float = 1.0,
     noise_scale: float = 1.0,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Applies Gumbel noise before categorical sampling."""
+    """Applies Gumbel noise before categorical sampling.
+
+    Args:
+        logits: Unnormalized categorical logits.
+        temperature: Sampling temperature forwarded to
+            :func:`sample_from_categorical`.
+        noise_scale: Multiplicative scale for the sampled Gumbel noise.
+
+    Returns:
+        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` sampled from the perturbed categorical
+        distribution.
+    """
     gumbel_noise = -torch.log(-torch.log(torch.rand_like(logits) + 1e-8) + 1e-8)
     noisy_logits = logits + noise_scale * gumbel_noise
     return sample_from_categorical(noisy_logits, temperature)
@@ -56,7 +94,20 @@ def stochastic_sample_from_categorical_n(
     noise_scale: float = 1.0,
     n: int = 1,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    """Samples multiple noisy categorical candidates."""
+    """Samples multiple noisy categorical candidates.
+
+    Args:
+        logits: Unnormalized categorical logits shaped as
+            ``[batch, seq_len, vocab]`` or similar.
+        temperature: Sampling temperature forwarded to
+            :func:`sample_from_categorical`.
+        noise_scale: Multiplicative scale for the sampled Gumbel noise.
+        n: Number of independent noisy candidate sets to draw.
+
+    Returns:
+        tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` whose leading dimension indexes the
+        sampled candidate set.
+    """
     expanded_logits = logits.unsqueeze(0).expand(n, *logits.shape)
     gumbel_noise = -torch.log(
         -torch.log(torch.rand_like(expanded_logits) + 1e-8) + 1e-8
@@ -65,13 +116,27 @@ def stochastic_sample_from_categorical_n(
     return sample_from_categorical(noisy_logits, temperature)
 
 
+# Logit filtering helpers.
+
 def top_k_top_p_filtering(
     logits: torch.Tensor,
     top_k: int = 0,
     top_p: float = 0.95,
     filter_value: float = -float("Inf"),
 ) -> torch.Tensor:
-    """Applies top-k and/or nucleus filtering to logits."""
+    """Applies top-k and/or nucleus filtering to logits.
+
+    Args:
+        logits: Unnormalized categorical logits.
+        top_k: Number of highest-logit entries to retain per row. A value of
+            ``0`` disables top-k filtering.
+        top_p: Nucleus-filtering threshold on cumulative probability mass.
+        filter_value: Replacement value written into filtered logit entries.
+
+    Returns:
+        torch.Tensor: A tensor with the same shape as ``logits`` where filtered entries are
+        replaced by ``filter_value``.
+    """
     original_shape = logits.shape
     flat_logits = logits.reshape(-1, original_shape[-1])
     assert flat_logits.dim() == 2

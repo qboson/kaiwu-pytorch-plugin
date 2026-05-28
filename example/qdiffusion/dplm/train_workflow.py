@@ -35,7 +35,7 @@ def default_fasta_path() -> Path:
     """Returns the bundled FASTA path for this clean case directory.
 
     Returns:
-        Path to the bundled FASTA file used by the workflow.
+        Path: Path to the bundled FASTA file used by the workflow.
     """
     return CASE_ROOT / "data" / "UP000005640_9606.fasta"
 
@@ -59,7 +59,7 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
         fasta_path: FASTA file to read.
 
     Returns:
-        A list of ``(header, sequence)`` pairs.
+        list[tuple[str, str]]: A list of ``(header, sequence)`` pairs.
     """
     records: list[tuple[str, str]] = []
     header = ""
@@ -104,7 +104,7 @@ def normalize_decoded_sequence(sequence: str) -> str:
         sequence: Raw decoded tokenizer output.
 
     Returns:
-        Normalized sequence text without spaces.
+        str: Normalized sequence text without spaces.
     """
     return sequence.replace(" ", "").strip()
 
@@ -125,7 +125,7 @@ def select_records(
         max_records: Optional maximum number of records to keep.
 
     Returns:
-        Filtered FASTA records.
+        list[tuple[str, str]]: Filtered FASTA records.
     """
     selected: list[tuple[str, str]] = []
     for header, sequence in records:
@@ -153,7 +153,7 @@ def split_train_val_test(
         seed: Random seed for deterministic shuffling.
 
     Returns:
-        A tuple ``(train_records, val_records, test_records)``.
+        tuple[list[tuple[str, str]], list[tuple[str, str]], list[tuple[str, str]]]: A tuple ``(train_records, val_records, test_records)``.
 
     Raises:
         ValueError: If the dataset is too small or split ratios consume all
@@ -187,7 +187,7 @@ def encode_sequence(
         max_length: Optional truncation length before tokenization.
 
     Returns:
-        Token tensor on the generator device.
+        torch.Tensor: Token tensor on the generator device.
     """
     if max_length is not None:
         sequence = sequence[:max_length]
@@ -206,19 +206,19 @@ def summarize_objective(outputs: dict[str, torch.Tensor]) -> str:
         outputs: Output dictionary returned by ``generator.objective(...)``.
 
     Returns:
-        Human-readable one-line summary for logging.
+        str: Human-readable one-line summary for logging.
     """
     logits = outputs["logits"]
     targets = outputs["targets"]
     loss_mask = outputs["loss_mask"]
     weight = outputs["weight"]
-    objective_ebm = outputs["objective_ebm"]
+    energy_objective = outputs["energy_objective"]
     return (
         f"logits={tuple(logits.shape)}, "
         f"targets={tuple(targets.shape)}, "
         f"masked_positions={int(loss_mask.sum().item())}, "
         f"weight_mean={float(weight.mean().item()):.4f}, "
-        f"objective_ebm_mean={float(objective_ebm.mean().item()):.4f}"
+        f"energy_objective_mean={float(energy_objective.mean().item()):.4f}"
     )
 
 
@@ -275,7 +275,7 @@ def build_data_loader_from_records(
         shuffle: Whether to shuffle records each epoch.
 
     Returns:
-        A dataloader producing tokenized batches.
+        DataLoader: A dataloader producing tokenized batches.
     """
     return DataLoader(
         FastaSequenceDataset(records),
@@ -318,7 +318,7 @@ def run_epoch(
         description: Progress-bar label.
 
     Returns:
-        Aggregated epoch metrics.
+        dict[str, float]: Aggregated epoch metrics.
     """
     training = optimizer is not None
     set_training_mode(generator, training=training)
@@ -330,7 +330,7 @@ def run_epoch(
     with context():
         for batch in tqdm(data_loader, desc=description, unit="batch"):
             outputs = generator.objective({"targets": batch["targets"]})
-            loss = outputs["objective_ebm"].mean()
+            loss = outputs["energy_objective"].mean()
 
             if training:
                 optimizer.zero_grad(set_to_none=True)
@@ -346,7 +346,7 @@ def run_epoch(
             total_loss += float(loss.item()) * batch_size
             total_examples += batch_size
 
-    return {"objective_ebm_mean": total_loss / max(total_examples, 1)}
+    return {"energy_objective_mean": total_loss / max(total_examples, 1)}
 
 
 def summarize_trainable_parameters(generator) -> dict[str, int]:
@@ -356,7 +356,7 @@ def summarize_trainable_parameters(generator) -> dict[str, int]:
         generator: Configured ``QDiffusion`` instance.
 
     Returns:
-        Dictionary with total and trainable parameter counts.
+        dict[str, int]: Dictionary with total and trainable parameter counts.
     """
     total = 0
     trainable = 0
@@ -386,7 +386,7 @@ def save_checkpoint(
         metric: Validation metric stored with the checkpoint.
 
     Returns:
-        Path to the written checkpoint file.
+        Path: Path to the written checkpoint file.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = output_dir / name
@@ -395,7 +395,9 @@ def save_checkpoint(
             "epoch": epoch,
             "metric": metric,
             "state_dict": {
-                "energy_model": generator.energy_model.state_dict(),
+                "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
+                "feature_projector": generator.energy_model.feature_projector.state_dict(),
+                "energy_rbm": generator.energy_model.energy_rbm.state_dict(),
                 "energy_head": generator.energy_head.state_dict(),
                 "vocab_proj": generator.vocab_proj.state_dict(),
             },
@@ -415,7 +417,11 @@ def load_trained_energy_weights(generator, checkpoint_path: str, device: str) ->
     """
     checkpoint = torch.load(checkpoint_path, map_location=device)
     state_dict = checkpoint["state_dict"]
-    generator.energy_model.load_state_dict(state_dict["energy_model"])
+    generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
+    generator.energy_model.feature_projector.load_state_dict(
+        state_dict["feature_projector"]
+    )
+    generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
     generator.energy_head.load_state_dict(state_dict["energy_head"])
     generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
 
@@ -436,7 +442,7 @@ def run_structural_validation(
         steps: Number of decode steps for the sanity-check generation.
 
     Returns:
-        Structured summary of objective and generation behavior.
+        dict[str, Any]: Structured summary of objective and generation behavior.
     """
     header, sequence = record
     target_tokens = encode_sequence(generator, sequence, max_length=max_length)
@@ -483,7 +489,7 @@ def run_generation_over_records(
         label: Artifact prefix label.
 
     Returns:
-        A tuple of generated FASTA records and per-sequence summary rows.
+        tuple[list[tuple[str, str]], list[dict[str, Any]]]: A tuple of generated FASTA records and per-sequence summary rows.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     generated_records: list[tuple[str, str]] = []
@@ -513,8 +519,8 @@ def run_generation_over_records(
                 "label": label,
                 "reference_length": len(sequence),
                 "generated_length": len(generated_sequence),
-                "objective_ebm_mean": round(
-                    float(objective_outputs["objective_ebm"].mean().item()), 4
+                "energy_objective_mean": round(
+                    float(objective_outputs["energy_objective"].mean().item()), 4
                 ),
             }
         )
@@ -807,13 +813,13 @@ def write_markdown_report(
         "",
         "## 3. Training History",
         "",
-        "| Epoch | Train objective_ebm_mean | Val objective_ebm_mean |",
+        "| Epoch | Train energy_objective_mean | Val energy_objective_mean |",
         "|---:|---:|---:|",
     ]
     for row in train_history:
         lines.append(
-            f"| {row['epoch']} | {row['train_objective_ebm_mean']:.5f} | "
-            f"{row['val_objective_ebm_mean']:.5f} |"
+            f"| {row['epoch']} | {row['train_energy_objective_mean']:.5f} | "
+            f"{row['val_energy_objective_mean']:.5f} |"
         )
     lines += [
         "",
@@ -1022,15 +1028,15 @@ def main() -> None:
 
         epoch_summary = {
             "epoch": epoch,
-            "train_objective_ebm_mean": train_metrics["objective_ebm_mean"],
-            "val_objective_ebm_mean": val_metrics["objective_ebm_mean"],
+            "train_energy_objective_mean": train_metrics["energy_objective_mean"],
+            "val_energy_objective_mean": val_metrics["energy_objective_mean"],
             "learning_rate": float(optimizer.param_groups[0]["lr"]),
         }
         train_history.append(epoch_summary)
         save_json(output_dir / "history.json", train_history)
         print(json.dumps(epoch_summary, ensure_ascii=False))
 
-        current_val = val_metrics["objective_ebm_mean"]
+        current_val = val_metrics["energy_objective_mean"]
         scheduler.step(current_val)
         if current_val < best_val:
             best_val = current_val
@@ -1061,7 +1067,7 @@ def main() -> None:
         f"final_epoch_{final_epoch}.pt",
         generator=train_generator,
         epoch=final_epoch,
-        metric=train_history[-1]["val_objective_ebm_mean"],
+        metric=train_history[-1]["val_energy_objective_mean"],
     )
     print(f"Best checkpoint: {best_checkpoint_path}")
     print(f"Final checkpoint: {final_checkpoint_path}")

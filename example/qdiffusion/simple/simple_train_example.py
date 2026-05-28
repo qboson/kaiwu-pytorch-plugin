@@ -9,7 +9,7 @@ This script intentionally keeps only the smallest useful training path:
 2. read a few FASTA sequences
 3. tokenize one mini-batch
 4. call ``objective()``
-5. optimize ``objective_ebm.mean()``
+5. optimize ``energy_objective.mean()``
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ def default_fasta_path() -> Path:
     """Returns the bundled example FASTA path.
 
     Returns:
-        Path to the bundled FASTA file used by this example.
+        Path: Path to the bundled FASTA file used by this example.
     """
     return CASE_ROOT / "data" / "UP000005640_9606.fasta"
 
@@ -46,7 +46,7 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
         fasta_path: FASTA file to read.
 
     Returns:
-        A list of ``(header, sequence)`` pairs.
+        list[tuple[str, str]]: A list of ``(header, sequence)`` pairs.
     """
     records: list[tuple[str, str]] = []
     header = ""
@@ -86,7 +86,7 @@ def select_records(
         max_records: Maximum number of records to keep.
 
     Returns:
-        The filtered prefix of usable FASTA records.
+        list[tuple[str, str]]: The filtered prefix of usable FASTA records.
     """
     selected: list[tuple[str, str]] = []
     for header, sequence in records:
@@ -151,7 +151,7 @@ def main() -> None:
 
     for step in range(1, num_steps + 1):
         outputs = generator.objective({"targets": targets})
-        loss = outputs["objective_ebm"].mean()
+        loss = outputs["energy_objective"].mean()
 
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
