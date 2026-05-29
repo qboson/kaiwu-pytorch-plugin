@@ -315,8 +315,10 @@ python example/qdiffusion/dplm/train_workflow.py
 
 ## 联系方式
 
-1. **玻色量子开发者社区**：获取更多学习资源
-2. **玻色量子官方助手**：咨询真机接入与合作事宜
-3. email: developer@boseq.com
+1. 玻色量子开发者社区，获取更多学习资源
+2. 玻色量子官方助手，真机申请及合作咨询
+3. 邮箱联系方式：developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/c71de786-96e7-4664-891d-4cb03766c98e)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  
+ ![communication group](https://github.com/user-attachments/assets/1931f657-572f-4f10-9e13-9cfdd3af0de9)
+
