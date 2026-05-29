@@ -186,7 +186,7 @@ if __name__ == "__main__":
     print(objective)
 ```
 
-### QDiffusion Quick Start
+### Q-Diffusion Quick Start
 
 `QDiffusion` is available from the top-level plugin package as a generic
 discrete-sequence core:
