@@ -56,9 +56,13 @@ the larger experiment workflow.
 
 - `dplm/dplm_builder.py`: DPLM-to-`Q-Diffusion` assembly entrypoint
 - `dplm/dplm_modeling.py`: DPLM/ESM modeling, feature encoding, and RBM reranker support code
+- `dplm/shared_io.py`: shared FASTA, JSON, Markdown, and tabular artifact helpers
+- `dplm/shared_runtime.py`: shared tokenization and compact checkpoint helpers
+- `dplm/shared_metrics.py`: shared sequence-quality metrics and comparison helpers
 - `dplm/train_workflow.py`: full train/eval workflow script
 - `dplm/rerun_from_checkpoint.py`: guided rerun script from saved checkpoints
 - `dplm/eval_esm2_distances.py`: ESM2 distance evaluation script
+- `dplm/model.py`: legacy reference implementation kept for comparison only; it is not part of the current recommended workflow
 
 `dplm/train_workflow.py` is the best place to read the full experiment chain.
 

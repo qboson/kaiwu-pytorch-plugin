@@ -15,8 +15,6 @@ Edit the config block inside ``main()`` before running:
 
 from __future__ import annotations
 
-import csv
-import json
 import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -29,10 +27,19 @@ import torch.nn.functional as F
 ensure_repo_src_on_path()
 
 from dplm_builder import build_dplm_qdiffusion
+from shared_io import (
+    write_csv_rows,
+    default_fasta_path,
+    default_outputs_root,
+    normalize_sequence,
+    read_fasta_records,
+    save_json,
+    save_markdown,
+    write_fasta_records,
+)
+from shared_runtime import load_trained_energy_weights
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
-
-CASE_ROOT = Path(__file__).resolve().parents[1]
 
 try:
     import esm
@@ -122,67 +129,6 @@ class EvalConfig:
     guided_resample_top_p: float
 
 
-# ---------------------------------------------------------------------------
-# FASTA I/O helpers
-# This section only reads/writes sequence files and normalizes decoded text.
-# ---------------------------------------------------------------------------
-def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
-    """Reads all FASTA records from one file.
-
-    Args:
-        fasta_path: FASTA file to read.
-
-    Returns:
-        list[tuple[str, str]]: A list of ``(header, sequence)`` pairs.
-    """
-    records: list[tuple[str, str]] = []
-    header = ""
-    sequence_parts: list[str] = []
-
-    with fasta_path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith(">"):
-                if header:
-                    records.append((header, "".join(sequence_parts)))
-                header = line[1:]
-                sequence_parts = []
-            else:
-                sequence_parts.append(line)
-
-    if header:
-        records.append((header, "".join(sequence_parts)))
-    return records
-
-
-def normalize_sequence(sequence: str) -> str:
-    """Converts tokenized/space-separated sequence text into compact FASTA text.
-
-    Args:
-        sequence: Raw decoded sequence text.
-
-    Returns:
-        str: Compact FASTA-friendly sequence text.
-    """
-    return sequence.replace(" ", "").strip()
-
-
-def write_fasta_records(path: Path, records: list[tuple[str, str]]) -> None:
-    """Writes FASTA records to disk.
-
-    Args:
-        path: Output FASTA path.
-        records: FASTA records to write.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        for index, (header, sequence) in enumerate(records, start=1):
-            handle.write(f">seq_{index} {header}\n")
-            handle.write(sequence + "\n")
-
-
 def maybe_limit_records(
     records: list[tuple[str, str]], max_records: int | None
 ) -> list[tuple[str, str]]:
@@ -224,32 +170,6 @@ def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
         return_tensors="pt",
     )
     return encoded["input_ids"].to(generator.device)
-
-
-def load_trained_energy_weights(
-    generator, checkpoint_path: str, device: torch.device
-) -> None:
-    """Loads a compact energy-side checkpoint into one generator.
-
-    Args:
-        generator: Configured ``QDiffusion`` instance.
-        checkpoint_path: Path to the compact checkpoint file.
-        device: Device used for checkpoint loading.
-    """
-    print(f"Loading guided checkpoint weights from: {checkpoint_path}")
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    state_dict = checkpoint["state_dict"]
-    generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
-    generator.energy_model.feature_projector.load_state_dict(
-        state_dict["feature_projector"]
-    )
-    if hasattr(generator.energy_model, "energy_rbm"):
-        generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
-    else:
-        generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
-        generator.energy_model.hidden_init.load_state_dict(state_dict["hidden_init"])
-    generator.energy_head.load_state_dict(state_dict["energy_head"])
-    generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
 
 
 def run_generation_over_records(
@@ -358,10 +278,7 @@ def generate_candidate_fastas(
         guided_resample_ratio=config.guided_resample_ratio,
         guided_resample_top_p=config.guided_resample_top_p,
     )
-    with (generation_dir / "generation_config.json").open(
-        "w", encoding="utf-8"
-    ) as handle:
-        json.dump(asdict(generation_cfg), handle, indent=2)
+    save_json(generation_dir / "generation_config.json", asdict(generation_cfg))
     print(f"Saved generation config to: {generation_dir / 'generation_config.json'}")
 
     baseline_path = generation_dir / "baseline_generated_sequences.fasta"
@@ -639,19 +556,12 @@ def evaluate_candidate_set(
 # ---------------------------------------------------------------------------
 def write_rows_csv(path: Path, rows: list[PairDistanceRow]) -> None:
     """Writes per-pair distance rows to CSV."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(asdict(rows[0]).keys()))
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(asdict(row))
+    write_csv_rows(path, [asdict(row) for row in rows])
 
 
 def write_summary_json(path: Path, summary: DistanceSummary) -> None:
     """Writes one summary object to JSON."""
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(asdict(summary), handle, indent=2)
+    save_json(path, asdict(summary))
 
 
 def write_report(
@@ -666,7 +576,6 @@ def write_report(
     pooling: str,
 ) -> None:
     """Writes one human-readable markdown report."""
-    path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         "# ESM2 Embedding Distance Report",
         "",
@@ -718,7 +627,7 @@ def write_report(
             ]
         )
 
-    path.write_text("\n".join(lines), encoding="utf-8")
+    save_markdown(path, lines)
 
 
 # ---------------------------------------------------------------------------
@@ -733,11 +642,11 @@ def main() -> None:
     """Runs one local/server generation+evaluation pass with in-file config."""
     config = EvalConfig(
         # Paths to your data/checkpoints.
-        reference_fasta=CASE_ROOT / "data" / "UP000005640_9606.fasta",
+        reference_fasta=default_fasta_path(),
         proposal_ckpt="/data2/wwx/models/dplm_150m",
         energy_ckpt="/data2/wwx/models/dplm_150m",
         guided_checkpoint="ckpt/best_epoch_9.pt",
-        output_dir=CASE_ROOT / "outputs" / "esm2_distance_eval",
+        output_dir=default_outputs_root() / "esm2_distance_eval",
         # Runtime / ESM2 settings.
         device="cuda:0" if torch.cuda.is_available() else "cpu",
         esm2_model="esm2_t33_650M_UR50D",

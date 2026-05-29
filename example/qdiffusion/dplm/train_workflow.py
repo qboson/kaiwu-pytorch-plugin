@@ -5,15 +5,13 @@
 
 from __future__ import annotations
 
-import csv
-import json
-import math
 import os
 import random
+import json
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 from _example_bootstrap import ensure_repo_src_on_path
 import torch
@@ -25,88 +23,30 @@ from tqdm import tqdm
 ensure_repo_src_on_path()
 
 from dplm_builder import build_dplm_qdiffusion
+from shared_io import (
+    default_fasta_path,
+    default_outputs_root,
+    normalize_decoded_sequence,
+    read_fasta_records,
+    save_json,
+    save_markdown,
+    write_fasta_records,
+    write_tsv_rows,
+)
+from shared_metrics import (
+    QualitySummary,
+    compare_generation_sets,
+    evaluate_generation_quality,
+    save_quality_summary,
+)
+from shared_runtime import (
+    encode_sequence,
+    load_trained_energy_weights,
+    save_checkpoint,
+    summarize_trainable_parameters,
+)
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
-
-CASE_ROOT = Path(__file__).resolve().parents[1]
-
-
-def default_fasta_path() -> Path:
-    """Returns the bundled FASTA path for this clean case directory.
-
-    Returns:
-        Path: Path to the bundled FASTA file used by the workflow.
-    """
-    return CASE_ROOT / "data" / "UP000005640_9606.fasta"
-
-
-def save_json(path: Path, payload: Any) -> None:
-    """Writes stable JSON to disk.
-
-    Args:
-        path: Output JSON path.
-        payload: JSON-serializable payload to write.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
-
-
-def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
-    """Reads all FASTA records from one file.
-
-    Args:
-        fasta_path: FASTA file to read.
-
-    Returns:
-        list[tuple[str, str]]: A list of ``(header, sequence)`` pairs.
-    """
-    records: list[tuple[str, str]] = []
-    header = ""
-    sequence_parts: list[str] = []
-
-    with fasta_path.open("r", encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith(">"):
-                if header:
-                    records.append((header, "".join(sequence_parts)))
-                header = line[1:]
-                sequence_parts = []
-            else:
-                sequence_parts.append(line)
-
-    if header:
-        records.append((header, "".join(sequence_parts)))
-    return records
-
-
-def write_fasta_records(path: Path, records: list[tuple[str, str]]) -> None:
-    """Writes FASTA records to disk.
-
-    Args:
-        path: Output FASTA path.
-        records: FASTA records to write.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        for index, (header, sequence) in enumerate(records, start=1):
-            handle.write(f">seq_{index} {header}\n")
-            handle.write(sequence + "\n")
-
-
-def normalize_decoded_sequence(sequence: str) -> str:
-    """Converts token-decoded output into FASTA-friendly sequence text.
-
-    Args:
-        sequence: Raw decoded tokenizer output.
-
-    Returns:
-        str: Normalized sequence text without spaces.
-    """
-    return sequence.replace(" ", "").strip()
 
 
 def select_records(
@@ -174,29 +114,6 @@ def split_train_val_test(
     test_records = shuffled[val_size : val_size + test_size]
     train_records = shuffled[val_size + test_size :]
     return train_records, val_records, test_records
-
-
-def encode_sequence(
-    generator, sequence: str, max_length: int | None = None
-) -> torch.Tensor:
-    """Tokenizes one protein sequence to ``[1, seq_len]``.
-
-    Args:
-        generator: Configured ``QDiffusion`` instance.
-        sequence: Protein sequence text.
-        max_length: Optional truncation length before tokenization.
-
-    Returns:
-        torch.Tensor: Token tensor on the generator device.
-    """
-    if max_length is not None:
-        sequence = sequence[:max_length]
-    encoded = generator.tokenizer(
-        sequence,
-        return_tensors="pt",
-        add_special_tokens=True,
-    )
-    return encoded["input_ids"].to(generator.device)
 
 
 def summarize_objective(outputs: dict[str, torch.Tensor]) -> str:
@@ -353,95 +270,6 @@ def run_epoch(
     return {"energy_objective_mean": total_loss / max(total_examples, 1)}
 
 
-def summarize_trainable_parameters(generator) -> dict[str, int]:
-    """Counts total and trainable parameters.
-
-    Args:
-        generator: Configured ``QDiffusion`` instance.
-
-    Returns:
-        dict[str, int]: Dictionary with total and trainable parameter counts.
-    """
-    total = 0
-    trainable = 0
-    for parameter in generator.parameters():
-        count = parameter.numel()
-        total += count
-        if parameter.requires_grad:
-            trainable += count
-    return {"total_parameters": total, "trainable_parameters": trainable}
-
-
-def save_checkpoint(
-    output_dir: Path,
-    name: str,
-    *,
-    generator,
-    epoch: int,
-    metric: float,
-) -> Path:
-    """Saves a compact checkpoint containing only energy-side weights.
-
-    Args:
-        output_dir: Checkpoint output directory.
-        name: Checkpoint filename.
-        generator: Configured ``QDiffusion`` instance.
-        epoch: Epoch index associated with the checkpoint.
-        metric: Validation metric stored with the checkpoint.
-
-    Returns:
-        Path: Path to the written checkpoint file.
-    """
-    output_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = output_dir / name
-    energy_backend_state = (
-        {"energy_rbm": generator.energy_model.energy_rbm.state_dict()}
-        if hasattr(generator.energy_model, "energy_rbm")
-        else {
-            "energy_bm": generator.energy_model.energy_bm.state_dict(),
-            "hidden_init": generator.energy_model.hidden_init.state_dict(),
-        }
-    )
-    torch.save(
-        {
-            "epoch": epoch,
-            "metric": metric,
-            "state_dict": {
-                "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
-                "feature_projector": generator.energy_model.feature_projector.state_dict(),
-                **energy_backend_state,
-                "energy_head": generator.energy_head.state_dict(),
-                "vocab_proj": generator.vocab_proj.state_dict(),
-            },
-        },
-        checkpoint_path,
-    )
-    return checkpoint_path
-
-
-def load_trained_energy_weights(generator, checkpoint_path: str, device: str) -> None:
-    """Loads a compact energy-side checkpoint into one generator.
-
-    Args:
-        generator: Configured ``QDiffusion`` instance.
-        checkpoint_path: Path to the compact checkpoint file.
-        device: Device string used for checkpoint loading.
-    """
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    state_dict = checkpoint["state_dict"]
-    generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
-    generator.energy_model.feature_projector.load_state_dict(
-        state_dict["feature_projector"]
-    )
-    if hasattr(generator.energy_model, "energy_rbm"):
-        generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
-    else:
-        generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
-        generator.energy_model.hidden_init.load_state_dict(state_dict["hidden_init"])
-    generator.energy_head.load_state_dict(state_dict["energy_head"])
-    generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
-
-
 def run_structural_validation(
     generator,
     record: tuple[str, str],
@@ -544,249 +372,9 @@ def run_generation_over_records(
     write_fasta_records(
         output_dir / f"{label}_generated_sequences.fasta", generated_records
     )
-    with (output_dir / f"{label}_generation_summary.tsv").open(
-        "w", encoding="utf-8", newline=""
-    ) as handle:
-        if rows:
-            writer = csv.DictWriter(
-                handle, fieldnames=list(rows[0].keys()), delimiter="\t"
-            )
-            writer.writeheader()
-            writer.writerows(rows)
+    write_tsv_rows(output_dir / f"{label}_generation_summary.tsv", rows)
 
     return generated_records, rows
-
-
-def sequence_identity(reference: str, candidate: str) -> float:
-    """Computes position-wise identity over the shared prefix."""
-    if not reference or not candidate:
-        return 0.0
-    compare_length = min(len(reference), len(candidate))
-    if compare_length == 0:
-        return 0.0
-    matches = sum(
-        1 for index in range(compare_length) if reference[index] == candidate[index]
-    )
-    return matches / compare_length
-
-
-def token_distribution(sequences: Iterable[str]) -> dict[str, int]:
-    """Counts amino-acid frequencies across a sequence set."""
-    counts: dict[str, int] = {}
-    for sequence in sequences:
-        for token in sequence:
-            counts[token] = counts.get(token, 0) + 1
-    return counts
-
-
-def kmer_distribution(sequences: Iterable[str], k: int) -> dict[str, int]:
-    """Counts k-mers across a sequence set."""
-    counts: dict[str, int] = {}
-    for sequence in sequences:
-        if len(sequence) < k:
-            continue
-        for index in range(len(sequence) - k + 1):
-            kmer = sequence[index : index + k]
-            counts[kmer] = counts.get(kmer, 0) + 1
-    return counts
-
-
-def jsd_from_counts(
-    reference_counts: dict[str, int], candidate_counts: dict[str, int]
-) -> float:
-    """Computes Jensen-Shannon divergence from two count dictionaries."""
-    vocabulary = sorted(set(reference_counts) | set(candidate_counts))
-    if not vocabulary:
-        return 0.0
-
-    reference_total = sum(reference_counts.values())
-    candidate_total = sum(candidate_counts.values())
-    if reference_total == 0 or candidate_total == 0:
-        return 0.0
-
-    reference_probs = [
-        reference_counts.get(token, 0) / reference_total for token in vocabulary
-    ]
-    candidate_probs = [
-        candidate_counts.get(token, 0) / candidate_total for token in vocabulary
-    ]
-    mean_probs = [(p + q) / 2.0 for p, q in zip(reference_probs, candidate_probs)]
-
-    def kl_divergence(probs_a: list[float], probs_b: list[float]) -> float:
-        value = 0.0
-        for prob_a, prob_b in zip(probs_a, probs_b):
-            if prob_a <= 0.0 or prob_b <= 0.0:
-                continue
-            value += prob_a * math.log(prob_a / prob_b)
-        return value
-
-    return 0.5 * kl_divergence(reference_probs, mean_probs) + 0.5 * kl_divergence(
-        candidate_probs, mean_probs
-    )
-
-
-def uniqueness_ratio(sequences: list[str]) -> float:
-    """Computes the fraction of unique generated full sequences."""
-    if not sequences:
-        return 0.0
-    return len(set(sequences)) / len(sequences)
-
-
-def max_repeat_run(sequence: str) -> int:
-    """Returns the longest run of one repeated token inside a sequence."""
-    if not sequence:
-        return 0
-    best = 1
-    current = 1
-    for index in range(1, len(sequence)):
-        if sequence[index] == sequence[index - 1]:
-            current += 1
-            best = max(best, current)
-        else:
-            current = 1
-    return best
-
-
-def repeat_ratio(sequences: list[str], *, min_repeat_run: int) -> float:
-    """Computes the fraction of sequences containing a long repeat run."""
-    if not sequences:
-        return 0.0
-    flagged = sum(
-        1 for sequence in sequences if max_repeat_run(sequence) >= min_repeat_run
-    )
-    return flagged / len(sequences)
-
-
-@dataclass
-class QualitySummary:
-    """Compact quality summary for one generated set."""
-
-    label: str
-    reference_count: int
-    generated_count: int
-    mean_reference_length: float
-    mean_generated_length: float
-    length_match_ratio: float
-    identity_to_reference_mean: float
-    amino_acid_jsd: float
-    kmer2_jsd: float
-    kmer3_jsd: float
-    uniqueness_ratio: float
-    repeat_ratio_ge4: float
-
-
-def evaluate_generation_quality(
-    reference_records: list[tuple[str, str]],
-    generated_records: list[tuple[str, str]],
-    *,
-    label: str,
-    min_repeat_run: int = 4,
-) -> QualitySummary:
-    """Evaluates one generated set against aligned reference records."""
-    reference_sequences = [
-        normalize_decoded_sequence(sequence) for _, sequence in reference_records
-    ]
-    generated_sequences = [
-        normalize_decoded_sequence(sequence) for _, sequence in generated_records
-    ]
-
-    paired_count = min(len(reference_sequences), len(generated_sequences))
-    if paired_count == 0:
-        raise ValueError(
-            "Need at least one aligned reference/generated pair for evaluation."
-        )
-
-    paired_references = reference_sequences[:paired_count]
-    paired_generated = generated_sequences[:paired_count]
-
-    length_match_ratio = (
-        sum(
-            1
-            for reference, generated in zip(paired_references, paired_generated)
-            if len(reference) == len(generated)
-        )
-        / paired_count
-    )
-    identity_to_reference_mean = (
-        sum(
-            sequence_identity(reference, generated)
-            for reference, generated in zip(paired_references, paired_generated)
-        )
-        / paired_count
-    )
-
-    return QualitySummary(
-        label=label,
-        reference_count=len(reference_sequences),
-        generated_count=len(generated_sequences),
-        mean_reference_length=sum(len(sequence) for sequence in reference_sequences)
-        / len(reference_sequences),
-        mean_generated_length=sum(len(sequence) for sequence in generated_sequences)
-        / len(generated_sequences),
-        length_match_ratio=length_match_ratio,
-        identity_to_reference_mean=identity_to_reference_mean,
-        amino_acid_jsd=jsd_from_counts(
-            token_distribution(reference_sequences),
-            token_distribution(generated_sequences),
-        ),
-        kmer2_jsd=jsd_from_counts(
-            kmer_distribution(reference_sequences, 2),
-            kmer_distribution(generated_sequences, 2),
-        ),
-        kmer3_jsd=jsd_from_counts(
-            kmer_distribution(reference_sequences, 3),
-            kmer_distribution(generated_sequences, 3),
-        ),
-        uniqueness_ratio=uniqueness_ratio(generated_sequences),
-        repeat_ratio_ge4=repeat_ratio(
-            generated_sequences, min_repeat_run=min_repeat_run
-        ),
-    )
-
-
-def save_quality_summary(output_dir: Path, summary: QualitySummary) -> None:
-    """Writes JSON and TSV summaries for one quality result."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-    payload = asdict(summary)
-    with (output_dir / "quality_summary.json").open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
-    with (output_dir / "quality_summary.tsv").open(
-        "w", encoding="utf-8", newline=""
-    ) as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(payload.keys()), delimiter="\t")
-        writer.writeheader()
-        writer.writerow(payload)
-
-
-def compare_generation_sets(
-    reference_records: list[tuple[str, str]],
-    baseline_records: list[tuple[str, str]],
-    guided_records: list[tuple[str, str]],
-) -> dict[str, Any]:
-    """Compares baseline and guided generations against each other."""
-    paired_count = min(
-        len(reference_records), len(baseline_records), len(guided_records)
-    )
-    changed_count = 0
-    baseline_identity_sum = 0.0
-    guided_identity_sum = 0.0
-
-    for (_, reference), (_, baseline), (_, guided) in zip(
-        reference_records[:paired_count],
-        baseline_records[:paired_count],
-        guided_records[:paired_count],
-    ):
-        if baseline != guided:
-            changed_count += 1
-        baseline_identity_sum += sequence_identity(reference, baseline)
-        guided_identity_sum += sequence_identity(reference, guided)
-
-    return {
-        "changed_sequences": changed_count,
-        "changed_fraction": changed_count / max(paired_count, 1),
-        "baseline_identity_mean": baseline_identity_sum / max(paired_count, 1),
-        "guided_identity_mean": guided_identity_sum / max(paired_count, 1),
-    }
 
 
 def write_markdown_report(
@@ -870,7 +458,7 @@ def write_markdown_report(
         f"| generation_steps | {config.generation_steps} |",
         "",
     ]
-    path.write_text("\n".join(lines), encoding="utf-8")
+    save_markdown(path, lines)
 
 
 @dataclass
@@ -922,7 +510,7 @@ def main() -> None:
         raise RuntimeError("CUDA is required for this real full-corpus workflow.")
     device = "cuda" if has_cuda else "cpu"
 
-    output_root = CASE_ROOT / "outputs"
+    output_root = default_outputs_root()
     run_name = datetime.now().strftime("real_full_workflow_%Y%m%d_%H%M%S")
     output_dir = output_root / run_name
     output_dir.mkdir(parents=True, exist_ok=True)
