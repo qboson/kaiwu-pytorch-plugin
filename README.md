@@ -63,7 +63,7 @@ The above image shows the project file structure:
 - Native PyTorch Support: Seamless integration with the PyTorch ecosystem, supports GPU acceleration
 - Flexible Architecture: Supports custom visible and hidden layer dimensions
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
-- QDiffusion Support: Includes a public `QDiffusion` module for energy-guided
+- Q-Diffusion Support: Includes a public `QDiffusion` module for energy-guided
   discrete generation with DPLM backbones
 
 ### Plugin Advantages
@@ -186,9 +186,9 @@ if __name__ == "__main__":
     print(objective)
 ```
 
-### QDiffusion Quick Start
+### Q-Diffusion Quick Start
 
-`QDiffusion` is available from the top-level plugin package as a generic
+Q-Diffusion is available from the top-level plugin package as a generic
 discrete-sequence core:
 
 ```python
@@ -248,16 +248,16 @@ To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.
 ### Generation Task: Proteomes: Homo sapiens Generation
 
 Demonstrates how to train and evaluate an energy-guided discrete diffusion
-workflow for protein sequence generation using `QDiffusion` with DPLM
+workflow for protein sequence generation using `Q-Diffusion` with DPLM
 backbones. This example is designed for users who want to understand how the
-generic `QDiffusion` core is connected to practical protein-generation
+generic `Q-Diffusion` core is connected to practical protein-generation
 experiments, providing a reference workflow for training, guided generation,
 checkpoint reruns, and evaluation. Key steps include:
 
 - **DPLM-backed Model Assembly**: Use
   `example/qdiffusion/dplm/dplm_builder.py` to load one proposal backbone and
   one energy backbone, expose token metadata, build the energy adapter, and
-  assemble a generic `QDiffusion(...)` instance.
+  assemble a generic Q-Diffusion instance.
 - **Training Objective**: In the epoch loop, tokenize FASTA sequences into
   `targets`, call `generator.objective({"targets": ...})`, corrupt clean
   sequences into noisy states, sample proposal candidates, and optimize

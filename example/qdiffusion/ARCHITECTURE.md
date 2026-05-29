@@ -1,6 +1,6 @@
 # `example/qdiffusion` Architecture
 
-This directory wires one generic `QDiffusion` core to one concrete experiment
+This directory wires one generic `Q-Diffusion` core to one concrete experiment
 stack:
 
 - proposal side: DPLM
@@ -17,7 +17,7 @@ stack:
    - `RBMConditionedEnergyModel`
    - `RBMConditionedEnergyAdapter`
 4. the builder passes those parts into `kaiwu.torch_plugin.QDiffusion`
-5. `QDiffusion` uses:
+5. `Q-Diffusion` uses:
    - proposal logits for candidate generation
    - `energy_adapter.score_conditioned(...)` for candidate reranking
 
@@ -30,7 +30,7 @@ stack:
 3. build one DPLM-proposal + RBM-reranker generator
 4. tokenize sequences into `targets`
 5. call `generator.objective({"targets": targets})`
-6. inside `QDiffusion.objective(...)`:
+6. inside `Q-Diffusion.objective(...)`:
    - corrupt clean targets into noisy tokens
    - run the DPLM proposal model
    - sample candidate reconstructions
@@ -41,7 +41,7 @@ stack:
 
 ## Generation Flow
 
-`QDiffusion.generate(...)` keeps the same outer API, but the reranking step now
+`Q-Diffusion.generate(...)` keeps the same outer API, but the reranking step now
 uses the RBM path:
 
 1. initialize a masked decode state
@@ -62,5 +62,5 @@ Example checkpoints store the guided energy branch explicitly:
 - `vocab_proj`
 
 `energy_head` and `vocab_proj` remain in the checkpoint so the generic
-`QDiffusion` module stays compatible with both the scorer-hook path and the
+`Q-Diffusion` module stays compatible with both the scorer-hook path and the
 fallback hidden-state path.
