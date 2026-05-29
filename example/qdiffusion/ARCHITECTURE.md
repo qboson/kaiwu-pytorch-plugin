@@ -12,7 +12,7 @@ stack:
 2. `dplm/dplm_builder.py` loads:
    - one DPLM proposal backbone
    - one DPLM feature encoder for the energy branch
-3. `dplm/dplm_modeling.py` builds:
+3. `dplm/models/energy.py` builds:
    - `DPLMFeatureEncoder`
    - `RBMConditionedEnergyModel`
    - `RBMConditionedEnergyAdapter`
@@ -23,7 +23,7 @@ stack:
 
 ## Training Flow
 
-`dplm/train_workflow.py` follows this chain:
+`dplm/workflows/train.py` follows this chain:
 
 1. read FASTA records
 2. split train/validation/test sets

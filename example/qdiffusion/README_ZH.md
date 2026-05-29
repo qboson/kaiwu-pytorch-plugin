@@ -43,7 +43,7 @@ python example/qdiffusion/simple/simple_generate_example.py
 
 1. 脚本调用 `build_dplm_qdiffusion(...)`
 2. `dplm/dplm_builder.py` 加载 DPLM proposal backbone 和 energy backbone
-3. `dplm/dplm_modeling.py` 基于特征编码器构建条件能量打分模块
+3. `dplm/models/energy.py` 基于特征编码器构建条件能量打分模块
 4. builder 组装出一个通用的 `Q-Diffusion(...)`
 5. 脚本通过 `objective(...)` 执行训练，或通过 `generate(...)` 执行推理
 
@@ -67,14 +67,14 @@ factory helper 间接接入。
 - `dplm/dplm_builder.py`：DPLM 到 `Q-Diffusion` 的组装入口
 - `dplm/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
 - `dplm/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
+- `dplm/workflows/`：真正的训练、rerun 和 ESM2 评估实现
 - `dplm/dplm_modeling.py`：兼容导出层，对外继续暴露原来的 modeling 符号
-- `dplm/shared_*.py`：兼容 shim，把旧 helper 名称重新导出到 `utils/`
-- `dplm/train_workflow.py`：完整训练与评估工作流
-- `dplm/rerun_from_checkpoint.py`：从已保存 checkpoint 复现实验
-- `dplm/eval_esm2_distances.py`：基于 ESM2 embedding distance 的评估脚本
+- `dplm/train_workflow.py`：完整训练与评估工作流的兼容入口
+- `dplm/rerun_from_checkpoint.py`：checkpoint rerun 的兼容入口
+- `dplm/eval_esm2_distances.py`：ESM2 distance 评估的兼容入口
 - `dplm/model.py`：保留在目录中的 legacy/reference 实现，仅用于对照，不属于当前推荐工作流
 
-其中，`dplm/train_workflow.py` 最适合用来理解完整实验链路。
+如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
 它的端到端流程如下：
 

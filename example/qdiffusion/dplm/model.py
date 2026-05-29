@@ -16,7 +16,8 @@
 # Legacy reference note:
 # This file is kept for architectural comparison with the current DPLM-backed
 # Q-Diffusion example stack. The recommended workflow now lives in
-# dplm_builder.py, dplm_modeling.py, and the shared_* helper modules.
+# dplm_builder.py, dplm_modeling.py, the models/ package, and the workflows/
+# plus utils/ modules instead of this legacy implementation.
 
 #多进程相关
 import os

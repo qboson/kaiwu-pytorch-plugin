@@ -33,7 +33,7 @@ The main assembly path is:
 
 1. a script calls `build_dplm_qdiffusion(...)`
 2. `dplm/dplm_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
-3. `dplm/dplm_modeling.py` builds one conditioned RBM reranker on top of that feature encoder
+3. `dplm/models/energy.py` builds one conditioned RBM/BM reranker on top of that feature encoder
 4. the builder constructs one generic `Q-Diffusion(...)`
 5. the script calls `objective(...)` for training or `generate(...)` for inference
 
@@ -57,14 +57,14 @@ the larger experiment workflow.
 - `dplm/dplm_builder.py`: DPLM-to-`Q-Diffusion` assembly entrypoint
 - `dplm/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
 - `dplm/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
+- `dplm/workflows/`: the actual train, rerun, and ESM2 evaluation implementations
 - `dplm/dplm_modeling.py`: compatibility export layer that re-exports the modeling symbols from `models/`
-- `dplm/shared_*.py`: compatibility shims that re-export the old helper names from `utils/`
-- `dplm/train_workflow.py`: full train/eval workflow script
-- `dplm/rerun_from_checkpoint.py`: guided rerun script from saved checkpoints
-- `dplm/eval_esm2_distances.py`: ESM2 distance evaluation script
+- `dplm/train_workflow.py`: compatibility entrypoint for the full train/eval workflow
+- `dplm/rerun_from_checkpoint.py`: compatibility entrypoint for guided reruns
+- `dplm/eval_esm2_distances.py`: compatibility entrypoint for ESM2 distance evaluation
 - `dplm/model.py`: legacy reference implementation kept for comparison only; it is not part of the current recommended workflow
 
-`dplm/train_workflow.py` is the best place to read the full experiment chain.
+If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
 
 Its end-to-end flow is:
 
