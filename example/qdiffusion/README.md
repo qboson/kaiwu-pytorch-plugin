@@ -58,11 +58,9 @@ the larger experiment workflow.
 - `dplm/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
 - `dplm/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
 - `dplm/workflows/`: the actual train, rerun, and ESM2 evaluation implementations
-- `dplm/dplm_modeling.py`: compatibility export layer that re-exports the modeling symbols from `models/`
 - `dplm/train_workflow.py`: compatibility entrypoint for the full train/eval workflow
 - `dplm/rerun_from_checkpoint.py`: compatibility entrypoint for guided reruns
 - `dplm/eval_esm2_distances.py`: compatibility entrypoint for ESM2 distance evaluation
-- `dplm/model.py`: legacy reference implementation kept for comparison only; it is not part of the current recommended workflow
 
 If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
 

@@ -68,11 +68,9 @@ factory helper 间接接入。
 - `dplm/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
 - `dplm/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
 - `dplm/workflows/`：真正的训练、rerun 和 ESM2 评估实现
-- `dplm/dplm_modeling.py`：兼容导出层，对外继续暴露原来的 modeling 符号
 - `dplm/train_workflow.py`：完整训练与评估工作流的兼容入口
 - `dplm/rerun_from_checkpoint.py`：checkpoint rerun 的兼容入口
 - `dplm/eval_esm2_distances.py`：ESM2 distance 评估的兼容入口
-- `dplm/model.py`：保留在目录中的 legacy/reference 实现，仅用于对照，不属于当前推荐工作流
 
 如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
