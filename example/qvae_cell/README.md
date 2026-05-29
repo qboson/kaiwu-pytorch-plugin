@@ -1,9 +1,16 @@
-﻿# KPP QVAE 单细胞表征学习
+# KPP QVAE Single-Cell Representation Learning
 
-本目录提供一个基于 `kaiwu-pytorch-plugin` 的 QVAE 单细胞表征学习实现。流程包括读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 UMAP、分析能量分布，并用细胞类型标签评估聚类质量。
+This directory provides an implementation of QVAE-based single-cell representation learning using `kaiwu-pytorch-plugin`. The workflow includes reading a single-cell expression matrix, training a QVAE, extracting low-dimensional representations, computing UMAP, analyzing the energy distribution, and evaluating clustering quality using cell-type labels.
 
-## 依赖
-```
+## Data
+
+The example dataset can be downloaded from:
+
+https://www.kaggle.com/datasets/redwoodz/immune-data
+
+## Dependencies
+
+```bash
 kaiwu==1.3.1
 kaiwu-torch-plugin==0.1.0
 torch==2.7.0
@@ -14,45 +21,45 @@ scib_metrics
 scgraph
 ```
 
-## 文件结构
+## File Structure
 
 ```text
 kpp_qvae/
 ├── models.py                  # QVAEEncoder / QVAEDecoder / CellQVAE
-├── trainer.py                 # 数据准备、模型构建、训练循环、表征和 energy 提取
-├── visualization.py           # 训练曲线、UMAP 和 energy 图
-├── train_qvae_cell.py         # 命令行入口
-├── evaluate_clustering.py      # 旧版 Leiden 聚类评估入口
-├── evaluate_benchmark.py       # 统一评估入口
+├── trainer.py                 # Data preparation, model construction, training loop, representation and energy extraction
+├── visualization.py           # Training curves, UMAP, and energy plots
+├── train_qvae_cell.py         # Command-line entry point
+├── evaluate_clustering.py     # Legacy Leiden clustering evaluation entry point
+├── evaluate_benchmark.py      # Unified evaluation entry point
 ├── scripts/
-│   ├── train.sh               # 当前训练命令
-│   ├── eval_clustering.sh                # 聚类评估命令
-│   └── eval.sh           # 综合评估命令
+│   ├── train.sh               # Current training command
+│   ├── eval_clustering.sh     # Clustering evaluation command
+│   └── eval.sh                # Comprehensive evaluation command
 └── README.md
 ```
 
-## 训练
+## Training
 
-默认数据为：
+The default data file is:
 
 ```text
 ../immune_processed.h5ad
 ```
 
-默认观测字段：
+The default observation fields are:
 
 ```text
 batch_key = batch
 labels_key = final_annotation
 ```
 
-运行训练：
+Run training:
 
 ```bash
 bash scripts/train.sh
 ```
 
-快速检查：
+Quick check:
 
 ```bash
 python train_qvae_cell.py \
@@ -63,7 +70,7 @@ python train_qvae_cell.py \
   --output-dir ./outputs_smoke
 ```
 
-指定其他数据：
+Specify another dataset:
 
 ```bash
 python train_qvae_cell.py \
@@ -72,36 +79,36 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
-## 输出
+## Outputs
 
-训练脚本会在 `--output-dir` 下生成：
+The training script will generate the following files under `--output-dir`:
 
 ```text
-immune_kpp_qvae_best.pth          # 最优模型权重
-model_epoch*.pth                  # 按 --checkpoint-every 保存的中间权重
-X_qvae.npy                        # QVAE 表征矩阵
-immune_kpp_qvae.h5ad              # 写入 X_qvae 和 QVAE_Energy 的 AnnData
-training_history.csv              # 训练指标
-training_curves.png               # loss / reconstruction / KL 曲线
-qvae_umap_labels_batches.png      # cell type 和 batch UMAP
-qvae_energy_umap.png              # energy UMAP
-qvae_energy_by_celltype.png       # cell type energy 分布
+immune_kpp_qvae_best.pth          # Best model weights
+model_epoch*.pth                  # Intermediate weights saved according to --checkpoint-every
+X_qvae.npy                        # QVAE representation matrix
+immune_kpp_qvae.h5ad              # AnnData file with X_qvae and QVAE_Energy written into it
+training_history.csv              # Training metrics
+training_curves.png               # Loss / reconstruction / KL curves
+qvae_umap_labels_batches.png      # Cell-type and batch UMAP
+qvae_energy_umap.png              # Energy UMAP
+qvae_energy_by_celltype.png       # Energy distribution by cell type
 ```
 
-## 评估
+## Evaluation
 
-统一评估入口为 `evaluate_benchmark.py`，通过 `--metrics` 选择要运行的评估项：
+The unified evaluation entry point is `evaluate_benchmark.py`. Use `--metrics` to select the evaluation items to run:
 
-|评估方法|作用|
-|----|----|
-|clustering   |     Leiden 聚类指标：ARI, AMI, NMI, Homogeneity, FMI（越高越好）|
-|classification |   Logistic Regression 下游细胞类型分类 |
-|scib     |         scIB 生物保留和批次校正指标，即是否既保留了细胞类型结构，又消除了不必要的批次效应 |
-|scgraph |          scGraph 图结构评价 |
-|dpt  |             DPT 伪时序和轨迹一致性，即是否能产生合理的细胞发育/状态变化顺序 |
-|all |              运行以上所有评估项 |
+| Evaluation Method | Purpose                                                                                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| clustering        | Leiden clustering metrics: ARI, AMI, NMI, Homogeneity, FMI. Higher is better.                                                                                           |
+| classification    | Downstream cell-type classification using Logistic Regression.                                                                                                          |
+| scib              | scIB biological conservation and batch-correction metrics, assessing whether the representation preserves cell-type structure while removing unnecessary batch effects. |
+| scgraph           | scGraph graph-structure evaluation.                                                                                                                                     |
+| dpt               | DPT pseudotime and trajectory consistency, assessing whether the representation can produce a reasonable ordering of cell development or state transitions.             |
+| all               | Run all of the above evaluation items.                                                                                                                                  |
 
-只跑聚类评估：
+Run clustering evaluation only:
 
 ```bash
 python evaluate_benchmark.py \
@@ -111,7 +118,7 @@ python evaluate_benchmark.py \
   --metrics clustering
 ```
 
-跑分类评估：
+Run classification evaluation:
 
 ```bash
 python evaluate_benchmark.py \
@@ -121,7 +128,7 @@ python evaluate_benchmark.py \
   --metrics classification
 ```
 
-跑多个评估项：
+Run multiple evaluation items:
 
 ```bash
 python evaluate_benchmark.py \
@@ -132,7 +139,7 @@ python evaluate_benchmark.py \
   --metrics clustering,classification,scib,scgraph
 ```
 
-跑 DPT：
+Run DPT:
 
 ```bash
 python evaluate_benchmark.py \
@@ -143,22 +150,25 @@ python evaluate_benchmark.py \
   --root-cell-type HSPCs
 ```
 
-`bash scripts/eval.sh` 等价于运行 `--metrics clustering`。结果会保存为对应的 CSV，并汇总到：
+`bash scripts/eval.sh` is equivalent to running `--metrics clustering`.
+
+The results will be saved as corresponding CSV files and summarized into:
 
 ```text
 <output_dir>/X_qvae_benchmark_summary.csv
 ```
-## 关键参数
+
+## Key Parameters
 
 ```text
---latent-dim      默认 256
---num-visible     默认 128
---num-hidden      默认 128
---sampler-type    sa 或 cim
---loss-type       默认 mse；可选 mse 或 bernoulli
---representation  默认 q；可选 zeta 或 q
---kl-beta         默认 1e-5
---dist-beta       默认 10.0
---lr              默认 1e-4
---rbm-lr          默认 1e-3
+--latent-dim      Default: 256
+--num-visible     Default: 128
+--num-hidden      Default: 128
+--sampler-type    sa or cim
+--loss-type       Default: mse; options: mse or bernoulli
+--representation  Default: q; options: zeta or q
+--kl-beta         Default: 1e-5
+--dist-beta       Default: 10.0
+--lr              Default: 1e-4
+--rbm-lr          Default: 1e-3
 ```
