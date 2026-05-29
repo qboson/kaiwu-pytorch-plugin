@@ -245,7 +245,7 @@ To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.
 
 ---  
 
-### Generation Task: Proteomes: Homo sapiens Generation
+### Q-Diffusion Generation Task: Proteomes: Homo sapiens Generation
 
 Demonstrates how to train and evaluate an energy-guided discrete diffusion
 workflow for protein sequence generation using `Q-Diffusion` with DPLM
@@ -262,9 +262,10 @@ checkpoint reruns, and evaluation. Key steps include:
   `targets`, call `generator.objective({"targets": ...})`, corrupt clean
   sequences into noisy states, sample proposal candidates, and optimize
   `energy_objective.mean()` to train the energy-guidance branch.
-- **Checkpoint and Rerun Workflow**: Save compact checkpoints containing
-  `energy_model`, `energy_head`, and `vocab_proj`, then rebuild baseline and
-  guided generators for test-time generation and reruns.
+- **Checkpoint and Rerun Workflow**: Save compact checkpoints containing the
+  energy encoder, feature projector, energy backend weights, `energy_head`, and
+  `vocab_proj`, then rebuild baseline and guided generators for test-time
+  generation and reruns.
 - **Evaluation and Reporting**: Compare baseline and guided outputs with quality
   metrics such as identity, Jensen-Shannon divergence, uniqueness, repeat
   ratio, and ESM2-based embedding distances, then write structured reports.

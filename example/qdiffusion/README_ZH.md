@@ -130,5 +130,6 @@ factory helper 间接接入。
 - 本目录是 example-only；可复用的库代码位于 `src/kaiwu/torch_plugin/qdiffusion.py`
 - 用户应从 `kaiwu.torch_plugin` 导入通用 `Q-Diffusion` 核心
 - DPLM 加载逻辑不属于正式 `src` 公共 API，而是此目录中的 example-side compatibility layer
-- 当前示例中的 guided 路径本质上是 “DPLM proposal + energy reranker”
+- 当前示例中的 guided 路径本质上是 “DPLM proposal + energy reranker”，
+  底层可通过 builder 切换为 RBM 或 BM backend
 - `simple/` 与 `dplm/` 建议配合阅读：`simple/` 展示 API 表层，`dplm/` 展示完整实验工作流

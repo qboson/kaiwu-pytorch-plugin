@@ -68,11 +68,11 @@ Its end-to-end flow is:
 
 1. read and filter FASTA records
 2. split them into train/validation/test sets
-3. build a `Q-Diffusion` generator with a DPLM proposal model and an RBM reranker
+3. build a `Q-Diffusion` generator with a DPLM proposal model and one conditioned energy reranker
 4. tokenize sequences into `targets`
 5. call `generator.objective({"targets": ...})` inside the epoch loop
-6. optimize `energy_objective.mean()`, mainly training the RBM reranking path
-7. save compact checkpoints containing `energy_encoder`, `feature_projector`, `energy_rbm`, `energy_head`, and `vocab_proj`
+6. optimize `energy_objective.mean()`, mainly training the energy reranking path
+7. save compact checkpoints containing `energy_encoder`, `feature_projector`, energy backend weights, `energy_head`, and `vocab_proj`
 8. rebuild baseline and guided generators for test-time generation
 9. compare baseline vs guided outputs and write reports
 
@@ -107,7 +107,7 @@ Inside `Q-Diffusion.objective(...)`, the training path is:
 2. corrupt them into noisy `x_t`
 3. run the proposal model to produce logits
 4. sample negative candidates from those logits
-5. score positive and negative candidates with the conditioned RBM reranker
+5. score positive and negative candidates with the conditioned energy reranker
 6. return `energy_objective` and related tensors to the outer training loop
 
 ## Shared Assets
@@ -122,6 +122,7 @@ Inside `Q-Diffusion.objective(...)`, the training path is:
 - Users should import the generic `Q-Diffusion` core from `kaiwu.torch_plugin`.
 - DPLM loading is no longer part of the formal `src` API; the DPLM factory in
   this directory is the example-side compatibility layer.
-- The guided path in these examples is now `DPLM proposal + RBM reranker`.
+- The guided path in these examples is now `DPLM proposal + energy reranker`,
+  with either an RBM or BM backend selected by the example builder.
 - `simple/` and `dplm/` are designed to be read together:
   `simple/` shows the API surface, while `dplm/` shows the full experiment workflow.
