@@ -28,7 +28,7 @@ from transformers.models.esm.modeling_esm import (
     EsmSelfAttention,
 )
 
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+from kaiwu.torch_plugin import BoltzmannMachine, RestrictedBoltzmannMachine
 from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
 
 # Config structures.
@@ -559,6 +559,194 @@ class RBMConditionedEnergyAdapter:
             bernoulli=False,
         )
         return self.energy_model.energy_rbm(rbm_state).unsqueeze(-1)
+
+
+class BMConditionedEnergyModel(nn.Module):
+    """Conditioned BM reranker backed by one DPLM feature encoder.
+
+    This example-side variant keeps the same visible-state construction as the
+    RBM path, then appends one trainable hidden state optimized jointly through
+    a small differentiable mean-field loop. The result is intentionally simpler
+    than the legacy experimental solver-heavy BM code, but it plugs cleanly into
+    the generic ``QDiffusion`` training and decoding APIs.
+    """
+
+    def __init__(
+        self,
+        encoder: DPLMFeatureEncoder,
+        bm_num_visible: int,
+        bm_num_hidden: int,
+        feature_pooling: str = "mean",
+        mean_field_steps: int = 3,
+    ) -> None:
+        """Initializes the BM-conditioned energy model.
+
+        Args:
+            encoder: Feature encoder used for noisy/candidate representations.
+            bm_num_visible: Visible-state size fed into the BM.
+            bm_num_hidden: Hidden-state size of the BM.
+            feature_pooling: Pooling strategy used before BM scoring.
+            mean_field_steps: Number of differentiable hidden-state refinement
+                steps used before BM scoring.
+
+        Raises:
+            ValueError: If the pooling strategy is unsupported.
+        """
+        super().__init__()
+        if feature_pooling != "mean":
+            raise ValueError(
+                f"Unsupported BM feature_pooling for DPLM examples: {feature_pooling}"
+            )
+
+        self.encoder = encoder
+        self.feature_pooling = feature_pooling
+        self.mean_field_steps = mean_field_steps
+        self.bm_num_visible = bm_num_visible
+        self.bm_num_hidden = bm_num_hidden
+        self.feature_projector = nn.Linear(2 * encoder.hidden_size, bm_num_visible)
+        self.energy_bm = BoltzmannMachine(num_nodes=bm_num_visible + bm_num_hidden)
+        self.hidden_init = nn.Linear(2 * encoder.hidden_size, bm_num_hidden)
+
+    @property
+    def hidden_size(self) -> int:
+        """Returns the feature-encoder hidden size."""
+        return self.encoder.hidden_size
+
+    @property
+    def tokenizer(self) -> Any:
+        """Returns the tokenizer associated with the wrapped backbone."""
+        return self.encoder.backbone.tokenizer
+
+    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Embeds token ids via the wrapped feature encoder."""
+        return self.encoder.embed_tokens(tokens)
+
+    def encode_conditioned(
+        self,
+        input_ids: torch.Tensor,
+        inputs_embeds: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Preserves fallback compatibility with ``QDiffusion.energy()``."""
+        outputs = self.encoder.backbone.net(
+            input_ids=input_ids,
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+        )
+        return outputs["last_hidden_state"]
+
+    def _masked_mean_pool(
+        self, hidden_states: torch.Tensor, attention_mask: torch.Tensor
+    ) -> torch.Tensor:
+        """Pools token-level hidden states into one sequence feature vector."""
+        mask = attention_mask.to(hidden_states.dtype).unsqueeze(-1)
+        denominator = mask.sum(dim=1).clamp_min(1.0)
+        return (hidden_states * mask).sum(dim=1) / denominator
+
+    def build_conditioned_features(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Builds pooled sequence features for BM visible-state construction."""
+        noisy_hidden = self.encoder.encode_tokens(
+            noisy_tokens, attention_mask=attention_mask
+        )
+        candidate_hidden = self.encoder.encode_tokens(
+            candidate_tokens, attention_mask=attention_mask
+        )
+        noisy_features = self._masked_mean_pool(noisy_hidden, attention_mask)
+        candidate_features = self._masked_mean_pool(candidate_hidden, attention_mask)
+        return torch.cat([noisy_features, candidate_features], dim=-1)
+
+    def build_visible_state(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Builds one BM visible state from conditioned DPLM features."""
+        conditioned_features = self.build_conditioned_features(
+            noisy_tokens=noisy_tokens,
+            candidate_tokens=candidate_tokens,
+            attention_mask=attention_mask,
+        )
+        return torch.sigmoid(self.feature_projector(conditioned_features))
+
+    def infer_hidden_state(
+        self, visible_state: torch.Tensor, conditioned_features: torch.Tensor
+    ) -> torch.Tensor:
+        """Approximates one BM hidden state with differentiable mean-field steps."""
+        hidden_state = torch.sigmoid(self.hidden_init(conditioned_features))
+        q_coef = self.energy_bm.symmetrized_quadratic_coef()
+        visible_to_hidden = q_coef[
+            : self.bm_num_visible, self.bm_num_visible :
+        ]
+        hidden_to_hidden = q_coef[
+            self.bm_num_visible :, self.bm_num_visible :
+        ]
+        hidden_bias = self.energy_bm.hidden_bias(self.bm_num_hidden)
+
+        for _ in range(self.mean_field_steps):
+            hidden_state = torch.sigmoid(
+                visible_state @ visible_to_hidden
+                + hidden_state @ hidden_to_hidden
+                + hidden_bias
+            )
+        return hidden_state
+
+
+class BMConditionedEnergyAdapter:
+    """Adapter exposing one DPLM-conditioned BM scorer to ``QDiffusion``."""
+
+    def __init__(self, energy_model: BMConditionedEnergyModel) -> None:
+        """Initializes the conditioned BM energy adapter."""
+        self.energy_model = energy_model
+
+    @property
+    def hidden_size(self) -> int:
+        """Returns the fallback hidden size expected by ``QDiffusion``."""
+        return self.energy_model.hidden_size
+
+    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Embeds discrete token ids via the wrapped energy model."""
+        return self.energy_model.embed_tokens(tokens)
+
+    def encode_conditioned(
+        self,
+        input_ids: torch.Tensor,
+        inputs_embeds: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Encodes fused embeddings for the fallback energy path."""
+        return self.energy_model.encode_conditioned(
+            input_ids=input_ids,
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+        )
+
+    def score_conditioned(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor:
+        """Scores candidates with the wrapped BM reranker."""
+        conditioned_features = self.energy_model.build_conditioned_features(
+            noisy_tokens=noisy_tokens,
+            candidate_tokens=candidate_tokens,
+            attention_mask=attention_mask,
+        )
+        visible_state = torch.sigmoid(
+            self.energy_model.feature_projector(conditioned_features)
+        )
+        hidden_state = self.energy_model.infer_hidden_state(
+            visible_state=visible_state,
+            conditioned_features=conditioned_features,
+        )
+        full_state = torch.cat([visible_state, hidden_state], dim=-1)
+        return self.energy_model.energy_bm(full_state).unsqueeze(-1)
 
 
 # Private ESM implementation details.

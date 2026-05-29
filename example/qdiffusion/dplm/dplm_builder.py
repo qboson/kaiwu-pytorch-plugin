@@ -12,6 +12,8 @@ import torch
 from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
 from dplm.dplm_modeling import (
+    BMConditionedEnergyAdapter,
+    BMConditionedEnergyModel,
     DPLMBackbone,
     DPLMFeatureEncoder,
     RBMConditionedEnergyAdapter,
@@ -59,7 +61,10 @@ def build_dplm_qdiffusion(
     energy_model_type: str = "rbm",
     rbm_num_visible: int = 256,
     rbm_num_hidden: int = 128,
+    bm_num_visible: int | None = None,
+    bm_num_hidden: int | None = None,
     feature_pooling: str = "mean",
+    bm_mean_field_steps: int = 3,
     num_candidates: int = 1,
     proposal_temperature: float = 0.0,
     proposal_noise_scale: float = 1.0,
@@ -81,11 +86,17 @@ def build_dplm_qdiffusion(
     Args:
         proposal_ckpt: Proposal backbone checkpoint or model id.
         energy_ckpt: Energy backbone checkpoint or model id.
-        energy_model_type: Energy-model backend type. Only ``"rbm"`` is
-            supported by the current examples.
+        energy_model_type: Energy-model backend type. Supported values are
+            ``"rbm"`` and ``"bm"``.
         rbm_num_visible: Visible-state size for the RBM reranker.
         rbm_num_hidden: Hidden-state size for the RBM reranker.
+        bm_num_visible: Optional visible-state size for the BM reranker. When
+            omitted, reuse ``rbm_num_visible`` for convenience.
+        bm_num_hidden: Optional hidden-state size for the BM reranker. When
+            omitted, reuse ``rbm_num_hidden`` for convenience.
         feature_pooling: Sequence pooling strategy used before RBM scoring.
+        bm_mean_field_steps: Number of mean-field hidden-state refinement steps
+            used by the BM reranker.
         num_candidates: Number of proposal candidates sampled per decode step.
         proposal_temperature: Temperature used for proposal-side sampling.
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
@@ -114,11 +125,6 @@ def build_dplm_qdiffusion(
         net_override=proposal_net_override,
         from_huggingface=from_huggingface,
     )
-    if energy_model_type != "rbm":
-        raise ValueError(
-            f"Unsupported DPLM example energy_model_type: {energy_model_type}"
-        )
-
     energy_backbone = load_dplm_backbone(
         energy_ckpt,
         cfg_override=energy_cfg_override,
@@ -126,14 +132,29 @@ def build_dplm_qdiffusion(
         from_huggingface=from_huggingface,
     )
     energy_encoder = DPLMFeatureEncoder(energy_backbone)
-    energy_model = RBMConditionedEnergyModel(
-        encoder=energy_encoder,
-        rbm_num_visible=rbm_num_visible,
-        rbm_num_hidden=rbm_num_hidden,
-        feature_pooling=feature_pooling,
-    )
+    if energy_model_type == "rbm":
+        energy_model = RBMConditionedEnergyModel(
+            encoder=energy_encoder,
+            rbm_num_visible=rbm_num_visible,
+            rbm_num_hidden=rbm_num_hidden,
+            feature_pooling=feature_pooling,
+        )
+        energy_adapter = RBMConditionedEnergyAdapter(energy_model)
+    elif energy_model_type == "bm":
+        energy_model = BMConditionedEnergyModel(
+            encoder=energy_encoder,
+            bm_num_visible=bm_num_visible or rbm_num_visible,
+            bm_num_hidden=bm_num_hidden or rbm_num_hidden,
+            feature_pooling=feature_pooling,
+            mean_field_steps=bm_mean_field_steps,
+        )
+        energy_adapter = BMConditionedEnergyAdapter(energy_model)
+    else:
+        raise ValueError(
+            f"Unsupported DPLM example energy_model_type: {energy_model_type}"
+        )
+
     token_spec = build_dplm_token_spec(proposal_model)
-    energy_adapter = RBMConditionedEnergyAdapter(energy_model)
     config = QDiffusionConfig(
         num_candidates=num_candidates,
         proposal_temperature=proposal_temperature,

@@ -326,9 +326,13 @@ def run_epoch(
     total_loss = 0.0
     total_examples = 0
 
+    # Shared epoch loop: with an optimizer we train, without one we only run
+    # the same objective in evaluation mode for validation statistics.
     context = torch.enable_grad if training else torch.no_grad
     with context():
         for batch in tqdm(data_loader, desc=description, unit="batch"):
+            # ``objective(...)`` packages the whole one-step diffusion training
+            # computation and returns the energy-guided objective we optimize.
             outputs = generator.objective({"targets": batch["targets"]})
             loss = outputs["energy_objective"].mean()
 
@@ -390,6 +394,14 @@ def save_checkpoint(
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = output_dir / name
+    energy_backend_state = (
+        {"energy_rbm": generator.energy_model.energy_rbm.state_dict()}
+        if hasattr(generator.energy_model, "energy_rbm")
+        else {
+            "energy_bm": generator.energy_model.energy_bm.state_dict(),
+            "hidden_init": generator.energy_model.hidden_init.state_dict(),
+        }
+    )
     torch.save(
         {
             "epoch": epoch,
@@ -397,7 +409,7 @@ def save_checkpoint(
             "state_dict": {
                 "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
                 "feature_projector": generator.energy_model.feature_projector.state_dict(),
-                "energy_rbm": generator.energy_model.energy_rbm.state_dict(),
+                **energy_backend_state,
                 "energy_head": generator.energy_head.state_dict(),
                 "vocab_proj": generator.vocab_proj.state_dict(),
             },
@@ -421,7 +433,11 @@ def load_trained_energy_weights(generator, checkpoint_path: str, device: str) ->
     generator.energy_model.feature_projector.load_state_dict(
         state_dict["feature_projector"]
     )
-    generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
+    if hasattr(generator.energy_model, "energy_rbm"):
+        generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
+    else:
+        generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
+        generator.energy_model.hidden_init.load_state_dict(state_dict["hidden_init"])
     generator.energy_head.load_state_dict(state_dict["energy_head"])
     generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
 
@@ -919,6 +935,8 @@ def main() -> None:
     if has_cuda:
         torch.cuda.manual_seed_all(config.seed)
 
+    # Stage 1: read the reference FASTA, filter it, and create deterministic
+    # train/validation/test splits for the rest of the run.
     all_records = read_fasta_records(Path(config.fasta_path))
     selected_records = select_records(
         all_records,
@@ -951,6 +969,8 @@ def main() -> None:
     write_fasta_records(splits_dir / "val.fasta", val_records)
     write_fasta_records(splits_dir / "test.fasta", test_records)
 
+    # Stage 2: run one pre-training structural sanity check so we can catch
+    # tokenization / generation wiring issues before the expensive training loop.
     validation_generator = (
         build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
@@ -969,6 +989,8 @@ def main() -> None:
     )
     save_json(output_dir / "validation_summary.json", validation_summary)
 
+    # Stage 3: build the actual trainable generator and dataloaders. In the
+    # default setup, proposal weights stay frozen and the energy side is tuned.
     train_generator = build_dplm_qdiffusion(
         proposal_ckpt=config.proposal_ckpt,
         energy_ckpt=config.energy_ckpt,
@@ -1009,6 +1031,8 @@ def main() -> None:
     best_checkpoint_path: Path | None = None
     epochs_without_improvement = 0
 
+    # Stage 4: optimize the energy-guided objective, track validation loss, and
+    # keep the best energy-side checkpoint for later guided generation.
     for epoch in range(1, config.epochs + 1):
         print(f"Epoch {epoch}/{config.epochs}")
         train_metrics = run_epoch(
@@ -1072,6 +1096,8 @@ def main() -> None:
     print(f"Best checkpoint: {best_checkpoint_path}")
     print(f"Final checkpoint: {final_checkpoint_path}")
 
+    # Stage 5: compare a proposal-only baseline against a guided generator that
+    # reloads the best learned energy weights from training.
     baseline_generator = (
         build_dplm_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
@@ -1128,6 +1154,8 @@ def main() -> None:
     save_quality_summary(output_dir / "baseline_eval", baseline_quality)
     save_quality_summary(output_dir / "guided_eval", guided_quality)
 
+    # Stage 6: aggregate the two generation branches into machine-readable and
+    # human-readable reports for later inspection.
     comparison_summary = compare_generation_sets(
         test_records, baseline_records, guided_records
     )

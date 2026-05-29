@@ -310,7 +310,11 @@ def load_trained_energy_weights(generator, checkpoint_path: str, device: str) ->
     generator.energy_model.feature_projector.load_state_dict(
         state_dict["feature_projector"]
     )
-    generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
+    if hasattr(generator.energy_model, "energy_rbm"):
+        generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
+    else:
+        generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
+        generator.energy_model.hidden_init.load_state_dict(state_dict["hidden_init"])
     generator.energy_head.load_state_dict(state_dict["energy_head"])
     generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
 
