@@ -11,15 +11,24 @@ import torch
 
 from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
-from dplm.dplm_modeling import (
-    BMConditionedEnergyAdapter,
-    BMConditionedEnergyModel,
-    DPLMBackbone,
-    DPLMFeatureEncoder,
-    RBMConditionedEnergyAdapter,
-    RBMConditionedEnergyModel,
-    build_dplm_token_spec,
-)
+try:
+    from .models.backbone import DPLMBackbone, build_dplm_token_spec
+    from .models.energy import (
+        BMConditionedEnergyAdapter,
+        BMConditionedEnergyModel,
+        DPLMFeatureEncoder,
+        RBMConditionedEnergyAdapter,
+        RBMConditionedEnergyModel,
+    )
+except ImportError:  # pragma: no cover - direct script-path compatibility
+    from models.backbone import DPLMBackbone, build_dplm_token_spec
+    from models.energy import (
+        BMConditionedEnergyAdapter,
+        BMConditionedEnergyModel,
+        DPLMFeatureEncoder,
+        RBMConditionedEnergyAdapter,
+        RBMConditionedEnergyModel,
+    )
 
 # Backbone loading helpers.
 

@@ -27,17 +27,30 @@ import torch.nn.functional as F
 ensure_repo_src_on_path()
 
 from dplm_builder import build_dplm_qdiffusion
-from shared_io import (
-    write_csv_rows,
-    default_fasta_path,
-    default_outputs_root,
-    normalize_sequence,
-    read_fasta_records,
-    save_json,
-    save_markdown,
-    write_fasta_records,
-)
-from shared_runtime import load_trained_energy_weights
+try:
+    from .utils.io import (
+        write_csv_rows,
+        default_fasta_path,
+        default_outputs_root,
+        normalize_sequence,
+        read_fasta_records,
+        save_json,
+        save_markdown,
+        write_fasta_records,
+    )
+    from .utils.runtime import load_trained_energy_weights
+except ImportError:  # pragma: no cover - direct script-path compatibility
+    from utils.io import (
+        write_csv_rows,
+        default_fasta_path,
+        default_outputs_root,
+        normalize_sequence,
+        read_fasta_records,
+        save_json,
+        save_markdown,
+        write_fasta_records,
+    )
+    from utils.runtime import load_trained_energy_weights
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 

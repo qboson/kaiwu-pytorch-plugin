@@ -65,10 +65,10 @@ factory helper 间接接入。
 `dplm/` 目录包含 DPLM 相关的适配层和完整工作流：
 
 - `dplm/dplm_builder.py`：DPLM 到 `Q-Diffusion` 的组装入口
-- `dplm/dplm_modeling.py`：DPLM/ESM 建模、特征编码和能量重排相关代码
-- `dplm/shared_io.py`：共享的 FASTA、JSON、Markdown 和表格写出工具
-- `dplm/shared_runtime.py`：共享的 tokenization 与紧凑 checkpoint 工具
-- `dplm/shared_metrics.py`：共享的序列质量评估与对比指标工具
+- `dplm/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
+- `dplm/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
+- `dplm/dplm_modeling.py`：兼容导出层，对外继续暴露原来的 modeling 符号
+- `dplm/shared_*.py`：兼容 shim，把旧 helper 名称重新导出到 `utils/`
 - `dplm/train_workflow.py`：完整训练与评估工作流
 - `dplm/rerun_from_checkpoint.py`：从已保存 checkpoint 复现实验
 - `dplm/eval_esm2_distances.py`：基于 ESM2 embedding distance 的评估脚本

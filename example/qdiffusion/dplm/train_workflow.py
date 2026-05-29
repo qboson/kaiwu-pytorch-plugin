@@ -23,28 +23,52 @@ from tqdm import tqdm
 ensure_repo_src_on_path()
 
 from dplm_builder import build_dplm_qdiffusion
-from shared_io import (
-    default_fasta_path,
-    default_outputs_root,
-    normalize_decoded_sequence,
-    read_fasta_records,
-    save_json,
-    save_markdown,
-    write_fasta_records,
-    write_tsv_rows,
-)
-from shared_metrics import (
-    QualitySummary,
-    compare_generation_sets,
-    evaluate_generation_quality,
-    save_quality_summary,
-)
-from shared_runtime import (
-    encode_sequence,
-    load_trained_energy_weights,
-    save_checkpoint,
-    summarize_trainable_parameters,
-)
+try:
+    from .utils.io import (
+        default_fasta_path,
+        default_outputs_root,
+        normalize_decoded_sequence,
+        read_fasta_records,
+        save_json,
+        save_markdown,
+        write_fasta_records,
+        write_tsv_rows,
+    )
+    from .utils.metrics import (
+        QualitySummary,
+        compare_generation_sets,
+        evaluate_generation_quality,
+        save_quality_summary,
+    )
+    from .utils.runtime import (
+        encode_sequence,
+        load_trained_energy_weights,
+        save_checkpoint,
+        summarize_trainable_parameters,
+    )
+except ImportError:  # pragma: no cover - direct script-path compatibility
+    from utils.io import (
+        default_fasta_path,
+        default_outputs_root,
+        normalize_decoded_sequence,
+        read_fasta_records,
+        save_json,
+        save_markdown,
+        write_fasta_records,
+        write_tsv_rows,
+    )
+    from utils.metrics import (
+        QualitySummary,
+        compare_generation_sets,
+        evaluate_generation_quality,
+        save_quality_summary,
+    )
+    from utils.runtime import (
+        encode_sequence,
+        load_trained_energy_weights,
+        save_checkpoint,
+        summarize_trainable_parameters,
+    )
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 

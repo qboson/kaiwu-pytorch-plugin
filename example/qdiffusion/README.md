@@ -55,10 +55,10 @@ the larger experiment workflow.
 `dplm/` contains the DPLM-specific adapter layer and larger workflows:
 
 - `dplm/dplm_builder.py`: DPLM-to-`Q-Diffusion` assembly entrypoint
-- `dplm/dplm_modeling.py`: DPLM/ESM modeling, feature encoding, and RBM reranker support code
-- `dplm/shared_io.py`: shared FASTA, JSON, Markdown, and tabular artifact helpers
-- `dplm/shared_runtime.py`: shared tokenization and compact checkpoint helpers
-- `dplm/shared_metrics.py`: shared sequence-quality metrics and comparison helpers
+- `dplm/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
+- `dplm/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
+- `dplm/dplm_modeling.py`: compatibility export layer that re-exports the modeling symbols from `models/`
+- `dplm/shared_*.py`: compatibility shims that re-export the old helper names from `utils/`
 - `dplm/train_workflow.py`: full train/eval workflow script
 - `dplm/rerun_from_checkpoint.py`: guided rerun script from saved checkpoints
 - `dplm/eval_esm2_distances.py`: ESM2 distance evaluation script
