@@ -32,7 +32,7 @@ flowchart TD
     abm --> bm
     abm --> rbm
     abm --> qvae
-    torch --> qdiff
+    abm --> qdiff
     dist --> qvae
     rbm --> dbn
 
