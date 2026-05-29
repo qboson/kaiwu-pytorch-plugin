@@ -10,11 +10,16 @@ import os
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
+import sys
 from typing import Any
 
 try:
     from .._example_bootstrap import ensure_repo_src_on_path
 except ImportError:  # pragma: no cover - direct script-path compatibility
+    _WORKFLOW_DIR = Path(__file__).resolve().parent
+    _DPLM_DIR = _WORKFLOW_DIR.parent
+    if str(_DPLM_DIR) not in sys.path:
+        sys.path.insert(0, str(_DPLM_DIR))
     from _example_bootstrap import ensure_repo_src_on_path
 import torch
 
