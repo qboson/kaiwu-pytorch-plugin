@@ -1,17 +1,16 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version">
-<img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
+<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License">
 
 # Kaiwu-PyTorch-Plugin
 
 **语言版本**: [中文](README_ZH.md) | [English](README.md)
 
-Kaiwu-PyTorch-Plugin使用请参考[**文档**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/) 
+有关 Kaiwu-PyTorch-Plugin 的使用说明，请参考[**项目文档**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/)。
 
-## 项目简介
+## 项目概览
 
-`Kaiwu-PyTorch-Plugin` 是一个基于PyTorch和Kaiwu SDK的量子计算编程套件，可基于玻色量子的相干光量子计算机来训练和评估受限玻尔兹曼机(Restricted Boltzmann Machines, RBM)和玻尔兹曼机(Boltzmann Machines, BM)。该插件提供了简单易用的接口，使研究人员和开发者能够快速实现能量神经网络模型的训练与验证，并应用于各种机器学习开发任务。
+`Kaiwu-PyTorch-Plugin` 是一个基于 PyTorch 和 Kaiwu SDK 的量子计算编程套件。它支持在相干光量子计算平台上训练和评估 Restricted Boltzmann Machine（RBM）与 Boltzmann Machine（BM）。插件提供了易于使用的接口，便于研究人员和开发者快速实现能量模型的训练、验证与应用。
 
-受限玻尔兹曼机是一种基于能量的无监督学习模型，由可见层和隐藏层构成，层间全连接但层内无连接。其核心思想是通过能量函数建模数据的概率分布，利用对比散度（Contrastive Divergence，CD）等算法训练权重，使模型能够学习输入数据的隐含特征。受限玻尔兹曼机常用于特征提取、降维或协同过滤，也是构建更复杂模型的基础。玻尔兹曼机是一种全连接的随机神经网络，所有神经元之间都可能存在连接（包括可见层和隐藏层内部），对于BM传统的采样方法效率较低，量子计算提供了一种新的方法。
+Restricted Boltzmann Machine 是一种基于能量函数的无监督学习模型，由可见层和隐藏层组成，层间全连接、层内无连接。它通过建模数据分布来学习输入的隐含特征，常用于特征提取、降维和协同过滤，也是更复杂模型的基础。Boltzmann Machine 则是全连接的随机神经网络，可见层与隐藏层内部也允许连接；其传统采样成本较高，而量子计算为这一类模型提供了新的求解路径。
 
 ```mermaid
 flowchart TD
@@ -26,7 +25,6 @@ flowchart TD
         qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
-        qgan["qgan.py<br/>QGAN utilities"]
     end
 
     torch --> abm
@@ -55,27 +53,31 @@ flowchart TD
     qvae --> qvae_cell
     bm --> qvae_cell
 ```
-上图是项目文件结构：
-- kaiwu-torch-plugin部分的代码包含基类，受限玻尔兹曼机和玻尔兹曼机
-- example部分的代码包含qvae生成数字和digits数字识别等示例
-- test包含了单元测试
 
+上图展示了项目的主要代码结构：
+
+- `kaiwu-torch-plugin` 部分包含抽象基类、RBM、BM、QVAE、Q-Diffusion 和 DBN 等核心模块
+- `example` 部分包含若干示例，包括数字识别、图像生成、蛋白质序列生成和单细胞表征学习
+- `tests` 部分包含对应的基础测试
 
 ### 主要特性
-- 量子支持：继承Kaiwu SDK，支持相干光量子计算机的调用
-- PyTorch原生支持：无缝集成PyTorch生态系统，支持GPU加速计算
-- 灵活的架构配置：支持自定义可见层和隐藏层维度
-- 可扩展性：模块化设计，方便添加新的能量函数或采样方法
+
+- 量子支持：继承 Kaiwu SDK 能力，支持调用光量子计算后端
+- 原生 PyTorch 支持：无缝集成 PyTorch 生态，支持 GPU 加速
+- 灵活架构：支持自定义可见层和隐藏层维度
+- 可扩展性：模块化设计便于扩展新的能量函数和采样方法
+- Q-Diffusion 支持：提供公开的 `QDiffusion` 模块，用于基于 DPLM backbone 的能量引导离散生成
 
 ### 插件优势
 
-- 灵活配置：将采样的方法和能量函数的过程分开实现，方便添加新的能量函数或采样方法。对使用广泛的BM和RBM进行实现，可以使用定义目标函数的方式集成到其他模型；
-- 案例参考：插件提供相关的例子，如digits和qvae训练，可以作为实现自己工作的参考；
-- 前沿算法支撑：插件为前沿算法的实现和应用提供了坚实的平台支持。如基于玻尔兹曼分布替代VAE高斯假设的创新方法，依托Kaiwu-PyTorch-Plugin实现。插件支持了模型的端到端训练，用于处理大规模、高噪声的单细胞数据，降低了算法开发和应用的门槛。
+- 灵活配置：采样方法和能量函数解耦实现，便于扩展新的模型和求解方式；BM 和 RBM 也可以通过自定义 objective 集成进其他模型
+- 示例参考：项目提供了 digits、QVAE 等完整示例，可作为二次开发参考
+- 前沿算法支持：插件为量子启发式生成模型和生命科学应用提供了稳定的实现基础。例如，项目支持将 Boltzmann 分布引入 VAE，并支持高噪声、大规模单细胞数据上的端到端训练与分析
 
 ## 快速开始
 
-### 安装要求
+### 环境要求
+
 - python == 3.10
 - kaiwu == v1.3.1
 - torch == 2.7.0
@@ -83,67 +85,77 @@ flowchart TD
 
 ### 代码风格
 
-- 遵循PEP 8规范
+- 遵循 PEP 8 规范
 
 ### 安装步骤
 
-1. **创建并激活环境**：
+1. **创建并激活环境**
+
    ```bash
    # 推荐使用 conda 创建新环境
    conda create -n quantum_env python=3.10
    conda activate quantum_env
    ```
 
-2. **克隆本仓库到本地**：
+2. **克隆仓库**
+
    ```bash
-   git clone https://github.com/QBoson/kaiwu-pytorch-plugin.git
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin
    ```
 
-3. **安装依赖包**：
+3. **安装依赖**
+
    ```bash
    pip install -r requirements/requirements.txt
    ```
-   Kaiwu SDK需要单独安装，具体方法参考下方安装说明。
 
-4. **安装**：
+   Kaiwu SDK 需要单独安装，见下方说明。
+
+4. **安装插件**
+
    ```bash
    pip install .
    ```
 
 ### Kaiwu SDK 安装说明（必需）
 
-Kaiwu SDK下载链接和安装步骤如下：
+Kaiwu SDK 的下载和安装步骤如下：
 
 ![](imgs/image.png)
 
-1. **获取 SDK**：
-   - 访问 [Kaiwu SDK 下载地址](https://platform.qboson.com/sdkDownload)（需要注册账号）
-   - 查看 [Kaiwu SDK 安装说明](https://kaiwu-sdk-docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html)
+1. **获取 SDK**
 
-2. **配置授权信息**：
-   获取您的 SDK 授权信息：
-   ```
-   用户ID: <your-user-id>
-   SDK授权码: <your-sdk-token>
-   ```
-   > 请将以上信息替换为您的实际授权信息
+- 访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)（需注册）
+- 参考 [Kaiwu SDK 安装说明](https://kaiwu-sdk-docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html)
+
+2. **配置授权信息**
+
+获取你的 SDK 授权信息：
+
+```text
+User ID: <your-user-id>
+SDK Token: <your-sdk-token>
+```
+
+> 请将上述内容替换为你的实际授权信息
 
 ### 获取真机调用资格
 
-若需体验量子真机计算，请在 [相干光量子计算云平台](https://platform.qboson.com/) 注册账号，并参考文档下方官方工作人员联系方式获取真机配额。
+如果希望体验真实量子计算，请先在 [QBoson Platform](https://platform.qboson.com/) 注册账户，并根据文档中的联系方式联系官方人员申请真机配额。
 
-
-## 案例示例
+## 示例案例
 
 ### 简单示例
-下面是RBM调用的简单实例。该例子展示了接口的使用方法，不涉及具体的任务。
+
+下面给出一个简单的 RBM 调用示例，主要展示基础接口的使用方式，不涉及具体任务。
 
 ```python
 import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -188,38 +200,76 @@ if __name__ == "__main__":
     print(objective)
 ```
 
+### Q-Diffusion 快速开始
+
+Q-Diffusion 作为通用离散序列生成核心，已经可以从顶层插件包直接导入：
+
+```python
+from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
+from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
+
+# Build your own proposal model, energy model, token spec, and energy adapter.
+model = QDiffusion(
+    proposal_model=proposal_model,
+    energy_model=energy_model,
+    token_spec=SequenceTokenSpec(
+        pad_id=0,
+        bos_id=1,
+        eos_id=2,
+        mask_id=3,
+    ),
+    energy_adapter=energy_adapter,
+    config=QDiffusionConfig(num_candidates=4),
+)
+```
+
+可直接运行的 DPLM 示例位于 `example/qdiffusion/`，其中：
+
+- `simple/`：最小训练和生成示例
+- `dplm/`：基于 DPLM 的完整工作流与适配代码
+
+如果你要运行这些 DPLM 示例，请额外安装示例依赖：
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
 
 ### 分类任务：手写数字识别
-展示利用受限玻尔兹曼机对手写数字数据集（Digits）进行特征学习与分类任务。该示例适用于初学者理解受限玻尔兹曼机在图像特征提取及分类场景中的应用流程，可作为后续进阶实验与功能扩展的基础。主要内容包括：
-- 数据扩增与预处理：针对原始 8x8 像素的手写数字图像，通过上下左右平移操作扩展数据集，并使用 MinMaxScaler 进行归一化特征处理；
-- RBM模型训练：实现 RBMRunner 类，对 RBM 的训练流程进行封装，训练过程中支持可视化生成样本与权重矩阵；
-- 特征提取与分类：RBM训练完成后，利用其隐层输出的特征表示，通过逻辑回归进行分类评估；
-- 可视化分析：支持训练过程中的样本生成与权重可视化功能，便于观察和判断模型学习效果。
 
-运行该实例可以运行`example/rbm_digits/rbm_digits.ipynb`
+该示例展示如何使用 Restricted Boltzmann Machine（RBM）在 Digits 数据集上进行特征学习和分类，适合初学者理解 RBM 在图像特征提取与分类任务中的基本流程。主要内容包括：
 
-### 生成任务：Q-VAE的MNIST图像生成
+- **数据增强与预处理**：对原始 8x8 手写数字图像进行上下左右平移扩充，并使用 MinMaxScaler 做归一化
+- **RBM 模型训练**：实现 `RBMRunner`，封装 RBM 的训练过程，并支持样本与权重可视化
+- **特征提取与分类**：使用 RBM 隐层输出作为特征，结合逻辑回归进行分类评估
+- **可视化分析**：支持在训练过程中查看生成样本和权重矩阵，辅助观察学习效果
 
-展示如何在MNIST手写数字数据集上训练和评估量子变分自编码器（Q-VAE）模型。该示例适用于希望理解Q-VAE模型训练、生成与评估流程的使用者，可作为生成模型后续研究的基础。主要内容包括：
-- 数据加载与预处理：通过自定义数据集类实现支持批次索引，并结合ToTensor转换和展平操作；
-- 模型构建：构建Q-VAE模型架构，包括编码器、解码器模块及RBM隐变量建模过程；
-- 训练过程：设计和实现完整的训练循环，记录损失、证据下界（ELBO）、KL散度等指标，同时支持模型断点保存；
-- 可视化与生成：提供原始图像、重构图像和生成图像的可视化对比方法，便于直观评估模型效果。
+运行方式：`example/rbm_digits/rbm_digits.ipynb`
 
-运行该实例可以运行`example/qvae_mnist/train_qvae.ipynb`
+---
+
+### 生成任务：基于 Q-VAE 的 MNIST 图像生成
+
+该示例展示如何在 MNIST 手写数字数据集上训练和评估 Quantum Variational Autoencoder（Q-VAE），适合希望理解 Q-VAE 训练、生成与评估流程的用户。主要内容包括：
+
+- **数据加载与预处理**：实现带 batch 索引的数据集封装，并完成 ToTensor 和 flatten 处理
+- **模型结构**：构建包含 encoder、decoder 和 RBM latent prior 的 Q-VAE
+- **训练过程**：实现完整训练循环，跟踪 loss、ELBO、KL divergence 等指标，并支持 checkpoint 保存
+- **可视化与生成**：对原图、重建图和生成图进行可视化对比，便于直观评估模型效果
+
+运行方式：`example/qvae_mnist/train_qvae.ipynb`
 
 ![](imgs/qvae.png)
 
----  
+---
 
-### 生成任务：Proteomes: Homo sapiens 蛋白序列生成
+### Q-Diffusion 生成任务：Proteomes: Homo sapiens Generation
 
-展示如何使用 `QDiffusion` 配合 DPLM backbone，完成蛋白质序列的能量引导离散扩散训练与生成。该示例适合希望理解通用 `QDiffusion` 核心如何连接到实际蛋白序列实验流程的用户，可作为训练、引导生成、checkpoint rerun 与评估分析的参考工作流。主要内容包括：
+该示例展示如何使用 `Q-Diffusion` 配合 DPLM backbone，完成蛋白质序列生成中的能量引导离散扩散训练与评估。它适合希望理解通用 `Q-Diffusion` 核心如何连接到实际蛋白质生成实验的用户，可作为训练、引导生成、checkpoint rerun 和评估分析的参考工作流。主要内容包括：
 
-- **DPLM 模型组装**：通过 `example/qdiffusion/dplm/dplm_builder.py` 加载 proposal backbone 与 energy backbone，整理 token metadata，构造 energy adapter，并最终组装成一个通用的 `QDiffusion(...)` 实例。
-- **训练目标构建**：在 epoch 循环中先将 FASTA 序列 tokenize 成 `targets`，再调用 `generator.objective({"targets": ...})`，把干净序列腐蚀成 noisy state，基于 proposal logits 采样候选，并优化 `energy_objective.mean()` 来训练 energy-guidance 分支。
-- **Checkpoint 与复现实验**：保存只包含 `energy_model`、`energy_head` 与 `vocab_proj` 的紧凑 checkpoint，再重新构建 baseline 与 guided generator，用于测试集生成和 rerun。
-- **评估与报告输出**：比较 baseline 与 guided 的生成结果，统计 identity、Jensen-Shannon divergence、uniqueness、repeat ratio 以及基于 ESM2 embedding distance 的指标，并输出结构化报告。
+- **DPLM 模型组装**：通过 `example/qdiffusion/dplm/dplm_builder.py` 加载 proposal backbone 和 energy backbone，整理 token metadata，构建 energy adapter，并最终组装出一个通用 Q-Diffusion 实例
+- **训练目标**：在 epoch 循环中将 FASTA 序列 tokenize 为 `targets`，调用 `generator.objective({"targets": ...})`，把干净序列腐蚀成 noisy states，采样 proposal candidates，并优化 `energy_objective.mean()` 训练能量引导分支
+- **Checkpoint 与复现实验**：保存轻量 checkpoint，包含 energy encoder、`feature_projector`、energy backend 权重、`energy_head` 和 `vocab_proj`，再据此重建 baseline 和 guided generator 用于测试时生成和复现实验
+- **评估与报告**：比较 baseline 和 guided 输出在 identity、Jensen-Shannon divergence、uniqueness、repeat ratio 和 ESM2 embedding distance 等指标上的表现，并输出结构化报告
 
 运行最小示例：
 
@@ -235,29 +285,33 @@ python example/qdiffusion/simple/simple_generate_example.py
 python example/qdiffusion/dplm/train_workflow.py
 ```
 
-如果想先顺着 example 目录理解整个数据流和脚本分工，建议先看 `example/qdiffusion/README.md`。
+如果想先聚焦阅读该示例目录及其数据流，请参考 `example/qdiffusion/README_ZH.md`。
+
+---
 
 ## 科研成果
 
-### QBM inside VAE = 更强的数据表征生成器（QBM-VAE）
-生物、化学、材料等自然世界产生的数据极其复杂，基于独立同分布的高斯假设往往造成模型表示的“失真”。
+### QBM Inside VAE = 更强的数据表征生成器（QBM-VAE）
 
-基于相干光量子计算机这一原生的玻尔兹曼分布采样器，可构建量子玻尔兹曼机（QBM）增强的深度变分自编码器（QBM-VAE）模型，大幅提升VAE的编码表征能力，使其能够捕获以往难以识别的深层数据特征。
+自然领域中的数据，例如生物、化学和材料科学数据，往往极其复杂，传统的高斯 i.i.d. 假设很容易造成表示失真。
 
-在单细胞转录组学分析（一种在单细胞水平检测基因表达以揭示细胞异质性和功能差异的技术）中，QBM-VAE可显著提升聚类精度，检测到传统方法无法辨识的新型细胞亚型（具有独特特征的新致病因素），为靶点发现提供新线索。
+基于相干光量子计算机原生的 Boltzmann 分布采样能力，我们构建了 Quantum Boltzmann Machine（QBM）增强的 Deep Variational Autoencoder（QBM-VAE），显著提升了 VAE 的编码表达能力，使模型能够捕捉更深层的数据结构特征。
 
-基于此表征我们精确地完成了百万量级单细胞转录组数据整合，并基于更优的隐变量表示在细胞聚类，细胞分类，细胞轨迹分析等下游任务中取得了较其他现有方法更优的结果，验证了此隐变量表示的优越性。
+在单细胞转录组分析中，QBM-VAE 能显著提高聚类精度，并发现传统方法难以识别的新细胞亚型，为靶点发现提供新的线索。
 
-如果你对该方法感兴趣，可以参考论文:  
+基于这一表示，我们进一步完成了百万级单细胞转录组数据整合，并在细胞聚类、分类、轨迹推断等下游任务中取得了优于现有方法的表现，验证了该潜在表示的有效性。
+
+如果你对这项工作感兴趣，可以参考论文：
 [**Quantum-Boosted High-Fidelity Deep Learning**](https://arxiv.org/pdf/2508.11190)
 
-<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/602802d9-0d5f-4304-a151-5b921b10ba4a" />
+<img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
 
+---
 
 ## 致谢
 
-- 感谢所有贡献者的宝贵贡献。
-- 感谢量子计算社区贡献者的支持和反馈。
+- 感谢所有贡献者的宝贵投入
+- 感谢量子计算社区给予的支持与反馈
 
 ## 联系方式
 

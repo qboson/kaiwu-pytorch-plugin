@@ -568,8 +568,7 @@ class QDiffusion(nn.Module):
         second_timestep_mask[same_timestep_mask] = (
             noise
             < (
-                first_timestep[same_timestep_mask]
-                / self.config.num_diffusion_timesteps
+                first_timestep[same_timestep_mask] / self.config.num_diffusion_timesteps
             )[:, None]
         ) & maskable_mask[same_timestep_mask]
         second_noisy_tokens = clean_tokens.masked_fill(
