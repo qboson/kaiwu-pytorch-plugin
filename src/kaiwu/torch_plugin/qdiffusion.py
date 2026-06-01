@@ -326,21 +326,31 @@ class QDiffusion(nn.Module):
 
         negative_tokens, _ = self._sample_candidates(logits, self.config.num_candidates)
         positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
+        positive_stats = self._collect_energy_adapter_stats()
         negative_energy = self._score_candidates(noisy_tokens, negative_tokens).mean(
             dim=1, keepdim=True
         )
+        negative_stats = self._collect_energy_adapter_stats()
         energy_objective = self.softplus(positive_energy) + self.softplus(
             -negative_energy
         )
         weight = self._compute_loss_weight(timesteps, weighting)
-
-        return {
+        outputs = {
             "logits": logits,
             "targets": target,
             "loss_mask": loss_mask,
             "weight": weight,
             "energy_objective": energy_objective,
+            "positive_energy_mean": positive_energy.mean().detach(),
+            "negative_energy_mean": negative_energy.mean().detach(),
         }
+        for prefix, stats in (
+            ("positive", positive_stats),
+            ("negative", negative_stats),
+        ):
+            for key, value in stats.items():
+                outputs[f"{prefix}_{key}"] = value.detach()
+        return outputs
 
     def initialize_state(
         self,
@@ -480,6 +490,13 @@ class QDiffusion(nn.Module):
         if partial_masks is not None:
             editable_token_mask &= ~partial_masks
         return editable_token_mask
+
+    def _collect_energy_adapter_stats(self) -> dict[str, torch.Tensor]:
+        """Collects optional adapter-side diagnostics from the last score call."""
+        get_last_stats = getattr(self.energy_adapter, "get_last_stats", None)
+        if not callable(get_last_stats):
+            return {}
+        return get_last_stats()
 
     def _initialize_output_tokens(
         self, input_tokens: torch.Tensor, partial_masks: torch.Tensor | None = None

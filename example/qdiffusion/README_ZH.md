@@ -99,6 +99,7 @@ factory helper 间接接入。
 | label | pairs | mean cosine dist | median cosine dist | mean l2 dist | median l2 dist |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | baseline | 20 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
+| MLP | 200 | 0.227007 | 0.205144 | 4.945239 | 4.803553 |
 | guided | 20 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
 
 在这次评估中，guided 相比 baseline 的改善为：
@@ -130,6 +131,5 @@ factory helper 间接接入。
 - 本目录是 example-only；可复用的库代码位于 `src/kaiwu/torch_plugin/qdiffusion.py`
 - 用户应从 `kaiwu.torch_plugin` 导入通用 `Q-Diffusion` 核心
 - DPLM 加载逻辑不属于正式 `src` 公共 API，而是此目录中的 example-side compatibility layer
-- 当前示例中的 guided 路径本质上是 “DPLM proposal + energy reranker”，
-  底层可通过 builder 切换为 RBM 或 BM backend
+- 当前示例中的 guided 路径本质上是 `DPLM proposal + BM energy reranker`
 - `simple/` 与 `dplm/` 建议配合阅读：`simple/` 展示 API 表层，`dplm/` 展示完整实验工作流

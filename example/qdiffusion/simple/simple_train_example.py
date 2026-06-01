@@ -138,6 +138,8 @@ def main() -> None:
         add_special_tokens=True,
         padding=True,
     )
+    # ``targets`` is the only tensor the outer loop needs; ``objective(...)``
+    # will create noisy states, sample candidates, and build the energy loss.
     targets = encoded["input_ids"].to(generator.device)
 
     optimizer = AdamW(
@@ -150,6 +152,8 @@ def main() -> None:
         generator.proposal_model.eval()
 
     for step in range(1, num_steps + 1):
+        # ``objective`` is the full training step contract for the example: it
+        # returns proposal logits, masks, and the scalar EBM objective term.
         outputs = generator.objective({"targets": targets})
         loss = outputs["energy_objective"].mean()
 

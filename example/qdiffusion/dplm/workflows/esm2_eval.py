@@ -46,7 +46,7 @@ try:
         save_markdown,
         write_fasta_records,
     )
-    from ..utils.runtime import load_trained_energy_weights
+    from ..utils.runtime import load_trained_energy_weights, seed_torch
 except ImportError:  # pragma: no cover - direct script-path compatibility
     from dplm_builder import build_dplm_qdiffusion
     from utils.io import (
@@ -59,7 +59,7 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         save_markdown,
         write_fasta_records,
     )
-    from utils.runtime import load_trained_energy_weights
+    from utils.runtime import load_trained_energy_weights, seed_torch
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
 
@@ -122,6 +122,8 @@ class GenerationConfig:
     guided_disable_resample: bool
     guided_resample_ratio: float
     guided_resample_top_p: float
+    bm_sampler_type: str
+    bm_sampler_kwargs: dict[str, object] | None
 
 
 @dataclass
@@ -149,6 +151,247 @@ class EvalConfig:
     guided_disable_resample: bool
     guided_resample_ratio: float
     guided_resample_top_p: float
+    bm_sampler_type: str
+    bm_sampler_kwargs: dict[str, object] | None
+
+
+def build_bm_kwargs(config: EvalConfig) -> dict[str, object]:
+    """Builds shared BM reranker kwargs for generation/evaluation runs."""
+    return {
+        "bm_sampler_type": config.bm_sampler_type,
+        "bm_sampler_kwargs": config.bm_sampler_kwargs,
+    }
+
+
+def build_generator_for_eval(
+    config: EvalConfig,
+    *,
+    device: torch.device,
+    num_candidates: int,
+    proposal_temperature: float = 0.0,
+    proposal_noise_scale: float = 1.0,
+    energy_temperature: float = 1.0,
+    disable_resample: bool = False,
+    resample_ratio: float = 0.25,
+    resample_top_p: float = 0.95,
+):
+    """Builds one generator for baseline or guided ESM2 evaluation."""
+    return (
+        build_dplm_qdiffusion(
+            proposal_ckpt=config.proposal_ckpt,
+            energy_ckpt=config.energy_ckpt,
+            num_candidates=num_candidates,
+            proposal_temperature=proposal_temperature,
+            proposal_noise_scale=proposal_noise_scale,
+            energy_temperature=energy_temperature,
+            disable_resample=disable_resample,
+            resample_ratio=resample_ratio,
+            resample_top_p=resample_top_p,
+            freeze_proposal=config.freeze_proposal,
+            **build_bm_kwargs(config),
+        )
+        .eval()
+        .to(device)
+    )
+
+
+def build_sa_eval_config(
+    *,
+    reference_fasta: Path,
+    proposal_ckpt: str,
+    energy_ckpt: str,
+    guided_checkpoint: str,
+    output_dir: Path,
+    device: str,
+    esm2_model: str = "esm2_t33_650M_UR50D",
+    pair_mode: str = "order",
+    pooling: str = "mean",
+    batch_size: int = 1,
+    max_records: int | None = 20,
+    generation_steps: int = 500,
+    seed: int = 42,
+    freeze_proposal: bool = True,
+    guided_num_candidates: int = 4,
+    guided_proposal_temperature: float = 0.3,
+    guided_proposal_noise_scale: float = 1.0,
+    guided_energy_temperature: float = 1.25,
+    guided_disable_resample: bool = False,
+    guided_resample_ratio: float = 0.20,
+    guided_resample_top_p: float = 0.90,
+) -> EvalConfig:
+    """Builds one ready-to-run SA-backed ESM2 evaluation config.
+
+    Args:
+        reference_fasta: Reference FASTA used for generation and evaluation.
+        proposal_ckpt: Proposal-model checkpoint or model id.
+        energy_ckpt: Energy-model checkpoint or model id.
+        guided_checkpoint: Trained compact energy checkpoint.
+        output_dir: Root output directory for generated/evaluation artifacts.
+        device: Runtime device string.
+        esm2_model: ESM2 model name from ``esm.pretrained``.
+        pair_mode: Pairing strategy for reference/candidate sequences.
+        pooling: Sequence embedding pooling strategy.
+        batch_size: ESM2 embedding batch size.
+        max_records: Optional reference-record limit.
+        generation_steps: Number of generation steps per sequence.
+        seed: Base random seed for generation.
+        freeze_proposal: Whether the proposal backbone stays frozen.
+        guided_num_candidates: Guided reranker candidate count.
+        guided_proposal_temperature: Guided proposal temperature.
+        guided_proposal_noise_scale: Guided proposal noise scale.
+        guided_energy_temperature: Guided energy temperature.
+        guided_disable_resample: Whether guided resampling is disabled.
+        guided_resample_ratio: Guided repetition-resample threshold.
+        guided_resample_top_p: Guided resample top-p cutoff.
+
+    Returns:
+        EvalConfig: An evaluation config that uses simulated annealing for BM
+        hidden-state solving.
+    """
+    return EvalConfig(
+        reference_fasta=reference_fasta,
+        proposal_ckpt=proposal_ckpt,
+        energy_ckpt=energy_ckpt,
+        guided_checkpoint=guided_checkpoint,
+        output_dir=output_dir,
+        device=device,
+        esm2_model=esm2_model,
+        pair_mode=pair_mode,
+        pooling=pooling,
+        batch_size=batch_size,
+        max_records=max_records,
+        generation_steps=generation_steps,
+        seed=seed,
+        freeze_proposal=freeze_proposal,
+        guided_num_candidates=guided_num_candidates,
+        guided_proposal_temperature=guided_proposal_temperature,
+        guided_proposal_noise_scale=guided_proposal_noise_scale,
+        guided_energy_temperature=guided_energy_temperature,
+        guided_disable_resample=guided_disable_resample,
+        guided_resample_ratio=guided_resample_ratio,
+        guided_resample_top_p=guided_resample_top_p,
+        bm_sampler_type="sa",
+        bm_sampler_kwargs=None,
+    )
+
+
+def build_cim_eval_config(
+    *,
+    reference_fasta: Path,
+    proposal_ckpt: str,
+    energy_ckpt: str,
+    guided_checkpoint: str,
+    output_dir: Path,
+    device: str,
+    task_name: str,
+    project_no: str | None = None,
+    task_mode: str | None = None,
+    sample_number: int | None = None,
+    tmp_dir: str | None = None,
+    wait: bool = False,
+    interval: int = 1,
+    use_precision_reducer: bool = False,
+    precision: int = 8,
+    truncated_precision: int = 10,
+    target_bits: int = 550,
+    only_feasible_solution: bool = False,
+    esm2_model: str = "esm2_t33_650M_UR50D",
+    pair_mode: str = "order",
+    pooling: str = "mean",
+    batch_size: int = 1,
+    max_records: int | None = 20,
+    generation_steps: int = 500,
+    seed: int = 42,
+    freeze_proposal: bool = True,
+    guided_num_candidates: int = 4,
+    guided_proposal_temperature: float = 0.3,
+    guided_proposal_noise_scale: float = 1.0,
+    guided_energy_temperature: float = 1.25,
+    guided_disable_resample: bool = False,
+    guided_resample_ratio: float = 0.20,
+    guided_resample_top_p: float = 0.90,
+) -> EvalConfig:
+    """Builds one ready-to-run CIM-backed ESM2 evaluation config.
+
+    Args:
+        reference_fasta: Reference FASTA used for generation and evaluation.
+        proposal_ckpt: Proposal-model checkpoint or model id.
+        energy_ckpt: Energy-model checkpoint or model id.
+        guided_checkpoint: Trained compact energy checkpoint.
+        output_dir: Root output directory for generated/evaluation artifacts.
+        device: Runtime device string.
+        task_name: CIM task name forwarded to ``CIMOptimizer``.
+        project_no: Optional CIM project id.
+        task_mode: Optional CIM task mode string such as ``"OPTIMIZATION"``
+            or ``"SAMPLING"``.
+        sample_number: Optional CIM sample count used for sampling mode.
+        tmp_dir: Optional checkpoint/cache directory required by some CIM runs.
+        wait: Whether to block until CIM execution finishes.
+        interval: Polling interval in minutes.
+        use_precision_reducer: Whether to wrap the CIM optimizer with
+            ``PrecisionReducer``.
+        precision: PrecisionReducer precision.
+        truncated_precision: PrecisionReducer truncated precision.
+        target_bits: PrecisionReducer target bit count.
+        only_feasible_solution: PrecisionReducer feasibility flag.
+        esm2_model: ESM2 model name from ``esm.pretrained``.
+        pair_mode: Pairing strategy for reference/candidate sequences.
+        pooling: Sequence embedding pooling strategy.
+        batch_size: ESM2 embedding batch size.
+        max_records: Optional reference-record limit.
+        generation_steps: Number of generation steps per sequence.
+        seed: Base random seed for generation.
+        freeze_proposal: Whether the proposal backbone stays frozen.
+        guided_num_candidates: Guided reranker candidate count.
+        guided_proposal_temperature: Guided proposal temperature.
+        guided_proposal_noise_scale: Guided proposal noise scale.
+        guided_energy_temperature: Guided energy temperature.
+        guided_disable_resample: Whether guided resampling is disabled.
+        guided_resample_ratio: Guided repetition-resample threshold.
+        guided_resample_top_p: Guided resample top-p cutoff.
+
+    Returns:
+        EvalConfig: An evaluation config that routes BM hidden-state solving
+        through ``CIMOptimizer``.
+    """
+    return EvalConfig(
+        reference_fasta=reference_fasta,
+        proposal_ckpt=proposal_ckpt,
+        energy_ckpt=energy_ckpt,
+        guided_checkpoint=guided_checkpoint,
+        output_dir=output_dir,
+        device=device,
+        esm2_model=esm2_model,
+        pair_mode=pair_mode,
+        pooling=pooling,
+        batch_size=batch_size,
+        max_records=max_records,
+        generation_steps=generation_steps,
+        seed=seed,
+        freeze_proposal=freeze_proposal,
+        guided_num_candidates=guided_num_candidates,
+        guided_proposal_temperature=guided_proposal_temperature,
+        guided_proposal_noise_scale=guided_proposal_noise_scale,
+        guided_energy_temperature=guided_energy_temperature,
+        guided_disable_resample=guided_disable_resample,
+        guided_resample_ratio=guided_resample_ratio,
+        guided_resample_top_p=guided_resample_top_p,
+        bm_sampler_type="cim",
+        bm_sampler_kwargs={
+            "task_name": task_name,
+            "wait": wait,
+            "interval": interval,
+            "project_no": project_no,
+            "task_mode": task_mode,
+            "sample_number": sample_number,
+            "use_precision_reducer": use_precision_reducer,
+            "precision": precision,
+            "truncated_precision": truncated_precision,
+            "target_bits": target_bits,
+            "only_feasible_solution": only_feasible_solution,
+            "tmp_dir": tmp_dir,
+        },
+    )
 
 
 def maybe_limit_records(
@@ -231,9 +474,7 @@ def run_generation_over_records(
         # editable because they are mask_id.
         partial_masks = input_tokens.ne(generator.mask_id)
         seed = seed_base + index
-        torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(seed)
+        seed_torch(seed)
 
         with torch.no_grad():
             generated_tokens = generator.generate(
@@ -299,6 +540,8 @@ def generate_candidate_fastas(
         guided_disable_resample=config.guided_disable_resample,
         guided_resample_ratio=config.guided_resample_ratio,
         guided_resample_top_p=config.guided_resample_top_p,
+        bm_sampler_type=config.bm_sampler_type,
+        bm_sampler_kwargs=config.bm_sampler_kwargs,
     )
     save_json(generation_dir / "generation_config.json", asdict(generation_cfg))
     print(f"Saved generation config to: {generation_dir / 'generation_config.json'}")
@@ -308,15 +551,10 @@ def generate_candidate_fastas(
 
     # Baseline mode: proposal-only behavior, aligned with the old script family.
     print("Building baseline generator...")
-    baseline_generator = (
-        build_dplm_qdiffusion(
-            proposal_ckpt=config.proposal_ckpt,
-            energy_ckpt=config.energy_ckpt,
-            num_candidates=1,
-            freeze_proposal=config.freeze_proposal,
-        )
-        .eval()
-        .to(device)
+    baseline_generator = build_generator_for_eval(
+        config,
+        device=device,
+        num_candidates=1,
     )
     run_generation_over_records(
         baseline_generator,
@@ -330,21 +568,16 @@ def generate_candidate_fastas(
     # Guided mode: same proposal backbone family, but energy-side weights are
     # restored from the trained compact checkpoint.
     print("Building guided generator...")
-    guided_generator = (
-        build_dplm_qdiffusion(
-            proposal_ckpt=config.proposal_ckpt,
-            energy_ckpt=config.energy_ckpt,
-            num_candidates=config.guided_num_candidates,
-            proposal_temperature=config.guided_proposal_temperature,
-            proposal_noise_scale=config.guided_proposal_noise_scale,
-            energy_temperature=config.guided_energy_temperature,
-            disable_resample=config.guided_disable_resample,
-            resample_ratio=config.guided_resample_ratio,
-            resample_top_p=config.guided_resample_top_p,
-            freeze_proposal=config.freeze_proposal,
-        )
-        .eval()
-        .to(device)
+    guided_generator = build_generator_for_eval(
+        config,
+        device=device,
+        num_candidates=config.guided_num_candidates,
+        proposal_temperature=config.guided_proposal_temperature,
+        proposal_noise_scale=config.guided_proposal_noise_scale,
+        energy_temperature=config.guided_energy_temperature,
+        disable_resample=config.guided_disable_resample,
+        resample_ratio=config.guided_resample_ratio,
+        resample_top_p=config.guided_resample_top_p,
     )
     load_trained_energy_weights(guided_generator, config.guided_checkpoint, device)
     run_generation_over_records(
@@ -662,26 +895,18 @@ def write_report(
 # ---------------------------------------------------------------------------
 def main() -> None:
     """Runs one local/server generation+evaluation pass with in-file config."""
-    config = EvalConfig(
-        # Paths to your data/checkpoints.
+    config = build_sa_eval_config(
         reference_fasta=default_fasta_path(),
         proposal_ckpt="/data2/wwx/models/dplm_150m",
         energy_ckpt="/data2/wwx/models/dplm_150m",
         guided_checkpoint="ckpt/best_epoch_9.pt",
         output_dir=default_outputs_root() / "esm2_distance_eval",
-        # Runtime / ESM2 settings.
         device="cuda:0" if torch.cuda.is_available() else "cpu",
         esm2_model="esm2_t33_650M_UR50D",
         pair_mode="order",
         pooling="mean",
         batch_size=1,
-        # How many reference sequences to generate/evaluate in one run.
-        # Recommended:
-        # 20 for a quick sanity check
-        # 50 for a balanced comparison
-        # 100+ only when you are ready for a longer run
         max_records=20,
-        # Generation hyperparameters.
         generation_steps=500,
         seed=42,
         freeze_proposal=True,
@@ -693,6 +918,22 @@ def main() -> None:
         guided_resample_ratio=0.20,
         guided_resample_top_p=0.90,
     )
+    # Switch to the CIM template when you want generation/evaluation to use the
+    # same remote CIM solver path as training.
+    #
+    # config = build_cim_eval_config(
+    #     reference_fasta=default_fasta_path(),
+    #     proposal_ckpt="/data2/wwx/models/dplm_150m",
+    #     energy_ckpt="/data2/wwx/models/dplm_150m",
+    #     guided_checkpoint="ckpt/best_epoch_9.pt",
+    #     output_dir=default_outputs_root() / "esm2_distance_eval",
+    #     device="cuda:0" if torch.cuda.is_available() else "cpu",
+    #     task_name="qdiffusion_bm",
+    #     project_no="YOUR_PROJECT_ID",
+    #     task_mode="OPTIMIZATION",
+    #     tmp_dir="./tmp",
+    #     wait=False,
+    # )
 
     device = torch.device(config.device)
     output_dir: Path = config.output_dir

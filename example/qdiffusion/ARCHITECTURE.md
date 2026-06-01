@@ -4,7 +4,7 @@ This directory wires one generic `Q-Diffusion` core to one concrete experiment
 stack:
 
 - proposal side: DPLM
-- energy side: conditioned BM/RBM reranker
+- energy side: conditioned BM reranker
 
 ## Main Path
 
@@ -12,10 +12,9 @@ stack:
 2. `dplm/dplm_builder.py` loads:
    - one DPLM proposal backbone
    - one DPLM feature encoder for the energy branch
-3. `dplm/models/energy.py` builds:
+3. `dplm/models/` builds:
    - `DPLMFeatureEncoder`
-   - one conditioned energy model and adapter pair
-   - either the RBM path or the BM path, depending on `energy_model_type`
+   - one conditioned BM energy model and adapter pair
 4. the builder passes those parts into `kaiwu.torch_plugin.QDiffusion`
 5. `Q-Diffusion` uses:
    - proposal logits for candidate generation
@@ -48,7 +47,7 @@ uses the configured energy-reranking path:
 2. run the DPLM proposal model
 3. sample candidate reconstructions
 4. call `energy_adapter.score_conditioned(...)`
-5. rerank candidates with BM/RBM energies
+5. rerank candidates with BM energies
 6. update the decode state and continue
 
 ## Checkpoints
@@ -57,7 +56,7 @@ Example checkpoints store the guided energy branch explicitly:
 
 - `energy_encoder`
 - `feature_projector`
-- energy backend weights (`energy_rbm` or `energy_bm`, plus BM-only helper state if needed)
+- `energy_bm`
 - `energy_head`
 - `vocab_proj`
 

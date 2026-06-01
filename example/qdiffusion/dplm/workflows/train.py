@@ -8,7 +8,7 @@ from __future__ import annotations
 import os
 import random
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -52,6 +52,7 @@ try:
         encode_sequence,
         load_trained_energy_weights,
         save_checkpoint,
+        seed_torch,
         summarize_trainable_parameters,
     )
 except ImportError:  # pragma: no cover - direct script-path compatibility
@@ -76,6 +77,7 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         encode_sequence,
         load_trained_energy_weights,
         save_checkpoint,
+        seed_torch,
         summarize_trainable_parameters,
     )
 
@@ -168,7 +170,9 @@ def summarize_objective(outputs: dict[str, torch.Tensor]) -> str:
         f"targets={tuple(targets.shape)}, "
         f"masked_positions={int(loss_mask.sum().item())}, "
         f"weight_mean={float(weight.mean().item()):.4f}, "
-        f"energy_objective_mean={float(energy_objective.mean().item()):.4f}"
+        f"energy_objective_mean={float(energy_objective.mean().item()):.4f}, "
+        f"positive_energy_mean={float(outputs.get('positive_energy_mean', torch.tensor(0.0)).item()):.4f}, "
+        f"negative_energy_mean={float(outputs.get('negative_energy_mean', torch.tensor(0.0)).item()):.4f}"
     )
 
 
@@ -250,6 +254,43 @@ def set_training_mode(generator, training: bool) -> None:
         generator.eval()
 
 
+def build_generator_from_config(
+    config: "WorkflowConfig",
+    *,
+    device: str,
+    num_candidates: int,
+    proposal_temperature: float = 0.0,
+    proposal_noise_scale: float = 1.0,
+    energy_temperature: float = 1.0,
+    disable_resample: bool = False,
+    resample_ratio: float = 0.25,
+    resample_top_p: float = 0.95,
+) -> Any:
+    """Builds one DPLM-backed generator from the shared workflow config.
+
+    The train, validation, baseline, and guided branches all reuse the same
+    builder with different decode-time overrides. Keeping that mapping in one
+    helper makes it easier to see which knobs are shared versus branch-specific.
+    """
+    return (
+        build_dplm_qdiffusion(
+            proposal_ckpt=config.model.proposal_ckpt,
+            energy_ckpt=config.model.energy_ckpt,
+            num_candidates=num_candidates,
+            proposal_temperature=proposal_temperature,
+            proposal_noise_scale=proposal_noise_scale,
+            energy_temperature=energy_temperature,
+            disable_resample=disable_resample,
+            resample_ratio=resample_ratio,
+            resample_top_p=resample_top_p,
+            freeze_proposal=config.model.freeze_proposal,
+            **make_bm_build_kwargs(config),
+        )
+        .eval()
+        .to(device)
+    )
+
+
 def run_epoch(
     generator,
     data_loader: DataLoader,
@@ -275,6 +316,17 @@ def run_epoch(
 
     total_loss = 0.0
     total_examples = 0
+    metric_totals: dict[str, float] = {}
+    tracked_keys = (
+        "positive_energy_mean",
+        "negative_energy_mean",
+        "positive_solver_mode",
+        "negative_solver_mode",
+        "positive_visible_on_ratio",
+        "negative_visible_on_ratio",
+        "positive_hidden_on_ratio",
+        "negative_hidden_on_ratio",
+    )
 
     # Shared epoch loop: with an optimizer we train, without one we only run
     # the same objective in evaluation mode for validation statistics.
@@ -288,6 +340,8 @@ def run_epoch(
 
             if training:
                 optimizer.zero_grad(set_to_none=True)
+                # Gradients only update the energy side in the default example
+                # setup because the proposal backbone is kept frozen.
                 loss.backward()
                 if grad_clip_norm > 0:
                     torch.nn.utils.clip_grad_norm_(
@@ -299,8 +353,17 @@ def run_epoch(
             batch_size = int(batch["targets"].shape[0])
             total_loss += float(loss.item()) * batch_size
             total_examples += batch_size
+            for key in tracked_keys:
+                if key in outputs:
+                    metric_totals[key] = metric_totals.get(key, 0.0) + (
+                        float(outputs[key].item()) * batch_size
+                    )
 
-    return {"energy_objective_mean": total_loss / max(total_examples, 1)}
+    total_examples = max(total_examples, 1)
+    metrics = {"energy_objective_mean": total_loss / total_examples}
+    for key, value in metric_totals.items():
+        metrics[key] = value / total_examples
+    return metrics
 
 
 def run_structural_validation(
@@ -375,9 +438,7 @@ def run_generation_over_records(
     for index, (header, sequence) in enumerate(records, start=1):
         target_tokens = encode_sequence(generator, sequence, max_length=None)
         seed = seed_base + index
-        torch.manual_seed(seed)
-        if torch.cuda.is_available():
-            torch.cuda.manual_seed_all(seed)
+        seed_torch(seed)
 
         with torch.no_grad():
             objective_outputs = generator.objective({"targets": target_tokens})
@@ -486,60 +547,131 @@ def write_markdown_report(
         "| Item | Value |",
         "|---|---|",
         f"| best_checkpoint | {best_checkpoint_path if best_checkpoint_path is not None else 'N/A'} |",
-        f"| train_num_candidates | {config.train_num_candidates} |",
-        f"| guided_num_candidates | {config.guided_num_candidates} |",
-        f"| generation_steps | {config.generation_steps} |",
+        f"| train_num_candidates | {config.train.num_candidates} |",
+        f"| guided_num_candidates | {config.generate.num_candidates} |",
+        f"| generation_steps | {config.generate.steps} |",
         "",
     ]
     save_markdown(path, lines)
 
 
 @dataclass
-class RealFullWorkflowConfig:
-    """Top-level config for the real full-corpus example."""
+class DataConfig:
+    """Dataset selection and split settings."""
 
     fasta_path: str
-    proposal_ckpt: str
-    energy_ckpt: str
     min_length: int = 50
     max_length: int = 256
     max_records: int | None = None
     val_ratio: float = 0.05
     test_ratio: float = 0.05
     seed: int = 42
+
+
+@dataclass
+class ModelConfig:
+    """Model checkpoints shared by training and generation."""
+
+    proposal_ckpt: str
+    energy_ckpt: str
+    freeze_proposal: bool = True
+
+
+@dataclass
+class SolverConfig:
+    """Energy solver settings.
+
+    Most runs only need ``sampler_type="sa"``. ``sampler_kwargs`` stays empty
+    unless the example is routed through a custom solver such as CIM.
+    """
+
+    sampler_type: str = "sa"
+    sampler_kwargs: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class TrainConfig:
+    """Training-only knobs."""
+
     epochs: int = 20
     min_epochs: int = 3
     batch_size: int = 4
     learning_rate: float = 5e-5
     weight_decay: float = 1e-2
     grad_clip_norm: float = 1.0
-    train_num_candidates: int = 4
-    guided_num_candidates: int = 8
-    guided_energy_temperature: float = 1.25
-    guided_proposal_temperature: float = 0.3
-    guided_proposal_noise_scale: float = 1.0
-    guided_disable_resample: bool = False
-    guided_resample_ratio: float = 0.20
-    guided_resample_top_p: float = 0.90
+    num_candidates: int = 4
     validation_steps: int = 3
-    generation_steps: int = 5
-    freeze_proposal: bool = True
     scheduler_factor: float = 0.5
     scheduler_patience: int = 1
     early_stop_patience: int = 4
     require_cuda: bool = True
 
 
-def main() -> None:
-    """Runs the final self-contained full workflow."""
-    config = RealFullWorkflowConfig(
-        fasta_path=str(default_fasta_path()),
-        proposal_ckpt="airkingbd/dplm_150m",
-        energy_ckpt="airkingbd/dplm_150m",
+@dataclass
+class GenerateConfig:
+    """Generation/evaluation knobs used after training."""
+
+    num_candidates: int = 8
+    energy_temperature: float = 1.25
+    proposal_temperature: float = 0.3
+    proposal_noise_scale: float = 1.0
+    disable_resample: bool = False
+    resample_ratio: float = 0.20
+    resample_top_p: float = 0.90
+    steps: int = 5
+
+
+@dataclass
+class WorkflowConfig:
+    """Top-level config grouped by concern instead of one flat field list."""
+
+    data: DataConfig
+    model: ModelConfig
+    solver: SolverConfig = field(default_factory=SolverConfig)
+    train: TrainConfig = field(default_factory=TrainConfig)
+    generate: GenerateConfig = field(default_factory=GenerateConfig)
+
+
+def make_bm_build_kwargs(config: WorkflowConfig) -> dict[str, Any]:
+    """Builds the small BM config payload consumed by the generator builder."""
+    return {
+        "bm_sampler_type": config.solver.sampler_type,
+        "bm_sampler_kwargs": dict(config.solver.sampler_kwargs),
+    }
+
+
+def build_default_workflow_config() -> WorkflowConfig:
+    """Returns one short, example-friendly default config."""
+    return WorkflowConfig(
+        data=DataConfig(fasta_path=str(default_fasta_path())),
+        model=ModelConfig(
+            proposal_ckpt="airkingbd/dplm_150m",
+            energy_ckpt="airkingbd/dplm_150m",
+        ),
+        solver=SolverConfig(
+            sampler_type="sa",
+        ),
     )
 
+
+def main() -> None:
+    """Runs the final self-contained full workflow."""
+    config = build_default_workflow_config()
+    # For custom solvers, keep the top-level structure and only swap this block.
+    #
+    # config.solver = SolverConfig(
+    #     sampler_type="cim",
+    #     sampler_kwargs={
+    #         "task_name": "qdiffusion_bm",
+    #         "project_no": "YOUR_PROJECT_ID",
+    #         "task_mode": "OPTIMIZATION",
+    #         "tmp_dir": "./tmp",
+    #         "wait": False,
+    #     },
+    # )
+
     has_cuda = torch.cuda.is_available()
-    if config.require_cuda and not has_cuda:
+    if config.train.require_cuda and not has_cuda:
         raise RuntimeError("CUDA is required for this real full-corpus workflow.")
     device = "cuda" if has_cuda else "cpu"
 
@@ -551,25 +683,23 @@ def main() -> None:
     print(f"Using device: {device}")
     print(f"Output directory: {output_dir}")
 
-    random.seed(config.seed)
-    torch.manual_seed(config.seed)
-    if has_cuda:
-        torch.cuda.manual_seed_all(config.seed)
+    random.seed(config.data.seed)
+    seed_torch(config.data.seed)
 
     # Stage 1: read the reference FASTA, filter it, and create deterministic
     # train/validation/test splits for the rest of the run.
-    all_records = read_fasta_records(Path(config.fasta_path))
+    all_records = read_fasta_records(Path(config.data.fasta_path))
     selected_records = select_records(
         all_records,
-        min_length=config.min_length,
-        max_length=config.max_length,
-        max_records=config.max_records,
+        min_length=config.data.min_length,
+        max_length=config.data.max_length,
+        max_records=config.data.max_records,
     )
     train_records, val_records, test_records = split_train_val_test(
         selected_records,
-        val_ratio=config.val_ratio,
-        test_ratio=config.test_ratio,
-        seed=config.seed,
+        val_ratio=config.data.val_ratio,
+        test_ratio=config.data.test_ratio,
+        seed=config.data.seed,
     )
 
     save_json(
@@ -592,42 +722,47 @@ def main() -> None:
 
     # Stage 2: run one pre-training structural sanity check so we can catch
     # tokenization / generation wiring issues before the expensive training loop.
-    validation_generator = (
-        build_dplm_qdiffusion(
-            proposal_ckpt=config.proposal_ckpt,
-            energy_ckpt=config.energy_ckpt,
-            num_candidates=1,
-            freeze_proposal=config.freeze_proposal,
-        )
-        .eval()
-        .to(device)
+    validation_generator = build_generator_from_config(
+        config,
+        device=device,
+        num_candidates=1,
     )
+    # Before spending time on training, verify that one real sequence can pass
+    # through both ``objective`` and ``generate`` without shape/wiring issues.
     validation_summary = run_structural_validation(
         validation_generator,
         test_records[0],
-        max_length=config.max_length,
-        steps=config.validation_steps,
+        max_length=config.data.max_length,
+        steps=config.train.validation_steps,
     )
     save_json(output_dir / "validation_summary.json", validation_summary)
 
     # Stage 3: build the actual trainable generator and dataloaders. In the
     # default setup, proposal weights stay frozen and the energy side is tuned.
-    train_generator = build_dplm_qdiffusion(
-        proposal_ckpt=config.proposal_ckpt,
-        energy_ckpt=config.energy_ckpt,
-        num_candidates=config.train_num_candidates,
-        freeze_proposal=config.freeze_proposal,
-    ).to(device)
+    train_generator = build_generator_from_config(
+        config,
+        device=device,
+        num_candidates=config.train.num_candidates,
+    )
+    train_generator.train()
+    if getattr(train_generator, "proposal_model", None) is not None:
+        train_generator.proposal_model.eval()
     save_json(
         output_dir / "parameter_summary.json",
         summarize_trainable_parameters(train_generator),
     )
 
     train_loader = build_data_loader_from_records(
-        train_generator, train_records, batch_size=config.batch_size, shuffle=True
+        train_generator,
+        train_records,
+        batch_size=config.train.batch_size,
+        shuffle=True,
     )
     val_loader = build_data_loader_from_records(
-        train_generator, val_records, batch_size=config.batch_size, shuffle=False
+        train_generator,
+        val_records,
+        batch_size=config.train.batch_size,
+        shuffle=False,
     )
 
     optimizer = AdamW(
@@ -636,14 +771,14 @@ def main() -> None:
             for parameter in train_generator.parameters()
             if parameter.requires_grad
         ],
-        lr=config.learning_rate,
-        weight_decay=config.weight_decay,
+        lr=config.train.learning_rate,
+        weight_decay=config.train.weight_decay,
     )
     scheduler = ReduceLROnPlateau(
         optimizer,
         mode="min",
-        factor=config.scheduler_factor,
-        patience=config.scheduler_patience,
+        factor=config.train.scheduler_factor,
+        patience=config.train.scheduler_patience,
     )
 
     checkpoints_dir = output_dir / "checkpoints"
@@ -654,20 +789,20 @@ def main() -> None:
 
     # Stage 4: optimize the energy-guided objective, track validation loss, and
     # keep the best energy-side checkpoint for later guided generation.
-    for epoch in range(1, config.epochs + 1):
-        print(f"Epoch {epoch}/{config.epochs}")
+    for epoch in range(1, config.train.epochs + 1):
+        print(f"Epoch {epoch}/{config.train.epochs}")
         train_metrics = run_epoch(
             train_generator,
             train_loader,
             optimizer=optimizer,
-            grad_clip_norm=config.grad_clip_norm,
+            grad_clip_norm=config.train.grad_clip_norm,
             description=f"train-{epoch}",
         )
         val_metrics = run_epoch(
             train_generator,
             val_loader,
             optimizer=None,
-            grad_clip_norm=config.grad_clip_norm,
+            grad_clip_norm=config.train.grad_clip_norm,
             description=f"val-{epoch}",
         )
 
@@ -676,6 +811,21 @@ def main() -> None:
             "train_energy_objective_mean": train_metrics["energy_objective_mean"],
             "val_energy_objective_mean": val_metrics["energy_objective_mean"],
             "learning_rate": float(optimizer.param_groups[0]["lr"]),
+            "train_positive_energy_mean": train_metrics.get(
+                "positive_energy_mean", 0.0
+            ),
+            "train_negative_energy_mean": train_metrics.get(
+                "negative_energy_mean", 0.0
+            ),
+            "val_positive_energy_mean": val_metrics.get("positive_energy_mean", 0.0),
+            "val_negative_energy_mean": val_metrics.get("negative_energy_mean", 0.0),
+            "solver_mode": train_metrics.get("positive_solver_mode", 0.0),
+            "train_visible_on_ratio": train_metrics.get(
+                "positive_visible_on_ratio", 0.0
+            ),
+            "train_hidden_on_ratio": train_metrics.get("positive_hidden_on_ratio", 0.0),
+            "val_visible_on_ratio": val_metrics.get("positive_visible_on_ratio", 0.0),
+            "val_hidden_on_ratio": val_metrics.get("positive_hidden_on_ratio", 0.0),
         }
         train_history.append(epoch_summary)
         save_json(output_dir / "history.json", train_history)
@@ -697,8 +847,8 @@ def main() -> None:
             epochs_without_improvement += 1
 
         if (
-            epoch >= config.min_epochs
-            and epochs_without_improvement >= config.early_stop_patience
+            epoch >= config.train.min_epochs
+            and epochs_without_improvement >= config.train.early_stop_patience
         ):
             print(
                 "Early stopping triggered: "
@@ -719,49 +869,43 @@ def main() -> None:
 
     # Stage 5: compare a proposal-only baseline against a guided generator that
     # reloads the best learned energy weights from training.
-    baseline_generator = (
-        build_dplm_qdiffusion(
-            proposal_ckpt=config.proposal_ckpt,
-            energy_ckpt=config.energy_ckpt,
-            num_candidates=1,
-            freeze_proposal=config.freeze_proposal,
-        )
-        .eval()
-        .to(device)
+    baseline_generator = build_generator_from_config(
+        config,
+        device=device,
+        num_candidates=1,
     )
+    # The baseline branch keeps the proposal path only; it gives us a direct
+    # comparison point for how much the learned BM reranker helps.
     baseline_records, _ = run_generation_over_records(
         baseline_generator,
         test_records,
-        max_steps=config.generation_steps,
-        seed_base=config.seed,
+        max_steps=config.generate.steps,
+        seed_base=config.data.seed,
         output_dir=output_dir / "baseline",
         label="proposal_only",
     )
 
-    guided_generator = (
-        build_dplm_qdiffusion(
-            proposal_ckpt=config.proposal_ckpt,
-            energy_ckpt=config.energy_ckpt,
-            num_candidates=config.guided_num_candidates,
-            proposal_temperature=config.guided_proposal_temperature,
-            proposal_noise_scale=config.guided_proposal_noise_scale,
-            energy_temperature=config.guided_energy_temperature,
-            disable_resample=config.guided_disable_resample,
-            resample_ratio=config.guided_resample_ratio,
-            resample_top_p=config.guided_resample_top_p,
-            freeze_proposal=config.freeze_proposal,
-        )
-        .eval()
-        .to(device)
+    guided_generator = build_generator_from_config(
+        config,
+        device=device,
+        num_candidates=config.generate.num_candidates,
+        proposal_temperature=config.generate.proposal_temperature,
+        proposal_noise_scale=config.generate.proposal_noise_scale,
+        energy_temperature=config.generate.energy_temperature,
+        disable_resample=config.generate.disable_resample,
+        resample_ratio=config.generate.resample_ratio,
+        resample_top_p=config.generate.resample_top_p,
     )
     if best_checkpoint_path is None:
         raise RuntimeError("Training did not produce a best checkpoint.")
+    # Guided generation reloads only the trained energy-side weights onto a
+    # fresh generator instance so inference mirrors rerun/eval behavior.
     load_trained_energy_weights(guided_generator, str(best_checkpoint_path), device)
     guided_records, _ = run_generation_over_records(
         guided_generator,
         test_records,
-        max_steps=config.generation_steps,
-        seed_base=config.seed,
+        max_steps=config.generate.steps,
+        seed_base=config.data.seed,
         output_dir=output_dir / "guided",
         label="energy_guided",
     )

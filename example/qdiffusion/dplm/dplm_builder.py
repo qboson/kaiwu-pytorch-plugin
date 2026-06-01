@@ -12,23 +12,19 @@ import torch
 from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
 try:
+    from .models import (
+        BMConditionedEnergyAdapter,
+        BMConditionedEnergyModel,
+        DPLMFeatureEncoder,
+    )
     from .models.backbone import DPLMBackbone, build_dplm_token_spec
-    from .models.energy import (
-        BMConditionedEnergyAdapter,
-        BMConditionedEnergyModel,
-        DPLMFeatureEncoder,
-        RBMConditionedEnergyAdapter,
-        RBMConditionedEnergyModel,
-    )
 except ImportError:  # pragma: no cover - direct script-path compatibility
-    from models.backbone import DPLMBackbone, build_dplm_token_spec
-    from models.energy import (
+    from models import (
         BMConditionedEnergyAdapter,
         BMConditionedEnergyModel,
         DPLMFeatureEncoder,
-        RBMConditionedEnergyAdapter,
-        RBMConditionedEnergyModel,
     )
+    from models.backbone import DPLMBackbone, build_dplm_token_spec
 
 # Backbone loading helpers.
 
@@ -63,17 +59,39 @@ def load_dplm_backbone(
 # Generic QDiffusion construction helpers.
 
 
+def _build_energy_components(
+    *,
+    energy_backbone: DPLMBackbone,
+    bm_num_visible: int,
+    bm_num_hidden: int,
+    bm_sampler: Any | None,
+    bm_sampler_type: str,
+    bm_sampler_kwargs: dict[str, Any] | None,
+) -> tuple[Any, Any]:
+    """Builds the BM energy model plus its adapter."""
+    # The example keeps a single energy path: DPLM feature encoding followed by
+    # one solver-backed BM reranker plus a thin adapter for generic QDiffusion.
+    energy_encoder = DPLMFeatureEncoder(energy_backbone)
+    energy_model = BMConditionedEnergyModel(
+        encoder=energy_encoder,
+        bm_num_visible=bm_num_visible,
+        bm_num_hidden=bm_num_hidden,
+        sampler=bm_sampler,
+        sampler_type=bm_sampler_type,
+        sampler_kwargs=bm_sampler_kwargs,
+    )
+    return energy_model, BMConditionedEnergyAdapter(energy_model)
+
+
 def build_dplm_qdiffusion(
     proposal_ckpt: str,
     energy_ckpt: str,
     *,
-    energy_model_type: str = "rbm",
-    rbm_num_visible: int = 256,
-    rbm_num_hidden: int = 128,
-    bm_num_visible: int | None = None,
-    bm_num_hidden: int | None = None,
-    feature_pooling: str = "mean",
-    bm_mean_field_steps: int = 3,
+    bm_num_visible: int = 256,
+    bm_num_hidden: int = 128,
+    bm_sampler: Any | None = None,
+    bm_sampler_type: str = "sa",
+    bm_sampler_kwargs: dict[str, Any] | None = None,
     num_candidates: int = 1,
     proposal_temperature: float = 0.0,
     proposal_noise_scale: float = 1.0,
@@ -95,17 +113,15 @@ def build_dplm_qdiffusion(
     Args:
         proposal_ckpt: Proposal backbone checkpoint or model id.
         energy_ckpt: Energy backbone checkpoint or model id.
-        energy_model_type: Energy-model backend type. Supported values are
-            ``"rbm"`` and ``"bm"``.
-        rbm_num_visible: Visible-state size for the RBM reranker.
-        rbm_num_hidden: Hidden-state size for the RBM reranker.
-        bm_num_visible: Optional visible-state size for the BM reranker. When
-            omitted, reuse ``rbm_num_visible`` for convenience.
-        bm_num_hidden: Optional hidden-state size for the BM reranker. When
-            omitted, reuse ``rbm_num_hidden`` for convenience.
-        feature_pooling: Sequence pooling strategy used before RBM scoring.
-        bm_mean_field_steps: Number of mean-field hidden-state refinement steps
-            used by the BM reranker.
+        bm_num_visible: Visible-state size for the BM reranker.
+        bm_num_hidden: Hidden-state size for the BM reranker.
+        bm_sampler: Optional pre-built sampler object used by BM solver mode.
+        bm_sampler_type: Sampler family used when ``bm_sampler`` is omitted.
+        bm_sampler_kwargs: Optional keyword arguments used when creating the
+            BM solver internally. For ``"cim"``, these correspond to
+            ``CIMOptimizer`` arguments such as ``task_name``, ``wait``,
+            ``interval``, ``project_no``, ``task_mode``, and
+            ``sample_number``, plus optional ``PrecisionReducer`` controls.
         num_candidates: Number of proposal candidates sampled per decode step.
         proposal_temperature: Temperature used for proposal-side sampling.
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
@@ -124,9 +140,6 @@ def build_dplm_qdiffusion(
 
     Returns:
         QDiffusion: One generic ``QDiffusion`` instance backed by DPLM adapters.
-
-    Raises:
-        ValueError: If the requested energy backend is unsupported.
     """
     proposal_model = load_dplm_backbone(
         proposal_ckpt,
@@ -140,30 +153,18 @@ def build_dplm_qdiffusion(
         net_override=energy_net_override,
         from_huggingface=from_huggingface,
     )
-    energy_encoder = DPLMFeatureEncoder(energy_backbone)
-    if energy_model_type == "rbm":
-        energy_model = RBMConditionedEnergyModel(
-            encoder=energy_encoder,
-            rbm_num_visible=rbm_num_visible,
-            rbm_num_hidden=rbm_num_hidden,
-            feature_pooling=feature_pooling,
-        )
-        energy_adapter = RBMConditionedEnergyAdapter(energy_model)
-    elif energy_model_type == "bm":
-        energy_model = BMConditionedEnergyModel(
-            encoder=energy_encoder,
-            bm_num_visible=bm_num_visible or rbm_num_visible,
-            bm_num_hidden=bm_num_hidden or rbm_num_hidden,
-            feature_pooling=feature_pooling,
-            mean_field_steps=bm_mean_field_steps,
-        )
-        energy_adapter = BMConditionedEnergyAdapter(energy_model)
-    else:
-        raise ValueError(
-            f"Unsupported DPLM example energy_model_type: {energy_model_type}"
-        )
+    energy_model, energy_adapter = _build_energy_components(
+        energy_backbone=energy_backbone,
+        bm_num_visible=bm_num_visible,
+        bm_num_hidden=bm_num_hidden,
+        bm_sampler=bm_sampler,
+        bm_sampler_type=bm_sampler_type,
+        bm_sampler_kwargs=bm_sampler_kwargs,
+    )
 
     token_spec = build_dplm_token_spec(proposal_model)
+    # ``QDiffusionConfig`` only stores generic generation/training knobs; the
+    # DPLM- and BM-specific assembly has already been done above.
     config = QDiffusionConfig(
         num_candidates=num_candidates,
         proposal_temperature=proposal_temperature,

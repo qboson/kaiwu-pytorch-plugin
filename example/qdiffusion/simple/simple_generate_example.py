@@ -134,6 +134,8 @@ def main() -> None:
         return_tensors="pt",
         add_special_tokens=True,
     )
+    # In the public API the caller provides a clean token sequence and
+    # ``generate()`` handles the iterative noisy-state decoding internally.
     input_tokens = encoded["input_ids"].to(generator.device)
 
     with torch.no_grad():

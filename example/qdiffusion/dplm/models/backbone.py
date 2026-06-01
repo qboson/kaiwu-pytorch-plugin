@@ -72,6 +72,8 @@ def get_net(cfg):
             f"Unsupported arch_type for DPLM examples: {cfg.net.arch_type}"
         )
 
+    # The example keeps one patched ESM implementation as its single DPLM
+    # backbone family; higher-level code should not depend on patch details.
     config = AutoConfig.from_pretrained(cfg.net.name)
     net = _EsmForDPLM(config, dropout=cfg.net.dropout)
 
@@ -79,6 +81,9 @@ def get_net(cfg):
         pretrained_model_name_or_path = cfg.net.pretrained_model_name_or_path
         is_local = os.path.exists(pretrained_model_name_or_path)
         if is_local:
+            # Local training artifacts come from the original DPLM codebase, so
+            # we strip their checkpoint prefixes before loading into the example
+            # wrapper.
             pretrained_state_dict = torch.load(
                 pretrained_model_name_or_path, map_location="cpu"
             )["state_dict"]
@@ -105,6 +110,8 @@ class DPLMBackbone(nn.Module):
         super().__init__()
         self._update_cfg(cfg or {})
 
+        # ``self.net`` is the only heavy model object here; the wrapper mainly
+        # exposes token ids and a stable forward interface to the example code.
         self.net = get_net(self.cfg) if net is None else net
         self.tokenizer = self.net.tokenizer
 
@@ -131,6 +138,8 @@ class DPLMBackbone(nn.Module):
         net_override = net_override or {}
 
         if not from_huggingface:
+            # This branch restores one local DPLM training artifact rather than
+            # a Hub model id.
             cfg_path = Path(net_name).parents[1]
             cfg_path = Path(cfg_path, ".hydra", "config.yaml")
             cfg = load_yaml_config(str(cfg_path)).model
