@@ -919,7 +919,7 @@ def main() -> None:
         guided_resample_top_p=0.90,
     )
     # Switch to the CIM template when you want generation/evaluation to use the
-    # same remote CIM solver path as training.
+    # same remote CIM sampling path as training.
     #
     # config = build_cim_eval_config(
     #     reference_fasta=default_fasta_path(),

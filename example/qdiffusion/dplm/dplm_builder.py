@@ -70,7 +70,7 @@ def _build_energy_components(
 ) -> tuple[Any, Any]:
     """Builds the BM energy model plus its adapter."""
     # The example keeps a single energy path: DPLM feature encoding followed by
-    # one solver-backed BM reranker plus a thin adapter for generic QDiffusion.
+    # one sampler-backed BM reranker plus a thin adapter for generic QDiffusion.
     energy_encoder = DPLMFeatureEncoder(energy_backbone)
     energy_model = BMConditionedEnergyModel(
         encoder=energy_encoder,
@@ -115,10 +115,10 @@ def build_dplm_qdiffusion(
         energy_ckpt: Energy backbone checkpoint or model id.
         bm_num_visible: Visible-state size for the BM reranker.
         bm_num_hidden: Hidden-state size for the BM reranker.
-        bm_sampler: Optional pre-built sampler object used by BM solver mode.
+        bm_sampler: Optional pre-built sampler object used by BM sampling mode.
         bm_sampler_type: Sampler family used when ``bm_sampler`` is omitted.
         bm_sampler_kwargs: Optional keyword arguments used when creating the
-            BM solver internally. For ``"cim"``, these correspond to
+            BM sampler internally. For ``"cim"``, these correspond to
             ``CIMOptimizer`` arguments such as ``task_name``, ``wait``,
             ``interval``, ``project_no``, ``task_mode``, and
             ``sample_number``, plus optional ``PrecisionReducer`` controls.

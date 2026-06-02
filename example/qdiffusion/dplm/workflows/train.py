@@ -320,8 +320,8 @@ def run_epoch(
     tracked_keys = (
         "positive_energy_mean",
         "negative_energy_mean",
-        "positive_solver_mode",
-        "negative_solver_mode",
+        "positive_sampling_mode",
+        "negative_sampling_mode",
         "positive_visible_on_ratio",
         "negative_visible_on_ratio",
         "positive_hidden_on_ratio",
@@ -578,11 +578,11 @@ class ModelConfig:
 
 
 @dataclass
-class SolverConfig:
-    """Energy solver settings.
+class SamplerConfig:
+    """Energy sampler settings.
 
     Most runs only need ``sampler_type="sa"``. ``sampler_kwargs`` stays empty
-    unless the example is routed through a custom solver such as CIM.
+    unless the example is routed through a custom sampler such as CIM.
     """
 
     sampler_type: str = "sa"
@@ -627,7 +627,7 @@ class WorkflowConfig:
 
     data: DataConfig
     model: ModelConfig
-    solver: SolverConfig = field(default_factory=SolverConfig)
+    sampler: SamplerConfig = field(default_factory=SamplerConfig)
     train: TrainConfig = field(default_factory=TrainConfig)
     generate: GenerateConfig = field(default_factory=GenerateConfig)
 
@@ -635,8 +635,8 @@ class WorkflowConfig:
 def make_bm_build_kwargs(config: WorkflowConfig) -> dict[str, Any]:
     """Builds the small BM config payload consumed by the generator builder."""
     return {
-        "bm_sampler_type": config.solver.sampler_type,
-        "bm_sampler_kwargs": dict(config.solver.sampler_kwargs),
+        "bm_sampler_type": config.sampler.sampler_type,
+        "bm_sampler_kwargs": dict(config.sampler.sampler_kwargs),
     }
 
 
@@ -648,7 +648,7 @@ def build_default_workflow_config() -> WorkflowConfig:
             proposal_ckpt="airkingbd/dplm_150m",
             energy_ckpt="airkingbd/dplm_150m",
         ),
-        solver=SolverConfig(
+        sampler=SamplerConfig(
             sampler_type="sa",
         ),
     )
@@ -657,9 +657,9 @@ def build_default_workflow_config() -> WorkflowConfig:
 def main() -> None:
     """Runs the final self-contained full workflow."""
     config = build_default_workflow_config()
-    # For custom solvers, keep the top-level structure and only swap this block.
+    # For custom samplers, keep the top-level structure and only swap this block.
     #
-    # config.solver = SolverConfig(
+    # config.sampler = SamplerConfig(
     #     sampler_type="cim",
     #     sampler_kwargs={
     #         "task_name": "qdiffusion_bm",
@@ -819,7 +819,7 @@ def main() -> None:
             ),
             "val_positive_energy_mean": val_metrics.get("positive_energy_mean", 0.0),
             "val_negative_energy_mean": val_metrics.get("negative_energy_mean", 0.0),
-            "solver_mode": train_metrics.get("positive_solver_mode", 0.0),
+            "sampling_mode": train_metrics.get("positive_sampling_mode", 0.0),
             "train_visible_on_ratio": train_metrics.get(
                 "positive_visible_on_ratio", 0.0
             ),

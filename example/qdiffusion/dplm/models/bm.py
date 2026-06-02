@@ -96,7 +96,7 @@ class BMConditionedEnergyModel(nn.Module):
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
         # The projector turns one concatenated sequence feature into the visible
-        # part of the BM state before discretization/solver steps.
+        # part of the BM state before discretization/sampling steps.
         conditioned_features = self.build_conditioned_features(
             noisy_tokens=noisy_tokens,
             candidate_tokens=candidate_tokens,
@@ -120,33 +120,33 @@ class BMConditionedEnergyModel(nn.Module):
         )
 
     def discretize_visible_state(self, visible_logits: torch.Tensor) -> torch.Tensor:
-        """Converts visible logits into the binary state consumed by the solver."""
+        """Converts visible logits into the binary state consumed by the sampler."""
         visible_probs = torch.sigmoid(visible_logits)
         hard_visible = (visible_probs >= self.visible_threshold).to(visible_probs.dtype)
         if self.use_straight_through:
-            # Forward uses hard 0/1 states so the solver sees a discrete
+            # Forward uses hard 0/1 states so the sampler sees a discrete
             # problem, while backward follows the soft probabilities.
             return hard_visible + visible_probs - visible_probs.detach()
         return hard_visible
 
-    def solve_hidden_state(
+    def sample_hidden_state(
         self,
         visible_state: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Solves one batch of BM hidden states with the configured sampler."""
-        sampled_states = []
+        """Samples one batch of BM hidden states with the configured sampler."""
+        batched_states = []
         split_sizes = []
         for sample_index in range(visible_state.size(0)):
-            # The solver works one visible assignment at a time and may return
+            # The sampler works one visible assignment at a time and may return
             # multiple full-state candidates for that single input example.
-            solved_states = self.energy_bm.condition_sample(
+            sampled_states = self.energy_bm.condition_sample(
                 self.sampler,
                 visible_state[sample_index : sample_index + 1],
                 dtype=visible_state.dtype,
             )
-            sampled_states.append(solved_states)
-            split_sizes.append(solved_states.size(0))
-        return torch.cat(sampled_states, dim=0), torch.tensor(
+            batched_states.append(sampled_states)
+            split_sizes.append(sampled_states.size(0))
+        return torch.cat(batched_states, dim=0), torch.tensor(
             split_sizes,
             device=visible_state.device,
             dtype=torch.long,
@@ -159,7 +159,7 @@ class BMConditionedEnergyModel(nn.Module):
         hidden_state: torch.Tensor,
     ) -> None:
         self._last_stats = {
-            "solver_mode": torch.tensor(
+            "sampling_mode": torch.tensor(
                 1.0,
                 dtype=visible_state.dtype,
                 device=visible_state.device,
@@ -169,7 +169,7 @@ class BMConditionedEnergyModel(nn.Module):
         }
 
     def get_last_stats(self) -> dict[str, torch.Tensor]:
-        """Returns lightweight solver diagnostics from the last score call."""
+        """Returns lightweight sampler diagnostics from the last score call."""
         return dict(self._last_stats)
 
     def score_conditioned(
@@ -185,16 +185,16 @@ class BMConditionedEnergyModel(nn.Module):
             attention_mask=attention_mask,
         )
         visible_state = self.discretize_visible_state(visible_logits)
-        # From here on we are in solver-backed BM mode: hidden states come from
+        # From here on we are in sampler-backed BM mode: hidden states come from
         # SA/CIM rather than from a differentiable mean-field approximation.
-        full_states, split_sizes = self.solve_hidden_state(visible_state)
+        full_states, split_sizes = self.sample_hidden_state(visible_state)
         hidden_state = full_states[:, self.bm_num_visible :]
         self._set_last_stats(
             visible_state=full_states[:, : self.bm_num_visible],
             hidden_state=hidden_state,
         )
         flat_energy = self.energy_bm(full_states).unsqueeze(-1)
-        # A solver may emit multiple states per input example, so we aggregate
+        # A sampler may emit multiple states per input example, so we aggregate
         # them back to one scalar score per original candidate.
         split_energy = torch.split(flat_energy, split_sizes.tolist())
         return torch.stack([energy.mean(dim=0) for energy in split_energy], dim=0)

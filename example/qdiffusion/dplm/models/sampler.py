@@ -1,4 +1,4 @@
-"""Sampler-construction helpers for solver-backed BM rerankers."""
+"""Sampler-construction helpers for sampler-backed BM rerankers."""
 
 from __future__ import annotations
 
@@ -11,13 +11,13 @@ def build_bm_sampler(
     sampler_type: str,
     sampler_kwargs: dict[str, Any] | None = None,
 ) -> Any:
-    """Builds one solver object for BM hidden-state search."""
+    """Builds one sampler object for BM hidden-state sampling."""
     sampler_kwargs = dict(sampler_kwargs or {})
     if sampler_type == "sa":
         from kaiwu.classical import SimulatedAnnealingOptimizer
 
         # Keep the local SA path self-contained so the example can run without
-        # any remote solver configuration.
+        # any remote sampler configuration.
         default_kwargs = {
             "alpha": 0.95,
             "size_limit": 10,
@@ -74,7 +74,7 @@ def build_bm_sampler(
             return sampler
 
         # PrecisionReducer is optional: keep the common path simple, but allow
-        # callers to wrap the remote solver when they explicitly need it.
+        # callers to wrap the remote sampler when they explicitly need it.
         precision_reducer = getattr(kaiwu_cim, "PrecisionReducer", None)
         if precision_reducer is None:
             raise ValueError(
