@@ -26,14 +26,14 @@ These commands work in both common local modes:
 This example tree is organized around one simple boundary:
 
 - `src/kaiwu/torch_plugin/qdiffusion.py` contains the generic `Q-Diffusion` core
-- `example/qdiffusion/dplm/` adapts DPLM checkpoints into that generic core
+- `example/qdiffusion/qdiffusion_protein/` adapts DPLM checkpoints into that generic core
 - `example/qdiffusion/simple/` shows the smallest runnable usage
 
 The main assembly path is:
 
-1. a script calls `build_dplm_qdiffusion(...)`
-2. `dplm/dplm_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
-3. `dplm/models/` builds one conditioned BM reranker on top of that feature encoder
+1. a script calls `build_qdiffusion_protein(...)`
+2. `qdiffusion_protein/qdiffusion_protein_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
+3. `qdiffusion_protein/models/` builds one conditioned BM reranker on top of that feature encoder
 4. the builder constructs one generic `Q-Diffusion(...)`
 5. the script calls `objective(...)` for training or `generate(...)` for inference
 
@@ -45,24 +45,23 @@ The main assembly path is:
 - `simple/simple_generate_example.py`: minimal iterative generation loop
 
 These scripts still use DPLM under the hood, but only through the example-side
-factory helpers in `dplm/`.
+factory helpers in `qdiffusion_protein/`.
 
 Use `simple/` when you want to understand the public API first without reading
 the larger experiment workflow.
 
 ## DPLM
 
-`dplm/` contains the DPLM-specific adapter layer and larger workflows:
+`qdiffusion_protein/` contains the protein-case adapter layer and larger workflows:
 
-- `dplm/dplm_builder.py`: DPLM-to-`Q-Diffusion` assembly entrypoint
-- `dplm/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
-- `dplm/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
-- `dplm/workflows/`: the actual train, rerun, and ESM2 evaluation implementations
-- `dplm/train_workflow.py`: compatibility entrypoint for the full train/eval workflow
-- `dplm/rerun_from_checkpoint.py`: compatibility entrypoint for guided reruns
-- `dplm/eval_esm2_distances.py`: compatibility entrypoint for ESM2 distance evaluation
+- `qdiffusion_protein/qdiffusion_protein_builder.py`: protein-case `Q-Diffusion` assembly entrypoint
+- `qdiffusion_protein/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
+- `qdiffusion_protein/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
+- `qdiffusion_protein/workflows/`: the actual train and ESM2 evaluation implementations
+- `qdiffusion_protein/train_workflow.py`: compatibility entrypoint for the full train/eval workflow
+- `qdiffusion_protein/eval_esm2_distances.py`: compatibility entrypoint for ESM2 distance evaluation
 
-If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
+If you want to read the actual implementation chain, start from `qdiffusion_protein/workflows/train.py`.
 
 Its end-to-end flow is:
 
@@ -78,7 +77,7 @@ Its end-to-end flow is:
 
 ## Sample ESM2 Distance Result
 
-The DPLM-guided workflow includes `dplm/eval_esm2_distances.py` for embedding-level
+The DPLM-guided workflow includes `qdiffusion_protein/eval_esm2_distances.py` for embedding-level
 comparison between generated sequences and the reference proteome. One example
 report from the current setup used:
 
@@ -124,5 +123,5 @@ Inside `Q-Diffusion.objective(...)`, the training path is:
 - DPLM loading is no longer part of the formal `src` API; the DPLM factory in
   this directory is the example-side compatibility layer.
 - The guided path in these examples is now `DPLM proposal + BM energy reranker`.
-- `simple/` and `dplm/` are designed to be read together:
-  `simple/` shows the API surface, while `dplm/` shows the full experiment workflow.
+- `simple/` and `qdiffusion_protein/` are designed to be read together:
+  `simple/` shows the API surface, while `qdiffusion_protein/` shows the full experiment workflow.

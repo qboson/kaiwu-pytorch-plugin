@@ -20,7 +20,7 @@ import torch
 
 ensure_repo_src_on_path()
 
-from dplm.dplm_builder import build_dplm_qdiffusion
+from qdiffusion_protein.qdiffusion_protein_builder import build_qdiffusion_protein
 
 # Path and sequence helpers.
 
@@ -112,7 +112,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    generator = build_dplm_qdiffusion(
+    generator = build_qdiffusion_protein(
         proposal_ckpt=proposal_ckpt,
         energy_ckpt=energy_ckpt,
         num_candidates=4,
