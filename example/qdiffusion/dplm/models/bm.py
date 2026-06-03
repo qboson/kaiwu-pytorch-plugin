@@ -9,7 +9,7 @@ from torch import nn
 
 from kaiwu.torch_plugin import BoltzmannMachine
 
-from .common import DPLMFeatureEncoder, build_conditioned_features
+from .common import DPLMFeatureEncoder, masked_mean_pool
 from .sampler import build_bm_sampler
 
 
@@ -21,7 +21,6 @@ class BMConditionedEnergyModel(nn.Module):
         encoder: DPLMFeatureEncoder,
         bm_num_visible: int,
         bm_num_hidden: int,
-        feature_pooling: str = "mean",
         sampler: Any | None = None,
         sampler_type: str = "sa",
         sampler_kwargs: dict[str, Any] | None = None,
@@ -29,13 +28,7 @@ class BMConditionedEnergyModel(nn.Module):
         use_straight_through: bool = True,
     ) -> None:
         super().__init__()
-        if feature_pooling != "mean":
-            raise ValueError(
-                f"Unsupported BM feature_pooling for DPLM examples: {feature_pooling}"
-            )
-
         self.encoder = encoder
-        self.feature_pooling = feature_pooling
         self.visible_threshold = visible_threshold
         self.use_straight_through = use_straight_through
         self.bm_num_visible = bm_num_visible
@@ -82,12 +75,17 @@ class BMConditionedEnergyModel(nn.Module):
         # Keep this helper explicit because it is the semantic bridge between
         # sequence modeling and BM scoring: everything after this point operates
         # on BM-space states rather than protein tokens.
-        return build_conditioned_features(
-            self.encoder,
+        noisy_hidden = self.encoder.encode_tokens(
             noisy_tokens,
-            candidate_tokens,
-            attention_mask,
+            attention_mask=attention_mask,
         )
+        candidate_hidden = self.encoder.encode_tokens(
+            candidate_tokens,
+            attention_mask=attention_mask,
+        )
+        noisy_features = masked_mean_pool(noisy_hidden, attention_mask)
+        candidate_features = masked_mean_pool(candidate_hidden, attention_mask)
+        return torch.cat([noisy_features, candidate_features], dim=-1)
 
     def build_visible_logits(
         self,
@@ -103,21 +101,6 @@ class BMConditionedEnergyModel(nn.Module):
             attention_mask=attention_mask,
         )
         return self.feature_projector(conditioned_features)
-
-    def build_visible_state(
-        self,
-        noisy_tokens: torch.Tensor,
-        candidate_tokens: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        """Returns visible probabilities for inspection/debugging."""
-        return torch.sigmoid(
-            self.build_visible_logits(
-                noisy_tokens=noisy_tokens,
-                candidate_tokens=candidate_tokens,
-                attention_mask=attention_mask,
-            )
-        )
 
     def discretize_visible_state(self, visible_logits: torch.Tensor) -> torch.Tensor:
         """Converts visible logits into the binary state consumed by the sampler."""
@@ -198,44 +181,3 @@ class BMConditionedEnergyModel(nn.Module):
         # them back to one scalar score per original candidate.
         split_energy = torch.split(flat_energy, split_sizes.tolist())
         return torch.stack([energy.mean(dim=0) for energy in split_energy], dim=0)
-
-
-class BMConditionedEnergyAdapter:
-    """Adapter exposing one DPLM-conditioned BM scorer to ``QDiffusion``."""
-
-    def __init__(self, energy_model: BMConditionedEnergyModel) -> None:
-        self.energy_model = energy_model
-
-    @property
-    def hidden_size(self) -> int:
-        return self.energy_model.hidden_size
-
-    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        return self.energy_model.embed_tokens(tokens)
-
-    def encode_conditioned(
-        self,
-        input_ids: torch.Tensor,
-        inputs_embeds: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        return self.energy_model.encode_conditioned(
-            input_ids=input_ids,
-            inputs_embeds=inputs_embeds,
-            attention_mask=attention_mask,
-        )
-
-    def score_conditioned(
-        self,
-        noisy_tokens: torch.Tensor,
-        candidate_tokens: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        return self.energy_model.score_conditioned(
-            noisy_tokens=noisy_tokens,
-            candidate_tokens=candidate_tokens,
-            attention_mask=attention_mask,
-        )
-
-    def get_last_stats(self) -> dict[str, torch.Tensor]:
-        return self.energy_model.get_last_stats()

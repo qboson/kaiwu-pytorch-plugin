@@ -185,30 +185,3 @@ def build_dplm_token_spec(backbone: DPLMBackbone) -> SequenceTokenSpec:
         x_id=backbone.x_id,
         tokenizer=backbone.tokenizer,
     )
-
-
-class DPLMEnergyAdapter:
-    """Adapter that exposes generic energy hooks over one DPLM backbone."""
-
-    def __init__(self, backbone: DPLMBackbone) -> None:
-        self.backbone = backbone
-
-    @property
-    def hidden_size(self) -> int:
-        return int(self.backbone.net.config.hidden_size)
-
-    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        return self.backbone.net.get_input_embeddings()(tokens)
-
-    def encode_conditioned(
-        self,
-        input_ids: torch.Tensor,
-        inputs_embeds: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        outputs = self.backbone.net(
-            input_ids=input_ids,
-            inputs_embeds=inputs_embeds,
-            attention_mask=attention_mask,
-        )
-        return outputs["last_hidden_state"]

@@ -13,14 +13,12 @@ from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
 try:
     from .models import (
-        BMConditionedEnergyAdapter,
         BMConditionedEnergyModel,
         DPLMFeatureEncoder,
     )
     from .models.backbone import DPLMBackbone, build_dplm_token_spec
 except ImportError:  # pragma: no cover - direct script-path compatibility
     from models import (
-        BMConditionedEnergyAdapter,
         BMConditionedEnergyModel,
         DPLMFeatureEncoder,
     )
@@ -68,9 +66,10 @@ def _build_energy_components(
     bm_sampler_type: str,
     bm_sampler_kwargs: dict[str, Any] | None,
 ) -> tuple[Any, Any]:
-    """Builds the BM energy model plus its adapter."""
+    """Builds the BM energy model plus the QDiffusion-facing adapter object."""
     # The example keeps a single energy path: DPLM feature encoding followed by
-    # one sampler-backed BM reranker plus a thin adapter for generic QDiffusion.
+    # one sampler-backed BM reranker. The BM model already exposes the generic
+    # QDiffusion hooks directly, so no extra wrapper layer is needed.
     energy_encoder = DPLMFeatureEncoder(energy_backbone)
     energy_model = BMConditionedEnergyModel(
         encoder=energy_encoder,
@@ -80,7 +79,7 @@ def _build_energy_components(
         sampler_type=bm_sampler_type,
         sampler_kwargs=bm_sampler_kwargs,
     )
-    return energy_model, BMConditionedEnergyAdapter(energy_model)
+    return energy_model, energy_model
 
 
 def build_dplm_qdiffusion(

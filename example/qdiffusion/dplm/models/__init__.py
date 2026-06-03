@@ -1,10 +1,9 @@
 """Model building blocks for Q-Diffusion DPLM examples."""
 
-from .bm import BMConditionedEnergyAdapter, BMConditionedEnergyModel
+from .bm import BMConditionedEnergyModel
 from .common import DPLMFeatureEncoder
 
 __all__ = [
-    "BMConditionedEnergyAdapter",
     "BMConditionedEnergyModel",
     "DPLMFeatureEncoder",
 ]
