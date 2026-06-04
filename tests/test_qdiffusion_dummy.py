@@ -14,6 +14,7 @@ from kaiwu.torch_plugin.qdiffusion import (
     QDiffusionConfig,
     SequenceTokenSpec,
 )
+from kaiwu.torch_plugin.energy_model import EnergyModel
 
 
 class DummyTokenizer:
@@ -39,43 +40,12 @@ class DummyProposalModel(nn.Module):
         return self.lm_head(hidden)
 
 
-class DummyEnergyModel(nn.Module):
-    """Tiny energy backbone whose parameters are optimized by QDiffusion."""
+class DummyEnergyModel(EnergyModel):
+    """Tiny energy model whose parameters are optimized by QDiffusion."""
 
     def __init__(self, vocab_size: int, hidden_size: int) -> None:
+        del vocab_size, hidden_size
         super().__init__()
-        self.embedding = nn.Embedding(vocab_size, hidden_size)
-        self.hidden = nn.Linear(hidden_size, hidden_size)
-
-
-class DummyEnergyAdapter:
-    """Minimal generic adapter that bridges the toy energy backbone."""
-
-    def __init__(self, energy_model: DummyEnergyModel) -> None:
-        self.energy_model = energy_model
-
-    @property
-    def hidden_size(self) -> int:
-        return self.energy_model.embedding.embedding_dim
-
-    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        return self.energy_model.embedding(tokens)
-
-    def encode_conditioned(
-        self,
-        input_ids: torch.Tensor,
-        inputs_embeds: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        del input_ids, attention_mask
-        return torch.tanh(self.energy_model.hidden(inputs_embeds))
-
-
-class DummyScoringEnergyAdapter(DummyEnergyAdapter):
-    """Adapter that exposes one direct conditional scorer hook."""
-
-    def __init__(self, energy_model: DummyEnergyModel) -> None:
-        super().__init__(energy_model)
         self.num_score_calls = 0
 
     def score_conditioned(
@@ -100,7 +70,6 @@ class TestQDiffusionDummy(unittest.TestCase):
         hidden_size = 12
         self.proposal_model = DummyProposalModel(vocab_size=vocab_size, hidden_size=hidden_size)
         self.energy_model = DummyEnergyModel(vocab_size=vocab_size, hidden_size=hidden_size)
-        self.energy_adapter = DummyEnergyAdapter(self.energy_model)
         self.token_spec = SequenceTokenSpec(
             pad_id=0,
             bos_id=1,
@@ -119,7 +88,6 @@ class TestQDiffusionDummy(unittest.TestCase):
             proposal_model=self.proposal_model,
             energy_model=self.energy_model,
             token_spec=self.token_spec,
-            energy_adapter=self.energy_adapter,
             config=self.config,
             freeze_proposal=False,
         )
@@ -139,13 +107,12 @@ class TestQDiffusionDummy(unittest.TestCase):
         energy = self.model.energy(self.targets, self.targets)
         self.assertEqual(energy.shape, (2, 1))
 
-    def test_energy_prefers_adapter_scorer_hook(self):
-        scorer_adapter = DummyScoringEnergyAdapter(self.energy_model)
+    def test_energy_uses_energy_model_scorer(self):
+        scorer_model_energy = DummyEnergyModel(vocab_size=8, hidden_size=12)
         scorer_model = QDiffusion(
             proposal_model=self.proposal_model,
-            energy_model=self.energy_model,
+            energy_model=scorer_model_energy,
             token_spec=self.token_spec,
-            energy_adapter=scorer_adapter,
             config=self.config,
             freeze_proposal=False,
         )
@@ -154,8 +121,23 @@ class TestQDiffusionDummy(unittest.TestCase):
             - self.targets[:, [0, 1, 3, 2, 4]].to(torch.float32).sum(dim=1, keepdim=True)
         )
         energy = scorer_model.energy(self.targets[:, [0, 1, 3, 2, 4]], self.targets)
-        self.assertEqual(scorer_adapter.num_score_calls, 1)
+        self.assertEqual(scorer_model_energy.num_score_calls, 1)
         self.assertTrue(torch.equal(energy, expected))
+
+    def test_objective_with_scorer_does_not_require_extra_objective(self):
+        scorer_model_energy = DummyEnergyModel(vocab_size=8, hidden_size=12)
+        scorer_model = QDiffusion(
+            proposal_model=self.proposal_model,
+            energy_model=scorer_model_energy,
+            token_spec=self.token_spec,
+            config=self.config,
+            freeze_proposal=False,
+        )
+
+        outputs = scorer_model.objective({"targets": self.targets})
+
+        self.assertGreaterEqual(scorer_model_energy.num_score_calls, 2)
+        self.assertEqual(outputs["energy_objective"].shape, (2, 1))
 
     def test_objective_fields(self):
         outputs = self.model.objective({"targets": self.targets})

@@ -5,10 +5,9 @@
 
 from __future__ import annotations
 
-from contextlib import nullcontext
 from dataclasses import dataclass
 import math
-from typing import Any, Protocol
+from typing import Any
 
 import numpy as np
 import torch
@@ -20,6 +19,7 @@ from ._qdiffusion_sampling import (
     top_k_top_p_filtering,
     topk_masking,
 )
+from .energy_model import EnergyModel
 
 __all__ = ["QDiffusion", "QDiffusionConfig"]
 
@@ -44,33 +44,6 @@ class SequenceTokenSpec:
     eos_id: int
     x_id: int | None = None
     tokenizer: Any | None = None
-
-
-class EnergyBackboneAdapter(Protocol):
-    """Protocol describing the generic energy-backbone bridge."""
-
-    @property
-    def hidden_size(self) -> int:
-        """Returns the backbone hidden size used by the energy head."""
-
-    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Embeds discrete token ids into hidden representations."""
-
-    def encode_conditioned(
-        self,
-        input_ids: torch.Tensor,
-        inputs_embeds: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        """Encodes fused embeddings and returns token-level hidden states."""
-
-    def score_conditioned(
-        self,
-        noisy_tokens: torch.Tensor,
-        candidate_tokens: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        """Optionally scores candidates directly without the fallback path."""
 
 
 @dataclass
@@ -120,35 +93,28 @@ class QDiffusion(nn.Module):
     def __init__(
         self,
         proposal_model: nn.Module,
-        energy_model: nn.Module,
+        energy_model: EnergyModel,
         token_spec: SequenceTokenSpec,
-        energy_adapter: EnergyBackboneAdapter,
         config: QDiffusionConfig | None = None,
         dtype: torch.dtype = torch.float32,
         device: torch.device | str | None = None,
         freeze_proposal: bool = True,
-        energy_head: nn.Module | None = None,
     ) -> None:
         """Initializes a QDiffusion model.
 
         Args:
             proposal_model: Backbone used to predict proposal logits.
-            energy_model: Backbone module whose parameters are optimized for
-                sequence-level energy scoring.
+            energy_model: Energy-side model used to encode and score candidates.
             token_spec: Special-token metadata required by the generator.
-            energy_adapter: Adapter exposing the generic embedding and encoding
-                hooks used by :meth:`energy`.
             config: Optional generation/training configuration.
             dtype: Floating point dtype tracked by the wrapper.
             device: Optional target device. When omitted, infer from parameters.
             freeze_proposal: Whether to freeze proposal model parameters.
-            energy_head: Optional custom sequence-level energy head.
         """
         super().__init__()
         self.proposal_model = proposal_model
         self.energy_model = energy_model
         self.token_spec = token_spec
-        self.energy_adapter = energy_adapter
         self.config = config or QDiffusionConfig()
         self.dtype = dtype
 
@@ -156,14 +122,6 @@ class QDiffusion(nn.Module):
             self.proposal_model.eval()
             for parameter in self.proposal_model.parameters():
                 parameter.requires_grad = False
-
-        hidden_size = self.energy_adapter.hidden_size
-        self.energy_head = energy_head or nn.Sequential(
-            nn.Linear(hidden_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, 1),
-        )
-        self.vocab_proj = nn.Linear(2 * hidden_size, hidden_size, bias=True)
 
         self.tokenizer = token_spec.tokenizer
         self.mask_id = token_spec.mask_id
@@ -250,36 +208,11 @@ class QDiffusion(nn.Module):
         if attention_mask is None:
             attention_mask = candidate_tokens.ne(self.pad_id)
 
-        score_conditioned = getattr(self.energy_adapter, "score_conditioned", None)
-        if callable(score_conditioned):
-            return score_conditioned(
-                noisy_tokens=noisy_tokens,
-                candidate_tokens=candidate_tokens,
-                attention_mask=attention_mask,
-            )
-
-        if noisy_tokens.device.type == "cuda":
-            outer_context = torch.amp.autocast("cuda", dtype=torch.float32)
-            inner_context = torch.amp.autocast("cuda", dtype=torch.bfloat16)
-        else:
-            outer_context = nullcontext()
-            inner_context = nullcontext()
-
-        with outer_context:
-            noisy_embeds = self.energy_adapter.embed_tokens(noisy_tokens)
-            candidate_embeds = self.energy_adapter.embed_tokens(candidate_tokens)
-            fused_embed = self.vocab_proj(
-                torch.cat([noisy_embeds, candidate_embeds], dim=-1)
-            )
-
-            with inner_context:
-                hidden = self.energy_adapter.encode_conditioned(
-                    input_ids=noisy_tokens,
-                    inputs_embeds=fused_embed,
-                    attention_mask=attention_mask,
-                )
-                pooled = hidden.mean(dim=1)
-                return self.energy_head(pooled)
+        return self.energy_model.score_conditioned(
+            noisy_tokens=noisy_tokens,
+            candidate_tokens=candidate_tokens,
+            attention_mask=attention_mask,
+        )
 
     def objective(
         self, batch: dict[str, torch.Tensor], weighting: str = "constant"
@@ -326,13 +259,15 @@ class QDiffusion(nn.Module):
 
         negative_tokens, _ = self._sample_candidates(logits, self.config.num_candidates)
         positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
-        positive_stats = self._collect_energy_adapter_stats()
+        positive_stats = self._collect_energy_model_stats()
         negative_energy = self._score_candidates(noisy_tokens, negative_tokens).mean(
             dim=1, keepdim=True
         )
-        negative_stats = self._collect_energy_adapter_stats()
-        energy_objective = self.softplus(positive_energy) + self.softplus(
-            -negative_energy
+        negative_stats = self._collect_energy_model_stats()
+
+        energy_objective = (
+            self.softplus(positive_energy)
+            + self.softplus(-negative_energy)
         )
         weight = self._compute_loss_weight(timesteps, weighting)
         outputs = {
@@ -491,9 +426,9 @@ class QDiffusion(nn.Module):
             editable_token_mask &= ~partial_masks
         return editable_token_mask
 
-    def _collect_energy_adapter_stats(self) -> dict[str, torch.Tensor]:
-        """Collects optional adapter-side diagnostics from the last score call."""
-        get_last_stats = getattr(self.energy_adapter, "get_last_stats", None)
+    def _collect_energy_model_stats(self) -> dict[str, torch.Tensor]:
+        """Collects optional energy-model diagnostics from the last score call."""
+        get_last_stats = getattr(self.energy_model, "get_last_stats", None)
         if not callable(get_last_stats):
             return {}
         return get_last_stats()

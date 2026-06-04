@@ -744,7 +744,7 @@ def main() -> None:
         device=device,
         num_candidates=config.train.num_candidates,
     )
-    train_generator.train()
+    train_generator.train()  # torch train()
     if getattr(train_generator, "proposal_model", None) is not None:
         train_generator.proposal_model.eval()
     save_json(

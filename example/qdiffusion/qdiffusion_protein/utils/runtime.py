@@ -78,8 +78,6 @@ def save_checkpoint(
                 "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
                 "feature_projector": generator.energy_model.feature_projector.state_dict(),
                 **_energy_backend_state(generator),
-                "energy_head": generator.energy_head.state_dict(),
-                "vocab_proj": generator.vocab_proj.state_dict(),
             },
         },
         checkpoint_path,
@@ -100,6 +98,4 @@ def load_trained_energy_weights(
         state_dict["feature_projector"]
     )
     generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
-    generator.energy_head.load_state_dict(state_dict["energy_head"])
-    generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
     return checkpoint.get("metadata", {})

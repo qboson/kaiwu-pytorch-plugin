@@ -57,7 +57,7 @@ def load_dplm_backbone(
 # Generic QDiffusion construction helpers.
 
 
-def _build_energy_components(
+def _build_energy_model(
     *,
     energy_backbone: DPLMBackbone,
     bm_num_visible: int,
@@ -65,13 +65,13 @@ def _build_energy_components(
     bm_sampler: Any | None,
     bm_sampler_type: str,
     bm_sampler_kwargs: dict[str, Any] | None,
-) -> tuple[Any, Any]:
-    """Builds the BM energy model plus the QDiffusion-facing adapter object."""
+) -> BMConditionedEnergyModel:
+    """Builds the BM energy model used by QDiffusion."""
     # The example keeps a single energy path: DPLM feature encoding followed by
     # one sampler-backed BM reranker. The BM model already exposes the generic
     # QDiffusion hooks directly, so no extra wrapper layer is needed.
     energy_encoder = DPLMFeatureEncoder(energy_backbone)
-    energy_model = BMConditionedEnergyModel(
+    return BMConditionedEnergyModel(
         encoder=energy_encoder,
         bm_num_visible=bm_num_visible,
         bm_num_hidden=bm_num_hidden,
@@ -79,7 +79,6 @@ def _build_energy_components(
         sampler_type=bm_sampler_type,
         sampler_kwargs=bm_sampler_kwargs,
     )
-    return energy_model, energy_model
 
 
 def build_qdiffusion_protein(
@@ -152,7 +151,7 @@ def build_qdiffusion_protein(
         net_override=energy_net_override,
         from_huggingface=from_huggingface,
     )
-    energy_model, energy_adapter = _build_energy_components(
+    energy_model = _build_energy_model(
         energy_backbone=energy_backbone,
         bm_num_visible=bm_num_visible,
         bm_num_hidden=bm_num_hidden,
@@ -177,7 +176,6 @@ def build_qdiffusion_protein(
         proposal_model=proposal_model,
         energy_model=energy_model,
         token_spec=token_spec,
-        energy_adapter=energy_adapter,
         config=config,
         dtype=dtype,
         device=device,
