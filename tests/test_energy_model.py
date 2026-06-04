@@ -55,36 +55,36 @@ class TestEnergyModel(unittest.TestCase):
 
         self.assertTrue(torch.equal(energy, expected))
 
-    def test_discretize_visible_state_without_straight_through(self):
+    def test_discretize_visible_state_returns_sigmoid_probabilities(self):
         model = EnergyModel(
             bm_num_visible=3,
             bm_num_hidden=1,
             sampler=DummySampler(),
-            visible_threshold=0.5,
-            use_straight_through=False,
         )
 
+        visible_logits = torch.tensor([[-2.0, 0.0, 2.0]])
         visible_state = model.discretize_visible_state(
-            torch.tensor([[-2.0, 0.0, 2.0]])
+            visible_logits
         )
 
         self.assertTrue(
-            torch.equal(visible_state, torch.tensor([[0.0, 1.0, 1.0]]))
+            torch.allclose(visible_state, torch.sigmoid(visible_logits))
         )
 
-    def test_discretize_visible_state_with_straight_through_keeps_gradient(self):
+    def test_discretize_visible_state_keeps_sigmoid_gradient(self):
         model = EnergyModel(
             bm_num_visible=2,
             bm_num_hidden=1,
             sampler=DummySampler(),
-            use_straight_through=True,
         )
         visible_logits = torch.tensor([[0.0, 2.0]], requires_grad=True)
 
         visible_state = model.discretize_visible_state(visible_logits)
         visible_state.sum().backward()
 
-        self.assertTrue(torch.equal(visible_state.detach(), torch.tensor([[1.0, 1.0]])))
+        self.assertTrue(
+            torch.allclose(visible_state.detach(), torch.sigmoid(visible_logits.detach()))
+        )
         self.assertIsNotNone(visible_logits.grad)
         self.assertTrue(torch.all(visible_logits.grad > 0))
 

@@ -12,19 +12,17 @@ import torch
 from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
 
 try:
-    from .models import (
+    from ..models import (
         BMConditionedEnergyModel,
         DPLMFeatureEncoder,
     )
-    from .models.backbone import DPLMBackbone, build_dplm_token_spec
+    from ..models.backbone import DPLMBackbone, build_dplm_token_spec
 except ImportError:  # pragma: no cover - direct script-path compatibility
     from models import (
         BMConditionedEnergyModel,
         DPLMFeatureEncoder,
     )
     from models.backbone import DPLMBackbone, build_dplm_token_spec
-
-# Backbone loading helpers.
 
 
 def load_dplm_backbone(
@@ -34,27 +32,13 @@ def load_dplm_backbone(
     net_override: dict[str, Any] | None = None,
     from_huggingface: bool = True,
 ) -> DPLMBackbone:
-    """Loads one DPLM backbone wrapper for example-only usage.
-
-    Args:
-        model_name_or_path: Hugging Face model id or local checkpoint path.
-        cfg_override: Optional wrapper-config overrides.
-        net_override: Optional keyword overrides forwarded to the network loader.
-        from_huggingface: Whether to treat ``model_name_or_path`` as a Hugging
-            Face identifier instead of a local training artifact.
-
-    Returns:
-        DPLMBackbone: One configured example-side DPLM backbone wrapper.
-    """
+    """Loads one DPLM backbone wrapper for example-only usage."""
     return DPLMBackbone.from_pretrained(
         model_name_or_path,
         cfg_override=cfg_override,
         net_override=net_override,
         from_huggingface=from_huggingface,
     )
-
-
-# Generic QDiffusion construction helpers.
 
 
 def _build_energy_model(
@@ -66,10 +50,6 @@ def _build_energy_model(
     bm_sampler_type: str,
     bm_sampler_kwargs: dict[str, Any] | None,
 ) -> BMConditionedEnergyModel:
-    """Builds the BM energy model used by QDiffusion."""
-    # The example keeps a single energy path: DPLM feature encoding followed by
-    # one sampler-backed BM reranker. The BM model already exposes the generic
-    # QDiffusion hooks directly, so no extra wrapper layer is needed.
     energy_encoder = DPLMFeatureEncoder(energy_backbone)
     return BMConditionedEnergyModel(
         encoder=energy_encoder,
@@ -81,7 +61,7 @@ def _build_energy_model(
     )
 
 
-def build_qdiffusion_protein(
+def build_qdiffusion(
     proposal_ckpt: str,
     energy_ckpt: str,
     *,
@@ -106,39 +86,7 @@ def build_qdiffusion_protein(
     dtype: torch.dtype = torch.float32,
     device: torch.device | str | None = None,
 ) -> QDiffusion:
-    """Builds one generic ``QDiffusion`` instance for the protein example case.
-
-    Args:
-        proposal_ckpt: Proposal backbone checkpoint or model id.
-        energy_ckpt: Energy backbone checkpoint or model id.
-        bm_num_visible: Visible-state size for the BM reranker.
-        bm_num_hidden: Hidden-state size for the BM reranker.
-        bm_sampler: Optional pre-built sampler object used by BM sampling mode.
-        bm_sampler_type: Sampler family used when ``bm_sampler`` is omitted.
-        bm_sampler_kwargs: Optional keyword arguments used when creating the
-            BM sampler internally. For ``"cim"``, these correspond to
-            ``CIMOptimizer`` arguments such as ``task_name``, ``wait``,
-            ``interval``, ``project_no``, ``task_mode``, and
-            ``sample_number``, plus optional ``PrecisionReducer`` controls.
-        num_candidates: Number of proposal candidates sampled per decode step.
-        proposal_temperature: Temperature used for proposal-side sampling.
-        proposal_noise_scale: Gumbel noise scale used during proposal sampling.
-        energy_temperature: Temperature used for energy-based reranking.
-        disable_resample: Whether to disable repetition-collapse resampling.
-        resample_ratio: Frequency threshold that triggers resampling.
-        resample_top_p: Top-p cutoff used during resampling.
-        freeze_proposal: Whether to freeze proposal-model parameters.
-        proposal_cfg_override: Optional config overrides for the proposal wrapper.
-        energy_cfg_override: Optional config overrides for the energy wrapper.
-        proposal_net_override: Optional network overrides for the proposal loader.
-        energy_net_override: Optional network overrides for the energy loader.
-        from_huggingface: Whether checkpoints should be loaded from Hugging Face.
-        dtype: Floating-point dtype tracked by the resulting ``QDiffusion``.
-        device: Optional target device for the resulting ``QDiffusion``.
-
-    Returns:
-        QDiffusion: One generic ``QDiffusion`` instance backed by DPLM adapters.
-    """
+    """Builds one generic ``QDiffusion`` instance for the protein example case."""
     proposal_model = load_dplm_backbone(
         proposal_ckpt,
         cfg_override=proposal_cfg_override,
@@ -160,9 +108,6 @@ def build_qdiffusion_protein(
         bm_sampler_kwargs=bm_sampler_kwargs,
     )
 
-    token_spec = build_dplm_token_spec(proposal_model)
-    # ``QDiffusionConfig`` only stores generic generation/training knobs; the
-    # DPLM- and BM-specific assembly has already been done above.
     config = QDiffusionConfig(
         num_candidates=num_candidates,
         proposal_temperature=proposal_temperature,
@@ -175,7 +120,7 @@ def build_qdiffusion_protein(
     return QDiffusion(
         proposal_model=proposal_model,
         energy_model=energy_model,
-        token_spec=token_spec,
+        token_spec=build_dplm_token_spec(proposal_model),
         config=config,
         dtype=dtype,
         device=device,
@@ -185,4 +130,9 @@ def build_qdiffusion_protein(
 
 def build_dplm_qdiffusion(*args, **kwargs) -> QDiffusion:
     """Backward-compatible alias for the old builder name."""
-    return build_qdiffusion_protein(*args, **kwargs)
+    return build_qdiffusion(*args, **kwargs)
+
+
+def build_qdiffusion_protein(*args, **kwargs) -> QDiffusion:
+    """Backward-compatible alias for the old protein-specific builder name."""
+    return build_qdiffusion(*args, **kwargs)

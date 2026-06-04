@@ -41,8 +41,8 @@ python example/qdiffusion/simple/simple_generate_example.py
 
 主装配路径如下：
 
-1. 脚本调用 `build_qdiffusion_protein(...)`
-2. `qdiffusion_protein/qdiffusion_protein_builder.py` 加载 DPLM proposal backbone 和 energy backbone
+1. 脚本调用 `build_qdiffusion(...)`
+2. `qdiffusion_protein/utils/qdiffusion_protein_builder.py` 加载 DPLM proposal backbone 和 energy backbone
 3. `qdiffusion_protein/models/` 基于特征编码器构建条件能量打分模块
 4. builder 组装出一个通用的 `Q-Diffusion(...)`
 5. 脚本通过 `objective(...)` 执行训练，或通过 `generate(...)` 执行推理
@@ -60,11 +60,11 @@ factory helper 间接接入。
 如果你想先理解公开 API，而不想一开始就进入完整实验脚本，建议先看
 `simple/`。
 
-## DPLM
+## qdiffusion_protein
 
 `qdiffusion_protein/` 目录包含蛋白案例相关的适配层和完整工作流：
 
-- `qdiffusion_protein/qdiffusion_protein_builder.py`：蛋白案例到 `Q-Diffusion` 的组装入口
+- `qdiffusion_protein/utils/qdiffusion_protein_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具
 - `qdiffusion_protein/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
 - `qdiffusion_protein/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
 - `qdiffusion_protein/workflows/`：真正的训练和 ESM2 评估实现

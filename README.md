@@ -255,7 +255,7 @@ experiments, providing a reference workflow for training, guided generation,
 checkpoint reruns, and evaluation. Key steps include:
 
 - **DPLM-backed Model Assembly**: Use
-  `example/qdiffusion/qdiffusion_protein/qdiffusion_protein_builder.py` to load one proposal backbone and
+  `example/qdiffusion/qdiffusion_protein/utils/qdiffusion_protein_builder.py` to load one proposal backbone and
   one energy backbone, expose token metadata, build the energy adapter, and
   assemble a generic Q-Diffusion instance.
 - **Training Objective**: In the epoch loop, tokenize FASTA sequences into

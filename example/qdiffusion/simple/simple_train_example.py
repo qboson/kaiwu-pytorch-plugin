@@ -22,7 +22,7 @@ from torch.optim import AdamW
 
 ensure_repo_src_on_path()
 
-from qdiffusion_protein.qdiffusion_protein_builder import build_qdiffusion_protein
+from qdiffusion_protein.utils.qdiffusion_protein_builder import build_qdiffusion
 
 # Path and data helpers.
 
@@ -100,6 +100,7 @@ def select_records(
 
 # Example entrypoint.
 
+
 def main() -> None:
     """Runs a tiny example training loop.
 
@@ -117,7 +118,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    generator = build_qdiffusion_protein(
+    generator = build_qdiffusion(
         proposal_ckpt=proposal_ckpt,
         energy_ckpt=energy_ckpt,
         num_candidates=4,

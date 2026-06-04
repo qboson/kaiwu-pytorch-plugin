@@ -266,7 +266,7 @@ pip install -r example/qdiffusion/requirements.txt
 
 该示例展示如何使用 `Q-Diffusion` 配合 DPLM backbone，完成蛋白质序列生成中的能量引导离散扩散训练与评估。它适合希望理解通用 `Q-Diffusion` 核心如何连接到实际蛋白质生成实验的用户，可作为训练、引导生成、checkpoint rerun 和评估分析的参考工作流。主要内容包括：
 
-- **DPLM 模型组装**：通过 `example/qdiffusion/qdiffusion_protein/qdiffusion_protein_builder.py` 加载 proposal backbone 和 energy backbone，整理 token metadata，构建 energy adapter，并最终组装出一个通用 Q-Diffusion 实例
+- **DPLM 模型组装**：通过 `example/qdiffusion/qdiffusion_protein/utils/qdiffusion_protein_builder.py` 加载 proposal backbone 和 energy backbone，整理 token metadata，构建 energy adapter，并最终组装出一个通用 Q-Diffusion 实例
 - **训练目标**：在 epoch 循环中将 FASTA 序列 tokenize 为 `targets`，调用 `generator.objective({"targets": ...})`，把干净序列腐蚀成 noisy states，采样 proposal candidates，并优化 `energy_objective.mean()` 训练能量引导分支
 - **Checkpoint 与复现实验**：保存轻量 checkpoint，包含 energy encoder、`feature_projector`、energy backend 权重、`energy_head` 和 `vocab_proj`，再据此重建 baseline 和 guided generator 用于测试时生成和复现实验
 - **评估与报告**：比较 baseline 和 guided 输出在 identity、Jensen-Shannon divergence、uniqueness、repeat ratio 和 ESM2 embedding distance 等指标上的表现，并输出结构化报告

@@ -18,12 +18,8 @@ class EnergyModel(nn.Module):
         bm_num_visible: int | None = None,
         bm_num_hidden: int | None = None,
         sampler: Any | None = None,
-        visible_threshold: float = 0.5,
-        use_straight_through: bool = True,
     ) -> None:
         super().__init__()
-        self.visible_threshold = visible_threshold
-        self.use_straight_through = use_straight_through
         self.bm_num_visible = bm_num_visible
         self.bm_num_hidden = bm_num_hidden
         self.sampler = sampler
@@ -44,12 +40,8 @@ class EnergyModel(nn.Module):
         )
 
     def discretize_visible_state(self, visible_logits: torch.Tensor) -> torch.Tensor:
-        """Converts visible logits into the binary state consumed by the sampler."""
-        visible_probs = torch.sigmoid(visible_logits)
-        hard_visible = (visible_probs >= self.visible_threshold).to(visible_probs.dtype)
-        if self.use_straight_through:
-            return hard_visible + visible_probs - visible_probs.detach()
-        return hard_visible
+        """Converts visible logits into normalized BM visible conditions."""
+        return torch.sigmoid(visible_logits)
 
     def sample_hidden_state(
         self,

@@ -24,8 +24,6 @@ class BMConditionedEnergyModel(EnergyModel):
         sampler: Any | None = None,
         sampler_type: str = "sa",
         sampler_kwargs: dict[str, Any] | None = None,
-        visible_threshold: float = 0.5,
-        use_straight_through: bool = True,
     ) -> None:
         self.sampler_type = sampler_type
         self.sampler_kwargs = dict(sampler_kwargs or {})
@@ -37,8 +35,6 @@ class BMConditionedEnergyModel(EnergyModel):
             bm_num_visible=bm_num_visible,
             bm_num_hidden=bm_num_hidden,
             sampler=bm_sampler,
-            visible_threshold=visible_threshold,
-            use_straight_through=use_straight_through,
         )
         self.encoder = encoder
         self.feature_projector = nn.Linear(2 * encoder.hidden_size, bm_num_visible)

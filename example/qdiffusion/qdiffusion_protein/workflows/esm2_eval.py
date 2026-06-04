@@ -19,7 +19,6 @@ import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 import sys
-from typing import Iterable
 
 try:
     from .._example_bootstrap import ensure_repo_src_on_path
@@ -30,79 +29,53 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         sys.path.insert(0, str(_CASE_DIR))
     from _example_bootstrap import ensure_repo_src_on_path
 import torch
-import torch.nn.functional as F
 
 ensure_repo_src_on_path()
 
 try:
-    from ..qdiffusion_protein_builder import build_qdiffusion_protein
+    from ..utils.qdiffusion_protein_builder import build_qdiffusion
     from ..utils.io import (
-        write_csv_rows,
         default_fasta_path,
         default_outputs_root,
         normalize_sequence,
         read_fasta_records,
         save_json,
-        save_markdown,
-        write_fasta_records,
     )
-    from ..utils.runtime import load_trained_energy_weights, seed_torch
+    from ..utils.runtime import load_trained_energy_weights
+    from .esm2_eval_helpers import (
+        DistanceSummary,
+        embed_sequences,
+        evaluate_candidate_set,
+        load_esm2_model,
+        maybe_limit_records,
+        run_generation_over_records,
+        write_report,
+        write_rows_csv,
+        write_summary_json,
+    )
 except ImportError:  # pragma: no cover - direct script-path compatibility
-    from qdiffusion_protein_builder import build_qdiffusion_protein
+    from utils.qdiffusion_protein_builder import build_qdiffusion
     from utils.io import (
-        write_csv_rows,
         default_fasta_path,
         default_outputs_root,
         normalize_sequence,
         read_fasta_records,
         save_json,
-        save_markdown,
-        write_fasta_records,
     )
-    from utils.runtime import load_trained_energy_weights, seed_torch
+    from utils.runtime import load_trained_energy_weights
+    from esm2_eval_helpers import (
+        DistanceSummary,
+        embed_sequences,
+        evaluate_candidate_set,
+        load_esm2_model,
+        maybe_limit_records,
+        run_generation_over_records,
+        write_report,
+        write_rows_csv,
+        write_summary_json,
+    )
 
 os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
-
-try:
-    import esm
-except ImportError as exc:  # pragma: no cover - import-time environment guard
-    raise SystemExit(
-        "Missing dependency 'esm'. Install facebookresearch/esm first, then rerun."
-    ) from exc
-
-# ---------------------------------------------------------------------------
-# Data containers
-# These dataclasses are just structured outputs for generation/evaluation.
-# ---------------------------------------------------------------------------
-@dataclass
-class PairDistanceRow:
-    """Per-pair embedding-distance result."""
-
-    index: int
-    reference_header: str
-    candidate_header: str
-    reference_length: int
-    candidate_length: int
-    cosine_distance: float
-    l2_distance: float
-
-
-@dataclass
-class DistanceSummary:
-    """Aggregate metrics for one generated FASTA against one reference FASTA."""
-
-    label: str
-    paired_count: int
-    mean_reference_length: float
-    mean_candidate_length: float
-    mean_cosine_distance: float
-    median_cosine_distance: float
-    min_cosine_distance: float
-    max_cosine_distance: float
-    mean_l2_distance: float
-    median_l2_distance: float
-    min_l2_distance: float
-    max_l2_distance: float
 
 
 @dataclass
@@ -177,7 +150,7 @@ def build_generator_for_eval(
 ):
     """Builds one generator for baseline or guided ESM2 evaluation."""
     return (
-        build_qdiffusion_protein(
+        build_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
             energy_ckpt=config.energy_ckpt,
             num_candidates=num_candidates,
@@ -394,106 +367,6 @@ def build_cim_eval_config(
     )
 
 
-def maybe_limit_records(
-    records: list[tuple[str, str]], max_records: int | None
-) -> list[tuple[str, str]]:
-    """Optionally truncates the reference set to keep one run manageable.
-
-    Args:
-        records: Input FASTA records.
-        max_records: Optional limit on record count.
-
-    Returns:
-        list[tuple[str, str]]: Either the full record list or its truncated prefix.
-    """
-    if max_records is None:
-        return records
-    return records[:max_records]
-
-
-# ---------------------------------------------------------------------------
-# Generation helpers
-# This section mirrors the old generate_dplm_ebm.py behavior:
-# build an all-mask input of the requested length, run baseline/guided
-# generators, and write the generated FASTA files.
-# ---------------------------------------------------------------------------
-def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
-    """Builds one all-mask input tensor with the requested residue length.
-
-    Args:
-        generator: Configured ``QDiffusion`` instance.
-        sequence_length: Residue length excluding special tokens.
-
-    Returns:
-        torch.Tensor: Input token tensor filled with mask tokens at residue positions.
-    """
-    masked_sequence = "".join(["<mask>"] * sequence_length)
-    encoded = generator.tokenizer.batch_encode_plus(
-        [masked_sequence],
-        add_special_tokens=True,
-        padding="longest",
-        return_tensors="pt",
-    )
-    return encoded["input_ids"].to(generator.device)
-
-
-def run_generation_over_records(
-    generator,
-    records: list[tuple[str, str]],
-    *,
-    max_steps: int,
-    seed_base: int,
-    output_fasta_path: Path,
-    label: str,
-) -> list[tuple[str, str]]:
-    """Generates one sequence per reference record and writes one FASTA file.
-
-    Args:
-        generator: Configured ``QDiffusion`` instance.
-        records: Reference FASTA records.
-        max_steps: Decode step count for each generation.
-        seed_base: Base random seed; each record offsets from this value.
-        output_fasta_path: FASTA output path.
-        label: Logging label for the generation run.
-
-    Returns:
-        list[tuple[str, str]]: Generated FASTA records aligned to the input order.
-    """
-    generated_records: list[tuple[str, str]] = []
-    print(
-        f"[{label}] starting generation for {len(records)} sequences "
-        f"with max_steps={max_steps}"
-    )
-
-    for index, (header, sequence) in enumerate(records, start=1):
-        sequence = normalize_sequence(sequence)
-        # Follow generate_dplm_ebm.py: generation starts from an all-mask
-        # sequence with the same residue length as the reference.
-        input_tokens = build_full_mask_input(generator, len(sequence))
-        # Only special tokens are fixed at this stage; residue positions remain
-        # editable because they are mask_id.
-        partial_masks = input_tokens.ne(generator.mask_id)
-        seed = seed_base + index
-        seed_torch(seed)
-
-        with torch.no_grad():
-            generated_tokens = generator.generate(
-                input_tokens,
-                max_steps=max_steps,
-                partial_masks=partial_masks,
-            )
-
-        decoded = generator.tokenizer.batch_decode(
-            generated_tokens, skip_special_tokens=True
-        )[0]
-        generated_records.append((header, normalize_sequence(decoded)))
-        print(f"[{label}] finished sequence {index}/{len(records)}: {header}")
-
-    write_fasta_records(output_fasta_path, generated_records)
-    print(f"[{label}] generated FASTA: {output_fasta_path}")
-    return generated_records
-
-
 def generate_candidate_fastas(
     *,
     config: EvalConfig,
@@ -593,299 +466,6 @@ def generate_candidate_fastas(
 
 
 # ---------------------------------------------------------------------------
-# Pairing helpers
-# This section decides how reference/generated records are aligned before
-# embedding comparison.
-# ---------------------------------------------------------------------------
-def pair_records_by_order(
-    reference_records: list[tuple[str, str]],
-    candidate_records: list[tuple[str, str]],
-) -> list[tuple[tuple[str, str], tuple[str, str]]]:
-    """Pairs records positionally, truncating to the shorter side."""
-    paired_count = min(len(reference_records), len(candidate_records))
-    return list(zip(reference_records[:paired_count], candidate_records[:paired_count]))
-
-
-def pair_records_by_header(
-    reference_records: list[tuple[str, str]],
-    candidate_records: list[tuple[str, str]],
-) -> list[tuple[tuple[str, str], tuple[str, str]]]:
-    """Pairs records by exact FASTA header match, preserving reference order."""
-    candidate_map = {header: (header, seq) for header, seq in candidate_records}
-    pairs: list[tuple[tuple[str, str], tuple[str, str]]] = []
-    for header, sequence in reference_records:
-        candidate = candidate_map.get(header)
-        if candidate is not None:
-            pairs.append(((header, sequence), candidate))
-    return pairs
-
-
-def chunked(
-    items: list[tuple[str, str]], batch_size: int
-) -> Iterable[list[tuple[str, str]]]:
-    """Yields fixed-size slices from one list."""
-    for start in range(0, len(items), batch_size):
-        yield items[start : start + batch_size]
-
-
-# ---------------------------------------------------------------------------
-# ESM2 embedding helpers
-# This section loads ESM2 and converts sequences into pooled sequence-level
-# embeddings used for distance comparison.
-# ---------------------------------------------------------------------------
-def load_esm2_model(
-    model_name: str, device: torch.device
-) -> tuple[torch.nn.Module, object]:
-    """Loads one supported ESM2 pretrained model from the esm package."""
-    print(f"Loading ESM2 model: {model_name} on {device}")
-    if not hasattr(esm.pretrained, model_name):
-        available = sorted(
-            name for name in dir(esm.pretrained) if name.startswith("esm2_")
-        )
-        raise ValueError(
-            f"Unsupported esm.pretrained model '{model_name}'. "
-            f"Available examples: {', '.join(available[:8])}"
-        )
-
-    loader = getattr(esm.pretrained, model_name)
-    model, alphabet = loader()
-    model = model.eval().to(device)
-    return model, alphabet
-
-
-def embed_sequences(
-    records: list[tuple[str, str]],
-    *,
-    model: torch.nn.Module,
-    alphabet: object,
-    device: torch.device,
-    batch_size: int,
-    pooling: str,
-) -> dict[str, torch.Tensor]:
-    """Embeds each sequence into one pooled ESM2 representation."""
-    if not records:
-        return {}
-
-    print(
-        f"Embedding {len(records)} sequences with batch_size={batch_size} "
-        f"and pooling={pooling}"
-    )
-    batch_converter = alphabet.get_batch_converter()
-    repr_layer = model.num_layers
-    embeddings: dict[str, torch.Tensor] = {}
-
-    with torch.no_grad():
-        for batch_records in chunked(records, batch_size):
-            normalized_batch = [
-                (header, normalize_sequence(sequence))
-                for header, sequence in batch_records
-            ]
-            _, _, tokens = batch_converter(normalized_batch)
-            tokens = tokens.to(device)
-
-            outputs = model(tokens, repr_layers=[repr_layer], return_contacts=False)
-            token_representations = outputs["representations"][repr_layer]
-            lengths = (tokens != alphabet.padding_idx).sum(dim=1)
-
-            for row_index, (header, sequence) in enumerate(normalized_batch):
-                seq_len = len(sequence)
-                if seq_len == 0:
-                    raise ValueError(
-                        f"Encountered empty sequence for header '{header}'."
-                    )
-
-                # Slice away BOS/EOS and pool only residue-token representations
-                # unless the caller explicitly asks for BOS/CLS/EOS pooling.
-                residue_repr = token_representations[row_index, 1 : seq_len + 1]
-                if pooling == "mean":
-                    pooled = residue_repr.mean(dim=0)
-                elif pooling == "cls":
-                    pooled = token_representations[row_index, 0]
-                elif pooling == "bos":
-                    pooled = token_representations[row_index, 0]
-                elif pooling == "eos":
-                    eos_index = int(lengths[row_index].item()) - 1
-                    pooled = token_representations[row_index, eos_index]
-                else:
-                    raise ValueError(f"Unsupported pooling mode: {pooling}")
-
-                embeddings[header] = pooled.detach().cpu()
-
-    return embeddings
-
-
-# ---------------------------------------------------------------------------
-# Distance computation helpers
-# This section turns ESM2 embeddings into per-pair distances and aggregate
-# summary metrics.
-# ---------------------------------------------------------------------------
-def summarize_distances(label: str, rows: list[PairDistanceRow]) -> DistanceSummary:
-    """Builds one aggregate summary from per-pair rows."""
-    if not rows:
-        raise ValueError(f"No aligned rows were available for label '{label}'.")
-
-    cosine_values = torch.tensor(
-        [row.cosine_distance for row in rows], dtype=torch.float64
-    )
-    l2_values = torch.tensor([row.l2_distance for row in rows], dtype=torch.float64)
-    reference_lengths = torch.tensor(
-        [row.reference_length for row in rows], dtype=torch.float64
-    )
-    candidate_lengths = torch.tensor(
-        [row.candidate_length for row in rows], dtype=torch.float64
-    )
-
-    return DistanceSummary(
-        label=label,
-        paired_count=len(rows),
-        mean_reference_length=float(reference_lengths.mean().item()),
-        mean_candidate_length=float(candidate_lengths.mean().item()),
-        mean_cosine_distance=float(cosine_values.mean().item()),
-        median_cosine_distance=float(cosine_values.median().item()),
-        min_cosine_distance=float(cosine_values.min().item()),
-        max_cosine_distance=float(cosine_values.max().item()),
-        mean_l2_distance=float(l2_values.mean().item()),
-        median_l2_distance=float(l2_values.median().item()),
-        min_l2_distance=float(l2_values.min().item()),
-        max_l2_distance=float(l2_values.max().item()),
-    )
-
-
-def evaluate_candidate_set(
-    *,
-    label: str,
-    reference_records: list[tuple[str, str]],
-    candidate_records: list[tuple[str, str]],
-    reference_embeddings: dict[str, torch.Tensor],
-    candidate_embeddings: dict[str, torch.Tensor],
-    pair_mode: str,
-) -> tuple[list[PairDistanceRow], DistanceSummary]:
-    """Evaluates one candidate FASTA against one reference FASTA."""
-    if pair_mode == "header":
-        pairs = pair_records_by_header(reference_records, candidate_records)
-    elif pair_mode == "order":
-        pairs = pair_records_by_order(reference_records, candidate_records)
-    else:
-        raise ValueError(f"Unsupported pair mode: {pair_mode}")
-
-    if not pairs:
-        raise ValueError(
-            f"No aligned pairs found for '{label}'. "
-            "Check --pair-mode and FASTA headers/order."
-        )
-
-    rows: list[PairDistanceRow] = []
-    for index, ((ref_header, ref_seq), (cand_header, cand_seq)) in enumerate(
-        pairs, start=1
-    ):
-        ref_embedding = reference_embeddings[ref_header]
-        cand_embedding = candidate_embeddings[cand_header]
-        # Cosine distance is 1 - cosine similarity; lower means embedding-wise
-        # closer to the reference sequence.
-        cosine_distance = (
-            1.0
-            - F.cosine_similarity(
-                ref_embedding.unsqueeze(0), cand_embedding.unsqueeze(0), dim=-1
-            ).item()
-        )
-        l2_distance = torch.norm(ref_embedding - cand_embedding, p=2).item()
-
-        rows.append(
-            PairDistanceRow(
-                index=index,
-                reference_header=ref_header,
-                candidate_header=cand_header,
-                reference_length=len(normalize_sequence(ref_seq)),
-                candidate_length=len(normalize_sequence(cand_seq)),
-                cosine_distance=float(cosine_distance),
-                l2_distance=float(l2_distance),
-            )
-        )
-
-    return rows, summarize_distances(label, rows)
-
-
-# ---------------------------------------------------------------------------
-# Output helpers
-# This section writes CSV/JSON/Markdown artifacts for later inspection.
-# ---------------------------------------------------------------------------
-def write_rows_csv(path: Path, rows: list[PairDistanceRow]) -> None:
-    """Writes per-pair distance rows to CSV."""
-    write_csv_rows(path, [asdict(row) for row in rows])
-
-
-def write_summary_json(path: Path, summary: DistanceSummary) -> None:
-    """Writes one summary object to JSON."""
-    save_json(path, asdict(summary))
-
-
-def write_report(
-    path: Path,
-    *,
-    reference_path: Path,
-    baseline_path: Path | None,
-    guided_path: Path | None,
-    summaries: list[DistanceSummary],
-    model_name: str,
-    pair_mode: str,
-    pooling: str,
-) -> None:
-    """Writes one human-readable markdown report."""
-    lines = [
-        "# ESM2 Embedding Distance Report",
-        "",
-        f"- reference: `{reference_path}`",
-        (
-            f"- baseline: `{baseline_path}`"
-            if baseline_path is not None
-            else "- baseline: not provided"
-        ),
-        (
-            f"- guided: `{guided_path}`"
-            if guided_path is not None
-            else "- guided: not provided"
-        ),
-        f"- esm2 model: `{model_name}`",
-        f"- pair mode: `{pair_mode}`",
-        f"- pooling: `{pooling}`",
-        "",
-        "| label | pairs | mean cosine dist | median cosine dist | mean l2 dist | median l2 dist |",
-        "| --- | ---: | ---: | ---: | ---: | ---: |",
-    ]
-    for summary in summaries:
-        lines.append(
-            "| "
-            + " | ".join(
-                [
-                    summary.label,
-                    str(summary.paired_count),
-                    f"{summary.mean_cosine_distance:.6f}",
-                    f"{summary.median_cosine_distance:.6f}",
-                    f"{summary.mean_l2_distance:.6f}",
-                    f"{summary.median_l2_distance:.6f}",
-                ]
-            )
-            + " |"
-        )
-
-    if len(summaries) == 2:
-        baseline_summary, guided_summary = summaries
-        lines.extend(
-            [
-                "",
-                "## Delta",
-                "",
-                f"- guided minus baseline mean cosine distance: "
-                f"{guided_summary.mean_cosine_distance - baseline_summary.mean_cosine_distance:.6f}",
-                f"- guided minus baseline mean l2 distance: "
-                f"{guided_summary.mean_l2_distance - baseline_summary.mean_l2_distance:.6f}",
-            ]
-        )
-
-    save_markdown(path, lines)
-
-
-# ---------------------------------------------------------------------------
 # Main entrypoint
 # High-level flow:
 # 1. read reference FASTA
@@ -944,7 +524,9 @@ def main() -> None:
         for header, sequence in read_fasta_records(config.reference_fasta)
     ]
     reference_records = maybe_limit_records(reference_records, config.max_records)
-    print(f"Loaded {len(reference_records)} reference sequences from: {config.reference_fasta}")
+    print(
+        f"Loaded {len(reference_records)} reference sequences from: {config.reference_fasta}"
+    )
     baseline_path, guided_path = generate_candidate_fastas(
         config=config,
         reference_records=reference_records,

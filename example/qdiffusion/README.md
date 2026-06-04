@@ -31,8 +31,8 @@ This example tree is organized around one simple boundary:
 
 The main assembly path is:
 
-1. a script calls `build_qdiffusion_protein(...)`
-2. `qdiffusion_protein/qdiffusion_protein_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
+1. a script calls `build_qdiffusion(...)`
+2. `qdiffusion_protein/utils/qdiffusion_protein_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
 3. `qdiffusion_protein/models/` builds one conditioned BM reranker on top of that feature encoder
 4. the builder constructs one generic `Q-Diffusion(...)`
 5. the script calls `objective(...)` for training or `generate(...)` for inference
@@ -50,11 +50,11 @@ factory helpers in `qdiffusion_protein/`.
 Use `simple/` when you want to understand the public API first without reading
 the larger experiment workflow.
 
-## DPLM
+## qdiffusion_protein
 
 `qdiffusion_protein/` contains the protein-case adapter layer and larger workflows:
 
-- `qdiffusion_protein/qdiffusion_protein_builder.py`: protein-case `Q-Diffusion` assembly entrypoint
+- `qdiffusion_protein/utils/qdiffusion_protein_builder.py`: protein-case `Q-Diffusion` assembly helper
 - `qdiffusion_protein/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
 - `qdiffusion_protein/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
 - `qdiffusion_protein/workflows/`: the actual train and ESM2 evaluation implementations
