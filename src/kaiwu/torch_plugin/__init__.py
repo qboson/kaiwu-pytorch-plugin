@@ -2,9 +2,8 @@
 """Kaiwu PyTorch plugin public API."""
 
 from .dbn import UnsupervisedDBN
-from .energy_model import EnergyModel
 from .full_boltzmann_machine import BoltzmannMachine
-from .qdiffusion import QDiffusion, QDiffusionConfig
+from .qdiffusion import EnergyModel, QDiffusion, QDiffusionConfig
 from .qvae import QVAE
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 

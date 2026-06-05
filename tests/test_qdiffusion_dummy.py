@@ -10,11 +10,11 @@ from torch import nn
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 from kaiwu.torch_plugin.qdiffusion import (
+    EnergyModel,
     QDiffusion,
     QDiffusionConfig,
     SequenceTokenSpec,
 )
-from kaiwu.torch_plugin.energy_model import EnergyModel
 
 
 class DummyTokenizer:
