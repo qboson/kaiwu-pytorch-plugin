@@ -88,9 +88,9 @@ report from the current setup used:
 
 | label | pairs | mean cosine dist | median cosine dist | mean l2 dist | median l2 dist |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| baseline | 20 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
+| baseline | 200 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
 | MLP | 200 | 0.227007 | 0.205144 | 4.945239 | 4.803553 |
-| guided | 20 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
+| guided | 200 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
 
 In this run, the guided generator improved over the baseline by:
 
