@@ -1,4 +1,4 @@
-"""Compatibility entrypoint for the ESM2 distance evaluation workflow."""
+"""Compatibility entrypoint for the dplm ESM2 evaluation workflow."""
 
 try:
     from .workflows.esm2_eval import *  # noqa: F401,F403

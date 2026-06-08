@@ -41,9 +41,9 @@ python example/qdiffusion/simple/simple_generate_example.py
 
 主装配路径如下：
 
-1. 脚本调用 `build_dplm_qdiffusion(...)`
-2. `dplm/dplm_builder.py` 加载 DPLM proposal backbone 和 energy backbone
-3. `dplm/models/energy.py` 基于特征编码器构建条件能量打分模块
+1. 脚本调用 `build_qdiffusion(...)`
+2. `dplm/utils/dplm_builder.py` 加载 DPLM proposal backbone 和 energy backbone
+3. `dplm/models/` 基于特征编码器构建条件能量打分模块
 4. builder 组装出一个通用的 `Q-Diffusion(...)`
 5. 脚本通过 `objective(...)` 执行训练，或通过 `generate(...)` 执行推理
 
@@ -60,16 +60,15 @@ factory helper 间接接入。
 如果你想先理解公开 API，而不想一开始就进入完整实验脚本，建议先看
 `simple/`。
 
-## DPLM
+## dplm
 
-`dplm/` 目录包含 DPLM 相关的适配层和完整工作流：
+`dplm/` 目录包含蛋白案例相关的适配层和完整工作流：
 
-- `dplm/dplm_builder.py`：DPLM 到 `Q-Diffusion` 的组装入口
+- `dplm/utils/dplm_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具
 - `dplm/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
 - `dplm/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
-- `dplm/workflows/`：真正的训练、rerun 和 ESM2 评估实现
+- `dplm/workflows/`：真正的训练和 ESM2 评估实现
 - `dplm/train_workflow.py`：完整训练与评估工作流的兼容入口
-- `dplm/rerun_from_checkpoint.py`：checkpoint rerun 的兼容入口
 - `dplm/eval_esm2_distances.py`：ESM2 distance 评估的兼容入口
 
 如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
@@ -98,8 +97,9 @@ factory helper 间接接入。
 
 | label | pairs | mean cosine dist | median cosine dist | mean l2 dist | median l2 dist |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| baseline | 20 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
-| guided | 20 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
+| baseline | 200 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
+| MLP | 200 | 0.227007 | 0.205144 | 4.945239 | 4.803553 |
+| guided | 200 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
 
 在这次评估中，guided 相比 baseline 的改善为：
 
@@ -130,6 +130,5 @@ factory helper 间接接入。
 - 本目录是 example-only；可复用的库代码位于 `src/kaiwu/torch_plugin/qdiffusion.py`
 - 用户应从 `kaiwu.torch_plugin` 导入通用 `Q-Diffusion` 核心
 - DPLM 加载逻辑不属于正式 `src` 公共 API，而是此目录中的 example-side compatibility layer
-- 当前示例中的 guided 路径本质上是 “DPLM proposal + energy reranker”，
-  底层可通过 builder 切换为 RBM 或 BM backend
+- 当前示例中的 guided 路径本质上是 `DPLM proposal + BM energy reranker`
 - `simple/` 与 `dplm/` 建议配合阅读：`simple/` 展示 API 表层，`dplm/` 展示完整实验工作流

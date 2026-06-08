@@ -5,15 +5,15 @@
 
 from __future__ import annotations
 
-from contextlib import nullcontext
 from dataclasses import dataclass
 import math
-from typing import Any, Protocol
+from typing import Any
 
 import numpy as np
 import torch
 from torch import nn
 
+from .full_boltzmann_machine import BoltzmannMachine
 from ._qdiffusion_sampling import (
     stochastic_sample_from_categorical,
     stochastic_sample_from_categorical_n,
@@ -21,7 +21,7 @@ from ._qdiffusion_sampling import (
     topk_masking,
 )
 
-__all__ = ["QDiffusion", "QDiffusionConfig"]
+__all__ = ["EnergyModel", "QDiffusion", "QDiffusionConfig"]
 
 
 @dataclass(frozen=True)
@@ -44,33 +44,6 @@ class SequenceTokenSpec:
     eos_id: int
     x_id: int | None = None
     tokenizer: Any | None = None
-
-
-class EnergyBackboneAdapter(Protocol):
-    """Protocol describing the generic energy-backbone bridge."""
-
-    @property
-    def hidden_size(self) -> int:
-        """Returns the backbone hidden size used by the energy head."""
-
-    def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
-        """Embeds discrete token ids into hidden representations."""
-
-    def encode_conditioned(
-        self,
-        input_ids: torch.Tensor,
-        inputs_embeds: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        """Encodes fused embeddings and returns token-level hidden states."""
-
-    def score_conditioned(
-        self,
-        noisy_tokens: torch.Tensor,
-        candidate_tokens: torch.Tensor,
-        attention_mask: torch.Tensor,
-    ) -> torch.Tensor:
-        """Optionally scores candidates directly without the fallback path."""
 
 
 @dataclass
@@ -104,6 +77,114 @@ class QDiffusionConfig:
     decoding_strategy: str = "reparam-uncond-deterministic-linear"
 
 
+class EnergyModel(nn.Module):
+    """Energy-side model interface used by QDiffusion candidate scoring."""
+
+    def __init__(
+        self,
+        bm_num_visible: int | None = None,
+        bm_num_hidden: int | None = None,
+        sampler: Any | None = None,
+    ) -> None:
+        super().__init__()
+        self.bm_num_visible = bm_num_visible
+        self.bm_num_hidden = bm_num_hidden
+        self.sampler = sampler
+        self._last_stats: dict[str, torch.Tensor] = {}
+        if bm_num_visible is not None and bm_num_hidden is not None:
+            self.energy_bm = BoltzmannMachine(num_nodes=bm_num_visible + bm_num_hidden)
+
+    def forward(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor | None:
+        """Runs conditioned energy scoring through the PyTorch module API."""
+        return self.score_conditioned(
+            noisy_tokens=noisy_tokens,
+            candidate_tokens=candidate_tokens,
+            attention_mask=attention_mask,
+        )
+
+    def score_conditioned(
+        self,
+        noisy_tokens: torch.Tensor,
+        candidate_tokens: torch.Tensor,
+        attention_mask: torch.Tensor,
+    ) -> torch.Tensor | None:
+        """Scores candidates conditioned on noisy tokens."""
+        del noisy_tokens, candidate_tokens, attention_mask
+        raise NotImplementedError(
+            "EnergyModel subclasses must implement score_conditioned()."
+        )
+
+    def discretize_visible_state(self, visible_logits: torch.Tensor) -> torch.Tensor:
+        """Converts visible logits into normalized BM visible conditions."""
+        return torch.sigmoid(visible_logits)
+
+    def sample_hidden_state(
+        self,
+        visible_state: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Samples BM hidden states for each visible assignment."""
+        if not hasattr(self, "energy_bm") or self.sampler is None:
+            raise RuntimeError(
+                "BM hidden-state sampling requires bm_num_visible, "
+                "bm_num_hidden, and sampler."
+            )
+        batched_states = []
+        split_sizes = []
+        for sample_index in range(visible_state.size(0)):
+            sampled_states = self.energy_bm.condition_sample(
+                self.sampler,
+                visible_state[sample_index : sample_index + 1],
+                dtype=visible_state.dtype,
+            )
+            batched_states.append(sampled_states)
+            split_sizes.append(sampled_states.size(0))
+        return torch.cat(batched_states, dim=0), torch.tensor(
+            split_sizes,
+            device=visible_state.device,
+            dtype=torch.long,
+        )
+
+    def _set_last_stats(
+        self,
+        *,
+        visible_state: torch.Tensor,
+        hidden_state: torch.Tensor,
+    ) -> None:
+        self._last_stats = {
+            "sampling_mode": torch.tensor(
+                1.0,
+                dtype=visible_state.dtype,
+                device=visible_state.device,
+            ),
+            "visible_on_ratio": visible_state.detach().mean(),
+            "hidden_on_ratio": hidden_state.detach().mean(),
+        }
+
+    def get_last_stats(self) -> dict[str, torch.Tensor]:
+        """Returns lightweight sampler diagnostics from the last score call."""
+        return dict(self._last_stats)
+
+    def score_visible_logits(self, visible_logits: torch.Tensor) -> torch.Tensor:
+        """Scores visible logits under the conditioned BM energy model."""
+        if self.bm_num_visible is None:
+            raise RuntimeError("BM visible-logit scoring requires bm_num_visible.")
+        visible_state = self.discretize_visible_state(visible_logits)
+        full_states, split_sizes = self.sample_hidden_state(visible_state)
+        hidden_state = full_states[:, self.bm_num_visible :]
+        self._set_last_stats(
+            visible_state=full_states[:, : self.bm_num_visible],
+            hidden_state=hidden_state,
+        )
+        flat_energy = self.energy_bm(full_states).unsqueeze(-1)
+        split_energy = torch.split(flat_energy, split_sizes.tolist())
+        return torch.stack([energy.mean(dim=0) for energy in split_energy], dim=0)
+
+
 class QDiffusion(nn.Module):
     """Energy-guided discrete diffusion wrapper over generic sequence backbones.
 
@@ -120,35 +201,28 @@ class QDiffusion(nn.Module):
     def __init__(
         self,
         proposal_model: nn.Module,
-        energy_model: nn.Module,
+        energy_model: EnergyModel,
         token_spec: SequenceTokenSpec,
-        energy_adapter: EnergyBackboneAdapter,
         config: QDiffusionConfig | None = None,
         dtype: torch.dtype = torch.float32,
         device: torch.device | str | None = None,
         freeze_proposal: bool = True,
-        energy_head: nn.Module | None = None,
     ) -> None:
         """Initializes a QDiffusion model.
 
         Args:
             proposal_model: Backbone used to predict proposal logits.
-            energy_model: Backbone module whose parameters are optimized for
-                sequence-level energy scoring.
+            energy_model: Energy-side model used to encode and score candidates.
             token_spec: Special-token metadata required by the generator.
-            energy_adapter: Adapter exposing the generic embedding and encoding
-                hooks used by :meth:`energy`.
             config: Optional generation/training configuration.
             dtype: Floating point dtype tracked by the wrapper.
             device: Optional target device. When omitted, infer from parameters.
             freeze_proposal: Whether to freeze proposal model parameters.
-            energy_head: Optional custom sequence-level energy head.
         """
         super().__init__()
         self.proposal_model = proposal_model
         self.energy_model = energy_model
         self.token_spec = token_spec
-        self.energy_adapter = energy_adapter
         self.config = config or QDiffusionConfig()
         self.dtype = dtype
 
@@ -156,14 +230,6 @@ class QDiffusion(nn.Module):
             self.proposal_model.eval()
             for parameter in self.proposal_model.parameters():
                 parameter.requires_grad = False
-
-        hidden_size = self.energy_adapter.hidden_size
-        self.energy_head = energy_head or nn.Sequential(
-            nn.Linear(hidden_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, 1),
-        )
-        self.vocab_proj = nn.Linear(2 * hidden_size, hidden_size, bias=True)
 
         self.tokenizer = token_spec.tokenizer
         self.mask_id = token_spec.mask_id
@@ -250,36 +316,11 @@ class QDiffusion(nn.Module):
         if attention_mask is None:
             attention_mask = candidate_tokens.ne(self.pad_id)
 
-        score_conditioned = getattr(self.energy_adapter, "score_conditioned", None)
-        if callable(score_conditioned):
-            return score_conditioned(
-                noisy_tokens=noisy_tokens,
-                candidate_tokens=candidate_tokens,
-                attention_mask=attention_mask,
-            )
-
-        if noisy_tokens.device.type == "cuda":
-            outer_context = torch.amp.autocast("cuda", dtype=torch.float32)
-            inner_context = torch.amp.autocast("cuda", dtype=torch.bfloat16)
-        else:
-            outer_context = nullcontext()
-            inner_context = nullcontext()
-
-        with outer_context:
-            noisy_embeds = self.energy_adapter.embed_tokens(noisy_tokens)
-            candidate_embeds = self.energy_adapter.embed_tokens(candidate_tokens)
-            fused_embed = self.vocab_proj(
-                torch.cat([noisy_embeds, candidate_embeds], dim=-1)
-            )
-
-            with inner_context:
-                hidden = self.energy_adapter.encode_conditioned(
-                    input_ids=noisy_tokens,
-                    inputs_embeds=fused_embed,
-                    attention_mask=attention_mask,
-                )
-                pooled = hidden.mean(dim=1)
-                return self.energy_head(pooled)
+        return self.energy_model.score_conditioned(
+            noisy_tokens=noisy_tokens,
+            candidate_tokens=candidate_tokens,
+            attention_mask=attention_mask,
+        )
 
     def objective(
         self, batch: dict[str, torch.Tensor], weighting: str = "constant"
@@ -326,21 +367,33 @@ class QDiffusion(nn.Module):
 
         negative_tokens, _ = self._sample_candidates(logits, self.config.num_candidates)
         positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
+        positive_stats = self._collect_energy_model_stats()
         negative_energy = self._score_candidates(noisy_tokens, negative_tokens).mean(
             dim=1, keepdim=True
         )
-        energy_objective = self.softplus(positive_energy) + self.softplus(
-            -negative_energy
+        negative_stats = self._collect_energy_model_stats()
+
+        energy_objective = (
+            self.softplus(positive_energy)
+            + self.softplus(-negative_energy)
         )
         weight = self._compute_loss_weight(timesteps, weighting)
-
-        return {
+        outputs = {
             "logits": logits,
             "targets": target,
             "loss_mask": loss_mask,
             "weight": weight,
             "energy_objective": energy_objective,
+            "positive_energy_mean": positive_energy.mean().detach(),
+            "negative_energy_mean": negative_energy.mean().detach(),
         }
+        for prefix, stats in (
+            ("positive", positive_stats),
+            ("negative", negative_stats),
+        ):
+            for key, value in stats.items():
+                outputs[f"{prefix}_{key}"] = value.detach()
+        return outputs
 
     def initialize_state(
         self,
@@ -480,6 +533,13 @@ class QDiffusion(nn.Module):
         if partial_masks is not None:
             editable_token_mask &= ~partial_masks
         return editable_token_mask
+
+    def _collect_energy_model_stats(self) -> dict[str, torch.Tensor]:
+        """Collects optional energy-model diagnostics from the last score call."""
+        get_last_stats = getattr(self.energy_model, "get_last_stats", None)
+        if not callable(get_last_stats):
+            return {}
+        return get_last_stats()
 
     def _initialize_output_tokens(
         self, input_tokens: torch.Tensor, partial_masks: torch.Tensor | None = None

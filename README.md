@@ -211,7 +211,7 @@ model = QDiffusion(
 ```
 
 Runnable DPLM-based workflow examples live under `example/qdiffusion/`, with
-`simple/` for minimal demos and `dplm/` for DPLM-specific workflows.
+`simple/` for minimal demos and `dplm/` for the protein-case workflows.
 
 If you want to run those DPLM examples, install the extra example-side
 dependencies separately:
@@ -255,7 +255,7 @@ experiments, providing a reference workflow for training, guided generation,
 checkpoint reruns, and evaluation. Key steps include:
 
 - **DPLM-backed Model Assembly**: Use
-  `example/qdiffusion/dplm/dplm_builder.py` to load one proposal backbone and
+  `example/qdiffusion/dplm/utils/dplm_builder.py` to load one proposal backbone and
   one energy backbone, expose token metadata, build the energy adapter, and
   assemble a generic Q-Diffusion instance.
 - **Training Objective**: In the epoch loop, tokenize FASTA sequences into
