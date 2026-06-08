@@ -1,7 +1,7 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
 # SPDX-License-Identifier: Apache-2.0
 
-"""Factory helpers for the ``qdiffusion_protein`` example case."""
+"""Factory helpers for the ``dplm`` example case."""
 
 from __future__ import annotations
 
@@ -133,6 +133,3 @@ def build_dplm_qdiffusion(*args, **kwargs) -> QDiffusion:
     return build_qdiffusion(*args, **kwargs)
 
 
-def build_qdiffusion_protein(*args, **kwargs) -> QDiffusion:
-    """Backward-compatible alias for the old protein-specific builder name."""
-    return build_qdiffusion(*args, **kwargs)

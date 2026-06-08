@@ -20,7 +20,7 @@ import torch
 
 ensure_repo_src_on_path()
 
-from qdiffusion_protein.utils.qdiffusion_protein_builder import build_qdiffusion
+from dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and sequence helpers.
 

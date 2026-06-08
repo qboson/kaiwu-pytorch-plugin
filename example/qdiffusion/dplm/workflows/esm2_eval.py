@@ -10,7 +10,7 @@ This script follows one fixed workflow:
 
 Edit the config block inside ``main()`` before running:
 
-    python example/qdiffusion/qdiffusion_protein/eval_esm2_distances.py
+    python example/qdiffusion/dplm/eval_esm2_distances.py
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ import torch
 ensure_repo_src_on_path()
 
 try:
-    from ..utils.qdiffusion_protein_builder import build_qdiffusion
+    from ..utils.dplm_builder import build_qdiffusion
     from ..utils.io import (
         default_fasta_path,
         default_outputs_root,
@@ -54,7 +54,7 @@ try:
         write_summary_json,
     )
 except ImportError:  # pragma: no cover - direct script-path compatibility
-    from utils.qdiffusion_protein_builder import build_qdiffusion
+    from utils.dplm_builder import build_qdiffusion
     from utils.io import (
         default_fasta_path,
         default_outputs_root,

@@ -1,4 +1,4 @@
-"""Development-time path bootstrap for qdiffusion_protein examples."""
+"""Development-time path bootstrap for dplm examples."""
 
 from __future__ import annotations
 

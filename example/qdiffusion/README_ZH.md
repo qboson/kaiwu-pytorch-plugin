@@ -36,14 +36,14 @@ python example/qdiffusion/simple/simple_generate_example.py
 这个示例目录围绕一个清晰的边界组织：
 
 - `src/kaiwu/torch_plugin/qdiffusion.py`：通用的 `Q-Diffusion` 核心实现
-- `example/qdiffusion/qdiffusion_protein/`：将 DPLM checkpoint 适配到通用 `Q-Diffusion`
+- `example/qdiffusion/dplm/`：将 DPLM checkpoint 适配到通用 `Q-Diffusion`
 - `example/qdiffusion/simple/`：最小可运行示例，便于先理解 API
 
 主装配路径如下：
 
 1. 脚本调用 `build_qdiffusion(...)`
-2. `qdiffusion_protein/utils/qdiffusion_protein_builder.py` 加载 DPLM proposal backbone 和 energy backbone
-3. `qdiffusion_protein/models/` 基于特征编码器构建条件能量打分模块
+2. `dplm/utils/dplm_builder.py` 加载 DPLM proposal backbone 和 energy backbone
+3. `dplm/models/` 基于特征编码器构建条件能量打分模块
 4. builder 组装出一个通用的 `Q-Diffusion(...)`
 5. 脚本通过 `objective(...)` 执行训练，或通过 `generate(...)` 执行推理
 
@@ -54,24 +54,24 @@ python example/qdiffusion/simple/simple_generate_example.py
 - `simple/simple_train_example.py`：最小训练目标与优化循环
 - `simple/simple_generate_example.py`：最小迭代生成流程
 
-这两个脚本底层仍然会使用 DPLM，但只通过 `qdiffusion_protein/` 里的 example-side
+这两个脚本底层仍然会使用 DPLM，但只通过 `dplm/` 里的 example-side
 factory helper 间接接入。
 
 如果你想先理解公开 API，而不想一开始就进入完整实验脚本，建议先看
 `simple/`。
 
-## qdiffusion_protein
+## dplm
 
-`qdiffusion_protein/` 目录包含蛋白案例相关的适配层和完整工作流：
+`dplm/` 目录包含蛋白案例相关的适配层和完整工作流：
 
-- `qdiffusion_protein/utils/qdiffusion_protein_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具
-- `qdiffusion_protein/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
-- `qdiffusion_protein/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
-- `qdiffusion_protein/workflows/`：真正的训练和 ESM2 评估实现
-- `qdiffusion_protein/train_workflow.py`：完整训练与评估工作流的兼容入口
-- `qdiffusion_protein/eval_esm2_distances.py`：ESM2 distance 评估的兼容入口
+- `dplm/utils/dplm_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具
+- `dplm/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
+- `dplm/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
+- `dplm/workflows/`：真正的训练和 ESM2 评估实现
+- `dplm/train_workflow.py`：完整训练与评估工作流的兼容入口
+- `dplm/eval_esm2_distances.py`：ESM2 distance 评估的兼容入口
 
-如果你想看真正的实现链路，建议从 `qdiffusion_protein/workflows/train.py` 开始读。
+如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
 它的端到端流程如下：
 
@@ -87,7 +87,7 @@ factory helper 间接接入。
 
 ## 示例 ESM2 距离结果
 
-这个 DPLM 引导工作流提供 `qdiffusion_protein/eval_esm2_distances.py`，用于在 embedding
+这个 DPLM 引导工作流提供 `dplm/eval_esm2_distances.py`，用于在 embedding
 层面比较生成序列与 reference proteome 的距离。当前一组示例评估使用了：
 
 - reference: `data/UP000005640_9606.fasta`
@@ -131,4 +131,4 @@ factory helper 间接接入。
 - 用户应从 `kaiwu.torch_plugin` 导入通用 `Q-Diffusion` 核心
 - DPLM 加载逻辑不属于正式 `src` 公共 API，而是此目录中的 example-side compatibility layer
 - 当前示例中的 guided 路径本质上是 `DPLM proposal + BM energy reranker`
-- `simple/` 与 `qdiffusion_protein/` 建议配合阅读：`simple/` 展示 API 表层，`qdiffusion_protein/` 展示完整实验工作流
+- `simple/` 与 `dplm/` 建议配合阅读：`simple/` 展示 API 表层，`dplm/` 展示完整实验工作流

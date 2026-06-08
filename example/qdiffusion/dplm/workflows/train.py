@@ -29,7 +29,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 ensure_repo_src_on_path()
 
 try:
-    from ..utils.qdiffusion_protein_builder import build_qdiffusion
+    from ..utils.dplm_builder import build_qdiffusion
     from ..utils.io import (
         default_fasta_path,
         default_outputs_root,
@@ -58,7 +58,7 @@ try:
         write_markdown_report,
     )
 except ImportError:  # pragma: no cover - direct script-path compatibility
-    from utils.qdiffusion_protein_builder import build_qdiffusion
+    from utils.dplm_builder import build_qdiffusion
     from utils.io import (
         default_fasta_path,
         default_outputs_root,
