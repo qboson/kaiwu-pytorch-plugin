@@ -13,26 +13,49 @@ For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://
 A Restricted Boltzmann Machine is an energy-based unsupervised learning model consisting of a visible layer and a hidden layer, with full connections between layers but no connections within a layer. Its core idea is to model the probability distribution of data through an energy function and train weights using algorithms such as Contrastive Divergence (CD), allowing the model to learn hidden features of input data. RBMs are commonly used for feature extraction, dimensionality reduction, or collaborative filtering, and are also the foundation for building more complex models. A Boltzmann Machine is a fully connected stochastic neural network where all neurons can be interconnected (including within the visible and hidden layers). Traditional sampling methods for BMs are inefficient, and quantum computing provides a new approach.
 
 ```mermaid
-graph TD
-    subgraph kaiwu-torch-plugin
-        bm[full_boltzmann_machine.py] -->abm[abstract_boltzmann_machine.py]
-        rbm[restricted_boltzmann_machine.py] -->abm
+flowchart TD
+    torch[PyTorch tensors, modules, autograd]
+    kaiwu[Kaiwu SDK samplers<br/>SA / CIM backend]
+
+    subgraph plugin["src/kaiwu/torch_plugin"]
+        abm["abstract_boltzmann_machine.py<br/>AbstractBoltzmannMachine"]
+        bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
+        rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
+        qvae["qvae.py<br/>QVAE"]
+        qdiff["qdiffusion.py<br/>QDiffusion"]
+        dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
+        dbn["dbn.py<br/>UnsupervisedDBN"]
     end
-    subgraph example
-        rbm_example_d1[rbm_digits.py] --> rbm
-        rbm_example_d2[rbm_digits.ipynb] --> rbm_example_d1
-        rbm_example_v1[qvae.py] --> rbm
-        rbm_example_v2 --> rbm_example_v3[dist_util.py] 
-        rbm_example_v2[train_qvae.ipynb] --> rbm_example_v1
+
+    torch --> abm
+    kaiwu --> abm
+    abm --> bm
+    abm --> rbm
+    abm --> qvae
+    abm --> qdiff
+    dist --> qvae
+    rbm --> dbn
+
+    subgraph examples["example"]
+        rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
+        dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
+        bm_generation["bm_generation<br/>BM distribution learning and sampling"]
+        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
+        qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
+        qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
     end
-    subgraph test
-        test_bm[test_bm.py] --> bm
-        test_rbm[test_rbm.py] --> rbm
-    end
+
+    rbm --> rbm_digits
+    dbn --> dbn_digits
+    bm --> bm_generation
+    qdiff --> qdiffusion
+    qvae --> qvae_mnist
+    qvae --> qvae_cell
+    bm --> qvae_cell
 ```
 The above image shows the project file structure:
 - The Kaiwu-torch-plugin section of the code includes base class, Restricted Boltzmann Machine, and Boltzmann Machine.
-- The example section of the code includes two examples: qvae for generating digits and digits for digit recognition.
+- The example section of the code includes examples: qvae for generating digits, digits for digit recognition etc.
 - The test section contains unit tests.
 
 ### Main Features
@@ -40,6 +63,8 @@ The above image shows the project file structure:
 - Native PyTorch Support: Seamless integration with the PyTorch ecosystem, supports GPU acceleration
 - Flexible Architecture: Supports custom visible and hidden layer dimensions
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
+- Q-Diffusion Support: Includes a public `QDiffusion` module for energy-guided
+  discrete generation with DPLM backbones
 
 ### Plugin Advantages
 
@@ -201,6 +226,41 @@ if __name__ == "__main__":
     opt_rbm.step()
     print(objective)
 ```
+
+### Q-Diffusion Quick Start
+
+Q-Diffusion is available from the top-level plugin package as a generic
+discrete-sequence core:
+
+```python
+from kaiwu.torch_plugin import QDiffusion, QDiffusionConfig
+from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
+
+# Build your own proposal model, energy model, token spec, and energy adapter.
+model = QDiffusion(
+    proposal_model=proposal_model,
+    energy_model=energy_model,
+    token_spec=SequenceTokenSpec(
+        pad_id=0,
+        bos_id=1,
+        eos_id=2,
+        mask_id=3,
+    ),
+    energy_adapter=energy_adapter,
+    config=QDiffusionConfig(num_candidates=4),
+)
+```
+
+Runnable DPLM-based workflow examples live under `example/qdiffusion/`, with
+`simple/` for minimal demos and `dplm/` for DPLM-specific workflows.
+
+If you want to run those DPLM examples, install the extra example-side
+dependencies separately:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
+
 ### Classification Task: Handwritten Digit Recognition  
 Demonstrates feature learning and classification on the Digits dataset using Restricted Boltzmann Machines (RBM). This example is suitable for beginners to understand the application of RBMs in image feature extraction and classification, serving as a foundation for advanced experiments and functional extensions. Key steps include:  
 - **Data Augmentation & Preprocessing**: Expand the original 8x8-pixel handwritten digit images through shifting (up, down, left, right) and normalize features using MinMaxScaler.  
@@ -226,6 +286,50 @@ To run this example, execute `example/qvae_mnist/train_qvae.ipynb`.
 
 ---  
 
+### Q-Diffusion Generation Task: Proteomes: Homo sapiens Generation
+
+Demonstrates how to train and evaluate an energy-guided discrete diffusion
+workflow for protein sequence generation using `Q-Diffusion` with DPLM
+backbones. This example is designed for users who want to understand how the
+generic `Q-Diffusion` core is connected to practical protein-generation
+experiments, providing a reference workflow for training, guided generation,
+checkpoint reruns, and evaluation. Key steps include:
+
+- **DPLM-backed Model Assembly**: Use
+  `example/qdiffusion/dplm/dplm_builder.py` to load one proposal backbone and
+  one energy backbone, expose token metadata, build the energy adapter, and
+  assemble a generic Q-Diffusion instance.
+- **Training Objective**: In the epoch loop, tokenize FASTA sequences into
+  `targets`, call `generator.objective({"targets": ...})`, corrupt clean
+  sequences into noisy states, sample proposal candidates, and optimize
+  `energy_objective.mean()` to train the energy-guidance branch.
+- **Checkpoint and Rerun Workflow**: Save compact checkpoints containing the
+  energy encoder, feature projector, energy backend weights, `energy_head`, and
+  `vocab_proj`, then rebuild baseline and guided generators for test-time
+  generation and reruns.
+- **Evaluation and Reporting**: Compare baseline and guided outputs with quality
+  metrics such as identity, Jensen-Shannon divergence, uniqueness, repeat
+  ratio, and ESM2-based embedding distances, then write structured reports.
+
+To run the minimal examples, execute:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+python example/qdiffusion/simple/simple_train_example.py
+python example/qdiffusion/simple/simple_generate_example.py
+```
+
+To run the full DPLM workflow, execute:
+
+```bash
+python example/qdiffusion/dplm/train_workflow.py
+```
+
+For a more focused walkthrough of the example tree and its data flow, see
+`example/qdiffusion/README.md`.
+
+---
+
 ## Scientific Research Achievements  
 
 ### QBM Inside VAE = A More Powerful Generative Data Representer (QBM-VAE)  
@@ -238,7 +342,7 @@ In single-cell transcriptomics analysis (a technique revealing cellular heteroge
 Based on this representation, we successfully integrated millions of single-cell transcriptomic data points and achieved superior performance in downstream tasks (e.g., cell clustering, classification, trajectory inference) compared to existing methods, validating the excellence of this latent representation.  
 
 If you are interested in this work, please check out our paper:  
-[Quantum-Boosted High-Fidelity Deep Learning](ttps://arxiv.org/pdf/2508.11190)
+[**Quantum-Boosted High-Fidelity Deep Learning**](ttps://arxiv.org/pdf/2508.11190)
 
 <img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
 
@@ -253,4 +357,5 @@ If you are interested in this work, please check out our paper:
 2. **Boson Quantum Official Assistant**: Inquire about real-machine access and collaborations.  
 3. email: developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/a39deb14-bbe4-4609-9a81-8522c2f71718)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/c71de786-96e7-4664-891d-4cb03766c98e)
+
