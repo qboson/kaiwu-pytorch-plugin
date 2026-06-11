@@ -11,7 +11,7 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 `example/qdiffusion/` now splits into:
 - `simple/`: minimal train and generate scripts
-- `dplm/`: DPLM-specific workflow utilities and adapter code
+- `dplm/`: protein-case workflow utilities and adapter code
 
 ---
 

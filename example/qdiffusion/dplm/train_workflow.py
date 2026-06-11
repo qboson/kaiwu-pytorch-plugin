@@ -1,4 +1,4 @@
-"""Compatibility entrypoint for the full DPLM training workflow."""
+"""Compatibility entrypoint for the full dplm training workflow."""
 
 try:
     from .workflows.train import *  # noqa: F401,F403

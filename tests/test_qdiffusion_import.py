@@ -11,12 +11,14 @@ def test_qdiffusion_names_are_exported():
     module = importlib.import_module("kaiwu.torch_plugin")
     assert "QDiffusion" in module.__all__
     assert "QDiffusionConfig" in module.__all__
+    assert "EnergyModel" in module.__all__
 
 
 def test_qdiffusion_direct_import():
     module = importlib.import_module("kaiwu.torch_plugin")
     assert module.QDiffusion.__name__ == "QDiffusion"
     assert module.QDiffusionConfig.__name__ == "QDiffusionConfig"
+    assert module.EnergyModel.__name__ == "EnergyModel"
 
 
 def test_qdiffusion_removed_dplm_classmethods():
