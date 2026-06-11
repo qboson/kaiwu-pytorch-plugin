@@ -20,7 +20,7 @@ import torch
 
 ensure_repo_src_on_path()
 
-from dplm.dplm_builder import build_dplm_qdiffusion
+from dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and sequence helpers.
 
@@ -98,6 +98,7 @@ def decode_tokens(generator, tokens: torch.Tensor) -> str:
 
 # Example entrypoint.
 
+
 def main() -> None:
     """Runs a tiny example generation loop.
 
@@ -112,7 +113,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    generator = build_dplm_qdiffusion(
+    generator = build_qdiffusion(
         proposal_ckpt=proposal_ckpt,
         energy_ckpt=energy_ckpt,
         num_candidates=4,
@@ -134,6 +135,8 @@ def main() -> None:
         return_tensors="pt",
         add_special_tokens=True,
     )
+    # In the public API the caller provides a clean token sequence and
+    # ``generate()`` handles the iterative noisy-state decoding internally.
     input_tokens = encoded["input_ids"].to(generator.device)
 
     with torch.no_grad():

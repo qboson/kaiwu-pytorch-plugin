@@ -31,9 +31,9 @@ This example tree is organized around one simple boundary:
 
 The main assembly path is:
 
-1. a script calls `build_dplm_qdiffusion(...)`
-2. `dplm/dplm_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
-3. `dplm/models/energy.py` builds one conditioned RBM/BM reranker on top of that feature encoder
+1. a script calls `build_qdiffusion(...)`
+2. `dplm/utils/dplm_builder.py` loads one DPLM proposal backbone and one DPLM feature encoder
+3. `dplm/models/` builds one conditioned BM reranker on top of that feature encoder
 4. the builder constructs one generic `Q-Diffusion(...)`
 5. the script calls `objective(...)` for training or `generate(...)` for inference
 
@@ -50,16 +50,15 @@ factory helpers in `dplm/`.
 Use `simple/` when you want to understand the public API first without reading
 the larger experiment workflow.
 
-## DPLM
+## dplm
 
-`dplm/` contains the DPLM-specific adapter layer and larger workflows:
+`dplm/` contains the protein-case adapter layer and larger workflows:
 
-- `dplm/dplm_builder.py`: DPLM-to-`Q-Diffusion` assembly entrypoint
+- `dplm/utils/dplm_builder.py`: protein-case `Q-Diffusion` assembly helper
 - `dplm/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
 - `dplm/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
-- `dplm/workflows/`: the actual train, rerun, and ESM2 evaluation implementations
+- `dplm/workflows/`: the actual train and ESM2 evaluation implementations
 - `dplm/train_workflow.py`: compatibility entrypoint for the full train/eval workflow
-- `dplm/rerun_from_checkpoint.py`: compatibility entrypoint for guided reruns
 - `dplm/eval_esm2_distances.py`: compatibility entrypoint for ESM2 distance evaluation
 
 If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
@@ -89,8 +88,9 @@ report from the current setup used:
 
 | label | pairs | mean cosine dist | median cosine dist | mean l2 dist | median l2 dist |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| baseline | 20 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
-| guided | 20 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
+| baseline | 200 | 0.232665 | 0.192503 | 5.199004 | 4.926634 |
+| MLP | 200 | 0.227007 | 0.205144 | 4.945239 | 4.803553 |
+| guided | 200 | 0.187927 | 0.159195 | 4.679255 | 4.432099 |
 
 In this run, the guided generator improved over the baseline by:
 
@@ -122,7 +122,6 @@ Inside `Q-Diffusion.objective(...)`, the training path is:
 - Users should import the generic `Q-Diffusion` core from `kaiwu.torch_plugin`.
 - DPLM loading is no longer part of the formal `src` API; the DPLM factory in
   this directory is the example-side compatibility layer.
-- The guided path in these examples is now `DPLM proposal + energy reranker`,
-  with either an RBM or BM backend selected by the example builder.
+- The guided path in these examples is now `DPLM proposal + BM energy reranker`.
 - `simple/` and `dplm/` are designed to be read together:
   `simple/` shows the API surface, while `dplm/` shows the full experiment workflow.

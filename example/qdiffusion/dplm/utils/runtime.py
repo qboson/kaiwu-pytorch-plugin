@@ -8,6 +8,13 @@ from typing import Any
 import torch
 
 
+def seed_torch(seed: int) -> None:
+    """Seeds Torch CPU/CUDA RNGs for reproducible generation steps."""
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
 def encode_sequence(
     generator, sequence: str, max_length: int | None = None
 ) -> torch.Tensor:
@@ -35,12 +42,17 @@ def summarize_trainable_parameters(generator) -> dict[str, int]:
 
 
 def _energy_backend_state(generator) -> dict[str, Any]:
-    """Collects the energy-backend-specific checkpoint payload."""
-    if hasattr(generator.energy_model, "energy_rbm"):
-        return {"energy_rbm": generator.energy_model.energy_rbm.state_dict()}
+    """Collects the BM checkpoint payload."""
     return {
         "energy_bm": generator.energy_model.energy_bm.state_dict(),
-        "hidden_init": generator.energy_model.hidden_init.state_dict(),
+    }
+
+
+def _energy_backend_metadata(generator) -> dict[str, Any]:
+    """Collects lightweight metadata required to rebuild the BM backend."""
+    return {
+        "bm_sampler_type": getattr(generator.energy_model, "sampler_type", None),
+        "bm_sampler_kwargs": getattr(generator.energy_model, "sampler_kwargs", {}),
     }
 
 
@@ -59,12 +71,13 @@ def save_checkpoint(
         {
             "epoch": epoch,
             "metric": metric,
+            "metadata": _energy_backend_metadata(generator),
             "state_dict": {
+                # Proposal weights are intentionally omitted because the current
+                # example treats proposal DPLM as a frozen upstream component.
                 "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
                 "feature_projector": generator.energy_model.feature_projector.state_dict(),
                 **_energy_backend_state(generator),
-                "energy_head": generator.energy_head.state_dict(),
-                "vocab_proj": generator.vocab_proj.state_dict(),
             },
         },
         checkpoint_path,
@@ -72,18 +85,17 @@ def save_checkpoint(
     return checkpoint_path
 
 
-def load_trained_energy_weights(generator, checkpoint_path: str, device: str) -> None:
+def load_trained_energy_weights(
+    generator, checkpoint_path: str, device: str
+) -> dict[str, Any]:
     """Loads a compact energy-side checkpoint into one generator."""
     checkpoint = torch.load(checkpoint_path, map_location=device)
     state_dict = checkpoint["state_dict"]
+    # Rebuild exactly the energy-side modules we saved during training so rerun
+    # and evaluation use the same scorer weights as the best checkpoint.
     generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
     generator.energy_model.feature_projector.load_state_dict(
         state_dict["feature_projector"]
     )
-    if hasattr(generator.energy_model, "energy_rbm"):
-        generator.energy_model.energy_rbm.load_state_dict(state_dict["energy_rbm"])
-    else:
-        generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
-        generator.energy_model.hidden_init.load_state_dict(state_dict["hidden_init"])
-    generator.energy_head.load_state_dict(state_dict["energy_head"])
-    generator.vocab_proj.load_state_dict(state_dict["vocab_proj"])
+    generator.energy_model.energy_bm.load_state_dict(state_dict["energy_bm"])
+    return checkpoint.get("metadata", {})

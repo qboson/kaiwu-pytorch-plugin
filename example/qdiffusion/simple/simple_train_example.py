@@ -22,7 +22,7 @@ from torch.optim import AdamW
 
 ensure_repo_src_on_path()
 
-from dplm.dplm_builder import build_dplm_qdiffusion
+from dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and data helpers.
 
@@ -100,6 +100,7 @@ def select_records(
 
 # Example entrypoint.
 
+
 def main() -> None:
     """Runs a tiny example training loop.
 
@@ -117,7 +118,7 @@ def main() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    generator = build_dplm_qdiffusion(
+    generator = build_qdiffusion(
         proposal_ckpt=proposal_ckpt,
         energy_ckpt=energy_ckpt,
         num_candidates=4,
@@ -138,6 +139,8 @@ def main() -> None:
         add_special_tokens=True,
         padding=True,
     )
+    # ``targets`` is the only tensor the outer loop needs; ``objective(...)``
+    # will create noisy states, sample candidates, and build the energy loss.
     targets = encoded["input_ids"].to(generator.device)
 
     optimizer = AdamW(
@@ -150,6 +153,8 @@ def main() -> None:
         generator.proposal_model.eval()
 
     for step in range(1, num_steps + 1):
+        # ``objective`` is the full training step contract for the example: it
+        # returns proposal logits, masks, and the scalar EBM objective term.
         outputs = generator.objective({"targets": targets})
         loss = outputs["energy_objective"].mean()
 

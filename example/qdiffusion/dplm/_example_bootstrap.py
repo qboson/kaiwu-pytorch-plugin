@@ -1,4 +1,4 @@
-"""Development-time path bootstrap for DPLM qdiffusion examples."""
+"""Development-time path bootstrap for dplm examples."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import sys
 def ensure_repo_src_on_path() -> None:
     """Adds the repository ``src`` directory to ``sys.path`` when needed.
 
-    This keeps the DPLM workflow examples runnable directly from a repository
+    This keeps the protein-case workflow examples runnable directly from a repository
     checkout without requiring an editable install first.
     """
     example_root = Path(__file__).resolve().parents[1]
