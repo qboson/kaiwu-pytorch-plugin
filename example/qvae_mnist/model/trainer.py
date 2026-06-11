@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Trainer module for QVAE training.
+
+This module provides the Trainer class that handles data loading, model creation,
+training loop, and result saving for QVAE models.
+"""
+
 import os
 from datetime import datetime
 import logging
@@ -13,7 +21,7 @@ import json
 from .model import QVAE
 from .config import Config
 from .feature_extractor import FeatureExtractor
-from .classifier import MLPClassifier
+# from .classifier import MLPClassifier
 
 from utils.loadMNIST import loadMNIST
 from utils.ModelTuner import ModelTuner
@@ -25,19 +33,19 @@ logger = logging.getLogger(__name__)
 
 class Trainer:
     """统一的训练器类，封装数据加载、模型创建、训练循环、结果保存"""
-    
+
     def __init__(
-        self, 
+        self,
         name, data_path, model_type,
-        batch_size=128, 
+        batch_size=128,
         num_epochs=50,
         lr=1e-3,
         bm_lr=1e-4,
-        num_train_samples=60000, 
+        num_train_samples=60000,
         num_test_samples=10000,
-        custom_train_data=None, 
+        custom_train_data=None,
         custom_test_data=None,
-        output_dir=None, 
+        output_dir=None,
         use_cuda=False
     ):
         self.name = name
@@ -52,12 +60,12 @@ class Trainer:
         self.lr = lr
         self.bm_lr = bm_lr
         self.use_cuda = use_cuda
-        
+
         # 输出目录
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.output_dir = output_dir or f"./output/{model_type}_{self.timestamp}"
         os.makedirs(self.output_dir, exist_ok=True)
-        
+
         # 内部组件
         self.config = None
         self.model = None
@@ -65,11 +73,11 @@ class Trainer:
         self.train_loader = None
         self.test_loader = None
         self.dataset_mean = None
-        
+
         # 训练历史
         self.train_losses = []
         self.test_losses = []
-    
+
     def _setup_data(self):
         """加载数据并计算均值"""
         if self.custom_train_data is not None:
@@ -99,23 +107,23 @@ class Trainer:
         self.dataset_mean = total_sum / total_count
         logger.info(f"Dataset mean: {self.dataset_mean:.4f}")
         return self.train_loader, self.test_loader
-    
+
     def _create_model(self):
         """创建模型和配置"""
         self.config = Config(self.model_type)
         input_dim = self.train_loader.dataset[0][0].numel()
         logger.info(f"Input dimension: {input_dim}")
-        
+
         if self.model_type == 'QVAE':
             model = QVAE(input_dimension=input_dim, activation_fct=self.config.activation_fct, sampler_type=self.config.sampler_type, config=self.config)
         else:
             raise ValueError(f"Unsupported model type: {self.model_type}")
-        
+
         model.create_networks()
         self.model = model
         logger.info(f"Model created: {self.model_type}")
         return model
-    
+
     def _setup_tuner(self):
         """初始化 ModelTuner 并设置优化器"""
         # 创建 tuner
@@ -148,14 +156,14 @@ class Trainer:
         if hasattr(self.model, 'set_dataset_mean'):
             self.model.set_dataset_mean(self.dataset_mean)
             logger.info("Set dataset mean")
-        
+    
         # 设置训练偏置（对 RBM_VAE, QVAE, CellQVAE）
         if self.model_type in ["RBM_VAE", "QVAE", "CellQVAE"] and hasattr(self.model, 'set_train_bias'):
             self.model.set_train_bias(self.dataset_mean)
             logger.info("Set train bias")
 
         return self.tuner
-    
+
     def train(self, run_tsne=False, tsne_interval=10, generate_animation=False):
         """
         执行完整训练流程
@@ -172,7 +180,7 @@ class Trainer:
 
         # 记录 t-SNE 帧路径
         tsne_frames = []
-        
+
         epoch_pbar = tqdm(range(1, self.num_epochs + 1), desc="Training Progress")
         for epoch in epoch_pbar:
             # 训练一个 epoch
@@ -180,16 +188,16 @@ class Trainer:
             if hasattr(train_loss, 'item'):   # check if it's a tensor
                 train_loss = train_loss.item()
             self.train_losses.append(train_loss)
-            
+
             # 测试
             test_loss, input_data, output_data, label_list = self.tuner.test()
             if hasattr(test_loss, 'item'):   # check if it's a tensor
                 test_loss = test_loss.item()
             self.test_losses.append(test_loss)
-            
+
             # 更新进度条
             epoch_pbar.set_description(f"Epoch {epoch}/{self.num_epochs} - Train Loss: {train_loss:.2f}, Test Loss: {test_loss:.2f}")
-            
+
             # 每 10 个 epoch 或最后保存重建图像
             # if epoch % 10 == 0 or epoch == self.num_epochs:
             if epoch % (self.num_epochs // 10) == 0 or epoch == self.num_epochs:
@@ -221,24 +229,24 @@ class Trainer:
 
         logger.info(f"{self.model_type} training completed")
         return self.model, self.train_losses, self.test_losses
-    
+
     def _save_reconstruction(self, epoch, input_data, output_data):
         """保存重建图像"""
         if isinstance(input_data, list):
             x_true = input_data[0][:10].detach().numpy()
         else:
             x_true = input_data[:10].detach().numpy()
-        
+
         if isinstance(output_data, list):
             x_recon = output_data[0][:10].detach().numpy()
         else:
             x_recon = output_data[:10].detach().numpy()
-        
+
         plot_MNIST_output(
             x_true, x_recon,
             output=os.path.join(self.output_dir, f"reconstruction_epoch_{epoch}.png")
         )
-    
+
     def _plot_training_curve(self):
         """绘制训练曲线并保存"""
         plt.figure(figsize=(6, 5))
@@ -255,7 +263,7 @@ class Trainer:
     def _visualize_tsne(self, point_size=20, alpha=0.6, save_path=None, show=True):
         """
         执行 t-SNE 可视化并保存图像
-        
+
         Args:
             point_size: 散点大小
             alpha: 透明度
@@ -269,10 +277,10 @@ class Trainer:
         # 生成默认保存路径（如果未指定）
         if save_path is None:
             save_path = os.path.join(
-                self.output_dir, 
+                self.output_dir,
                 f"{self.model_type}_t-SNE_epochs_{self.num_epochs}.png"
             )
-        
+
         # 调用 t_SNE 函数
         df_tsne, final_save_path, training_status = t_SNE(
             test_loader=self.test_loader,
@@ -283,7 +291,7 @@ class Trainer:
             save_path=save_path,
             show=show
         )
-        
+
         return df_tsne, final_save_path, training_status
 
     def _save_tsne_frame(self, epoch):
@@ -293,7 +301,7 @@ class Trainer:
         frame_dir = os.path.join(self.output_dir, "temp_tsne_frames")
         os.makedirs(frame_dir, exist_ok=True)
         frame_path = os.path.join(frame_dir, f"tsne_epoch_{epoch:03d}.png")
-        
+
         # 调用 t_SNE 生成帧（不显示）
         _, _, _ = t_SNE(
             test_loader=self.test_loader,

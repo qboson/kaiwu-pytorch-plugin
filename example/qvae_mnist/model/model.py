@@ -2,17 +2,18 @@
 # Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
+"""
+QVAE model implementation for MNIST using BasicEncoder, BasicDecoder and RBM.
+"""
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import nn
 
-from .networks import BasicEncoder, BasicDecoder
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, BaseQVAE
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
-from kaiwu.torch_plugin import BaseQVAE
+
+from .networks import BasicEncoder, BasicDecoder
 
 
 class QVAE(BaseQVAE):
@@ -33,11 +34,14 @@ class QVAE(BaseQVAE):
         input_dimension,
         activation_fct,
         config,
-        sampler_type="sa",
-        n_batches=0,
+        # sampler_type="sa",
+        # n_batches=0,
         **kwargs,
     ):
         # 调用父类 __init__，父类会调用 create_networks()
+        # Optional parameters extracted from kwargs or using defaults
+        sampler_type = kwargs.pop('sampler_type', 'sa')
+        n_batches = kwargs.pop('n_batches', 0)
         super().__init__(
             input_dimension=input_dimension,
             activation_fct=activation_fct,
@@ -56,10 +60,17 @@ class QVAE(BaseQVAE):
             BasicEncoder: Encoder network.
         """
         # 根据 config.encoder_hidden_nodes 构造节点序列
-        enc_nodes = [self._input_dimension] + self._config.encoder_hidden_nodes + [self._latent_dimensions]
-        node_pairs = [(enc_nodes[i], enc_nodes[i+1]) for i in range(len(enc_nodes)-1)]
+        enc_nodes = (
+            [self._input_dimension]
+            + self._config.encoder_hidden_nodes
+            + [self._latent_dimensions]
+        )
+        node_pairs = [
+            (enc_nodes[i], enc_nodes[i+1])
+            for i in range(len(enc_nodes)-1)
+        ]
         return BasicEncoder(
-            node_sequence=node_pairs, 
+            node_sequence=node_pairs,
             activation_fct=self._activation_fct,
             weight_decay=self.weight_decay   # 传递衰减系数
         )
@@ -71,10 +82,17 @@ class QVAE(BaseQVAE):
         Returns:
             BasicDecoder: Decoder network (output logits).
         """
-        dec_nodes = [self._latent_dimensions] + self._config.decoder_hidden_nodes + [self._input_dimension]
-        node_pairs = [(dec_nodes[i], dec_nodes[i+1]) for i in range(len(dec_nodes)-1)]
+        dec_nodes = (
+            [self._latent_dimensions]
+            + self._config.decoder_hidden_nodes
+            + [self._input_dimension]
+        )
+        node_pairs = [
+            (dec_nodes[i], dec_nodes[i+1])
+            for i in range(len(dec_nodes)-1)
+        ]
         return BasicDecoder(
-            node_sequence=node_pairs, 
+            node_sequence=node_pairs,
             activation_fct=self._activation_fct,
             output_activation_fct=nn.Identity(),
             weight_decay=self.weight_decay

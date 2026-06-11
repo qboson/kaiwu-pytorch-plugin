@@ -2,13 +2,19 @@
 # Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
+"""
+Quantum Variational Autoencoder (QVAE) model.
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.distributions as dist
+This module contains the BaseQVAE class and supporting utilities for training
+a QVAE with a Boltzmann machine prior. 
+"""
+
 import abc
 import logging
+
+import torch
+from torch import nn
+from torch.nn.functional import one_hot
 
 from .qvae_dist_util import MixtureGeneric, FactorialBernoulliUtil
 
@@ -19,28 +25,28 @@ torch.manual_seed(42)
 class AutoEncoderBase(nn.Module):
     """
     Base class for AutoEncoders, providing common initialization and interfaces.
-    
+
     Args:
         input_dimension (int or list of int): Dimensionality of input features.
             If list, only first element is used for now.
         activation_fct (callable, optional): Activation function for hidden layers.
         config (object): Configuration object with hyperparameters.
             Must contain `num_latent_units` (int > 0) and `loss_type` (str).
-        **kwargs: Additional keyword arguments for nn.Module.    
+        **kwargs: Additional keyword arguments for nn.Module.
     """
     def __init__(self, input_dimension=None, activation_fct=None, config=None, **kwargs):
-        super(AutoEncoderBase,self).__init__(**kwargs)
-        
+        super().__init__(**kwargs)
+
         # Validate and normalize input dimension
         if isinstance(input_dimension, list):
             assert len(input_dimension) > 0, "Input dimension not defined, needed for model structure"
         else:
             assert input_dimension > 0, "Input dimension not defined, needed for model structure"
             input_dimension = [input_dimension]  # wrap in list for consistent handling
-            
+
         assert config is not None, "Config not defined"
         assert config.num_latent_units is not None and config.num_latent_units > 0, "Latent dimension must be >0"
-        assert hasattr(config, "loss_type"), "Config must contain loss_type (e.g., 'bernoulli' or 'mse')"        
+        assert hasattr(config, "loss_type"), "Config must contain loss_type (e.g., 'bernoulli' or 'mse')"
 
         self._model_type = None
         self._config = config
@@ -58,12 +64,12 @@ class AutoEncoderBase(nn.Module):
     def _create_decoder(self):
         """Create decoder network. Must be implemented in subclasses."""
         raise NotImplementedError
-    
+
     @abc.abstractmethod
     def forward(self, x):
         """Forward pass. Must be implemented in subclasses."""
         raise NotImplementedError
-    
+
     def set_dataset_mean(self,mean):
         """
         Set dataset mean for bias correction.
@@ -71,7 +77,7 @@ class AutoEncoderBase(nn.Module):
         Args:
             mean (torch.Tensor): Mean of the training data (shape: input_dim).
         """
-        self._dataset_mean=mean    
+        self._dataset_mean=mean
 
     def __repr__(self):
         parameter_string="\n".join([str(par) for par in self.__dict__.items()])
@@ -93,26 +99,27 @@ class BaseQVAE(AutoEncoderBase):
             - weight_decay (float, default=0.01)
         sampler_type (str): Type of sampler for BM ('sa' or 'cim').
         n_batches (int): Number of batches for conditional decoding (0 = no conditioning).
-        bm (object, optional): Pre-created Boltzmann Machine. If None, created in create_networks.
-        encoder (object, optional): Pre-created encoder. If None, created in create_networks.
-        decoder (object, optional): Pre-created decoder. If None, created in create_networks.
-        sampler (object, optional): Pre-created sampler. If None, created in create_networks.
+        bm (object, optional): Pre-created Boltzmann Machine.
+        encoder (object, optional): Pre-created encoder.
+        decoder (object, optional): Pre-created decoder.
+        sampler (object, optional): Pre-created sampler.
         **kwargs: Additional keyword arguments for AutoEncoderBase.
     """
     def __init__(
-        self, 
-        input_dimension=None, 
-        activation_fct=None, 
+        self,
+        input_dimension=None,
+        activation_fct=None,
         config=None,
-        sampler_type='sa', 
-        n_batches=0, 
-        bm=None, 
-        encoder=None, 
-        decoder=None, 
-        sampler=None,
         **kwargs
     ):
-        super(BaseQVAE, self).__init__(input_dimension, activation_fct, config, **kwargs)
+        # Extract optional pre-created modules from kwargs
+        sampler_type = kwargs.pop('sampler_type', 'sa')
+        n_batches = kwargs.pop('n_batches', 0)
+        bm = kwargs.pop('bm', None)
+        encoder = kwargs.pop('encoder', None)
+        decoder = kwargs.pop('decoder', None)
+        sampler = kwargs.pop('sampler', None)
+        super().__init__(input_dimension, activation_fct, config, **kwargs)
         self._model_type = "QVAE"   # for identification, can be used in ModelTuner
         self.sampler_type = sampler_type
         self.n_batches = n_batches
@@ -127,7 +134,7 @@ class BaseQVAE(AutoEncoderBase):
         self.decoder = decoder
         self.bm = bm
         self.sampler = sampler
-        
+
         # Bias for Bernoulli reconstruction
         self._train_bias = None
 
@@ -165,7 +172,6 @@ class BaseQVAE(AutoEncoderBase):
         """Compute train bias from dataset mean for Bernoulli reconstruction."""
         clipped_mean = torch.clamp(mean, 0.001, 0.999).detach()
         self._train_bias = -torch.log(1/clipped_mean - 1)
-        return 
 
     def forward(self, x, batch_idx=None):
         """
@@ -200,7 +206,10 @@ class BaseQVAE(AutoEncoderBase):
         if self.n_batches > 0:
             if batch_idx is None:
                 raise ValueError("batch_idx required when n_batches > 0")
-            batch_one_hot = F.one_hot(batch_idx, num_classes=self.n_batches).float().to(zeta.device)
+            batch_one_hot = one_hot(
+                batch_idx,
+                num_classes=self.n_batches
+            ).float().to(zeta.device)
             decoder_input = torch.cat([zeta, batch_one_hot], dim=-1)
         else:
             decoder_input = zeta
@@ -213,7 +222,7 @@ class BaseQVAE(AutoEncoderBase):
 
         return recon_x, posterior, q, zeta
 
-    def loss(self, x, recon_x, posterior, q, zeta):
+    def loss(self, x, recon_x, posterior):
         """Compute total loss (reconstruction + KL + weight decay).
 
         Args:
@@ -231,25 +240,25 @@ class BaseQVAE(AutoEncoderBase):
         """
         if self._config.loss_type == 'mse':
             recon_loss = F.mse_loss(
-                recon_x, 
-                x.view(-1, self._input_dimension), 
+                recon_x,
+                x.view(-1, self._input_dimension),
                 reduction='sum'
             ) / x.size(0)
         elif self._config.loss_type == 'bernoulli':  # bernoulli
             # recon_loss = F.binary_cross_entropy_with_logits(
-            #     recon_x, 
-            #     x.view(-1, self._input_dimension), 
+            #     recon_x,
+            #     x.view(-1, self._input_dimension),
             #     reduction='sum'
             # ) / x.size(0)
             output_dist = FactorialBernoulliUtil(recon_x)
             recon_loss = -output_dist.log_prob_per_var(x).sum(dim=1).mean()
         else:
             raise ValueError(f"Unsupported loss type: {self._config.loss_type}")
-        
+
         # KL divergence
         kl_loss = self._kl_dist_from(posterior).mean()
 
-        # Weight decay 
+        # Weight decay
         wd_loss = self._weight_decay_loss()
 
         # Total loss

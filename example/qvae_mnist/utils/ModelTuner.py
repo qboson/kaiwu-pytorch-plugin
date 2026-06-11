@@ -114,7 +114,7 @@ class ModelTuner(object):
 				# 注意：forward 返回: output_logits, posterior_dist, q_logits, zeta
 				output_logits, posterior, q, zeta = self._model(inputData)
 				# 直接使用 forward 返回的 logits 和 posterior 计算损失
-				train_loss = self._model.loss(inputData, output_logits, posterior, q, zeta)
+				train_loss = self._model.loss(inputData, output_logits, posterior)
 			else:
 				logger.debug("ERROR Unknown Model Type")
 				raise NotImplementedError
@@ -161,7 +161,7 @@ class ModelTuner(object):
 				if self._config.type == 'QVAE':
 					# forward 返回: output_logits, posterior, q, zeta
 					output_logits, posterior, q, zeta = self._model(inputData)
-					test_loss += self._model.loss(inputData, output_logits, posterior, q, zeta)
+					test_loss += self._model.loss(inputData, output_logits, posterior)
 
 					# 设置 outputData 为概率值（用于绘图）
 					outputData = torch.sigmoid(output_logits)
