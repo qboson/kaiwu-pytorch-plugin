@@ -71,17 +71,9 @@ class PipelineTransformer:
         y_train = np.zeros(len(X_train), dtype=int)
         y_val = np.zeros(len(X_val), dtype=int)
 
-        # Create Trainer with config
+        # Create Trainer with config - now passing config directly
         self.trainer = Trainer(
-            name=self.config.name,
-            data_path=self.config.data_path,
-            model_type=self.config.type,
-            batch_size=self.config.batch_size,
-            num_epochs=self.config.num_epochs,
-            lr=self.config.lr,
-            bm_lr=self.config.bm_lr,
-            use_cuda=self.config.use_cuda,
-            output_dir=self.config.output_dir,
+            config=self.config,
             custom_train_data=(X_train, y_train),
             custom_test_data=(X_val, y_val)
         )
