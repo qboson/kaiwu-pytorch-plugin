@@ -52,6 +52,7 @@ def main():
     parser.add_argument("--use-cuda", action="store_true")
     parser.add_argument("--feature-type", type=str, default="q", choices=["q", "zeta"])
     parser.add_argument("--run-tsne", action="store_true")
+    parser.add_argument("--compute_energy", action="store_true")
 
     # Output
     parser.add_argument("--output-dir", type=str, default=None)
@@ -78,6 +79,7 @@ def main():
         use_cuda=args.use_cuda,
         feature_type=args.feature_type,
         run_tsne=args.run_tsne,
+        compute_energy=args.compute_energy,
         num_train_samples=args.num_train_samples,
         num_test_samples=args.num_test_samples,
         output_dir=args.output_dir,

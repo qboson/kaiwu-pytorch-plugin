@@ -67,9 +67,19 @@ class PipelineTransformer:
         Returns:
             self: The fitted transformer.
         """
-        X_train, X_val = train_test_split(X, test_size=0.2, random_state=42)
-        y_train = np.zeros(len(X_train), dtype=int)
-        y_val = np.zeros(len(X_val), dtype=int)
+        if y is None:
+            y = np.zeros(X.shape[0], dtype=int)
+    
+        X_train, X_val, y_train, y_val = train_test_split(
+            X, y, 
+            test_size=0.2, 
+            random_state=42, 
+            stratify=y
+        )
+
+        # X_train, X_val = train_test_split(X, test_size=0.2, random_state=42)
+        # y_train = np.zeros(len(X_train), dtype=int)
+        # y_val = np.zeros(len(X_val), dtype=int)
 
         # Create Trainer with config - now passing config directly
         self.trainer = Trainer(
@@ -78,7 +88,7 @@ class PipelineTransformer:
             custom_test_data=(X_val, y_val)
         )
         # Train QVAE
-        self.model, _, _ = self.trainer.train(run_tsne=self.config.run_tsne)
+        self.model, _, _ = self.trainer.train(run_tsne=self.config.run_tsne, compute_energy=self.config.compute_energy)
         return self
 
     def transform(self, X):

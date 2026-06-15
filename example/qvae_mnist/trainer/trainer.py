@@ -6,6 +6,7 @@ This module provides the Trainer class that handles data loading, model creation
 training loop, and result saving for QVAE models.
 """
 
+
 import os
 from datetime import datetime
 import logging
@@ -14,7 +15,9 @@ import numpy as np
 from tqdm import tqdm
 from copy import deepcopy
 from torch.utils.data import DataLoader, Subset, TensorDataset
+import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import json
 
 # from kaiwu.torch_plugin import QVAE
@@ -100,6 +103,13 @@ class Trainer:
                 sampler_type=self.config.sampler_type,
                 config=self.config
             )
+        elif self.config.type == 'CellQVAE':
+            model = CellQVAE(
+                input_dimension=input_dim,
+                activation_fct=self.config.activation_fct,
+                config=self.config,
+                n_batches=self.n_batches,
+            )
         else:
             raise ValueError(f"Unsupported model type: {self.config.type}")
 
@@ -139,12 +149,23 @@ class Trainer:
 
         return self.tuner
 
-    def train(self, run_tsne=False, tsne_interval=10, generate_animation=False):
+    def train(self, run_tsne=False, compute_energy=False, tsne_interval=10, generate_animation=False):
         """执行完整训练流程"""
         logger.info(f"Start training {self.config.type}")
         self._setup_data()
         self._create_model()
         self._setup_tuner()
+
+        # 提取测试集标签（用于能量可视化）
+        y_test = []
+        for _, labels in self.test_loader:
+            y_test.extend(labels.numpy().tolist())
+        y_test = np.array(y_test)
+
+    
+        # 调试信息
+        logger.info(f"Test labels - unique: {np.unique(y_test)}, count: {len(y_test)}")
+        logger.info(f"Test labels distribution: {np.bincount(y_test)}")
 
         tsne_frames = []
 
@@ -184,6 +205,11 @@ class Trainer:
             logger.info("Generating t-SNE visualization...")
             self._visualize_tsne()
 
+        if compute_energy:
+            logger.info("Compute BM energy for each sample...")
+            energies = self.compute_energy(self.model, self.test_loader)
+            self._save_energy_plot(energies, y_test, output_path=self.output_dir)
+
         logger.info(f"{self.config.type} training completed")
         return self.model, self.train_losses, self.test_losses
 
@@ -216,6 +242,34 @@ class Trainer:
         plt.grid(True, alpha=0.3)
         plt.savefig(os.path.join(self.output_dir, 'qvae_training_curve.png'))
         plt.show()
+
+    def _save_energy_plot(self, energies, labels, output_path):
+        """绘制能量分布小提琴图并保存"""
+        # 将标签转换为字符串，确保 seaborn 视其为分类变量
+        labels_str = [str(label) for label in labels]
+        # df = pd.DataFrame({'energy': energies, 'label': labels_str})
+        df = pd.DataFrame({'energy': energies, 'label': [str(l) for l in labels]})
+        median_order = df.groupby('label')['energy'].median().sort_values().index.tolist()
+
+        # # 获取唯一标签并排序（确保 0-9 顺序）
+        # unique_labels = sorted(df['label'].unique())
+
+        plt.figure(figsize=(10, 6))
+        sns.violinplot(
+            x='label', 
+            y='energy', 
+            data=df, 
+            order=median_order,  # 按中位数排序
+            inner='quartile', 
+            palette='Spectral'
+        )
+        plt.title('QVAE Energy Distribution (sorted by median)', fontsize=14, pad=15)
+        plt.xlabel('Class')
+        plt.ylabel('Energy')
+        save_path = os.path.join(output_path, 'qvae_energy_by_class.png')
+        plt.savefig(save_path, dpi=300)
+        plt.close()
+        logger.info(f"Energy distribution plot saved to {save_path}")
 
     def _visualize_tsne(self, point_size=20, alpha=0.6, save_path=None, show=True):
         """
@@ -293,6 +347,17 @@ class Trainer:
     def extract_features(self, dataloader, feature_type='q'):
         extractor = FeatureExtractor(self.model, feature_type)
         return extractor.extract(dataloader)
+
+    def compute_energy(self, model, dataloader):
+        """Compute BM energy for each sample in dataloader."""
+        model.eval()
+        energies = []
+        with torch.no_grad():
+            for x, _ in dataloader:
+                x = x.to(next(model.parameters()).device)
+                energy = model.energy(x, self.config.loss_type)
+                energies.extend(energy.cpu().numpy().tolist())
+        return energies
 
     # def get_classifier_pipeline(self, feature_type='q', **classifier_kwargs):
     #     extractor = FeatureExtractor(self.model, feature_type)

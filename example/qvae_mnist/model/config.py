@@ -40,6 +40,7 @@ class Config:
         self.use_cuda = kwargs.get('use_cuda', False)
         self.feature_type = kwargs.get('feature_type', 'q')
         self.run_tsne = kwargs.get('run_tsne', False)
+        self.compute_energy = kwargs.get('compute_energy', False)
         self.num_train_samples = kwargs.get('num_train_samples', 60000)
         self.num_test_samples = kwargs.get('num_test_samples', 10000)
         self.output_dir = kwargs.get('output_dir', None)
