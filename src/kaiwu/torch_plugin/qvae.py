@@ -14,6 +14,7 @@ import logging
 
 import torch
 from torch import nn
+import torch.nn.functional as F
 from torch.nn.functional import one_hot
 
 from .qvae_dist_util import MixtureGeneric, FactorialBernoulliUtil
@@ -113,6 +114,7 @@ class BaseQVAE(AutoEncoderBase):
         **kwargs
     ):
         # Extract optional pre-created modules from kwargs
+        bm_type = kwargs.pop('bm_type', 'rbm')
         sampler_type = kwargs.pop('sampler_type', 'sa')
         n_batches = kwargs.pop('n_batches', 0)
         bm = kwargs.pop('bm', None)
@@ -121,6 +123,7 @@ class BaseQVAE(AutoEncoderBase):
         sampler = kwargs.pop('sampler', None)
         super().__init__(input_dimension, activation_fct, config, **kwargs)
         self._model_type = "QVAE"   # for identification, can be used in ModelTuner
+        self.bm_type = bm_type
         self.sampler_type = sampler_type
         self.n_batches = n_batches
 
@@ -145,7 +148,7 @@ class BaseQVAE(AutoEncoderBase):
         """Create encoder, decoder, BM and sampler. Subclasses must override."""
         self.encoder = self._create_encoder()
         self.decoder = self._create_decoder()
-        self.bm = self._create_bm()
+        self.bm = self._create_bm(self.bm_type)
         self.sampler = self._create_sampler(self.sampler_type)
         if self._dataset_mean is not None:
             self.set_train_bias(self._dataset_mean)
@@ -160,7 +163,7 @@ class BaseQVAE(AutoEncoderBase):
         pass
 
     @abc.abstractmethod
-    def _create_bm(self):
+    def _create_bm(self, bm_type):
         pass
 
     @abc.abstractmethod
@@ -221,6 +224,18 @@ class BaseQVAE(AutoEncoderBase):
             recon_x = recon_x + self._train_bias.to(recon_x.device)
 
         return recon_x, posterior, q, zeta
+
+    def energy(self, x, loss_type):
+        """计算 BM 能量（用于评估）"""
+        x = x.view(-1, self._input_dimension)
+        if loss_type == 'bernoulli' and self._dataset_mean is not None:
+            x_centered = x - self._dataset_mean
+        elif loss_type == 'mse':
+            x_centered = x
+        else:
+            raise ValueError(f"Unsupported loss type: {loss_type}")
+        q = self.encoder(x_centered)
+        return self.bm((q > 0).float())
 
     def loss(self, x, recon_x, posterior):
         """Compute total loss (reconstruction + KL + weight decay).

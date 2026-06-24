@@ -1,5 +1,5 @@
 #!/bin/bash
-python train_qvae_cell.py \
+python ../train_qvae_cell.py \
   --epochs 100 \
   --sampler-type sa \
   --loss-type mse \
