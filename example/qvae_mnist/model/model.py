@@ -34,18 +34,18 @@ class QVAE(BaseQVAE):
         input_dimension,
         activation_fct,
         config,
-        # sampler_type="sa",
-        # n_batches=0,
         **kwargs,
     ):
         # 调用父类 __init__，父类会调用 create_networks()
         # Optional parameters extracted from kwargs or using defaults
+        bm_type = kwargs.pop('bm_type', 'rbm')
         sampler_type = kwargs.pop('sampler_type', 'sa')
         n_batches = kwargs.pop('n_batches', 0)
         super().__init__(
             input_dimension=input_dimension,
             activation_fct=activation_fct,
             config=config,
+            bm_type=bm_type,
             sampler_type=sampler_type,
             n_batches=n_batches,
             **kwargs,
@@ -98,7 +98,7 @@ class QVAE(BaseQVAE):
             weight_decay=self.weight_decay
         )  # 输出 logits
 
-    def _create_bm(self):
+    def _create_bm(self, bm_type='rbm'):
         """
         Create RBM with visible and hidden units split from latent dimension.
 
@@ -107,7 +107,14 @@ class QVAE(BaseQVAE):
         """
         n_vis = self._latent_dimensions // 2
         n_hid = self._latent_dimensions - n_vis
-        return RestrictedBoltzmannMachine(num_visible=n_vis, num_hidden=n_hid)
+
+        if bm_type =="rbm":
+            bm = RestrictedBoltzmannMachine(num_visible=n_vis, num_hidden=n_hid)
+        elif bm_type =="bm":
+            bm = BoltzmannMachine(num_nodes=self._latent_dimensions)
+        else:
+            raise ValueError(f"Unsupported bm type: {bm_type}")
+        return bm
 
     def _create_sampler(self, sampler_type='sa'):
         """
@@ -137,15 +144,3 @@ class QVAE(BaseQVAE):
         else:
             raise ValueError(f"Unsupported sampler type: {sampler_type}")
         return sampler
-
-    # def energy(self, x, loss_type):
-    #     """计算 BM 能量（用于评估）"""
-    #     x = x.view(-1, self._input_dimension)
-    #     if loss_type == 'bernoulli' self._dataset_mean is not None:
-    #         x_centered = x - self._dataset_mean
-    #     elifl oss_type == 'mse':
-    #         x_centered = x
-    #     else:
-    #         raise ValueError(f"Unsupported loss type: {loss_type}")
-    #     q = self.encoder(x_centered)
-    #     return self.bm((q > 0).float())

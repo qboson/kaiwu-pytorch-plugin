@@ -100,6 +100,7 @@ class Trainer:
             model = QVAE(
                 input_dimension=input_dim,
                 activation_fct=self.config.activation_fct,
+                bm_type=self.config.bm_type,
                 sampler_type=self.config.sampler_type,
                 config=self.config
             )
@@ -107,6 +108,8 @@ class Trainer:
             model = CellQVAE(
                 input_dimension=input_dim,
                 activation_fct=self.config.activation_fct,
+                bm_type=self.config.bm_type,
+                sampler_type=self.config.sampler_type,
                 config=self.config,
                 n_batches=self.n_batches,
             )
@@ -115,7 +118,10 @@ class Trainer:
 
         model.create_networks()
         self.model = model
+        logger.info(f"Sampler created: {self.config.sampler_type}")
         logger.info(f"Model created: {self.config.type}")
+        if self.config.type in ['QVAE', 'CellQVAE']:
+            logger.info(f"BM created: {self.config.bm_type}")
         return model
 
     def _setup_tuner(self):

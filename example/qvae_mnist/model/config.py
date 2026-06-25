@@ -13,6 +13,7 @@ class Config:
             self.num_latent_units = 256            # 总潜变量维数，RBM 可见/隐藏各一半
             self.dist_beta = 10.0
             self.kl_beta = 0.000001
+            self.bm_type = 'rbm'
             self.sampler_type = 'sa'               # 'sa' or 'cim'
             self.loss_type = 'bernoulli'           # 'bernoulli' or 'mse'
             self.weight_decay = 0.01
@@ -22,6 +23,7 @@ class Config:
             self.num_latent_units = 256
             self.dist_beta = 10.0
             self.kl_beta = 1e-5
+            self.bm_type = 'bm'
             self.sampler_type = 'sa'
             self.loss_type = 'bernoulli'
             self.weight_decay = 0.01
