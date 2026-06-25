@@ -9,7 +9,6 @@ training loop, and result saving for QVAE models.
 
 import os
 from datetime import datetime
-import logging
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -20,15 +19,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 
-# from kaiwu.torch_plugin import QVAE
 from model import Config, QVAE, FeatureExtractor
 from .model_tuner import ModelTuner
 
 from utils.loadMNIST import loadMNIST
 from utils.helpers import plot_MNIST_output, t_SNE, create_tsne_animation#, save_list_to_txt
+from utils.logging import get_logger
+from utils.exception import ValueError, BuildError
 
-
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class Trainer:

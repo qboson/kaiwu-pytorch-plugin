@@ -2,11 +2,11 @@ import os
 import torch
 import numpy as np
 
-# from .loadMNIST import loadMNIST
+from utils.logging import get_logger
+from utils.exception import ValueError, TypeError
 
-import logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+logger = get_logger(__name__)
+logger.setLevel('WARNING')
 
 class ModelTuner(object):
 	def __init__(self, config=None):
