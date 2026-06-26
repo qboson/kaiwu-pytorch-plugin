@@ -1,9 +1,11 @@
 services:
   jupyter:
-    # platform: linux/amd64   # 强制使用 x86_64 架构镜像
+    # platform: linux/amd64
     build: 
       context: .
       dockerfile: ./docker/Dockerfile
+      # platforms:
+      #   - linux/amd64   # 强制使用 x86_64 架构镜像
     image: jupyter/kpp-notebook
     volumes:
       - ./work:/home/jovyan/work
