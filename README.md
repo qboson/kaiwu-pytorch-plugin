@@ -76,7 +76,7 @@ The above image shows the project file structure:
 
 ### Requirements
 - python == 3.10
-- kaiwu == v1.3.1
+- kaiwu == 1.3.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -112,7 +112,9 @@ The above image shows the project file structure:
 
 ### Kaiwu SDK Installation Instructions (Required)
 
-Download link and installation steps for Kaiwu SDK:
+Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+
+The download and installation steps for other versions of the Kaiwu SDK are as follows:
 ![](imgs/image.png)
 
 1. **Get the SDK**:
