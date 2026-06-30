@@ -79,7 +79,7 @@ flowchart TD
 ### 环境要求
 
 - python == 3.10
-- kaiwu == v1.3.1
+- kaiwu == 1.3.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -120,7 +120,9 @@ flowchart TD
 
 ### Kaiwu SDK 安装说明（必需）
 
-Kaiwu SDK 的下载和安装步骤如下：
+现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装
+
+其他版本的Kaiwu SDK 的下载和安装步骤如下：
 
 ![](imgs/image.png)
 
