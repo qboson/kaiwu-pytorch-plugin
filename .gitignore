@@ -156,6 +156,10 @@ cython_debug/
 # Visual Studio Code
 .vscode
 
+# codex
+.agents
+Agent.md
+
 # End of https://www.toptal.com/developers/gitignore/api/python
 tmp
 example/data/
