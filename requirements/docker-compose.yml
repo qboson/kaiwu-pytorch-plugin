@@ -1,14 +1,14 @@
 services:
   jupyter:
-    # platform: linux/amd64
+    platform: linux/amd64
     build: 
       context: .
       dockerfile: ./docker/Dockerfile
-      # platforms:
-      #   - linux/amd64   # 强制使用 x86_64 架构镜像
+      platforms:
+        - linux/amd64   # 强制使用 x86_64 架构镜像
     image: jupyter/kpp-notebook
     volumes:
-      - ./work:/home/jovyan/work
+      - ../:/home/jovyan/work   # 将 KPP 根目录挂载到容器的 work 目录
     ports:
       - 8888:8888
     container_name: jupyter_notebook
