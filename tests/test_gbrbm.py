@@ -46,10 +46,10 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         self.bm.log_var.data = torch.log(
             torch.tensor([4.0, 1.0], dtype=torch.float64)
         )
-        self.bm.U.data = torch.tensor(
+        self.bm.quadratic_coef.data = torch.tensor(
             [[2.0, -1.0], [0.5, 1.0]], dtype=torch.float64
         )
-        self.bm.H.data = torch.tensor([0.25, -0.5], dtype=torch.float64)
+        self.bm.linear_bias.data = torch.tensor([0.25, -0.5], dtype=torch.float64)
 
     def test_constructor_matches_abstract_base(self):
         """GBRBM should initialize through the abstract base without dtype conflict."""
@@ -68,11 +68,60 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         s_bernoulli = s_all[:, 2:]
         expected = (
             0.5 * torch.sum((s_gaussian - self.bm.mu).square() / self.bm.var, dim=-1)
-            - torch.sum((s_gaussian / self.bm.var) @ self.bm.U * s_bernoulli, dim=-1)
-            - s_bernoulli @ self.bm.H
+            - torch.sum(
+                (s_gaussian / self.bm.var) @ self.bm.quadratic_coef * s_bernoulli,
+                dim=-1,
+            )
+            - s_bernoulli @ self.bm.linear_bias
         )
 
         torch.testing.assert_close(self.bm(s_all), expected)
+
+    def test_marginal_energy_matches_manual_formula(self):
+        """Marginal energy should sum out the Bernoulli side analytically."""
+        s_gaussian = torch.tensor([[3.0, 0.0], [1.0, -2.0]], dtype=torch.float64)
+        logits = (
+            (s_gaussian / self.bm.var) @ self.bm.quadratic_coef + self.bm.linear_bias
+        )
+        expected = (
+            0.5 * torch.sum((s_gaussian - self.bm.mu).square() / self.bm.var, dim=-1)
+            - torch.sum(torch.nn.functional.softplus(logits), dim=-1)
+        )
+
+        actual = self.bm.marginal_energy(s_gaussian)
+
+        self.assertFalse(actual.requires_grad)
+        torch.testing.assert_close(actual, expected)
+
+    def test_positive_phase_energy_expectation_matches_manual_formula(self):
+        """Positive phase should use Bernoulli probabilities from Gaussian data."""
+        s_gaussian = torch.tensor([[3.0, 0.0], [1.0, -2.0]], dtype=torch.float64)
+        prob_bernoulli = torch.sigmoid(
+            (s_gaussian / self.bm.var) @ self.bm.quadratic_coef + self.bm.linear_bias
+        )
+        expected = (
+            0.5 * torch.sum((s_gaussian - self.bm.mu).square() / self.bm.var, dim=-1)
+            - torch.sum(
+                (s_gaussian / self.bm.var) @ self.bm.quadratic_coef * prob_bernoulli,
+                dim=-1,
+            )
+            - prob_bernoulli @ self.bm.linear_bias
+        )
+
+        torch.testing.assert_close(
+            self.bm.positive_phase_energy_expectation(s_gaussian), expected
+        )
+
+    def test_positive_phase_can_disable_grad(self):
+        """Positive phase should honor the enable_grad option."""
+        s_gaussian = torch.tensor([[3.0, 0.0]], dtype=torch.float64)
+
+        actual = self.bm.positive_phase_energy_expectation(
+            s_gaussian,
+            enable_grad=False,
+        )
+
+        self.assertFalse(actual.requires_grad)
 
     def test_get_ising_matrix_returns_bernoulli_side_matrix(self):
         """Ising matrix should cover only Bernoulli nodes plus gauge spin."""
@@ -85,7 +134,10 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         """Gaussian-side inference should expose Bernoulli probabilities."""
         s_gaussian = torch.tensor([[3.0, 0.0]], dtype=torch.float64)
         s_all = self.bm.infer_from_gaussian(s_gaussian, binarize=False)
-        expected_prob = torch.sigmoid((s_gaussian / self.bm.var) @ self.bm.U + self.bm.H)
+        expected_prob = torch.sigmoid(
+            (s_gaussian / self.bm.var) @ self.bm.quadratic_coef
+            + self.bm.linear_bias
+        )
 
         torch.testing.assert_close(s_all[:, :2], s_gaussian)
         torch.testing.assert_close(s_all[:, 2:], expected_prob)
@@ -94,7 +146,7 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         """Bernoulli-side deterministic inference should return Gaussian means."""
         s_bernoulli = torch.tensor([[1.0, 0.0], [1.0, 1.0]], dtype=torch.float64)
         s_all = self.bm.infer_from_bernoulli(s_bernoulli, no_random=True)
-        expected_gaussian = s_bernoulli @ self.bm.U.t() + self.bm.mu
+        expected_gaussian = s_bernoulli @ self.bm.quadratic_coef.t() + self.bm.mu
 
         torch.testing.assert_close(s_all[:, :2], expected_gaussian)
         torch.testing.assert_close(s_all[:, 2:], s_bernoulli)
@@ -129,6 +181,23 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertEqual(data_sample.shape, (4, 4))
         self.assertFalse(hasattr(self.bm, "conditional_gibbs_sample"))
         self.assertFalse(hasattr(self.bm, "cd_gibbs_sample"))
+
+    def test_constructor_supports_bernoulli_visible_layout(self):
+        """Non-Gaussian visible mode should still build Gaussian-first internals."""
+        bm = GaussianBernoulliRestrictedBoltzmannMachine(
+            num_visible=3,
+            num_hidden=2,
+            is_visible_gaussian=False,
+            dtype=torch.float64,
+            device=torch.device("cpu"),
+        )
+
+        self.assertEqual(bm.num_gaussian, 2)
+        self.assertEqual(bm.num_bernoulli, 3)
+        self.assertEqual(bm.num_nodes, 5)
+        self.assertEqual(bm.mu.shape, (2,))
+        self.assertEqual(bm.quadratic_coef.shape, (2, 3))
+        self.assertEqual(bm.linear_bias.shape, (3,))
 
 
 if __name__ == "__main__":
