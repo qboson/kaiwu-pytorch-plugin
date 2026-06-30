@@ -140,23 +140,18 @@ requirements/
    ```bash
    docker compose up
    ```
-The notebook will be available at http://localhost:8888 (no token required). Your local `./work` folder is mounted inside the container.
+The notebook will be available at http://localhost:8888 (no token required). The project root (the entire repository) is mounted inside the container at `/home/jovyan/work`, so you can directly access all source files, notebooks, and scripts.
 
-4. **(Optional) Clone the source code inside the container**  
-   After starting Jupyter, you can either open a terminal within the JupyterLab interface (click the "Terminal" icon in the left sidebar) or use `docker exec` from your host command line.
+4. **Access the source code directly in the container**  
 
-   **Option 1: Inside the JupyterLab terminal**
+   After starting Jupyter, you can open a terminal within the JupyterLab interface (click the "Terminal" icon in the left sidebar).
+
    ```bash
    cd /home/jovyan/work
-   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+   # All project files are already here; edit, run, and version them directly.
    ```
 
-   **Option 2: From the host command line**
-   ```bash
-   docker exec -it jupyter_notebook bash -c "cd /home/jovyan/work && git clone https://github.com/qboson/kaiwu-pytorch-plugin.git"
-   ```
-
-   This will clone the plugin source code into your locally mounted `./work` directory, making it accessible directly from your notebooks.
+   This mounts your local repository into the container, so any changes you make locally will be reflected immediately inside Jupyter.
 
 5. **Stop the server**:
 Press `Ctrl+C`, then run:

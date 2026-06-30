@@ -151,23 +151,17 @@ requirements/
    ```bash
    docker compose up
    ```  
-   Notebook 将在 `http://localhost:8888` 可用（无需 token）。本地 `./work` 文件夹会被挂载到容器内。
+   Notebook 将在 `http://localhost:8888` 可用（无需 token）。本地的项目根目录（即整个仓库）会被挂载到容器内的 `/home/jovyan/work`，因此您可以直接访问所有源代码、Notebook 和脚本。
 
-4. **（可选）在容器内克隆插件源码**  
-   启动 Jupyter 后，您可以在 JupyterLab 界面中打开终端（点击左侧工具栏的“终端”图标），或直接在宿主机命令行中使用 `docker exec` 进入容器。
+4. **在容器内直接访问源码**  
+   启动 Jupyter 后，您可以在 JupyterLab 界面中打开终端（点击左侧工具栏的“终端”图标），并输入
 
-   **方式一：在 JupyterLab 终端中执行**
    ```bash
    cd /home/jovyan/work
-   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+   # 所有项目文件都在这里，可直接编辑、运行和版本管理。
    ```
 
-   **方式二：在宿主机命令行中执行**
-   ```bash
-   docker exec -it jupyter_notebook bash -c "cd /home/jovyan/work && git clone https://github.com/qboson/kaiwu-pytorch-plugin.git"
-   ```
-
-   执行后，插件源码将克隆到您本地挂载的 `./work` 目录中，您可以直接在 Notebook 中访问和使用。
+   仓库已挂载到容器中，本地所做的任何修改会立即在 Jupyter 中生效。
 
 5. **停止服务器**  
    按下 `Ctrl+C`，然后运行：  
