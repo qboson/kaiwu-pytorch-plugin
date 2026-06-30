@@ -41,6 +41,8 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         is_visible_gaussian: bool = True,
         eps=1e-8,
         dtype: torch.dtype = torch.float32,
+        linear_bias=None,
+        quadratic_coef=None,
         device=None,
     ):
         """Initialize the Restricted Gaussian-Bernoulli Boltzmann Machine."""
@@ -71,25 +73,36 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 torch.ones(self.num_gaussian, dtype=self.dtype, device=self.device)
             ),
         )
-        self.register_parameter(
-            "U",
-            nn.Parameter(
-                torch.zeros(
-                    self.num_gaussian,
-                    self.num_bernoulli,
-                    dtype=self.dtype,
-                    device=self.device,
-                )
-            ),
+        # self.register_parameter(
+        #     "U",
+        #     nn.Parameter(
+        #         torch.zeros(
+        #             self.num_gaussian,
+        #             self.num_bernoulli,
+        #             dtype=self.dtype,
+        #             device=self.device,
+        #         )
+        #     ),
+        # )
+        # self.register_parameter(
+        #     "H",
+        #     nn.Parameter(
+        #         torch.zeros(
+        #             self.num_bernoulli, dtype=self.dtype, device=self.device
+        #         )
+        #     ),
+        # )
+        self.quadratic_coef = torch.nn.Parameter(
+            quadratic_coef
+            if quadratic_coef is not None
+            else torch.randn((self.num_gaussian, self.num_bernoulli)).to(self.device) * 0.01
         )
-        self.register_parameter(
-            "H",
-            nn.Parameter(
-                torch.zeros(
-                    self.num_bernoulli, dtype=self.dtype, device=self.device
-                )
-            ),
+        self.linear_bias = torch.nn.Parameter(
+            linear_bias
+            if linear_bias is not None
+            else torch.zeros(self.num_bernoulli).to(self.device)
         )
+
 
         self.init_parameter(std=0.01, init_var=1)
 
@@ -127,10 +140,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         init.normal_(self.mu, 0, std)
         self.get_parameter("mu").data.clip_(-bound, bound)
         init.constant_(self.log_var, np.log(init_var))
-        init.normal_(self.U, 0, std)
-        self.get_parameter("U").data.clip_(-bound, bound)
-        init.normal_(self.H, 0, std)
-        self.get_parameter("H").data.clip_(-bound, bound)
+        init.normal_(self.quadratic_coef, 0, std)
+        self.quadratic_coef.data.clip_(-bound, bound)
+        init.normal_(self.linear_bias, 0, std)
+        self.linear_bias.data.clip_(-bound, bound)
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
@@ -164,9 +177,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 0.5
                 * torch.sum((s_gaussian - self.mu).square() / self.var, dim=-1)
                 - torch.sum(
-                    (s_gaussian / self.var) @ self.U * s_bernoulli, dim=-1
+                    (s_gaussian / self.var) @ self.quadratic_coef * s_bernoulli, dim=-1
                 )
-                - s_bernoulli @ self.H
+                - s_bernoulli @ self.linear_bias
             )
 
     def marginal_energy(
@@ -185,7 +198,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             return 0.5 * torch.sum(
                 (s_gaussian - self.mu).square() / self.var, dim=-1
             ) - torch.sum(
-                F.softplus((s_gaussian / self.var) @ self.U + self.H),
+                F.softplus((s_gaussian / self.var) @ self.quadratic_coef + self.linear_bias),
                 dim=-1,
             )
 
@@ -198,8 +211,8 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             numpy.ndarray: Ising matrix representation of the Bernoulli part.
         """
-        linear_term = self.U.t() @ (self.mu / self.var) + self.H
-        quadratic_term = self.U.t() @ self.diag_precision @ self.U
+        linear_term = self.quadratic_coef.t() @ (self.mu / self.var) + self.linear_bias
+        quadratic_term = self.quadratic_coef.t() @ self.diag_precision @ self.quadratic_coef
         column_sums = torch.sum(quadratic_term, dim=0)
         num_nodes = self.num_bernoulli
         ising_mat = torch.zeros(
@@ -236,7 +249,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 n_sample, self.num_nodes, device=self.device, dtype=self.dtype
             )
             s_all[:, : self.num_gaussian] = s_gaussian
-            prob = torch.sigmoid((s_gaussian / self.var) @ self.U + self.H)
+            prob = torch.sigmoid((s_gaussian / self.var) @ self.quadratic_coef + self.linear_bias)
             if not binarize:
                 s_all[:, self.num_gaussian :] = prob
             elif no_random:
@@ -269,7 +282,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 n_sample, self.num_nodes, device=self.device, dtype=self.dtype
             )
             s_all[:, self.num_gaussian :] = s_bernoulli
-            mu = s_bernoulli @ self.U.t() + self.mu
+            mu = s_bernoulli @ self.quadratic_coef.t() + self.mu
             if no_random:
                 s_all[:, : self.num_gaussian] = mu
             else:
@@ -392,8 +405,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                     (s_gaussian - self.mu).square() / self.var, dim=-1
                 )
                 - torch.sum(
-                    (s_gaussian / self.var) @ self.U * prob_bernoulli, dim=-1
+                    (s_gaussian / self.var) @ self.quadratic_coef * prob_bernoulli, dim=-1
                 )
-                - prob_bernoulli @ self.H
+                - prob_bernoulli @ self.linear_bias
             )
-
