@@ -89,6 +89,10 @@ flowchart TD
 
 ### 安装步骤
 
+你可以选择 **本地环境配置（conda/pip）** 或 **Docker 配置**（推荐用于可复现性和隔离环境）。
+
+#### 方式一：本地环境配置（conda/pip）
+
 1. **创建并激活环境**
 
    ```bash
@@ -116,6 +120,53 @@ flowchart TD
 
    ```bash
    pip install .
+   ```
+
+#### 方式二：Docker 配置（无需本地配适环境）
+
+Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有依赖（包括 Kaiwu SDK）均已安装。
+
+**所需项目结构**：
+```text
+requirements/
+├── docker-compose.yml
+├── requirements.txt               # 已包含 Kaiwu SDK
+├── kaiwu-1.3.1-py3-none-any.whl   # 或从 Qboson 平台下载
+└── docker/
+    └── Dockerfile
+```
+
+1. **克隆仓库**  
+   ```bash
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   cd kaiwu-pytorch-plugin/requirements
+   ```
+
+2. **构建 Docker 镜像**  
+   ```bash
+   docker compose build
+   ```
+
+3. **启动 Jupyter Notebook 服务器**  
+   ```bash
+   docker compose up
+   ```  
+   Notebook 将在 `http://localhost:8888` 可用（无需 token）。本地的项目根目录（即整个仓库）会被挂载到容器内的 `/home/jovyan/work`，因此您可以直接访问所有源代码、Notebook 和脚本。
+
+4. **在容器内直接访问源码**  
+   启动 Jupyter 后，您可以在 JupyterLab 界面中打开终端（点击左侧工具栏的“终端”图标），并输入
+
+   ```bash
+   cd /home/jovyan/work
+   # 所有项目文件都在这里，可直接编辑、运行和版本管理。
+   ```
+
+   仓库已挂载到容器中，本地所做的任何修改会立即在 Jupyter 中生效。
+
+5. **停止服务器**  
+   按下 `Ctrl+C`，然后运行：  
+   ```bash
+   docker compose down
    ```
 
 ### Kaiwu SDK 安装说明（必需）

@@ -85,7 +85,9 @@ The above image shows the project file structure:
 - Follows PEP 8 standards
 
 ### Installation Steps
+You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
 
+#### Option 1: Local Setup (conda/pip)
 1. **Create and activate an environment**:
    ```bash
    # It is recommended to use conda to create a new environment
@@ -108,6 +110,53 @@ The above image shows the project file structure:
 4. **Install the plugin**:
    ```bash
    pip install .
+   ```
+
+#### Option 2: Docker Setup (no local environment required)
+The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
+
+Project structure required:
+```text
+requirements/
+├── docker-compose.yml
+├── requirements.txt               # Kaiwu SDK included
+├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
+└── docker/
+    └── Dockerfile
+```
+
+1. **Clone the repository:**:
+   ```bash
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   cd kaiwu-pytorch-plugin/requirements
+   ```
+
+2. **Build the Docker image**:
+   ```bash
+   docker compose build
+   ```
+
+3. **Start the Jupyter notebook server**:
+   ```bash
+   docker compose up
+   ```
+The notebook will be available at http://localhost:8888 (no token required). The project root (the entire repository) is mounted inside the container at `/home/jovyan/work`, so you can directly access all source files, notebooks, and scripts.
+
+4. **Access the source code directly in the container**  
+
+   After starting Jupyter, you can open a terminal within the JupyterLab interface (click the "Terminal" icon in the left sidebar).
+
+   ```bash
+   cd /home/jovyan/work
+   # All project files are already here; edit, run, and version them directly.
+   ```
+
+   This mounts your local repository into the container, so any changes you make locally will be reflected immediately inside Jupyter.
+
+5. **Stop the server**:
+Press `Ctrl+C`, then run:
+   ```bash
+   docker compose down
    ```
 
 ### Kaiwu SDK Installation Instructions (Required)
