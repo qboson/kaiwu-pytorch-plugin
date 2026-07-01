@@ -30,7 +30,7 @@ def flatten_dataloader(dataloader):
 def main():
     parser = argparse.ArgumentParser(description="Train QVAE + MLP pipeline")
     # Model hyperparameters
-    parser.add_argument("--model-type", type=str, default="QVAE", choices=["QVAE", "CellQVAE"])
+    parser.add_argument("--model-type", type=str, default="MNISTQVAE", choices=["MNISTQVAE"])
     parser.add_argument("--num-latent-units", type=int, default=256)
     parser.add_argument("--dist-beta", type=float, default=10.0)
     parser.add_argument("--kl-beta", type=float, default=1e-6)

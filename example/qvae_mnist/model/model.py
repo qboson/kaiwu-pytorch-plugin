@@ -10,13 +10,14 @@ from torch import nn
 
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, BaseQVAE
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 
 from .networks import BasicEncoder, BasicDecoder
 
 
-class QVAE(BaseQVAE):
+class MNISTQVAE(QVAE):
     """
     Concrete QVAE implementation with BasicEncoder, BasicDecoder and RBM.
 
@@ -26,31 +27,24 @@ class QVAE(BaseQVAE):
         config (object): Configuration object (must contain encoder_hidden_nodes,
             decoder_hidden_nodes, etc.).
         sampler_type (str, optional): Sampler type ('sa' or 'cim').
-        n_batches (int, optional): Number of conditional batches. Default 0.
-        **kwargs: Additional kwargs passed to BaseQVAE.
     """
+
     def __init__(
         self,
         input_dimension,
         activation_fct,
         config,
-        # sampler_type="sa",
-        # n_batches=0,
-        **kwargs,
+        sampler_type="sa",
     ):
-        # 调用父类 __init__，父类会调用 create_networks()
-        # Optional parameters extracted from kwargs or using defaults
-        sampler_type = kwargs.pop('sampler_type', 'sa')
-        n_batches = kwargs.pop('n_batches', 0)
+        # QVAE 只保存通用状态，具体模型负责完成组件构建。
         super().__init__(
             input_dimension=input_dimension,
             activation_fct=activation_fct,
             config=config,
             sampler_type=sampler_type,
-            n_batches=n_batches,
-            **kwargs,
         )
-        self._model_type = "QVAE"
+        self._model_type = "MNISTQVAE"
+        self.create_networks()
 
     def _create_encoder(self):
         """
@@ -62,17 +56,16 @@ class QVAE(BaseQVAE):
         # 根据 config.encoder_hidden_nodes 构造节点序列
         enc_nodes = (
             [self._input_dimension]
-            + self._config.encoder_hidden_nodes
+            + self.config.encoder_hidden_nodes
             + [self._latent_dimensions]
         )
         node_pairs = [
-            (enc_nodes[i], enc_nodes[i+1])
-            for i in range(len(enc_nodes)-1)
+            (enc_nodes[i], enc_nodes[i + 1]) for i in range(len(enc_nodes) - 1)
         ]
         return BasicEncoder(
             node_sequence=node_pairs,
             activation_fct=self._activation_fct,
-            weight_decay=self.weight_decay   # 传递衰减系数
+            weight_decay=self.weight_decay,  # 传递衰减系数
         )
 
     def _create_decoder(self):
@@ -84,18 +77,17 @@ class QVAE(BaseQVAE):
         """
         dec_nodes = (
             [self._latent_dimensions]
-            + self._config.decoder_hidden_nodes
+            + self.config.decoder_hidden_nodes
             + [self._input_dimension]
         )
         node_pairs = [
-            (dec_nodes[i], dec_nodes[i+1])
-            for i in range(len(dec_nodes)-1)
+            (dec_nodes[i], dec_nodes[i + 1]) for i in range(len(dec_nodes) - 1)
         ]
         return BasicDecoder(
             node_sequence=node_pairs,
             activation_fct=self._activation_fct,
             output_activation_fct=nn.Identity(),
-            weight_decay=self.weight_decay
+            weight_decay=self.weight_decay,
         )  # 输出 logits
 
     def _create_bm(self):
@@ -109,7 +101,7 @@ class QVAE(BaseQVAE):
         n_hid = self._latent_dimensions - n_vis
         return RestrictedBoltzmannMachine(num_visible=n_vis, num_hidden=n_hid)
 
-    def _create_sampler(self, sampler_type='sa'):
+    def _create_sampler(self, sampler_type="sa"):
         """
         Create sampler based on type.
 
@@ -122,30 +114,44 @@ class QVAE(BaseQVAE):
         Raises:
             ValueError: If sampler_type is unknown.
         """
-        if sampler_type == 'cim':
-            kw.common.CheckpointManager.save_dir = './tmp'
+        if sampler_type == "cim":
+            kw.common.CheckpointManager.save_dir = "./tmp"
             sampler = CIMOptimizer(task_name="qvae_sampling", wait=True)
             sampler = PrecisionReducer(
                 sampler,
                 precision=8,
                 truncated_precision=10,
                 target_bits=550,
-                only_feasible_solution=False
+                only_feasible_solution=False,
             )
-        elif sampler_type == 'sa':
+        elif sampler_type == "sa":
             sampler = SimulatedAnnealingOptimizer(alpha=0.95)
         else:
             raise ValueError(f"Unsupported sampler type: {sampler_type}")
         return sampler
 
-    # def energy(self, x, loss_type):
-    #     """计算 BM 能量（用于评估）"""
-    #     x = x.view(-1, self._input_dimension)
-    #     if loss_type == 'bernoulli' self._dataset_mean is not None:
-    #         x_centered = x - self._dataset_mean
-    #     elifl oss_type == 'mse':
-    #         x_centered = x
-    #     else:
-    #         raise ValueError(f"Unsupported loss type: {loss_type}")
-    #     q = self.encoder(x_centered)
-    #     return self.bm((q > 0).float())
+    def energy(self, x, loss_type):
+        """Compute BM energy for MNIST samples in latent space.
+
+        Args:
+            x: Input tensor with shape ``(batch_size, input_dimension)``.
+            loss_type: Reconstruction loss type. Must match ``config.loss_type``.
+
+        Returns:
+            Energy values with shape ``(batch_size,)``.
+        """
+        if loss_type != self.config.loss_type:
+            raise ValueError("loss_type must match model.config.loss_type")
+
+        x = x.view(-1, self._input_dimension)
+        if loss_type == "bernoulli":
+            encoder_x = x
+            if self._dataset_mean is not None:
+                encoder_x = encoder_x - x.new_tensor(self._dataset_mean)
+        elif loss_type == "mse":
+            encoder_x = x
+        else:
+            raise ValueError(f"Unsupported loss type: {loss_type}")
+
+        q = self.encoder(encoder_x)
+        return self.bm((q > 0).float())

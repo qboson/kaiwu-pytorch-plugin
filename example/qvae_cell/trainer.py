@@ -1,5 +1,6 @@
 import os
 import random
+from types import SimpleNamespace
 
 import kaiwu as kw
 import numpy as np
@@ -9,7 +10,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 from kaiwu.torch_plugin import BoltzmannMachine
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder
@@ -142,16 +144,26 @@ class Trainer:
             input_dim,
             self.args.normalization_method,
         )
+        config = SimpleNamespace(
+            num_latent_units=self.args.latent_dim,
+            loss_type=self.args.loss_type,
+            dist_beta=self.args.dist_beta,
+            kl_beta=self.args.kl_beta,
+            weight_decay=0.0,
+        )
         model = CellQVAE(
+            input_dimension=input_dim,
+            activation_fct=torch.nn.ReLU(),
+            config=config,
             encoder=encoder,
             decoder=decoder,
             bm=BoltzmannMachine(self.args.latent_dim, device=self.device),
             sampler=self.create_sampler(),
-            dist_beta=self.args.dist_beta,
-            mean_x=self.compute_mean_x(train_loader),
-            num_vis=self.args.num_visible,
             n_batches=self.n_batches,
         ).to(self.device)
+        mean_x = self.compute_mean_x(train_loader)
+        model.set_dataset_mean(mean_x)
+        model.set_train_bias(mean_x)
         # VAE 部分和 BM 部分分开优化，便于使用不同学习率和更新目标。
         vae_optimizer = torch.optim.Adam(
             list(model.encoder.parameters()) + list(model.decoder.parameters()),
@@ -173,9 +185,8 @@ class Trainer:
 
             with torch.set_grad_enabled(train):
                 # 第一阶段：更新 encoder/decoder，使重构项和 KL 项组成的 ELBO 更优。
-                loss, kl, recon_loss, q = model.cell_loss(
-                    x, batch_idx, self.args.loss_type, self.args.kl_beta
-                )
+                output, posterior, q, _ = model(x, batch_idx)
+                loss = model.loss(x, output, posterior)
                 if train:
                     loss.backward()
                     vae_optimizer.step()
@@ -184,15 +195,15 @@ class Trainer:
             if train:
                 # 第二阶段：固定 encoder 输出 q，单独用 BM 目标更新玻尔兹曼机参数。
                 bm_optimizer.zero_grad()
-                bm_loss = model.bm_phase_loss(q, self.args.bm_weight_decay)
+                bm_loss = model.bm_loss(q, self.args.bm_weight_decay)
                 bm_loss.backward()
                 bm_optimizer.step()
                 bm_loss_value = bm_loss.item()
 
             totals["loss"] += loss.item()
             totals["neg_elbo"] += loss.item()
-            totals["kl"] += kl.item()
-            totals["recon_loss"] += recon_loss.item()
+            totals["kl"] += model.last_kl_loss.item()
+            totals["recon_loss"] += model.last_recon_loss.item()
             totals["bm_loss"] += bm_loss_value
 
         return {key: value / len(loader) for key, value in totals.items()}
@@ -269,8 +280,10 @@ class Trainer:
         model.eval()
         reps = []
         with torch.no_grad():
-            for x, _ in eval_loader:
-                q, _, zeta = model.encode_for_loss(x.to(self.device), self.args.loss_type)
+            for x, batch_idx in eval_loader:
+                _, _, q, zeta = model(
+                    x.to(self.device), batch_idx.to(self.device)
+                )
                 # q 是 encoder logits，zeta 是后验采样/松弛后的潜变量表示。
                 rep = q if self.args.representation == "q" else zeta
                 reps.append(rep.cpu().numpy())

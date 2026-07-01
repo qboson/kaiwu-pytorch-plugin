@@ -110,7 +110,7 @@ class ModelTuner(object):
 			else:
 				self._optimiser.zero_grad()
 
-			if self._config.type == 'QVAE':
+			if self._config.type == 'MNISTQVAE':
 				# 注意：forward 返回: output_logits, posterior_dist, q_logits, zeta
 				output_logits, posterior, q, zeta = self._model(inputData)
 				# 直接使用 forward 返回的 logits 和 posterior 计算损失
@@ -128,7 +128,7 @@ class ModelTuner(object):
 				self._optimiser.step()
 			
 			# 第二阶段：更新 BM 参数（仅在两阶段模式下）
-			if self._use_two_optimisers and (self._config.type in ['QVAE', 'CellQVAE']):
+			if self._use_two_optimisers and self._config.type == 'MNISTQVAE':
 				self._bm_optimiser.zero_grad()
 				# 使用提取的 q 计算 BM 损失（注意 q 应已 detach，但为安全再次 detach）
 				bm_loss = self._model.bm_loss(q.detach(), getattr(self._config, 'weight_decay', 0.0))
@@ -158,7 +158,7 @@ class ModelTuner(object):
 
 		with torch.no_grad():
 			for batch_idx, (inputData, label) in enumerate(self.test_loader):
-				if self._config.type == 'QVAE':
+				if self._config.type == 'MNISTQVAE':
 					# forward 返回: output_logits, posterior, q, zeta
 					output_logits, posterior, q, zeta = self._model(inputData)
 					test_loss += self._model.loss(inputData, output_logits, posterior)

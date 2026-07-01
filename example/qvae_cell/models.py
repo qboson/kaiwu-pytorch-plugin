@@ -2,11 +2,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from kaiwu.torch_plugin import QVAE
-from kaiwu.torch_plugin.qvae_dist_util import FactorialBernoulliUtil
 
 
 class QVAEEncoder(nn.Module):
-    """单细胞表达矩阵到 QVAE 潜变量 logits 的编码器。"""
+    """将单细胞表达矩阵编码为 QVAE 潜变量 logits。
+
+    Args:
+        input_dim: 输入基因特征数。
+        hidden_dim: 隐藏层维度。
+        latent_dim: 潜变量维度。
+        normalization_method: 归一化方式，可选 ``layer`` 或 ``batch``。
+    """
 
     def __init__(self, input_dim, hidden_dim, latent_dim, normalization_method="layer"):
         super().__init__()
@@ -22,6 +28,14 @@ class QVAEEncoder(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, latent_dim)
 
     def forward(self, x):
+        """执行编码器前向传播。
+
+        Args:
+            x: 形状为 ``(batch_size, input_dim)`` 的表达矩阵。
+
+        Returns:
+            形状为 ``(batch_size, latent_dim)`` 的潜变量 logits。
+        """
         h = self.fc1(x)
         h = self.norm(h)
         h = F.relu(h)
@@ -31,7 +45,14 @@ class QVAEEncoder(nn.Module):
 
 
 class QVAEDecoder(nn.Module):
-    """从 QVAE 潜变量重构输入表达矩阵的解码器。"""
+    """从 QVAE 潜变量重构单细胞表达矩阵。
+
+    Args:
+        latent_dim: 解码器输入维度，包含潜变量和可选 batch one-hot。
+        hidden_dim: 隐藏层维度。
+        output_dim: 输出基因特征数。
+        normalization_method: 归一化方式，可选 ``layer`` 或 ``batch``。
+    """
 
     def __init__(
         self, latent_dim, hidden_dim, output_dim, normalization_method="layer"
@@ -48,6 +69,14 @@ class QVAEDecoder(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, zeta):
+        """执行解码器前向传播。
+
+        Args:
+            zeta: 潜变量及可选 batch 条件组成的输入张量。
+
+        Returns:
+            重构表达值或 Bernoulli logits。
+        """
         h = self.fc1(zeta)
         h = self.norm(h)
         h = F.relu(h)
@@ -57,13 +86,58 @@ class QVAEDecoder(nn.Module):
 
 
 class CellQVAE(QVAE):
-    """面向单细胞数据的 QVAE 封装，额外支持 batch 条件输入和两类重构损失。"""
+    """面向单细胞数据并支持 batch 条件解码的 QVAE。
 
-    def __init__(self, *args, n_batches=0, **kwargs):
-        super().__init__(*args, **kwargs)
+    Args:
+        input_dimension: 输入基因特征数。
+        activation_fct: 网络使用的激活函数。
+        config: QVAE 配置，包含潜变量维度、损失类型和损失权重。
+        encoder: 单细胞编码器。
+        decoder: 单细胞解码器。
+        bm: 玻尔兹曼机先验。
+        sampler: BM 负相采样器。
+        sampler_type: 采样器类型标识。
+        n_batches: 数据批次数；大于 0 时向解码器追加 batch one-hot。
+    """
+
+    def __init__(
+        self,
+        input_dimension,
+        activation_fct,
+        config,
+        encoder=None,
+        decoder=None,
+        bm=None,
+        sampler=None,
+        sampler_type="sa",
+        n_batches=0,
+    ):
+        super().__init__(
+            input_dimension=input_dimension,
+            activation_fct=activation_fct,
+            config=config,
+            encoder=encoder,
+            decoder=decoder,
+            bm=bm,
+            sampler=sampler,
+            sampler_type=sampler_type,
+        )
         self.n_batches = n_batches
+        self._model_type = "CellQVAE"
 
     def _decoder_input(self, zeta, batch_idx=None):
+        """构造包含 batch 条件的解码器输入。
+
+        Args:
+            zeta: QVAE 潜变量。
+            batch_idx: 每个样本的 batch 整数索引。
+
+        Returns:
+            原始潜变量，或拼接 batch one-hot 后的张量。
+
+        Raises:
+            ValueError: 配置了 batch 条件但没有传入 ``batch_idx``。
+        """
         # 若存在 batch 信息，把 one-hot batch 拼到潜变量后面，帮助 decoder 消化批次差异。
         if self.n_batches <= 0:
             return zeta
@@ -74,52 +148,66 @@ class CellQVAE(QVAE):
         )
         return torch.cat([zeta, batch_one_hot], dim=-1)
 
-    def encode_for_loss(self, x, loss_type):
-        # Bernoulli 重构使用训练集均值偏置做中心化；MSE 直接拟合原始连续表达值。
-        encoder_x = x if loss_type == "mse" else x - self.train_bias
+    def _encode(self, x):
+        """按照配置的重构损失编码输入。
+
+        Args:
+            x: 单细胞表达矩阵。
+
+        Returns:
+            ``(q, posterior, zeta)``，分别为编码器 logits、后验分布和潜变量样本。
+
+        Raises:
+            ValueError: 配置了不支持的损失类型。
+        """
+        x = x.view(-1, self._input_dimension)
+        if self.config.loss_type == "mse":
+            encoder_x = x
+        elif self.config.loss_type == "bernoulli":
+            encoder_x = x
+            if self._dataset_mean is not None:
+                encoder_x = encoder_x - torch.as_tensor(
+                    self._dataset_mean,
+                    dtype=x.dtype,
+                    device=x.device,
+                )
+        else:
+            raise ValueError(f"Unsupported loss type: {self.config.loss_type}")
         q = self.encoder(encoder_x)
-        posterior, zeta = self.posterior(q, self.dist_beta)
+        posterior, zeta = self.posterior(q, self.config.dist_beta)
         return q, posterior, zeta
 
-    def mse_elbo(self, x, batch_idx, kl_beta):
-        # MSE 版本的 ELBO：连续重构误差 + 加权 KL 正则。
-        q, posterior, zeta = self.encode_for_loss(x, "mse")
+    def forward(self, x, batch_idx=None):
+        """执行带可选 batch 条件的 QVAE 前向传播。
+
+        Args:
+            x: 单细胞表达矩阵。
+            batch_idx: 每个样本的 batch 整数索引。
+
+        Returns:
+            ``(recon_x, posterior, q, zeta)``，分别为重构结果、后验分布、
+            编码器 logits 和潜变量样本。
+        """
+        q, posterior, zeta = self._encode(x)
         recon_x = self.decoder(self._decoder_input(zeta, batch_idx))
-        recon_loss = F.mse_loss(recon_x, x, reduction="sum") / x.size(0)
-        kl = self._kl_dist_from(posterior).mean()
-        return recon_loss + kl_beta * kl, kl, recon_loss, q
-
-    def bernoulli_elbo(self, x, batch_idx, kl_beta):
-        # encoder_x = x - self.train_bias
-        # Bernoulli 版本适合已归一化到 [0, 1] 的输入，decoder 输出作为 Bernoulli logits。
-        q, posterior, zeta = self.encode_for_loss(x, "bernoulli")
-        recon_x = self.decoder(self._decoder_input(zeta, batch_idx)) + self.train_bias
-        output_dist = FactorialBernoulliUtil(recon_x)
-        kl = self._kl_dist_from(posterior).mean()
-        recon_loss = -output_dist.log_prob_per_var(x).sum(dim=1).mean()
-        return recon_loss + kl_beta * kl, kl, recon_loss, q
-
-    def cell_loss(self, x, batch_idx, loss_type, kl_beta):
-        # 统一训练入口，方便 Trainer 不关心具体重构分布。
-        if loss_type == "mse":
-            return self.mse_elbo(x, batch_idx, kl_beta)
-        return self.bernoulli_elbo(x, batch_idx, kl_beta)
-
-    def bm_phase_loss(self, q, bm_weight_decay=0.0):
-        # BM 阶段用 encoder 的 q 构造正样本，再和采样器得到的负样本做能量目标。
-        positive_state = (q.detach() > 0).float()
-        loss = self.bm.objective(positive_state, self.bm.sample(self.sampler))
-        # 使用 sigmoid(q) 的软状态作为正相，可减少硬阈值带来的不稳定。
-        loss = self.bm.objective(
-            torch.sigmoid(q.detach()), self.bm.sample(self.sampler)
-        )
-        if bm_weight_decay > 0:
-            loss = loss + bm_weight_decay * (
-                torch.sum(self.bm.quadratic_coef**2) + torch.sum(self.bm.linear_bias**2)
-            )
-        return loss
+        if self.config.loss_type == "bernoulli":
+            recon_x = recon_x + self._train_bias
+        return recon_x, posterior, q, zeta
 
     def energy(self, x, loss_type):
-        # 评估阶段把样本映射到离散 latent 状态，并返回 BM 能量用于可视化/分析。
-        q, _, _ = self.encode_for_loss(x, loss_type)
+        """计算单细胞样本在 BM 潜空间中的能量。
+
+        Args:
+            x: 单细胞表达矩阵。
+            loss_type: 损失类型，必须与模型配置一致。
+
+        Returns:
+            每个样本对应的 BM 能量。
+
+        Raises:
+            ValueError: ``loss_type`` 与模型配置不一致。
+        """
+        if loss_type != self.config.loss_type:
+            raise ValueError("loss_type must match model.config.loss_type")
+        q, _, _ = self._encode(x)
         return self.bm((q > 0).float())

@@ -1,8 +1,8 @@
 #!/bin/bash
-# Example script to run run_pipeline.py with arguments
+# Example script to run run_pipeline.py with arguments.
 
-python run_pipeline.py \
-  --model-type QVAE \
+python ./run_pipeline.py \
+  --model-type MNISTQVAE \
   --name mnist \
   --data-path ./data \
   --batch-size 256 \
@@ -17,6 +17,8 @@ python run_pipeline.py \
   --mlp-lr 8e-5 \
   --mlp-epochs 100 \
   --compute_energy
-  # --run-tsne \
-  # --output-dir ./outputs_30ep_sa_mse_split_q_rbm8e-4 \
-  # --use-cuda
+
+# Optional arguments:
+#   --run-tsne
+#   --output-dir ./outputs_30ep_sa_mse_split_q_rbm8e-4
+#   --use-cuda
