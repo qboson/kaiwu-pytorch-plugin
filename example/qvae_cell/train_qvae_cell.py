@@ -22,7 +22,7 @@ DATASET_PARAMS = {
         "dataset_name": "immune",
         "batch_key": "batch",
         "labels_key": "final_annotation",
-        "file_path": "/Users/chang137/GitHub/kaiwu-pytorch-plugin/example/qvae_cell/immune_processed.h5ad",
+        "file_path": "./immune_processed.h5ad",
     }
 }
 
