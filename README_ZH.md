@@ -322,5 +322,5 @@ python example/qdiffusion/dplm/train_workflow.py
 3. 邮箱联系方式：developer@boseq.com
 
  ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  
- ![communication group](https://github.com/user-attachments/assets/1931f657-572f-4f10-9e13-9cfdd3af0de9)
+ ![communication group](https://github.com/user-attachments/assets/bba37a66-777e-4b83-8535-e656119b0c78)
 
