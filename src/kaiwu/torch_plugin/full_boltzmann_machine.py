@@ -4,6 +4,7 @@
 import numpy as np
 import torch
 
+from kaiwu.torch_plugin.usage_stats import kpp_caller_context
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
@@ -210,7 +211,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
-            solution = sampler.solve(ising_mat)
+
+            with kpp_caller_context():
+                solution = sampler.solve(ising_mat)
+
             solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
             solution = torch.tensor(solution, dtype=dtype, device=self.device)
             solution = torch.cat(
@@ -218,5 +222,6 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 dim=-1,
             )
             solutions.append(solution)
+
         solutions = torch.cat(solutions, dim=0)
         return solutions

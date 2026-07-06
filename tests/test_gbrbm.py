@@ -10,7 +10,9 @@ sys.path.insert(0, src_root)
 
 import kaiwu
 
-kaiwu.__path__.insert(0, os.path.join(src_root, "kaiwu"))
+# Extend namespace package __path__ so that local src is preferred
+kaiwu.__path__ = list(kaiwu.__path__) + [os.path.join(src_root, "kaiwu")]
+
 for module_name in list(sys.modules):
     if module_name == "kaiwu.torch_plugin" or module_name.startswith(
         "kaiwu.torch_plugin."
