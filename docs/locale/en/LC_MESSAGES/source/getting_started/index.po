@@ -4,7 +4,6 @@
 # Plugin package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"

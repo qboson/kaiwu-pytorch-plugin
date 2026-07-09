@@ -1,0 +1,413 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 21:27+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-recap.md:10
+msgid "Part I Summary: The Core Bottleneck and the Path Forward"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:12
+msgid ""
+"The prerequisite knowledge established in **Part I** forms the conceptual"
+" backbone for understanding Boltzmann machines:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:13
+msgid ""
+"**Statistical Physics** provided the Boltzmann distribution, linking low "
+"energy to high probability, and introduced the energy landscape metaphor."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:14
+msgid ""
+"**Neural network fundamentals** supplied the architectural building "
+"blocks (units, biases, weights) and the biological inspiration (Hebbian "
+"learning)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:15
+msgid ""
+"**Energy-Based Models** formalized the learning objective: shape the "
+"energy function so that real data occupies deep valleys. The gradient "
+"involves an expectation under the model distribution, which is "
+"intractable to compute exactly due to the partition function sum over "
+"exponentially many configurations."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:16
+msgid ""
+"**Boltzmann Machine Architecture** evolved from the computationally "
+"prohibitive full Boltzmann Machine to the Restricted Boltzmann Machine "
+"(RBM), which serves as the critical building block for stacking deep "
+"generative architectures."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:18
+msgid "The Core Tension: Expressiveness vs. Sampling Tractability"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:19
+msgid ""
+"Despite architectural simplifications, all Boltzmann machines share a "
+"fundamental bottleneck: **sampling from high‑dimensional Boltzmann "
+"distributions is hard**. Classical Markov Chain Monte Carlo (MCMC) "
+"methods, such as Gibbs sampling, suffer from:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:21
+msgid ""
+"**Slow mixing** at low temperatures, where energy barriers trap the chain"
+" in isolated modes."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:22
+msgid ""
+"**Mode collapse** in short‑run approximations like Contrastive Divergence"
+" (CD)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:23
+msgid ""
+"**Bias** that accumulates when persistent chains fail to fully "
+"equilibrate."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:25
+msgid ""
+"This is not merely a software optimisation problem; it is a **physical "
+"phenomenon** deeply rooted in statistical mechanics. Near a critical "
+"point, correlation lengths diverge, causing the Markov chain to mix "
+"extremely slowly (critical slowing down). The same physics that makes it "
+"hard to simulate a critical Ising model also makes it hard to sample from"
+" a well-trained Boltzmann machine that has learned a rich, multimodal "
+"data distribution."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:27
+msgid ""
+"These sampling limitations cap the practical expressiveness of "
+"energy‑based models and motivate the search for fundamentally different "
+"sampling strategies."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:29
+msgid "A Principled Classical Alternative: Simulated Annealing"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:31
+msgid ""
+"**Simulated annealing (SA)** is a classical metaheuristic that can be "
+"used to sample from Ising Hamiltonians. Instead of relying on a single "
+"Markov chain, SA mimics the physical annealing process:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:33
+msgid ""
+"Start at a high temperature, allowing the system to explore the energy "
+"landscape freely."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:34
+msgid "Gradually lower the temperature according to a cooling schedule."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:35
+msgid ""
+"At each temperature, perform Metropolis updates to move toward low-energy"
+" configurations."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:37
+msgid ""
+"When the system is cooled sufficiently slowly, the final distribution of "
+"states approximates the Boltzmann distribution at the effective "
+"temperature. SA is a powerful baseline for sampling in Boltzmann machines"
+" and is implemented in the `Kaiwu-PyTorch-Plugin` as the "
+"`SimulatedAnnealingOptimizer`. It requires no specialized hardware and "
+"can be run entirely on CPU."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:39
+msgid ""
+"However, SA still relies on **thermal activation** to escape local "
+"minima, which becomes exponentially slow for high energy barriers (the "
+"critical slowing down phenomenon). This limitation opens the door to more"
+" advanced methods, including quantum sampling."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:41
+msgid "Beyond Classical Sampling: Quantum Sampling"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:43
+msgid ""
+"**Quantum sampling** offers a physically grounded alternative that can "
+"overcome the limitations of classical MCMC and simulated annealing. "
+"Instead of simulating a Markov chain, one can encode the energy function "
+"as an Ising Hamiltonian and let a quantum physical system evolve toward "
+"its low‑energy states. Devices such as **quantum annealers**, i.e. "
+"Coherent Ising Machines (CIMs), realize this principle in hardware."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:45
+msgid ""
+"The full details of quantum sampling, including its physical "
+"implementation, integration with PyTorch, and practical performance "
+"benefits, are **covered in the hands‑on tutorials of Part II**. You will "
+"learn how to replace the classical `SimulatedAnnealingOptimizer` with a "
+"quantum sampler (e.g., `CIMOptimizer`) and observe the potential speed‑up"
+" and improved sample quality."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:47
+msgid "Part II Preview: Quantum‑Enhanced Hands‑on Tutorials"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:48
+msgid ""
+"Part II [KPP Hands-on Tutorials](../getting_started/tutorials/index.md) shifts from "
+"theory to practice. you will use the **Kaiwu-PyTorch-Plugin** to replace "
+"classical sampling (Gibbs, CD, and simulated annealing) with "
+"quantum‑enhanced sampling. The plugin abstracts away the hardware "
+"details, allowing you to switch between classical and quantum samplers "
+"with minimal code changes."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:50
+msgid "Moreover, four sophisticated tasks will be covered:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:52
+msgid ""
+"**Quantum Sampling for EBMs:** Understand the annealing principle and "
+"integrate quantum samplers into PyTorch."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:53
+msgid ""
+"**Full Boltzmann Machine:** Model a 2D mixture distribution and observe "
+"quantum speed‑up."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:54
+msgid ""
+"**RBMs and DBNs:** Learn hierarchical features from MNIST digits; compare"
+" quantum‑accelerated training against classical CD."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:55
+msgid ""
+"**Quantum Variational Autoencoder (Q‑VAE):** Replace the Gaussian prior "
+"of a VAE with a discrete quantum RBM and apply it to image generation and"
+" single‑cell transcriptomics."
+msgstr ""
+
+#: ../../source/theoretical-foundations-recap.md:57
+msgid ""
+"Each tutorial is self‑contained in a Jupyter notebook that you can run, "
+"modify, and extend. By the end of Part II, you will have experienced "
+"first‑hand how quantum sampling alleviates the classical mixing "
+"bottleneck and enables more expressive generative models."
+msgstr ""
+
+#~ msgid ""
+#~ "The prerequisite knowledge established in "
+#~ "<b>Part I</b> forms the conceptual "
+#~ "backbone for understanding Boltzmann machines:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Statistical Physics </b>provided the "
+#~ "Boltzmann distribution, linking low energy "
+#~ "to high probability, and introduced the"
+#~ " energy landscape metaphor."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Neural network fundamentals</b> supplied "
+#~ "the architectural building blocks (units, "
+#~ "biases, weights) and the biological "
+#~ "inspiration (Hebbian learning)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Energy-Based Models</b> formalized the "
+#~ "learning objective: shape the energy "
+#~ "function so that real data occupies "
+#~ "deep valleys. The gradient involves an"
+#~ " expectation under the model distribution,"
+#~ " which is intractable to compute "
+#~ "exactly due to the partition function"
+#~ " sum over exponentially many "
+#~ "configurations."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Boltzmann Machine Architecture </b>evolved  "
+#~ "from the computationally prohibitive full "
+#~ "Boltzmann Machine to the Restricted "
+#~ "Boltzmann Machine (RBM), which serves as"
+#~ " the critical building block for "
+#~ "stacking deep generative architectures."
+#~ msgstr ""
+
+#~ msgid "<b>The Core Tension: Expressiveness vs. Sampling Tractability</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Despite architectural simplifications, all "
+#~ "Boltzmann machines share a fundamental "
+#~ "bottleneck: <b>sampling from high‑dimensional "
+#~ "Boltzmann distributions is hard</b>. Classical"
+#~ " Markov Chain Monte Carlo (MCMC) "
+#~ "methods, such as Gibbs sampling, suffer"
+#~ " from:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Slow mixing</b> at low temperatures, "
+#~ "where energy barriers trap the chain "
+#~ "in isolated modes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Mode collapse</b> in short‑run "
+#~ "approximations like Contrastive Divergence "
+#~ "(CD)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Bias</b> that accumulates when persistent"
+#~ " chains fail to fully equilibrate."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This is not merely a software "
+#~ "optimisation problem; it is a "
+#~ "<b>physical phenomenon</b> deeply rooted in"
+#~ " statistical mechanics. Near a critical "
+#~ "point, correlation lengths diverge, causing"
+#~ " the Markov chain to mix extremely"
+#~ " slowly (critical slowing down). The "
+#~ "same physics that makes it hard to"
+#~ " simulate a critical Ising model also"
+#~ " makes it hard to sample from a"
+#~ " well-trained Boltzmann machine that "
+#~ "has learned a rich, multimodal data "
+#~ "distribution."
+#~ msgstr ""
+
+#~ msgid "<b>A Principled Classical Alternative: Simulated Annealing</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Simulated annealing (SA)</b> is a "
+#~ "classical metaheuristic that can be used"
+#~ " to sample from Ising Hamiltonians. "
+#~ "Instead of relying on a single "
+#~ "Markov chain, SA mimics the physical "
+#~ "annealing process:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "However, SA still relies on <b>thermal"
+#~ " activation</b> to escape local minima, "
+#~ "which becomes exponentially slow for "
+#~ "high energy barriers (the critical "
+#~ "slowing down phenomenon). This limitation "
+#~ "opens the door to more advanced "
+#~ "methods, including quantum sampling."
+#~ msgstr ""
+
+#~ msgid "<b>Beyond Classical Sampling: Quantum Sampling </b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Quantum sampling</b> offers a physically"
+#~ " grounded alternative that can overcome "
+#~ "the limitations of classical MCMC and"
+#~ " simulated annealing. Instead of simulating"
+#~ " a Markov chain, one can encode "
+#~ "the energy function as an Ising "
+#~ "Hamiltonian and let a quantum physical"
+#~ " system evolve toward its low‑energy "
+#~ "states. Devices such as <b>quantum "
+#~ "annealers</b>,<b> </b>i.e. Coherent Ising "
+#~ "Machines (CIMs), realize this principle "
+#~ "in hardware."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The full details of quantum sampling,"
+#~ " including its physical implementation, "
+#~ "integration with PyTorch, and practical "
+#~ "performance benefits, are <b>covered in "
+#~ "the hands‑on tutorials of Part II</b>."
+#~ " You will learn how to replace "
+#~ "the classical `SimulatedAnnealingOptimizer` with "
+#~ "a quantum sampler (e.g., `CIMOptimizer`) "
+#~ "and observe the potential speed‑up and"
+#~ " improved sample quality."
+#~ msgstr ""
+
+#~ msgid "<b>Part II Preview: Quantum‑Enhanced Hands‑on Tutorials</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Part II [KPP Hands-on Tutorials"
+#~ "](../getting_started/tutorials/index.md) shifts from "
+#~ "theory to practice. you will use "
+#~ "the <b>Kaiwu-PyTorch-Plugin</b> to "
+#~ "replace classical sampling (Gibbs, CD, "
+#~ "and simulated annealing) with quantum‑enhanced"
+#~ " sampling. The plugin abstracts away "
+#~ "the hardware details, allowing you to"
+#~ " switch between classical and quantum "
+#~ "samplers with minimal code changes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Quantum Sampling for EBMs:</b> Understand"
+#~ " the annealing principle and integrate "
+#~ "quantum samplers into PyTorch."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Full Boltzmann Machine:</b> Model a "
+#~ "2D mixture distribution and observe "
+#~ "quantum speed‑up."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>RBMs and DBNs: </b>Learn hierarchical "
+#~ "features from MNIST digits; compare "
+#~ "quantum‑accelerated training against classical "
+#~ "CD."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Quantum Variational Autoencoder (Q‑VAE):</b> "
+#~ "Replace the Gaussian prior of a "
+#~ "VAE with a discrete quantum RBM "
+#~ "and apply it to image generation "
+#~ "and single‑cell transcriptomics."
+#~ msgstr ""
+

@@ -1,0 +1,491 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-stat-noise.md:10
+msgid "1.3 The Need for Noise: Escaping Spurious Minima"
+msgstr "1.3 为什么需要噪声：逃离伪极小值"
+
+#: ../../source/theoretical-foundations-stat-noise.md:12
+msgid ""
+"The Boltzmann distribution provides a probabilistic description of "
+"equilibrium, but it does not, by itself, explain *why* we must introduce "
+"stochasticity into neural dynamics. To appreciate the essential role of "
+"noise, we must first examine its absence: the deterministic Hopfield "
+"network and its notorious tendency to become trapped in **spurious "
+"minima**."
+msgstr ""
+"玻尔兹曼分布提供了对平衡态的概率描述，但它本身并没有解释为什么必须在神经动力学中引入随机性。要理解噪声的关键作用，我们需要先考察没有噪声时的情形：确定性的"
+" Hopfield 网络，以及它众所周知的陷入 **伪极小值** 的倾向。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:14
+msgid "The Hopfield Network: Deterministic Descent"
+msgstr "Hopfield 网络：确定性下降"
+
+#: ../../source/theoretical-foundations-stat-noise.md:15
+#, python-brace-format
+msgid ""
+"A Hopfield network is a recurrent neural network with symmetric weights "
+"$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves"
+" via asynchronous updates: at each time step, a single unit $i$is "
+"selected and its new state is determined by the sign of its total input:"
+msgstr ""
+"Hopfield 网络是一类具有对称权重 $w_{ij} = w_{ji}$ 且无自连接 $w_{ii} = 0$ "
+"的循环神经网络。其状态通过异步更新演化：每个时间步选择一个单元 $i$，并由其总输入的符号决定新状态："
+
+#: ../../source/theoretical-foundations-stat-noise.md:17
+#, python-brace-format
+msgid ""
+"x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i "
+"\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:19
+msgid ""
+"This update rule has a crucial property: it never increases the energy of"
+" the network. To see this, consider the change in energy when unit $i$ "
+"flips from $x_i$ to $x_i'$:"
+msgstr "该更新规则具有一个关键性质：它永远不会增加网络能量。为了看到这一点，考虑单元 $i$ 从 $x_i$ 翻转到 $x_i'$ 时的能量变化："
+
+#: ../../source/theoretical-foundations-stat-noise.md:21
+#, python-brace-format
+msgid ""
+"\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = -(x_i' - x_i)\\left( "
+"\\sum_{j \\neq i} w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:23
+msgid ""
+"If the sign of the input matches the new state, the energy decreases; if "
+"it matches the old state, the energy remains unchanged. The dynamics "
+"therefore implements a strict **gradient descent** on the energy "
+"landscape: the network state slides inexorably downhill toward the "
+"nearest local minimum, where it remains indefinitely."
+msgstr ""
+"如果输入符号与新状态一致，能量会下降；如果与旧状态一致，能量保持不变。因此，该动力学在能量景观上实现了严格的 "
+"**梯度下降**：网络状态不可逆地向最近的局部极小值滑落，并会无限期停留在那里。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:25
+msgid "Memories as Energy Minima"
+msgstr "作为能量极小值的记忆"
+
+#: ../../source/theoretical-foundations-stat-noise.md:26
+msgid ""
+"The Hopfield network was originally proposed as a model of **associative "
+"memory**. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
+"\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian"
+" learning rule:"
+msgstr ""
+"Hopfield 网络最初被提出作为 **联想记忆** 模型。通过 Hebbian 学习规则存储一组模式 "
+"$\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
+"\\boldsymbol{\\xi}^P\\}$："
+
+#: ../../source/theoretical-foundations-stat-noise.md:28
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:30
+msgid ""
+"each stored pattern becomes a local minimum of the energy function. When "
+"presented with a corrupted or partial version of a memory as the initial "
+"state, the deterministic dynamics naturally flow downhill and restore the"
+" complete pattern. This is **content-addressable memory**: retrieval is "
+"driven by similarity to the stored patterns rather than by an explicit "
+"address."
+msgstr ""
+"每个存储模式都会成为能量函数的一个局部极小值。当以某个记忆的损坏版本或部分版本作为初始状态时，确定性动力学会自然向下流动并恢复完整模式。这就是 "
+"**内容寻址记忆**：检索由与存储模式的相似性驱动，而不是由显式地址驱动。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:32
+msgid "The Curse of Spurious Minima"
+msgstr "伪极小值的困扰"
+
+#: ../../source/theoretical-foundations-stat-noise.md:33
+#, python-brace-format
+msgid ""
+"The Hebbian learning rule, however, is imperfect. The weight matrix "
+"$\\mathbf{W}$ contains not only the intended contributions from the "
+"stored patterns but also unwanted **cross-talk** terms arising from "
+"overlaps between different memories. These cross-talk terms create "
+"additional local minima in the energy landscape—states that are stable "
+"under the deterministic dynamics but do not correspond to any stored "
+"pattern. Such states are called **spurious minima** (or *spurious "
+"memories*)."
+msgstr ""
+"然而，Hebbian 学习规则并不完美。权重矩阵 $\\mathbf{W}$ 不仅包含来自存储模式的预期贡献，也包含不同记忆之间重叠导致的非预期 "
+"**串扰** 项。这些串扰项会在能量景观中创造额外局部极小值：这些状态在确定性动力学下是稳定的，却并不对应任何存储模式。这样的状态称为 "
+"**伪极小值**（或伪记忆）。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:35
+msgid "Spurious minima manifest in several forms:"
+msgstr "伪极小值有几种常见形式："
+
+#: ../../source/theoretical-foundations-stat-noise.md:37
+#, python-brace-format
+msgid ""
+"**Mixture states**: Linear combinations of an odd number of stored "
+"patterns (e.g., $ \\text{sign}(\\xi^1 + \\xi^2 + \\xi^3)$) often form "
+"stable attractors."
+msgstr ""
+"**混合状态**：奇数个存储模式的线性组合（例如 $ \\text{sign}(\\xi^1 + \\xi^2 + "
+"\\xi^3)$）常常会形成稳定吸引子。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:38
+msgid ""
+"**Spin-reversed states**: For every stored pattern, its global negation "
+"(all spins flipped) is also an energy minimum."
+msgstr "**自旋反转状态**：对于每个存储模式，它的全局取反（所有自旋翻转）也可能成为能量极小值。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:39
+msgid ""
+"**Random valleys**: Even random weight matrices produce numerous local "
+"minima purely due to quenched disorder."
+msgstr "**随机谷地**：即使是随机权重矩阵，也会仅因淬火无序而产生大量局部极小值。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:41
+msgid ""
+"As the number of stored patterns $P$ increases relative to the number of "
+"neurons $N$, the density of spurious minima grows catastrophically. "
+"Beyond a critical **storage capacity** of approximately $0.14 N$, the "
+"network undergoes a phase transition: the intended memories are no longer"
+" stable, and the landscape becomes dominated by spurious attractors. "
+"Retrieval fails entirely."
+msgstr ""
+"随着存储模式数 $P$ 相对于神经元数 $N$ 增加，伪极小值密度会灾难性增长。当超过约 $0.14 N$ 的临界 **存储容量** "
+"后，网络会经历相变：目标记忆不再稳定，能量景观由伪吸引子主导，检索完全失败。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:43
+msgid "The Limits of Deterministic Search"
+msgstr "确定性搜索的局限"
+
+#: ../../source/theoretical-foundations-stat-noise.md:44
+msgid ""
+"Deterministic downhill dynamics face a fundamental limitation: once the "
+"state enters the basin of attraction of a spurious minimum, it can never "
+"escape. The network is **trapped**, and the only remedy is external "
+"intervention—resetting the state and hoping for a better trajectory. This"
+" brittleness makes deterministic Hopfield networks unsuitable as "
+"generative models of complex data distributions, where the energy "
+"landscape is inherently rugged and multimodal."
+msgstr ""
+"确定性的下坡动力学面临一个根本限制：一旦状态进入伪极小值的吸引域，就再也无法逃脱。网络被 "
+"**困住**，唯一补救办法是外部干预，即重置状态并期待下一条轨迹更好。这种脆弱性使确定性 Hopfield "
+"网络不适合作为复杂数据分布的生成模型，因为真实数据对应的能量景观通常崎岖且多模态。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:46
+msgid ""
+"The core problem is that the network lacks any mechanism for "
+"**exploration**. It always takes the greedy, myopic path downhill, never "
+"venturing uphill to discover potentially deeper valleys elsewhere. In "
+"optimization terms, deterministic descent is a **local** search method "
+"with no capacity for global exploration."
+msgstr ""
+"核心问题在于网络缺乏任何 **探索** "
+"机制。它总是贪婪且短视地向下移动，永远不会主动上坡去发现其他地方可能更深的谷地。从优化角度看，确定性下降是一种局部搜索方法，不具备全局探索能力。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:48
+msgid "Enter Noise: Stochastic Dynamics and Thermal Fluctuations"
+msgstr "引入噪声：随机动力学与热涨落"
+
+#: ../../source/theoretical-foundations-stat-noise.md:49
+msgid ""
+"The Boltzmann machine resolves this impasse by introducing **thermal "
+"noise**. Instead of setting a neuron deterministically to the sign of its"
+" input, the state is sampled probabilistically:"
+msgstr "玻尔兹曼机通过引入 **热噪声** 解决这一困境。它不再把神经元确定性地设为输入符号，而是按概率采样状态："
+
+#: ../../source/theoretical-foundations-stat-noise.md:51
+msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:53
+msgid ""
+"where $\\sigma(z) = 1/(1+\\exp(-z))$ is the sigmoid function, and $T > 0$"
+" is the **temperature** parameter."
+msgstr "其中 $\\sigma(z) = 1/(1+\\exp(-z))$ 是 sigmoid 函数，$T > 0$ 是 **温度** 参数。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:55
+msgid ""
+"At finite temperature, the probability of transitioning to a state with "
+"*higher* energy is non-zero. Specifically, the ratio of probabilities for"
+" two states differing only in unit $i$satisfies:"
+msgstr "在有限温度下，系统转移到更高能量状态的概率不为零。具体来说，仅在单元 $i$ 上不同的两个状态，其概率比满足："
+
+#: ../../source/theoretical-foundations-stat-noise.md:57
+#, python-brace-format
+msgid ""
+"\\frac{P(x_i = 1)}{P(x_i = 0)} = \\exp\\left( \\frac{\\Delta E_i}{T} "
+"\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:59
+#, python-brace-format
+msgid ""
+"where $\\Delta E_i = E_{x_i=0} - E_{x_i=1}$ is the energy *decrease* when"
+" unit $i$turns on. If $\\Delta E_i$ is positive (turning on lowers "
+"energy), the probability ratio favors the on state. Crucially, even if "
+"$\\Delta E_i$ is negative (turning on *increases* energy), the "
+"probability of turning on remains greater than zero. Thermal fluctuations"
+" occasionally push the system **uphill**."
+msgstr ""
+"其中 $\\Delta E_i = E_{x_i=0} - E_{x_i=1}$ 是单元 $i$ 打开时的能量下降量。如果 $\\Delta "
+"E_i$ 为正（打开会降低能量），概率比偏向打开状态。关键是，即使 $\\Delta E_i$ "
+"为负（打开会增加能量），打开的概率仍然大于零。热涨落会偶尔把系统推向 **上坡** 方向。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:61
+msgid ""
+"This ability to climb energy barriers is precisely what enables escape "
+"from spurious minima. A network trapped in a shallow local minimum can, "
+"after a sequence of unfavorable thermal fluctuations, surmount the "
+"surrounding energy barrier and descend into a deeper, more favorable "
+"basin. The noise provides the **exploration** mechanism that "
+"deterministic dynamics lack."
+msgstr ""
+"这种攀越能垒的能力，正是逃离伪极小值的关键。困在浅层局部极小值中的网络，经过一连串不利的热涨落后，可能越过周围能垒并下降到更深、更有利的吸引域。噪声提供了确定性动力学所缺少的"
+" **探索** 机制。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:63
+msgid "Statistical Physics Foundations: Noise as Thermal Equilibrium"
+msgstr "统计物理基础：作为热平衡的噪声"
+
+#: ../../source/theoretical-foundations-stat-noise.md:64
+#, python-brace-format
+msgid ""
+"The introduction of noise is not merely an algorithmic trick; it is a "
+"direct consequence of the **canonical ensemble** derived in Section [1.2 "
+"The Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-"
+"stat-boltzmann.md). When a system is in thermal contact with a heat "
+"reservoir at temperature $T$, the probability of occupying any microstate"
+" is given by the Boltzmann distribution. The stochastic update rule for a"
+" single neuron is precisely the conditional probability $P(x_i = 1 \\mid "
+"\\mathbf{x}_{-i})$ derived from the Boltzmann distribution:"
+msgstr ""
+"引入噪声并不只是算法技巧；它直接来自 [1.2 玻尔兹曼分布与平衡](kpp-theoretical-foundations-stat-"
+"boltzmann.md) 中推导的 **正则系综**。当系统与温度为 $T$ "
+"的热源发生热接触时，占据任意微观状态的概率由玻尔兹曼分布给出。单个神经元的随机更新规则，正是从玻尔兹曼分布推导出的条件概率 $P(x_i = 1 "
+"\\mid \\mathbf{x}_{-i})$："
+
+#: ../../source/theoretical-foundations-stat-noise.md:66
+msgid ""
+"P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\frac{\\exp(-E(x_i=1, "
+"\\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + "
+"\\exp(-E(x_i=0, \\mathbf{x}_{-i})/T)} = \\sigma\\left( \\frac{\\sum_j "
+"w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:68
+msgid ""
+"Thus, the noise is **not** a heuristic; it is the physical manifestation "
+"of the system being in thermal equilibrium with its environment. The "
+"probability of moving uphill is exactly the Boltzmann factor ratio, "
+"ensuring that the system obeys detailed balance and converges to the "
+"correct equilibrium distribution."
+msgstr ""
+"因此，噪声 **不是** "
+"启发式补丁，而是系统与环境处于热平衡时的物理表现。向上爬升的概率恰好由玻尔兹曼因子比值决定，从而保证系统满足细致平衡并收敛到正确的平衡分布。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:70
+msgid "Simulated Annealing: From Exploration to Exploitation"
+msgstr "模拟退火：从探索到利用"
+
+#: ../../source/theoretical-foundations-stat-noise.md:71
+msgid ""
+"Noise alone, however, is not a panacea. If the temperature remains high, "
+"the network never settles. it wanders endlessly across the energy "
+"landscape, sampling configurations roughly uniformly. To obtain a "
+"meaningful low-energy state, we must gradually reduce the temperature "
+"over time, a process known as **simulated annealing**."
+msgstr ""
+"不过，仅有噪声并不是万能药。如果温度始终很高，网络永远不会稳定下来，而是在能量景观中无休止游走，近似均匀地采样各种构型。为了得到有意义的低能状态，必须随时间逐渐降低温度，这一过程称为"
+" **模拟退火**。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:73
+msgid ""
+"The annealing schedule typically starts with a high temperature "
+"$T_{\\text{high}}$, where the system easily escapes local minima and "
+"explores the global structure of the landscape. The temperature is then "
+"slowly lowered according to a cooling schedule, often geometric:"
+msgstr ""
+"退火调度通常从高温 $T_{\\text{high}}$ "
+"开始，此时系统容易逃离局部极小值并探索能量景观的全局结构。随后按照冷却计划缓慢降低温度，常见的是几何降温："
+
+#: ../../source/theoretical-foundations-stat-noise.md:75
+#, python-brace-format
+msgid "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-noise.md:77
+msgid ""
+"As $T \\to 0$, the stochastic dynamics approach the deterministic "
+"Hopfield limit, and the network freezes into the nearest local minimum. "
+"If the annealing is sufficiently slow, the system converges to the "
+"**global minimum** with high probability, which is a result formally "
+"guaranteed by the theory of Markov chain Monte Carlo (MCMC)."
+msgstr ""
+"当 $T \\to 0$ 时，随机动力学接近确定性 Hopfield 极限，网络冻结到最近的局部极小值。如果退火足够缓慢，系统将以高概率收敛到 "
+"**全局最小值**，这一点由马尔可夫链蒙特卡洛（MCMC）理论形式化保证。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:79
+msgid ""
+"In practice, true global optimization is rarely achievable for large "
+"networks due to the exponential slowdown of mixing times at low "
+"temperatures (critical slowing down). Nonetheless, simulated annealing "
+"provides a powerful heuristic for finding deep, low-energy states that "
+"correspond to likely configurations under the model's learned "
+"distribution."
+msgstr "实践中，由于低温下混合时间会指数级变慢（临界慢化），大型网络几乎无法实现真正的全局优化。即便如此，模拟退火仍然是寻找深层低能状态的强大启发式方法，这些状态对应模型学习分布下的高概率构型。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:81
+msgid "The Dual Role of Noise in Learning"
+msgstr "噪声在学习中的双重作用"
+
+#: ../../source/theoretical-foundations-stat-noise.md:82
+msgid ""
+"In the context of Boltzmann machine *learning*, noise serves a second, "
+"equally vital purpose. The learning algorithm relies on comparing two "
+"distinct phases of network operation:"
+msgstr "在玻尔兹曼机学习语境中，噪声还有第二个同样重要的作用。学习算法依赖于比较网络运行的两个阶段："
+
+#: ../../source/theoretical-foundations-stat-noise.md:84
+msgid ""
+"**Positive phase (clamped)**: Visible units are held fixed to a training "
+"example, and hidden units are allowed to fluctuate. Noise ensures the "
+"hidden units explore all configurations consistent with the visible data,"
+" providing an unbiased estimate of the *data-dependent* statistics."
+msgstr "**正相（固定）**：可见单元固定为某个训练样本，隐藏单元允许涨落。噪声保证隐藏单元探索与可见数据一致的所有构型，从而为依赖数据的统计量提供无偏估计。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:85
+msgid ""
+"**Negative phase (free-running)**: The entire network runs freely without"
+" external input. Noise drives the system toward its equilibrium "
+"distribution, generating samples that reflect the model's current beliefs"
+" about the data."
+msgstr "**负相（自由运行）**：整个网络在没有外部输入的情况下自由运行。噪声驱动系统走向自身的平衡分布，生成反映模型当前“信念”的样本。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:87
+msgid ""
+"Without stochasticity, the network would simply collapse to the nearest "
+"deterministic attractor in both phases, failing to capture the full "
+"distribution of hidden causes or to generate diverse samples. **Noise is "
+"not a bug to be eliminated, but an essential feature that enables the "
+"Boltzmann machine to represent and learn complex probability "
+"distributions.**"
+msgstr "如果没有随机性，网络在两个阶段都会简单坍缩到最近的确定性吸引子，既无法捕捉隐藏原因的完整分布，也无法生成多样化样本。**噪声不是需要消除的缺陷，而是使玻尔兹曼机能够表示和学习复杂概率分布的必要特性。**"
+
+#: ../../source/theoretical-foundations-stat-noise.md:89
+msgid "Summary: From Deterministic Traps to Stochastic Freedom"
+msgstr "小结：从确定性陷阱到随机自由"
+
+#: ../../source/theoretical-foundations-stat-noise.md:90
+msgid ""
+"The deterministic Hopfield network demonstrates that symmetric recurrent "
+"networks can store memories as energy minima, but its greedy descent "
+"dynamics render it brittle and prone to entrapment in spurious states. "
+"The Boltzmann machine inherits the energy-based architecture but replaces"
+" deterministic updates with **stochastic sampling governed by "
+"temperature**."
+msgstr ""
+"确定性 Hopfield "
+"网络表明，对称循环网络可以把记忆存储为能量极小值，但其贪婪下降动力学使它脆弱且容易陷入伪状态。玻尔兹曼机继承了基于能量的架构，但用 "
+"**受温度控制的随机采样** 取代了确定性更新。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:92
+msgid "This single modification confers two transformative capabilities:"
+msgstr "这一单一修改带来两种根本能力："
+
+#: ../../source/theoretical-foundations-stat-noise.md:94
+msgid ""
+"**Escape from local minima** during inference, enabling the network to "
+"find globally consistent interpretations of ambiguous inputs."
+msgstr "**推断时逃离局部极小值**，使网络能够为模糊输入找到全局一致的解释。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:95
+msgid ""
+"**Exploration of the full state space** during learning, providing the "
+"statistical samples required for gradient estimation in the presence of "
+"an intractable partition function."
+msgstr "**学习时探索完整状态空间**，在配分函数不可处理的情况下提供梯度估计所需的统计样本。"
+
+#: ../../source/theoretical-foundations-stat-noise.md:97
+msgid ""
+"The following sections will formalize the energy functions used in "
+"Boltzmann machines and introduce the specific architectures—most notably "
+"the Restricted Boltzmann Machine (RBM), that make stochastic sampling "
+"computationally tractable."
+msgstr "后续章节将形式化玻尔兹曼机使用的能量函数，并介绍使随机采样在计算上可行的具体架构，尤其是受限玻尔兹曼机（RBM）。"
+
+#~ msgid ""
+#~ "x_i \\leftarrow \\text{sign}\\left( \\sum_{j "
+#~ "\\neq i} w_{ij} x_j + b_i \\right)"
+#~ msgstr ""
+#~ "x_i \\leftarrow \\text{sign}\\left( \\sum_{j "
+#~ "\\neq i} w_{ij} x_j + b_i \\right)"
+
+#~ msgid ""
+#~ "\\Delta E = E(\\mathbf{x}') - "
+#~ "E(\\mathbf{x}) = -(x_i' - x_i)\\left( "
+#~ "\\sum_{j \\neq i} w_{ij} x_j + b_i"
+#~ " \\right)"
+#~ msgstr ""
+#~ "\\Delta E = E(\\mathbf{x}') - "
+#~ "E(\\mathbf{x}) = -(x_i' - x_i)\\left( "
+#~ "\\sum_{j \\neq i} w_{ij} x_j + b_i"
+#~ " \\right)"
+
+#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+#~ msgstr "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+
+#~ msgid ""
+#~ "P(x_i = 1) = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+#~ msgstr ""
+#~ "P(x_i = 1) = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+
+#~ msgid ""
+#~ "\\frac{P(x_i = 1)}{P(x_i = 0)} = "
+#~ "\\exp\\left( \\frac{\\Delta E_i}{T} \\right)"
+#~ msgstr ""
+#~ "\\frac{P(x_i = 1)}{P(x_i = 0)} = "
+#~ "\\exp\\left( \\frac{\\Delta E_i}{T} \\right)"
+
+#~ msgid ""
+#~ "P(x_i = 1 \\mid \\mathbf{x}_{-i}) = "
+#~ "\\frac{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, "
+#~ "\\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0, "
+#~ "\\mathbf{x}_{-i})/T)} = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+#~ msgstr ""
+#~ "P(x_i = 1 \\mid \\mathbf{x}_{-i}) = "
+#~ "\\frac{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, "
+#~ "\\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0, "
+#~ "\\mathbf{x}_{-i})/T)} = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+
+#~ msgid "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
+#~ msgstr "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
+
+#~ msgid "::"
+#~ msgstr "::"

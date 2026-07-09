@@ -1,0 +1,600 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-nn-learning.md:10
+msgid "2.3 Hebbian Learning as Sculpting Energy"
+msgstr "2.3 将 Hebbian 学习理解为能量雕塑"
+
+#: ../../source/theoretical-foundations-nn-learning.md:12
+msgid ""
+"The previous section introduced the Hopfield network as a dynamical "
+"system whose state evolves to minimize an energy function. The weights of"
+" the network determine the shape of this energy landscape, where the "
+"valleys are located, how deep they are, and how steep the walls between "
+"them. The question then arises: **how should these weights be set so that"
+" the energy landscape encodes useful memories?** The answer lies in a "
+"remarkably simple and biologically plausible principle proposed by "
+"Canadian psychologist Donald Hebb in 1949. The **Hebbian learning rule**,"
+" often summarized as *\"neurons that fire together, wire together,\"* "
+"provides a local mechanism by which neural activity sculpts the global "
+"energy function. This section explores the mathematical connection "
+"between Hebbian synaptic modification and the shaping of an energy "
+"landscape, establishing the foundational learning principle that carries "
+"forward into the Boltzmann machine."
+msgstr ""
+"上一节把 Hopfield "
+"网络介绍为一个动力系统，其状态演化以最小化能量函数为目标。网络权重决定了能量景观的形状：谷地在哪里、深度如何、谷壁有多陡。于是问题变成：**应该如何设置这些权重，使能量景观编码有用记忆？**"
+" 答案来自加拿大心理学家 Donald Hebb 于 1949 年提出的一个极其简单且具有生物学合理性的原则。**Hebbian 学习规则** "
+"常被概括为“一起激发的神经元连接在一起”，它提供了一种局部机制，使神经活动能够雕塑全局能量函数。本节探讨 Hebbian "
+"突触修饰与能量景观塑造之间的数学联系，为玻尔兹曼机中的学习原则奠定基础。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:15
+msgid "The Hebbian Postulate"
+msgstr "Hebbian 假设"
+
+#: ../../source/theoretical-foundations-nn-learning.md:16
+msgid ""
+"In his seminal work \"*The Organization of Behavior\"*, Hebb proposed "
+"that:"
+msgstr "Hebb 在其奠基性著作 The Organization of Behavior 中提出："
+
+#: ../../source/theoretical-foundations-nn-learning.md:18
+msgid ""
+"\"When an axon of cell A is near enough to excite cell B and repeatedly "
+"or persistently takes part in firing it, some growth process or metabolic"
+" change takes place in one or both cells such that A's efficiency, as one"
+" of the cells firing B, is increased.\""
+msgstr ""
+"“当细胞 A 的轴突足够接近以激发细胞 B，并反复或持续参与激发它时，一个或两个细胞中会发生某种生长过程或代谢变化，使 A 作为激发 B "
+"的细胞之一的效率提高。”"
+
+#: ../../source/theoretical-foundations-nn-learning.md:20
+msgid ""
+"Translated into the language of artificial neural networks, this becomes "
+"a simple weight update rule: if two connected neurons are simultaneously "
+"active, the strength of their connection should increase. Conversely, if "
+"their activities are anti-correlated, the connection strength should "
+"decrease."
+msgstr "翻译成人工神经网络语言，这就是简单的权重更新规则：如果两个相连神经元同时活跃，它们之间的连接强度应增加；反之，如果它们的活动反相关，连接强度应减弱。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:22
+#, python-brace-format
+msgid ""
+"For binary neurons taking values in $\\{-1, +1\\}$, the change in weight "
+"$w_{ij}$ due to a single pattern $\\boldsymbol{\\xi}$ is proportional to "
+"the product of their activities:"
+msgstr ""
+"对于取值于 $\\{-1, +1\\}$ 的二值神经元，由单个模式 $\\boldsymbol{\\xi}$ 引起的权重 $w_{ij}$ "
+"变化与二者活动乘积成正比："
+
+#: ../../source/theoretical-foundations-nn-learning.md:24
+#, python-brace-format
+msgid "\\Delta w_{ij} \\propto \\xi_i \\xi_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:26
+#, python-brace-format
+msgid ""
+"For $\\{0, 1\\}$ valued neurons, a common variant adjusts weights only "
+"when both neurons are active:"
+msgstr "对于取值于 $\\{0, 1\\}$ 的神经元，常见变体只在两个神经元都活跃时调整权重："
+
+#: ../../source/theoretical-foundations-nn-learning.md:28
+#, python-brace-format
+msgid "\\Delta w_{ij} \\propto x_i x_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:30
+msgid ""
+"In both formulations, the essential principle is the same: **co-"
+"activation strengthens the connection**."
+msgstr "两种表述的核心原则相同：**共同激活会增强连接**。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:32
+msgid "Storing Multiple Patterns: The Outer Product Rule"
+msgstr "存储多个模式：外积规则"
+
+#: ../../source/theoretical-foundations-nn-learning.md:33
+msgid ""
+"To store a set of $P$ patterns $\\{\\boldsymbol{\\xi}^1, "
+"\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$, the Hebbian "
+"prescription is simply to sum the outer products of each pattern:"
+msgstr ""
+"要存储一组 $P$ 个模式 $\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
+"\\boldsymbol{\\xi}^P\\}$，Hebbian 方案就是把每个模式的外积相加："
+
+#: ../../source/theoretical-foundations-nn-learning.md:35
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:37
+msgid ""
+"The factor $1/N$ (or sometimes $1/P$ is a normalization constant that "
+"prevents weights from growing without bound as more patterns are added. "
+"The weight matrix can be written compactly as:"
+msgstr "因子 $1/N$（有时也用 $1/P$）是归一化常数，用于防止随着模式增加权重无限增长。权重矩阵可以紧凑写为："
+
+#: ../../source/theoretical-foundations-nn-learning.md:39
+#, python-brace-format
+msgid ""
+"\\mathbf{W} = \\frac{1}{N} \\sum_{\\mu=1}^P \\boldsymbol{\\xi}^\\mu "
+"(\\boldsymbol{\\xi}^\\mu)^\\top - \\frac{P}{N} \\mathbf{I}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:41
+#, python-brace-format
+msgid ""
+"where the subtraction of the identity matrix enforces the condition "
+"$w_{ii} = 0$ (no self-connections)."
+msgstr "其中减去单位矩阵是为了强制满足 $w_{ii} = 0$（无自连接）。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:43
+#, python-brace-format
+msgid ""
+"This learning rule is purely **local**: to update $w_{ij}$, only the "
+"activities of neurons $i$ and $j$ are required. No global error signal, "
+"no backpropagation of gradients, no explicit knowledge of the energy "
+"function is necessary. Yet, as we shall see, this local rule has a "
+"profound global effect on the energy landscape."
+msgstr ""
+"该学习规则完全是 **局部** 的：更新 $w_{ij}$ 只需要神经元 $i$ 和 $j$ "
+"的活动。不需要全局误差信号，不需要反向传播梯度，也不需要显式知道能量函数。尽管如此，这条局部规则会对全局能量景观产生深远影响。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:45
+msgid "Hebbian Learning as Energy Basin Creation"
+msgstr "Hebbian学习：构建能量盆地"
+
+#: ../../source/theoretical-foundations-nn-learning.md:46
+msgid ""
+"Consider the energy function of the Hopfield network with Hebbian "
+"weights. Substituting the outer product weight formula into the energy "
+"definition yields:"
+msgstr "考虑带 Hebbian 权重的 Hopfield 网络能量函数。将外积权重公式代入能量定义，可得："
+
+#: ../../source/theoretical-foundations-nn-learning.md:48
+#, python-brace-format
+msgid ""
+"\\begin{aligned}E(\\mathbf{x}) &= -\\frac{1}{2} \\sum_{i \\neq j} w_{ij} "
+"x_i x_j - \\sum_i b_i x_i \\\\&= -\\frac{1}{2N} \\sum_{\\mu=1}^P \\sum_{i"
+" \\neq j} \\xi_i^\\mu \\xi_j^\\mu x_i x_j - \\sum_i b_i x_i\\end{aligned}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:50
+#, python-brace-format
+msgid ""
+"For a state $\\mathbf{x}$ that exactly matches one of the stored "
+"patterns, say $\\boldsymbol{\\xi}^\\nu$, the double sum simplifies "
+"dramatically. Assuming the patterns are random and uncorrelated, the "
+"dominant contribution comes from the term $\\mu = \\nu$:"
+msgstr ""
+"对于恰好等于某个存储模式的状态 $\\mathbf{x}$，例如 "
+"$\\boldsymbol{\\xi}^\\nu$，双重求和会大幅简化。假设模式随机且不相关，主导贡献来自 $\\mu = \\nu$ 项："
+
+#: ../../source/theoretical-foundations-nn-learning.md:52
+#, python-brace-format
+msgid ""
+"\\sum_{i \\neq j} \\xi_i^\\nu \\xi_j^\\nu \\xi_i^\\nu \\xi_j^\\nu = "
+"\\sum_{i \\neq j} (\\xi_i^\\nu)^2 (\\xi_j^\\nu)^2 = N(N-1) \\approx N^2"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:54
+msgid "Thus, the energy of a stored pattern is approximately:"
+msgstr "因此，存储模式的能量近似为："
+
+#: ../../source/theoretical-foundations-nn-learning.md:56
+#, python-brace-format
+msgid ""
+"E(\\boldsymbol{\\xi}^\\nu) \\approx -\\frac{1}{2N} \\cdot N^2 = "
+"-\\frac{N}{2}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:58
+msgid ""
+"This is a **deep energy minimum**. In contrast, a random state "
+"uncorrelated with any stored pattern will have energy near zero, because "
+"the cross terms average out."
+msgstr "这是一个 **深能量极小值**。相比之下，与任何存储模式都不相关的随机状态，其能量接近零，因为交叉项会相互抵消。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:60
+msgid ""
+"The Hebbian rule therefore accomplishes the following geometric "
+"transformation:"
+msgstr "因此，Hebbian 规则完成了以下几何变换："
+
+#: ../../source/theoretical-foundations-nn-learning.md:62
+msgid ""
+"**Basins of attraction** are carved into the energy landscape at the "
+"locations of the stored patterns."
+msgstr "在存储模式所在位置，将 **吸引盆地** 雕刻进能量景观。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:63
+msgid "The **depth** of each basin is proportional to $N$, the number of neurons."
+msgstr "每个盆地的 **深度** 与神经元数量 $N$ 成正比。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:64
+msgid ""
+"The **walls** between basins are shaped by the crosstalk terms from other"
+" patterns."
+msgstr "盆地之间的 **墙壁** 由其他模式引起的串扰项塑造。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:66
+msgid ""
+"In this precise sense, **Hebbian learning sculpts the energy landscape**."
+" Each memory contributes a quadratic depression centered at the pattern "
+"vector. The collective effect of all stored memories is an additive "
+"superposition of these depressions, resulting in a rugged landscape whose"
+" local minima correspond, ideally, to the stored memories."
+msgstr ""
+"在这个精确意义上，**Hebbian "
+"学习塑造了能量景观**。每个记忆都会贡献一个以该模式向量为中心的二次凹陷。所有记忆的集体作用是这些凹陷的叠加，最终形成崎岖景观，其局部极小值理想情况下对应存储记忆。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:68
+msgid "The Mathematical Foundation for Hebb's Rule"
+msgstr "从能量角度看权重变化"
+
+#: ../../source/theoretical-foundations-nn-learning.md:69
+msgid ""
+"While Hebb's postulate is biologically motivated, the Boltzmann machine "
+"provides a rigorous mathematical justification for it. Recall from "
+"Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-"
+"theoretical-foundations-ebms-def.md) the gradient of the log-likelihood "
+"for a Boltzmann machine:"
+msgstr ""
+"我们也可以考察单个权重更新如何改变能量景观。假设把 $w_{ij}$ 增加一个小量 $\\Delta w$。任意状态 $\\mathbf{x}$ "
+"的能量变化为："
+
+#: ../../source/theoretical-foundations-nn-learning.md:71
+msgid ""
+"\\frac{\\partial f}{\\partial w_{ij}} = \\langle x_i x_j "
+"\\rangle_{\\text{data}} - \\langle x_i x_j \\rangle_{\\text{model}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:73
+msgid ""
+"This learning rule, often called the **contrastive Hebbian rule**, is a "
+"direct generalization of Hebb's original idea. The first term, $\\langle "
+"x_i x_j \\rangle_{\\text{data}}$, is purely **Hebbian**: it strengthens "
+"the connection between two units when they are co-active in the data. The"
+" second term, $\\langle x_i x_j \\rangle_{\\text{model}}$, is **anti-"
+"Hebbian**: it weakens connections that are spuriously co-active in the "
+"model's own generated fantasies."
+msgstr "如果 $x_i$ 和 $x_j$ **同号**，能量会降低 $\\Delta w$；如果它们 **异号**，能量会升高 $\\Delta w$。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:75
+msgid ""
+"As derived in Section [3.3 Contrastive Divergence](kpp-theoretical-"
+"foundations-ebms-cd.md), the stochastic gradient update for a Boltzmann "
+"machine can be written as:"
+msgstr "如 [3.3 对比散度](kpp-theoretical-foundations-ebms-cd.md) 所推导，玻尔兹曼机的随机梯度更新可以写为："
+
+#: ../../source/theoretical-foundations-nn-learning.md:77
+#, python-brace-format
+msgid ""
+"\\Delta w_{ij} = \\eta \\left( X_i(\\omega) X_j(\\omega) - "
+"\\mathbb{E}_\\theta [X_i X_j] \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:79
+msgid ""
+"This formulation reveals that **the simple, local Hebbian update (\"fire "
+"together, wire together\") emerges naturally from the principled "
+"objective of maximizing the data likelihood**. In essence, the Boltzmann "
+"machine's learning algorithm proves that Hebb's rule is not just a "
+"biological heuristic but the optimal learning strategy when the goal is "
+"to match the model's equilibrium distribution to the data distribution."
+msgstr "Hebbian 规则以局部、增量方式实现了这一点。每当呈现一个模式时，共同活跃神经元之间的权重就会增强，从而逐渐降低该模式相对于其他构型的能量。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:81
+msgid "Limitations of Hebbian Learning"
+msgstr "Hebbian 学习的局限"
+
+#: ../../source/theoretical-foundations-nn-learning.md:82
+msgid ""
+"While elegant and biologically motivated, pure Hebbian learning has "
+"significant drawbacks when used in Hopfield networks:"
+msgstr "纯 Hebbian 学习虽然优雅且具有生物学动机，但用于 Hopfield 网络时存在显著缺点："
+
+#: ../../source/theoretical-foundations-nn-learning.md:84
+msgid ""
+"**Spurious Minima**: The crosstalk between stored patterns creates "
+"unintended energy minima, mixture states and random valleys, that trap "
+"dynamics."
+msgstr "**伪极小值**：存储模式之间的串扰会产生非预期的能量极小值，例如混合状态和随机谷地，并困住动力学。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:85
+msgid ""
+"**Storage Capacity**: The number of patterns that can be reliably stored "
+"scales only linearly with $N$, with a proportionality constant of "
+"approximately 0.14. Beyond this, the network undergoes a phase transition"
+" to a spin-glass state where no patterns are retrievable."
+msgstr "**存储容量**：可可靠存储的模式数量只随 $N$ 线性增长，比例常数约为 0.14。超过该容量后，网络会相变为自旋玻璃状态，无法检索模式。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:86
+msgid ""
+"**Catastrophic Forgetting**: Storing a new pattern modifies all weights "
+"and can destabilize previously stored memories. There is no mechanism to "
+"protect old memories while learning new ones."
+msgstr "**灾难性遗忘**：存储新模式会修改所有权重，并可能破坏先前存储的记忆。它没有保护旧记忆的机制。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:87
+msgid ""
+"**No Unlearning of Spurious States**: Once a spurious minimum is created,"
+" pure Hebbian learning offers no way to eliminate it. The rule only adds "
+"basins; it never fills them in.These limitations motivated the "
+"development of more sophisticated learning algorithms, including the "
+"**Boltzmann machine learning rule**, which uses a combination of Hebbian "
+"and anti-Hebbian updates guided by the difference between data-driven and"
+" model-driven correlations."
+msgstr "**无法消除伪状态**：一旦伪极小值产生，纯 Hebbian 学习没有办法将其去除；它只会添加盆地，而不会填平盆地。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:89
+msgid "From Hebbian Storage to Probabilistic Learning"
+msgstr "从 Hebbian 存储到概率学习"
+
+#: ../../source/theoretical-foundations-nn-learning.md:90
+msgid ""
+"The Boltzmann machine inherits the energy-based architecture of the "
+"Hopfield network and the idea that learning corresponds to modifying the "
+"energy landscape. However, it replaces the simple Hebbian storage "
+"prescription with a **principled probabilistic learning algorithm**."
+msgstr ""
+"玻尔兹曼机继承了 Hopfield 网络的基于能量架构，以及“学习等于修改能量景观”的思想。但它把简单 Hebbian 存储方案替换为 "
+"**原则化的概率学习算法**。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:92
+msgid ""
+"In a Boltzmann machine, the goal is not merely to store a set of patterns"
+" as attractors, but to make the equilibrium distribution of the network "
+"match the distribution of the observed data. The learning rule that "
+"achieves this is a generalization of Hebb's principle:"
+msgstr "在玻尔兹曼机中，目标不只是把一组模式存为吸引子，而是让网络的平衡分布匹配观测数据分布。实现这一点的学习规则是 Hebb 原则的推广："
+
+#: ../../source/theoretical-foundations-nn-learning.md:94
+msgid ""
+"\\Delta w_{ij} \\propto \\langle x_i x_j \\rangle_{\\text{data}} - "
+"\\langle x_i x_j \\rangle_{\\text{model}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:96
+msgid ""
+"This is sometimes called the **contrastive Hebbian rule** or **delta "
+"rule**. The first term, $\\langle x_i x_j \\rangle_{\\text{data}}$, is "
+"the average correlation between units $i$ and $j$when the visible units "
+"are clamped to data examples. This term is **Hebbian**: it strengthens "
+"connections between units that are co-active in the data."
+msgstr ""
+"这有时称为 **对比 Hebbian 规则** 或 **delta 规则**。第一项 $\\langle x_i x_j "
+"\\rangle_{\\text{data}}$ 是可见单元被固定到数据样本时，单元 $i$ 与 $j$ 的平均相关性。该项是 "
+"**Hebbian** 的：它增强在数据中共同活跃的单元之间的连接。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:98
+msgid ""
+"The second term, $ \\langle x_i x_j \\rangle_{\\text{model}}$, is the "
+"average correlation when the network runs freely from its own equilibrium"
+" distribution. This term is **anti-Hebbian**: it weakens connections that"
+" are spuriously co-active in the model's own fantasies."
+msgstr ""
+"第二项 $ \\langle x_i x_j \\rangle_{\\text{model}}$ "
+"是网络从自身平衡分布自由运行时的平均相关性。该项是 **反 Hebbian** 的：它削弱模型自身“幻想”中伪共同活跃的连接。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:100
+msgid ""
+"The difference between these two correlations drives the weight update. "
+"If the data shows a stronger correlation than the model's current "
+"distribution, the weight increases (lowering energy for that co-"
+"activation pattern). If the model overestimates the correlation, the "
+"weight decreases (raising energy for that pattern)."
+msgstr "这两个相关性的差驱动权重更新。如果数据中的相关性强于模型当前分布，权重增加（降低该共同激活模式的能量）；如果模型高估了相关性，权重降低（提高该模式的能量）。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:102
+msgid ""
+"This contrastive update dynamically sculpts the energy landscape to match"
+" the data distribution. It retains the local, Hebbian character of the "
+"update—only the activities of the connected neurons are required—while "
+"providing a principled way to avoid the pitfalls of pure Hebbian storage."
+msgstr ""
+"这种对比更新会动态雕塑能量景观，使其匹配数据分布。它保留了更新的局部 Hebbian 特征，即只需要相连神经元的活动，同时提供了原则化方法来避免纯"
+" Hebbian 存储的陷阱。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:104
+msgid "Sculpting Energy: A Unifying Metaphor"
+msgstr "能量雕塑：统一隐喻"
+
+#: ../../source/theoretical-foundations-nn-learning.md:105
+msgid ""
+"The metaphor of **sculpting an energy landscape** provides a powerful "
+"unifying framework for understanding both Hopfield networks and Boltzmann"
+" machines:"
+msgstr "**雕塑能量景观** 这一隐喻，为理解 Hopfield 网络和玻尔兹曼机提供了强大的统一框架："
+
+#: ../../source/theoretical-foundations-nn-learning.md:107
+#, python-brace-format
+msgid ""
+"**Weights as sculpting tools**: Each weight $w_{ij}$ acts like a chisel "
+"that can either carve a valley (if $w_{ij} > 0$) or raise a ridge (if "
+"$w_{ij} < 0$) along the diagonal where $x_i = x_j$."
+msgstr ""
+"**权重作为雕刻工具**：每个权重 $w_{ij}$ 像一把刻刀，可以在 $x_i = x_j$ 的对角方向上雕出谷地（若 $w_{ij} > "
+"0$），或抬高山脊（若 $w_{ij} < 0$）。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:108
+msgid ""
+"**Hebbian learning as an additive process**: Each stored pattern adds a "
+"new depression to the landscape, creating a new attractor basin."
+msgstr "**Hebbian 学习作为加法过程**：每个存储模式为景观添加一个新凹陷，创造新的吸引盆地。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:109
+msgid ""
+"**Boltzmann learning as a corrective process**: By comparing data "
+"correlations to model correlations, the learning algorithm not only adds "
+"basins where data lies but also **fills in spurious basins** that the "
+"model has invented."
+msgstr "**玻尔兹曼学习作为校正过程**：通过比较数据相关性与模型相关性，学习算法不仅在数据所在区域添加盆地，也会 **填平模型凭空创造的伪盆地**。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:111
+msgid ""
+"This energy-centric view will recur throughout the remainder of this "
+"tutorial. The restricted Boltzmann machine (RBM), deep belief networks, "
+"and even modern energy-based models all share this **fundamental "
+"perspective**: learning is the process of shaping an energy function so "
+"that desirable configurations are assigned low energy and undesirable "
+"configurations are assigned high energy."
+msgstr ""
+"这一以能量为中心的视角将在教程后续反复出现。受限玻尔兹曼机（RBM）、深度置信网络，乃至现代基于能量的模型，都共享这一 "
+"**基本观点**：学习就是塑造一个能量函数，使期望构型具有低能量，而不期望构型具有高能量。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:113
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-nn-learning.md:114
+msgid ""
+"**Hebbian learning** is a local, biologically plausible rule: *neurons "
+"that fire together, wire together*."
+msgstr "**Hebbian 学习** 是一条局部且具有生物学合理性的规则：一起激发的神经元连接在一起。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:115
+#, python-brace-format
+msgid ""
+"For binary patterns, the Hebbian weight update is $ \\Delta w_{ij} "
+"\\propto x_i x_j$."
+msgstr "对二值模式，Hebbian 权重更新为 $ \\Delta w_{ij} \\propto x_i x_j$。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:116
+msgid ""
+"Storing multiple patterns corresponds to summing their outer products, "
+"resulting in a weight matrix that reflects pairwise correlations."
+msgstr "存储多个模式对应于求和它们的外积，从而得到反映成对相关性的权重矩阵。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:117
+msgid ""
+"**Hebbian learning sculpts the energy landscape** by creating basins of "
+"attraction at the locations of stored patterns."
+msgstr "**Hebbian 学习通过在存储模式位置创建吸引盆地来雕塑能量景观**。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:118
+#, python-brace-format
+msgid ""
+"A single weight increase $\\Delta w_{ij} > 0$ lowers the energy of states"
+" where $x_i$ and $x_j$ agree and raises the energy where they disagree."
+msgstr "单个权重增加 $\\Delta w_{ij} > 0$ 会降低 $x_i$ 与 $x_j$ 一致状态的能量，并提高不一致状态的能量。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:119
+msgid ""
+"Pure Hebbian learning suffers from **spurious minima**, **limited "
+"capacity**, and **catastrophic forgetting**."
+msgstr "纯 Hebbian 学习存在 **伪极小值**、**容量有限** 和 **灾难性遗忘** 等问题。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:120
+msgid ""
+"The **Boltzmann machine learning rule** generalizes Hebb's principle by "
+"subtracting model correlations from data correlations, providing a "
+"principled way to shape the energy landscape to match a probability "
+"distribution."
+msgstr "**玻尔兹曼机学习规则** 通过从数据相关性中减去模型相关性来推广 Hebb 原则，提供了一种原则化方式，使能量景观匹配概率分布。"
+
+#: ../../source/theoretical-foundations-nn-learning.md:121
+msgid ""
+"The metaphor of **energy sculpting** unifies the learning principles of "
+"Hopfield networks and Boltzmann machines, and extends to modern deep "
+"generative models."
+msgstr "**能量雕塑** 隐喻统一了 Hopfield 网络和玻尔兹曼机的学习原则，并延伸到现代深度生成模型。"
+
+#~ msgid ""
+#~ "The metaphor of <b>energy sculpting</b> "
+#~ "unifies the learning principles of "
+#~ "Hopfield networks and Boltzmann machines, "
+#~ "and extends to modern deep generative"
+#~ " models."
+#~ msgstr ""
+
+#~ msgid "\\Delta w_{ij} \\propto \\xi_i \\xi_j"
+#~ msgstr ""
+#~ "对于取值于 $\\{-1, +1\\}$ 的二值神经元，由单个模式 "
+#~ "$\\boldsymbol{\\xi}$ 引起的权重 $w_{ij}$ 变化与二者活动乘积成正比："
+
+#~ msgid "\\Delta w_{ij} \\propto x_i x_j"
+#~ msgstr "对于取值于 $\\{0, 1\\}$ 的神经元，常见变体只在两个神经元都活跃时调整权重："
+
+#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+#~ msgstr ""
+#~ "要存储一组 $P$ 个模式 $\\{\\boldsymbol{\\xi}^1, "
+#~ "\\boldsymbol{\\xi}^2, \\ldots, "
+#~ "\\boldsymbol{\\xi}^P\\}$，Hebbian 方案就是把每个模式的外积相加："
+
+#~ msgid ""
+#~ "\\mathbf{W} = \\frac{1}{N} \\sum_{\\mu=1}^P "
+#~ "\\boldsymbol{\\xi}^\\mu (\\boldsymbol{\\xi}^\\mu)^\\top -"
+#~ " \\frac{P}{N} \\mathbf{I}"
+#~ msgstr "因子 $1/N$（有时也用 $1/P$）是归一化常数，用于防止随着模式增加权重无限增长。权重矩阵可以紧凑写为："
+
+#~ msgid ""
+#~ "\\begin{aligned}E(\\mathbf{x}) &= -\\frac{1}{2} "
+#~ "\\sum_{i \\neq j} w_{ij} x_i x_j -"
+#~ " \\sum_i b_i x_i \\\\&= -\\frac{1}{2N} "
+#~ "\\sum_{\\mu=1}^P \\sum_{i \\neq j} \\xi_i^\\mu"
+#~ " \\xi_j^\\mu x_i x_j - \\sum_i b_i"
+#~ " x_i\\end{aligned}"
+#~ msgstr "考虑带 Hebbian 权重的 Hopfield 网络能量函数。将外积权重公式代入能量定义，可得："
+
+#~ msgid ""
+#~ "\\sum_{i \\neq j} \\xi_i^\\nu \\xi_j^\\nu "
+#~ "\\xi_i^\\nu \\xi_j^\\nu = \\sum_{i \\neq "
+#~ "j} (\\xi_i^\\nu)^2 (\\xi_j^\\nu)^2 = N(N-1)"
+#~ " \\approx N^2"
+#~ msgstr ""
+#~ "对于恰好等于某个存储模式的状态 $\\mathbf{x}$，例如 "
+#~ "$\\boldsymbol{\\xi}^\\nu$，双重求和会大幅简化。假设模式随机且不相关，主导贡献来自 $\\mu "
+#~ "= \\nu$ 项："
+
+#~ msgid ""
+#~ "E(\\boldsymbol{\\xi}^\\nu) \\approx -\\frac{1}{2N} "
+#~ "\\cdot N^2 = -\\frac{N}{2}"
+#~ msgstr "因此，存储模式的能量近似为："
+
+#~ msgid ""
+#~ "\\frac{\\partial f}{\\partial w_{ij}} = "
+#~ "\\langle x_i x_j \\rangle_{\\text{data}} - "
+#~ "\\langle x_i x_j \\rangle_{\\text{model}}"
+#~ msgstr ""
+#~ "我们也可以考察单个权重更新如何改变能量景观。假设把 $w_{ij}$ 增加一个小量 $\\Delta"
+#~ " w$。任意状态 $\\mathbf{x}$ 的能量变化为："
+
+#~ msgid ""
+#~ "\\Delta w_{ij} = \\eta \\left( "
+#~ "X_i(\\omega) X_j(\\omega) - \\mathbb{E}_\\theta "
+#~ "[X_i X_j] \\right)"
+#~ msgstr ""
+#~ "因此，增强神经元 $i$ 和 $j$ 之间的连接，会 "
+#~ "**降低二者一致状态的能量**，并 **提高二者不一致状态的能量**。这正是存储记忆模式所需的效果：希望模式本身（在 "
+#~ "$w_{ij}>0$ 时 $x_i$ 与 $x_j$ "
+#~ "一致）具有低能量，而损坏版本（部分单元与模式不一致）具有更高能量。"
+
+#~ msgid ""
+#~ "\\Delta w_{ij} \\propto \\langle x_i x_j"
+#~ " \\rangle_{\\text{data}} - \\langle x_i x_j"
+#~ " \\rangle_{\\text{model}}"
+#~ msgstr "在玻尔兹曼机中，目标不只是把一组模式存为吸引子，而是让网络的平衡分布匹配观测数据分布。实现这一点的学习规则是 Hebb 原则的推广："
+
+#~ msgid "::"
+#~ msgstr "::"
+

@@ -1,0 +1,419 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 16:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:10
+msgid "2.1 A Brief Recap: Linear Neurons and Limitations"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:12
+msgid ""
+"The previous chapter situated the Boltzmann machine within the conceptual"
+" landscape of statistical physics—a landscape defined by energy "
+"functions, equilibrium distributions, and thermal fluctuations. Before we"
+" delve deeper into energy-based learning, it is essential to revisit the "
+"elementary building blocks of neural computation. Understanding the "
+"simplest neuron models, their capabilities, and—crucially—their "
+"limitations provides the necessary contrast to appreciate why the "
+"Boltzmann machine adopts such a radically different computational "
+"paradigm."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:14
+msgid "<b>The Linear Neuron: Weighted Sum and Threshold</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:16
+msgid ""
+"The most basic computational unit in neural networks is the <b>linear "
+"neuron</b> (also called a <em>linear threshold unit</em> or, "
+"historically, a <em>McCulloch-Pitts neuron</em>). Its operation is "
+"straightforward: it computes a weighted sum of its inputs and produces an"
+" output based on whether that sum exceeds a threshold."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:18
+#, python-brace-format
+msgid ""
+"Let $\\mathbf{x} = (x_1, x_2, \\ldots, x_d)$ be a vector of input values."
+" Each input $x_j$ is multiplied by a corresponding <b>weight</b> $w_j$, "
+"representing the strength of the synaptic connection. An additional "
+"<b>bias</b> term $b$ shifts the decision boundary. The neuron's output "
+"$y$ is given by:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:20
+#, python-brace-format
+msgid ""
+"y = \\begin{cases}1 & \\text{if } \\sum_{j=1}^d w_j x_j + b \\geq 0 \\\\0"
+" & \\text{otherwise}\\end{cases}"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:22
+msgid "Equivalently, we can write this as:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:24
+#, python-brace-format
+msgid "y = \\mathbb{I}\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\geq 0 \\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:26
+#, python-brace-format
+msgid ""
+"where $\\mathbb{I}(\\cdot)$ is the indicator function. The vector $ "
+"\\mathbf{w} = (w_1, \\ldots, w_d)$ is called the <b>weight vector</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:28
+msgid "<b>Geometric Interpretation: Linear Separability</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:30
+#, python-brace-format
+msgid ""
+"The linear neuron has a clear geometric interpretation. The equation "
+"$\\mathbf{w}^\\top \\mathbf{x} + b = 0$ defines a <b>hyperplane</b> in "
+"the $d$-dimensional input space. This hyperplane partitions the space "
+"into two half-spaces:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:32
+msgid "Points on one side produce an output of 1."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:33
+msgid "Points on the other side produce an output of 0."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:35
+#, python-brace-format
+msgid ""
+"The weight vector $\\mathbf{w}$ is perpendicular to the hyperplane and "
+"points toward the positive half-space. The bias $b$ determines the "
+"perpendicular distance from the origin to the hyperplane (specifically, "
+"distance $= -b / \\|\\mathbf{w}\\|$)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:37
+#, python-brace-format
+msgid ""
+"This geometric view immediately reveals the fundamental capability and "
+"the fundamental limitation of linear neurons. A linear neuron can "
+"successfully classify any dataset that is <b>linearly separable, "
+"</b>which means there exists some hyperplane that perfectly separates the"
+" positive examples (label 1) from the negative examples (label 0). For "
+"such problems, there exist weight vectors $\\mathbf{w}$ and biases $b$ "
+"that achieve perfect accuracy."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:39
+msgid "<b>The Perceptron Learning Algorithm</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:41
+msgid ""
+"The <b>perceptron</b> is a specific training algorithm for linear "
+"threshold units, introduced by Frank Rosenblatt in 1958. It provides a "
+"simple, iterative procedure for finding a separating hyperplane, "
+"<em>provided one exists</em>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:43
+#, python-brace-format
+msgid ""
+"The perceptron learning rule processes training examples one at a time. "
+"For each example $(\\mathbf{x}, t)$, where $t \\in \\{0,1\\}$ is the "
+"target label, the algorithm:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:45
+#, python-brace-format
+msgid ""
+"Computes the current output: $y = \\mathbb{I}(\\mathbf{w}^\\top "
+"\\mathbf{x} + b \\geq 0)$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:46
+msgid "If $y = t$, the weights remain unchanged."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:47
+msgid "If $y \\neq t$, the weights are updated as follows:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:48
+#, python-brace-format
+msgid ""
+"If $t = 1$ but $y = 0$ (false negative): $\\mathbf{w} \\leftarrow "
+"\\mathbf{w} + \\eta \\mathbf{x}$, $b \\leftarrow b + \\eta$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:49
+#, python-brace-format
+msgid ""
+"If $t = 0$ but $y = 1$ (false positive): $\\mathbf{w} \\leftarrow "
+"\\mathbf{w} - \\eta \\mathbf{x}$, $b \\leftarrow b - \\eta$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:51
+msgid ""
+"Here, $\\eta > 0$ is the <b>learning rate</b>, a small positive constant "
+"controlling the step size."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:53
+msgid ""
+"The <b>Perceptron Convergence Theorem</b> guarantees that if the training"
+" data are linearly separable, this algorithm will find a separating "
+"hyperplane in a finite number of steps. This theoretical guarantee, "
+"proven in the early 1960s, generated enormous enthusiasm for neural "
+"network research."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:55
+msgid "<b>The Limits of Linear Separability: The XOR Problem</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:57
+msgid ""
+"The enthusiasm was short-lived. In 1969, Marvin Minsky and Seymour Papert"
+" published their influential book <em>Perceptrons</em>, which rigorously "
+"analyzed the capabilities and limitations of linear threshold units. "
+"Their most famous counterexample is the <b>XOR (exclusive-or)</b> "
+"problem."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:59
+#, python-brace-format
+msgid ""
+"Consider two binary inputs $x_1, x_2 \\in \\{0,1\\}$ and the desired "
+"outputs:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md
+msgid "$$x_1$$"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md
+msgid "$$x_2$$"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md
+msgid "<b>XOR Output</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md
+msgid "0"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md
+msgid "1"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:68
+msgid ""
+"Plotting these four points in the 2D input plane reveals the difficulty. "
+"The positive examples, (0,1) and (1,0), are diagonally opposite; the "
+"negative examples, (0,0) and (1,1), occupy the other diagonal. <b>No "
+"single straight line can separate the two classes.</b> The XOR function "
+"is not linearly separable."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:70
+msgid ""
+"Minsky and Papert proved that this limitation extends far beyond XOR. "
+"Linear threshold units fail on any function that requires a <em>non-"
+"convex</em> decision boundary or one with disconnected regions. Many "
+"seemingly simple logical functions, i.e. parity, connectedness in visual "
+"patterns are beyond the reach of a single perceptron."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:72
+msgid "<b>The Historical Impact: The First AI Winter</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:74
+msgid ""
+"The rigorous demonstration of the perceptron's limitations had a chilling"
+" effect on neural network research throughout the 1970s. Funding dried "
+"up, and many researchers abandoned connectionist approaches in favor of "
+"symbolic artificial intelligence. This period is often referred to as the"
+" <b>first AI winter</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:76
+msgid ""
+"The core insight from this episode, however, was not that neural networks"
+" were fundamentally flawed, but that <b>single-layer linear networks are "
+"insufficient for complex tasks</b>. The path forward required two "
+"essential innovations:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:78
+msgid ""
+"<b>Multiple Layers</b>: Stacking linear threshold units into layers, with"
+" the outputs of one layer serving as inputs to the next, can overcome the"
+" linear separability limitation. A two-layer network can represent any "
+"Boolean function; with continuous activation functions, deeper networks "
+"can approximate arbitrarily complex decision boundaries."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:79
+#, python-brace-format
+msgid ""
+"<b>Nonlinear Activation Functions</b>: The step function $\\mathbb{I}(z "
+"\\geq 0)$ is discontinuous and non-differentiable. Replacing it with "
+"smooth, differentiable nonlinearities—such as the <b>sigmoid</b> "
+"$\\sigma(z) = 1/(1+e^{-z})$ or the <b>hyperbolic tangent</b> $\\tanh(z)$,"
+" enables gradient-based learning through <b>backpropagation</b>, a topic "
+"we will revisit in the context of energy-based models."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:81
+msgid "<b>From Feedforward Classification to Probabilistic Generation</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:83
+#, python-brace-format
+msgid ""
+"The perceptron and its multilayer successors are fundamentally "
+"<b>discriminative models</b>: they learn a direct mapping from inputs "
+"$\\mathbf{x}$ to outputs $y$. Their objective is to minimize "
+"classification errors on a labeled dataset. The computation is "
+"<b>feedforward</b>: information flows in one direction, from input to "
+"output, without cycles or recurrence."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:85
+#, python-brace-format
+msgid ""
+"The Boltzmann machine, in stark contrast, belongs to the family of "
+"<b>generative models</b>. Its objective is not to map inputs to outputs "
+"but to model the <em>joint probability distribution</em> $P(\\mathbf{x})$"
+" (or $P(\\mathbf{x}, \\mathbf{h})$ with hidden units) of the observed "
+"data. The computation is <b>recurrent</b>: units are interconnected "
+"symmetrically, and the network's state evolves over time through "
+"stochastic updates until equilibrium is reached."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:87
+msgid ""
+"Why abandon the simplicity of feedforward classification for the "
+"complexity of recurrent, stochastic, energy-based models? The answer lies"
+" in the types of problems each paradigm addresses. Perceptrons excel at "
+"<em>supervised pattern recognition</em> when large labeled datasets are "
+"available. Boltzmann machines address <em>unsupervised learning</em> and "
+"<em>generation</em>: discovering the underlying structure of data without"
+" explicit labels, completing missing information, and synthesizing new, "
+"plausible examples."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:89
+msgid ""
+"The limitations of linear neurons taught us that simple, shallow "
+"architectures cannot capture the rich structure of natural data. The "
+"Boltzmann machine answers this lesson not by stacking deterministic "
+"layers, but by embracing a fundamentally different computational "
+"metaphor—one drawn from the statistical physics of complex systems, where"
+" global structure emerges from local, stochastic interactions."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:91
+msgid "<b>Connection to Energy-Based Models</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:93
+#, python-brace-format
+msgid ""
+"As we transition to the next section, note a subtle but important "
+"parallel. The perceptron's decision rule $\\mathbf{w}^\\top \\mathbf{x} +"
+" b \\geq 0$ can be reinterpreted in energetic terms. Define an "
+"<b>energy</b> for a given input-output pair:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:95
+#, python-brace-format
+msgid "E(\\mathbf{x}, y) = -y (\\mathbf{w}^\\top \\mathbf{x} + b)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:97
+msgid ""
+"The perceptron outputs $y=1$ when this energy is negative (i.e., low), "
+"and $y=0$ when it is zero (i.e., higher). The learning rule adjusts "
+"weights to lower the energy of correct classifications and raises the "
+"energy of incorrect ones."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:99
+msgid ""
+"This energy-based perspective, while rudimentary in the perceptron, "
+"becomes the central organizing principle in Boltzmann machines. The "
+"difference is that Boltzmann machines define energy over <em>all</em> "
+"units, both visible and hidden and use stochastic, rather than "
+"deterministic, state transitions to explore the energy landscape. The "
+"following sections will develop this energy-based viewpoint in full "
+"mathematical detail."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:101
+msgid "<b>Summary</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:103
+msgid ""
+"A <b>linear neuron</b> computes a weighted sum of inputs and applies a "
+"threshold, partitioning the input space with a hyperplane."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:104
+msgid ""
+"The <b>perceptron algorithm</b> provably finds a separating hyperplane "
+"for linearly separable data."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:105
+msgid ""
+"The <b>XOR problem</b> demonstrates that single linear threshold units "
+"cannot solve non-linearly separable tasks, triggering the first AI "
+"winter."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:106
+msgid ""
+"Overcoming this limitation requires either <b>multiple layers</b> of "
+"nonlinear units or a fundamentally different computational paradigm."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:107
+msgid ""
+"The <b>Boltzmann machine</b> chooses the latter path: a "
+"<b>generative</b>, <b>recurrent</b>, and <b>energy-based</b> architecture"
+" capable of unsupervised learning and probabilistic inference."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-nn-recap.md:108
+msgid ""
+"The transition from deterministic perceptrons to stochastic Boltzmann "
+"machines parallels a shift from <b>discriminative classification</b> to "
+"<b>probabilistic modeling</b> of data distributions."
+msgstr ""
+

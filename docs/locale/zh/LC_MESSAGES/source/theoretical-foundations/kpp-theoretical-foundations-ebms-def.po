@@ -1,0 +1,802 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-ebms-def.md:10
+msgid "3.1 Defining the Objective: Low Energy for Real Data"
+msgstr "3.1 定义目标：让真实数据具有低能量"
+
+#: ../../source/theoretical-foundations-ebms-def.md:12
+msgid ""
+"The preceding chapters have introduced two essential perspectives: the "
+"**probabilistic framework** of statistical physics (Chapter 1) and the "
+"**architectural principles** of recurrent neural networks (Chapter 2). We"
+" now unite these perspectives under the umbrella of **Energy-Based Models"
+" (EBMs)**. This section defines the core learning objective that drives "
+"all energy-based models, including the Boltzmann machine: to shape the "
+"energy landscape so that real data resides in deep valleys, while all "
+"other configurations occupy higher ground."
+msgstr ""
+"前几章引入了两个关键视角：统计物理的 **概率框架**（第 1 章）和循环神经网络的 **架构原则**（第 2 章）。现在，我们把它们统一到 "
+"**基于能量的模型（Energy-Based Models, EBMs）** "
+"之下。本节定义驱动所有基于能量模型（包括玻尔兹曼机）的核心学习目标：塑造能量景观，使真实数据位于深谷中，而其他构型处于更高位置。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:14
+msgid "The Energy-Based Modeling Paradigm"
+msgstr "基于能量的建模范式"
+
+#: ../../source/theoretical-foundations-ebms-def.md:15
+#, python-brace-format
+msgid ""
+"An energy-based model is defined by a scalar **energy function** "
+"$E_\\theta(\\mathbf{x})$, parameterized by $ \\theta$, that assigns a "
+"real-valued energy to every possible configuration $\\mathbf{x}$ of the "
+"variables of interest. For a Boltzmann machine, $\\mathbf{x}$ represents "
+"the joint state of visible and hidden units, but the framework applies "
+"broadly to any structured configuration."
+msgstr ""
+"基于能量的模型由一个标量 **能量函数** $E_\\theta(\\mathbf{x})$ 定义，该函数由参数 $\\theta$ "
+"参数化，并为变量的每个可能构型 $\\mathbf{x}$ 分配一个实值能量。对于玻尔兹曼机，$\\mathbf{x}$ "
+"表示可见单元和隐藏单元的联合状态；但这一框架可以广泛应用于任何结构化构型。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:17
+msgid ""
+"The energy function induces a probability distribution via the "
+"**Boltzmann distribution** (or Gibbs distribution):"
+msgstr "能量函数通过 **玻尔兹曼分布**（或 Gibbs 分布）诱导出概率分布："
+
+#: ../../source/theoretical-foundations-ebms-def.md:19
+msgid ""
+"P_\\theta(\\mathbf{x}) = "
+"\\frac{\\exp\\left(-E_\\theta(\\mathbf{x})\\right)}{Z_\\theta}, \\quad "
+"\\text{where} \\quad Z_\\theta = \\sum_{\\tilde{\\mathbf{x}}} "
+"\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:21
+msgid ""
+"This formulation accomplishes a fundamental transformation: **low energy "
+"corresponds to high probability**. The model assigns higher likelihood to"
+" configurations that it deems \"good\" or \"compatible\" according to its"
+" internal criteria."
+msgstr "这一形式完成了一个根本转换：**低能量对应高概率**。模型会根据自身内部标准，把更高似然分配给它认为“好”或“兼容”的构型。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:23
+msgid ""
+"Crucially, the energy function is **unnormalized,** it provides a "
+"relative ordering of configurations but does not directly yield "
+"probabilities without the partition function $Z_\\theta$. This is both a "
+"strength (flexibility in designing energy functions) and a challenge "
+"(intractability of $Z_\\theta$."
+msgstr ""
+"关键在于，能量函数是 **未归一化的**：它提供构型之间的相对排序，但如果没有配分函数 "
+"$Z_\\theta$，并不能直接给出概率。这既是优点（能量函数设计灵活），也是挑战（$Z_\\theta$ 难以计算）。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:25
+msgid "The Learning Objective: Maximum Likelihood and KL Divergence"
+msgstr "学习目标：最大似然"
+
+#: ../../source/theoretical-foundations-ebms-def.md:26
+msgid ""
+"Given a training dataset $\\mathcal{D} = \\{\\mathbf{x}^{(1)}, "
+"\\mathbf{x}^{(2)}, \\ldots, \\mathbf{x}^{(M)}\\}$ drawn independently "
+"from an unknown data distribution $P_{\\text{data}}(\\mathbf{x})$, the "
+"goal of learning is to adjust the parameters $ \\theta$ so that the model"
+" distribution $P_\\theta(\\mathbf{x})$ approximates $P_{\\text{data}}$ as"
+" closely as possible."
+msgstr ""
+"给定从未知数据分布 $ P_{\\text{data}}(\\mathbf{x}) $ 独立采样得到的训练集 $ \\mathcal{D} = "
+"\\{\\mathbf{x}^{(1)}, \\mathbf{x}^{(2)}, \\ldots, \\mathbf{x}^{(M)}\\} "
+"$，学习目标是调整参数 $ \\theta $，使模型分布 $ P_\\theta(\\mathbf{x}) $ 尽可能接近 $ "
+"P_{\\text{data}} $。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:28
+msgid ""
+"The standard criterion for this approximation is **maximum likelihood "
+"estimation (MLE)**. We seek parameters that maximize the probability of "
+"the observed data under the model:"
+msgstr "衡量这种接近性的标准准则是 **最大似然估计（MLE）**。我们希望找到使观测数据在模型下概率最大的参数："
+
+#: ../../source/theoretical-foundations-ebms-def.md:30
+#, python-brace-format
+msgid ""
+"\\theta^* = \\arg\\max_\\theta \\prod_{m=1}^M "
+"P_\\theta(\\mathbf{x}^{(m)}) = \\arg\\max_\\theta \\sum_{m=1}^M \\log "
+"P_\\theta(\\mathbf{x}^{(m)})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:32
+msgid "Equivalently, we minimize the **negative log-likelihood**:"
+msgstr "等价地，我们最小化 **负对数似然**："
+
+#: ../../source/theoretical-foundations-ebms-def.md:34
+#, python-brace-format
+msgid ""
+"\\mathcal{L}(\\theta) = -\\frac{1}{M} \\sum_{m=1}^M \\log "
+"P_\\theta(\\mathbf{x}^{(m)})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:36
+msgid "Substituting the Boltzmann distribution form of $P_\\theta$:"
+msgstr "代入 $ P_\\theta $ 的玻尔兹曼分布形式："
+
+#: ../../source/theoretical-foundations-ebms-def.md:38
+#, python-brace-format
+msgid "\\log P_\\theta(\\mathbf{x}) = -E_\\theta(\\mathbf{x}) - \\log Z_\\theta"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:40
+msgid "Thus, the negative log-likelihood becomes:"
+msgstr "于是负对数似然变为："
+
+#: ../../source/theoretical-foundations-ebms-def.md:42
+#, python-brace-format
+msgid ""
+"\\mathcal{L}(\\theta) = \\frac{1}{M} \\sum_{m=1}^M "
+"E_\\theta(\\mathbf{x}^{(m)}) + \\log Z_\\theta"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:44
+msgid "This decomposition reveals the two competing forces that shape learning:"
+msgstr "与 KL 散度的联系"
+
+#: ../../source/theoretical-foundations-ebms-def.md:46
+#, python-brace-format
+msgid ""
+"**Data term**: $\\frac{1}{M} \\sum_{m} E_\\theta(\\mathbf{x}^{(m)})$, the"
+" average energy of real data points. Minimizing this term pushes the "
+"energy of observed data **downward**."
+msgstr ""
+"MLE 目标在信息论中还有更深层的解释。最小化负对数似然 **等价于** 最小化数据分布到模型分布的 **Kullback-"
+"Leibler（KL）散度**："
+
+#: ../../source/theoretical-foundations-ebms-def.md:47
+msgid ""
+"**Partition function term**: $\\log Z_\\theta$, the log of the sum of "
+"exponentials of negative energies over all configurations. Minimizing "
+"this term pushes the energy of **all** configurations, and especially "
+"those with currently low energy, **upward**, because $\\log Z_\\theta$ "
+"grows as more configurations acquire low energy."
+msgstr "它可以改写为："
+
+#: ../../source/theoretical-foundations-ebms-def.md:49
+msgid ""
+"The learning process is therefore a **tug-of-war**: the data term pulls "
+"down the energy at the observed data points, while the partition function"
+" term pushes up the energy everywhere else to maintain normalization. The"
+" equilibrium of this tug-of-war is reached when the model distribution "
+"matches the data distribution."
+msgstr ""
+"其中 $H(P_{\\text{data}}) = -\\mathbb{E}_{\\text{data}}[\\log "
+"P_{\\text{data}}(\\mathbf{X})]$ 是数据分布的熵，与 $\\theta$ 无关。因此，最小化 "
+"$\\text{KL}(P_{\\text{data}} \\parallel P_\\theta)$ 等价于最大化期望对数似然 "
+"$f(\\theta)$："
+
+#: ../../source/theoretical-foundations-ebms-def.md:51
+msgid "Connection to KL Divergence"
+msgstr "与 KL 散度的联系"
+
+#: ../../source/theoretical-foundations-ebms-def.md:53
+msgid ""
+"The MLE objective has a deeper interpretation from information theory. "
+"Minimizing the negative log-likelihood is **equivalent** to minimizing "
+"the **Kullback-Leibler (KL) divergence** from the data distribution to "
+"the model distribution:"
+msgstr ""
+"MLE 目标在信息论中还有更深层的解释。最小化负对数似然 **等价于** 最小化数据分布到模型分布的 **Kullback-"
+"Leibler（KL）散度**："
+
+#: ../../source/theoretical-foundations-ebms-def.md:55
+msgid ""
+"\\text{KL}(P_{\\text{data}} \\parallel P_\\theta) = "
+"\\sum_{\\tilde{\\mathbf{x}}} P_{\\text{data}}(\\tilde{\\mathbf{x}}) \\log"
+" "
+"\\frac{P_{\\text{data}}(\\tilde{\\mathbf{x}})}{P_\\theta(\\tilde{\\mathbf{x}})}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:57
+msgid "This can be rewritten as:"
+msgstr "它可以改写为："
+
+#: ../../source/theoretical-foundations-ebms-def.md:59
+msgid ""
+"\\text{KL}(P_{\\text{data}} \\parallel P_\\theta) = "
+"-\\mathbb{E}_{\\text{data}}[\\log P_\\theta(\\mathbf{X})] - "
+"H(P_{\\text{data}})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:61
+msgid ""
+"where $H(P_{\\text{data}}) = -\\mathbb{E}_{\\text{data}}[\\log "
+"P_{\\text{data}}(\\mathbf{X})]$ is the entropy of the data distribution "
+"(a constant independent of $\\theta$). Therefore, minimizing "
+"$\\text{KL}(P_{\\text{data}} \\parallel P_\\theta)$ is equivalent to "
+"maximizing the expected log-likelihood $f(\\theta) = "
+"\\mathbb{E}_{\\text{data}}[\\log P_\\theta(\\mathbf{X})] = \\frac{1}{M} "
+"\\sum_{m=1}^M \\log P_\\theta(\\mathbf{x}^{(m)})$."
+msgstr "其中 $H(P_{\\text{data}}) = -\\mathbb{E}_{\\text{data}}[\\log P_{\\text{data}}(\\mathbf{X})]$ 是数据分布的熵，与 $\\theta$ 无关。因此，最小化 $\\text{KL}(P_{\\text{data}} \\parallel P_\\theta)$ 等价于最大化期望对数似然 $f(\\theta) = \\mathbb{E}_{\\text{data}}[\\log P_\\theta(\\mathbf{X})] = \\frac{1}{M} \\sum_{m=1}^M \\log P_\\theta(\\mathbf{x}^{(m)})$。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:63
+msgid ""
+"This equivalence reveals that **MLE is fundamentally about matching "
+"distributions,** which means the model distribution $P_\\theta$ is "
+"trained to be as close as possible to the empirical data distribution in "
+"the sense of KL divergence."
+msgstr "这个等价关系说明：**MLE 本质上是在匹配分布**，也就是把模型分布 $P_\\theta$ 训练得在 KL 散度意义下尽可能接近经验数据分布。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:65
+msgid "Gradient of the Log-Likelihood"
+msgstr "几何直觉：塑造能量景观"
+
+#: ../../source/theoretical-foundations-ebms-def.md:67
+msgid ""
+"To perform gradient-based optimization, we compute the gradient of the "
+"log-likelihood $f(\\theta)$ with respect to the parameters:"
+msgstr "可以把能量景观看作定义在所有构型空间上的可变形表面。初始时，该表面可能是平坦的（所有构型能量和概率相近），也可能任意褶皱。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:69
+msgid ""
+"\\nabla f(\\theta) = \\mathbb{E}_{\\text{data}}[\\nabla \\log "
+"P_\\theta(\\mathbf{X})] = -\\mathbb{E}_{\\text{data}}[\\nabla "
+"E_\\theta(\\mathbf{X})] - \\nabla \\log Z_\\theta"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:71
+msgid "The gradient of $\\log Z_\\theta$ is:"
+msgstr "学习通过反复执行两类操作进行："
+
+#: ../../source/theoretical-foundations-ebms-def.md:73
+msgid ""
+"\\nabla \\log Z_\\theta = \\frac{1}{Z_\\theta} "
+"\\sum_{\\tilde{\\mathbf{x}}} \\exp(-E_\\theta(\\tilde{\\mathbf{x}})) "
+"\\nabla E_\\theta(\\tilde{\\mathbf{x}}) = \\mathbb{E}_\\theta[\\nabla "
+"E_\\theta(\\mathbf{X})]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:75
+msgid "Thus, the gradient of the log-likelihood becomes:"
+msgstr "**挖掘**：在训练样本所在位置向下挖，降低能量以形成吸引盆地。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:77
+msgid ""
+"\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}}[\\nabla "
+"E_\\theta(\\mathbf{X})] + \\mathbb{E}_\\theta[\\nabla "
+"E_\\theta(\\mathbf{X})]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:79
+msgid ""
+"This contrastive form, i.e. the difference between an expectation under "
+"the **data distribution** and an expectation under the **model "
+"distribution,** is the mathematical heart of all Boltzmann machine "
+"learning algorithms. The first term lowers the energy of observed data "
+"configurations; the second term raises the energy of configurations that "
+"the model currently deems probable."
+msgstr "**抬升**：在其他区域抬高景观，防止模型给没有数据的区域分配高概率。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:81
+msgid "Special Case: Visible-Only Boltzmann Machine"
+msgstr "对数似然梯度"
+
+#: ../../source/theoretical-foundations-ebms-def.md:83
+#, python-brace-format
+msgid ""
+"For a Boltzmann machine with only visible units (no hidden units), the "
+"gradient simplifies to a particularly transparent form. Substituting the "
+"energy function $E_\\theta(\\mathbf{x}) = -\\mathbf{b}^\\top \\mathbf{x} "
+"- \\frac{1}{2} \\mathbf{x}^\\top \\mathbf{W} \\mathbf{x}$ and taking the "
+"derivative with respect to a weight $w_{ij}$ yields:"
+msgstr "如果改用对数似然 $f(\\theta)$ 而不是负对数似然 $\\mathcal{L}(\\theta)$，梯度符号会相反："
+
+#: ../../source/theoretical-foundations-ebms-def.md:85
+msgid ""
+"\\frac{\\partial f(\\theta)}{\\partial w_{ij}} = \\langle X_i X_j "
+"\\rangle_{\\text{data}} - \\langle X_i X_j \\rangle_{\\text{model}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:87
+msgid ""
+"where $\\langle X_i X_j \\rangle_{\\text{data}}$ is the expected product "
+"of the activities of units $i$ and $j$ when the visible units are clamped"
+" to the data (the positive phase), and $\\langle X_i X_j "
+"\\rangle_{\\text{model}}$ is the expected product when the network "
+"samples freely from its equilibrium distribution (the negative phase). "
+"This simple expression directly captures the essence of contrastive "
+"learning: co-activations observed in the data are reinforced, while those"
+" generated by the model’s own fantasies are suppressed."
+msgstr ""
+"这种对比形式，即 **数据分布** 下期望与 **模型分布** "
+"下期望之间的差，是所有玻尔兹曼机学习算法的数学核心。第一项降低观测数据构型的能量；第二项提高模型当前认为可能的构型的能量。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:89
+msgid "Geometric Intuition: Sculpting the Energy Landscape"
+msgstr "特殊情形：仅含可见单元的玻尔兹曼机"
+
+#: ../../source/theoretical-foundations-ebms-def.md:90
+msgid ""
+"Imagine the energy landscape as a deformable surface over the space of "
+"all configurations. Initially, the surface may be flat (all "
+"configurations have similar energy and probability) or arbitrarily "
+"wrinkled."
+msgstr ""
+"对于只有可见单元、没有隐藏单元的玻尔兹曼机，梯度可以化为特别直观的形式。代入能量函数 $E_\\theta(\\mathbf{x}) = "
+"-\\mathbf{b}^\\top \\mathbf{x} - \\frac{1}{2} \\mathbf{x}^\\top "
+"\\mathbf{W} \\mathbf{x}$，并对权重 $w_{ij}$ 求导，可得："
+
+#: ../../source/theoretical-foundations-ebms-def.md:92
+msgid "Learning proceeds by iteratively applying two operations:"
+msgstr ""
+"其中 $\\langle X_i X_j \\rangle_{\\text{data}}$ 表示可见单元被固定到数据时，单元 $i$ 和 $j$ "
+"活动乘积的期望（正相）；$\\langle X_i X_j \\rangle_{\\text{model}}$ "
+"表示网络从自身平衡分布自由采样时的期望乘积（负相）。这个简单表达式直接捕捉了对比学习的本质：强化数据中出现的共激活，抑制模型自身“幻想”中产生的共激活。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:94
+msgid ""
+"**Excavation**: At the locations of training examples, we dig downward, "
+"which lowering the energy to create basins of attraction."
+msgstr "特殊情形：仅含可见单元的玻尔兹曼机"
+
+#: ../../source/theoretical-foundations-ebms-def.md:95
+msgid ""
+"**Elevation**: Everywhere else, we raise the landscape to prevent the "
+"model from assigning high probability to regions where no data resides."
+msgstr ""
+"对于只有可见单元、没有隐藏单元的玻尔兹曼机，梯度可以化为特别直观的形式。代入能量函数 $E_\\theta(\\mathbf{x}) = "
+"-\\mathbf{b}^\\top \\mathbf{x} - \\frac{1}{2} \\mathbf{x}^\\top "
+"\\mathbf{W} \\mathbf{x}$，并对权重 $w_{ij}$ 求导，可得："
+
+#: ../../source/theoretical-foundations-ebms-def.md:97
+msgid ""
+"The **gradient** of the log-likelihood with respect to the parameters "
+"$\\theta$formalizes this intuition:"
+msgstr ""
+"其中 $\\langle X_i X_j \\rangle_{\\text{data}}$ 表示可见单元被固定到数据时，单元 $i$ 和 $j$ "
+"活动乘积的期望（正相）；$\\langle X_i X_j \\rangle_{\\text{model}}$ "
+"表示网络从自身平衡分布自由采样时的期望乘积（负相）。这个简单表达式直接捕捉了对比学习的本质：强化数据中出现的共激活，抑制模型自身“幻想”中产生的共激活。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:99
+msgid ""
+"\\frac{\\partial f}{\\partial \\theta} = -\\frac{1}{M} \\sum_{m=1}^M "
+"\\frac{\\partial E_\\theta(\\mathbf{x}^{(m)})}{\\partial \\theta} + "
+"\\mathbb{E}_{P_\\theta} \\left[ \\frac{\\partial "
+"E_\\theta(\\mathbf{x})}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:101
+msgid ""
+"The first term is the negative average gradient of the energy at the data"
+" points, the direction of steepest descent for lowering data energy. The "
+"second term is the expected gradient of the energy under the model's own "
+"distribution, the direction that would lower the energy of configurations"
+" the model currently favors."
+msgstr "为什么真实数据应具有低能量？"
+
+#: ../../source/theoretical-foundations-ebms-def.md:103
+msgid ""
+"The positive sign on the second term means that, overall, we move "
+"parameters in the direction that **increases energy** where the model "
+"currently puts probability mass. This is the mathematical expression of "
+"tug-of-war."
+msgstr "“让真实数据具有低能量”不是任意选择；它直接来自最大似然原则，以及能量与概率之间的指数关系。除了数学上的必然性，这一目标还有多个直观和实践优势："
+
+#: ../../source/theoretical-foundations-ebms-def.md:105
+#, python-brace-format
+msgid ""
+"**Note on notation**: In many textbooks, the negative log-likelihood "
+"$\\mathcal{L}(\\theta)$ is minimized. Here we maximize $f(\\theta) = "
+"-\\mathcal{L}(\\theta)$ to keep the gradient sign consistent with the "
+"contrastive divergence algorithm introduced in Section [3.3 Contrastive "
+"Divergence](kpp-theoretical-foundations-ebms-cd.md)."
+msgstr "**未归一化的灵活性**：设计能量函数时无需担心归一化。构型上的任意可微函数都可以作为能量，因此可融入领域知识、约束与结构化架构。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:107
+msgid "Why Low Energy for Real Data?"
+msgstr "为什么真实数据应具有低能量？"
+
+#: ../../source/theoretical-foundations-ebms-def.md:108
+msgid ""
+"The mandate \"low energy for real data\" is not an arbitrary choice; it "
+"follows directly from the maximum likelihood principle and the "
+"exponential link between energy and probability. But beyond mathematics, "
+"this objective carries several intuitive and practical advantages:"
+msgstr "“让真实数据具有低能量”不是任意选择；它直接来自最大似然原则，以及能量与概率之间的指数关系。除了数学上的必然性，这一目标还有多个直观和实践优势："
+
+#: ../../source/theoretical-foundations-ebms-def.md:110
+msgid ""
+"**Unnormalized Flexibility**: The energy function can be designed without"
+" concern for normalization. Any differentiable function of the "
+"configuration can serve as an energy. This allows incorporating domain "
+"knowledge, constraints, and structured architectures."
+msgstr "**未归一化的灵活性**：设计能量函数时无需担心归一化。构型上的任意可微函数都可以作为能量，因此可融入领域知识、约束与结构化架构。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:111
+msgid ""
+"**Natural Handling of Uncertainty**: In regions where no data has been "
+"observed, the model's energy can remain high, corresponding to low "
+"probability. The model is not forced to make arbitrary predictions in "
+"unobserved regions."
+msgstr "**自然处理不确定性**：在没有观测数据的区域，模型能量可以保持较高，对应较低概率。模型不会被迫在未观测区域做出任意预测。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:112
+msgid ""
+"**Generation by Descent**: Once trained, new samples can be generated by "
+"starting from a random configuration and following a stochastic descent "
+"procedure on the energy landscape. This yields configurations that are "
+"typical under the learned distribution."
+msgstr "**通过下降生成**：训练完成后，可以从随机构型出发，在能量景观上执行随机下降过程生成新样本。这会产生学习分布下的典型构型。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:113
+#, python-brace-format
+msgid ""
+"**Compositionality**: Energy functions can be combined additively. If "
+"$E_1(\\mathbf{x})$ and $E_2(\\mathbf{x})$ model different aspects of the "
+"data, the sum $E_1 + E_2$ defines a product of experts model that "
+"captures both constraints."
+msgstr ""
+"**可组合性**：能量函数可以相加组合。如果 $E_1(\\mathbf{x})$ 和 $E_2(\\mathbf{x})$ "
+"建模数据的不同方面，则 $E_1 + E_2$ 定义了一个专家乘积模型，可同时捕捉多种约束。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:114
+msgid ""
+"**Physical Plausibility**: The energy-based view connects learning to "
+"well-understood physical processes like annealing and phase transitions, "
+"providing a rich conceptual vocabulary for understanding model behavior."
+msgstr "**物理合理性**：基于能量的视角把学习与退火、相变等成熟物理过程连接起来，为理解模型行为提供丰富概念词汇。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:116
+msgid "The Challenge: The Partition Function Gradient"
+msgstr "挑战：配分函数梯度"
+
+#: ../../source/theoretical-foundations-ebms-def.md:117
+msgid ""
+"The elegance of the energy-based objective comes at a computational cost."
+" The gradient involves an expectation under the model distribution:"
+msgstr "基于能量目标的优雅伴随着计算代价。梯度包含模型分布下的期望："
+
+#: ../../source/theoretical-foundations-ebms-def.md:119
+msgid ""
+"\\mathbb{E}_{P_\\theta} \\left[ \\frac{\\partial "
+"E_\\theta(\\mathbf{x})}{\\partial \\theta} \\right] = "
+"\\sum_{\\tilde{\\mathbf{x}}} P_\\theta(\\tilde{\\mathbf{x}}) "
+"\\frac{\\partial E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:121
+msgid ""
+"This sum over all possible configurations is intractable for any non-"
+"trivial model. We cannot compute it exactly, nor can we enumerate all "
+"configurations to approximate it."
+msgstr "对所有可能构型求和，对任何非平凡模型都是不可处理的。我们既无法精确计算，也无法枚举所有构型来近似它。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:123
+msgid ""
+"This intractability is the central computational challenge that defines "
+"the field of energy-based learning. Every practical algorithm for "
+"training Boltzmann machines can be understood as a strategy for "
+"approximating this model expectation."
+msgstr "这种不可处理性是定义基于能量学习领域的核心计算挑战。几乎所有训练玻尔兹曼机的实用算法，都可以理解为近似这一模型期望的策略。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:125
+msgid "The subsequent sections will explore these strategies in depth:"
+msgstr "后续章节将深入讨论这些策略："
+
+#: ../../source/theoretical-foundations-ebms-def.md:127
+msgid ""
+"**Section** [3.2 The Intractable Partition Function Problem](kpp-"
+"theoretical-foundations-ebms-partition.md) formalizes the partition "
+"function problem and its implications."
+msgstr ""
+"[3.2 节：难以精确处理的配分函数问题](kpp-theoretical-foundations-ebms-partition.md) "
+"将形式化配分函数问题及其影响。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:128
+msgid ""
+"**Section** [3.3 Contrastive Divergence](kpp-theoretical-foundations-"
+"ebms-cd.md) introduces **contrastive divergence**, the breakthrough "
+"approximation that made Boltzmann machines practical."
+msgstr ""
+"[3.3 节：对比散度](kpp-theoretical-foundations-ebms-cd.md) 将介绍 "
+"**对比散度**，这一使玻尔兹曼机变得实用的突破性近似方法。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:129
+msgid ""
+"**Chapters 4 and beyond** develop specific architectures (Restricted "
+"Boltzmann Machines) and training algorithms that exploit structural "
+"constraints to make the model expectation tractable."
+msgstr "第 4 章及以后 将发展具体架构（受限玻尔兹曼机）与训练算法，利用结构约束使模型期望更易处理。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:131
+msgid "Connection to Discriminative Learning"
+msgstr "与判别式学习的联系"
+
+#: ../../source/theoretical-foundations-ebms-def.md:132
+msgid ""
+"It is instructive to contrast the energy-based generative objective with "
+"the more familiar **discriminative** objective used in feedforward "
+"classifiers."
+msgstr "把基于能量的生成式目标与前馈分类器中更熟悉的 **判别式** 目标进行对比，能够进一步加深理解。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:134
+#, python-brace-format
+msgid ""
+"In a discriminative model, such as a logistic regression or a multilayer "
+"perceptron classifier, we model the conditional distribution $P(y \\mid "
+"\\mathbf{x})$ directly, without modeling the input distribution "
+"$P(\\mathbf{x})$. The energy function is defined over the joint space "
+"$(\\mathbf{x}, y)$, and the probability of a label given an input is:"
+msgstr ""
+"在判别模型中，例如逻辑回归或多层感知机分类器，我们直接建模条件分布 $P(y \\mid \\mathbf{x})$，而不建模输入分布 "
+"$P(\\mathbf{x})$。能量函数定义在联合空间 $(\\mathbf{x}, y)$ 上，给定输入时某个标签的概率为："
+
+#: ../../source/theoretical-foundations-ebms-def.md:136
+msgid ""
+"P(y \\mid \\mathbf{x}) = \\frac{\\exp(-E(\\mathbf{x}, y))}{\\sum_{y'} "
+"\\exp(-E(\\mathbf{x}, y'))}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-def.md:138
+#, python-brace-format
+msgid ""
+"Crucially, the partition function now sums only over the possible labels "
+"$y'$ for a fixed input $\\mathbf{x}$. This sum is typically tractable "
+"(e.g., over a finite set of classes). The intractable sum over all "
+"configurations $\\mathbf{x}$ is **not required** for discriminative "
+"training."
+msgstr ""
+"关键是，此时配分函数只对固定输入 $\\mathbf{x}$ 下的可能标签 $y'$ 求和。该求和通常是可处理的（例如有限类别集合）。判别式训练 "
+"**不需要** 对所有构型 $\\mathbf{x}$ 的不可处理求和。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:140
+msgid ""
+"This observation explains why discriminative models have been so "
+"successful in supervised learning: they circumvent the partition function"
+" bottleneck entirely. However, they pay a price: they cannot generate new"
+" inputs, complete missing data, or learn from unlabeled examples."
+msgstr "这解释了为什么判别模型在监督学习中如此成功：它们完全绕开了配分函数瓶颈。但代价是，它们无法生成新输入、补全缺失数据或从无标签样本中学习。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:142
+msgid ""
+"Energy-based generative models embrace the full complexity of the "
+"partition function because they aim to model the entire data "
+"distribution, not just the decision boundary between classes. The reward "
+"is a richer, more flexible model capable of unsupervised learning, "
+"generation, and inference in any direction."
+msgstr "基于能量的生成模型接受配分函数的全部复杂性，因为它们的目标是建模整个数据分布，而不只是类别之间的决策边界。回报是模型更加丰富和灵活，能够进行无监督学习、生成以及任意方向的推断。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:144
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-ebms-def.md:145
+#, python-brace-format
+msgid ""
+"**Energy-Based Models** define a probability distribution via "
+"$P_\\theta(\\mathbf{x}) \\propto \\exp(-E_\\theta(\\mathbf{x}))$, linking"
+" low energy to high probability."
+msgstr ""
+"**基于能量的模型** 通过 $P_\\theta(\\mathbf{x}) \\propto "
+"\\exp(-E_\\theta(\\mathbf{x}))$ 定义概率分布，将低能量与高概率联系起来。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:146
+msgid ""
+"The learning objective is **maximum likelihood**, which decomposes into "
+"minimizing the average energy of data while controlling the partition "
+"function."
+msgstr "学习目标是 **最大似然**，它分解为降低数据平均能量，同时控制配分函数。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:147
+msgid ""
+"The gradient of the log-likelihood $f(\\theta)$ involves a **data term** "
+"(easy to compute) and a **model expectation** (intractable to compute "
+"exactly)."
+msgstr "负对数似然的梯度包含 **数据项**（易计算）和 **模型期望**（无法精确计算）。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:148
+msgid ""
+"Learning is geometrically interpreted as **sculpting the energy "
+"landscape**: lowering basins at data points while raising the surrounding"
+" terrain."
+msgstr "学习可以几何地理解为 **雕塑能量景观**：降低数据点处的盆地，同时抬高周围地形。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:149
+msgid ""
+"The intractability of the model expectation is the central computational "
+"challenge that motivates approximate methods like **contrastive "
+"divergence**."
+msgstr "模型期望的不可处理性是核心计算挑战，并推动了 **对比散度** 等近似方法。"
+
+#: ../../source/theoretical-foundations-ebms-def.md:150
+msgid ""
+"Generative energy-based models contrast with discriminative models by "
+"modeling the full joint distribution, enabling generation and "
+"unsupervised learning at the cost of the partition function "
+"intractability."
+msgstr "生成式基于能量模型通过建模完整联合分布区别于判别模型，以配分函数不可处理性为代价，获得生成与无监督学习能力。"
+
+#~ msgid ""
+#~ "\\text{KL}(P_{\\text{data}} \\parallel P_\\theta) ="
+#~ " \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "P_{\\text{data}}(\\tilde{\\mathbf{x}}) \\log "
+#~ "\\frac{P_{\\text{data}}(\\tilde{\\mathbf{x}})}{P_\\theta(\\tilde{\\mathbf{x}})}"
+#~ msgstr ""
+#~ "$f(\\theta) = \\mathbb{E}_{\\text{data}}[\\log "
+#~ "P_\\theta(\\mathbf{X})] = \\frac{1}{M} \\sum_{m=1}^M"
+#~ " \\log P_\\theta(\\mathbf{x}^{(m)})$"
+
+#~ msgid ""
+#~ "\\text{KL}(P_{\\text{data}} \\parallel P_\\theta) ="
+#~ " -\\mathbb{E}_{\\text{data}}[\\log P_\\theta(\\mathbf{X})]"
+#~ " - H(P_{\\text{data}})"
+#~ msgstr "这一分解揭示了塑造学习的两股竞争力量："
+
+#~ msgid ""
+#~ "f(\\theta) = \\mathbb{E}_{\\text{data}}[\\log "
+#~ "P_\\theta(\\mathbf{X})] = \\frac{1}{M} \\sum_{m=1}^M"
+#~ " \\log P_\\theta(\\mathbf{x}^{(m)})"
+#~ msgstr ""
+#~ "**配分函数项**：$\\log "
+#~ "Z_\\theta$，即所有构型上负能量指数和的对数。最小化该项会把**所有**构型的能量，尤其是当前低能构型的能量向**上**推，因为当更多构型获得低能量时，$\\log"
+#~ " Z_\\theta$ 会增大。"
+
+#~ msgid ""
+#~ "\\nabla f(\\theta) = "
+#~ "\\mathbb{E}_{\\text{data}}[\\nabla \\log "
+#~ "P_\\theta(\\mathbf{X})] = "
+#~ "-\\mathbb{E}_{\\text{data}}[\\nabla E_\\theta(\\mathbf{X})] "
+#~ "- \\nabla \\log Z_\\theta"
+#~ msgstr "学习通过反复执行两类操作进行："
+
+#~ msgid ""
+#~ "\\nabla \\log Z_\\theta = \\frac{1}{Z_\\theta}"
+#~ " \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp(-E_\\theta(\\tilde{\\mathbf{x}})) \\nabla "
+#~ "E_\\theta(\\tilde{\\mathbf{x}}) = "
+#~ "\\mathbb{E}_\\theta[\\nabla E_\\theta(\\mathbf{X})]"
+#~ msgstr "**抬升**：在其他区域抬高景观，防止模型给没有数据的区域分配高概率。"
+
+#~ msgid ""
+#~ "\\nabla f(\\theta) = "
+#~ "-\\mathbb{E}_{\\text{data}}[\\nabla E_\\theta(\\mathbf{X})] "
+#~ "+ \\mathbb{E}_\\theta[\\nabla E_\\theta(\\mathbf{X})]"
+#~ msgstr ""
+#~ "$\\frac{\\partial \\mathcal{L}}{\\partial \\theta} ="
+#~ " \\frac{1}{M} \\sum_{m=1}^M \\frac{\\partial "
+#~ "E_\\theta(\\mathbf{x}^{(m)})}{\\partial \\theta} - "
+#~ "\\mathbb{E}_{P_\\theta} \\left[ \\frac{\\partial "
+#~ "E_\\theta(\\mathbf{x})}{\\partial \\theta} \\right]$"
+
+#~ msgid ""
+#~ "\\mathbb{E}_{P_\\theta} \\left[ \\frac{\\partial "
+#~ "E_\\theta(\\mathbf{x})}{\\partial \\theta} \\right] "
+#~ "= \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "P_\\theta(\\tilde{\\mathbf{x}}) \\frac{\\partial "
+#~ "E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+#~ msgstr ""
+#~ "[3.3 节：对比散度](/kpp-theoretical-"
+#~ "foundations\\section3.3-kpp-theoretical-foundations-"
+#~ "ebms-cd) 将介绍 **对比散度**，这一使玻尔兹曼机变得实用的突破性近似方法。"
+
+#~ msgid "::"
+#~ msgstr "::"
+
+#~ msgid "<b>Summary</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Energy-Based Models</b> define a "
+#~ "probability distribution via $P_\\theta(\\mathbf{x})"
+#~ " \\propto \\exp(-E_\\theta(\\mathbf{x}))$, linking "
+#~ "low energy to high probability."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The learning objective is <b>maximum "
+#~ "likelihood</b>, which decomposes into "
+#~ "minimizing the average energy of data"
+#~ " while controlling the partition function."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The gradient of the log-likelihood "
+#~ "$f(\\theta)$ involves a <b>data term</b> "
+#~ "(easy to compute) and a <b>model "
+#~ "expectation</b> (intractable to compute "
+#~ "exactly)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Learning is geometrically interpreted as "
+#~ "<b>sculpting the energy landscape</b>: "
+#~ "lowering basins at data points while "
+#~ "raising the surrounding terrain."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The intractability of the model "
+#~ "expectation is the central computational "
+#~ "challenge that motivates approximate methods"
+#~ " like <b>contrastive divergence</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{x}) = "
+#~ "\\frac{\\exp\\left(-E_\\theta(\\mathbf{x})\\right)}{Z_\\theta}, "
+#~ "\\quad \\text{where} \\quad Z_\\theta = "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+#~ msgstr ""
+#~ "P_\\theta(\\mathbf{x}) = "
+#~ "\\frac{\\exp\\left(-E_\\theta(\\mathbf{x})\\right)}{Z_\\theta}, "
+#~ "\\quad \\text{where} \\quad Z_\\theta = "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+
+#~ msgid ""
+#~ "\\theta^* = \\arg\\max_\\theta \\prod_{m=1}^M "
+#~ "P_\\theta(\\mathbf{x}^{(m)}) = \\arg\\max_\\theta "
+#~ "\\sum_{m=1}^M \\log P_\\theta(\\mathbf{x}^{(m)})"
+#~ msgstr ""
+#~ "\\theta^* = \\arg\\max_\\theta \\prod_{m=1}^M "
+#~ "P_\\theta(\\mathbf{x}^{(m)}) = \\arg\\max_\\theta "
+#~ "\\sum_{m=1}^M \\log P_\\theta(\\mathbf{x}^{(m)})"
+
+#~ msgid ""
+#~ "\\mathcal{L}(\\theta) = -\\frac{1}{M} \\sum_{m=1}^M"
+#~ " \\log P_\\theta(\\mathbf{x}^{(m)})"
+#~ msgstr ""
+#~ "\\mathcal{L}(\\theta) = -\\frac{1}{M} \\sum_{m=1}^M"
+#~ " \\log P_\\theta(\\mathbf{x}^{(m)})"
+
+#~ msgid ""
+#~ "\\log P_\\theta(\\mathbf{x}) = "
+#~ "-E_\\theta(\\mathbf{x}) - \\log Z_\\theta"
+#~ msgstr ""
+#~ "\\log P_\\theta(\\mathbf{x}) = "
+#~ "-E_\\theta(\\mathbf{x}) - \\log Z_\\theta"
+
+#~ msgid ""
+#~ "\\mathcal{L}(\\theta) = \\frac{1}{M} \\sum_{m=1}^M"
+#~ " E_\\theta(\\mathbf{x}^{(m)}) + \\log Z_\\theta"
+#~ msgstr ""
+#~ "\\mathcal{L}(\\theta) = \\frac{1}{M} \\sum_{m=1}^M"
+#~ " E_\\theta(\\mathbf{x}^{(m)}) + \\log Z_\\theta"
+
+#~ msgid ""
+#~ "\\frac{\\partial f(\\theta)}{\\partial w_{ij}} = "
+#~ "\\langle X_i X_j \\rangle_{\\text{data}} - "
+#~ "\\langle X_i X_j \\rangle_{\\text{model}}"
+#~ msgstr "如果改用对数似然 $f(\\theta)$ 而不是负对数似然 $\\mathcal{L}(\\theta)$，梯度符号会相反："
+
+#~ msgid ""
+#~ "\\frac{\\partial f}{\\partial \\theta} = "
+#~ "-\\frac{1}{M} \\sum_{m=1}^M \\frac{\\partial "
+#~ "E_\\theta(\\mathbf{x}^{(m)})}{\\partial \\theta} + "
+#~ "\\mathbb{E}_{P_\\theta} \\left[ \\frac{\\partial "
+#~ "E_\\theta(\\mathbf{x})}{\\partial \\theta} \\right]"
+#~ msgstr "“让真实数据具有低能量”不是任意选择；它直接来自最大似然原则，以及能量与概率之间的指数关系。除了数学上的必然性，这一目标还有多个直观和实践优势："
+
+#~ msgid ""
+#~ "P(y \\mid \\mathbf{x}) = "
+#~ "\\frac{\\exp(-E(\\mathbf{x}, y))}{\\sum_{y'} "
+#~ "\\exp(-E(\\mathbf{x}, y'))}"
+#~ msgstr ""
+#~ "**基于能量的模型** 通过 $P_\\theta(\\mathbf{x}) \\propto "
+#~ "\\exp(-E_\\theta(\\mathbf{x}))$ 定义概率分布，将低能量与高概率联系起来。"
+

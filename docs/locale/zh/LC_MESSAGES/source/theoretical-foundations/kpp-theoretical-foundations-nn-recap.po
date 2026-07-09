@@ -1,0 +1,481 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-nn-recap.md:10
+msgid "2.1 A Brief Recap: Linear Neurons and Limitations"
+msgstr "2.1 简要回顾：线性神经元及其局限"
+
+#: ../../source/theoretical-foundations-nn-recap.md:12
+msgid ""
+"The previous chapter situated the Boltzmann machine within the conceptual"
+" landscape of statistical physics—a landscape defined by energy "
+"functions, equilibrium distributions, and thermal fluctuations. Before we"
+" delve deeper into energy-based learning, it is essential to revisit the "
+"elementary building blocks of neural computation. Understanding the "
+"simplest neuron models, their capabilities, and—crucially—their "
+"limitations provides the necessary contrast to appreciate why the "
+"Boltzmann machine adopts such a radically different computational "
+"paradigm."
+msgstr "上一章把玻尔兹曼机放在统计物理的概念图景中：能量函数、平衡分布和热涨落共同定义了这一图景。在深入基于能量的学习之前，有必要回顾神经计算的基本构件。理解最简单的神经元模型、它们的能力，以及尤其重要的局限性，可以帮助我们理解为什么玻尔兹曼机采用了如此不同的计算范式。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:14
+msgid "The Linear Neuron: Weighted Sum and Threshold"
+msgstr "线性神经元：加权求和与阈值"
+
+#: ../../source/theoretical-foundations-nn-recap.md:15
+msgid ""
+"The most basic computational unit in neural networks is the **linear "
+"neuron** (also called a *linear threshold unit* or, historically, a "
+"*McCulloch-Pitts neuron*). Its operation is straightforward: it computes "
+"a weighted sum of its inputs and produces an output based on whether that"
+" sum exceeds a threshold."
+msgstr ""
+"神经网络中最基本的计算单元是 **线性神经元**，也称为线性阈值单元，历史上也称为 McCulloch-Pitts "
+"神经元。它的工作方式很直接：对输入进行加权求和，并根据该和是否超过阈值产生输出。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:17
+#, python-brace-format
+msgid ""
+"Let $\\mathbf{x} = (x_1, x_2, \\ldots, x_d)$ be a vector of input values."
+" Each input $x_j$ is multiplied by a corresponding **weight** $w_j$, "
+"representing the strength of the synaptic connection. An additional "
+"**bias** term $b$ shifts the decision boundary. The neuron's output $y$ "
+"is given by:"
+msgstr ""
+"设 $\\mathbf{x} = (x_1, x_2, \\ldots, x_d)$ 为输入向量。每个输入 $x_j$ 都乘以对应的 **权重**"
+" $w_j$，表示突触连接强度。额外的 **偏置** 项 $b$（或等价地，阈值 $-\\theta$）会平移决策边界。神经元输出 $y$ 为："
+
+#: ../../source/theoretical-foundations-nn-recap.md:19
+#, python-brace-format
+msgid ""
+"y = \\begin{cases}1 & \\text{if } \\sum_{j=1}^d w_j x_j + b \\geq 0 \\\\0"
+" & \\text{otherwise}\\end{cases}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recap.md:21
+msgid "Equivalently, we can write this as:"
+msgstr "等价地，可以写为："
+
+#: ../../source/theoretical-foundations-nn-recap.md:23
+#, python-brace-format
+msgid "y = \\mathbb{I}\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\geq 0 \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recap.md:25
+#, python-brace-format
+msgid ""
+"where $\\mathbb{I}(\\cdot)$ is the indicator function. The vector $ "
+"\\mathbf{w} = (w_1, \\ldots, w_d)$ is called the **weight vector**."
+msgstr ""
+"其中 $\\mathbb{I}(\\cdot)$ 是指示函数。向量 $ \\mathbf{w} = (w_1, \\ldots, w_d)$ 称为"
+" **权重向量**。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:27
+msgid "Geometric Interpretation: Linear Separability"
+msgstr "几何解释：线性可分性"
+
+#: ../../source/theoretical-foundations-nn-recap.md:28
+#, python-brace-format
+msgid ""
+"The linear neuron has a clear geometric interpretation. The equation "
+"$\\mathbf{w}^\\top \\mathbf{x} + b = 0$ defines a **hyperplane** in the "
+"$d$-dimensional input space. This hyperplane partitions the space into "
+"two half-spaces:"
+msgstr ""
+"线性神经元具有清晰的几何解释。方程 $\\mathbf{w}^\\top \\mathbf{x} + b = 0$ 在 $d$ "
+"维输入空间中定义了一个 **超平面**。该超平面把空间划分为两个半空间："
+
+#: ../../source/theoretical-foundations-nn-recap.md:30
+msgid "Points on one side produce an output of 1."
+msgstr "一侧的点输出为 1。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:31
+msgid "Points on the other side produce an output of 0."
+msgstr "另一侧的点输出为 0。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:33
+#, python-brace-format
+msgid ""
+"The weight vector $\\mathbf{w}$ is perpendicular to the hyperplane and "
+"points toward the positive half-space. The bias $b$ determines the "
+"perpendicular distance from the origin to the hyperplane (specifically, "
+"distance $= -b / \\|\\mathbf{w}\\|$)."
+msgstr ""
+"权重向量 $\\mathbf{w}$ 垂直于超平面，并指向正半空间。偏置 $b$ 决定超平面到原点的垂直距离，具体为 $-b / "
+"\\|\\mathbf{w}\\|$。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:35
+#, python-brace-format
+msgid ""
+"This geometric view immediately reveals the fundamental capability and "
+"the fundamental limitation of linear neurons. A linear neuron can "
+"successfully classify any dataset that is **linearly separable,** which "
+"means there exists some hyperplane that perfectly separates the positive "
+"examples (label 1) from the negative examples (label 0). For such "
+"problems, there exist weight vectors $\\mathbf{w}$ and biases $b$ that "
+"achieve perfect accuracy."
+msgstr ""
+"这个几何视角立即揭示了线性神经元的根本能力和根本限制。线性神经元可以成功分类任何 **线性可分** "
+"的数据集，也就是说，存在某个超平面能够完美分离正例（标签 1）与负例（标签 0）。对于这类问题，总能找到权重向量 $\\mathbf{w}$ "
+"和偏置 $b$ 实现完美准确率。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:37
+msgid "The Perceptron Learning Algorithm"
+msgstr "感知机学习算法"
+
+#: ../../source/theoretical-foundations-nn-recap.md:38
+msgid ""
+"The **perceptron** is a specific training algorithm for linear threshold "
+"units, introduced by Frank Rosenblatt in 1958. It provides a simple, "
+"iterative procedure for finding a separating hyperplane, *provided one "
+"exists*."
+msgstr ""
+"**感知机** 是 Frank Rosenblatt 于 1958 "
+"年提出的线性阈值单元训练算法。它提供了一个简单的迭代过程，用于寻找分离超平面，前提是这样的超平面确实存在。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:40
+#, python-brace-format
+msgid ""
+"The perceptron learning rule processes training examples one at a time. "
+"For each example $(\\mathbf{x}, t)$, where $t \\in \\{0,1\\}$ is the "
+"target label, the algorithm:"
+msgstr ""
+"感知机学习规则一次处理一个训练样本。对于每个样本 $(\\mathbf{x}, t)$，其中 $t \\in \\{0,1\\}$ "
+"是目标标签，算法执行："
+
+#: ../../source/theoretical-foundations-nn-recap.md:42
+#, python-brace-format
+msgid ""
+"Computes the current output: $y = \\mathbb{I}(\\mathbf{w}^\\top "
+"\\mathbf{x} + b \\geq 0)$."
+msgstr "计算当前输出：$y = \\mathbb{I}(\\mathbf{w}^\\top \\mathbf{x} + b \\geq 0)$。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:43
+msgid "If $y = t$, the weights remain unchanged."
+msgstr "若 $y = t$，权重保持不变。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:44
+msgid "If $y \\neq t$, the weights are updated as follows:"
+msgstr "若 $y \\neq t$，按如下方式更新权重："
+
+#: ../../source/theoretical-foundations-nn-recap.md:45
+#, python-brace-format
+msgid ""
+"If $t = 1$ but $y = 0$ (false negative): $\\mathbf{w} \\leftarrow "
+"\\mathbf{w} + \\eta \\mathbf{x}$, $b \\leftarrow b + \\eta$."
+msgstr ""
+"若 $t = 1$ 但 $y = 0$（假阴性）：$\\mathbf{w} \\leftarrow \\mathbf{w} + \\eta "
+"\\mathbf{x}$，$b \\leftarrow b + \\eta$。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:46
+#, python-brace-format
+msgid ""
+"If $t = 0$ but $y = 1$ (false positive): $\\mathbf{w} \\leftarrow "
+"\\mathbf{w} - \\eta \\mathbf{x}$, $b \\leftarrow b - \\eta$."
+msgstr ""
+"若 $t = 0$ 但 $y = 1$（假阳性）：$\\mathbf{w} \\leftarrow \\mathbf{w} - \\eta "
+"\\mathbf{x}$，$b \\leftarrow b - \\eta$。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:48
+msgid ""
+"Here, $\\eta > 0$ is the **learning rate**, a small positive constant "
+"controlling the step size."
+msgstr "这里，$\\eta > 0$ 是 **学习率**，是控制步长的小正数。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:50
+msgid ""
+"The **Perceptron Convergence Theorem** guarantees that if the training "
+"data are linearly separable, this algorithm will find a separating "
+"hyperplane in a finite number of steps. This theoretical guarantee, "
+"proven in the early 1960s, generated enormous enthusiasm for neural "
+"network research."
+msgstr ""
+"**感知机收敛定理** 保证：如果训练数据线性可分，该算法会在有限步内找到一个分离超平面。这个在 20 世纪 60 "
+"年代早期得到证明的理论保证，曾极大激发神经网络研究的热情。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:52
+msgid "The Limits of Linear Separability: The XOR Problem"
+msgstr "线性可分性的局限：XOR 问题"
+
+#: ../../source/theoretical-foundations-nn-recap.md:53
+msgid ""
+"The enthusiasm was short-lived. In 1969, Marvin Minsky and Seymour Papert"
+" published their influential book *Perceptrons*, which rigorously "
+"analyzed the capabilities and limitations of linear threshold units. "
+"Their most famous counterexample is the **XOR (exclusive-or)** problem."
+msgstr ""
+"这种热情并没有持续太久。1969 年，Marvin Minsky 与 Seymour Papert 出版了有影响力的著作 "
+"Perceptrons，严格分析了线性阈值单元的能力与局限。其中最著名的反例是 **XOR（异或）** 问题。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:55
+#, python-brace-format
+msgid ""
+"Consider two binary inputs $x_1, x_2 \\in \\{0,1\\}$ and the desired "
+"outputs:"
+msgstr "考虑两个二值输入 $x_1, x_2 \\in \\{0,1\\}$ 及其期望输出："
+
+#: ../../source/theoretical-foundations-nn-recap.md
+msgid "$$x_1$$"
+msgstr "$x_1$"
+
+#: ../../source/theoretical-foundations-nn-recap.md
+msgid "$$x_2$$"
+msgstr "$x_2$"
+
+#: ../../source/theoretical-foundations-nn-recap.md
+msgid "**XOR Output**"
+msgstr "**XOR 输出**"
+
+#: ../../source/theoretical-foundations-nn-recap.md
+msgid "0"
+msgstr "0"
+
+#: ../../source/theoretical-foundations-nn-recap.md
+msgid "1"
+msgstr "1"
+
+#: ../../source/theoretical-foundations-nn-recap.md:64
+msgid ""
+"Plotting these four points in the 2D input plane reveals the difficulty. "
+"The positive examples, (0,1) and (1,0), are diagonally opposite; the "
+"negative examples, (0,0) and (1,1), occupy the other diagonal. **No "
+"single straight line can separate the two classes.** The XOR function is "
+"not linearly separable."
+msgstr ""
+"把这四个点画在二维输入平面上即可看到困难：正例 (0,1) 和 (1,0) 位于对角线两端；负例 (0,0) 和 (1,1) "
+"位于另一条对角线两端。**不存在一条直线可以分开这两类点。** 因此 XOR 函数不是线性可分的。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:66
+msgid ""
+"Minsky and Papert proved that this limitation extends far beyond XOR. "
+"Linear threshold units fail on any function that requires a *non-convex* "
+"decision boundary or one with disconnected regions. Many seemingly simple"
+" logical functions, i.e. parity, connectedness in visual patterns are "
+"beyond the reach of a single perceptron."
+msgstr ""
+"Minsky 与 Papert 证明，这一局限远超 "
+"XOR。凡是需要非凸决策边界，或需要互不连通的决策区域的函数，单个线性阈值单元都无法表示。许多看似简单的逻辑函数，例如奇偶校验、视觉模式中的连通性，都超出了单层感知机能力范围。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:68
+msgid "The Historical Impact: The First AI Winter"
+msgstr "历史影响：第一次 AI 寒冬"
+
+#: ../../source/theoretical-foundations-nn-recap.md:69
+msgid ""
+"The rigorous demonstration of the perceptron's limitations had a chilling"
+" effect on neural network research throughout the 1970s. Funding dried "
+"up, and many researchers abandoned connectionist approaches in favor of "
+"symbolic artificial intelligence. This period is often referred to as the"
+" **first AI winter**."
+msgstr ""
+"对感知机局限性的严格展示，使 20 世纪 70 年代的神经网络研究显著降温。资金减少，许多研究者转向符号主义人工智能。这一时期常被称为 **第一次"
+" AI 寒冬**。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:71
+msgid ""
+"The core insight from this episode, however, was not that neural networks"
+" were fundamentally flawed, but that **single-layer linear networks are "
+"insufficient for complex tasks**. The path forward required two essential"
+" innovations:"
+msgstr "不过，这段历史真正揭示的并不是神经网络在根本上有缺陷，而是 **单层线性网络不足以处理复杂任务**。继续前进需要两类关键创新："
+
+#: ../../source/theoretical-foundations-nn-recap.md:73
+msgid ""
+"**Multiple Layers**: Stacking linear threshold units into layers, with "
+"the outputs of one layer serving as inputs to the next, can overcome the "
+"linear separability limitation. A two-layer network can represent any "
+"Boolean function; with continuous activation functions, deeper networks "
+"can approximate arbitrarily complex decision boundaries."
+msgstr "**多层结构**：把线性阈值单元堆叠成层，让一层输出作为下一层输入，可以突破线性可分性限制。两层网络可以表示任意布尔函数；配合连续激活函数，更深的网络可以逼近任意复杂的决策边界。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:74
+#, python-brace-format
+msgid ""
+"**Nonlinear Activation Functions**: The step function $\\mathbb{I}(z "
+"\\geq 0)$ is discontinuous and non-differentiable. Replacing it with "
+"smooth, differentiable nonlinearities—such as the **sigmoid** $\\sigma(z)"
+" = 1/(1+e^{-z})$ or the **hyperbolic tangent** $\\tanh(z)$, enables "
+"gradient-based learning through **backpropagation**, a topic we will "
+"revisit in the context of energy-based models."
+msgstr ""
+"**非线性激活函数**：阶跃函数 $\\mathbb{I}(z \\geq 0)$ 不连续且不可微。用平滑可微的非线性函数替代它，例如 "
+"**sigmoid** $\\sigma(z) = 1/(1+e^{-z})$ 或 **双曲正切** $\\tanh(z)$，就可以通过 "
+"**反向传播** 进行基于梯度的学习。我们将在基于能量的模型语境中再次遇到这一主题。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:76
+msgid "From Feedforward Classification to Probabilistic Generation"
+msgstr "从前馈分类到概率生成"
+
+#: ../../source/theoretical-foundations-nn-recap.md:77
+#, python-brace-format
+msgid ""
+"The perceptron and its multilayer successors are fundamentally "
+"**discriminative models**: they learn a direct mapping from inputs "
+"$\\mathbf{x}$ to outputs $y$. Their objective is to minimize "
+"classification errors on a labeled dataset. The computation is "
+"**feedforward**: information flows in one direction, from input to "
+"output, without cycles or recurrence."
+msgstr ""
+"感知机及其多层后继模型本质上是 **判别模型**：它们学习从输入 $\\mathbf{x}$ 到输出 $y$ "
+"的直接映射，目标是在有标签数据集上最小化分类错误。其计算是 **前馈** 的：信息从输入单向流向输出，没有环路或递归。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:79
+#, python-brace-format
+msgid ""
+"The Boltzmann machine, in stark contrast, belongs to the family of "
+"**generative models**. Its objective is not to map inputs to outputs but "
+"to model the *joint probability distribution* $P(\\mathbf{x})$ (or "
+"$P(\\mathbf{x}, \\mathbf{h})$ with hidden units) of the observed data. "
+"The computation is **recurrent**: units are interconnected symmetrically,"
+" and the network's state evolves over time through stochastic updates "
+"until equilibrium is reached."
+msgstr ""
+"与之形成鲜明对比的是，玻尔兹曼机属于 **生成模型**。它的目标不是把输入映射到输出，而是建模观测数据的联合概率分布 "
+"$P(\\mathbf{x})$（有隐藏单元时为 $P(\\mathbf{x}, \\mathbf{h})$）。其计算是 **循环** "
+"的：单元以对称方式相互连接，网络状态通过随机更新随时间演化，直到达到平衡。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:81
+msgid ""
+"Why abandon the simplicity of feedforward classification for the "
+"complexity of recurrent, stochastic, energy-based models? The answer lies"
+" in the types of problems each paradigm addresses. Perceptrons excel at "
+"*supervised pattern recognition* when large labeled datasets are "
+"available. Boltzmann machines address *unsupervised learning* and "
+"*generation*: discovering the underlying structure of data without "
+"explicit labels, completing missing information, and synthesizing new, "
+"plausible examples."
+msgstr "为什么要放弃前馈分类的简洁性，转向循环、随机、基于能量的复杂模型？答案在于两种范式处理的问题不同。感知机擅长在拥有大量标签数据时进行监督模式识别。玻尔兹曼机面向无监督学习与生成：在没有显式标签的情况下发现数据底层结构，补全缺失信息，并合成新的合理样本。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:83
+msgid ""
+"The limitations of linear neurons taught us that simple, shallow "
+"architectures cannot capture the rich structure of natural data. The "
+"Boltzmann machine answers this lesson not by stacking deterministic "
+"layers, but by embracing a fundamentally different computational "
+"metaphor—one drawn from the statistical physics of complex systems, where"
+" global structure emerges from local, stochastic interactions."
+msgstr "线性神经元的局限告诉我们，简单浅层架构无法捕捉自然数据的丰富结构。玻尔兹曼机的回应并非通过堆叠确定性的层，而是采用了一种截然不同的计算视角——这种视角源自复杂系统的统计物理学，即全局结构是从局部的随机相互作用中涌现出来的。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:85
+msgid "Connection to Energy-Based Models"
+msgstr "与基于能量的模型的联系"
+
+#: ../../source/theoretical-foundations-nn-recap.md:86
+#, python-brace-format
+msgid ""
+"As we transition to the next section, note a subtle but important "
+"parallel. The perceptron's decision rule $\\mathbf{w}^\\top \\mathbf{x} +"
+" b \\geq 0$ can be reinterpreted in energetic terms. Define an **energy**"
+" for a given input-output pair:"
+msgstr ""
+"过渡到下一节前，注意一个微妙但重要的平行关系。感知机的决策规则 $\\mathbf{w}^\\top \\mathbf{x} + b \\geq "
+"0$ 可以重新解释为能量形式。对给定输入-输出对定义 **能量**："
+
+#: ../../source/theoretical-foundations-nn-recap.md:88
+#, python-brace-format
+msgid "E(\\mathbf{x}, y) = -y (\\mathbf{w}^\\top \\mathbf{x} + b)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recap.md:90
+msgid ""
+"The perceptron outputs $y=1$ when this energy is negative (i.e., low), "
+"and $y=0$ when it is zero (i.e., higher). The learning rule adjusts "
+"weights to lower the energy of correct classifications and raises the "
+"energy of incorrect ones."
+msgstr ""
+"当该能量为负（即较低）时，感知机输出 $y=1$；当其为零（即较高）时，输出 "
+"$y=0$。学习规则调整权重，以降低正确分类的能量，并提高错误分类的能量。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:92
+msgid ""
+"This energy-based perspective, while rudimentary in the perceptron, "
+"becomes the central organizing principle in Boltzmann machines. The "
+"difference is that Boltzmann machines define energy over *all* units, "
+"both visible and hidden and use stochastic, rather than deterministic, "
+"state transitions to explore the energy landscape. The following sections"
+" will develop this energy-based viewpoint in full mathematical detail."
+msgstr "这种基于能量的视角在感知机中还很初步，但在玻尔兹曼机中会成为核心组织原则。区别在于，玻尔兹曼机在所有单元（可见单元和隐藏单元）上定义能量，并使用随机而非确定性的状态转移来探索能量景观。后续章节将完整展开这一基于能量的数学观点。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:94
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-nn-recap.md:95
+msgid ""
+"A **linear neuron** computes a weighted sum of inputs and applies a "
+"threshold, partitioning the input space with a hyperplane."
+msgstr "**线性神经元** 计算输入的加权和并施加阈值，用超平面划分输入空间。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:96
+msgid ""
+"The **perceptron algorithm** provably finds a separating hyperplane for "
+"linearly separable data."
+msgstr "**感知机算法** 能够在数据线性可分时保证找到分离超平面。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:97
+msgid ""
+"The **XOR problem** demonstrates that single linear threshold units "
+"cannot solve non-linearly separable tasks, triggering the first AI "
+"winter."
+msgstr "**XOR 问题** 说明单个线性阈值单元无法解决非线性可分任务，并触发了第一次 AI 寒冬。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:98
+msgid ""
+"Overcoming this limitation requires either **multiple layers** of "
+"nonlinear units or a fundamentally different computational paradigm."
+msgstr "克服这一局限需要 **多层非线性单元**，或一种根本不同的计算范式。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:99
+msgid ""
+"The **Boltzmann machine** chooses the latter path: a **generative**, "
+"**recurrent**, and **energy-based** architecture capable of unsupervised "
+"learning and probabilistic inference."
+msgstr "**玻尔兹曼机** 选择了后一条路径：一种 **生成式**、**循环式**、**基于能量** 的架构，能够进行无监督学习和概率推断。"
+
+#: ../../source/theoretical-foundations-nn-recap.md:100
+msgid ""
+"The transition from deterministic perceptrons to stochastic Boltzmann "
+"machines parallels a shift from **discriminative classification** to "
+"**probabilistic modeling** of data distributions."
+msgstr "从确定性感知机到随机玻尔兹曼机的转变，也对应着从 **判别式分类** 到数据分布的 **概率建模** 的转变。"
+
+#~ msgid ""
+#~ "y = \\begin{cases}1 & \\text{if } "
+#~ "\\sum_{j=1}^d w_j x_j + b \\geq 0"
+#~ " \\\\0 & \\text{otherwise}\\end{cases}"
+#~ msgstr ""
+#~ "y = \\begin{cases}1 & \\text{if } "
+#~ "\\sum_{j=1}^d w_j x_j + b \\geq 0"
+#~ " \\\\0 & \\text{otherwise}\\end{cases}"
+
+#~ msgid ""
+#~ "y = \\mathbb{I}\\left( \\mathbf{w}^\\top "
+#~ "\\mathbf{x} + b \\geq 0 \\right)"
+#~ msgstr ""
+#~ "y = \\mathbb{I}\\left( \\mathbf{w}^\\top "
+#~ "\\mathbf{x} + b \\geq 0 \\right)"
+
+#~ msgid "E(\\mathbf{x}, y) = -y (\\mathbf{w}^\\top \\mathbf{x} + b)"
+#~ msgstr "E(\\mathbf{x}, y) = -y (\\mathbf{w}^\\top \\mathbf{x} + b)"
+
+#~ msgid "::"
+#~ msgstr "::"
+

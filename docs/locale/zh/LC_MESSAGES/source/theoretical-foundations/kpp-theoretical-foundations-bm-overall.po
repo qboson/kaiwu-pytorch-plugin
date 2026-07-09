@@ -1,0 +1,612 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-bm-overall.md:10
+msgid "4.1 The Classic Boltzmann Machine: Visible and Hidden Symmetry"
+msgstr "4.1 经典玻尔兹曼机：可见单元与隐藏单元的对称性"
+
+#: ../../source/theoretical-foundations-bm-overall.md:12
+msgid ""
+"The preceding chapters have built the theoretical foundations—statistical"
+" physics, recurrent neural dynamics, and energy-based learning, that "
+"culminate in the **Boltzmann machine**. In this section, we present the "
+"architecture of the classic, fully connected Boltzmann machine as "
+"originally proposed by Geoffrey Hinton and Terrence Sejnowski in 1985. We"
+" will examine its structure, its probabilistic semantics, the learning "
+"algorithm that shapes its energy landscape, and the practical limitations"
+" that motivated the development of restricted variants."
+msgstr ""
+"前几章建立了统计物理、循环神经动力学和基于能量学习的理论基础，这些最终汇聚到 **玻尔兹曼机**。本节介绍 Geoffrey Hinton 和 "
+"Terrence Sejnowski 于 1985 "
+"年提出的经典全连接玻尔兹曼机架构。我们将考察它的结构、概率语义、塑造能量景观的学习算法，以及促成受限变体发展的实践局限。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:14
+msgid "The Architecture: A Fully Connected Stochastic Network"
+msgstr "架构：全连接随机网络"
+
+#: ../../source/theoretical-foundations-bm-overall.md:15
+msgid ""
+"A classic Boltzmann machine is a recurrent neural network composed of "
+"**stochastic binary units**. Each unit $x_i$ can be in one of two states:"
+" active (1) or inactive (0). The units are partitioned into two sets:"
+msgstr "经典玻尔兹曼机是由 **随机二值单元** 组成的循环神经网络。每个单元 $x_i$ 有两种状态：激活（1）或非激活（0）。这些单元被划分为两组："
+
+#: ../../source/theoretical-foundations-bm-overall.md:17
+#, python-brace-format
+msgid ""
+"**Visible units** $\\mathbf{v} \\in \\{0,1\\}^{N_v}$: These interface "
+"with the external world. They receive data during training and represent "
+"the observed variables of interest."
+msgstr "**可见单元** $\\mathbf{v} \\in \\{0,1\\}^{N_v}$：与外部世界交互，在训练时接收数据，表示感兴趣的观测变量。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:18
+#, python-brace-format
+msgid ""
+"**Hidden units** $\\mathbf{h} \\in \\{0,1\\}^{N_h}$: These are internal, "
+"latent variables that capture higher-order structure and dependencies not"
+" directly observed in the visible data."
+msgstr ""
+"**隐藏单元** $\\mathbf{h} \\in "
+"\\{0,1\\}^{N_h}$：内部潜变量，用于捕捉可见数据中未直接观测到的高阶结构和依赖关系。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:20
+#, python-brace-format
+msgid ""
+"Crucially, the classic Boltzmann machine is **fully connected**: every "
+"unit is symmetrically connected to every other unit, regardless of "
+"whether they are visible or hidden. The weight matrix $\\mathbf{W}$ is a "
+"square, symmetric matrix of size $N \\times N$, where $N = N_v + N_h$. "
+"The symmetry condition,"
+msgstr ""
+"关键是，经典玻尔兹曼机是 **全连接** 的：无论单元是可见还是隐藏，每个单元都与其他所有单元对称连接。权重矩阵 $\\mathbf{W}$ "
+"是大小为 $N \\times N$ 的方阵，其中 $N = N_v + N_h$，并满足："
+
+#: ../../source/theoretical-foundations-bm-overall.md:22
+#, python-brace-format
+msgid "w_{ij} = w_{ji}, \\quad \\text{for all } i, j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:24
+#, python-brace-format
+msgid ""
+"is essential because it guarantees the existence of a well-defined energy"
+" function and ensures that the stochastic dynamics converge to an "
+"equilibrium distribution. Self-connections are prohibited (\\( w_{ii} = 0"
+" \\)), as they would merely add a constant offset to the energy without "
+"affecting the conditional distributions that drive sampling."
+msgstr ""
+"该对称条件保证存在定义良好的能量函数，并确保随机动力学收敛到平衡分布。自连接被禁止（$ w_{ii} = 0 "
+"$），因为它们只会给能量添加常数偏移，不会影响驱动采样的条件分布。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:26
+msgid ""
+"Each unit also has a **bias** $b_i$, which can be interpreted as a "
+"connection from an always-active unit or as an external field acting on "
+"that unit."
+msgstr "每个单元还具有 **偏置** $b_i$，可解释为来自始终激活单元的连接，或作用于该单元的外场。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:28
+msgid "The Energy Function"
+msgstr "能量函数"
+
+#: ../../source/theoretical-foundations-bm-overall.md:29
+#, python-brace-format
+msgid ""
+"The energy of a joint configuration $(\\mathbf{v}, \\mathbf{h})$ is "
+"defined as:"
+msgstr "联合构型 $(\\mathbf{v}, \\mathbf{h})$ 的能量定义为："
+
+#: ../../source/theoretical-foundations-bm-overall.md:31
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i \\in \\text{vis}} b_i v_i - "
+"\\sum_{j \\in \\text{hid}} c_j h_j - \\sum_{i<j} w_{ij} x_i x_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:33
+#, python-brace-format
+msgid ""
+"where $\\mathbf{x} = (\\mathbf{v}, \\mathbf{h})$ denotes the full state "
+"vector, $b_i$ are visible biases, and $c_j$ are hidden biases. The "
+"summation over $i<j$ runs over all distinct pairs of units, both visible-"
+"visible, visible-hidden, and hidden-hidden."
+msgstr ""
+"其中 $\\mathbf{x} = (\\mathbf{v}, \\mathbf{h})$ 表示完整状态向量，$b_i$ 是可见偏置，$c_j$ "
+"是隐藏偏置。对 $i<j$ 的求和覆盖所有不同单元对，包括可见-可见、可见-隐藏和隐藏-隐藏。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:35
+#, python-brace-format
+msgid ""
+"This energy function defines a joint probability distribution over all "
+"$2^{N}$ possible states via the Boltzmann distribution:"
+msgstr "该能量函数通过玻尔兹曼分布定义所有 $2^{N}$ 个可能状态上的联合概率："
+
+#: ../../source/theoretical-foundations-bm-overall.md:37
+#, python-brace-format
+msgid ""
+"P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
+"\\mathbf{h})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:39
+msgid "where the partition function $Z$ sums over all joint configurations:"
+msgstr "其中配分函数 $Z$ 对所有联合构型求和："
+
+#: ../../source/theoretical-foundations-bm-overall.md:41
+msgid ""
+"Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:43
+#, python-brace-format
+msgid ""
+"The probability of observing a visible vector $\\mathbf{v}$ alone is "
+"obtained by marginalizing over the hidden units:"
+msgstr "单独观测可见向量 $\\mathbf{v}$ 的概率，通过对隐藏单元边缘化得到："
+
+#: ../../source/theoretical-foundations-bm-overall.md:45
+msgid ""
+"P(\\mathbf{v}) = \\sum_{\\tilde{\\mathbf{h}}} P(\\mathbf{v}, "
+"\\tilde{\\mathbf{h}}) = \\frac{1}{Z} \\sum_{\\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E(\\mathbf{v}, \\tilde{\\mathbf{h}})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:47
+msgid "Stochastic Dynamics and Equilibrium"
+msgstr "随机动力学与平衡"
+
+#: ../../source/theoretical-foundations-bm-overall.md:48
+msgid ""
+"The network operates as a **stochastic dynamical system**. At each time "
+"step, a unit is selected at random, and its new state is sampled from its"
+" conditional distribution given the states of all other units. For a unit"
+" $i$, the probability of being active is:"
+msgstr "网络作为 **随机动力系统** 运行。每个时间步随机选择一个单元，并根据其他所有单元状态给定时的条件分布采样其新状态。对单元 $i$，其激活概率为："
+
+#: ../../source/theoretical-foundations-bm-overall.md:50
+#, python-brace-format
+msgid ""
+"P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\sigma\\left( \\sum_{j \\neq i} "
+"w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:52
+#, python-brace-format
+msgid ""
+"where $\\sigma(z) = 1/(1 + \\exp(-z))$ is sigmoid function, and "
+"$\\mathbf{x}_{-i}$ denotes the states of all units except $i$."
+msgstr ""
+"其中 $\\sigma(z) = 1/(1 + \\exp(-z))$ 是 sigmoid 函数，$\\mathbf{x}_{-i}$ 表示除 "
+"$i$ 外所有单元状态。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:54
+msgid ""
+"Because the weights are symmetric, this update satisfies detailed balance"
+" with respect to the Boltzmann distribution defined in Section [1.2 The "
+"Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
+"boltzmann.md)."
+msgstr ""
+"由于权重对称，该更新规则相对于 [1.2 玻尔兹曼分布与平衡](kpp-theoretical-foundations-stat-"
+"boltzmann.md) 中定义的玻尔兹曼分布满足细致平衡。因此，只要网络运行足够长时间（许多异步更新），状态序列就构成一条 Markov "
+"链，其平稳分布正是 $P(\\mathbf{v}, \\mathbf{h})$。这一性质是玻尔兹曼机推断和学习的基石。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:56
+#, python-brace-format
+msgid ""
+"Consequently, if the network is allowed to run for a sufficiently long "
+"time (i.e., many asynchronous updates), the sequence of states "
+"constitutes a Markov chain whose stationary distribution is exactly "
+"$P(\\mathbf{v}, \\mathbf{h})$. This property is the cornerstone of both "
+"inference and learning in the Boltzmann machine."
+msgstr "学习目标：带隐藏变量的最大似然"
+
+#: ../../source/theoretical-foundations-bm-overall.md:58
+#, python-brace-format
+msgid ""
+"Consequently, repeated application drives the network toward equilibrium,"
+" where configurations are sampled according to $P(\\mathbf{v}, "
+"\\mathbf{h})$."
+msgstr ""
+"学习目标是调整权重和偏置，使可见单元上的边缘分布 $P(\\mathbf{v})$ 近似训练数据的经验分布。根据 [3.1 "
+"定义目标：让真实数据具有低能量](kpp-theoretical-foundations-ebms-def.md) 推导，单个训练样本 "
+"$\\mathbf{v}$ 关于权重 $w_{ij}$ 的负对数似然梯度为："
+
+#: ../../source/theoretical-foundations-bm-overall.md:60
+msgid "Learning Objective: Maximum Likelihood with Hidden Variables"
+msgstr "学习目标：带隐藏变量的最大似然"
+
+#: ../../source/theoretical-foundations-bm-overall.md:61
+#, python-brace-format
+msgid ""
+"The goal of learning is to adjust the weights and biases so that the "
+"marginal distribution over visible units, $P(\\mathbf{v})$, approximates "
+"the empirical distribution of the training data. As derived in Section "
+"[3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-"
+"foundations-ebms-def.md), the gradient of the negative log-likelihood for"
+" a single training example $\\mathbf{v}$ with respect to a weight "
+"$w_{ij}$ is:"
+msgstr ""
+"学习目标是调整权重和偏置，使可见单元上的边缘分布 $P(\\mathbf{v})$ 近似训练数据的经验分布。根据 [3.1 "
+"定义目标：让真实数据具有低能量](kpp-theoretical-foundations-ebms-def.md) 推导，单个训练样本 "
+"$\\mathbf{v}$ 关于权重 $w_{ij}$ 的负对数似然梯度为："
+
+#: ../../source/theoretical-foundations-bm-overall.md:63
+msgid ""
+"\\frac{\\partial \\left( -\\log P(\\mathbf{v}) \\right)}{\\partial "
+"w_{ij}} = \\mathbb{E}_{\\mathbf{h} \\mid \\mathbf{v}} \\left[ x_i x_j "
+"\\right] - \\mathbb{E}_{P(\\mathbf{v}, \\mathbf{h})} \\left[ x_i x_j "
+"\\right]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:65
+#, python-brace-format
+msgid ""
+"Here, $ x_i$ and $x_j$ denote the states of the two connected units. The "
+"first term is the expected product of their activities when the visible "
+"units are **clamped** to the training example $\\mathbf{v}$ and the "
+"hidden units are allowed to fluctuate according to their conditional "
+"distribution. This is the **positive phase** or **wake phase** statistic."
+msgstr ""
+"第一项是在可见单元被 **固定（clamped）** 到训练样本 "
+"$\\mathbf{v}$、隐藏单元按条件分布涨落时，两个连接单元活动乘积的期望。这是 **正相** 或 **清醒阶段** 统计量。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:67
+msgid ""
+"The second term is the expected product when the network runs **freely** "
+"without any external input, sampling from its equilibrium distribution. "
+"This is the **negative phase** or **sleep phase** statistic."
+msgstr "第二项是网络在没有外部输入时 **自由（free）** 运行、从自身平衡分布采样时的期望。这是 **负相** 或 **睡眠阶段** 统计量。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:69
+msgid "The learning rule is thus:"
+msgstr "学习规则因此为："
+
+#: ../../source/theoretical-foundations-bm-overall.md:71
+msgid ""
+"\\Delta w_{ij} = \\eta \\left( \\langle x_i x_j "
+"\\rangle_{\\text{clamped}} - \\langle x_i x_j \\rangle_{\\text{free}} "
+"\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-overall.md:73
+msgid ""
+"where $\\eta$ is the learning rate. Biases are updated similarly by "
+"treating them as weights from an always-on unit with state 1."
+msgstr "其中 $\\eta$ 是学习率。偏置可视为来自始终开启、状态为 1 的单元的权重，并以类似方式更新。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:75
+msgid "The Wake-Sleep Algorithm: A Biological Metaphor"
+msgstr "清醒-睡眠算法：生物学隐喻"
+
+#: ../../source/theoretical-foundations-bm-overall.md:76
+msgid ""
+"The two-phase nature of the learning rule suggests a compelling "
+"biological metaphor. In the **wake phase**, the network is driven by "
+"sensory input (the visible units are clamped to data). The hidden units "
+"respond to this input, and the correlations $\\langle x_i x_j "
+"\\rangle_{\\text{clamped}}$ are recorded. These correlations strengthen "
+"connections between units that tend to be co-active in response to real-"
+"world stimuli—a Hebbian process."
+msgstr ""
+"学习规则的两阶段性质给出了一个有吸引力的生物学隐喻。在 **清醒阶段** "
+"中，网络由感官输入驱动（可见单元固定到数据）。隐藏单元响应该输入，记录相关性 $\\langle x_i x_j "
+"\\rangle_{\\text{clamped}}$。这些相关性会增强对真实世界刺激共同活跃的单元之间的连接，这是 Hebbian 过程。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:78
+msgid ""
+"In the **sleep phase**, the network is disconnected from sensory input "
+"and generates its own \"fantasies\" by running freely from its "
+"equilibrium distribution. The correlations $\\langle x_i x_j "
+"\\rangle_{\\text{free}}$ recorded during this phase are used to weaken "
+"connections that are spuriously co-active in the model's internal "
+"fantasies—an anti-Hebbian process that prevents the network from "
+"generating patterns not present in the data."
+msgstr ""
+"在 **睡眠阶段** 中，网络与感官输入断开，并通过自由运行从平衡分布中生成自身的“幻想”。该阶段记录的相关性 $\\langle x_i x_j"
+" \\rangle_{\\text{free}}$ 用于削弱模型内部幻想中伪共同活跃的连接，这是反 Hebbian "
+"过程，可防止网络生成数据中不存在的模式。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:80
+msgid ""
+"The difference between the wake and sleep statistics drives learning. "
+"This **contrastive Hebbian learning** elegantly combines local synaptic "
+"updates with a global objective."
+msgstr "清醒阶段与睡眠阶段统计量之差驱动学习。这种 **对比 Hebbian 学习** 优雅地结合了局部突触更新和全局目标。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:82
+msgid "The Computational Bottleneck: Equilibrium Sampling"
+msgstr "计算瓶颈：平衡采样"
+
+#: ../../source/theoretical-foundations-bm-overall.md:83
+msgid ""
+"Despite its theoretical elegance, the classic Boltzmann machine suffers "
+"from a severe practical limitation: **the need to sample from the "
+"equilibrium distribution in both phases is computationally prohibitive**."
+msgstr "尽管理论优雅，经典玻尔兹曼机存在严重实践限制：**在两个阶段都需要从平衡分布采样，这在计算上代价极高**。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:85
+#, python-brace-format
+msgid ""
+"In the clamped phase, we must sample hidden states from $P(\\mathbf{h} "
+"\\mid \\mathbf{v})$. Because the hidden units are fully connected to one "
+"another, they do not become conditionally independent given the visible "
+"units. Computing the exact conditional distribution requires summing over"
+" all $2^{N_h}$ hidden configurations, which is intractable for non-"
+"trivial $N_h$. Instead, we must run a Markov chain over the hidden units "
+"until it reaches equilibrium—a process that can be extremely slow, "
+"especially when the energy landscape has high barriers."
+msgstr ""
+"在固定阶段，需要从 $P(\\mathbf{h} \\mid \\mathbf{v})$ "
+"中采样隐藏状态。由于隐藏单元彼此全连接，在给定可见单元后并不会条件独立。精确计算条件分布需要对所有 $2^{N_h}$ 个隐藏构型求和，对非平凡 "
+"$N_h$ 不可处理。因此必须在隐藏单元上运行 Markov 链直到平衡；若能量景观存在高能垒，这会非常缓慢。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:87
+msgid ""
+"In the free phase, the situation is even worse: we must run a Markov "
+"chain over **all** $N$ units until the joint distribution reaches "
+"equilibrium. The mixing time of this chain scales poorly with network "
+"size, and for large networks, obtaining unbiased samples is effectively "
+"impossible."
+msgstr ""
+"在自由阶段情况更糟：必须在 **所有** $N$ 个单元上运行 Markov "
+"链，直到联合分布达到平衡。链的混合时间随网络规模恶化；对大网络而言，获得无偏样本实际上不可行。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:89
+msgid "The Unconstrained Connectivity: A Double-Edged Sword"
+msgstr "无约束连接：双刃剑"
+
+#: ../../source/theoretical-foundations-bm-overall.md:90
+msgid ""
+"The fully connected architecture gives the classic Boltzmann machine its "
+"theoretical power: it is a **universal approximator** for probability "
+"distributions over binary vectors, given enough hidden units. The hidden-"
+"hidden connections allow the model to capture complex, higher-order "
+"dependencies that simpler models miss."
+msgstr "全连接架构赋予经典玻尔兹曼机理论威力：只要隐藏单元足够多，它是二值向量概率分布的 **通用近似器**。隐藏-隐藏连接允许模型捕捉更复杂的高阶依赖。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:92
+#, python-brace-format
+msgid ""
+"However, this same connectivity is the source of the computational "
+"intractability. The hidden units are not conditionally independent given "
+"the visible units, nor are the visible units conditionally independent "
+"given the hidden units. Every sampling step requires computing the total "
+"input to a unit from **all** other units, visible and hidden alike, and "
+"the Markov chain must mix over a state space of size $2^{N}$."
+msgstr ""
+"但同一连接结构也是计算不可处理性的来源。给定可见单元后，隐藏单元不条件独立；给定隐藏单元后，可见单元也不条件独立。每个采样步骤都需要从 "
+"**所有** 其他可见和隐藏单元计算总输入，Markov 链必须在大小为 $2^N$ 的状态空间中混合。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:94
+msgid ""
+"In practice, training a classic Boltzmann machine on anything but tiny "
+"toy problems was infeasible with 1980s and 1990s computing resources. The"
+" algorithm remained a theoretical curiosity until the introduction of "
+"architectural restrictions that dramatically simplified the sampling "
+"process."
+msgstr ""
+"实践中，在 20 世纪 80 和 90 "
+"年代的计算资源下，经典玻尔兹曼机只能用于很小的玩具问题。直到引入能够显著简化采样过程的架构限制，它才从理论构想走向实用工具。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:96
+msgid "The Path Forward: Restricted Architectures"
+msgstr "前进方向：受限架构"
+
+#: ../../source/theoretical-foundations-bm-overall.md:97
+msgid ""
+"The limitations of the classic Boltzmann machine motivated a crucial "
+"architectural innovation: the **Restricted Boltzmann Machine (RBM)**. By "
+"removing all visible-visible and hidden-hidden connections, the RBM makes"
+" the units in one layer conditionally independent given the other layer. "
+"This seemingly small change has profound computational consequences:"
+msgstr ""
+"经典玻尔兹曼机的局限促成了关键架构创新：**受限玻尔兹曼机（RBM）**。通过移除所有可见-可见和隐藏-隐藏连接，RBM "
+"使一层单元在给定另一层时条件独立。这一看似微小的改变具有深远计算后果："
+
+#: ../../source/theoretical-foundations-bm-overall.md:99
+msgid ""
+"**Clamped phase sampling**: Given visible units, the hidden units become "
+"independent, and their states can be sampled in parallel in a single "
+"step. No Markov chain is needed."
+msgstr "**正相采样**：给定可见单元后，隐藏单元相互独立，可在一步内并行采样，不需要 Markov 链。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:100
+msgid ""
+"**Free phase sampling**: Block Gibbs sampling alternates between updating"
+" all hidden units given the visible units and all visible units given the"
+" hidden units. While still requiring multiple iterations to reach "
+"equilibrium, each iteration is fast and parallelizable."
+msgstr ""
+"**负相采样**：块 Gibbs "
+"采样在“给定可见单元更新所有隐藏单元”和“给定隐藏单元更新所有可见单元”之间交替。虽然仍需多次迭代才能达到平衡，但每次迭代快速且可并行。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:102
+msgid ""
+"The RBM, combined with the **contrastive divergence** approximation "
+"(Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-"
+"cd.md)), transformed the Boltzmann machine from a theoretical construct "
+"into a practical tool for unsupervised feature learning. The classic "
+"Boltzmann machine thus serves as the conceptual foundation, the "
+"\"Platonic ideal\", from which more tractable variants are derived."
+msgstr ""
+"RBM 结合 **对比散度** 近似（[3.3 对比散度](kpp-theoretical-foundations-ebms-"
+"cd.md)），把玻尔兹曼机从理论构造转化为无监督特征学习的实用工具。经典玻尔兹曼机因此可视为概念基础，是更可处理变体所来源的“柏拉图式理想”。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:104
+msgid "Recap: The Classic Boltzmann Machine"
+msgstr "回顾：经典玻尔兹曼机"
+
+#: ../../source/theoretical-foundations-bm-overall.md:105
+msgid ""
+"The classic Boltzmann machine embodies the core principles of energy-"
+"based generative modeling:"
+msgstr "经典玻尔兹曼机体现了基于能量的生成式建模核心原则："
+
+#: ../../source/theoretical-foundations-bm-overall.md:107
+msgid ""
+"**Architecture**: A fully connected, symmetric recurrent network of "
+"stochastic binary units, partitioned into visible and hidden sets."
+msgstr "**架构**：由随机二值单元组成的全连接、对称、循环网络，划分为可见集合与隐藏集合。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:108
+msgid ""
+"**Energy function**: A quadratic form over all units, with weights and "
+"biases as parameters."
+msgstr "**能量函数**：定义在所有单元上的二次形式，参数为权重和偏置。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:109
+msgid ""
+"**Dynamics**: Asynchronous stochastic updates that converge to the "
+"Boltzmann equilibrium distribution."
+msgstr "**动力学**：异步随机更新，收敛到玻尔兹曼平衡分布。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:110
+msgid ""
+"**Learning**: Contrastive Hebbian updates driven by the difference "
+"between clamped (wake) and free-running (sleep) correlations."
+msgstr "**学习**：由固定（wake）和自由运行（sleep）相关性差异驱动的对比 Hebbian 更新。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:111
+msgid ""
+"**Limitation**: The need for equilibrium sampling over a fully connected "
+"graph renders exact training computationally intractable for all but the "
+"smallest networks."
+msgstr "**局限**：在全连接图上进行平衡采样，使除最小网络外的精确训练在计算上不可处理。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:113
+msgid ""
+"The next section introduces the **Restricted Boltzmann Machine**, which "
+"imposes structural constraints that dramatically reduce sampling "
+"complexity while retaining much of the expressive power of the classic "
+"model."
+msgstr "下一节介绍 **受限玻尔兹曼机**，它通过施加结构约束显著降低采样复杂度，同时保留经典模型的大部分表达能力。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:115
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-bm-overall.md:116
+msgid ""
+"The **classic Boltzmann machine** is a fully connected, undirected "
+"probabilistic graphical model with symmetric weights and stochastic "
+"binary units."
+msgstr "**经典玻尔兹曼机** 是具有对称权重和随机二值单元的全连接无向概率图模型。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:117
+msgid ""
+"Units are divided into **visible** (observed data) and **hidden** (latent"
+" features) groups, with full connectivity among all units."
+msgstr "单元分为 **可见**（观测数据）和 **隐藏**（潜在特征）两组，所有单元之间全连接。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:118
+msgid ""
+"The energy function defines a joint Boltzmann distribution, and "
+"stochastic updates guarantee convergence to equilibrium."
+msgstr "能量函数定义联合玻尔兹曼分布，随机更新保证收敛到平衡。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:119
+msgid ""
+"Learning follows a **contrastive Hebbian rule**: increase weights based "
+"on correlations when visible units are clamped to data, and decrease "
+"weights based on correlations when the network runs freely."
+msgstr "学习遵循 **对比 Hebbian 规则**：可见单元固定到数据时根据相关性增强权重，网络自由运行时根据相关性削弱权重。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:120
+msgid ""
+"The fully connected architecture makes **exact inference and equilibrium "
+"sampling intractable**, limiting practical applications."
+msgstr "全连接架构使 **精确推断和平衡采样不可处理**，限制了实际应用。"
+
+#: ../../source/theoretical-foundations-bm-overall.md:121
+msgid ""
+"The computational bottleneck of the classic Boltzmann machine motivated "
+"the development of the **Restricted Boltzmann Machine (RBM)**, which "
+"removes certain connections to enable efficient sampling."
+msgstr "经典玻尔兹曼机的计算瓶颈推动了 **受限玻尔兹曼机（RBM）** 的发展，后者通过移除部分连接实现高效采样。"
+
+#~ msgid "w_{ij} = w_{ji}, \\quad \\text{for all } i, j"
+#~ msgstr "$w_{ij} = w_{ji}, \\quad \\forall i, j$"
+
+#~ msgid ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i \\in"
+#~ " \\text{vis}} b_i v_i - \\sum_{j \\in"
+#~ " \\text{hid}} c_j h_j - \\sum_{i<j} "
+#~ "w_{ij} x_i x_j"
+#~ msgstr ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i \\in"
+#~ " \\text{vis}} b_i v_i - \\sum_{j \\in"
+#~ " \\text{hid}} c_j h_j - \\sum_{i<j} "
+#~ "w_{ij} x_i x_j"
+
+#~ msgid ""
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} "
+#~ "\\exp\\left(-E(\\mathbf{v}, \\mathbf{h})\\right)"
+#~ msgstr ""
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} "
+#~ "\\exp\\left(-E(\\mathbf{v}, \\mathbf{h})\\right)"
+
+#~ msgid ""
+#~ "Z = \\sum_{\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}}} \\exp\\left(-E(\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}})\\right)"
+#~ msgstr ""
+#~ "Z = \\sum_{\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}}} \\exp\\left(-E(\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}})\\right)"
+
+#~ msgid ""
+#~ "P(\\mathbf{v}) = \\sum_{\\tilde{\\mathbf{h}}} "
+#~ "P(\\mathbf{v}, \\tilde{\\mathbf{h}}) = \\frac{1}{Z}"
+#~ " \\sum_{\\tilde{\\mathbf{h}}} \\exp\\left(-E(\\mathbf{v}, "
+#~ "\\tilde{\\mathbf{h}})\\right)"
+#~ msgstr ""
+#~ "P(\\mathbf{v}) = \\sum_{\\tilde{\\mathbf{h}}} "
+#~ "P(\\mathbf{v}, \\tilde{\\mathbf{h}}) = \\frac{1}{Z}"
+#~ " \\sum_{\\tilde{\\mathbf{h}}} \\exp\\left(-E(\\mathbf{v}, "
+#~ "\\tilde{\\mathbf{h}})\\right)"
+
+#~ msgid ""
+#~ "P(x_i = 1 \\mid \\mathbf{x}_{-i}) = "
+#~ "\\sigma\\left( \\sum_{j \\neq i} w_{ij} "
+#~ "x_j + b_i \\right)"
+#~ msgstr ""
+#~ "P(x_i = 1 \\mid \\mathbf{x}_{-i}) = "
+#~ "\\sigma\\left( \\sum_{j \\neq i} w_{ij} "
+#~ "x_j + b_i \\right)"
+
+#~ msgid ""
+#~ "\\frac{\\partial \\left( -\\log P(\\mathbf{v}) "
+#~ "\\right)}{\\partial w_{ij}} = "
+#~ "\\mathbb{E}_{\\mathbf{h} \\mid \\mathbf{v}} \\left["
+#~ " x_i x_j \\right] - "
+#~ "\\mathbb{E}_{P(\\mathbf{v}, \\mathbf{h})} \\left[ "
+#~ "x_i x_j \\right]"
+#~ msgstr "第二项是网络在没有外部输入时 **自由（free）** 运行、从自身平衡分布采样时的期望。这是 **负相** 或 **睡眠阶段** 统计量。"
+
+#~ msgid ""
+#~ "\\Delta w_{ij} = \\eta \\left( \\langle"
+#~ " x_i x_j \\rangle_{\\text{clamped}} - "
+#~ "\\langle x_i x_j \\rangle_{\\text{free}} "
+#~ "\\right)"
+#~ msgstr "清醒-睡眠算法：生物学隐喻"
+
+#~ msgid "::"
+#~ msgstr "::"

@@ -1,0 +1,226 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 16:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:10
+msgid ""
+"1.4 The Renormalization Group: From Microscopic Spins to Macroscopic "
+"Features"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:12
+msgid ""
+"So far we have seen how the Ising model describes a system of interacting"
+" spins and how the Boltzmann distribution governs its equilibrium "
+"behaviour. But what happens when we <b>zoom out, i.e.</b> when we stop "
+"looking at every individual spin and instead focus on larger, coarse-"
+"grained blocks? This question is answered by the <b>Renormalization Group"
+" (RG)</b>, a powerful framework from statistical physics that explains "
+"why the laws of nature appear simple at different scales and why "
+"seemingly different systems can behave identically near a critical point."
+" Remarkably, the RG also provides a deep physical analogy for the "
+"hierarchical feature learning performed by deep neural networks."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:14
+msgid "<b>The Core Idea: Coarse-Graining</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:16
+msgid ""
+"Imagine a two-dimensional Ising model on a square lattice. Instead of "
+"observing every spin, we partition the lattice into blocks of size $2 "
+"\\times 2$, and replace each block with a single effective spin. This is "
+"called <b>coarse-graining</b>. The new effective spins interact with each"
+" other according to new, renormalized couplings $J'$ and fields $h'$. The"
+" key insight is that the rules of the universe – the Hamiltonian – change"
+" when you change your observational scale."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:18
+msgid "The process of coarse-graining is repeated iteratively:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:20
+msgid "Start with spins at the finest scale."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:21
+msgid ""
+"Apply a coarse-graining transformation (e.g., block averaging or majority"
+" rule)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:22
+msgid "Obtain a new, coarser Hamiltonian with new parameters."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:23
+msgid "Repeat."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:25
+msgid "This defines a <b>flow</b> in the space of Hamiltonians."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:27
+msgid "<b>Fixed Points and Universality</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:29
+msgid ""
+"As the RG flow is iterated, the parameters $(J, h, \\ldots)$ move through"
+" the parameter space. The system may eventually reach a <b>fixed "
+"point</b> – a point where further coarse-graining leaves the Hamiltonian "
+"unchanged. Fixed points correspond to <b>critical points</b> of the "
+"system, where the correlation length diverges and the system becomes "
+"scale-invariant."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:31
+msgid ""
+"The profound consequence is <b>universality</b>: many different "
+"microscopic systems (different metals, different liquids) flow to the "
+"same fixed point. This is why we can compute properties of a liquid "
+"without knowing every detail of the molecules – the relevant physics at "
+"the macroscopic scale is determined by the fixed point, not by the "
+"microscopic details."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:33
+msgid "<b>The Renormalization Group and Deep Learning</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:35
+msgid ""
+"The RG provides a striking physical analogy for the <b>hierarchical "
+"feature learning</b> performed by stacked RBMs (Deep Belief Networks, see"
+" Section [4.3 Beyond Single Layers: Stacking for Deep Learning](/kpp-"
+"theoretical-foundations\\kpp-theoretical-foundations-bm-deep))."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:53
+msgid ""
+"In a DBN, each new hidden layer can be seen as a <b>coarse-graining "
+"operation</b> on the distribution of features from the layer below. The "
+"first hidden layer captures local edges and corners; the second layer "
+"combines these into mid-level shapes; the third layer forms high-level "
+"object representations. This process is directly analogous to an RG flow,"
+" where the “microscopic” data distribution is progressively simplified "
+"into a “macroscopic” abstract representation."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:55
+msgid ""
+"Just as the RG reveals that all critical points belong to a finite number"
+" of universality classes, deep learning shows that a well-trained network"
+" automatically discovers the universal structure of the data – the "
+"features that generalise across examples."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:57
+msgid "<b>Statistical Physics Foundations: Extensive and Intensive Variables</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:59
+msgid ""
+"To fully appreciate the RG analogy, we must distinguish between "
+"<b>extensive</b> and <b>intensive</b> variables in thermodynamics:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:61
+msgid ""
+"<b>Extensive variables</b> (e.g., volume $V$, energy $E$, entropy $S$, "
+"number of particles $N$) scale with the size of the system."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:62
+msgid ""
+"<b>Intensive variables</b> (e.g., temperature $T$, pressure $p$, chemical"
+" potential $\\mu$) are independent of system size."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:64
+msgid ""
+"In the RG flow, the coarse-graining operation reduces the effective "
+"number of degrees of freedom—the \"system size\" decreases. Intensive "
+"variables like temperature and pressure remain invariant under scaling, "
+"while extensive variables like energy and entropy scale linearly with the"
+" number of effective spins."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:66
+msgid ""
+"This distinction is mirrored in deep learning: high-level representations"
+" are <b>intensive</b>—they capture invariant features of the data (e.g., "
+"\"catness\") that are independent of the input's spatial resolution or "
+"pixel count—while lower-level features are <b>extensive</b>, requiring "
+"more units to represent fine-grained details."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:68
+msgid "<b>The Connection to the Sampling Bottleneck</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:70
+msgid ""
+"The RG also offers a physical perspective on the sampling problem "
+"introduced in later sections. Near a critical point, the correlation "
+"length diverges, and the system becomes difficult to simulate – Markov "
+"chains mix extremely slowly (critical slowing down). This is precisely "
+"the difficulty encountered when sampling from Boltzmann machines that are"
+" near their “critical” state, i.e., when the model has learned a rich, "
+"multimodal distribution. Understanding this slowdown is central to "
+"appreciating why alternative approaches – such as quantum sampling – are "
+"needed."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:72
+msgid "<b>Summary</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:74
+msgid ""
+"<b>Coarse-graining</b> transforms a system at one scale to an equivalent "
+"system at a larger scale."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:75
+msgid ""
+"<b>Renormalization Group</b> is the study of how the Hamiltonian changes "
+"under coarse-graining, leading to <b>fixed points</b> and "
+"<b>universality</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:76
+msgid ""
+"The RG provides a deep physical analogy for <b>hierarchical feature "
+"learning</b> in deep neural networks: each layer coarse-grains the "
+"features from the layer below."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-renormalization.md:77
+msgid ""
+"Critical slowing down in physical systems mirrors the <b>sampling "
+"bottleneck</b> in energy-based models, motivating the search for more "
+"efficient sampling methods."
+msgstr ""
+

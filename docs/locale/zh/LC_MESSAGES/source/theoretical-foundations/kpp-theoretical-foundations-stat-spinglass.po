@@ -1,0 +1,408 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:10
+msgid "1.1 The Spin-Glass Analogy"
+msgstr "1.1 自旋玻璃类比"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:12
+msgid ""
+"The conceptual bridge between statistical physics and neural networks "
+"rests on a powerful analogy: neurons can be treated as tiny magnets, and "
+"their collective behavior can be described using the language of "
+"statistical mechanics. This connection, first fully exploited by John "
+"Hopfield in 1982, provides the foundational framework for understanding "
+"the Boltzmann Machine."
+msgstr ""
+"统计物理与神经网络之间的概念桥梁，建立在一个强有力的类比之上：神经元可以被看作微小的磁体，它们的集体行为可以用统计力学的语言来描述。John "
+"Hopfield 在 1982 年首次充分利用了这一联系，并为理解玻尔兹曼机提供了基础框架。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:14
+msgid "The Ising Model of Magnetism"
+msgstr "磁性 Ising 模型"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:15
+#, python-brace-format
+msgid ""
+"In condensed matter physics, the Ising model describes a system of "
+"interacting magnetic spins. Each spin $s_i$ resides on a lattice site and"
+" can point either \"up\" $(s_i = +1 )$ or \"down\" $( s_i = -1)$. The "
+"energy of a particular spin configuration $\\mathbf{s} = (s_1, s_2, "
+"\\ldots, s_N)$is given by the Hamiltonian:"
+msgstr ""
+"在凝聚态物理中，Ising 模型描述的是一组相互作用的磁自旋。每个自旋 $s_i$ 位于晶格的一个格点上，可以指向“上”$(s_i = +1 )$"
+" 或“下”$( s_i = -1)$。某个自旋构型 $\\mathbf{s} = (s_1, s_2, \\ldots, s_N)$ "
+"的能量由哈密顿量给出："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:17
+#, python-brace-format
+msgid "E(\\mathbf{s}) = -\\sum_{i<j} J_{ij} s_i s_j - \\sum_i h_i s_i"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:19
+#, python-brace-format
+msgid ""
+"Here, $J_{ij}$ represents the interaction strength (coupling) between "
+"spins $i$and $j$. If $J_{ij} > 0$, the interaction is **ferromagnetic**: "
+"the spins prefer to align in the same direction to lower the energy. If "
+"$J_{ij} < 0$, the interaction is **antiferromagnetic**: the spins prefer "
+"opposite alignment. The term $h_i$ represents an external magnetic field "
+"biasing individual spins."
+msgstr ""
+"这里，$J_{ij}$ 表示自旋 $i$ 与 $j$ 之间的相互作用强度（耦合）。若 $J_{ij} > 0$，相互作用是 **铁磁性** "
+"的：自旋倾向于沿相同方向排列以降低能量。若 $J_{ij} < 0$，相互作用是 **反铁磁性** 的：自旋倾向于相反排列。$h_i$ "
+"项表示外部磁场对单个自旋的偏置。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:21
+msgid ""
+"At thermal equilibrium with a heat bath at temperature $T$, the "
+"probability of observing a given spin configuration follows the "
+"**Boltzmann distribution**:"
+msgstr "当系统与温度为 $T$ 的热源达到热平衡时，观测到给定自旋构型的概率遵循 **玻尔兹曼分布**："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:23
+msgid ""
+"P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{s})}{k_B "
+"T}\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:25
+msgid ""
+"where $k_B$ is Boltzmann's constant and $Z = \\sum_{\\mathbf{s}} "
+"\\exp(-E(\\mathbf{s})/k_B T)$ is the partition function. At low "
+"temperatures, the system freezes into low-energy, ordered states. At high"
+" temperatures, thermal fluctuations dominate and spins become randomly "
+"oriented."
+msgstr ""
+"其中 $k_B$ 是玻尔兹曼常数，$Z = \\sum_{\\mathbf{s}} \\exp(-E(\\mathbf{s})/k_B T)$ "
+"是配分函数。低温下，系统冻结到低能、有序的状态；高温下，热涨落占主导，自旋方向变得随机。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:27
+msgid "Neurons as Spins, Synapses as Couplings"
+msgstr "神经元作为自旋，突触作为耦合"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:28
+msgid ""
+"The transition from magnetic spins to neural networks requires only a "
+"change of interpretation:"
+msgstr "从磁自旋过渡到神经网络，只需要改变解释方式："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+msgid "Physics (Ising Model)"
+msgstr "物理系统（Ising 模型）"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+msgid "Neural Network (Hopfield/Boltzmann)"
+msgstr "神经网络（Hopfield/Boltzmann）"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+#, python-brace-format
+msgid "Spin $s_i \\in {-1, +1}$"
+msgstr "自旋 $s_i \\in {-1, +1}$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+#, python-brace-format
+msgid "Neuron state $x_i \\in {0, 1}$ or ${-1, +1}$"
+msgstr "神经元状态 $x_i \\in {0, 1}$ 或 ${-1, +1}$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+#, python-brace-format
+msgid "Coupling strength $J_{ij}$"
+msgstr "耦合强度 $J_{ij}$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+#, python-brace-format
+msgid "Synaptic weight $w_{ij}$"
+msgstr "突触权重 $w_{ij}$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+msgid "External field $h_i$"
+msgstr "外场 $h_i$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+msgid "Neuron bias $b_i$"
+msgstr "神经元偏置 $b_i$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+msgid "Thermal fluctuation $k_B T$"
+msgstr "热涨落 $k_B T$"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md
+msgid "Stochasticity (inverse temperature $\\beta = 1/T$)"
+msgstr "随机性（逆温度 $\\beta = 1/T$）"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:37
+msgid ""
+"With this dictionary, the energy function of a recurrent neural network "
+"becomes:"
+msgstr "有了这张“词典”，循环神经网络的能量函数可以写为："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:39
+#, python-brace-format
+msgid "E(\\mathbf{x}) = -\\sum_{i<j} w_{ij} x_i x_j - \\sum_i b_i x_i"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:41
+msgid "or, in matrix form:"
+msgstr "或写成矩阵形式："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:43
+#, python-brace-format
+msgid ""
+"E_\\theta(\\mathbf{x}) = -\\mathbf{b}^\\top \\mathbf{x} - "
+"\\frac{1}{2}\\mathbf{x}^\\top \\mathbf{W} \\mathbf{x}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:45
+#, python-brace-format
+msgid ""
+"where $\\mathbf{W}$ is a symmetric weight matrix with zero diagonal "
+"$(w_{ii} = 0)$. The symmetry requirement $w_{ij} = w_{ji}$ is crucial "
+"because it ensures that the system possesses a well-defined energy "
+"landscape and will eventually settle into an equilibrium distribution."
+msgstr ""
+"其中 $\\mathbf{W}$ 是一个对称权重矩阵，且对角线为零 $(w_{ii} = 0)$。对称性要求 $w_{ij} = w_{ji}$ "
+"至关重要，因为它保证系统具有定义良好的能量景观，并最终会收敛到某个平衡分布。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:47
+msgid "Why Quadratic Energy?"
+msgstr "为什么是二次能量？"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:48
+#, python-brace-format
+msgid ""
+"The energy function $E = -\\sum w_{ij}x_i x_j$ is the simplest possible "
+"form for a system with pairwise interactions. It represents the sum of "
+"interactions between every pair of units. This is the same form as the "
+"Ising Hamiltonian. More complex (higher-order) interactions are possible "
+"but are much harder to work with. This quadratic form is the 'first-"
+"order' approximation of a many-body system, making it the natural "
+"starting point for both physics and neural network models."
+msgstr ""
+"能量函数 $E = -\\sum w_{ij}x_i x_j$ 是描述成对相互作用系统的最简单形式。它表示所有单元对之间相互作用的总和，与 "
+"Ising "
+"哈密顿量具有相同形式。更复杂的高阶相互作用当然可能存在，但处理起来困难得多。这个二次形式可以看作多体系统的一阶近似，因此成为物理模型和神经网络模型的自然起点。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:50
+msgid "Statistical Physics Foundations: The Microcanonical Ensemble"
+msgstr "统计物理基础：微正则系综"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:51
+msgid ""
+"To understand the probabilistic behavior of such a system, we must invoke"
+" the **fundamental assumption of statistical physics**: For an isolated "
+"system at equilibrium, all accessible microstates (configurations) "
+"consistent with the system's macroscopic constraints (e.g., total energy)"
+" are equally probable."
+msgstr ""
+"为了理解这类系统的概率行为，必须引入 "
+"**统计物理的基本假设**：对于处于平衡态的孤立系统，所有满足系统宏观约束（例如总能量）的可达微观状态（构型）等概率。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:53
+msgid ""
+"This principle gives rise to the **microcanonical ensemble**. For a "
+"system with fixed energy $E$, volume $V$, and number of particles $N$, "
+"the number of microstates with energy in the range $(E, E + \\delta E)$ "
+"is denoted $\\Omega(E, V, N)$. The **Boltzmann entropy** is then defined "
+"as:"
+msgstr ""
+"这一原则产生了 **微正则系综**。对于能量 $E$、体积 $V$ 和粒子数 $N$ 固定的系统，能量落在 $(E, E + \\delta "
+"E)$ 范围内的微观状态数记为 $\\Omega(E, V, N)$。于是 **玻尔兹曼熵** 定义为："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:55
+msgid "S(E, V, N) = k \\log \\Omega(E, V, N)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:57
+msgid ""
+"where $k$ is Boltzmann's constant. This entropy measures the number of "
+"microscopic configurations consistent with a given macrostate."
+msgstr "其中 $k$ 是玻尔兹曼常数。这个熵度量与给定宏观状态相容的微观构型数量。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:59
+#, python-brace-format
+msgid ""
+"For a macroscopic system (e.g., $N \\sim 10^{23}$), $\\Omega$ is an "
+"astronomically large number, and the entropy is extensive, i.e. it scales"
+" linearly with $N$. This is why the second law of thermodynamics holds: "
+"the system evolves toward the macrostate with the largest number of "
+"microstates (highest entropy)."
+msgstr ""
+"对于宏观系统（例如 $N \\sim 10^{23}$），$\\Omega$ 是天文数字，熵是广延量，也就是随 $N$ "
+"线性缩放。这解释了热力学第二定律为何成立：系统会向微观状态数最多（熵最高）的宏观状态演化。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:61
+msgid "Spin Glasses and Frustration"
+msgstr "自旋玻璃与受挫"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:62
+#, python-brace-format
+msgid ""
+"A **spin glass** is a magnetic system in which the coupling strengths "
+"$J_{ij}$ are random and contain both positive (ferromagnetic) and "
+"negative (antiferromagnetic) values. This mixture creates "
+"**frustration**: a single spin cannot simultaneously satisfy the "
+"competing demands of all its neighbors. As a result, the energy landscape"
+" of a spin glass is rugged, containing a vast number of **metastable "
+"states** (local minima) separated by energy barriers."
+msgstr ""
+"**自旋玻璃** 是一类磁性系统，其中耦合强度 $J_{ij}$ 是随机的，并同时包含正值（铁磁）和负值（反铁磁）。这种混合会产生 "
+"**受挫**：单个自旋无法同时满足所有邻居彼此竞争的要求。因此，自旋玻璃的能量景观非常崎岖，包含大量由能垒分隔的 **亚稳态**（局部极小值）。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:64
+msgid ""
+"This is precisely the scenario we encounter in neural networks designed "
+"for associative memory. When we store multiple patterns using a Hebbian "
+"learning rule:"
+msgstr "这正是用于联想记忆的神经网络所面对的场景。当我们使用 Hebbian 学习规则存储多个模式时："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:66
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:68
+msgid ""
+"we are effectively engineering a spin glass whose low-energy "
+"configurations correspond to the stored memories $ "
+"\\{\\boldsymbol{\\xi}^\\mu\\}$. However, because the weight matrix mixes "
+"contributions from different memories, the energy landscape inevitably "
+"develops **spurious minima**—states that are not stored patterns but "
+"nevertheless trap the network dynamics."
+msgstr ""
+"实际上就是在构造一个自旋玻璃，使其低能构型对应存储的记忆 $ "
+"\\{\\boldsymbol{\\xi}^\\mu\\}$。然而，由于权重矩阵混合了不同记忆的贡献，能量景观不可避免地会产生 "
+"**伪极小值**：这些状态并非被存储的模式，却仍然会困住网络动力学。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:70
+msgid "From Deterministic Dynamics to Stochastic Search"
+msgstr "从确定性动力学到随机搜索"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:71
+msgid "Hopfield's original network employed deterministic, asynchronous updates:"
+msgstr "Hopfield 最初的网络采用确定性的异步更新："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:73
+#, python-brace-format
+msgid "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:75
+msgid ""
+"This dynamics is equivalent to moving strictly downhill in the energy "
+"landscape. The network will converge to the nearest local minimum, but it"
+" may get stuck in a spurious state rather than the intended memory."
+msgstr "这种动力学等价于沿着能量景观严格下坡移动。网络会收敛到最近的局部极小值，但这个极小值可能是伪状态，而不是目标记忆。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:77
+msgid ""
+"The **Boltzmann Machine** introduces a crucial modification: updates "
+"become **stochastic**. At a finite temperature $T$, a neuron $i$ is set "
+"to state $1$ with probability:"
+msgstr "**玻尔兹曼机** 引入了一个关键修改：更新变为 **随机** 的。在有限温度 $T$ 下，神经元 $i$ 被置为状态 $1$ 的概率为："
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:79
+msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:81
+msgid ""
+"where $ \\sigma(z) = 1/(1 + \\exp(-z))$ is the sigmoid function. Thermal "
+"noise occasionally pushes the system *uphill*, allowing it to escape "
+"shallow local minima and explore the energy landscape more thoroughly. As"
+" the temperature is gradually reduced (**simulated annealing**), the "
+"system is more likely to settle into a deep, low-energy state "
+"corresponding to a true memory."
+msgstr ""
+"其中 $ \\sigma(z) = 1/(1 + \\exp(-z))$ 是 sigmoid "
+"函数。热噪声会偶尔把系统推向上坡方向，使它能够逃离浅层局部极小值，并更充分地探索能量景观。随着温度逐渐降低（**模拟退火**），系统更有可能落入一个深的低能状态，对应真正的记忆。"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:83
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-stat-spinglass.md:84
+msgid ""
+"This spin-glass analogy provides the essential intuition for the "
+"Boltzmann Machine: it is a neural network that, through the introduction "
+"of temperature-governed stochasticity, uses the principles of equilibrium"
+" statistical mechanics to model probability distributions over data. The "
+"subsequent sections will formalize the mathematics of this distribution "
+"and its implications for learning."
+msgstr "自旋玻璃类比为玻尔兹曼机提供了核心直觉：它是一种神经网络，通过引入受温度控制的随机性，使用平衡统计力学原理来建模数据上的概率分布。后续章节将进一步形式化这一分布的数学结构，以及它对学习过程的影响。"
+
+#~ msgid ""
+#~ "E_\\theta(\\mathbf{x}) = -\\mathbf{b}^\\top "
+#~ "\\mathbf{x} - \\frac{1}{2}\\mathbf{x}^\\top "
+#~ "\\mathbf{W} \\mathbf{x}"
+#~ msgstr ""
+#~ "E_\\theta(\\mathbf{x}) = -\\mathbf{b}^\\top "
+#~ "\\mathbf{x} - \\frac{1}{2}\\mathbf{x}^\\top "
+#~ "\\mathbf{W} \\mathbf{x}"
+
+#~ msgid "::"
+#~ msgstr "::"
+
+#~ msgid ""
+#~ "where $ \\sigma(z) = 1/(1 + "
+#~ "\\exp(-z))$ is the sigmoid function. "
+#~ "Thermal noise occasionally pushes the "
+#~ "system <em>uphill</em>, allowing it to "
+#~ "escape shallow local minima and explore"
+#~ " the energy landscape more thoroughly. "
+#~ "As the temperature is gradually reduced"
+#~ " (<b>simulated annealing</b>), the system "
+#~ "is more likely to settle into a"
+#~ " deep, low-energy state corresponding "
+#~ "to a true memory."
+#~ msgstr ""
+
+#~ msgid "E(\\mathbf{s}) = -\\sum_{i<j} J_{ij} s_i s_j - \\sum_i h_i s_i"
+#~ msgstr "E(\\mathbf{s}) = -\\sum_{i<j} J_{ij} s_i s_j - \\sum_i h_i s_i"
+
+#~ msgid ""
+#~ "P(\\mathbf{s}) = \\frac{1}{Z} "
+#~ "\\exp\\left(-\\frac{E(\\mathbf{s})}{k_B T}\\right)"
+#~ msgstr ""
+#~ "P(\\mathbf{s}) = \\frac{1}{Z} "
+#~ "\\exp\\left(-\\frac{E(\\mathbf{s})}{k_B T}\\right)"
+
+#~ msgid "E(\\mathbf{x}) = -\\sum_{i<j} w_{ij} x_i x_j - \\sum_i b_i x_i"
+#~ msgstr "E(\\mathbf{x}) = -\\sum_{i<j} w_{ij} x_i x_j - \\sum_i b_i x_i"
+
+#~ msgid "S(E, V, N) = k \\log \\Omega(E, V, N)"
+#~ msgstr "S(E, V, N) = k \\log \\Omega(E, V, N)"
+
+#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+#~ msgstr "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+
+#~ msgid "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
+#~ msgstr "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
+
+#~ msgid ""
+#~ "P(x_i = 1) = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+#~ msgstr ""
+#~ "P(x_i = 1) = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+

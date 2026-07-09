@@ -1,0 +1,506 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 16:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:10
+msgid "4.1 The Classic Boltzmann Machine: Visible and Hidden Symmetry"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:12
+msgid ""
+"The preceding chapters have built the theoretical foundations—statistical"
+" physics, recurrent neural dynamics, and energy-based learning, that "
+"culminate in the <b>Boltzmann machine</b>. In this section, we present "
+"the architecture of the classic, fully connected Boltzmann machine as "
+"originally proposed by Geoffrey Hinton and Terrence Sejnowski in 1985. We"
+" will examine its structure, its probabilistic semantics, the learning "
+"algorithm that shapes its energy landscape, and the practical limitations"
+" that motivated the development of restricted variants."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:14
+msgid "<b>The Architecture: A Fully Connected Stochastic Network</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:16
+msgid ""
+"A classic Boltzmann machine is a recurrent neural network composed of "
+"<b>stochastic binary units</b>. Each unit  $x_i$ can be in one of two "
+"states: active (1) or inactive (0). The units are partitioned into two "
+"sets:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:18
+#, python-brace-format
+msgid ""
+"<b>Visible units</b> $\\mathbf{v} \\in \\{0,1\\}^{N_v}$: These interface "
+"with the external world. They receive data during training and represent "
+"the observed variables of interest."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:19
+#, python-brace-format
+msgid ""
+"<b>Hidden units</b> $\\mathbf{h} \\in \\{0,1\\}^{N_h}$: These are "
+"internal, latent variables that capture higher-order structure and "
+"dependencies not directly observed in the visible data."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:21
+#, python-brace-format
+msgid ""
+"Crucially, the classic Boltzmann machine is <b>fully connected</b>: every"
+" unit is symmetrically connected to every other unit, regardless of "
+"whether they are visible or hidden. The weight matrix $\\mathbf{W}$ is a "
+"square, symmetric matrix of size $N \\times N$, where $N = N_v + N_h$. "
+"The symmetry condition,"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:23
+#, python-brace-format
+msgid "w_{ij} = w_{ji}, \\quad \\text{for all } i, j"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:25
+#, python-brace-format
+msgid ""
+"is essential because it guarantees the existence of a well-defined energy"
+" function and ensures that the stochastic dynamics converge to an "
+"equilibrium distribution. Self-connections are prohibited (\\( w_{ii} = 0"
+" \\)), as they would merely add a constant offset to the energy without "
+"affecting the conditional distributions that drive sampling."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:27
+msgid ""
+"Each unit also has a <b>bias</b> $b_i$, which can be interpreted as a "
+"connection from an always-active unit or as an external field acting on "
+"that unit."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:29
+msgid "<b>The Energy Function</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:31
+#, python-brace-format
+msgid ""
+"The energy of a joint configuration $(\\mathbf{v}, \\mathbf{h})$ is "
+"defined as:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:33
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i \\in \\text{vis}} b_i v_i - "
+"\\sum_{j \\in \\text{hid}} c_j h_j - \\sum_{i<j} w_{ij} x_i x_j"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:35
+#, python-brace-format
+msgid ""
+"where $\\mathbf{x} = (\\mathbf{v}, \\mathbf{h})$ denotes the full state "
+"vector, $b_i$ are visible biases, and $c_j$ are hidden biases. The "
+"summation over $i<j$ runs over all distinct pairs of units, both visible-"
+"visible, visible-hidden, and hidden-hidden."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:37
+#, python-brace-format
+msgid ""
+"This energy function defines a joint probability distribution over all "
+"$2^{N}$ possible states via the Boltzmann distribution:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:39
+#, python-brace-format
+msgid ""
+"P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
+"\\mathbf{h})\\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:41
+msgid "where the partition function $Z$ sums over all joint configurations:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:43
+msgid ""
+"Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:45
+#, python-brace-format
+msgid ""
+"The probability of observing a visible vector $\\mathbf{v}$ alone is "
+"obtained by marginalizing over the hidden units:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:47
+msgid ""
+"P(\\mathbf{v}) = \\sum_{\\tilde{\\mathbf{h}}} P(\\mathbf{v}, "
+"\\tilde{\\mathbf{h}}) = \\frac{1}{Z} \\sum_{\\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E(\\mathbf{v}, \\tilde{\\mathbf{h}})\\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:49
+msgid "<b>Stochastic Dynamics and Equilibrium</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:51
+msgid ""
+"The network operates as a <b>stochastic dynamical system</b>. At each "
+"time step, a unit is selected at random, and its new state is sampled "
+"from its conditional distribution given the states of all other units. "
+"For a unit $i$, the probability of being active is:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:53
+#, python-brace-format
+msgid ""
+"P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\sigma\\left( \\sum_{j \\neq i} "
+"w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:55
+#, python-brace-format
+msgid ""
+"where $\\sigma(z) = 1/(1 + \\exp(-z))$ is sigmoid function, and "
+"$\\mathbf{x}_{-i}$ denotes the states of all units except $i$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:57
+msgid ""
+"Because the weights are symmetric, this update satisfies detailed balance"
+" with respect to the Boltzmann distribution defined in Section [1.2 The "
+"Boltzmann Distribution and Equilibrium](/kpp-theoretical-foundations"
+"\\kpp-theoretical-foundations-stat-boltzmann)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:59
+#, python-brace-format
+msgid ""
+"Consequently, if the network is allowed to run for a sufficiently long "
+"time (i.e., many asynchronous updates), the sequence of states "
+"constitutes a Markov chain whose stationary distribution is exactly "
+"$P(\\mathbf{v}, \\mathbf{h})$. This property is the cornerstone of both "
+"inference and learning in the Boltzmann machine."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:61
+#, python-brace-format
+msgid ""
+"Consequently, repeated application drives the network toward equilibrium,"
+" where configurations are sampled according to $P(\\mathbf{v}, "
+"\\mathbf{h})$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:63
+msgid "<b>Learning Objective: Maximum Likelihood with Hidden Variables</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:65
+#, python-brace-format
+msgid ""
+"The goal of learning is to adjust the weights and biases so that the "
+"marginal distribution over visible units, $P(\\mathbf{v})$, approximates "
+"the empirical distribution of the training data. As derived in Section "
+"[3.1 Defining the Objective: Low Energy for Real Data](/kpp-theoretical-"
+"foundations\\kpp-theoretical-foundations-ebms-def), the gradient of the "
+"negative log-likelihood for a single training example $\\mathbf{v}$ with "
+"respect to a weight $w_{ij}$ is:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:67
+msgid ""
+"\\frac{\\partial \\left( -\\log P(\\mathbf{v}) \\right)}{\\partial "
+"w_{ij}} = \\mathbb{E}_{\\mathbf{h} \\mid \\mathbf{v}} \\left[ x_i x_j "
+"\\right] - \\mathbb{E}_{P(\\mathbf{v}, \\mathbf{h})} \\left[ x_i x_j "
+"\\right]"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:69
+#, python-brace-format
+msgid ""
+"Here, $ x_i$ and $x_j$ denote the states of the two connected units. The "
+"first term is the expected product of their activities when the visible "
+"units are <b>clamped</b> to the training example $\\mathbf{v}$ and the "
+"hidden units are allowed to fluctuate according to their conditional "
+"distribution. This is the <b>positive phase</b> or <b>wake phase</b> "
+"statistic."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:71
+msgid ""
+"The second term is the expected product when the network runs "
+"<b>freely</b> without any external input, sampling from its equilibrium "
+"distribution. This is the <b>negative phase</b> or <b>sleep phase</b> "
+"statistic."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:73
+msgid "The learning rule is thus:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:75
+msgid ""
+"\\Delta w_{ij} = \\eta \\left( \\langle x_i x_j "
+"\\rangle_{\\text{clamped}} - \\langle x_i x_j \\rangle_{\\text{free}} "
+"\\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:77
+msgid ""
+"where $\\eta$ is the learning rate. Biases are updated similarly by "
+"treating them as weights from an always-on unit with state 1."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:79
+msgid "<b>The Wake-Sleep Algorithm: A Biological Metaphor</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:81
+msgid ""
+"The two-phase nature of the learning rule suggests a compelling "
+"biological metaphor. In the <b>wake phase</b>, the network is driven by "
+"sensory input (the visible units are clamped to data). The hidden units "
+"respond to this input, and the correlations $\\langle x_i x_j "
+"\\rangle_{\\text{clamped}}$ are recorded. These correlations strengthen "
+"connections between units that tend to be co-active in response to real-"
+"world stimuli—a Hebbian process."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:83
+msgid ""
+"In the <b>sleep phase</b>, the network is disconnected from sensory input"
+" and generates its own \"fantasies\" by running freely from its "
+"equilibrium distribution. The correlations $\\langle x_i x_j "
+"\\rangle_{\\text{free}}$ recorded during this phase are used to weaken "
+"connections that are spuriously co-active in the model's internal "
+"fantasies—an anti-Hebbian process that prevents the network from "
+"generating patterns not present in the data."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:85
+msgid ""
+"The difference between the wake and sleep statistics drives learning. "
+"This <b>contrastive Hebbian learning</b> elegantly combines local "
+"synaptic updates with a global objective."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:87
+msgid "<b>The Computational Bottleneck: Equilibrium Sampling</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:89
+msgid ""
+"Despite its theoretical elegance, the classic Boltzmann machine suffers "
+"from a severe practical limitation: <b>the need to sample from the "
+"equilibrium distribution in both phases is computationally "
+"prohibitive</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:91
+#, python-brace-format
+msgid ""
+"In the clamped phase, we must sample hidden states from $P(\\mathbf{h} "
+"\\mid \\mathbf{v})$. Because the hidden units are fully connected to one "
+"another, they do not become conditionally independent given the visible "
+"units. Computing the exact conditional distribution requires summing over"
+" all $2^{N_h}$ hidden configurations, which is intractable for non-"
+"trivial $N_h$. Instead, we must run a Markov chain over the hidden units "
+"until it reaches equilibrium—a process that can be extremely slow, "
+"especially when the energy landscape has high barriers."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:93
+msgid ""
+"In the free phase, the situation is even worse: we must run a Markov "
+"chain over <b>all</b> $N$ units until the joint distribution reaches "
+"equilibrium. The mixing time of this chain scales poorly with network "
+"size, and for large networks, obtaining unbiased samples is effectively "
+"impossible."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:95
+msgid "<b>The Unconstrained Connectivity: A Double-Edged Sword</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:97
+msgid ""
+"The fully connected architecture gives the classic Boltzmann machine its "
+"theoretical power: it is a <b>universal approximator</b> for probability "
+"distributions over binary vectors, given enough hidden units. The hidden-"
+"hidden connections allow the model to capture complex, higher-order "
+"dependencies that simpler models miss."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:99
+#, python-brace-format
+msgid ""
+"However, this same connectivity is the source of the computational "
+"intractability. The hidden units are not conditionally independent given "
+"the visible units, nor are the visible units conditionally independent "
+"given the hidden units. Every sampling step requires computing the total "
+"input to a unit from <b>all</b> other units, visible and hidden alike, "
+"and the Markov chain must mix over a state space of size $2^{N}$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:101
+msgid ""
+"In practice, training a classic Boltzmann machine on anything but tiny "
+"toy problems was infeasible with 1980s and 1990s computing resources. The"
+" algorithm remained a theoretical curiosity until the introduction of "
+"architectural restrictions that dramatically simplified the sampling "
+"process."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:103
+msgid "<b>The Path Forward: Restricted Architectures</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:105
+msgid ""
+"The limitations of the classic Boltzmann machine motivated a crucial "
+"architectural innovation: the <b>Restricted Boltzmann Machine (RBM)</b> ."
+" By removing all visible-visible and hidden-hidden connections, the RBM "
+"makes the units in one layer conditionally independent given the other "
+"layer. This seemingly small change has profound computational "
+"consequences:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:107
+msgid ""
+"<b>Clamped phase sampling</b>: Given visible units, the hidden units "
+"become independent, and their states can be sampled in parallel in a "
+"single step. No Markov chain is needed."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:108
+msgid ""
+"<b>Free phase sampling</b>: Block Gibbs sampling alternates between "
+"updating all hidden units given the visible units and all visible units "
+"given the hidden units. While still requiring multiple iterations to "
+"reach equilibrium, each iteration is fast and parallelizable."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:110
+msgid ""
+"The RBM, combined with the <b>contrastive divergence</b> approximation "
+"(Section [3.3 Contrastive Divergence](/kpp-theoretical-foundations\\kpp-"
+"theoretical-foundations-ebms-cd)), transformed the Boltzmann machine from"
+" a theoretical construct into a practical tool for unsupervised feature "
+"learning. The classic Boltzmann machine thus serves as the conceptual "
+"foundation, the \"Platonic ideal\", from which more tractable variants "
+"are derived."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:112
+msgid "<b>Recap: The Classic Boltzmann Machine</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:114
+msgid ""
+"The classic Boltzmann machine embodies the core principles of energy-"
+"based generative modeling:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:116
+msgid ""
+"<b>Architecture</b>: A fully connected, symmetric recurrent network of "
+"stochastic binary units, partitioned into visible and hidden sets."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:117
+msgid ""
+"<b>Energy function</b>: A quadratic form over all units, with weights and"
+" biases as parameters."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:118
+msgid ""
+"<b>Dynamics</b>: Asynchronous stochastic updates that converge to the "
+"Boltzmann equilibrium distribution."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:119
+msgid ""
+"<b>Learning</b>: Contrastive Hebbian updates driven by the difference "
+"between clamped (wake) and free-running (sleep) correlations."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:120
+msgid ""
+"<b>Limitation</b>: The need for equilibrium sampling over a fully "
+"connected graph renders exact training computationally intractable for "
+"all but the smallest networks."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:122
+msgid ""
+"The next section introduces the <b>Restricted Boltzmann Machine</b>, "
+"which imposes structural constraints that dramatically reduce sampling "
+"complexity while retaining much of the expressive power of the classic "
+"model."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:124
+msgid "<b>Summary </b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:126
+msgid ""
+"The <b>classic Boltzmann machine</b> is a fully connected, undirected "
+"probabilistic graphical model with symmetric weights and stochastic "
+"binary units."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:127
+msgid ""
+"Units are divided into <b>visible</b> (observed data) and <b>hidden</b> "
+"(latent features) groups, with full connectivity among all units."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:128
+msgid ""
+"The energy function defines a joint Boltzmann distribution, and "
+"stochastic updates guarantee convergence to equilibrium."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:129
+msgid ""
+"Learning follows a <b>contrastive Hebbian rule</b>: increase weights "
+"based on correlations when visible units are clamped to data, and "
+"decrease weights based on correlations when the network runs freely."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:130
+msgid ""
+"The fully connected architecture makes <b>exact inference and equilibrium"
+" sampling intractable</b>, limiting practical applications."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-bm-overall.md:131
+msgid ""
+"The computational bottleneck of the classic Boltzmann machine motivated "
+"the development of the <b>Restricted Boltzmann Machine (RBM)</b> , which "
+"removes certain connections to enable efficient sampling."
+msgstr ""
+

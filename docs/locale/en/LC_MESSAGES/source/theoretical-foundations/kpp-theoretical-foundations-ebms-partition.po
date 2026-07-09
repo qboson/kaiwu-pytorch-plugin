@@ -1,0 +1,976 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:10
+msgid "3.2 The Intractable Partition Function Problem"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:12
+msgid ""
+"Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-"
+"theoretical-foundations-ebms-def.md) introduced the maximum likelihood "
+"objective for energy-based models and revealed that the gradient of the "
+"negative log-likelihood contains a term involving an expectation under "
+"the model distribution. This expectation, in turn, requires summing over "
+"all possible configurations, a sum that is encoded in the **partition "
+"function** $Z_\\theta$. In this section, we examine why the partition "
+"function is computationally intractable, what consequences this "
+"intractability has for learning and inference, and why it constitutes the"
+" central algorithmic challenge for Boltzmann machines and energy-based "
+"models more broadly."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:14
+msgid "The Partition Function: Definition and Its Implications"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:15
+#, python-brace-format
+msgid ""
+"Recall the definition of the partition function for a Boltzmann machine "
+"with binary units $\\mathbf{x} \\in \\{0,1\\}^N$:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:17
+msgid ""
+"Z_\\theta = \\sum_{\\tilde{\\mathbf{x}} \\in \\{0,1\\}^N} "
+"\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:19
+msgid ""
+"The sum runs over **all** $2^N$ **possible binary vectors** of length "
+"$N$. For a modest network of $N=100$ visible units (a tiny image by "
+"modern standards, only $10 \\times 10$ pixels), the number of terms in "
+"this sum is:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:21
+#, python-brace-format
+msgid "2^{100} \\approx 1.27 \\times 10^{30}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:23
+msgid "To put this number in perspective:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:25
+#, python-brace-format
+msgid ""
+"The estimated number of stars in the observable universe is about "
+"$10^{22}$ to $10^{24}$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:26
+#, python-brace-format
+msgid "The age of the universe is approximately $4.35 \\times 10^{17}$ seconds."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:27
+#, python-brace-format
+msgid ""
+"Even if we could evaluate one trillion ($10^{12}$) configurations per "
+"second, enumerating $2^{100}$ configurations would take over "
+"$10^{10}$times the age of the universe."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:29
+msgid ""
+"And $N = 100$ is **tiny**. Real-world Boltzmann machines and restricted "
+"Boltzmann machines often have hundreds of visible units and hundreds or "
+"thousands of hidden units, yielding state spaces of size "
+"$2^{N_{\\text{vis}} + N_{\\text{hid}}}$. The partition function is "
+"**exponentially large** in the number of units."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:31
+msgid "Why the Partition Function Matters"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:32
+msgid "The partition function appears in three critical contexts:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:34
+#, python-brace-format
+msgid ""
+"**Probability Evaluation** To compute the probability "
+"$P_\\theta(\\mathbf{x})$ of a specific configuration, we must divide the "
+"Boltzmann factor by $Z_\\theta$:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:36
+msgid "P_\\theta(\\mathbf{x}) = \\frac{\\exp(-E_\\theta(\\mathbf{x}))}{Z_\\theta}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:38
+msgid ""
+"Without $Z_\\theta$, we have only an unnormalized score. This means we "
+"cannot directly compute likelihoods on test data, making model comparison"
+" and hyperparameter tuning difficult."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:40
+msgid ""
+"**Learning by Gradient Descent** Recall from Section [3.1 Defining the "
+"Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-"
+"def.md) that the gradient of the negative log-likelihood decomposes into "
+"a data term and a model term:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:42
+msgid ""
+"\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} \\left[ \\frac{\\partial"
+" E_\\theta}{\\partial \\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+"\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:44
+msgid ""
+"Note: $\\nabla f(\\theta) = -\\frac{\\partial \\mathcal{L}}{\\partial "
+"\\theta}$, where $\\mathcal{L}$ is the negative log-likelihood minimized "
+"in many textbooks."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:46
+msgid ""
+"The first term is straightforward to estimate from the training set. The "
+"second term, i.e. the expectation under the model distribution "
+"$P_\\theta$, is the source of difficulty. As shown in the expression "
+"above, computing this expectation exactly requires summing over all $2^N$"
+" possible configurations, weighted by the Boltzmann factor. Both the "
+"numerator and the denominator involve the partition function $Z_\\theta$,"
+" making exact gradient evaluation computationally intractable for any "
+"non-trivial model."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:48
+msgid ""
+"The **model expectation** $\\mathbb{E}_{\\text{model}}[\\cdot]$*is an "
+"average over the model distribution*$P_\\theta$:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:50
+msgid ""
+"\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial E_\\theta}{\\partial"
+" \\theta} \\right] = \\sum_{\\tilde{\\mathbf{x}}} "
+"P_\\theta(\\tilde{\\mathbf{x}}) \\frac{\\partial "
+"E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta} = "
+"\\frac{1}{Z_\\theta} \\sum_{\\tilde{\\mathbf{x}}} "
+"\\exp(-E_\\theta(\\tilde{\\mathbf{x}})) \\frac{\\partial "
+"E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:52
+msgid ""
+"Both the numerator and the denominator involve sums over all $2^N$ "
+"configurations. Exact gradient computation is infeasible."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:54
+msgid ""
+"**Sampling and Inference** Generating samples from the model distribution"
+" typically requires Markov chain Monte Carlo (MCMC) methods, such as "
+"Gibbs sampling. While MCMC does not require computing $Z_\\theta$ "
+"explicitly, it does require running the Markov chain long enough to reach"
+" equilibrium. The time required to obtain independent samples scales with"
+" the **mixing time** of the chain, which can be exponentially long in the"
+" system size, especially when the energy landscape has high barriers."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:56
+msgid "The Partition Function as a Free Energy Barrier"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:57
+msgid ""
+"In statistical physics, the partition function is intimately related to "
+"the **Helmholtz free energy** $F = -\\log Z$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:59
+msgid ""
+"(Setting $ k_B T = 1$ for notational simplicity.) The free energy "
+"summarizes the balance between energy and entropy. For a given visible "
+"configuration $\\mathbf{v}$ in a Boltzmann machine with hidden units "
+"$\\mathbf{h}$, the **free energy** is defined analogously as "
+"$F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E_\\theta(\\mathbf{v}, \\tilde{\\mathbf{h}})\\right)$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:61
+msgid "The probability of a visible vector is then:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:63
+msgid ""
+"$P_\\theta(\\mathbf{v}) = "
+"\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
+"\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:65
+msgid ""
+"Even with hidden units marginalized out, the denominator still sums over "
+"all $2^{N_{\\text{vis}}}$ visible configurations. The intractability "
+"remains."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:67
+msgid "The Consequence: Exact Maximum Likelihood Is Impossible"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:68
+msgid ""
+"The intractability of $Z_\\theta$ has a stark implication: **exact "
+"maximum likelihood learning of a Boltzmann machine is computationally "
+"impossible for all but the smallest toy problems.** Any practical "
+"training algorithm must rely on approximations."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:70
+msgid ""
+"This is not merely an engineering inconvenience; it is a fundamental "
+"computational barrier. The partition function sum is a prototypical "
+"#P-complete problem in computational complexity theory, meaning it is at "
+"least as hard as counting the number of satisfying assignments to a "
+"Boolean formula."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:72
+msgid "Hessian and Non-Convexity"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:74
+msgid ""
+"The difficulty extends beyond the gradient. The Hessian of the log-"
+"likelihood function also reveals the complexity of the optimization "
+"landscape. For a Boltzmann machine with only visible units, the Hessian "
+"has a simple and revealing form:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:76
+#, python-brace-format
+msgid "\\nabla^2 f(\\theta) = -\\text{Cov}_\\theta(\\mathbf{S})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:78
+#, python-brace-format
+msgid ""
+"where $\\mathbf{S}$ is the vector of sufficient statistics (e.g., $X_i$ "
+"and $X_i X_j$). This means the Hessian is negative definite, and the "
+"optimization is **concave**—there are no non-global local minima when all"
+" units are visible."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:80
+msgid "However, when hidden units are introduced, the Hessian becomes:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:82
+msgid ""
+"\\nabla^2 f(\\theta) = "
+"\\mathbb{E}_{\\text{target}}[\\text{Cov}_\\theta(\\mathbf{S}|\\mathbf{X})]"
+" - \\text{Cov}_\\theta(\\mathbf{S})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:84
+msgid ""
+"The first term is the conditional covariance given the visible units, and"
+" the second term is the unconditional covariance under the model. This "
+"expression is **not** necessarily negative semidefinite, meaning that "
+"**the log-likelihood is not concave** in the presence of hidden units. "
+"Consequently, gradient-based methods can converge to local optima, and "
+"the quality of the learned model depends crucially on the initialization "
+"and optimization algorithm."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:86
+msgid "Approaches to Taming the Intractability"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:87
+msgid ""
+"Faced with this barrier, researchers have developed several families of "
+"approximation strategies. Understanding these strategies is essential for"
+" navigating the landscape of energy-based learning."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:89
+msgid ""
+"**Sampling-Based Approximations** Instead of summing over all "
+"configurations, we can **sample** configurations from the model "
+"distribution using MCMC. The model expectation is then approximated by an"
+" empirical average over the samples:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:91
+msgid ""
+"\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial E_\\theta}{\\partial"
+" \\theta} \\right] \\approx \\frac{1}{K} \\sum_{k=1}^K \\frac{\\partial "
+"E_\\theta(\\tilde{\\mathbf{x}}^{(k)})}{\\partial \\theta}, \\quad "
+"\\tilde{\\mathbf{x}}^{(k)} \\sim P_\\theta"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:93
+msgid ""
+"The challenge is that obtaining unbiased samples requires running the "
+"Markov chain to equilibrium for every gradient step, which is "
+"prohibitively slow. **Contrastive divergence** (Section [3.3 Contrastive "
+"Divergence](kpp-theoretical-foundations-ebms-cd.md)) and **persistent "
+"contrastive divergence** address this by using short MCMC runs "
+"initialized from the data or from previous model states."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:95
+msgid ""
+"**Variational Approximations** Variational methods replace the "
+"intractable model distribution $P_\\theta$ with a simpler, tractable "
+"**variational distribution** $Q_\\phi$ from a restricted family. The "
+"parameters $ \\phi$ are optimized to make $Q_\\phi$ as close as possible "
+"to $P_\\theta$ in the sense of Kullback-Leibler divergence. This "
+"transforms the learning problem into an optimization over both $ \\theta$"
+" and $\\phi$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:97
+msgid ""
+"While variational methods provide a rigorous lower bound on the log-"
+"likelihood, they often require making strong independence assumptions "
+"(e.g., mean-field approximations) that can limit the model's expressive "
+"power."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:99
+#, python-brace-format
+msgid ""
+"**Architectural Constraints** By restricting the connectivity pattern of "
+"the Boltzmann machine, we can make certain computations tractable. The "
+"**Restricted Boltzmann Machine (RBM)** is the most celebrated example. By"
+" eliminating visible-visible and hidden-hidden connections, the "
+"conditional distributions $P(\\mathbf{h} \\mid \\mathbf{v})$ and "
+"$P(\\mathbf{v} \\mid \\mathbf{h})$ factorize into products of independent"
+" Bernoulli distributions. This allows efficient Gibbs sampling and "
+"enables the contrastive divergence algorithm."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:101
+msgid ""
+"**Score Matching and Noise Contrastive Estimation** These are alternative"
+" training criteria that circumvent the partition function entirely. "
+"**Score matching** minimizes the Fisher divergence between the model and "
+"data distributions by matching the gradients of their log-densities, "
+"which does not require $Z_\\theta$. **Noise contrastive estimation "
+"(NCE)** transforms the unsupervised learning problem into a supervised "
+"logistic regression task of distinguishing data samples from noise "
+"samples, where the partition function becomes a learnable parameter."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:103
+msgid ""
+"**Annealed Importance Sampling** For model evaluation (rather than "
+"training), **annealed importance sampling (AIS)** provides an unbiased "
+"estimate of $Z_\\theta$. It works by gradually transforming a simple base"
+" distribution (e.g., uniform) into the model distribution through a "
+"sequence of intermediate distributions, using importance weights to "
+"correct for the sampling bias. While computationally expensive, AIS is a "
+"gold standard for evaluating generative models when exact likelihoods are"
+" required."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:105
+msgid "The Partition Function in the Era of Deep Learning"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:106
+msgid ""
+"It is worth noting that the intractability of the partition function is "
+"not unique to Boltzmann machines. Many modern deep generative models face"
+" analogous challenges:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:108
+msgid ""
+"**Generative Adversarial Networks (GANs)** avoid the partition function "
+"entirely by using an adversarial training criterion that does not require"
+" likelihood evaluation."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:109
+msgid ""
+"**Variational Autoencoders (VAEs)** use a variational lower bound that "
+"circumvents the partition function."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:110
+msgid ""
+"**Normalizing Flows** design architectures where the Jacobian "
+"determinant, the analog of $Z_\\theta$, is tractable by construction."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:111
+msgid ""
+"**Diffusion Models** learn to reverse a gradual noising process, with a "
+"training objective that involves only tractable conditional "
+"distributions."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:113
+msgid ""
+"The Boltzmann machine's struggle with the partition function thus "
+"foreshadows a central theme in deep generative modeling: the tension "
+"between expressive power and tractable normalization."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:115
+msgid "Summary"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:116
+msgid ""
+"The **partition function** $Z_\\theta = \\sum_{\\mathbf{x}} "
+"\\exp(-E_\\theta(\\mathbf{x}))$ is a sum over an exponential number of "
+"configurations, making exact computation infeasible for non-trivial "
+"models."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:117
+msgid ""
+"The intractability of $Z_\\theta$ prevents exact **probability "
+"evaluation**, exact **gradient computation**, and efficient exact "
+"**sampling**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:118
+msgid ""
+"This computational barrier implies that **exact maximum likelihood "
+"learning is impossible** for general Boltzmann machines."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:119
+msgid ""
+"Approximation strategies fall into several categories: **sampling-based**"
+" (MCMC, contrastive divergence), **variational** (mean-field), "
+"**architectural constraints** (RBM), and **alternative objectives** "
+"(score matching, NCE)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:120
+msgid ""
+"The partition function problem is a fundamental challenge that connects "
+"Boltzmann machines to contemporary deep generative models, many of which "
+"are designed explicitly to circumvent or tame this intractability."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:121
+msgid ""
+"The **Restricted Boltzmann Machine** and **contrastive divergence,** "
+"topics of the upcoming sections, provide a pragmatic and influential "
+"solution to this problem for a restricted but powerful class of "
+"architectures."
+msgstr ""
+
+#~ msgid ""
+#~ "\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} "
+#~ "\\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+#~ "\\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right]"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial "
+#~ "E_\\theta}{\\partial \\theta} \\right] = "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} P_\\theta(\\tilde{\\mathbf{x}}) "
+#~ "\\frac{\\partial E_\\theta(\\tilde{\\mathbf{x}})}{\\partial "
+#~ "\\theta} = \\frac{1}{Z_\\theta} "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp(-E_\\theta(\\tilde{\\mathbf{x}})) \\frac{\\partial "
+#~ "E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "F_\\theta(\\mathbf{v}) = -\\log "
+#~ "\\sum_{\\tilde{\\mathbf{h}}} \\exp\\left(-E_\\theta(\\mathbf{v},"
+#~ " \\tilde{\\mathbf{h}})\\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{v}) = "
+#~ "\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}}"
+#~ " \\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
+#~ msgstr ""
+
+#~ msgid "\\nabla^2 f(\\theta) = -\\text{Cov}_\\theta(\\mathbf{S})"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\nabla^2 f(\\theta) = "
+#~ "\\mathbb{E}_{\\text{target}}[\\text{Cov}_\\theta(\\mathbf{S}|\\mathbf{X})]"
+#~ " - \\text{Cov}_\\theta(\\mathbf{S})"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial "
+#~ "E_\\theta}{\\partial \\theta} \\right] \\approx "
+#~ "\\frac{1}{K} \\sum_{k=1}^K \\frac{\\partial "
+#~ "E_\\theta(\\tilde{\\mathbf{x}}^{(k)})}{\\partial \\theta}, "
+#~ "\\quad \\tilde{\\mathbf{x}}^{(k)} \\sim P_\\theta"
+#~ msgstr ""
+
+#~ msgid "::"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Section [3.1 Defining the Objective: Low"
+#~ " Energy for Real Data](/kpp-theoretical-"
+#~ "foundationskpp-theoretical-foundations-ebms-"
+#~ "def) introduced the maximum likelihood "
+#~ "objective for energy-based models and"
+#~ " revealed that the gradient of the"
+#~ " negative log-likelihood contains a "
+#~ "term involving an expectation under the"
+#~ " model distribution. This expectation, in"
+#~ " turn, requires summing over all "
+#~ "possible configurations, a sum that is"
+#~ " encoded in the <b>partition function</b>"
+#~ " $Z_\\theta$. In this section, we "
+#~ "examine why the partition function is"
+#~ " computationally intractable, what consequences"
+#~ " this intractability has for learning "
+#~ "and inference, and why it constitutes"
+#~ " the central algorithmic challenge for "
+#~ "Boltzmann machines and energy-based "
+#~ "models more broadly."
+#~ msgstr ""
+
+#~ msgid "<b>The Partition Function: Definition and Its Implications</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The sum runs over <b>all </b>$2^N$<b>"
+#~ " possible binary vectors</b> of length "
+#~ "$N$. For a modest network of "
+#~ "$N=100$ visible units (a tiny image "
+#~ "by modern standards, only $10 \\times"
+#~ " 10$ pixels), the number of terms "
+#~ "in this sum is:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "And $N = 100$ is <b>tiny</b>. "
+#~ "Real-world Boltzmann machines and "
+#~ "restricted Boltzmann machines often have "
+#~ "hundreds of visible units and hundreds"
+#~ " or thousands of hidden units, "
+#~ "yielding state spaces of size "
+#~ "$2^{N_{\\text{vis}} + N_{\\text{hid}}}$. The "
+#~ "partition function is <b>exponentially "
+#~ "large</b> in the number of units."
+#~ msgstr ""
+
+#~ msgid "<b>Why the Partition Function Matters</b>"
+#~ msgstr ""
+
+#~ msgid "<b> Probability Evaluation</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To compute the probability "
+#~ "$P_\\theta(\\mathbf{x})$ of a specific "
+#~ "configuration, we must divide the "
+#~ "Boltzmann factor by $Z_\\theta$:"
+#~ msgstr ""
+
+#~ msgid "<b>Learning by Gradient Descent</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Recall from Section [3.1 Defining the"
+#~ " Objective: Low Energy for Real Data"
+#~ "](kpp-theoretical-foundations-ebms-def.md) "
+#~ "that the gradient of the negative "
+#~ "log-likelihood decomposes into a data "
+#~ "term and a model term:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>model expectation "
+#~ "</b>$\\mathbb{E}_{\\text{model}}[\\cdot]$<em> is an "
+#~ "average over the model distribution "
+#~ "</em>$P_\\theta$:"
+#~ msgstr ""
+
+#~ msgid "<b>Sampling and Inference</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Generating samples from the model "
+#~ "distribution typically requires Markov chain"
+#~ " Monte Carlo (MCMC) methods, such as"
+#~ " Gibbs sampling. While MCMC does not"
+#~ " require computing $Z_\\theta$ explicitly, "
+#~ "it does require running the Markov "
+#~ "chain long enough to reach equilibrium."
+#~ " The time required to obtain "
+#~ "independent samples scales with the "
+#~ "<b>mixing time</b> of the chain, which"
+#~ " can be exponentially long in the "
+#~ "system size, especially when the energy"
+#~ " landscape has high barriers."
+#~ msgstr ""
+
+#~ msgid "<b>The Partition Function as a Free Energy Barrier</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In statistical physics, the partition "
+#~ "function is intimately related to the"
+#~ " <b>Helmholtz free energy</b> $F$:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "(Setting $ k_B T = 1$ for "
+#~ "notational simplicity.) The free energy "
+#~ "summarizes the balance between energy "
+#~ "and entropy. For a given visible "
+#~ "configuration $\\mathbf{v}$ in a Boltzmann "
+#~ "machine with hidden units $\\mathbf{h}$, "
+#~ "the <b>free energy</b> is defined "
+#~ "analogously:"
+#~ msgstr ""
+
+#~ msgid "<b>The Consequence: Exact Maximum Likelihood Is Impossible</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The intractability of $Z_\\theta$ has a"
+#~ " stark implication: <b>exact maximum "
+#~ "likelihood learning of a Boltzmann "
+#~ "machine is computationally impossible for "
+#~ "all but the smallest toy problems.</b>"
+#~ " Any practical training algorithm must "
+#~ "rely on approximations."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "where $\\mathbf{S}$ is the vector of "
+#~ "sufficient statistics (e.g., $X_i$ and "
+#~ "$X_i X_j$). This means the Hessian "
+#~ "is negative definite, and the "
+#~ "optimization is <b>concave</b>—there are no"
+#~ " non-global local minima when all "
+#~ "units are visible."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The first term is the conditional "
+#~ "covariance given the visible units, and"
+#~ " the second term is the unconditional"
+#~ " covariance under the model. This "
+#~ "expression is <b>not</b> necessarily negative"
+#~ " semidefinite, meaning that <b>the log-"
+#~ "likelihood is not concave</b> in the "
+#~ "presence of hidden units. Consequently, "
+#~ "gradient-based methods can converge to "
+#~ "local optima, and the quality of "
+#~ "the learned model depends crucially on"
+#~ " the initialization and optimization "
+#~ "algorithm."
+#~ msgstr ""
+
+#~ msgid "<b>Approaches to Taming the Intractability</b>"
+#~ msgstr ""
+
+#~ msgid "<b>Sampling-Based Approximations</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Instead of summing over all "
+#~ "configurations, we can <b>sample "
+#~ "</b>configurations from the model distribution"
+#~ " using MCMC. The model expectation is"
+#~ " then approximated by an empirical "
+#~ "average over the samples:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The challenge is that obtaining unbiased"
+#~ " samples requires running the Markov "
+#~ "chain to equilibrium for every gradient"
+#~ " step, which is prohibitively slow. "
+#~ "<b>Contrastive divergence</b> (Section [3.3 "
+#~ "Contrastive Divergence](kpp-theoretical-"
+#~ "foundations-ebms-cd)) and <b>persistent "
+#~ "contrastive divergence</b> address this by "
+#~ "using short MCMC runs initialized from"
+#~ " the data or from previous model "
+#~ "states."
+#~ msgstr ""
+
+#~ msgid "<b>Variational Approximations</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Variational methods replace the intractable"
+#~ " model distribution $P_\\theta$ with a "
+#~ "simpler, tractable <b>variational distribution</b>"
+#~ " $Q_\\phi$ from a restricted family. "
+#~ "The parameters $ \\phi$ are optimized"
+#~ " to make $Q_\\phi$ as close as "
+#~ "possible to $P_\\theta$ in the sense "
+#~ "of Kullback-Leibler divergence. This "
+#~ "transforms the learning problem into an"
+#~ " optimization over both $ \\theta$ "
+#~ "and $\\phi$."
+#~ msgstr ""
+
+#~ msgid "<b>Architectural Constraints</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "By restricting the connectivity pattern "
+#~ "of the Boltzmann machine, we can "
+#~ "make certain computations tractable. The "
+#~ "<b>Restricted Boltzmann Machine (RBM)</b> is"
+#~ " the most celebrated example. By "
+#~ "eliminating visible-visible and hidden-"
+#~ "hidden connections, the conditional "
+#~ "distributions $P(\\mathbf{h} \\mid \\mathbf{v})$ "
+#~ "and $P(\\mathbf{v} \\mid \\mathbf{h})$ "
+#~ "factorize into products of independent "
+#~ "Bernoulli distributions. This allows efficient"
+#~ " Gibbs sampling and enables the "
+#~ "contrastive divergence algorithm."
+#~ msgstr ""
+
+#~ msgid "<b>Score Matching and Noise Contrastive Estimation</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "These are alternative training criteria "
+#~ "that circumvent the partition function "
+#~ "entirely. <b>Score matching</b> minimizes the"
+#~ " Fisher divergence between the model "
+#~ "and data distributions by matching the"
+#~ " gradients of their log-densities, "
+#~ "which does not require $Z_\\theta$. "
+#~ "<b>Noise contrastive estimation (NCE)</b> "
+#~ "transforms the unsupervised learning problem"
+#~ " into a supervised logistic regression "
+#~ "task of distinguishing data samples from"
+#~ " noise samples, where the partition "
+#~ "function becomes a learnable parameter."
+#~ msgstr ""
+
+#~ msgid "<b>Annealed Importance Sampling</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "For model evaluation (rather than "
+#~ "training), <b>annealed importance sampling "
+#~ "(AIS)</b> provides an unbiased estimate "
+#~ "of $Z_\\theta$. It works by gradually"
+#~ " transforming a simple base distribution"
+#~ " (e.g., uniform) into the model "
+#~ "distribution through a sequence of "
+#~ "intermediate distributions, using importance "
+#~ "weights to correct for the sampling "
+#~ "bias. While computationally expensive, AIS "
+#~ "is a gold standard for evaluating "
+#~ "generative models when exact likelihoods "
+#~ "are required."
+#~ msgstr ""
+
+#~ msgid "<b>The Partition Function in the Era of Deep Learning</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Generative Adversarial Networks (GANs)</b> "
+#~ "avoid the partition function entirely by"
+#~ " using an adversarial training criterion"
+#~ " that does not require likelihood "
+#~ "evaluation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Variational Autoencoders (VAEs)</b> use a"
+#~ " variational lower bound that circumvents"
+#~ " the partition function."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Normalizing Flows</b> design architectures "
+#~ "where the Jacobian determinant, the "
+#~ "analog of $Z_\\theta$, is tractable by"
+#~ " construction."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Diffusion Models</b> learn to reverse "
+#~ "a gradual noising process, with a "
+#~ "training objective that involves only "
+#~ "tractable conditional distributions."
+#~ msgstr ""
+
+#~ msgid "<b>Summary</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>partition function</b> $Z_\\theta = "
+#~ "\\sum_{\\mathbf{x}} \\exp(-E_\\theta(\\mathbf{x}))$ is "
+#~ "a sum over an exponential number "
+#~ "of configurations, making exact computation"
+#~ " infeasible for non-trivial models."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The intractability of $Z_\\theta$ prevents "
+#~ "exact <b>probability evaluation</b>, exact "
+#~ "<b>gradient computation</b>, and efficient "
+#~ "exact <b>sampling</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This computational barrier implies that "
+#~ "<b>exact maximum likelihood learning is "
+#~ "impossible</b> for general Boltzmann machines."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Approximation strategies fall into several "
+#~ "categories: <b>sampling-based</b> (MCMC, "
+#~ "contrastive divergence), <b>variational</b> "
+#~ "(mean-field), <b>architectural constraints</b> "
+#~ "(RBM), and <b>alternative objectives</b> "
+#~ "(score matching, NCE)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Restricted Boltzmann Machine</b> and"
+#~ " <b>contrastive divergence, </b>topics of "
+#~ "the upcoming sections, provide a "
+#~ "pragmatic and influential solution to "
+#~ "this problem for a restricted but "
+#~ "powerful class of architectures."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Z_\\theta = \\sum_{\\tilde{\\mathbf{x}} \\in "
+#~ "\\{0,1\\}^N} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+#~ msgstr ""
+
+#~ msgid "2^{100} \\approx 1.27 \\times 10^{30}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{x}) = "
+#~ "\\frac{\\exp(-E_\\theta(\\mathbf{x}))}{Z_\\theta}"
+#~ msgstr ""
+
+#~ msgid "F = -\\log Z"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In statistical physics, the partition "
+#~ "function is intimately related to the"
+#~ " **Helmholtz free energy** $F$:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "(Setting $ k_B T = 1$ for "
+#~ "notational simplicity.) The free energy "
+#~ "summarizes the balance between energy "
+#~ "and entropy. For a given visible "
+#~ "configuration $\\mathbf{v}$ in a Boltzmann "
+#~ "machine with hidden units $\\mathbf{h}$, "
+#~ "the **free energy** is defined "
+#~ "analogously:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Section [3.1 Defining the Objective: Low"
+#~ " Energy for Real Data](/kpp-theoretical-"
+#~ "foundationskpp-theoretical-foundations-ebms-"
+#~ "def) introduced the maximum likelihood "
+#~ "objective for energy-based models and"
+#~ " revealed that the gradient of the"
+#~ " negative log-likelihood contains a "
+#~ "term involving an expectation under the"
+#~ " model distribution. This expectation, in"
+#~ " turn, requires summing over all "
+#~ "possible configurations, a sum that is"
+#~ " encoded in the **partition function** "
+#~ "$Z_\\theta$. In this section, we examine"
+#~ " why the partition function is "
+#~ "computationally intractable, what consequences "
+#~ "this intractability has for learning and"
+#~ " inference, and why it constitutes "
+#~ "the central algorithmic challenge for "
+#~ "Boltzmann machines and energy-based "
+#~ "models more broadly."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Learning by Gradient Descent** Recall "
+#~ "from Section [3.1 Defining the "
+#~ "Objective: Low Energy for Real Data"
+#~ "](kpp-theoretical-foundations-ebms-def.md) "
+#~ "that the gradient of the negative "
+#~ "log-likelihood decomposes into a data "
+#~ "term and a model term:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Section [3.1 Defining the Objective: Low"
+#~ " Energy for Real Data](kpp-theoretical-"
+#~ "foundations-ebms-def) introduced the "
+#~ "maximum likelihood objective for energy-"
+#~ "based models and revealed that the "
+#~ "gradient of the negative log-likelihood"
+#~ " contains a term involving an "
+#~ "expectation under the model distribution. "
+#~ "This expectation, in turn, requires "
+#~ "summing over all possible configurations, "
+#~ "a sum that is encoded in the "
+#~ "**partition function** $Z_\\theta$. In this"
+#~ " section, we examine why the "
+#~ "partition function is computationally "
+#~ "intractable, what consequences this "
+#~ "intractability has for learning and "
+#~ "inference, and why it constitutes the"
+#~ " central algorithmic challenge for "
+#~ "Boltzmann machines and energy-based "
+#~ "models more broadly."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Learning by Gradient Descent** Recall "
+#~ "from Section [3.1 Defining the "
+#~ "Objective: Low Energy for Real Data"
+#~ "](kpp-theoretical-foundations-ebms-def.md) "
+#~ "that the gradient of the negative "
+#~ "log-likelihood decomposes into a data "
+#~ "term and a model term:"
+#~ msgstr ""
+

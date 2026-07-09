@@ -51,17 +51,27 @@ class QDiffusionConfig:
     """Configuration for energy-guided discrete generation.
 
     Attributes:
+
         num_diffusion_timesteps: Number of discrete noising steps used by the
             training objective.
+
         use_coupled_sampling: Whether to use the coupled corruption variant.
+
         num_candidates: Number of proposal candidates sampled at each decode step.
+
         proposal_temperature: Temperature used for proposal-side sampling.
+
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
+
         energy_temperature: Temperature used when converting energies into
             reranking weights.
+
         disable_resample: Whether to disable repetition-collapse resampling.
+
         resample_ratio: Frequency threshold that triggers resampling.
+
         resample_top_p: Top-p cutoff used during resampling.
+
         decoding_strategy: Skeptical-remasking strategy string.
     """
 
@@ -187,6 +197,7 @@ class EnergyModel(nn.Module):
 
 class QDiffusion(nn.Module):
     """Energy-guided discrete diffusion wrapper over generic sequence backbones.
+    Initializes a QDiffusion model.
 
     The class combines two backbone roles:
 
@@ -196,6 +207,21 @@ class QDiffusion(nn.Module):
     It exposes both training-oriented APIs such as :meth:`objective` and
     decoding-oriented APIs such as :meth:`initialize_state`, :meth:`step`, and
     :meth:`generate`.
+
+    Args:
+        proposal_model: Backbone used to predict proposal logits.
+
+        energy_model: Energy-side model used to encode and score candidates.
+
+        token_spec: Special-token metadata required by the generator.
+
+        config: Optional generation/training configuration.
+
+        dtype: Floating point dtype tracked by the wrapper.
+
+        device: Optional target device. When omitted, infer from parameters.
+
+        freeze_proposal: Whether to freeze proposal model parameters.
     """
 
     def __init__(
@@ -208,16 +234,9 @@ class QDiffusion(nn.Module):
         device: torch.device | str | None = None,
         freeze_proposal: bool = True,
     ) -> None:
-        """Initializes a QDiffusion model.
+        """
 
-        Args:
-            proposal_model: Backbone used to predict proposal logits.
-            energy_model: Energy-side model used to encode and score candidates.
-            token_spec: Special-token metadata required by the generator.
-            config: Optional generation/training configuration.
-            dtype: Floating point dtype tracked by the wrapper.
-            device: Optional target device. When omitted, infer from parameters.
-            freeze_proposal: Whether to freeze proposal model parameters.
+
         """
         super().__init__()
         self.proposal_model = proposal_model
@@ -307,7 +326,9 @@ class QDiffusion(nn.Module):
 
         Args:
             noisy_tokens: Noisy token tensor used as conditioning input.
+
             candidate_tokens: Candidate clean token tensor to score.
+
             attention_mask: Optional attention mask for the energy model.
 
         Returns:

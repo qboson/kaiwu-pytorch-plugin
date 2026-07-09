@@ -1,0 +1,612 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:10
+msgid "3.3 Contrastive Divergence"
+msgstr "3.3 对比散度"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:12
+msgid ""
+"Section [3.2 The Intractable Partition Function Problem](kpp-theoretical-"
+"foundations-ebms-partition.md) established that exact maximum likelihood "
+"learning of Boltzmann machines is computationally infeasible due to the "
+"intractable partition function. The model expectation term in the "
+"gradient requires sampling from the equilibrium distribution $P_\\theta$,"
+" which in turn demands running a Markov chain to convergence, which is a "
+"prohibitively slow process. In this section, we introduce **contrastive "
+"divergence (CD)**, the algorithmic breakthrough that made Boltzmann "
+"machines practical for real-world applications. CD provides a simple, "
+"efficient approximation to the gradient that circumvents the need for "
+"equilibrium sampling, trading theoretical purity for empirical "
+"effectiveness."
+msgstr ""
+"[3.2 难以精确处理的配分函数问题](kpp-theoretical-foundations-ebms-partition.md) "
+"已经说明，由于配分函数不可处理，玻尔兹曼机的精确最大似然学习在计算上不可行。梯度中的模型期望项需要从平衡分布 $P_\\theta$ "
+"中采样，而这又要求 Markov 链运行到收敛，过程极其缓慢。本节介绍 **对比散度（contrastive divergence, "
+"CD）**，这一使玻尔兹曼机在实际应用中可用的算法突破。CD 为梯度提供了简单高效的近似，绕开了平衡采样需求，以理论纯粹性换取经验有效性。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:14
+msgid "The Core Insight: Truncated Markov Chains"
+msgstr "核心洞见：截断 Markov 链"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:15
+msgid ""
+"The key observation behind contrastive divergence, introduced by Geoffrey"
+" Hinton in 2002, is that we need not run the Markov chain all the way to "
+"equilibrium. Instead, we can initialize the chain at a **data point** and"
+" run it for only a small number of steps, often just **one,** and then "
+"treat the resulting state as an approximate sample from the model "
+"distribution."
+msgstr ""
+"Geoffrey Hinton 于 2002 年提出对比散度，其关键观察是：我们不必把 Markov 链一直运行到平衡。相反，可以把链初始化在 "
+"**数据点** 上，只运行少量步骤，通常甚至只运行 **一步**，然后把得到的状态当作来自模型分布的近似样本。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:17
+msgid ""
+"Why should this work? Consider the gradient of the negative log-"
+"likelihood:"
+msgstr "为什么这会有效？考虑负对数似然梯度："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:19
+msgid ""
+"\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} \\left[ \\frac{\\partial"
+" E_\\theta}{\\partial \\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+"\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-cd.md:21
+msgid ""
+"The first term is an expectation over the data distribution, which is "
+"easy to compute. But the second term requires sampling from the model "
+"distribution."
+msgstr ""
+"第一项是数据分布上的期望，易于计算。第二项才是困难所在。在对比散度中，我们用从数据初始化并经过 $ k $ 步 Gibbs "
+"采样后得到的分布上的期望，替代模型期望。这给出 **CD-k** 更新规则："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:23
+msgid ""
+"In contrastive divergence, we replace the model expectation with an "
+"expectation over a distribution obtained after $k$ steps of Gibbs "
+"sampling initialized from the data, yielding the **CD-k** update rule:"
+msgstr ""
+"直觉是，即使只运行几步，Markov 链也会从数据分布向模型分布移动。数据统计量与 $k$ "
+"步后统计量之间的差，可以近似真实梯度方向。令人惊讶的是，当 $k = 1$ 时，这个简单启发式已经足以训练有用的生成模型。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:25
+msgid ""
+"\\Delta \\theta \\propto -\\mathbb{E}_{\\text{data}} \\left[ "
+"\\frac{\\partial E_\\theta}{\\partial \\theta} \\right] + "
+"\\mathbb{E}_{\\text{recon after } k \\text{ steps}} \\left[ "
+"\\frac{\\partial E_\\theta}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-cd.md:27
+msgid ""
+"Note that this is equivalent to the standard CD update $\\Delta w_{ij} = "
+"\\eta (\\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j "
+"\\rangle_{\\text{recon}})$ because $\\frac{\\partial E_\\theta}{\\partial"
+" w_{ij}} = -v_i h_j$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-cd.md:29
+msgid ""
+"The intuition is that the Markov chain, even after a few steps, moves "
+"away from the data distribution toward the model distribution. The "
+"difference between the data statistics and the statistics after $k$ steps"
+" approximates the true gradient direction. Remarkably, for $k = 1$, this "
+"simple heuristic works well enough to train useful generative models."
+msgstr "用于训练受限玻尔兹曼机（RBM）或一般玻尔兹曼机的 CD-k 算法如下："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:31
+msgid "The CD-k Algorithm in Detail"
+msgstr "CD-k 算法细节"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:32
+#, python-brace-format
+msgid ""
+"The CD-k algorithm for training a Restricted Boltzmann Machine (RBM) or a"
+" general Boltzmann machine proceeds as follows: **Algorithm: Contrastive "
+"Divergence (CD-k)** For each training example $\\mathbf{v}^{(0)}$ (the "
+"visible state):"
+msgstr "用于训练受限玻尔兹曼机（RBM）或一般玻尔兹曼机的 CD-k 算法如下："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:34
+msgid "**Positive Phase**:"
+msgstr "**算法：对比散度（CD-k）**"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:35
+#, python-brace-format
+msgid "Clamp the visible units to the data vector $\\mathbf{v}^{(0)}$."
+msgstr "对每个训练样本 $\\mathbf{v}^{(0)}$（可见状态）："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:36
+#, python-brace-format
+msgid ""
+"Compute the hidden unit activations $P(\\mathbf{h} \\mid "
+"\\mathbf{v}^{(0)})$ and sample a binary hidden state $\\mathbf{h}^{(0)}$."
+msgstr "**正相**："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:37
+#, python-brace-format
+msgid ""
+"Record the outer product $\\mathbf{v}^{(0)} (\\mathbf{h}^{(0)})^\\top$ as"
+" the **positive statistics**."
+msgstr "将可见单元固定到数据向量 $\\mathbf{v}^{(0)}$。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:39
+msgid "**Negative Phase** (Gibbs sampling for $k$ steps):"
+msgstr ""
+"计算隐藏单元激活 $P(\\mathbf{h} \\mid \\mathbf{v}^{(0)})$，并采样二值隐藏状态 "
+"$\\mathbf{h}^{(0)}$。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:40
+msgid "For $t = 1$ to $k$:"
+msgstr "记录外积 $\\mathbf{v}^{(0)} (\\mathbf{h}^{(0)})^\\top$ 作为 **正统计量**。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:41
+#, python-brace-format
+msgid ""
+"Sample visible reconstruction $ \\mathbf{v}^{(t)} \\sim P(\\mathbf{v} "
+"\\mid \\mathbf{h}^{(t-1)})$."
+msgstr "**负相**（执行 $k$ 步 Gibbs 采样）："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:42
+#, python-brace-format
+msgid ""
+"Sample hidden reconstruction $\\mathbf{h}^{(t)} \\sim P(\\mathbf{h} \\mid"
+" \\mathbf{v}^{(t)})$."
+msgstr "对 $t = 1$ 到 $k$："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:43
+#, python-brace-format
+msgid ""
+"Record the outer product $\\mathbf{v}^{(k)} (\\mathbf{h}^{(k)})^\\top$ as"
+" the **negative statistics**."
+msgstr ""
+"采样可见重构 $ \\mathbf{v}^{(t)} \\sim P(\\mathbf{v} \\mid "
+"\\mathbf{h}^{(t-1)})$。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:45
+msgid "**Weight Update**:"
+msgstr "采样隐藏重构 $\\mathbf{h}^{(t)} \\sim P(\\mathbf{h} \\mid \\mathbf{v}^{(t)})$。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:47
+#, python-brace-format
+msgid ""
+"Update each weight $w_{ij}$ using the difference between positive and "
+"negative statistics:"
+msgstr "记录外积 $\\mathbf{v}^{(k)} (\\mathbf{h}^{(k)})^\\top$ 作为 **负统计量**。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:49
+msgid ""
+"\\Delta w_{ij} = \\eta \\left( \\langle v_i h_j \\rangle_{\\text{data}} -"
+" \\langle v_i h_j \\rangle_{\\text{recon}} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-cd.md:51
+msgid ""
+"where $\\eta$ is the learning rate. Biases are updated similarly using "
+"unit activations."
+msgstr "**权重更新**："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:53
+msgid ""
+"For **CD-1** (the most common variant), the negative phase consists of a "
+"single round-trip:"
+msgstr "用正、负统计量之间的差更新每个权重 $w_{ij}$："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:55
+#, python-brace-format
+msgid ""
+"$\\mathbf{v}^{(0)} \\rightarrow \\mathbf{h}^{(0)} \\rightarrow "
+"\\mathbf{v}^{(1)} \\rightarrow \\mathbf{h}^{(1)}$."
+msgstr "其中 $\\eta$ 是学习率。偏置也用单元激活以类似方式更新。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:57
+msgid "Geometric Interpretation: Approximating the Gradient"
+msgstr "局限与注意事项"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:58
+msgid ""
+"The contrastive divergence update can be understood geometrically. The "
+"true gradient of the log-likelihood points in the direction that reduces "
+"the energy of data configurations and increases the energy of "
+"configurations that the model currently deems probable. CD approximates "
+"this by comparing the data configurations to nearby **reconstructions**, "
+"which are configurations obtained by following the Markov chain a short "
+"distance."
+msgstr "对比散度是实用近似，而非精确算法。它有若干已知局限："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:60
+msgid ""
+"Consider the energy landscape. The data points sit in (or near) basins of"
+" low energy. Running Gibbs sampling for a few steps moves the state "
+"slightly away from the data, typically toward regions of higher energy if"
+" the model has not yet fully learned the data distribution. The CD update"
+" pushes the energy **down** at the data point and **up** at the nearby "
+"reconstruction. This effectively deepens the basin around the data while "
+"raising the energy of the surrounding region, creating a steeper "
+"attractor."
+msgstr ""
+"**偏差**：CD 不产生真实对数似然梯度的无偏估计。小 $k$ "
+"时偏差可能很大，得到的参数也不是最大似然估计。学习到的模型未必给数据分配最高可能似然。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:62
+msgid ""
+"Crucially, CD does **not** attempt to raise the energy of *all* other "
+"configurations equally. It focuses only on those configurations that are "
+"easily reachable from the data via short MCMC trajectories. This local "
+"contrast is sufficient to learn a good model in practice, even though it "
+"introduces a bias relative to the true maximum likelihood gradient."
+msgstr "**不是某个固定函数的严格梯度**：当 $k > 1$ 时，CD 更新通常不是任何固定目标函数的梯度。这使理论分析困难，也使收敛监控更复杂。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:64
+msgid "Why Contrastive Divergence Works: A Heuristic Justification"
+msgstr "从对比散度到现代近似"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:65
+msgid ""
+"The empirical success of CD, especially CD-1, initially surprised many "
+"researchers. Several lines of reasoning help explain its effectiveness:"
+msgstr "CD 的成功启发了一系列相关算法，用以改进其局限："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:67
+msgid ""
+"**Initialization at Data**: By starting the Markov chain at data points, "
+"we are sampling from regions of high data density. If the model "
+"distribution is already close to the data distribution, the chain will "
+"mix quickly, and a few steps suffice. If the model is far from the data, "
+"the chain moves away rapidly, providing a strong contrast signal."
+msgstr "**持久对比散度（PCD）**：使用持久 Markov 链获得更好的负样本。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:68
+msgid ""
+"**Gradient of the KL Divergence**: It can be shown that CD-k minimizes a "
+"different objective function: the difference between two Kullback-Leibler"
+" divergences:"
+msgstr "**快速持久对比散度（FPCD）**：引入额外的快速学习权重以改善混合。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:70
+msgid ""
+"\\text{CD}_k = \\text{KL}(P_{\\text{data}} \\| P_\\theta) - "
+"\\text{KL}(P_\\theta^{(k)} \\| P_\\theta)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-cd.md:72
+#, python-brace-format
+msgid ""
+"where $P_\\theta^{(k)}$ is the distribution after $k$ steps of MCMC "
+"starting from the data. Minimizing this **contrastive divergence** "
+"encourages the model distribution to be close to the data distribution "
+"while simultaneously being far from the $k$ step distribution. This "
+"formulation justifies the name and provides a more principled foundation "
+"than a mere heuristic."
+msgstr "**并行回火（Parallel Tempering）**：在不同温度运行多条链，以跨越能垒。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:74
+msgid ""
+"**Persistent Contrastive Divergence (PCD)**: An important variant, "
+"**persistent contrastive divergence**, maintains a persistent set of "
+"Markov chains whose states are retained across weight updates. Instead of"
+" reinitializing from data each time, the chains continue to evolve. PCD "
+"yields samples that are closer to the true model distribution and can "
+"improve the quality of the learned model, especially for deeper "
+"architectures."
+msgstr "**持久对比散度（PCD）**：一个重要变体，**持久对比散度** 会维护一组持久 Markov"
+"链，其状态会在权重更新之间保留。它不是每次都从数据重新初始化，而是让这些链继续演化。PCD"
+"产生的样本更接近真实模型分布，并能提升学习模型质量，尤其是在更深架构中。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:76
+msgid "Limitations and Caveats"
+msgstr "实践实现：mini-batch 与采样"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:77
+msgid ""
+"Contrastive divergence is a pragmatic approximation, not an exact "
+"algorithm. It has several known limitations:"
+msgstr ""
+"实践中，期望 $\\mathbb{E}_{\\text{data}}$ 通常不是在完整数据集上计算，而是在包含 $M$ 个样本的 **mini-"
+"batch** 上计算。这可以降低计算成本，并提供随机梯度，后者往往有助于逃离局部极小值。常见 mini-batch 大小在 10 到 100 "
+"之间。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:79
+msgid ""
+"**Bias**: CD does not produce an unbiased estimate of the true log-"
+"likelihood gradient. The bias can be large for small $k$, and the "
+"resulting parameter estimates are not maximum likelihood estimates. The "
+"learned model may not assign the highest possible likelihood to the data."
+msgstr ""
+"对于负相中的 Gibbs 采样，通常会从数据出发运行 $k$ 步（常见 $k=1$）。这就是 Contrastive "
+"Divergence-$k$（CD-$k$）算法。它虽然并不严格遵循对数似然梯度，但实践效果良好。实现更新时，一个 mini-batch "
+"上的权重变化为："
+
+#: ../../source/theoretical-foundations-ebms-cd.md:80
+msgid ""
+"**Not a Proper Gradient of Any Function**: For $k > 1$, the CD update is "
+"not the gradient of any fixed objective function. This makes theoretical "
+"analysis difficult and complicates convergence monitoring."
+msgstr ""
+"其中 $\\mathbf{v}^{(m)}_k, \\mathbf{h}^{(m)}_k$ 是经过 $k$ 步 Gibbs 采样后的最终状态。使用"
+" mini-batch 对扩展到 MNIST 或 ImageNet 这类大型数据集非常关键。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:81
+msgid ""
+"**Mixing and Mode Collapse**: If the model distribution has widely "
+"separated modes, short MCMC runs starting from data may fail to explore "
+"the full landscape, leading to mode collapse—the model learns only a "
+"subset of the data distribution."
+msgstr ""
+"**效率提示**：在代码中，尤其是 Python 中，应尽量使用矩阵运算对整个 mini-batch "
+"做向量化计算，而不是逐样本循环。这通常能带来数量级的速度提升。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:82
+msgid ""
+"**Dependence on k**: Larger values of $k$ reduce bias but increase "
+"computational cost. In practice, CD-1 or CD-5 are common compromises."
+msgstr "实践实现：mini-batch 与采样"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:84
+msgid ""
+"Despite these limitations, contrastive divergence remains a cornerstone "
+"algorithm for training restricted Boltzmann machines and deep belief "
+"networks. Its simplicity, speed, and empirical effectiveness enabled the "
+"mid-2000s renaissance of deep learning based on layer-wise pretraining."
+msgstr ""
+"实践中，期望 $\\mathbb{E}_{\\text{data}}$ 通常不是在完整数据集上计算，而是在包含 $M$ 个样本的 **mini-"
+"batch** 上计算。这可以降低计算成本，并提供随机梯度，后者往往有助于逃离局部极小值。常见 mini-batch 大小在 10 到 100 "
+"之间。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:86
+msgid "From Contrastive Divergence to Modern Approximations"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:87
+msgid ""
+"The success of CD inspired a family of related algorithms that improve "
+"upon its limitations:"
+msgstr "**对比散度（CD）** 是训练玻尔兹曼机时对最大似然梯度的实用近似。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:89
+msgid ""
+"**Persistent Contrastive Divergence (PCD)**: Uses persistent Markov "
+"chains to obtain better negative samples."
+msgstr "CD 用从数据初始化的 **短 Markov 链** 上的期望替代模型期望，通常只运行 $k$ 步（常见 $k=1$）。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:90
+msgid ""
+"**Fast Persistent Contrastive Divergence (FPCD)**: Introduces additional "
+"fast-learning weights to improve mixing."
+msgstr "CD-k 算法在 **正相**（固定到数据）和 **负相**（短暂自由运行重构）之间交替。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:91
+msgid ""
+"**Parallel Tempering**: Runs multiple chains at different temperatures to"
+" overcome energy barriers."
+msgstr "从几何上看，CD 加深数据点处的能量盆地，同时抬高其 MCMC 可达邻域中的能量。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:92
+msgid ""
+"**Score Matching and Noise Contrastive Estimation**: Bypass the need for "
+"MCMC entirely, as mentioned in Section [3.2 The Intractable Partition "
+"Function Problem](kpp-theoretical-foundations-ebms-partition.md)."
+msgstr "**分数匹配和噪声对比估计**：如 [3.2 难以精确处理的配分函数问题](kpp-theoretical-foundations-ebms-partition.md) 所述，这类方法完全绕开了 MCMC 需求。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:94
+msgid ""
+"These methods represent the ongoing evolution of techniques for training "
+"energy-based models, all stemming from the fundamental insight that we "
+"can trade exactness for tractability in learning."
+msgstr "局限包括 **偏差**、$k>1$ 时缺少严格目标函数，以及潜在 **模态塌缩**。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:96
+msgid "Practical Implementation: Mini-Batches and Sampling"
+msgstr "从几何上看，CD 加深数据点处的能量盆地，同时抬高其 MCMC 可达邻域中的能量。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:97
+msgid ""
+"In practice, the expectation $\\mathbb{E}_{\\text{data}}$ is not computed"
+" over the full dataset, but over a **mini-batch** of $M$ samples. This "
+"reduces computational cost and provides a stochastic gradient that can "
+"often escape local minima. Typical mini-batch sizes range from 10 to 100."
+msgstr "CD 最小化的是 **KL 散度之差**，而不是直接最小化负对数似然。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:99
+msgid ""
+"For the Gibbs sampling in the negative phase, you will usually run the "
+"chain for $k$ steps (often $k=1$) starting from the data. This is the "
+"Contrastive Divergence-$k$ (CD-$k$) algorithm. While not strictly "
+"following the gradient of the log-likelihood, it works well in practice. "
+"When implementing the update, the weight change for a mini-batch becomes:"
+msgstr "局限包括 **偏差**、$k>1$ 时缺少严格目标函数，以及潜在 **模态塌缩**。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:101
+msgid ""
+"\\Delta \\mathbf{W} = \\frac{\\eta}{M} \\sum_{m=1}^M \\left( \\langle "
+"\\mathbf{v}^{(m)} (\\mathbf{h}^{(m)})^\\top \\rangle_{\\text{data}} - "
+"\\langle \\mathbf{v}^{(m)}_k (\\mathbf{h}^{(m)}_k)^\\top "
+"\\rangle_{\\text{recon}} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-cd.md:103
+#, python-brace-format
+msgid ""
+"where $\\mathbf{v}^{(m)}_k, \\mathbf{h}^{(m)}_k$ are the final states "
+"after $k$ Gibbs steps. Using mini-batches is crucial for scaling to large"
+" datasets like MNIST or ImageNet. **Efficiency tip**: In code (especially"
+" Python), try to vectorize the computation over the entire mini-batch "
+"using matrix operations rather than looping over individual examples. "
+"This can lead to orders-of-magnitude speedups."
+msgstr "**持久对比散度（PCD）** 通过在更新之间维护持久 Markov 链来提高采样质量。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:105
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:106
+msgid ""
+"**Contrastive divergence (CD)** is a practical approximation to the "
+"maximum likelihood gradient for training Boltzmann machines."
+msgstr "CD 使 RBM 和深度置信网络的实际训练成为可能，并在 2000 年代深度学习复兴中发挥了关键作用。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:107
+msgid ""
+"CD replaces the model expectation with an expectation over a **short "
+"Markov chain** initialized at the data, typically running for only $k$ "
+"steps (often $k=1$)."
+msgstr "**对比散度（CD）** 是训练玻尔兹曼机时对最大似然梯度的实用近似。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:108
+msgid ""
+"The CD-k algorithm alternates between a **positive phase** (clamped to "
+"data) and a **negative phase** (brief free-running reconstruction)."
+msgstr "CD 用从数据初始化的 **短 Markov 链** 上的期望替代模型期望，通常只运行 $k$ 步（常见 $k=1$）。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:109
+msgid ""
+"Geometrically, CD deepens the energy basin at data points while raising "
+"energy in their immediate MCMC-accessible neighborhood."
+msgstr "CD-k 算法在 **正相**（固定到数据）和 **负相**（短暂自由运行重构）之间交替。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:110
+msgid ""
+"CD minimizes a **difference of KL divergences** rather than the negative "
+"log-likelihood directly."
+msgstr "从几何上看，CD 加深数据点处的能量盆地，同时抬高其 MCMC 可达邻域中的能量。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:111
+msgid ""
+"Limitations include **bias**, lack of a proper objective function for $ "
+"k>1$, and potential **mode collapse**."
+msgstr "CD 最小化的是 **KL 散度之差**，而不是直接最小化负对数似然。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:112
+msgid ""
+"**Persistent contrastive divergence (PCD)** improves sampling quality by "
+"maintaining persistent Markov chains across updates."
+msgstr "局限包括 **偏差**、$k>1$ 时缺少严格目标函数，以及潜在 **模态塌缩**。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:113
+msgid ""
+"**Mini-batch training** and **vectorization** are key practical "
+"considerations for efficient implementation."
+msgstr "**持久对比散度（PCD）** 通过在更新之间维护持久 Markov 链来提高采样质量。"
+
+#: ../../source/theoretical-foundations-ebms-cd.md:114
+msgid ""
+"CD enabled the practical training of RBMs and deep belief networks, "
+"playing a pivotal role in the deep learning renaissance of the 2000s."
+msgstr "**Mini-batch 训练** 和 **向量化** 是高效实现中的关键实践要点。"
+
+#~ msgid ""
+#~ "\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} "
+#~ "\\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+#~ "\\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right]"
+#~ msgstr ""
+#~ "$\\frac{\\partial \\mathcal{L}}{\\partial \\theta} ="
+#~ " \\mathbb{E}_{\\text{data}} \\left[ \\frac{\\partial"
+#~ " E_\\theta}{\\partial \\theta} \\right] - "
+#~ "\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial "
+#~ "E_\\theta}{\\partial \\theta} \\right]$"
+
+#~ msgid ""
+#~ "\\text{CD}_k = \\text{KL}(P_{\\text{data}} \\| "
+#~ "P_\\theta) - \\text{KL}(P_\\theta^{(k)} \\| "
+#~ "P_\\theta)"
+#~ msgstr ""
+#~ "\\text{CD}_k = \\text{KL}(P_{\\text{data}} \\| "
+#~ "P_\\theta) - \\text{KL}(P_\\theta^{(k)} \\| "
+#~ "P_\\theta)"
+
+#~ msgid "::"
+#~ msgstr "::"
+
+#~ msgid "<b>Algorithm: Contrastive Divergence (CD-k)</b>"
+#~ msgstr ""
+#~ "<b>将</b><b>可</b><b>见</b><b>单</b><b>元</b><b>固</b><b>定</b><b>到</b><b>数</b><b>据</b><b>向</b><b>量</b><b>"
+#~ " "
+#~ "</b><b>$</b><b>m</b><b>a</b><b>t</b><b>h</b><b>b</b><b>f</b><b>{</b><b>v</b><b>}</b><b>^</b><b>{</b><b>(</b><b>0</b><b>)</b><b>}</b><b>$</b><b>。</b>"
+
+#~ msgid "For each training example $\\mathbf{v}^{(0)}$ (the visible state):"
+#~ msgstr ""
+#~ "<b>计</b><b>算</b><b>隐</b><b>藏</b><b>单</b><b>元</b><b>激</b><b>活</b><b>"
+#~ " "
+#~ "</b><b>$</b><b>P</b><b>(</b><b>m</b><b>a</b><b>t</b><b>h</b><b>b</b><b>f</b><b>{</b><b>h</b><b>}</b><b>"
+#~ " </b><b>m</b><b>i</b><b>d</b><b> "
+#~ "</b><b>m</b><b>a</b><b>t</b><b>h</b><b>b</b><b>f</b><b>{</b><b>v</b><b>}</b><b>^</b><b>{</b><b>(</b><b>0</b><b>)</b><b>}</b><b>)</b><b>$</b><b>，</b><b>并</b><b>采</b><b>样</b><b>二</b><b>值</b><b>隐</b><b>藏</b><b>状</b><b>态</b><b>"
+#~ " "
+#~ "</b><b>$</b><b>m</b><b>a</b><b>t</b><b>h</b><b>b</b><b>f</b><b>{</b><b>h</b><b>}</b><b>^</b><b>{</b><b>(</b><b>0</b><b>)</b><b>}</b><b>$</b><b>。</b>"
+
+#~ msgid ""
+#~ "where $\\mathbf{v}^{(m)}_k, \\mathbf{h}^{(m)}_k$ are"
+#~ " the final states after $k$ Gibbs "
+#~ "steps. Using mini-batches is crucial "
+#~ "for scaling to large datasets like "
+#~ "MNIST or ImageNet."
+#~ msgstr "<b>*</b><b>*</b><b>对</b><b>比</b><b>散</b><b>度</b><b>（</b><b>C</b><b>D</b><b>）</b><b>*</b><b>*</b><b>是</b><b>训</b><b>练</b><b>玻</b><b>尔</b><b>兹</b><b>曼</b><b>机</b><b>时</b><b>对</b><b>最</b><b>大</b><b>似</b><b>然</b><b>梯</b><b>度</b><b>的</b><b>实</b><b>用</b><b>近</b><b>似</b><b>。</b>"
+
+#~ msgid ""
+#~ "<b>Persistent contrastive divergence (PCD)</b> "
+#~ "improves sampling quality by maintaining "
+#~ "persistent Markov chains across updates."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Mini-batch training</b> and "
+#~ "<b>vectorization</b> are key practical "
+#~ "considerations for efficient implementation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\Delta \\theta \\propto -\\mathbb{E}_{\\text{data}}"
+#~ " \\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right] + \\mathbb{E}_{\\text{recon "
+#~ "after } k \\text{ steps}} \\left[ "
+#~ "\\frac{\\partial E_\\theta}{\\partial \\theta} "
+#~ "\\right]"
+#~ msgstr ""
+#~ "直觉是，即使只运行几步，Markov 链也会从数据分布向模型分布移动。数据统计量与 $k$ "
+#~ "步后统计量之间的差，可以近似真实梯度方向。令人惊讶的是，当 $k = 1$ "
+#~ "时，这个简单启发式已经足以训练有用的生成模型。"
+
+#~ msgid ""
+#~ "\\Delta w_{ij} = \\eta \\left( \\langle"
+#~ " v_i h_j \\rangle_{\\text{data}} - \\langle"
+#~ " v_i h_j \\rangle_{\\text{recon}} \\right)"
+#~ msgstr ""
+#~ "\\Delta w_{ij} = \\eta \\left( \\langle"
+#~ " v_i h_j \\rangle_{\\text{data}} - \\langle"
+#~ " v_i h_j \\rangle_{\\text{recon}} \\right)"
+
+#~ msgid ""
+#~ "\\Delta \\mathbf{W} = \\frac{\\eta}{M} "
+#~ "\\sum_{m=1}^M \\left( \\langle \\mathbf{v}^{(m)} "
+#~ "(\\mathbf{h}^{(m)})^\\top \\rangle_{\\text{data}} - "
+#~ "\\langle \\mathbf{v}^{(m)}_k (\\mathbf{h}^{(m)}_k)^\\top"
+#~ " \\rangle_{\\text{recon}} \\right)"
+#~ msgstr ""
+#~ "\\Delta \\mathbf{W} = \\frac{\\eta}{M} "
+#~ "\\sum_{m=1}^M \\left( \\langle \\mathbf{v}^{(m)} "
+#~ "(\\mathbf{h}^{(m)})^\\top \\rangle_{\\text{data}} - "
+#~ "\\langle \\mathbf{v}^{(m)}_k (\\mathbf{h}^{(m)}_k)^\\top"
+#~ " \\rangle_{\\text{recon}} \\right)"
+

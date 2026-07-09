@@ -1,0 +1,891 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:39+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-bm-deep.md:10
+msgid "4.3 Beyond Single Layers: Stacking for Deep Learning"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:12
+msgid ""
+"The Restricted Boltzmann Machine, as presented in Section [4.2 Restricted"
+" Boltzmann Machine (RBM)](kpp-theoretical-foundations-bm-restricted.md), is "
+"a powerful generative model with a single layer of latent variables. "
+"However, many real-world datasets, i.e. images, speech, natural language,"
+" exhibit **hierarchical structure**. Low-level features (edges, phonemes,"
+" word fragments) combine to form mid-level features (shapes, syllables, "
+"phrases), which in turn combine to form high-level concepts (objects, "
+"words, semantics). A single-layer latent variable model, no matter how "
+"many hidden units it possesses, may struggle to capture such multi-level "
+"abstractions efficiently. This limitation motivates the **stacking** of "
+"RBMs to form **Deep Belief Networks (DBNs)** and **Deep Boltzmann "
+"Machines (DBMs)**. Stacking transforms a shallow generative model into a "
+"deep, hierarchical one, capable of learning progressively more abstract "
+"representations of the data. This section describes the greedy layer-wise"
+" training procedure that made deep generative models practical, and "
+"explains how stacked RBMs connect to the broader landscape of deep "
+"learning."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:15
+msgid "The Motivation: Hierarchical Feature Learning"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:16
+msgid ""
+"Consider the task of modeling a collection of face images. A shallow RBM "
+"with a single hidden layer might learn localized Gabor-like edge "
+"detectors as its hidden features. These are useful, but they fail to "
+"capture the higher-order regularities of faces: the spatial arrangement "
+"of eyes, nose, and mouth, or the characteristic symmetries of facial "
+"structure."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:18
+msgid ""
+"A deep architecture, by contrast, can learn a **hierarchy of "
+"representations**:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:20
+msgid ""
+"**First hidden layer**: Detects low-level features such as oriented edges"
+" and corners."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:21
+msgid ""
+"**Second hidden layer**: Combines edges to form mid-level features like "
+"facial parts (eye, nose, mouth detectors)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:22
+msgid ""
+"**Third hidden layer**: Combines facial parts to form high-level, "
+"abstract representations of whole faces."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:24
+msgid ""
+"This hierarchical composition mirrors the structure of the visual cortex "
+"and enables the model to represent complex data distributions with "
+"exponentially fewer parameters than a shallow model of comparable "
+"representational power."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:26
+msgid "Deep Belief Networks: Composition of RBMs"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:27
+msgid ""
+"A **Deep Belief Network (DBN)** is a generative model composed of "
+"multiple layers of stochastic, latent variables. The top two layers form "
+"an **undirected** RBM, while the lower layers form a **directed** sigmoid"
+" belief network. Specifically, a DBN with $L$ hidden layers is defined "
+"as:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:29
+#, python-brace-format
+msgid ""
+"The top two layers, $\\mathbf{h}^{(L-1)}$ and $\\mathbf{h}^{(L)}$, form "
+"an RBM."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:30
+#, python-brace-format
+msgid ""
+"The remaining layers are connected via directed, top-down generative "
+"weights: $\\mathbf{h}^{(l)}$ generates $\\mathbf{h}^{(l-1)}$ for $l = "
+"L-1, \\ldots, 1$, with $\\mathbf{h}^{(0)} = \\mathbf{v}$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:32
+msgid "The joint distribution factorizes as:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:34
+#, python-brace-format
+msgid ""
+"P(\\mathbf{v}, \\mathbf{h}^{(1)}, \\ldots, \\mathbf{h}^{(L)}) = "
+"P(\\mathbf{h}^{(L-1)}, \\mathbf{h}^{(L)}) \\prod_{l=1}^{L-2} "
+"P(\\mathbf{h}^{(l)} \\mid \\mathbf{h}^{(l+1)})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:36
+#, python-brace-format
+msgid ""
+"where $P(\\mathbf{h}^{(L-1)}, \\mathbf{h}^{(L)})$ is the RBM distribution"
+" at the top, and the conditional distributions $P(\\mathbf{h}^{(l)} \\mid"
+" \\mathbf{h}^{(l+1)})$ are those of a sigmoid belief network."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:38
+#, python-brace-format
+msgid ""
+"The directed connections enable efficient **ancestral sampling**: to "
+"generate a sample, one first samples from the top RBM to obtain "
+"$\\mathbf{h}^{(L-1)}$ and $\\mathbf{h}^{(L)}$, then propagates downward "
+"through the directed layers, sampling each layer in turn."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:40
+msgid "Greedy Layer-Wise Training"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:41
+msgid ""
+"Training a deep generative model with many layers of latent variables is "
+"challenging due to the **explaining-away** effect and the intractability "
+"of exact inference. The breakthrough that made DBNs practical was "
+"**greedy layer-wise pre-training**, introduced by Hinton, Osindero, and "
+"Teh in 2006."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:43
+msgid ""
+"The core idea is elegantly simple: **train one RBM at a time, and stack "
+"them**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:45
+msgid "**Algorithm: Greedy Layer-Wise Training of a DBN**"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:47
+msgid "**Train the first RBM**:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:48
+#, python-brace-format
+msgid ""
+"Treat the visible data $\\mathbf{v}$ as the visible layer and introduce a"
+" hidden layer $\\mathbf{h}^{(1)}$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:49
+msgid "Train an RBM on the data using contrastive divergence."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:50
+#, python-brace-format
+msgid ""
+"After training, the RBM defines a generative model $P(\\mathbf{v}, "
+"\\mathbf{h}^{(1)})$ and an inference model $P(\\mathbf{h}^{(1)} \\mid "
+"\\mathbf{v})$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:52
+msgid "**Generate training data for the next layer**:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:53
+#, python-brace-format
+msgid ""
+"Use the trained inference model to compute the posterior probabilities "
+"$P(\\mathbf{h}^{(1)} \\mid \\mathbf{v})$ for each training example."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:54
+msgid ""
+"These posterior probabilities (or samples from them) become the \"data\" "
+"for training the next RBM. They represent the data in the feature space "
+"learned by the first hidden layer."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:56
+msgid "**Train the second RBM**:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:57
+#, python-brace-format
+msgid ""
+"Treat the vectors $\\mathbf{h}^{(1)}$ as visible units and introduce a "
+"second hidden layer $\\mathbf{h}^{(2)}$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:58
+msgid "Train an RBM on these feature vectors."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:60
+msgid "**Repeat** for as many layers as desired."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:62
+msgid ""
+"After this unsupervised pre-training, the stacked RBMs can be converted "
+"into a DBN by discarding the bottom-up recognition weights of all but the"
+" first layer, and using the top-down generative weights to define the "
+"directed model. Alternatively, weights can be used to initialize a deep "
+"neural network for **discriminative fine-tuning** using backpropagation."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:64
+msgid "Why Greedy Layer-Wise Training Works"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:65
+msgid ""
+"The effectiveness of greedy layer-wise training can be understood from "
+"several perspectives:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:67
+msgid ""
+"**Variational Lower Bound**: Adding a new hidden layer and training it as"
+" an RBM on the inferred features of the previous layer can be shown to "
+"improve a variational lower bound on the log-likelihood of the data under"
+" the expanded model. Each additional layer tightens the bond."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:68
+msgid ""
+"**Feature Abstraction**: Each RBM learns to model the distribution of "
+"features produced by the layer below. Since these features are already "
+"somewhat abstract and decorrelated, the next RBM can focus on capturing "
+"higher-order dependencies among them."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:69
+msgid ""
+"**Avoiding Local Minima**: Deep supervised networks trained from random "
+"initializations often get stuck in poor local minima due to the complex, "
+"non-convex loss landscape. Pre-training initializes the weights in a "
+"region of parameter space that corresponds to a sensible generative model"
+" of the data, providing a far better starting point for subsequent "
+"discriminative fine-tuning."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:71
+msgid "Deep Boltzmann Machines (DBMs)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:72
+msgid ""
+"A closely related architecture is the **Deep Boltzmann Machine (DBM)**, "
+"introduced by Salakhutdinov and Hinton in 2009. Unlike a DBN, where only "
+"the top two layers form an undirected RBM, a DBM is a **fully "
+"undirected** model with multiple hidden layers. All connections are "
+"symmetric, and there are no directed edges."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:74
+msgid "The energy function for a DBM with two hidden layers is:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:76
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}^{(1)}, \\mathbf{h}^{(2)}) = -\\mathbf{v}^\\top"
+" \\mathbf{W}^{(1)} \\mathbf{h}^{(1)} - (\\mathbf{h}^{(1)})^\\top "
+"\\mathbf{W}^{(2)} \\mathbf{h}^{(2)} - \\mathbf{b}^\\top \\mathbf{v} - "
+"(\\mathbf{c}^{(1)})^\\top \\mathbf{h}^{(1)} - (\\mathbf{c}^{(2)})^\\top "
+"\\mathbf{h}^{(2)}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:78
+msgid ""
+"DBMs retain the full undirected nature of the Boltzmann machine, which "
+"makes them more principled probabilistic models than DBNs. However, exact"
+" inference is even more challenging, and training typically requires a "
+"more sophisticated procedure, often involving mean-field approximations "
+"or persistent contrastive divergence with carefully designed "
+"initialization."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:80
+msgid ""
+"In practice, DBNs have been more widely adopted due to their simpler "
+"training procedure and direct compatibility with feedforward neural "
+"network initialization."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:82
+msgid "From Unsupervised Pre-Training to Discriminative Fine-Tuning"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:83
+msgid ""
+"One of the most impactful applications of stacked RBMs was **unsupervised"
+" pre-training for deep supervised learning**. Before the widespread "
+"adoption of techniques like batch normalization, ReLU activations, and "
+"large labeled datasets (e.g., ImageNet), training deep neural networks "
+"with many hidden layers was notoriously difficult. Gradients would vanish"
+" or explode, and optimization would stall in poor local minima."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:85
+msgid "The RBM pre-training pipeline provided a solution:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:87
+msgid ""
+"**Pre-train** a stack of RBMs in an unsupervised manner on unlabeled data"
+" (which was often abundant)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:88
+msgid ""
+"**Unroll** the stacked RBMs to form a deep feedforward network with the "
+"same weights. This network effectively implements the bottom-up inference"
+" pathway."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:89
+msgid "**Add a classification layer** on top of the highest-level features."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:90
+msgid ""
+"**Fine-tune** the entire network using backpropagation on the labeled "
+"data."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:92
+msgid ""
+"This approach achieved state-of-the-art results on MNIST and, more "
+"impressively, enabled the first significant reduction in error rates on "
+"the TIMIT speech recognition benchmark. It demonstrated that deep "
+"architectures could be trained effectively if initialized properly, "
+"paving the way for the deep learning revolution."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:94
+msgid "The End of the Pre-Training Era and the Legacy of Stacked RBMs"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:95
+msgid ""
+"By the early 2010s, advances in optimization (momentum, RMSprop, Adam), "
+"activation functions (ReLU and variants), regularization (dropout), and "
+"the availability of massive labeled datasets made unsupervised pre-"
+"training less necessary for many supervised tasks. End-to-end supervised "
+"training of deep networks from random initialization became the norm."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:97
+msgid "However, the conceptual legacy of stacked RBMs endures:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:99
+msgid ""
+"They established the **viability of deep architectures** and the "
+"importance of **hierarchical feature learning**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:100
+msgid ""
+"They demonstrated the value of **unsupervised representation learning** "
+"as a precursor to supervised tasks."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:101
+msgid ""
+"They introduced **contrastive divergence** and **greedy layer-wise "
+"training**, which remain valuable tools in the generative modeling "
+"toolkit."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:102
+msgid ""
+"They inspired subsequent generative models, including **Variational "
+"Autoencoders (VAEs)** and **Generative Adversarial Networks (GANs)**, "
+"which also learn hierarchical latent representations, albeit with "
+"different training objectives."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:104
+msgid ""
+"Moreover, in domains where labeled data is scarce but unlabeled data is "
+"plentiful, unsupervised pre-training with RBMs or their modern "
+"descendants (e.g., deep belief networks, deep Boltzmann machines) remains"
+" a relevant and effective strategy."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:106
+msgid "Stacking Beyond RBMs: The General Principle"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:107
+msgid ""
+"The principle of stacking simple modules to build deep, hierarchical "
+"models extends far beyond RBMs. Modern deep learning is built on this "
+"exact idea:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:109
+msgid ""
+"**Convolutional neural networks** stack convolutional layers to learn "
+"increasingly complex visual features."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:110
+msgid ""
+"**Transformers** stack self-attention layers to capture hierarchical "
+"linguistic structure."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:111
+msgid ""
+"**Diffusion models** stack denoising steps to gradually refine generated "
+"samples."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:113
+msgid ""
+"The RBM stack was the first practical demonstration that **greedy layer-"
+"wise construction** could bootstrap the training of deep generative "
+"models. This insight remains a cornerstone of deep learning methodology."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:115
+msgid "Summary"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:116
+msgid ""
+"**Stacking RBMs** forms **Deep Belief Networks (DBNs)** and **Deep "
+"Boltzmann Machines (DBMs)**, enabling hierarchical feature learning."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:117
+msgid ""
+"**Greedy layer-wise training** trains one RBM at a time, using the "
+"inferred features of one layer as data for the next."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:118
+msgid ""
+"DBNs combine an undirected top RBM with directed lower layers, while DBMs"
+" are fully undirected."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:119
+msgid ""
+"Pre-trained stacks of RBMs provided effective **weight initializations** "
+"for deep supervised networks, fueling early deep learning successes."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:120
+msgid ""
+"Although largely supplanted by end-to-end supervised training on large "
+"datasets, stacked RBMs remain historically significant and practically "
+"useful in label-scarce regimes."
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:121
+msgid ""
+"The concept of **hierarchical representation learning** pioneered by "
+"stacked RBMs is foundational to modern deep learning architectures."
+msgstr ""
+
+#~ msgid ""
+#~ "The Restricted Boltzmann Machine, as "
+#~ "presented in Section [4.2 Restricted "
+#~ "Boltzmann Machine (RBM)](/kpp-theoretical-"
+#~ "foundationskpp-theoretical-foundations-bm-"
+#~ "restricted), is a powerful generative "
+#~ "model with a single layer of "
+#~ "latent variables. However, many real-"
+#~ "world datasets, i.e. images, speech, "
+#~ "natural language, exhibit <b>hierarchical "
+#~ "structure</b>. Low-level features (edges, "
+#~ "phonemes, word fragments) combine to "
+#~ "form mid-level features (shapes, "
+#~ "syllables, phrases), which in turn "
+#~ "combine to form high-level concepts "
+#~ "(objects, words, semantics). A single-"
+#~ "layer latent variable model, no matter"
+#~ " how many hidden units it possesses,"
+#~ " may struggle to capture such "
+#~ "multi-level abstractions efficiently. This "
+#~ "limitation motivates the <b>stacking</b> of"
+#~ " RBMs to form <b>Deep Belief Networks"
+#~ " (DBNs)</b> and <b>Deep Boltzmann Machines"
+#~ " (DBMs)</b> . Stacking transforms a "
+#~ "shallow generative model into a deep,"
+#~ " hierarchical one, capable of learning "
+#~ "progressively more abstract representations of"
+#~ " the data. This section describes the"
+#~ " greedy layer-wise training procedure "
+#~ "that made deep generative models "
+#~ "practical, and explains how stacked RBMs"
+#~ " connect to the broader landscape of"
+#~ " deep learning."
+#~ msgstr ""
+
+#~ msgid "<b>The Motivation: Hierarchical Feature Learning</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A deep architecture, by contrast, can"
+#~ " learn a <b>hierarchy of "
+#~ "representations</b>:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>First hidden layer</b>: Detects low-"
+#~ "level features such as oriented edges"
+#~ " and corners."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Second hidden layer</b>: Combines edges "
+#~ "to form mid-level features like "
+#~ "facial parts (eye, nose, mouth "
+#~ "detectors)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Third hidden layer</b>: Combines facial "
+#~ "parts to form high-level, abstract "
+#~ "representations of whole faces."
+#~ msgstr ""
+
+#~ msgid "<b>Deep Belief Networks: Composition of RBMs</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A <b>Deep Belief Network (DBN)</b> is"
+#~ " a generative model composed of "
+#~ "multiple layers of stochastic, latent "
+#~ "variables. The top two layers form "
+#~ "an <b>undirected</b> RBM, while the "
+#~ "lower layers form a <b>directed</b> "
+#~ "sigmoid belief network. Specifically, a "
+#~ "DBN with $L$ hidden layers is "
+#~ "defined as:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The directed connections enable efficient "
+#~ "<b>ancestral sampling</b>: to generate a "
+#~ "sample, one first samples from the "
+#~ "top RBM to obtain $\\mathbf{h}^{(L-1)}$ "
+#~ "and $\\mathbf{h}^{(L)}$, then propagates "
+#~ "downward through the directed layers, "
+#~ "sampling each layer in turn."
+#~ msgstr ""
+
+#~ msgid "<b>Greedy Layer-Wise Training</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Training a deep generative model with"
+#~ " many layers of latent variables is"
+#~ " challenging due to the <b>explaining-"
+#~ "away</b> effect and the intractability "
+#~ "of exact inference. The breakthrough "
+#~ "that made DBNs practical was <b>greedy"
+#~ " layer-wise pre-training</b>, introduced"
+#~ " by Hinton, Osindero, and Teh in "
+#~ "2006."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The core idea is elegantly simple: "
+#~ "<b>train one RBM at a time, and"
+#~ " stack them</b>."
+#~ msgstr ""
+
+#~ msgid "<b>Algorithm: Greedy Layer-Wise Training of a DBN</b>"
+#~ msgstr ""
+
+#~ msgid "<b>Train the first RBM</b>:"
+#~ msgstr ""
+
+#~ msgid "<b>Generate training data for the next layer</b>:"
+#~ msgstr ""
+
+#~ msgid "<b>Train the second RBM</b>:"
+#~ msgstr ""
+
+#~ msgid "<b>Repeat</b> for as many layers as desired."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "After this unsupervised pre-training, "
+#~ "the stacked RBMs can be converted "
+#~ "into a DBN by discarding the "
+#~ "bottom-up recognition weights of all "
+#~ "but the first layer, and using the"
+#~ " top-down generative weights to "
+#~ "define the directed model. Alternatively, "
+#~ "weights can be used to initialize "
+#~ "a deep neural network for "
+#~ "<b>discriminative fine-tuning</b> using "
+#~ "backpropagation."
+#~ msgstr ""
+
+#~ msgid "<b>Why Greedy Layer-Wise Training Works</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Variational Lower Bound</b>: Adding a "
+#~ "new hidden layer and training it "
+#~ "as an RBM on the inferred features"
+#~ " of the previous layer can be "
+#~ "shown to improve a variational lower "
+#~ "bound on the log-likelihood of the"
+#~ " data under the expanded model. Each"
+#~ " additional layer tightens the bond."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Feature Abstraction</b>: Each RBM learns"
+#~ " to model the distribution of "
+#~ "features produced by the layer below."
+#~ " Since these features are already "
+#~ "somewhat abstract and decorrelated, the "
+#~ "next RBM can focus on capturing "
+#~ "higher-order dependencies among them."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Avoiding Local Minima</b>: Deep supervised"
+#~ " networks trained from random "
+#~ "initializations often get stuck in poor"
+#~ " local minima due to the complex, "
+#~ "non-convex loss landscape. Pre-training"
+#~ " initializes the weights in a region"
+#~ " of parameter space that corresponds "
+#~ "to a sensible generative model of "
+#~ "the data, providing a far better "
+#~ "starting point for subsequent discriminative"
+#~ " fine-tuning."
+#~ msgstr ""
+
+#~ msgid "<b>Deep Boltzmann Machines (DBMs)</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A closely related architecture is the"
+#~ " <b>Deep Boltzmann Machine (DBM)</b> , "
+#~ "introduced by Salakhutdinov and Hinton "
+#~ "in 2009. Unlike a DBN, where only"
+#~ " the top two layers form an "
+#~ "undirected RBM, a DBM is a "
+#~ "<b>fully undirected </b>model with multiple"
+#~ " hidden layers. All connections are "
+#~ "symmetric, and there are no directed "
+#~ "edges."
+#~ msgstr ""
+
+#~ msgid "<b>From Unsupervised Pre-Training to Discriminative Fine-Tuning</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "One of the most impactful applications"
+#~ " of stacked RBMs was <b>unsupervised "
+#~ "pre-training for deep supervised "
+#~ "learning</b>. Before the widespread adoption"
+#~ " of techniques like batch normalization,"
+#~ " ReLU activations, and large labeled "
+#~ "datasets (e.g., ImageNet), training deep "
+#~ "neural networks with many hidden layers"
+#~ " was notoriously difficult. Gradients would"
+#~ " vanish or explode, and optimization "
+#~ "would stall in poor local minima."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Pre-train</b> a stack of RBMs "
+#~ "in an unsupervised manner on unlabeled"
+#~ " data (which was often abundant)."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Unroll</b> the stacked RBMs to form"
+#~ " a deep feedforward network with the"
+#~ " same weights. This network effectively "
+#~ "implements the bottom-up inference "
+#~ "pathway."
+#~ msgstr ""
+
+#~ msgid "<b>Add a classification layer</b> on top of the highest-level features."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Fine-tune</b> the entire network "
+#~ "using backpropagation on the labeled "
+#~ "data."
+#~ msgstr ""
+
+#~ msgid "<b>The End of the Pre-Training Era and the Legacy of Stacked RBMs</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "They established the <b>viability of "
+#~ "deep architectures</b> and the importance "
+#~ "of <b>hierarchical feature learning</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "They demonstrated the value of "
+#~ "<b>unsupervised representation learning</b> as "
+#~ "a precursor to supervised tasks."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "They introduced <b>contrastive divergence</b> "
+#~ "and <b>greedy layer-wise training</b>, "
+#~ "which remain valuable tools in the "
+#~ "generative modeling toolkit."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "They inspired subsequent generative models,"
+#~ " including <b>Variational Autoencoders (VAEs)</b>"
+#~ " and <b>Generative Adversarial Networks "
+#~ "(GANs)</b>, which also learn hierarchical "
+#~ "latent representations, albeit with different"
+#~ " training objectives."
+#~ msgstr ""
+
+#~ msgid "<b>Stacking Beyond RBMs: The General Principle</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Convolutional neural networks</b> stack "
+#~ "convolutional layers to learn increasingly "
+#~ "complex visual features."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Transformers</b> stack self-attention "
+#~ "layers to capture hierarchical linguistic "
+#~ "structure."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Diffusion models</b> stack denoising steps"
+#~ " to gradually refine generated samples."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The RBM stack was the first "
+#~ "practical demonstration that <b>greedy "
+#~ "layer-wise construction</b> could bootstrap "
+#~ "the training of deep generative models."
+#~ " This insight remains a cornerstone "
+#~ "of deep learning methodology."
+#~ msgstr ""
+
+#~ msgid "<b>Summary</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Stacking RBMs</b> forms <b>Deep Belief "
+#~ "Networks (DBNs)</b> and <b>Deep Boltzmann "
+#~ "Machines (DBMs)</b> , enabling hierarchical"
+#~ " feature learning."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Greedy layer-wise training</b> trains "
+#~ "one RBM at a time, using the "
+#~ "inferred features of one layer as "
+#~ "data for the next."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "DBNs combine an undirected top RBM "
+#~ "with directed lower layers, while DBMs"
+#~ " are fully undirected.- Pre-trained "
+#~ "stacks of RBMs provided effective "
+#~ "<b>weight initializations</b> for deep "
+#~ "supervised networks, fueling early deep "
+#~ "learning successes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The concept of <b>hierarchical representation"
+#~ " learning</b> pioneered by stacked RBMs "
+#~ "is foundational to modern deep learning"
+#~ " architectures."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P(\\mathbf{v}, \\mathbf{h}^{(1)}, \\ldots, "
+#~ "\\mathbf{h}^{(L)}) = P(\\mathbf{h}^{(L-1)}, "
+#~ "\\mathbf{h}^{(L)}) \\prod_{l=1}^{L-2} P(\\mathbf{h}^{(l)}"
+#~ " \\mid \\mathbf{h}^{(l+1)})"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "E(\\mathbf{v}, \\mathbf{h}^{(1)}, \\mathbf{h}^{(2)}) "
+#~ "= -\\mathbf{v}^\\top \\mathbf{W}^{(1)} "
+#~ "\\mathbf{h}^{(1)} - (\\mathbf{h}^{(1)})^\\top "
+#~ "\\mathbf{W}^{(2)} \\mathbf{h}^{(2)} - "
+#~ "\\mathbf{b}^\\top \\mathbf{v} - "
+#~ "(\\mathbf{c}^{(1)})^\\top \\mathbf{h}^{(1)} - "
+#~ "(\\mathbf{c}^{(2)})^\\top \\mathbf{h}^{(2)}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "DBNs combine an undirected top RBM "
+#~ "with directed lower layers, while DBMs"
+#~ " are fully undirected.- Pre-trained "
+#~ "stacks of RBMs provided effective "
+#~ "**weight initializations** for deep supervised"
+#~ " networks, fueling early deep learning "
+#~ "successes."
+#~ msgstr ""
+
+#~ msgid "::"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Restricted Boltzmann Machine, as "
+#~ "presented in Section [4.2 Restricted "
+#~ "Boltzmann Machine (RBM)](\\kpp-theoretical-"
+#~ "foundations-bm-restricted), is a powerful"
+#~ " generative model with a single layer"
+#~ " of latent variables. However, many "
+#~ "real-world datasets, i.e. images, speech,"
+#~ " natural language, exhibit **hierarchical "
+#~ "structure**. Low-level features (edges, "
+#~ "phonemes, word fragments) combine to "
+#~ "form mid-level features (shapes, "
+#~ "syllables, phrases), which in turn "
+#~ "combine to form high-level concepts "
+#~ "(objects, words, semantics). A single-"
+#~ "layer latent variable model, no matter"
+#~ " how many hidden units it possesses,"
+#~ " may struggle to capture such "
+#~ "multi-level abstractions efficiently. This "
+#~ "limitation motivates the **stacking** of "
+#~ "RBMs to form **Deep Belief Networks "
+#~ "(DBNs)** and **Deep Boltzmann Machines "
+#~ "(DBMs)**. Stacking transforms a shallow "
+#~ "generative model into a deep, "
+#~ "hierarchical one, capable of learning "
+#~ "progressively more abstract representations of"
+#~ " the data. This section describes the"
+#~ " greedy layer-wise training procedure "
+#~ "that made deep generative models "
+#~ "practical, and explains how stacked RBMs"
+#~ " connect to the broader landscape of"
+#~ " deep learning."
+#~ msgstr ""
+
