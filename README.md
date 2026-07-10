@@ -119,8 +119,8 @@ Project structure required:
 ```text
 requirements/
 ├── docker-compose.yml
-├── requirements.txt
-├── kaiwu-1.3.1-py3-none-any.whl   # Downloaded from Qboson platform
+├── requirements.txt               # Kaiwu SDK included
+├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
@@ -131,19 +131,32 @@ requirements/
    cd kaiwu-pytorch-plugin/requirements
    ```
 
-2. **Place the Kaiwu SDK wheel:**:
-Download `kaiwu-1.3.1-py3-none-any.whl` from the Kaiwu SDK download page and place it in the `requirements` folder.
-
-3. **Build the Docker image**:
+2. **Build the Docker image**:
    ```bash
    docker compose build
    ```
 
-4. **Start the Jupyter notebook server**:
+3. **Start the Jupyter notebook server**:
    ```bash
    docker compose up
    ```
 The notebook will be available at http://localhost:8888 (no token required). Your local `./work` folder is mounted inside the container.
+
+4. **(Optional) Clone the source code inside the container**  
+   After starting Jupyter, you can either open a terminal within the JupyterLab interface (click the "Terminal" icon in the left sidebar) or use `docker exec` from your host command line.
+
+   **Option 1: Inside the JupyterLab terminal**
+   ```bash
+   cd /home/jovyan/work
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+   ```
+
+   **Option 2: From the host command line**
+   ```bash
+   docker exec -it jupyter_notebook bash -c "cd /home/jovyan/work && git clone https://github.com/qboson/kaiwu-pytorch-plugin.git"
+   ```
+
+   This will clone the plugin source code into your locally mounted `./work` directory, making it accessible directly from your notebooks.
 
 5. **Stop the server**:
 Press `Ctrl+C`, then run:
