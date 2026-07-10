@@ -10,13 +10,13 @@ from torch import nn
 
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, BaseQVAE
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 from .networks import BasicEncoder, BasicDecoder
 
 
-class QVAE(BaseQVAE):
+class MnistQVAE(QVAE):
     """
     Concrete QVAE implementation with BasicEncoder, BasicDecoder and RBM.
 

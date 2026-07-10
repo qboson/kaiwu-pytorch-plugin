@@ -40,14 +40,21 @@ class AutoEncoderBase(nn.Module):
 
         # Validate and normalize input dimension
         if isinstance(input_dimension, list):
-            assert len(input_dimension) > 0, "Input dimension not defined, needed for model structure"
+            assert len(input_dimension) > 0, (
+                "Input dimension not defined, needed for model structure"
+                )
         else:
-            assert input_dimension > 0, "Input dimension not defined, needed for model structure"
+            assert input_dimension > 0, (
+                "Input dimension not defined, needed for model structure"
+                )
             input_dimension = [input_dimension]  # wrap in list for consistent handling
 
         assert config is not None, "Config not defined"
-        assert config.num_latent_units is not None and config.num_latent_units > 0, "Latent dimension must be >0"
-        assert hasattr(config, "loss_type"), "Config must contain loss_type (e.g., 'bernoulli' or 'mse')"
+        assert config.num_latent_units is not None, "Latent units must be defined"
+        assert config.num_latent_units > 0, "Latent dimension must be >0"
+        assert hasattr(config, "loss_type"), (
+            "Config must contain loss_type (e.g., 'bernoulli' or 'mse')"
+            )
 
         self._model_type = None
         self._config = config
@@ -85,7 +92,7 @@ class AutoEncoderBase(nn.Module):
         return parameter_string
 
 
-class BaseQVAE(AutoEncoderBase):
+class QVAE(AutoEncoderBase):
     """
     Quantum Variational Autoencoder integrated into AutoEncoderBase framework.
 

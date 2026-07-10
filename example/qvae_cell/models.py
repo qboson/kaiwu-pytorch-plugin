@@ -11,7 +11,7 @@ import torch.nn.functional as F
 
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, BaseQVAE
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
 from kaiwu.torch_plugin.qvae_dist_util import MixtureGeneric, FactorialBernoulliUtil
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
@@ -66,7 +66,7 @@ class QVAEDecoder(nn.Module):
         return self.fc2(h)
 
 
-class CellQVAE(BaseQVAE):
+class CellQVAE(QVAE):
     """面向单细胞数据的 QVAE，支持 batch 条件与两阶段训练。"""
     
     def __init__(

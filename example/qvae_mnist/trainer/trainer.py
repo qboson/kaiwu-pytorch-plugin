@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import json
 
-from model import Config, QVAE, FeatureExtractor
+from model import Config, FeatureExtractor, MnistQVAE as QVAE
 from .model_tuner import ModelTuner
 
 from utils.loadMNIST import loadMNIST
