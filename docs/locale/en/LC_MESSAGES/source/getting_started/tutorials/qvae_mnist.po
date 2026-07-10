@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 14:54+0800\n"
+"POT-Creation-Date: 2026-07-10 18:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -314,7 +314,8 @@ msgid "5.1 训练过程可视化"
 msgstr "5.1 Training-Process Visualization"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:184
-msgid "5.3 潜在空间可视化"
+#, fuzzy
+msgid "5.2 潜在空间可视化"
 msgstr "5.3 Latent-Space Visualization"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:189
