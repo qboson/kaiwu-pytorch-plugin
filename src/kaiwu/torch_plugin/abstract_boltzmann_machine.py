@@ -7,6 +7,8 @@
 """Abstract base class for Boltzmann Machines."""
 import torch
 
+from kaiwu.torch_plugin.usage_stats import kpp_caller_context
+
 
 class AbstractBoltzmannMachine(torch.nn.Module):
     """Abstract base class for Boltzmann Machines.
@@ -95,8 +97,15 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             torch.Tensor: Spins sampled from the model.
         """
         ising_mat = self.get_ising_matrix()
-        solution = sampler.solve(ising_mat)
+
+        # kpp stats: set _caller_context so kaiwu @track_data decorator
+        # prefixes alg_name ('sa' -> 'kpp_sa') and CIM tasks carry
+        # task_source_detail.
+        with kpp_caller_context():
+            solution = sampler.solve(ising_mat)
+
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
         solution = torch.FloatTensor(solution)
         solution = solution.to(self.device)
+
         return solution

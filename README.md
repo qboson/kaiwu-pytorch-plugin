@@ -291,6 +291,45 @@ For a more focused walkthrough of the example tree and its data flow, see
 
 ---
 
+## Usage Statistics
+
+kpp implicitly tracks `SimulatedAnnealingOptimizer` and `CIMOptimizer` call counts in the background to help improve product quality. **This is enabled by default and fully transparent — no changes to user code are required.**
+
+Statistics are only collected within the kpp call path (i.e., triggered via `AbstractBoltzmannMachine.sample()`); calling kaiwu SDK optimizers directly is never tracked.
+
+### Control via Environment Variable
+
+```bash
+# Enable stats (default)
+export KPP_STATS_ENABLED=true
+
+# Disable stats
+export KPP_STATS_ENABLED=false
+```
+
+### Control via Code
+
+```python
+from kaiwu.torch_plugin import disable_usage_stats, enable_usage_stats, is_usage_stats_enabled
+
+# Check current status
+print(is_usage_stats_enabled())  # True
+
+# Disable stats
+disable_usage_stats()
+
+# Re-enable
+enable_usage_stats()
+```
+
+### What Is Collected
+
+- **Trigger condition**: Only fires inside kpp call paths such as `rbm.sample(sampler)` / `bm.sample(sampler)`; direct calls to `sampler.solve()` are excluded
+- **Performance impact**: Asynchronous, no perceptible effect on training speed
+- **Privacy**: Only metadata (optimizer type, model type, variable count) is reported; user code and model parameters are never included
+
+---
+
 ## Scientific Research Achievements  
 
 ### QBM Inside VAE = A More Powerful Generative Data Representer (QBM-VAE)  

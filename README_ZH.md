@@ -291,6 +291,45 @@ python example/qdiffusion/dplm/train_workflow.py
 
 ---
 
+## 使用量统计
+
+kpp 会在后台隐性统计 `SimulatedAnnealingOptimizer` 和 `CIMOptimizer` 的调用量，用于改进产品和服务质量。**该统计默认开启，对用户代码完全透明，无需修改任何调用逻辑。**
+
+统计仅在 kpp 调用链路（即通过 `AbstractBoltzmannMachine.sample()` 触发）中生效；直接调用 kaiwu SDK 的优化器不会被统计。
+
+### 通过环境变量控制
+
+```bash
+# 开启统计（默认）
+export KPP_STATS_ENABLED=true
+
+# 关闭统计
+export KPP_STATS_ENABLED=false
+```
+
+### 通过代码控制
+
+```python
+from kaiwu.torch_plugin import disable_usage_stats, enable_usage_stats, is_usage_stats_enabled
+
+# 查看当前状态
+print(is_usage_stats_enabled())  # True
+
+# 关闭统计
+disable_usage_stats()
+
+# 重新开启
+enable_usage_stats()
+```
+
+### 统计说明
+
+- **触发条件**：仅在 `rbm.sample(sampler)` / `bm.sample(sampler)` 等 kpp 调用链路中触发，直接调用 `sampler.solve()` 不会触发
+- **性能影响**：异步上报，对训练性能无可感知影响
+- **隐私保护**：仅上报优化器类型、模型类型、变量数等元数据，不涉及用户代码或模型参数
+
+---
+
 ## 科研成果
 
 ### QBM Inside VAE = 更强的数据表征生成器（QBM-VAE）
