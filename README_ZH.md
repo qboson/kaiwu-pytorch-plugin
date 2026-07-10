@@ -142,8 +142,9 @@ requirements/
    cd kaiwu-pytorch-plugin/requirements
    ```
 
-2. **构建 Docker 镜像**  
+2. **进入 requirements 目录并构建镜像**
    ```bash
+   cd kaiwu-pytorch-plugin/requirements
    docker compose build
    ```
 
@@ -151,23 +152,10 @@ requirements/
    ```bash
    docker compose up
    ```  
-   Notebook 将在 `http://localhost:8888` 可用（无需 token）。本地 `./work` 文件夹会被挂载到容器内。
+   Notebook 将在 `http://localhost:8888` 可用（无需 token）。
 
-4. **（可选）在容器内克隆插件源码**  
-   启动 Jupyter 后，您可以在 JupyterLab 界面中打开终端（点击左侧工具栏的“终端”图标），或直接在宿主机命令行中使用 `docker exec` 进入容器。
-
-   **方式一：在 JupyterLab 终端中执行**
-   ```bash
-   cd /home/jovyan/work
-   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
-   ```
-
-   **方式二：在宿主机命令行中执行**
-   ```bash
-   docker exec -it jupyter_notebook bash -c "cd /home/jovyan/work && git clone https://github.com/qboson/kaiwu-pytorch-plugin.git"
-   ```
-
-   执行后，插件源码将克隆到您本地挂载的 `./work` 目录中，您可以直接在 Notebook 中访问和使用。
+4. **直接访问插件源码**  
+   容器的 `/home/jovyan/work` 已挂载为项目根目录（`../`），因此您可以在 JupyterLab 左侧文件浏览器中直接看到并编辑 `src/`、`setup.py` 等所有文件，**无需在容器内额外执行 `git clone`**。
 
 5. **停止服务器**  
    按下 `Ctrl+C`，然后运行：  

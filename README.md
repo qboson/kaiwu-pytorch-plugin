@@ -131,8 +131,9 @@ requirements/
    cd kaiwu-pytorch-plugin/requirements
    ```
 
-2. **Build the Docker image**:
+2. **Enter the requirements directory and build the image**  
    ```bash
+   cd kaiwu-pytorch-plugin/requirements
    docker compose build
    ```
 
@@ -140,23 +141,10 @@ requirements/
    ```bash
    docker compose up
    ```
-The notebook will be available at http://localhost:8888 (no token required). Your local `./work` folder is mounted inside the container.
+The notebook will be available at http://localhost:8888 (no token required).
 
-4. **(Optional) Clone the source code inside the container**  
-   After starting Jupyter, you can either open a terminal within the JupyterLab interface (click the "Terminal" icon in the left sidebar) or use `docker exec` from your host command line.
-
-   **Option 1: Inside the JupyterLab terminal**
-   ```bash
-   cd /home/jovyan/work
-   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
-   ```
-
-   **Option 2: From the host command line**
-   ```bash
-   docker exec -it jupyter_notebook bash -c "cd /home/jovyan/work && git clone https://github.com/qboson/kaiwu-pytorch-plugin.git"
-   ```
-
-   This will clone the plugin source code into your locally mounted `./work` directory, making it accessible directly from your notebooks.
+4. **Directly access the plugin source code**  
+   The container's `/home/jovyan/work` is mounted to the project root (`../`), so you can directly view and edit `src/`, `setup.py`, and all other files in the JupyterLab file browser — **no additional `git clone` inside the container is required**.
 
 5. **Stop the server**:
 Press `Ctrl+C`, then run:
