@@ -79,7 +79,7 @@ flowchart TD
 ### 环境要求
 
 - python == 3.10
-- kaiwu == v1.3.1
+- kaiwu == 1.3.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -177,7 +177,9 @@ requirements/
 
 ### Kaiwu SDK 安装说明（必需）
 
-Kaiwu SDK 的下载和安装步骤如下：
+现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装
+
+其他版本的Kaiwu SDK 的下载和安装步骤如下：
 
 ![](imgs/image.png)
 
@@ -377,5 +379,5 @@ python example/qdiffusion/dplm/train_workflow.py
 3. 邮箱联系方式：developer@boseq.com
 
  ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  
- ![communication group](https://github.com/user-attachments/assets/1931f657-572f-4f10-9e13-9cfdd3af0de9)
+ ![communication group](https://github.com/user-attachments/assets/bba37a66-777e-4b83-8535-e656119b0c78)
 

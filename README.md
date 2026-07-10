@@ -76,7 +76,7 @@ The above image shows the project file structure:
 
 ### Requirements
 - python == 3.10
-- kaiwu == v1.3.1
+- kaiwu == 1.3.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -166,7 +166,9 @@ Press `Ctrl+C`, then run:
 
 ### Kaiwu SDK Installation Instructions (Required)
 
-Download link and installation steps for Kaiwu SDK:
+Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+
+The download and installation steps for other versions of the Kaiwu SDK are as follows:
 ![](imgs/image.png)
 
 1. **Get the SDK**:
@@ -370,5 +372,5 @@ If you are interested in this work, please check out our paper:
 2. **Boson Quantum Official Assistant**: Inquire about real-machine access and collaborations.  
 3. email: developer@boseq.com
 
- ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/c71de786-96e7-4664-891d-4cb03766c98e)
+ ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  ![communication group](https://github.com/user-attachments/assets/bba37a66-777e-4b83-8535-e656119b0c78)
 
