@@ -89,6 +89,10 @@ flowchart TD
 
 ### 安装步骤
 
+你可以选择 **本地环境配置（conda/pip）** 或 **Docker 配置**（推荐用于可复现性和隔离环境）。
+
+#### 方式一：本地环境配置（conda/pip）
+
 1. **创建并激活环境**
 
    ```bash
@@ -116,6 +120,47 @@ flowchart TD
 
    ```bash
    pip install .
+   ```
+
+#### 方式二：Docker 配置（无需本地配适环境）
+
+Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有依赖（包括 Kaiwu SDK）均已安装。
+
+**所需项目结构**：
+```text
+requirements/
+├── docker-compose.yml
+├── requirements.txt               # 已包含 Kaiwu SDK
+├── kaiwu-1.3.1-py3-none-any.whl   # 或从 Qboson 平台下载
+└── docker/
+    └── Dockerfile
+```
+
+1. **克隆仓库**  
+   ```bash
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   cd kaiwu-pytorch-plugin/requirements
+   ```
+
+2. **进入 requirements 目录并构建镜像**
+   ```bash
+   cd kaiwu-pytorch-plugin/requirements
+   docker compose build
+   ```
+
+3. **启动 Jupyter Notebook 服务器**  
+   ```bash
+   docker compose up
+   ```  
+   Notebook 将在 `http://localhost:8888` 可用（无需 token）。
+
+4. **直接访问插件源码**  
+   容器的 `/home/jovyan/work` 已挂载为项目根目录（`../`），因此您可以在 JupyterLab 左侧文件浏览器中直接看到并编辑 `src/`、`setup.py` 等所有文件，**无需在容器内额外执行 `git clone`**。
+
+5. **停止服务器**  
+   按下 `Ctrl+C`，然后运行：  
+   ```bash
+   docker compose down
    ```
 
 ### Kaiwu SDK 安装说明（必需）
