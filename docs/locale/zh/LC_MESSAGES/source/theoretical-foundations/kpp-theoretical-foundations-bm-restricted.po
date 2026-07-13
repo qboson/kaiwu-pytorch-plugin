@@ -1,0 +1,990 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:10
+msgid "4.2 Restricted Boltzmann Machine (RBM)"
+msgstr "4.2 受限玻尔兹曼机（RBM）"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:12
+msgid ""
+"The classic Boltzmann machine, as presented in Section [4.1 The Classic "
+"Boltzmann Machine: Visible and Hidden Symmetry](kpp-theoretical-"
+"foundations-bm-overall.md), is theoretically powerful but computationally"
+" intractable due to the need for equilibrium sampling over a fully "
+"connected graph. The **Restricted Boltzmann Machine (RBM)**, introduced "
+"by Paul Smolensky in 1986 under the name *Harmonium* and later "
+"popularized by Geoffrey Hinton, imposes a simple but profound "
+"architectural constraint that dramatically reduces sampling complexity "
+"while preserving the ability to model complex probability distributions. "
+"This section details the RBM architecture, its mathematical properties, "
+"and why it has become the workhorse of energy-based unsupervised "
+"learning."
+msgstr ""
+"如 [4.1 经典玻尔兹曼机：可见单元与隐藏单元的对称性](kpp-theoretical-foundations-bm-overall.md) "
+"所述，经典玻尔兹曼机理论上强大，但由于需要在全连接图上进行平衡采样，计算上不可处理。**受限玻尔兹曼机（Restricted Boltzmann "
+"Machine, RBM）** 由 Paul Smolensky 于 1986 年以 Harmonium 之名提出，后由 Geoffrey "
+"Hinton 推广。它施加了一个简单却深刻的架构约束，在保留建模复杂概率分布能力的同时，大幅降低采样复杂度。本节介绍 RBM "
+"架构、数学性质，以及它为何成为基于能量的无监督学习主力模型。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:14
+msgid "The Architectural Restriction: A Bipartite Graph"
+msgstr "架构限制：二部图"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:15
+msgid ""
+"The defining characteristic of an RBM is its **restricted connectivity**:"
+" the network is organized as a **bipartite graph** with two layers, a "
+"visible layer and a hidden layer. Connections exist **only** between "
+"visible and hidden units. There are **no visible-visible connections** "
+"and **no hidden-hidden connections**."
+msgstr ""
+"RBM 的定义特征是 **受限连接**：网络组织为一个包含可见层和隐藏层的 **二部图**。连接 **只** 存在于可见单元与隐藏单元之间。没有 "
+"**可见-可见连接**，也没有 **隐藏-隐藏连接**。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:17
+#, python-brace-format
+msgid ""
+"Formally, let the visible units be $\\mathbf{v} = (v_1, v_2, \\ldots, "
+"v_{N_v})$ with biases $\\mathbf{b} = (b_1, \\ldots, b_{N_v})$, and the "
+"hidden units be $\\mathbf{h} = (h_1, h_2, \\ldots, h_{N_h})$ with biases "
+"$\\mathbf{c} = (c_1, \\ldots, c_{N_h})$. The weight matrix $\\mathbf{W}$ "
+"is of size $N_v \\times N_h$, where $w_{ij}$ connects visible unit $i$ to"
+" hidden unit $j$. There is no weight matrix for visible-visible or "
+"hidden-hidden pairs."
+msgstr ""
+"形式化地，设可见单元为 $\\mathbf{v} = (v_1, v_2, \\ldots, v_{N_v})$，偏置为 $\\mathbf{b}"
+" = (b_1, \\ldots, b_{N_v})$；隐藏单元为 $\\mathbf{h} = (h_1, h_2, \\ldots, "
+"h_{N_h})$，偏置为 $\\mathbf{c} = (c_1, \\ldots, c_{N_h})$。权重矩阵 $\\mathbf{W}$ "
+"大小为 $N_v \\times N_h$，其中 $w_{ij}$ 连接可见单元 $i$ 与隐藏单元 "
+"$j$。不存在可见-可见或隐藏-隐藏权重矩阵。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:19
+msgid "This restricted topology is illustrated below:"
+msgstr "这种受限的拓扑结构如下图所示："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:21
+msgid ""
+"This restricted topology yields a crucial property: **conditional "
+"independence**. Given the visible units, the hidden units become "
+"independent of each other. Conversely, given the hidden units, the "
+"visible units become independent."
+msgstr "这种受限的拓扑结构带来了一个至关重要的特性：**条件独立性**。只要给定了可见单元的状态，各个隐单元之间就会变得相互独立。反之亦然，只要给定了隐单元的状态，各个可见单元之间也会变得相互独立。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:23
+msgid "Energy Function and Joint Distribution"
+msgstr "能量函数与联合分布"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:24
+#, python-brace-format
+msgid ""
+"The energy of a joint configuration $(\\mathbf{v}, \\mathbf{h})$ in an "
+"RBM with binary visible and binary hidden units is:"
+msgstr "对于二值可见单元和二值隐藏单元的 RBM，联合构型 $(\\mathbf{v}, \\mathbf{h})$ 的能量为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:26
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} b_i v_i - "
+"\\sum_{j=1}^{N_h} c_j h_j - \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i "
+"w_{ij} h_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:28
+msgid "In matrix notation:"
+msgstr "矩阵形式为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:30
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
+"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:32
+msgid ""
+"The joint probability distribution is, as always, given by the Boltzmann "
+"distribution:"
+msgstr "联合概率分布仍由玻尔兹曼分布给出："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:34
+#, python-brace-format
+msgid ""
+"P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
+"\\mathbf{h})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:36
+msgid "with the partition function:"
+msgstr "配分函数为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:38
+msgid ""
+"Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:40
+msgid "Probability Distributions in RBMs"
+msgstr "RBM 中的概率分布"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:41
+msgid ""
+"To better understand the generative and training processes of an RBM, we "
+"need to clearly distinguish several key probability distributions. All of"
+" them originate from the joint distribution $p(v, h)$, but they differ in"
+" their normalization."
+msgstr "为了更清楚地理解 RBM 的生成与训练过程，需要区分几个关键概率分布。它们都源自联合分布 $p(v,h)$，但归一化方式不同。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:43
+msgid "**Joint distribution** $p(v, h)$:"
+msgstr "**联合分布** $p(v,h)$："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:45
+#, python-brace-format
+msgid "p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:47
+#, python-brace-format
+msgid ""
+"where $Z = \\sum_{v,h} \\exp(-E(v, h))$. This is the most complete "
+"description of the model."
+msgstr "其中 $Z = \\sum_{v,h} \\exp(-E(v,h))$。这是模型最完整的描述。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:49
+msgid "**Marginal distribution** $p(v)$:"
+msgstr "**边缘分布** $p(v)$："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:51
+#, python-brace-format
+msgid ""
+"This is the distribution we care most about. Because it directly defines "
+"the probability that the RBM assigns to observed visible data (e.g., "
+"images, features) without reference to the hidden units. During training,"
+" our goal (maximum likelihood estimation) is to maximize $p(\\mathbf{v})$"
+" over the training data. A well-trained RBM should be able to sample new "
+"visible configurations from $p(\\mathbf{v})$ that look like real data. "
+"The hidden units are latent auxiliary variables that capture complex "
+"dependencies, but $p(\\mathbf{v})$ is the ultimate evaluation criterion "
+"for the generative quality."
+msgstr ""
+"这是我们最关心的分布，因为它直接定义了 RBM "
+"赋予观测可见数据（例如图像、特征）的概率，而不需要显式引用隐藏单元。训练时，最大似然估计的目标就是在训练数据上最大化 "
+"$p(\\mathbf{v})$。训练良好的 RBM 应能从 $p(\\mathbf{v})$ "
+"中采样出看起来像真实数据的新可见构型。隐藏单元是捕捉复杂依赖关系的潜在辅助变量，但 $p(\\mathbf{v})$ 才是生成质量的最终评价对象。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:53
+msgid "It is obtained by summing over all possible hidden unit states:"
+msgstr "它通过对所有可能隐藏单元状态求和得到："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:55
+msgid "p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:57
+msgid ""
+"This is the distribution we care most about because it directly defines "
+"the probability that the RBM assigns to observed visible data (e.g., "
+"images, features) without reference to the hidden units. During training,"
+" our goal is to maximize $p(v)$ over the training data. Ideally, a well-"
+"trained RBM should be able to sample new visible configurations from "
+"$p(v)$ that look like real data. The hidden units only serve as latent "
+"auxiliary variables to capture complex dependencies, but $p(v)$ is the "
+"ultimate evaluation criterion for the generative quality."
+msgstr "**条件概率**："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:59
+msgid "**Conditional probabilities**:"
+msgstr "这些分布是 RBM 计算效率的关键。由于二部图结构，它们可以分解为独立 Bernoulli 分布的乘积。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:61
+msgid ""
+"These are the key to the computational efficiency of RBMs. Due to the "
+"bipartite structure, they factorize into products of independent "
+"Bernoulli distributions."
+msgstr "**给定可见单元时隐藏单元的分布** $p(h|v)$："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:62
+msgid ""
+"**Distribution of hidden units given visible units** $p(h|v)$: $$ p(h|v) "
+"= \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} \\exp(-E(v, "
+"h'))}$$ Because there are no hidden-hidden connections in an RBM, this "
+"distribution factorizes as  $$p(\\mathbf{h} \\mid \\mathbf{v}) = "
+"\\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),$$ where $p(h_j = 1 \\mid "
+"\\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} v_i \\right)$ , "
+"enabling parallel sampling."
+msgstr ""
+"$p(h|v) = \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} "
+"\\exp(-E(v, h'))}$"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:68
+#, python-brace-format
+msgid ""
+"**Distribution of visible units given hidden units** $p(v|h)$: Similarly,"
+" we have $$p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i "
+"\\mid \\mathbf{h})$$ where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left("
+" b_i + \\sum_{j} w_{ij} h_j \\right)$"
+msgstr "由于 RBM 中不存在隐藏-隐藏连接，该分布分解为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:72
+msgid "The Key Computational Advantage: Conditional Independence"
+msgstr "关键计算优势：条件独立"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:73
+msgid ""
+"The absence of intra-layer connections yields a crucial property: "
+"**conditional independence**. Given the visible units, the hidden units "
+"become independent of each other. Conversely, given the hidden units, the"
+" visible units become independent."
+msgstr "没有层内连接带来了关键性质：**条件独立**。给定可见单元后，隐藏单元彼此独立；反过来，给定隐藏单元后，可见单元也彼此独立。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:75
+msgid ""
+"Mathematically, the conditional probability of a hidden unit $h_j$ being "
+"active given the visible layer is:"
+msgstr "给定可见层时，隐藏单元 $h_j$ 激活的条件概率为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:77
+#, python-brace-format
+msgid ""
+"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i=1}^{N_v} "
+"w_{ij} v_i \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:79
+msgid ""
+"where \\( \\sigma(z) = 1/(1 + \\exp(-z)) \\) is the sigmoid function. "
+"Because there are no hidden-hidden connections, the joint conditional "
+"distribution over all hidden units factorizes:"
+msgstr ""
+"其中 $ \\sigma(z) = 1/(1 + \\exp(-z)) $ 是 sigmoid "
+"函数。由于没有隐藏-隐藏连接，所有隐藏单元的联合条件分布分解为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:81
+#, python-brace-format
+msgid ""
+"P(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} P(h_j \\mid "
+"\\mathbf{v})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:83
+msgid ""
+"Similarly, the conditional probability of a visible unit being active "
+"given the hidden layer is:"
+msgstr "类似地，给定隐藏层时，可见单元的激活概率为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:85
+#, python-brace-format
+msgid ""
+"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j=1}^{N_h} "
+"w_{ij} h_j \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:87
+msgid ""
+"and the visible units are conditionally independent given the hidden "
+"units:"
+msgstr "且可见单元在给定隐藏单元时条件独立："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:89
+#, python-brace-format
+msgid ""
+"P(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} P(v_i \\mid "
+"\\mathbf{h})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:91
+msgid "Efficient Gibbs Sampling: Block Updates"
+msgstr "高效 Gibbs 采样：块更新"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:92
+msgid ""
+"The conditional independence property transforms Gibbs sampling from a "
+"slow, unit-by-unit process into a fast, **block-wise** process. A single "
+"round of Gibbs sampling consists of two parallel steps:"
+msgstr "条件独立性质把 Gibbs 采样从缓慢的逐单元过程，转化为快速的 **分块** 过程。一轮 Gibbs 采样包含两个并行步骤："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:94
+#, python-brace-format
+msgid ""
+"**Sample hidden layer given visible layer**: For each hidden unit $j$, "
+"compute $P(h_j = 1 \\mid \\mathbf{v})$ and sample $h_j \\in \\{0,1\\}$ "
+"accordingly. All hidden units can be sampled simultaneously."
+msgstr ""
+"**给定可见层采样隐藏层**：对每个隐藏单元 $j$，计算 $P(h_j = 1 \\mid \\mathbf{v})$ 并采样 $h_j "
+"\\in \\{0,1\\}$。所有隐藏单元可同时采样。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:95
+#, python-brace-format
+msgid ""
+"**Sample visible layer given hidden layer**: For each visible unit $i$, "
+"compute $P(v_i = 1 \\mid \\mathbf{h})$ and sample $ v_i \\in \\{0,1\\}$. "
+"All visible units can be sampled simultaneously."
+msgstr ""
+"**给定隐藏层采样可见层**：对每个可见单元 $i$，计算 $P(v_i = 1 \\mid \\mathbf{h})$ 并采样 $v_i "
+"\\in \\{0,1\\}$。所有可见单元可同时采样。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:97
+#, python-brace-format
+msgid ""
+"This pair of steps constitutes one full step of **block Gibbs sampling**."
+" Starting from a visible vector $\\mathbf{v}^{(0)}$, the sequence is:"
+msgstr "这两个步骤构成一次完整的 **块 Gibbs 采样**。从可见向量 $\\mathbf{v}^{(0)}$ 出发，序列为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:99
+msgid ""
+"\\mathbf{v}^{(0)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(0)})} "
+"\\mathbf{h}^{(0)} \\xrightarrow{P(\\mathbf{v} \\mid \\mathbf{h}^{(0)})} "
+"\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(1)})} "
+"\\mathbf{h}^{(1)} \\rightarrow \\cdots"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:101
+msgid ""
+"Each half-step updates an entire layer in parallel, making the RBM vastly"
+" more efficient than the classic Boltzmann machine, where each unit "
+"update requires computing inputs from all other units."
+msgstr "每个半步并行更新整层，使 RBM 比经典玻尔兹曼机高效得多；后者每次更新都需要从所有其他单元计算输入。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:103
+msgid "Learning the RBM: Contrastive Divergence Revisited"
+msgstr "学习 RBM：回到对比散度"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:104
+msgid ""
+"The RBM is trained using the **contrastive divergence (CD)** algorithm "
+"introduced in Section [3.3 Contrastive Divergence](kpp-theoretical-"
+"foundations-ebms-cd.md). The gradient of the log-likelihood retains the "
+"same contrastive form:"
+msgstr ""
+"RBM 使用 [3.3 对比散度](kpp-theoretical-foundations-ebms-cd.md) 中介绍的 **对比散度** "
+"算法训练。对数似然梯度保持同样的对比形式："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:106
+msgid ""
+"\\frac{\\partial \\log P(\\mathbf{v})}{\\partial w_{ij}} = \\langle v_i "
+"h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{model}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:108
+msgid ""
+"Thanks to the conditional independence property of the RBM, the Gibbs "
+"sampling steps required by CD become **block-parallel** operations. A "
+"single round-trip consists of sampling all hidden units given the visible"
+" layer, then sampling all visible units given the hidden layer. This "
+"makes even CD-1 remarkably effective. The weight update for a mini-batch "
+"is:"
+msgstr ""
+"得益于 RBM 的条件独立性，CD 所需的 Gibbs 采样步骤成为 **块并行** "
+"操作。一次往返由“给定可见层采样所有隐藏单元”以及“给定隐藏层采样所有可见单元”组成。因此即便 CD-1 也非常有效。小批量权重更新为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:110
+msgid ""
+"\\Delta \\mathbf{W} = \\eta \\left( \\mathbb{E}[\\mathbf{v} "
+"\\mathbf{h}^\\top]_{\\text{data}} - \\mathbb{E}[\\mathbf{v} "
+"\\mathbf{h}^\\top]_{\\text{recon}} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:112
+msgid ""
+"with analogous updates for biases. For a full exposition of the CD-k "
+"algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-"
+"theoretical-foundations-ebms-cd.md)."
+msgstr ""
+"偏置以类似方式更新。关于 CD-k 算法的完整说明，请参见 [3.3 对比散度](kpp-theoretical-foundations-"
+"ebms-cd.md)。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:114
+msgid ""
+"In practice, **CD-1**, i.e. k = 1, is often sufficient. The algorithm "
+"then becomes remarkably simple: for each data vector, compute hidden "
+"probabilities, sample hidden states, reconstruct visible probabilities, "
+"sample visible states, recompute hidden probabilities, and update weights"
+" based on the difference between the initial and reconstructed pairwise "
+"products."
+msgstr "自由能与边缘概率"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:116
+msgid "Free Energy and Marginal Probability"
+msgstr "自由能与边缘概率"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:117
+#, python-brace-format
+msgid ""
+"For an RBM, the free energy of a visible vector $\\mathbf{v}$ is defined "
+"as:"
+msgstr "对于 RBM，由于隐藏单元可以解析求和，可见向量 $\\mathbf{v}$ 的自由能具有闭式表达："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:119
+msgid ""
+"F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\mathbf{h}} "
+"\\exp\\left(-E_\\theta(\\mathbf{v}, \\mathbf{h})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:121
+msgid "The marginal probability of a visible vector is then:"
+msgstr "于是可见向量边缘概率为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:123
+msgid ""
+"P_\\theta(\\mathbf{v}) = "
+"\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
+"\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:125
+#, python-brace-format
+msgid ""
+"While the denominator (partition function over visible states) remains "
+"intractable, i.e. still sums over all $2^{N_v}$ visible configurations, "
+"the free energy itself is cheap to compute for any given $\\mathbf{v}$. "
+"This allows, for example, comparing the relative likelihood of different "
+"visible vectors, even though the absolute likelihood remains intractable."
+msgstr ""
+"虽然分母仍需对所有 $2^{N_v}$ 个可见构型求和，但对给定 $\\mathbf{v}$ "
+"计算自由能很便宜。因此，即使绝对似然仍不可处理，也可以比较不同可见向量的相对似然。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:127
+msgid "Free Energy and Its Analytical Form"
+msgstr "自由能与解析形式"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:128
+msgid ""
+"In an RBM, the hidden units are conditionally independent given the "
+"visible units. This allows us to sum out the hidden units analytically. "
+"Substituting the RBM energy function:"
+msgstr "在 RBM 中，给定可见单元后隐藏单元条件独立，因此可以把隐藏单元解析求和。代入 RBM 能量函数："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:130
+#, python-brace-format
+msgid ""
+"E_\\theta(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
+"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:132
+msgid "We can sum out the hidden units analytically:"
+msgstr "可以得到："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:134
+msgid ""
+"\\sum_{\\mathbf{h}} \\exp(-E_\\theta(\\mathbf{v}, \\mathbf{h})) = "
+"\\exp(\\mathbf{b}^\\top \\mathbf{v}) \\prod_{j=1}^{N_h} \\left( 1 + "
+"\\exp(c_j + \\sum_i v_i w_{ij}) \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:136
+msgid "Thus, free energy has a closed-form expression:"
+msgstr "因此，自由能具有闭式表达："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:138
+#, python-brace-format
+msgid ""
+"F_\\theta(\\mathbf{v}) = -\\mathbf{b}^\\top \\mathbf{v} - "
+"\\sum_{j=1}^{N_h} \\log \\left( 1 + \\exp\\left( c_j + \\sum_i v_i w_{ij}"
+" \\right) \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:140
+#, python-brace-format
+msgid ""
+"**This analytical form is a key computational advantage of the RBM over "
+"the classic Boltzmann machine.** It allows us to evaluate the relative "
+"likelihood of different visible vectors in $O(N_v N_h)$ **time**, without"
+" enumerating the $2^{N_h}$ hidden configurations. However, **the absolute"
+" likelihood remains intractable**."
+msgstr ""
+"**这个解析形式是 RBM 相对经典玻尔兹曼机的关键计算优势**。它允许我们以 $O(N_v N_h)$ "
+"的时间评估不同可见向量的相对似然，而无需枚举 $2^{N_h}$ "
+"个隐藏构型。需要注意的是，由于可见状态上的配分函数仍不可处理，**绝对似然仍然不可处理**；但闭式自由能已足以支持模型比较、相对似然比较和采样等许多实际应用。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:142
+msgid "Free Energy vs. Expected Energy"
+msgstr "自由能与期望能量"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:144
+msgid ""
+"To gain deeper physical intuition, it is instructive to compare the free "
+"energy with the **expected energy** under the conditional distribution of"
+" hidden units:"
+msgstr "为了获得更深入的物理直觉，可以把自由能与隐藏单元条件分布下的 **期望能量** 进行比较："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:146
+#, python-brace-format
+msgid ""
+"\\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, \\mathbf{H}) \\mid "
+"\\mathbf{v}] = -\\mathbf{b}^\\top \\mathbf{v} - \\mathbf{c}^\\top "
+"\\mathbf{m}(\\mathbf{v}) - \\mathbf{v}^\\top \\mathbf{W} "
+"\\mathbf{m}(\\mathbf{v})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:148
+#, python-brace-format
+msgid ""
+"where $m_j(\\mathbf{v}) = \\sigma(c_j + \\sum_i v_i w_{ij})$ is the "
+"conditional expectation of hidden unit $j$ given $\\mathbf{v}$. The free "
+"energy and expected energy are related by:"
+msgstr ""
+"其中 $m_j(\\mathbf{v}) = \\sigma(c_j + \\sum_i v_i w_{ij})$ 是给定 "
+"$\\mathbf{v}$ 时隐藏单元 $j$ 的条件期望。自由能与期望能量满足："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:150
+#, python-brace-format
+msgid ""
+"F_\\theta(\\mathbf{v}) = \\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, "
+"\\mathbf{H}) \\mid \\mathbf{v}] - \\text{Entropy}(P_\\theta(\\mathbf{H} "
+"\\mid \\mathbf{v}))"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:152
+msgid ""
+"The difference is precisely the **entropy** of the hidden layer given the"
+" visible layer. This aligns with the thermodynamic relation $F = U - TS$:"
+" free energy equals the expected energy minus the temperature-weighted "
+"entropy. In the RBM, this entropy term accounts for uncertainty in the "
+"hidden unit activations."
+msgstr ""
+"二者差值正是给定可见层时隐藏层的 **熵**。这与热力学关系 $F = U - TS$ 一致：自由能等于期望能量减去温度加权熵。在 RBM "
+"中，这个熵项刻画了隐藏单元激活的不确定性。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:154
+msgid "RBMs as Product of Experts"
+msgstr "RBM 作为专家乘积"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:155
+#, python-brace-format
+msgid ""
+"An RBM can be interpreted as a **product of experts** (PoE). Each hidden "
+"unit $h_j$ acts as an \"expert\" that assigns a probability to a visible "
+"vector $\\mathbf{v}$ based on how well $\\mathbf{v}$ matches its "
+"preferred pattern (encoded in the weight vector $\\mathbf{w}_{:j}$). The "
+"joint distribution is the product of these expert opinions, renormalized:"
+msgstr ""
+"RBM 可以解释为 **专家乘积**（Product of Experts, PoE）。每个隐藏单元 $h_j$ 都像一个“专家”，根据可见向量 "
+"$\\mathbf{v}$ 与其偏好模式（由权重向量 $\\mathbf{w}_{:j}$ 编码）的匹配程度，对 $\\mathbf{v}$ "
+"赋予概率。联合分布是这些专家意见的乘积并重新归一化："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:157
+msgid ""
+"P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} \\exp\\left( c_j h_j + \\sum_i"
+" v_i w_{ij} h_j \\right) \\bigg|_{h_j \\text{ summed out}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:159
+msgid ""
+"The product-of-experts view highlights the RBM's representational power: "
+"each hidden unit contributes a soft constraint, and the combination of "
+"many such constraints can model complex, high-dimensional distributions. "
+"The bipartite restriction prevents experts from directly interacting, "
+"forcing them to coordinate only through the visible layer."
+msgstr ""
+"专家乘积视角突出了 RBM "
+"的表示能力：每个隐藏单元贡献一个软约束，许多约束组合即可建模复杂高维分布。二部图限制阻止专家直接相互作用，迫使它们只通过可见层协调。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:161
+msgid "Variants: Handling Different Data Types"
+msgstr "变体：处理不同数据类型"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:162
+msgid ""
+"The basic RBM with binary visible units is suitable for modeling binary "
+"data (e.g., black-and-white images, binary feature vectors). However, the"
+" RBM framework extends naturally to other data types by modifying the "
+"energy function and the conditional distributions."
+msgstr "具有二值可见单元的基本 RBM 适合建模二值数据，例如黑白图像或二值特征向量。不过，RBM 框架可通过修改能量函数和条件分布自然扩展到其他数据类型。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:164
+msgid ""
+"**Gaussian-Bernoulli RBM**: For real-valued data (e.g., grayscale images,"
+" continuous features), the visible units are modeled as Gaussian with "
+"unit variance (or learned variance). The energy becomes:"
+msgstr ""
+"**Gaussian-Bernoulli RBM**：用于实值数据（如灰度图像、连续特征）。可见单元建模为单位方差或可学习方差的 "
+"Gaussian。能量为："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:166
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}) = \\sum_i \\frac{(v_i - b_i)^2}{2\\sigma_i^2}"
+" - \\sum_j c_j h_j - \\sum_{i,j} \\frac{v_i}{\\sigma_i} w_{ij} h_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-restricted.md:167
+#, python-brace-format
+msgid ""
+"The conditional $P(v_i \\mid \\mathbf{h})$ is Gaussian with mean $b_i + "
+"\\sigma_i \\sum_{j} w_{ij} h_j$"
+msgstr ""
+"条件分布 $P(v_i \\mid \\mathbf{h})$ 是均值为 $b_i + \\sigma_i \\sum_{j} w_{ij} "
+"h_j$ 的 Gaussian。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:169
+msgid ""
+"**Softmax / Multinomial RBM**: For count data or categorical data (e.g., "
+"word counts, user ratings), the visible layer can be a softmax unit over "
+"a vocabulary or rating scale."
+msgstr ""
+"**Softmax / Multinomial RBM**：用于计数或类别数据，例如词频、用户评分，可见层可设为词表或评分尺度上的 softmax"
+" 单元。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:170
+msgid ""
+"**Replicated Softmax RBM**: For variable-length documents, the visible "
+"layer consists of a set of multinomial units, modeling the distribution "
+"of word counts."
+msgstr "**Replicated Softmax RBM**：用于变长文档，可见层由一组多项式单元组成，建模词频分布。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:172
+msgid ""
+"These variants preserve the bipartite structure and conditional "
+"independence properties, allowing the same efficient block Gibbs sampling"
+" and contrastive divergence training."
+msgstr "这些变体保留二部图结构和条件独立性质，因此仍可使用相同的高效块 Gibbs 采样和对比散度训练。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:174
+msgid "Limitations of the RBM"
+msgstr "RBM 的局限"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:175
+msgid "Despite its success, the RBM has limitations:"
+msgstr "尽管 RBM 取得了成功，它仍有局限："
+
+#: ../../source/theoretical-foundations-bm-restricted.md:177
+msgid ""
+"**Shallow Architecture**: A single RBM is a shallow model with only one "
+"layer of latent variables. Its representational power is limited compared"
+" to deep architectures, although stacking RBMs to form a **Deep Belief "
+"Network (DBN)** mitigates this (see Section [4.3 Beyond Single Layers: "
+"Stacking for Deep Learning](kpp-theoretical-foundations-bm-deep.md))."
+msgstr ""
+"**浅层架构**：单个 RBM 只有一层潜变量，表达能力相比深层架构有限；堆叠 RBM 形成 **深度置信网络（DBN）** 可缓解这一点（见 "
+"[4.3 超越单层：面向深度学习的堆叠](kpp-theoretical-foundations-bm-deep.md)）。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:178
+#, python-brace-format
+msgid ""
+"**Partition Function Still Intractable**: The marginal likelihood "
+"$P(\\mathbf{v})$ still requires summing over all visible configurations. "
+"While inference is efficient, model evaluation and comparison remain "
+"challenging."
+msgstr "**配分函数仍不可处理**：边缘似然 $P(\\mathbf{v})$ 仍需对所有可见构型求和。推断虽然高效，模型评估和比较仍具挑战。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:179
+msgid ""
+"**Mode Collapse in CD Training**: As noted in Section [3.3 Contrastive "
+"Divergence](kpp-theoretical-foundations-ebms-cd.md), CD training can "
+"suffer from mode collapse, where the model fails to capture all modes of "
+"the data distribution. Persistent CD (PCD) improves this but adds "
+"computational overhead."
+msgstr ""
+"**CD 训练中的模态塌缩**：如 [3.3 对比散度](kpp-theoretical-foundations-ebms-cd.md) "
+"所述，CD 训练可能无法捕捉数据分布所有模态。持久 CD（PCD）可改善这一点，但增加计算开销。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:180
+msgid ""
+"**Hyperparameter Sensitivity**: The quality of the learned features "
+"depends sensitively on the learning rate, momentum, weight decay, and the"
+" number of hidden units. Tuning these hyperparameters requires experience"
+" and careful validation."
+msgstr "**超参数敏感**：学习特征质量对学习率、动量、权重衰减和隐藏单元数量敏感，需要经验和仔细验证。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:182
+msgid "The RBM's Place in Deep Learning History"
+msgstr "RBM 在深度学习历史中的位置"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:183
+msgid ""
+"The RBM played a pivotal role in the **deep learning renaissance** of the"
+" mid-2000s. Before the widespread adoption of rectified linear units "
+"(ReLUs), batch normalization, and improved optimizers for feedforward "
+"networks, training deep neural networks was notoriously difficult. The "
+"RBM provided an effective **unsupervised pre-training** method: by "
+"stacking RBMs trained layer by layer, one could initialize a deep network"
+" with sensible features extracted from the data distribution, rather than"
+" random weights. This pre-training, followed by discriminative fine-"
+"tuning with backpropagation, enabled the first successful training of "
+"truly deep architectures on challenging tasks like MNIST and later "
+"ImageNet."
+msgstr ""
+"RBM 在 2000 年代中期的 **深度学习复兴** 中发挥了关键作用。在 "
+"ReLU、批归一化以及更好前馈网络优化器广泛使用之前，训练深层神经网络非常困难。RBM 提供了有效的 **无监督预训练** 方法：逐层训练并堆叠 "
+"RBM，可以用从数据分布中提取的合理特征初始化深层网络，而不是随机权重。随后再用反向传播进行判别式微调，使真正深层架构在 MNIST 以及后来 "
+"ImageNet 等任务上的训练成为可能。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:185
+msgid ""
+"Although modern deep learning has largely moved away from RBM pre-"
+"training in favor of end-to-end supervised training with large labeled "
+"datasets, the conceptual contributions of the RBM, i.e. energy-based "
+"learning, contrastive divergence, and the power of distributed "
+"representations, remain foundational. Moreover, RBMs continue to find "
+"niche applications in collaborative filtering, dimensionality reduction, "
+"and generative modeling of small-to-medium datasets."
+msgstr ""
+"尽管现代深度学习大多转向大规模有标签数据上的端到端监督训练，RBM "
+"的概念贡献仍是基础性的：基于能量学习、对比散度，以及分布式表示的力量。此外，RBM 仍在协同过滤、降维、小到中等数据集的生成建模中有小众应用。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:187
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:188
+msgid ""
+"The **Restricted Boltzmann Machine (RBM)** imposes a **bipartite "
+"connectivity** constraint: no visible-visible or hidden-hidden "
+"connections."
+msgstr "**受限玻尔兹曼机（RBM）** 施加 **二部连接** 约束：没有可见-可见或隐藏-隐藏连接。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:189
+#, python-brace-format
+msgid ""
+"This restriction yields **conditional independence**: $P(\\mathbf{h} "
+"\\mid \\mathbf{v})$ and $P(\\mathbf{v} \\mid \\mathbf{h})$ factorize into"
+" products of independent Bernoulli distributions."
+msgstr ""
+"该限制带来 **条件独立**：$P(\\mathbf{h} \\mid \\mathbf{v})$ 和 $P(\\mathbf{v} \\mid "
+"\\mathbf{h})$ 分解为独立 Bernoulli 分布乘积。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:190
+msgid ""
+"**Block Gibbs sampling** updates entire layers in parallel, dramatically "
+"accelerating inference and training."
+msgstr "**块 Gibbs 采样** 并行更新整层，大幅加速推断与训练。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:191
+msgid ""
+"The RBM is trained using **contrastive divergence (CD)**, typically CD-1,"
+" which requires only one round-trip of block Gibbs sampling per data "
+"point."
+msgstr "RBM 使用 **对比散度（CD）** 训练，通常为 CD-1，每个数据点只需一次块 Gibbs 往返。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:192
+msgid ""
+"The **free energy** of a visible vector has a closed-form expression, "
+"enabling efficient comparison of relative likelihoods."
+msgstr "可见向量的 **自由能** 具有闭式表达，可高效比较相对似然。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:193
+msgid ""
+"The RBM can be extended to handle **real-valued** (Gaussian-Bernoulli "
+"RBM) and **categorical** (Softmax RBM) data."
+msgstr "RBM 可扩展到 **实值**（Gaussian-Bernoulli RBM）和 **类别**（Softmax RBM）数据。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:194
+msgid ""
+"RBMs served as the building blocks for **Deep Belief Networks** and "
+"played a historic role in enabling unsupervised pre-training for deep "
+"neural networks."
+msgstr "RBM 是 **深度置信网络** 构建块，并在深层神经网络无监督预训练历史中发挥重要作用。"
+
+#: ../../source/theoretical-foundations-bm-restricted.md:195
+msgid ""
+"While no longer the dominant paradigm for supervised deep learning, RBMs "
+"remain important models for unsupervised learning, feature extraction, "
+"and understanding energy-based generative models."
+msgstr "虽然不再是监督深度学习主流范式，RBM 仍是理解无监督学习、特征提取和基于能量生成模型的重要模型。"
+
+#~ msgid ""
+#~ "Z = \\sum_{\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}}} \\exp\\left(-E(\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}})\\right)"
+#~ msgstr ""
+#~ "Z = \\sum_{\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}}} \\exp\\left(-E(\\tilde{\\mathbf{v}}, "
+#~ "\\tilde{\\mathbf{h}})\\right)"
+
+#~ msgid "p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))"
+#~ msgstr "p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))"
+
+#~ msgid "p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}"
+#~ msgstr "p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}"
+
+#~ msgid ""
+#~ "\\mathbf{v}^{(0)} \\xrightarrow{P(\\mathbf{h} \\mid "
+#~ "\\mathbf{v}^{(0)})} \\mathbf{h}^{(0)} "
+#~ "\\xrightarrow{P(\\mathbf{v} \\mid \\mathbf{h}^{(0)})} "
+#~ "\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid "
+#~ "\\mathbf{v}^{(1)})} \\mathbf{h}^{(1)} \\rightarrow "
+#~ "\\cdots"
+#~ msgstr ""
+#~ "$P(\\mathbf{v} \\mid \\mathbf{h}) = "
+#~ "\\prod_{i=1}^{N_v} P(v_i \\mid \\mathbf{h})$"
+
+#~ msgid ""
+#~ "F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\mathbf{h}}"
+#~ " \\exp\\left(-E_\\theta(\\mathbf{v}, \\mathbf{h})\\right)"
+#~ msgstr ""
+#~ "得益于 RBM 的条件独立性，CD 所需的 Gibbs 采样步骤成为 "
+#~ "**块并行** 操作。一次往返由“给定可见层采样所有隐藏单元”以及“给定隐藏层采样所有可见单元”组成。因此即便 "
+#~ "CD-1 也非常有效。小批量权重更新为："
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{v}) = "
+#~ "\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}}"
+#~ " \\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
+#~ msgstr ""
+#~ "偏置以类似方式更新。关于 CD-k 算法的完整说明，请参见 [3.3 "
+#~ "对比散度](\\section3.3-kpp-theoretical-foundations-"
+#~ "ebms-cd)。"
+
+#~ msgid ""
+#~ "E_\\theta(\\mathbf{v}, \\mathbf{h}) = "
+#~ "-\\mathbf{b}^\\top \\mathbf{v} - \\mathbf{c}^\\top"
+#~ " \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} "
+#~ "\\mathbf{h}"
+#~ msgstr "于是可见向量边缘概率为："
+
+#~ msgid ""
+#~ "\\sum_{\\mathbf{h}} \\exp(-E_\\theta(\\mathbf{v}, "
+#~ "\\mathbf{h})) = \\exp(\\mathbf{b}^\\top \\mathbf{v})"
+#~ " \\prod_{j=1}^{N_h} \\left( 1 + \\exp(c_j"
+#~ " + \\sum_i v_i w_{ij}) \\right)"
+#~ msgstr ""
+#~ "虽然分母仍需对所有 $2^{N_v}$ 个可见构型求和，但对给定 $\\mathbf{v}$ "
+#~ "计算自由能很便宜。因此，即使绝对似然仍不可处理，也可以比较不同可见向量的相对似然。"
+
+#~ msgid ""
+#~ "F_\\theta(\\mathbf{v}) = -\\mathbf{b}^\\top "
+#~ "\\mathbf{v} - \\sum_{j=1}^{N_h} \\log \\left("
+#~ " 1 + \\exp\\left( c_j + \\sum_i "
+#~ "v_i w_{ij} \\right) \\right)"
+#~ msgstr "在 RBM 中，给定可见单元后隐藏单元条件独立，因此可以把隐藏单元解析求和。代入 RBM 能量函数："
+
+#~ msgid ""
+#~ "\\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, \\mathbf{H}) "
+#~ "\\mid \\mathbf{v}] = -\\mathbf{b}^\\top "
+#~ "\\mathbf{v} - \\mathbf{c}^\\top "
+#~ "\\mathbf{m}(\\mathbf{v}) - \\mathbf{v}^\\top "
+#~ "\\mathbf{W} \\mathbf{m}(\\mathbf{v})"
+#~ msgstr "因此，自由能具有闭式表达："
+
+#~ msgid ""
+#~ "F_\\theta(\\mathbf{v}) = "
+#~ "\\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, \\mathbf{H}) "
+#~ "\\mid \\mathbf{v}] - "
+#~ "\\text{Entropy}(P_\\theta(\\mathbf{H} \\mid \\mathbf{v}))"
+#~ msgstr ""
+#~ "**这个解析形式是 RBM 相对经典玻尔兹曼机的关键计算优势**。它允许我们以 $O(N_v "
+#~ "N_h)$ 的时间评估不同可见向量的相对似然，而无需枚举 $2^{N_h}$ "
+#~ "个隐藏构型。需要注意的是，由于可见状态上的配分函数仍不可处理，**绝对似然仍然不可处理**；但闭式自由能已足以支持模型比较、相对似然比较和采样等许多实际应用。"
+
+#~ msgid "::"
+#~ msgstr "::"
+
+#~ msgid ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} "
+#~ "b_i v_i - \\sum_{j=1}^{N_h} c_j h_j "
+#~ "- \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i "
+#~ "w_{ij} h_j"
+#~ msgstr ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} "
+#~ "b_i v_i - \\sum_{j=1}^{N_h} c_j h_j "
+#~ "- \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i "
+#~ "w_{ij} h_j"
+
+#~ msgid ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top "
+#~ "\\mathbf{v} - \\mathbf{c}^\\top \\mathbf{h} -"
+#~ " \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
+#~ msgstr ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top "
+#~ "\\mathbf{v} - \\mathbf{c}^\\top \\mathbf{h} -"
+#~ " \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
+
+#~ msgid ""
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} "
+#~ "\\exp\\left(-E(\\mathbf{v}, \\mathbf{h})\\right)"
+#~ msgstr ""
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} "
+#~ "\\exp\\left(-E(\\mathbf{v}, \\mathbf{h})\\right)"
+
+#~ msgid ""
+#~ "P(h_j = 1 \\mid \\mathbf{v}) = "
+#~ "\\sigma\\left( c_j + \\sum_{i=1}^{N_v} w_{ij}"
+#~ " v_i \\right)"
+#~ msgstr "类似地，有："
+
+#~ msgid ""
+#~ "P(\\mathbf{h} \\mid \\mathbf{v}) = "
+#~ "\\prod_{j=1}^{N_h} P(h_j \\mid \\mathbf{v})"
+#~ msgstr ""
+#~ "其中 $p(v_i = 1 \\mid \\mathbf{h}) ="
+#~ " \\sigma\\left( b_i + \\sum_j w_{ij} "
+#~ "h_j \\right)$。"
+
+#~ msgid ""
+#~ "P(v_i = 1 \\mid \\mathbf{h}) = "
+#~ "\\sigma\\left( b_i + \\sum_{j=1}^{N_h} w_{ij}"
+#~ " h_j \\right)"
+#~ msgstr "没有层内连接带来了关键性质：**条件独立**。给定可见单元后，隐藏单元彼此独立；反过来，给定隐藏单元后，可见单元也彼此独立。"
+
+#~ msgid ""
+#~ "P(\\mathbf{v} \\mid \\mathbf{h}) = "
+#~ "\\prod_{i=1}^{N_v} P(v_i \\mid \\mathbf{h})"
+#~ msgstr ""
+#~ "$P(h_j = 1 \\mid \\mathbf{v}) = "
+#~ "\\sigma\\left( c_j + \\sum_{i=1}^{N_v} w_{ij}"
+#~ " v_i \\right)$"
+
+#~ msgid ""
+#~ "\\frac{\\partial \\log P(\\mathbf{v})}{\\partial "
+#~ "w_{ij}} = \\langle v_i h_j "
+#~ "\\rangle_{\\text{data}} - \\langle v_i h_j "
+#~ "\\rangle_{\\text{model}}"
+#~ msgstr ""
+#~ "**给定隐藏层采样可见层**：对每个可见单元 $i$，计算 $P(v_i = 1 "
+#~ "\\mid \\mathbf{h})$ 并采样 $v_i \\in "
+#~ "\\{0,1\\}$。所有可见单元可同时采样。"
+
+#~ msgid ""
+#~ "\\Delta \\mathbf{W} = \\eta \\left( "
+#~ "\\mathbb{E}[\\mathbf{v} \\mathbf{h}^\\top]_{\\text{data}} "
+#~ "- \\mathbb{E}[\\mathbf{v} "
+#~ "\\mathbf{h}^\\top]_{\\text{recon}} \\right)"
+#~ msgstr ""
+#~ "$\\mathbf{v}^{(0)} \\xrightarrow{P(\\mathbf{h} \\mid "
+#~ "\\mathbf{v}^{(0)})} \\mathbf{h}^{(0)} "
+#~ "\\xrightarrow{P(\\mathbf{v} \\mid \\mathbf{h}^{(0)})} "
+#~ "\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid "
+#~ "\\mathbf{v}^{(1)})} \\mathbf{h}^{(1)} \\rightarrow "
+#~ "\\cdots$"
+
+#~ msgid ""
+#~ "P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} "
+#~ "\\exp\\left( c_j h_j + \\sum_i v_i "
+#~ "w_{ij} h_j \\right) \\bigg|_{h_j \\text{ "
+#~ "summed out}}"
+#~ msgstr ""
+#~ "其中 $m_j(\\mathbf{v}) = \\sigma(c_j + "
+#~ "\\sum_i v_i w_{ij})$ 是给定 $\\mathbf{v}$ "
+#~ "时隐藏单元 $j$ 的条件期望。自由能与期望能量满足："
+
+#~ msgid ""
+#~ "E(\\mathbf{v}, \\mathbf{h}) = \\sum_i "
+#~ "\\frac{(v_i - b_i)^2}{2\\sigma_i^2} - \\sum_j"
+#~ " c_j h_j - \\sum_{i,j} "
+#~ "\\frac{v_i}{\\sigma_i} w_{ij} h_j"
+#~ msgstr ""
+#~ "$P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} "
+#~ "\\exp\\left( c_j h_j + \\sum_i v_i "
+#~ "w_{ij} h_j \\right) \\bigg|_{h_j \\text{ "
+#~ "summed out}}$"
+

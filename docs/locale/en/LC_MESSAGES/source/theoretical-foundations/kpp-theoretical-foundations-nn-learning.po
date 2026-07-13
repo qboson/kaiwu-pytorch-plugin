@@ -1,0 +1,934 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-nn-learning.md:10
+msgid "2.3 Hebbian Learning as Sculpting Energy"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:12
+msgid ""
+"The previous section introduced the Hopfield network as a dynamical "
+"system whose state evolves to minimize an energy function. The weights of"
+" the network determine the shape of this energy landscape, where the "
+"valleys are located, how deep they are, and how steep the walls between "
+"them. The question then arises: **how should these weights be set so that"
+" the energy landscape encodes useful memories?** The answer lies in a "
+"remarkably simple and biologically plausible principle proposed by "
+"Canadian psychologist Donald Hebb in 1949. The **Hebbian learning rule**,"
+" often summarized as *\"neurons that fire together, wire together,\"* "
+"provides a local mechanism by which neural activity sculpts the global "
+"energy function. This section explores the mathematical connection "
+"between Hebbian synaptic modification and the shaping of an energy "
+"landscape, establishing the foundational learning principle that carries "
+"forward into the Boltzmann machine."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:15
+msgid "The Hebbian Postulate"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:16
+msgid ""
+"In his seminal work \"*The Organization of Behavior\"*, Hebb proposed "
+"that:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:18
+msgid ""
+"\"When an axon of cell A is near enough to excite cell B and repeatedly "
+"or persistently takes part in firing it, some growth process or metabolic"
+" change takes place in one or both cells such that A's efficiency, as one"
+" of the cells firing B, is increased.\""
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:20
+msgid ""
+"Translated into the language of artificial neural networks, this becomes "
+"a simple weight update rule: if two connected neurons are simultaneously "
+"active, the strength of their connection should increase. Conversely, if "
+"their activities are anti-correlated, the connection strength should "
+"decrease."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:22
+#, python-brace-format
+msgid ""
+"For binary neurons taking values in $\\{-1, +1\\}$, the change in weight "
+"$w_{ij}$ due to a single pattern $\\boldsymbol{\\xi}$ is proportional to "
+"the product of their activities:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:24
+#, python-brace-format
+msgid "\\Delta w_{ij} \\propto \\xi_i \\xi_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:26
+#, python-brace-format
+msgid ""
+"For $\\{0, 1\\}$ valued neurons, a common variant adjusts weights only "
+"when both neurons are active:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:28
+#, python-brace-format
+msgid "\\Delta w_{ij} \\propto x_i x_j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:30
+msgid ""
+"In both formulations, the essential principle is the same: **co-"
+"activation strengthens the connection**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:32
+msgid "Storing Multiple Patterns: The Outer Product Rule"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:33
+msgid ""
+"To store a set of $P$ patterns $\\{\\boldsymbol{\\xi}^1, "
+"\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$, the Hebbian "
+"prescription is simply to sum the outer products of each pattern:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:35
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:37
+msgid ""
+"The factor $1/N$ (or sometimes $1/P$ is a normalization constant that "
+"prevents weights from growing without bound as more patterns are added. "
+"The weight matrix can be written compactly as:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:39
+#, python-brace-format
+msgid ""
+"\\mathbf{W} = \\frac{1}{N} \\sum_{\\mu=1}^P \\boldsymbol{\\xi}^\\mu "
+"(\\boldsymbol{\\xi}^\\mu)^\\top - \\frac{P}{N} \\mathbf{I}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:41
+#, python-brace-format
+msgid ""
+"where the subtraction of the identity matrix enforces the condition "
+"$w_{ii} = 0$ (no self-connections)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:43
+#, python-brace-format
+msgid ""
+"This learning rule is purely **local**: to update $w_{ij}$, only the "
+"activities of neurons $i$ and $j$ are required. No global error signal, "
+"no backpropagation of gradients, no explicit knowledge of the energy "
+"function is necessary. Yet, as we shall see, this local rule has a "
+"profound global effect on the energy landscape."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:45
+msgid "Hebbian Learning as Energy Basin Creation"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:46
+msgid ""
+"Consider the energy function of the Hopfield network with Hebbian "
+"weights. Substituting the outer product weight formula into the energy "
+"definition yields:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:48
+#, python-brace-format
+msgid ""
+"\\begin{aligned}E(\\mathbf{x}) &= -\\frac{1}{2} \\sum_{i \\neq j} w_{ij} "
+"x_i x_j - \\sum_i b_i x_i \\\\&= -\\frac{1}{2N} \\sum_{\\mu=1}^P \\sum_{i"
+" \\neq j} \\xi_i^\\mu \\xi_j^\\mu x_i x_j - \\sum_i b_i x_i\\end{aligned}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:50
+#, python-brace-format
+msgid ""
+"For a state $\\mathbf{x}$ that exactly matches one of the stored "
+"patterns, say $\\boldsymbol{\\xi}^\\nu$, the double sum simplifies "
+"dramatically. Assuming the patterns are random and uncorrelated, the "
+"dominant contribution comes from the term $\\mu = \\nu$:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:52
+#, python-brace-format
+msgid ""
+"\\sum_{i \\neq j} \\xi_i^\\nu \\xi_j^\\nu \\xi_i^\\nu \\xi_j^\\nu = "
+"\\sum_{i \\neq j} (\\xi_i^\\nu)^2 (\\xi_j^\\nu)^2 = N(N-1) \\approx N^2"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:54
+msgid "Thus, the energy of a stored pattern is approximately:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:56
+#, python-brace-format
+msgid ""
+"E(\\boldsymbol{\\xi}^\\nu) \\approx -\\frac{1}{2N} \\cdot N^2 = "
+"-\\frac{N}{2}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:58
+msgid ""
+"This is a **deep energy minimum**. In contrast, a random state "
+"uncorrelated with any stored pattern will have energy near zero, because "
+"the cross terms average out."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:60
+msgid ""
+"The Hebbian rule therefore accomplishes the following geometric "
+"transformation:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:62
+msgid ""
+"**Basins of attraction** are carved into the energy landscape at the "
+"locations of the stored patterns."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:63
+msgid "The **depth** of each basin is proportional to $N$, the number of neurons."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:64
+msgid ""
+"The **walls** between basins are shaped by the crosstalk terms from other"
+" patterns."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:66
+msgid ""
+"In this precise sense, **Hebbian learning sculpts the energy landscape**."
+" Each memory contributes a quadratic depression centered at the pattern "
+"vector. The collective effect of all stored memories is an additive "
+"superposition of these depressions, resulting in a rugged landscape whose"
+" local minima correspond, ideally, to the stored memories."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:68
+msgid "The Mathematical Foundation for Hebb's Rule"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:69
+msgid ""
+"While Hebb's postulate is biologically motivated, the Boltzmann machine "
+"provides a rigorous mathematical justification for it. Recall from "
+"Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-"
+"theoretical-foundations-ebms-def.md) the gradient of the log-likelihood "
+"for a Boltzmann machine:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:71
+msgid ""
+"\\frac{\\partial f}{\\partial w_{ij}} = \\langle x_i x_j "
+"\\rangle_{\\text{data}} - \\langle x_i x_j \\rangle_{\\text{model}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:73
+msgid ""
+"This learning rule, often called the **contrastive Hebbian rule**, is a "
+"direct generalization of Hebb's original idea. The first term, $\\langle "
+"x_i x_j \\rangle_{\\text{data}}$, is purely **Hebbian**: it strengthens "
+"the connection between two units when they are co-active in the data. The"
+" second term, $\\langle x_i x_j \\rangle_{\\text{model}}$, is **anti-"
+"Hebbian**: it weakens connections that are spuriously co-active in the "
+"model's own generated fantasies."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:75
+msgid ""
+"As derived in Section [3.3 Contrastive Divergence](kpp-theoretical-"
+"foundations-ebms-cd.md), the stochastic gradient update for a Boltzmann "
+"machine can be written as:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:77
+#, python-brace-format
+msgid ""
+"\\Delta w_{ij} = \\eta \\left( X_i(\\omega) X_j(\\omega) - "
+"\\mathbb{E}_\\theta [X_i X_j] \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:79
+msgid ""
+"This formulation reveals that **the simple, local Hebbian update (\"fire "
+"together, wire together\") emerges naturally from the principled "
+"objective of maximizing the data likelihood**. In essence, the Boltzmann "
+"machine's learning algorithm proves that Hebb's rule is not just a "
+"biological heuristic but the optimal learning strategy when the goal is "
+"to match the model's equilibrium distribution to the data distribution."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:81
+msgid "Limitations of Hebbian Learning"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:82
+msgid ""
+"While elegant and biologically motivated, pure Hebbian learning has "
+"significant drawbacks when used in Hopfield networks:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:84
+msgid ""
+"**Spurious Minima**: The crosstalk between stored patterns creates "
+"unintended energy minima, mixture states and random valleys, that trap "
+"dynamics."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:85
+msgid ""
+"**Storage Capacity**: The number of patterns that can be reliably stored "
+"scales only linearly with $N$, with a proportionality constant of "
+"approximately 0.14. Beyond this, the network undergoes a phase transition"
+" to a spin-glass state where no patterns are retrievable."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:86
+msgid ""
+"**Catastrophic Forgetting**: Storing a new pattern modifies all weights "
+"and can destabilize previously stored memories. There is no mechanism to "
+"protect old memories while learning new ones."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:87
+msgid ""
+"**No Unlearning of Spurious States**: Once a spurious minimum is created,"
+" pure Hebbian learning offers no way to eliminate it. The rule only adds "
+"basins; it never fills them in.These limitations motivated the "
+"development of more sophisticated learning algorithms, including the "
+"**Boltzmann machine learning rule**, which uses a combination of Hebbian "
+"and anti-Hebbian updates guided by the difference between data-driven and"
+" model-driven correlations."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:89
+msgid "From Hebbian Storage to Probabilistic Learning"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:90
+msgid ""
+"The Boltzmann machine inherits the energy-based architecture of the "
+"Hopfield network and the idea that learning corresponds to modifying the "
+"energy landscape. However, it replaces the simple Hebbian storage "
+"prescription with a **principled probabilistic learning algorithm**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:92
+msgid ""
+"In a Boltzmann machine, the goal is not merely to store a set of patterns"
+" as attractors, but to make the equilibrium distribution of the network "
+"match the distribution of the observed data. The learning rule that "
+"achieves this is a generalization of Hebb's principle:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:94
+msgid ""
+"\\Delta w_{ij} \\propto \\langle x_i x_j \\rangle_{\\text{data}} - "
+"\\langle x_i x_j \\rangle_{\\text{model}}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:96
+msgid ""
+"This is sometimes called the **contrastive Hebbian rule** or **delta "
+"rule**. The first term, $\\langle x_i x_j \\rangle_{\\text{data}}$, is "
+"the average correlation between units $i$ and $j$when the visible units "
+"are clamped to data examples. This term is **Hebbian**: it strengthens "
+"connections between units that are co-active in the data."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:98
+msgid ""
+"The second term, $ \\langle x_i x_j \\rangle_{\\text{model}}$, is the "
+"average correlation when the network runs freely from its own equilibrium"
+" distribution. This term is **anti-Hebbian**: it weakens connections that"
+" are spuriously co-active in the model's own fantasies."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:100
+msgid ""
+"The difference between these two correlations drives the weight update. "
+"If the data shows a stronger correlation than the model's current "
+"distribution, the weight increases (lowering energy for that co-"
+"activation pattern). If the model overestimates the correlation, the "
+"weight decreases (raising energy for that pattern)."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:102
+msgid ""
+"This contrastive update dynamically sculpts the energy landscape to match"
+" the data distribution. It retains the local, Hebbian character of the "
+"update—only the activities of the connected neurons are required—while "
+"providing a principled way to avoid the pitfalls of pure Hebbian storage."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:104
+msgid "Sculpting Energy: A Unifying Metaphor"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:105
+msgid ""
+"The metaphor of **sculpting an energy landscape** provides a powerful "
+"unifying framework for understanding both Hopfield networks and Boltzmann"
+" machines:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:107
+#, python-brace-format
+msgid ""
+"**Weights as sculpting tools**: Each weight $w_{ij}$ acts like a chisel "
+"that can either carve a valley (if $w_{ij} > 0$) or raise a ridge (if "
+"$w_{ij} < 0$) along the diagonal where $x_i = x_j$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:108
+msgid ""
+"**Hebbian learning as an additive process**: Each stored pattern adds a "
+"new depression to the landscape, creating a new attractor basin."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:109
+msgid ""
+"**Boltzmann learning as a corrective process**: By comparing data "
+"correlations to model correlations, the learning algorithm not only adds "
+"basins where data lies but also **fills in spurious basins** that the "
+"model has invented."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:111
+msgid ""
+"This energy-centric view will recur throughout the remainder of this "
+"tutorial. The restricted Boltzmann machine (RBM), deep belief networks, "
+"and even modern energy-based models all share this **fundamental "
+"perspective**: learning is the process of shaping an energy function so "
+"that desirable configurations are assigned low energy and undesirable "
+"configurations are assigned high energy."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:113
+msgid "Summary"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:114
+msgid ""
+"**Hebbian learning** is a local, biologically plausible rule: *neurons "
+"that fire together, wire together*."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:115
+#, python-brace-format
+msgid ""
+"For binary patterns, the Hebbian weight update is $ \\Delta w_{ij} "
+"\\propto x_i x_j$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:116
+msgid ""
+"Storing multiple patterns corresponds to summing their outer products, "
+"resulting in a weight matrix that reflects pairwise correlations."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:117
+msgid ""
+"**Hebbian learning sculpts the energy landscape** by creating basins of "
+"attraction at the locations of stored patterns."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:118
+#, python-brace-format
+msgid ""
+"A single weight increase $\\Delta w_{ij} > 0$ lowers the energy of states"
+" where $x_i$ and $x_j$ agree and raises the energy where they disagree."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:119
+msgid ""
+"Pure Hebbian learning suffers from **spurious minima**, **limited "
+"capacity**, and **catastrophic forgetting**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:120
+msgid ""
+"The **Boltzmann machine learning rule** generalizes Hebb's principle by "
+"subtracting model correlations from data correlations, providing a "
+"principled way to shape the energy landscape to match a probability "
+"distribution."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-learning.md:121
+msgid ""
+"The metaphor of **energy sculpting** unifies the learning principles of "
+"Hopfield networks and Boltzmann machines, and extends to modern deep "
+"generative models."
+msgstr ""
+
+#~ msgid ""
+#~ "The previous section introduced the "
+#~ "Hopfield network as a dynamical system"
+#~ " whose state evolves to minimize an"
+#~ " energy function. The weights of the"
+#~ " network determine the shape of this"
+#~ " energy landscape, where the valleys "
+#~ "are located, how deep they are, "
+#~ "and how steep the walls between "
+#~ "them. The question then arises: <b>how"
+#~ " should these weights be set so "
+#~ "that the energy landscape encodes useful"
+#~ " memories?</b> The answer lies in a"
+#~ " remarkably simple and biologically "
+#~ "plausible principle proposed by Canadian "
+#~ "psychologist Donald Hebb in 1949. The"
+#~ " <b>Hebbian learning rule</b>, often "
+#~ "summarized as <em>\"neurons that fire "
+#~ "together, wire together,\"</em> provides a "
+#~ "local mechanism by which neural activity"
+#~ " sculpts the global energy function. "
+#~ "This section explores the mathematical "
+#~ "connection between Hebbian synaptic "
+#~ "modification and the shaping of an "
+#~ "energy landscape, establishing the "
+#~ "foundational learning principle that carries"
+#~ " forward into the Boltzmann machine."
+#~ msgstr ""
+
+#~ msgid "<b>The Hebbian Postulate</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In his seminal work \"<em>The "
+#~ "Organization of Behavior\"</em>, Hebb proposed"
+#~ " that:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In both formulations, the essential "
+#~ "principle is the same: <b>co-activation"
+#~ " strengthens the connection</b>."
+#~ msgstr ""
+
+#~ msgid "<b>Storing Multiple Patterns: The Outer Product Rule</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This learning rule is purely "
+#~ "<b>local</b>: to update $w_{ij}$, only "
+#~ "the activities of neurons $i$ and "
+#~ "$j$ are required. No global error "
+#~ "signal, no backpropagation of gradients, "
+#~ "no explicit knowledge of the energy "
+#~ "function is necessary. Yet, as we "
+#~ "shall see, this local rule has a"
+#~ " profound global effect on the energy"
+#~ " landscape."
+#~ msgstr ""
+
+#~ msgid "<b>Hebbian Learning as Energy Basin Creation</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This is a <b>deep energy minimum</b>."
+#~ " In contrast, a random state "
+#~ "uncorrelated with any stored pattern "
+#~ "will have energy near zero, because "
+#~ "the cross terms average out."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Basins of attraction</b> are carved "
+#~ "into the energy landscape at the "
+#~ "locations of the stored patterns."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>depth</b> of each basin is "
+#~ "proportional to $N$, the number of "
+#~ "neurons."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>walls</b> between basins are "
+#~ "shaped by the crosstalk terms from "
+#~ "other patterns."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In this precise sense, <b>Hebbian "
+#~ "learning sculpts the energy landscape</b>. "
+#~ "Each memory contributes a quadratic "
+#~ "depression centered at the pattern "
+#~ "vector. The collective effect of all "
+#~ "stored memories is an additive "
+#~ "superposition of these depressions, resulting"
+#~ " in a rugged landscape whose local"
+#~ " minima correspond, ideally, to the "
+#~ "stored memories."
+#~ msgstr ""
+
+#~ msgid "<b>The Mathematical Foundation for Hebb's Rule</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "While Hebb's postulate is biologically "
+#~ "motivated, the Boltzmann machine provides "
+#~ "a rigorous mathematical justification for "
+#~ "it. Recall from Section [3.1 Defining"
+#~ " the Objective: Low Energy for Real"
+#~ " Data](kpp-theoretical-foundations-ebms-"
+#~ "def) the gradient of the  log-"
+#~ "likelihood for a Boltzmann machine:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This learning rule, often called the "
+#~ "<b>contrastive Hebbian rule</b>, is a "
+#~ "direct generalization of Hebb's original "
+#~ "idea. The first term, $\\langle x_i "
+#~ "x_j \\rangle_{\\text{data}}$, is purely "
+#~ "<b>Hebbian</b>: it strengthens the connection"
+#~ " between two units when they are "
+#~ "co-active in the data. The second"
+#~ " term, $\\langle x_i x_j "
+#~ "\\rangle_{\\text{model}}$, is <b>anti-Hebbian</b>:"
+#~ " it weakens connections that are "
+#~ "spuriously co-active in the model's "
+#~ "own generated fantasies."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This formulation reveals that <b>the "
+#~ "simple, local Hebbian update (\"fire "
+#~ "together, wire together\") emerges naturally"
+#~ " from the principled objective of "
+#~ "maximizing the data likelihood</b>. In "
+#~ "essence, the Boltzmann machine's learning "
+#~ "algorithm proves that Hebb's rule is "
+#~ "not just a biological heuristic but "
+#~ "the optimal learning strategy when the"
+#~ " goal is to match the model's "
+#~ "equilibrium distribution to the data "
+#~ "distribution."
+#~ msgstr ""
+
+#~ msgid "<b>Limitations of Hebbian Learning</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Spurious Minima</b>: The crosstalk between"
+#~ " stored patterns creates unintended energy"
+#~ " minima, mixture states and random "
+#~ "valleys, that trap dynamics."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Storage Capacity</b>: The number of "
+#~ "patterns that can be reliably stored "
+#~ "scales only linearly with $N$, with "
+#~ "a proportionality constant of approximately"
+#~ " 0.14. Beyond this, the network "
+#~ "undergoes a phase transition to a "
+#~ "spin-glass state where no patterns "
+#~ "are retrievable."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Catastrophic Forgetting</b>: Storing a new"
+#~ " pattern modifies all weights and can"
+#~ " destabilize previously stored memories. "
+#~ "There is no mechanism to protect "
+#~ "old memories while learning new ones."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>No Unlearning of Spurious States</b>: "
+#~ "Once a spurious minimum is created, "
+#~ "pure Hebbian learning offers no way "
+#~ "to eliminate it. The rule only "
+#~ "adds basins; it never fills them "
+#~ "in.These limitations motivated the development"
+#~ " of more sophisticated learning algorithms,"
+#~ " including the <b>Boltzmann machine "
+#~ "learning rule</b>, which uses a "
+#~ "combination of Hebbian and anti-Hebbian"
+#~ " updates guided by the difference "
+#~ "between data-driven and model-driven "
+#~ "correlations."
+#~ msgstr ""
+
+#~ msgid "<b>From Hebbian Storage to Probabilistic Learning</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Boltzmann machine inherits the "
+#~ "energy-based architecture of the Hopfield"
+#~ " network and the idea that learning"
+#~ " corresponds to modifying the energy "
+#~ "landscape. However, it replaces the "
+#~ "simple Hebbian storage prescription with "
+#~ "a <b>principled probabilistic learning "
+#~ "algorithm</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This is sometimes called the "
+#~ "<b>contrastive Hebbian rule</b> or <b>delta"
+#~ " rule</b>. The first term, $\\langle "
+#~ "x_i x_j \\rangle_{\\text{data}}$, is the "
+#~ "average correlation between units $i$ "
+#~ "and $j$when the visible units are "
+#~ "clamped to data examples. This term "
+#~ "is <b>Hebbian</b>: it strengthens connections"
+#~ " between units that are co-active "
+#~ "in the data."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The second term, $ \\langle x_i "
+#~ "x_j \\rangle_{\\text{model}}$, is the average"
+#~ " correlation when the network runs "
+#~ "freely from its own equilibrium "
+#~ "distribution. This term is <b>anti-"
+#~ "Hebbian</b>: it weakens connections that "
+#~ "are spuriously co-active in the "
+#~ "model's own fantasies."
+#~ msgstr ""
+
+#~ msgid "<b>Sculpting Energy: A Unifying Metaphor</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The metaphor of <b>sculpting an energy"
+#~ " landscape</b> provides a powerful unifying"
+#~ " framework for understanding both Hopfield"
+#~ " networks and Boltzmann machines:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Weights as sculpting tools</b>: Each "
+#~ "weight $w_{ij}$ acts like a chisel "
+#~ "that can either carve a valley (if"
+#~ " $w_{ij} > 0$) or raise a ridge"
+#~ " (if $w_{ij} < 0$) along the "
+#~ "diagonal where $x_i = x_j$."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Hebbian learning as an additive "
+#~ "process</b>: Each stored pattern adds a"
+#~ " new depression to the landscape, "
+#~ "creating a new attractor basin."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Boltzmann learning as a corrective "
+#~ "process</b>: By comparing data correlations"
+#~ " to model correlations, the learning "
+#~ "algorithm not only adds basins where "
+#~ "data lies but also <b>fills in "
+#~ "spurious basins </b>that the model has"
+#~ " invented."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This energy-centric view will recur "
+#~ "throughout the remainder of this "
+#~ "tutorial. The restricted Boltzmann machine "
+#~ "(RBM), deep belief networks, and even"
+#~ " modern energy-based models all share"
+#~ " this <b>fundamental perspective</b>: learning"
+#~ " is the process of shaping an "
+#~ "energy function so that desirable "
+#~ "configurations are assigned low energy "
+#~ "and undesirable configurations are assigned"
+#~ " high energy."
+#~ msgstr ""
+
+#~ msgid "<b>Summary</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Hebbian learning</b> is a local, "
+#~ "biologically plausible rule: <em>neurons that"
+#~ " fire together, wire together</em>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Hebbian learning sculpts the energy "
+#~ "landscape</b> by creating basins of "
+#~ "attraction at the locations of stored"
+#~ " patterns."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Pure Hebbian learning suffers from "
+#~ "<b>spurious minima</b>, <b>limited capacity</b>, "
+#~ "and <b>catastrophic forgetting</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Boltzmann machine learning rule</b> "
+#~ "generalizes Hebb's principle by subtracting"
+#~ " model correlations from data correlations,"
+#~ " providing a principled way to shape"
+#~ " the energy landscape to match a "
+#~ "probability distribution."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The metaphor of <b>energy sculpting</b> "
+#~ "unifies the learning principles of "
+#~ "Hopfield networks and Boltzmann machines, "
+#~ "and extends to modern deep generative"
+#~ " models."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The previous section introduced the "
+#~ "Hopfield network as a dynamical system"
+#~ " whose state evolves to minimize an"
+#~ " energy function. The weights of the"
+#~ " network determine the shape of this"
+#~ " energy landscape, where the valleys "
+#~ "are located, how deep they are, "
+#~ "and how steep the walls between "
+#~ "them. The question then arises: **how"
+#~ " should these weights be set so "
+#~ "that the energy landscape encodes useful"
+#~ " memories?**> The answer lies in a"
+#~ " remarkably simple and biologically "
+#~ "plausible principle proposed by Canadian "
+#~ "psychologist Donald Hebb in 1949. The"
+#~ " **Hebbian learning rule**, often "
+#~ "summarized as *\"neurons that fire "
+#~ "together, wire together,\"* provides a "
+#~ "local mechanism by which neural activity"
+#~ " sculpts the global energy function. "
+#~ "This section explores the mathematical "
+#~ "connection between Hebbian synaptic "
+#~ "modification and the shaping of an "
+#~ "energy landscape, establishing the "
+#~ "foundational learning principle that carries"
+#~ " forward into the Boltzmann machine."
+#~ msgstr ""
+
+#~ msgid "\\Delta w_{ij} \\propto \\xi_i \\xi_j"
+#~ msgstr ""
+
+#~ msgid "\\Delta w_{ij} \\propto x_i x_j"
+#~ msgstr ""
+
+#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\mathbf{W} = \\frac{1}{N} \\sum_{\\mu=1}^P "
+#~ "\\boldsymbol{\\xi}^\\mu (\\boldsymbol{\\xi}^\\mu)^\\top -"
+#~ " \\frac{P}{N} \\mathbf{I}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\begin{aligned}E(\\mathbf{x}) &= -\\frac{1}{2} "
+#~ "\\sum_{i \\neq j} w_{ij} x_i x_j -"
+#~ " \\sum_i b_i x_i \\\\&= -\\frac{1}{2N} "
+#~ "\\sum_{\\mu=1}^P \\sum_{i \\neq j} \\xi_i^\\mu"
+#~ " \\xi_j^\\mu x_i x_j - \\sum_i b_i"
+#~ " x_i\\end{aligned}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\sum_{i \\neq j} \\xi_i^\\nu \\xi_j^\\nu "
+#~ "\\xi_i^\\nu \\xi_j^\\nu = \\sum_{i \\neq "
+#~ "j} (\\xi_i^\\nu)^2 (\\xi_j^\\nu)^2 = N(N-1)"
+#~ " \\approx N^2"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "E(\\boldsymbol{\\xi}^\\nu) \\approx -\\frac{1}{2N} "
+#~ "\\cdot N^2 = -\\frac{N}{2}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\frac{\\partial f}{\\partial w_{ij}} = "
+#~ "\\langle x_i x_j \\rangle_{\\text{data}} - "
+#~ "\\langle x_i x_j \\rangle_{\\text{model}}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\Delta w_{ij} = \\eta \\left( "
+#~ "X_i(\\omega) X_j(\\omega) - \\mathbb{E}_\\theta "
+#~ "[X_i X_j] \\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\Delta w_{ij} \\propto \\langle x_i x_j"
+#~ " \\rangle_{\\text{data}} - \\langle x_i x_j"
+#~ " \\rangle_{\\text{model}}"
+#~ msgstr ""
+
+#~ msgid "::"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "While Hebb's postulate is biologically "
+#~ "motivated, the Boltzmann machine provides "
+#~ "a rigorous mathematical justification for "
+#~ "it. Recall from Section [3.1 Defining"
+#~ " the Objective: Low Energy for Real"
+#~ " Data](kpp-"
+#~ "theoretical-foundations-ebms-def) the "
+#~ "gradient of the log-likelihood for "
+#~ "a Boltzmann machine:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "As derived in Section [3.3 Contrastive"
+#~ " Divergence](kpp-"
+#~ "theoretical-foundations-ebms-cd), the "
+#~ "stochastic gradient update for a "
+#~ "Boltzmann machine can be written as:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "While Hebb's postulate is biologically "
+#~ "motivated, the Boltzmann machine provides "
+#~ "a rigorous mathematical justification for "
+#~ "it. Recall from Section [3.1 Defining"
+#~ " the Objective: Low Energy for Real"
+#~ " Data](kpp-theoretical-foundations-ebms-"
+#~ "def) the gradient of the log-"
+#~ "likelihood for a Boltzmann machine:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "As derived in Section [3.3 Contrastive"
+#~ " Divergence](kpp-theoretical-foundations-ebms-"
+#~ "cd), the stochastic gradient update for"
+#~ " a Boltzmann machine can be written"
+#~ " as:"
+#~ msgstr ""
+

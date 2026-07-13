@@ -1,0 +1,975 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:10
+msgid "2.2 Recurrent Networks and Content-Addressable Memory"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:12
+msgid ""
+"The perceptron exemplifies **feedforward** computation: information flows"
+" unidirectionally from input to output, and the network's state is "
+"entirely determined by the current input. This architecture is well-"
+"suited for pattern classification and function approximation, but it is "
+"fundamentally incapable of modeling temporal dependencies or exhibiting "
+"persistent internal states. To understand the architectural lineage that "
+"culminates in the Boltzmann machine, we must introduce **recurrent neural"
+" networks,** networks in which connections form directed cycles, allowing"
+" information to persist and dynamics to unfold over time. This section "
+"focuses on the recurrent architecture that directly precedes the "
+"Boltzmann machine, while the previous section 2.1 established the "
+"fundamental limitations of simple feedforward networks."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:15
+msgid "From Feedforward to Recurrence"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:16
+msgid ""
+"A recurrent neural network (RNN) differs from a feedforward network in a "
+"single, crucial respect: at least some of its connections form **feedback"
+" loops**. The output of a neuron at one time step can influence its own "
+"input, or the input of neurons earlier in the processing chain at "
+"subsequent time steps. This architectural difference has profound "
+"consequences:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:18
+msgid ""
+"**State persistence**: The network maintains an internal state that "
+"evolves over time, enabling it to process sequences of inputs or to "
+"settle into stable patterns even in the absence of external input."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:19
+msgid ""
+"**Dynamical systems**: An RNN is best understood not as a static function"
+" approximator but as a **dynamical system** whose state trajectory is "
+"governed by its weights and the initial conditions."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:20
+msgid ""
+"**Memory**: Recurrence provides a form of **short-term memory** that "
+"extends beyond the single feedforward pass."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:22
+msgid "The Hopfield Network: A Prototypical Recurrent Architecture"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:23
+msgid ""
+"The **Hopfield network**, introduced by John Hopfield in 1982, is the "
+"canonical example of a recurrent network designed for **associative "
+"memory**. Its elegant formulation and deep connection to statistical "
+"physics make it the direct conceptual precursor to the Boltzmann machine."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:25
+#, python-brace-format
+msgid ""
+"A Hopfield network consists of $N$ binary units, each taking values in "
+"$\\{-1, +1\\}$ (or equivalently $\\{0, 1\\}$). Every unit is connected to"
+" every other unit, forming a **fully connected recurrent graph**. The "
+"connections are **symmetric**:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:27
+#, python-brace-format
+msgid "w_{ij} = w_{ji},\\quad \\forall i, j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:29
+#, python-brace-format
+msgid "and there are no self-connections: $w_{ii} = 0$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:31
+msgid ""
+"The network operates in discrete time. At each time step, a single unit "
+"is selected at random (or according to a fixed schedule) and its state is"
+" updated according to a deterministic rule:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:33
+#, python-brace-format
+msgid ""
+"x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i "
+"\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:35
+#, python-brace-format
+msgid ""
+"This **asynchronous update** dynamics continues until the network reaches"
+" a **fixed point,** a state $\\mathbf{x}$ that remains unchanged under "
+"the update rule. The symmetry of the weight matrix guarantees that such "
+"fixed points exist and that the dynamics will converge to one from any "
+"initial state"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:37
+msgid "Energy Landscape and Convergence"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:38
+msgid ""
+"The convergence of the Hopfield network is guaranteed by the existence of"
+" a **Lyapunov function** (or energy function) that decreases "
+"monotonically with each state update. For the Hopfield network, this "
+"energy is defined as:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:40
+#, python-brace-format
+msgid ""
+"E(\\mathbf{x}) = -\\frac{1}{2} \\sum_{i \\neq j} w_{ij} x_i x_j - \\sum_i"
+" b_i x_i"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:42
+msgid "or, in matrix form:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:44
+#, python-brace-format
+msgid ""
+"E(\\mathbf{x}) = -\\frac{1}{2} \\mathbf{x}^\\top \\mathbf{W} \\mathbf{x} "
+"- \\mathbf{b}^\\top \\mathbf{x}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:46
+msgid ""
+"To verify that energy never increases, consider a flip of unit $i$from "
+"$x_i$ to $x_i' = -x_i$. The change in energy is:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:48
+#, python-brace-format
+msgid ""
+"\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = (x_i - x_i')\\left( "
+"\\sum_{j \\neq i} w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:50
+#, python-brace-format
+msgid ""
+"If $x_i'$ is chosen to be $ \\text{sign}(\\sum w_{ij} x_j + b_i)$, then "
+"the term in parentheses has the same sign as $x_i'$. Since $x_i$ has the "
+"opposite sign, the product $(x_i - x_i')$ is non-zero and opposite in "
+"sign to the parenthesized term, ensuring $\\Delta E \\leq 0$. Energy "
+"strictly decreases unless the unit is already aligned with its input."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:52
+msgid ""
+"Because the energy is bounded below (for finite weights and binary "
+"units), the network must eventually reach a **local minimum** of the "
+"energy function, where no single-unit flip can further lower the energy. "
+"These local minima are the **attractors** of the dynamic, which states "
+"toward which nearby initial configurations evolve."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:54
+msgid "Storing Memories as Attractors"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:55
+msgid ""
+"The Hopfield network is not merely a dynamical curiosity; it is a model "
+"of **content-addressable memory**. The goal is to store a set of desired "
+"patterns $\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
+"\\boldsymbol{\\xi}^P\\}$ as attractors of network dynamics. When "
+"presented with a corrupted or partial version of a stored pattern as the "
+"initial state, the network's deterministic descent down the energy "
+"landscape will restore the complete, original memory."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:57
+#, python-brace-format
+msgid ""
+"The **Hebbian learning rule** provides a biologically inspired "
+"prescription for setting weights. For binary $ \\{-1, +1\\}$patterns, the"
+" weight between units $i$ and $j$ is set to:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:59
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:61
+msgid ""
+"This rule is local, incremental, and plausible as a synaptic plasticity "
+"mechanism. Each stored pattern contributes $+1/N$ if units $i$ and $j$ "
+"have the same sign in that pattern, and $-1/N$ if they differ. The "
+"weights thus reflect the average correlation between units across the set"
+" of memories."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:63
+msgid "Retrieval Dynamics: Pattern Completion and Error Correction"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:64
+#, python-brace-format
+msgid ""
+"Consider a stored pattern $\\boldsymbol{\\xi}^\\mu$. Under the Hebbian "
+"weight matrix, the input to unit $i$ when the network is in state "
+"$\\boldsymbol{\\xi}^\\mu$ is:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:66
+#, python-brace-format
+msgid ""
+"\\sum_{j \\neq i} w_{ij} \\xi_j^\\mu = \\frac{1}{N} \\sum_{j \\neq i} "
+"\\sum_{\\nu=1}^P \\xi_i^\\nu \\xi_j^\\nu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:68
+msgid ""
+"This sum decomposes into a **signal** term (when $\\nu = \\mu$) and a "
+"**noise** or **crosstalk** term (when $\\nu \\neq \\mu$):"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:70
+#, python-brace-format
+msgid ""
+"\\text{Signal} = \\frac{1}{N} \\sum_{j \\neq i} \\xi_i^\\mu "
+"(\\xi_j^\\mu)^2 = \\frac{N-1}{N} \\xi_i^\\mu \\approx \\xi_i^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:72
+#, python-brace-format
+msgid ""
+"\\text{Noise} = \\frac{1}{N} \\sum_{\\nu \\neq \\mu} \\sum_{j \\neq i} "
+"\\xi_i^\\nu \\xi_j^\\nu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:74
+#, python-brace-format
+msgid ""
+"If the stored patterns are random and uncorrelated, the noise term is "
+"approximately Gaussian with zero mean and variance proportional to $P/N$."
+" As long as the number of stored patterns $P$ is small compared to $N$, "
+"the signal dominates, and the pattern $\\boldsymbol{\\xi}^\\mu$ is a "
+"stable fixed point."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:76
+#, python-brace-format
+msgid ""
+"When the initial state is a **corrupted** version of "
+"$\\boldsymbol{\\xi}^\\mu$, say, with a fraction of bits flipped, the "
+"network dynamics drive the state back toward the original pattern. Each "
+"unit \"votes\" according to its connections, and the collective influence"
+" of the correctly recalled bits overwhelms the errors. This is **pattern "
+"completion**: the network fills in missing or noisy information by "
+"descending the energy landscape toward the nearest memory attractor."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:78
+msgid "Content-Addressable vs. Address-Based Memory"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:79
+msgid ""
+"Conventional computer memory is **address-based**: to retrieve an item, "
+"you must supply its exact memory address (or a pointer to it). If the "
+"address is corrupted or unknown, retrieval is impossible. Content-"
+"addressable memory, in contrast, allows retrieval based on **partial or "
+"approximate content**. You provide a fragment of the desired memory, and "
+"the system returns the complete item that best matches the fragment."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:81
+msgid ""
+"The Hopfield network implements content-addressable memory in a "
+"distributed, fault-tolerant manner:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:83
+msgid ""
+"**Distributed representation**: Each memory is stored across many "
+"synaptic weights, and each weight contributes to the storage of many "
+"memories."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:84
+msgid ""
+"**Graceful degradation**: As more memories are stored, retrieval becomes "
+"noisier but does not fail catastrophically until a critical capacity is "
+"exceeded."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:85
+msgid ""
+"**Parallel processing**: All units update concurrently, allowing fast "
+"retrieval times that are independent of the number of stored memories."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:87
+msgid "Capacity Limitations and Spurious Attractors"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:88
+msgid ""
+"The Hopfield network's capacity is not infinite. As the number of stored "
+"patterns $P$ increases, the crosstalk noise grows. Beyond a critical "
+"**storage capacity** of approximately $ \\alpha_c \\approx 0.14 N$ (for "
+"random, unbiased patterns), the memories are no longer stable. The "
+"network undergoes a phase transition in which the intended attractors "
+"merge or disappear, and retrieval error rises abruptly."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:90
+msgid ""
+"Moreover, the Hebbian learning rule creates **spurious attractors,** "
+"stable states that do not correspond to any stored memory. These arise "
+"from:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:92
+msgid ""
+"**Mixture states**: Linear combinations of an odd number of stored "
+"patterns."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:93
+msgid ""
+"**Spin-reversed states**: The global negation of any stored pattern is "
+"also an attractor."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:94
+msgid ""
+"**Random valleys**: Intrinsic local minima of the disordered energy "
+"landscape."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:96
+msgid ""
+"These spurious attractors are the price of distributed, content-"
+"addressable storage. They limit the practical capacity of the network and"
+" can trap dynamics in unintended states."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:98
+msgid "From Hopfield to Boltzmann: The Missing Ingredient"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:99
+msgid ""
+"The Hopfield network demonstrates that recurrent, symmetric networks can "
+"function as powerful associative memories. Yet it suffers from a critical"
+" limitation as a **generative model** of data: its dynamics are strictly "
+"deterministic and converge to the *nearest* local minimum, regardless of "
+"whether that minimum is a true memory, a spurious attractor, or merely a "
+"shallow basin in the energy landscape."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:101
+msgid ""
+"The **Boltzmann machine** addresses this limitation by introducing "
+"**stochasticity** into the state updates, as previewed in Section [1.3 "
+"The Need for Noise: Escaping Spurious Minima](kpp-theoretical-"
+"foundations-stat-noise.md). Instead of deterministic thresholding, units "
+"update according to a probabilistic rule:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:103
+msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:105
+msgid ""
+"This single modification transforms the Hopfield network from a "
+"deterministic content-addressable memory into a **probabilistic "
+"generative model** capable of:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:107
+msgid ""
+"**Sampling from a distribution**: The network no longer converges to a "
+"single fixed point but generates samples from the equilibrium Boltzmann "
+"distribution."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:108
+msgid ""
+"**Exploring multiple modes**: Thermal noise allows the network to visit "
+"different attractor basins, capturing the multimodal structure of complex"
+" data."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:109
+msgid ""
+"**Learning by maximum likelihood**: The probabilistic formulation "
+"provides a principled objective function (maximizing the likelihood of "
+"observed data) and a learning algorithm based on contrasting clamped and "
+"free-running statistics."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:111
+msgid ""
+"Effectively, the Boltzmann machine allows the system to sample from a "
+"canonical ensemble (see Section [1.2 The Boltzmann Distribution and "
+"Equilibrium](kpp-theoretical-foundations-stat-boltzmann.md)) rather than "
+"simply descending into the nearest deterministic fixed point."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:113
+msgid ""
+"The connection is profound: the Hopfield network defines the **energy "
+"landscape**, while the Boltzmann machine defines the **probability "
+"distribution** over that landscape. The two are intimately related by the"
+" Boltzmann distribution:"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:115
+#, python-brace-format
+msgid "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{x}) / T\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:117
+msgid ""
+"As $T \\to 0$, the Boltzmann machine reduces to the deterministic "
+"Hopfield network. At finite temperatures, it becomes a flexible, "
+"probabilistic model of data."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:119
+msgid "Summary"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:120
+msgid ""
+"**Recurrent neural networks** introduce feedback loops, enabling "
+"persistent internal states and dynamical behavior over time."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:121
+msgid ""
+"The **Hopfield network** is a fully connected recurrent network with "
+"symmetric weights, designed for **content-addressable memory**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:122
+msgid ""
+"The network's dynamics minimize an **energy function**, guaranteeing "
+"convergence to **local minima** that serve as attractors for stored "
+"memories."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:123
+msgid ""
+"The **Hebbian learning rule** stores patterns as correlations in the "
+"weight matrix, enabling pattern completion and error correction."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:124
+msgid ""
+"**Spurious attractors** and limited **storage capacity** are intrinsic "
+"drawbacks of the Hopfield model."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:125
+msgid ""
+"The **Boltzmann machine** extends the Hopfield network by replacing "
+"deterministic updates with **stochastic sampling**, transforming an "
+"associative memory into a **probabilistic generative model**."
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:126
+msgid ""
+"The Hopfield energy function becomes the basis for the **Boltzmann "
+"distribution**, linking deterministic attractor dynamics to probabilistic"
+" inference."
+msgstr ""
+
+#~ msgid ""
+#~ "The perceptron exemplifies <b>feedforward</b> "
+#~ "computation: information flows unidirectionally "
+#~ "from input to output, and the "
+#~ "network's state is entirely determined "
+#~ "by the current input. This architecture"
+#~ " is well-suited for pattern "
+#~ "classification and function approximation, but"
+#~ " it is fundamentally incapable of "
+#~ "modeling temporal dependencies or exhibiting"
+#~ " persistent internal states. To understand"
+#~ " the architectural lineage that culminates"
+#~ " in the Boltzmann machine, we must"
+#~ " introduce <b>recurrent neural networks, "
+#~ "</b>networks in which connections form "
+#~ "directed cycles, allowing information to "
+#~ "persist and dynamics to unfold over "
+#~ "time. This section focuses on the "
+#~ "recurrent architecture that directly precedes"
+#~ " the Boltzmann machine, while the "
+#~ "previous section 2.1 established the "
+#~ "fundamental limitations of simple feedforward"
+#~ " networks."
+#~ msgstr ""
+
+#~ msgid "<b>From Feedforward to Recurrence</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A recurrent neural network (RNN) differs"
+#~ " from a feedforward network in a "
+#~ "single, crucial respect: at least some"
+#~ " of its connections form <b>feedback "
+#~ "loops</b>. The output of a neuron "
+#~ "at one time step can influence its"
+#~ " own input, or the input of "
+#~ "neurons earlier in the processing chain"
+#~ " at subsequent time steps. This "
+#~ "architectural difference has profound "
+#~ "consequences:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>State persistence</b>: The network "
+#~ "maintains an internal state that evolves"
+#~ " over time, enabling it to process"
+#~ " sequences of inputs or to settle "
+#~ "into stable patterns even in the "
+#~ "absence of external input."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Dynamical systems</b>: An RNN is best"
+#~ " understood not as a static function"
+#~ " approximator but as a <b>dynamical "
+#~ "system</b> whose state trajectory is "
+#~ "governed by its weights and the "
+#~ "initial conditions."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Memory</b>: Recurrence provides a form "
+#~ "of <b>short-term memory</b> that extends"
+#~ " beyond the single feedforward pass."
+#~ msgstr ""
+
+#~ msgid "<b>The Hopfield Network: A Prototypical Recurrent Architecture</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Hopfield network</b>, introduced by "
+#~ "John Hopfield in 1982, is the "
+#~ "canonical example of a recurrent network"
+#~ " designed for <b>associative memory</b>. "
+#~ "Its elegant formulation and deep "
+#~ "connection to statistical physics make "
+#~ "it the direct conceptual precursor to"
+#~ " the Boltzmann machine."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A Hopfield network consists of $N$ "
+#~ "binary units, each taking values in "
+#~ "$\\{-1, +1\\}$ (or equivalently $\\{0, "
+#~ "1\\}$). Every unit is connected to "
+#~ "every other unit, forming a <b>fully "
+#~ "connected recurrent graph</b>. The connections"
+#~ " are <b>symmetric</b>:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This <b>asynchronous update</b> dynamics "
+#~ "continues until the network reaches a"
+#~ " <b>fixed point, </b>a state $\\mathbf{x}$"
+#~ " that remains unchanged under the "
+#~ "update rule. The symmetry of the "
+#~ "weight matrix guarantees that such fixed"
+#~ " points exist and that the dynamics"
+#~ " will converge to one from any "
+#~ "initial state"
+#~ msgstr ""
+
+#~ msgid "<b>Energy Landscape and Convergence</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The convergence of the Hopfield network"
+#~ " is guaranteed by the existence of"
+#~ " a <b>Lyapunov function</b> (or energy "
+#~ "function) that decreases monotonically with"
+#~ " each state update. For the Hopfield"
+#~ " network, this energy is defined as:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Because the energy is bounded below "
+#~ "(for finite weights and binary units),"
+#~ " the network must eventually reach a"
+#~ " <b>local minimum</b> of the energy "
+#~ "function, where no single-unit flip "
+#~ "can further lower the energy. These "
+#~ "local minima are the <b>attractors</b> "
+#~ "of the dynamic, which states toward "
+#~ "which nearby initial configurations evolve."
+#~ msgstr ""
+
+#~ msgid "<b>Storing Memories as Attractors</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Hopfield network is not merely "
+#~ "a dynamical curiosity; it is a "
+#~ "model of <b>content-addressable memory</b>."
+#~ " The goal is to store a set "
+#~ "of desired patterns $\\{\\boldsymbol{\\xi}^1, "
+#~ "\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$"
+#~ " as attractors of network dynamics. "
+#~ "When presented with a corrupted or "
+#~ "partial version of a stored pattern "
+#~ "as the initial state, the network's "
+#~ "deterministic descent down the energy "
+#~ "landscape will restore the complete, "
+#~ "original memory."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Hebbian learning rule</b> provides "
+#~ "a biologically inspired prescription for "
+#~ "setting weights. For binary $ \\{-1, "
+#~ "+1\\}$patterns, the weight between units "
+#~ "$i$ and $j$ is set to:"
+#~ msgstr ""
+
+#~ msgid "<b>Retrieval Dynamics: Pattern Completion and Error Correction</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This sum decomposes into a <b>signal</b>"
+#~ " term (when $\\nu = \\mu$) and "
+#~ "a <b>noise</b> or <b>crosstalk</b> term "
+#~ "(when $\\nu \\neq \\mu$):"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "When the initial state is a "
+#~ "<b>corrupted </b>version of "
+#~ "$\\boldsymbol{\\xi}^\\mu$, say, with a "
+#~ "fraction of bits flipped, the network"
+#~ " dynamics drive the state back toward"
+#~ " the original pattern. Each unit "
+#~ "\"votes\" according to its connections, "
+#~ "and the collective influence of the "
+#~ "correctly recalled bits overwhelms the "
+#~ "errors. This is <b>pattern completion</b>: "
+#~ "the network fills in missing or "
+#~ "noisy information by descending the "
+#~ "energy landscape toward the nearest "
+#~ "memory attractor."
+#~ msgstr ""
+
+#~ msgid "<b>Content-Addressable vs. Address-Based Memory</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Conventional computer memory is <b>address-"
+#~ "based</b>: to retrieve an item, you "
+#~ "must supply its exact memory address "
+#~ "(or a pointer to it). If the "
+#~ "address is corrupted or unknown, "
+#~ "retrieval is impossible. Content-addressable"
+#~ " memory, in contrast, allows retrieval "
+#~ "based on <b>partial or approximate "
+#~ "content</b>. You provide a fragment of"
+#~ " the desired memory, and the system"
+#~ " returns the complete item that best"
+#~ " matches the fragment."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Distributed representation</b>: Each memory "
+#~ "is stored across many synaptic weights,"
+#~ " and each weight contributes to the"
+#~ " storage of many memories."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Graceful degradation</b>: As more memories"
+#~ " are stored, retrieval becomes noisier "
+#~ "but does not fail catastrophically until"
+#~ " a critical capacity is exceeded."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Parallel processing</b>: All units update"
+#~ " concurrently, allowing fast retrieval "
+#~ "times that are independent of the "
+#~ "number of stored memories."
+#~ msgstr ""
+
+#~ msgid "<b>Capacity Limitations and Spurious Attractors</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Hopfield network's capacity is not"
+#~ " infinite. As the number of stored"
+#~ " patterns $P$ increases, the crosstalk "
+#~ "noise grows. Beyond a critical "
+#~ "<b>storage capacity</b> of approximately $ "
+#~ "\\alpha_c \\approx 0.14 N$ (for random,"
+#~ " unbiased patterns), the memories are "
+#~ "no longer stable. The network undergoes"
+#~ " a phase transition in which the "
+#~ "intended attractors merge or disappear, "
+#~ "and retrieval error rises abruptly."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Moreover, the Hebbian learning rule "
+#~ "creates <b>spurious attractors, </b>stable "
+#~ "states that do not correspond to "
+#~ "any stored memory. These arise from:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Mixture states</b>: Linear combinations of"
+#~ " an odd number of stored patterns."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Spin-reversed states</b>: The global "
+#~ "negation of any stored pattern is "
+#~ "also an attractor."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Random valleys</b>: Intrinsic local minima"
+#~ " of the disordered energy landscape."
+#~ msgstr ""
+
+#~ msgid "<b>From Hopfield to Boltzmann: The Missing Ingredient</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Hopfield network demonstrates that "
+#~ "recurrent, symmetric networks can function "
+#~ "as powerful associative memories. Yet it"
+#~ " suffers from a critical limitation "
+#~ "as a <b>generative model</b> of data:"
+#~ " its dynamics are strictly deterministic"
+#~ " and converge to the <em>nearest</em> "
+#~ "local minimum, regardless of whether "
+#~ "that minimum is a true memory, a"
+#~ " spurious attractor, or merely a "
+#~ "shallow basin in the energy landscape."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Boltzmann machine</b> addresses this"
+#~ " limitation by introducing <b>stochasticity</b>"
+#~ " into the state updates, as previewed"
+#~ " in Section [1.3 The Need for "
+#~ "Noise: Escaping Spurious Minima](/kpp-"
+#~ "theoretical-foundations\\kpp-theoretical-"
+#~ "foundations-stat-noise). Instead of "
+#~ "deterministic thresholding, units update "
+#~ "according to a probabilistic rule:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This single modification transforms the "
+#~ "Hopfield network from a deterministic "
+#~ "content-addressable memory into a "
+#~ "<b>probabilistic generative model</b> capable "
+#~ "of:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Sampling from a distribution</b>: The "
+#~ "network no longer converges to a "
+#~ "single fixed point but generates samples"
+#~ " from the equilibrium Boltzmann "
+#~ "distribution."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Exploring multiple modes</b>: Thermal noise"
+#~ " allows the network to visit "
+#~ "different attractor basins, capturing the "
+#~ "multimodal structure of complex data."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Learning by maximum likelihood</b>: The "
+#~ "probabilistic formulation provides a "
+#~ "principled objective function (maximizing the"
+#~ " likelihood of observed data) and a"
+#~ " learning algorithm based on contrasting"
+#~ " clamped and free-running statistics."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The connection is profound: the Hopfield"
+#~ " network defines the <b>energy "
+#~ "landscape</b>, while the Boltzmann machine "
+#~ "defines the <b>probability distribution</b> "
+#~ "over that landscape. The two are "
+#~ "intimately related by the Boltzmann "
+#~ "distribution:"
+#~ msgstr ""
+
+#~ msgid "<b>Summary</b>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Recurrent neural networks</b> introduce "
+#~ "feedback loops, enabling persistent internal"
+#~ " states and dynamical behavior over "
+#~ "time."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Hopfield network</b> is a fully"
+#~ " connected recurrent network with symmetric"
+#~ " weights, designed for <b>content-"
+#~ "addressable memory</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The network's dynamics minimize an "
+#~ "<b>energy function</b>, guaranteeing convergence "
+#~ "to <b>local minima </b> that serve "
+#~ "as attractors for stored memories."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Hebbian learning rule</b> stores "
+#~ "patterns as correlations in the weight"
+#~ " matrix, enabling pattern completion and"
+#~ " error correction."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "<b>Spurious attractors</b> and limited "
+#~ "<b>storage capacity</b> are intrinsic "
+#~ "drawbacks of the Hopfield model."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The <b>Boltzmann machine</b> extends the "
+#~ "Hopfield network by replacing deterministic"
+#~ " updates with <b>stochastic sampling</b>, "
+#~ "transforming an associative memory into "
+#~ "a <b>probabilistic generative model</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The Hopfield energy function becomes the"
+#~ " basis for the <b>Boltzmann "
+#~ "distribution</b>, linking deterministic attractor"
+#~ " dynamics to probabilistic inference."
+#~ msgstr ""
+
+#~ msgid "w_{ij} = w_{ji},\\quad \\forall i, j"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "x_i \\leftarrow \\text{sign}\\left( \\sum_{j "
+#~ "\\neq i} w_{ij} x_j + b_i \\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "E(\\mathbf{x}) = -\\frac{1}{2} \\sum_{i \\neq"
+#~ " j} w_{ij} x_i x_j - \\sum_i "
+#~ "b_i x_i"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "E(\\mathbf{x}) = -\\frac{1}{2} \\mathbf{x}^\\top "
+#~ "\\mathbf{W} \\mathbf{x} - \\mathbf{b}^\\top "
+#~ "\\mathbf{x}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\Delta E = E(\\mathbf{x}') - "
+#~ "E(\\mathbf{x}) = (x_i - x_i')\\left( "
+#~ "\\sum_{j \\neq i} w_{ij} x_j + b_i"
+#~ " \\right)"
+#~ msgstr ""
+
+#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\sum_{j \\neq i} w_{ij} \\xi_j^\\mu ="
+#~ " \\frac{1}{N} \\sum_{j \\neq i} "
+#~ "\\sum_{\\nu=1}^P \\xi_i^\\nu \\xi_j^\\nu \\xi_j^\\mu"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\text{Signal} = \\frac{1}{N} \\sum_{j \\neq"
+#~ " i} \\xi_i^\\mu (\\xi_j^\\mu)^2 = "
+#~ "\\frac{N-1}{N} \\xi_i^\\mu \\approx \\xi_i^\\mu"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\text{Noise} = \\frac{1}{N} \\sum_{\\nu \\neq"
+#~ " \\mu} \\sum_{j \\neq i} \\xi_i^\\nu "
+#~ "\\xi_j^\\nu \\xi_j^\\mu"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P(x_i = 1) = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+#~ msgstr ""
+
+#~ msgid "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{x}) / T\\right)"
+#~ msgstr ""
+
+#~ msgid "::"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The **Boltzmann machine** addresses this "
+#~ "limitation by introducing **stochasticity** "
+#~ "into the state updates, as previewed "
+#~ "in Section [1.3 The Need for "
+#~ "Noise: Escaping Spurious Minima](/kpp-"
+#~ "theoretical-foundationskpp-theoretical-foundations-"
+#~ "stat-noise). Instead of deterministic "
+#~ "thresholding, units update according to "
+#~ "a probabilistic rule:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The **Boltzmann machine** addresses this "
+#~ "limitation by introducing **stochasticity** "
+#~ "into the state updates, as previewed "
+#~ "in Section [1.3 The Need for "
+#~ "Noise: Escaping Spurious Minima](kpp-"
+#~ "theoretical-foundations-stat-noise). Instead "
+#~ "of deterministic thresholding, units update"
+#~ " according to a probabilistic rule:"
+#~ msgstr ""
+

@@ -32,13 +32,21 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinxcontrib.jquery',
-    'sphinx.ext.imgmath',
+    #'sphinx.ext.imgmath',
+    #'sphinx.ext.mathjax',
+    'sphinxcontrib.katex',
     'myst_parser',
     'sphinxcontrib.mermaid'
 ]
+myst_enable_extensions = [
+    "dollarmath",
+    "amsmath",
+]
+katex_prerender = True
+
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.md', 'source/getting_started/start.rst']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'README.md', 'source/getting_started/start.md']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

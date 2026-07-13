@@ -8,14 +8,12 @@ from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
-
 # 添加licence认证
 # print("User ID:", os.getenv("USER_ID"), "SDK Code:", os.getenv("SDK_CODE"))
 # kw.license.init(os.getenv("USER_ID"), os.getenv("SDK_CODE"))
 
 
 if __name__ == "__main__":
-    USE_QPU = False
     NUM_READS = 1
     SAMPLE_SIZE = 1
     USE_CIM = False

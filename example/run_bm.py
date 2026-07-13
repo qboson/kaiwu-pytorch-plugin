@@ -8,7 +8,6 @@ from kaiwu.torch_plugin import BoltzmannMachine
 
 
 if __name__ == "__main__":
-    USE_QPU = False
     SAMPLE_SIZE = 5
 
     sampler = SimulatedAnnealingOptimizer(alpha=0.99, size_limit=5)

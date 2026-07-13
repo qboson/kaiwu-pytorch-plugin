@@ -4,39 +4,36 @@
 # Plugin package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-07 16:34+0800\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-10 18:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
-"Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
-#: ../../source/modules/kaiwu.torch_plugin.rst:3
+#: ../../source/modules/kaiwu.torch_plugin.md:1
 msgid "模块手册"
 msgstr "Module contents"
 
-#: ../../source/modules/kaiwu.torch_plugin.rst:6
+#: ../../source/modules/kaiwu.torch_plugin.md:3
 msgid "Module contents"
-msgstr ""
+msgstr "Module contents"
 
 #: kaiwu.torch_plugin:1 of
-msgid "玻尔兹曼机"
-msgstr "Boltzmann machine"
+msgid "Kaiwu PyTorch plugin public API."
+msgstr ""
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1
 #: of
 msgid "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
-msgstr "based :py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
+msgstr ""
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1 of
 msgid "Boltzmann Machine."
@@ -56,7 +53,16 @@ msgstr ""
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:3
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:3
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:3
-#: kaiwu.torch_plugin.qvae.QVAE:3 kaiwu.torch_plugin.qvae.QVAE.forward:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:3 kaiwu.torch_plugin.qvae.QVAE:3
+#: kaiwu.torch_plugin.qvae.QVAE.forward:3
 #: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:3
 #: kaiwu.torch_plugin.qvae.QVAE.posterior:3
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:3
@@ -88,11 +94,9 @@ msgid ""
 msgstr ""
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:11 of
-msgid "device (torch.device, optional): Device for tensor construction."
-msgstr ""
-
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:12 of
-msgid "If ``None``, uses CPU."
+msgid ""
+"device (torch.device, optional): Device for tensor construction. If "
+"``None``, uses CPU."
 msgstr ""
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:1
@@ -133,6 +137,15 @@ msgstr ""
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:6
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:7
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:7
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:8
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:8
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:10
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:8
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:9
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:7
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:8
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:7
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:7
 #: kaiwu.torch_plugin.qvae.QVAE.forward:6
 #: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:8
 #: kaiwu.torch_plugin.qvae.QVAE.posterior:8
@@ -217,8 +230,251 @@ msgstr ""
 msgid "num_visible (int): Number of visible nodes."
 msgstr ""
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1 kaiwu.torch_plugin.qvae.QVAE:1 of
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel:1
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:1 kaiwu.torch_plugin.qvae.QVAE:1 of
 msgid "基类：:py:class:`~torch.nn.modules.module.Module`"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel:1 of
+msgid "Energy-side model interface used by QDiffusion candidate scoring."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel.discretize_visible_state:1 of
+msgid "Converts visible logits into normalized BM visible conditions."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel.forward:1 of
+msgid "Runs conditioned energy scoring through the PyTorch module API."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel.get_last_stats:1 of
+msgid "Returns lightweight sampler diagnostics from the last score call."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel.sample_hidden_state:1 of
+msgid "Samples BM hidden states for each visible assignment."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel.score_conditioned:1 of
+msgid "Scores candidates conditioned on noisy tokens."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel.score_visible_logits:1 of
+msgid "Scores visible logits under the conditioned BM energy model."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:1 of
+msgid "Energy-guided discrete diffusion wrapper over generic sequence backbones."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:3 of
+msgid "The class combines two backbone roles:"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:5 of
+msgid "a proposal model that predicts token logits for the current noisy state"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:6 of
+msgid "an energy model that reranks candidate reconstructions"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:8 of
+msgid ""
+"It exposes both training-oriented APIs such as :meth:`objective` and "
+"decoding-oriented APIs such as :meth:`initialize_state`, :meth:`step`, "
+"and :meth:`generate`."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:1 of
+msgid "Scores candidate reconstructions conditioned on the noisy state."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:4 of
+msgid ""
+"noisy_tokens: Noisy token tensor used as conditioning input. "
+"candidate_tokens: Candidate clean token tensor to score. attention_mask: "
+"Optional attention mask for the energy model."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:9 of
+msgid "torch.Tensor: A tensor of scalar energies with shape ``[batch, 1]``."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:1 of
+msgid "Runs the proposal model on the current noisy state."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:4
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:4 of
+msgid ""
+"noisy_tokens: Current noisy token tensor. **kwargs: Additional keyword "
+"arguments forwarded to the proposal"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:6
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:6 of
+msgid "model."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:9
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:9 of
+msgid "torch.Tensor: Proposal logits over the token vocabulary."
+msgstr ""
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:9
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:12
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:11 of
+msgid "Raises:"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:12 of
+msgid "TypeError: If the proposal model does not implement ``forward``."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:1 of
+msgid "Runs a complete iterative decoding loop inside the core class."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:4 of
+msgid ""
+"input_tokens: Initial token tensor. max_steps: Number of decode "
+"iterations to run. partial_masks: Optional boolean mask of fixed "
+"positions. temperature: Sampling temperature stored in the decode state. "
+"return_state: Whether to return the full final state dictionary."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:11 of
+msgid ""
+"torch.Tensor | dict[str, Any]: Either the final token tensor or the full "
+"decode state."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:1 of
+msgid "Returns a boolean mask of editable non-special-token positions."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:4 of
+msgid ""
+"output_tokens: Token tensor to inspect. partial_masks: Optional boolean "
+"mask of positions that should remain"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:6 of
+msgid "fixed."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:9 of
+msgid ""
+"torch.Tensor: A boolean mask where ``True`` marks editable non-special "
+"positions."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:1 of
+msgid "Creates the initial decoding state for an external generation loop."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:4 of
+msgid ""
+"input_tokens: Initial token tensor. partial_masks: Optional boolean mask "
+"of fixed positions. max_steps: Planned number of decode iterations. "
+"temperature: Sampling temperature stored in the state payload."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:10 of
+msgid ""
+"dict[str, Any]: A mutable state dictionary suitable for repeated "
+":meth:`step` calls."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:1 of
+msgid "Builds the one-step training objective used by an external loop."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:4 of
+msgid ""
+"batch: Batch dictionary containing at least ``batch[\"targets\"]``. "
+"weighting: Per-sample timestep weighting mode."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:8 of
+msgid ""
+"dict[str, torch.Tensor]: A dictionary containing proposal logits, "
+"supervision masks, loss weights, and the EBM objective term."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:1 of
+msgid "Semantic alias around :meth:`forward` for proposal-side calls."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:1 of
+msgid "Runs one denoising/reranking step and returns updated state."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:4 of
+msgid ""
+"state: Current decode state created by :meth:`initialize_state`. "
+"partial_masks: Optional boolean mask of fixed positions."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:8 of
+msgid "dict[str, Any]: The updated decode state after one iteration."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:1 of
+msgid "Moves the module and refreshes cached device/dtype metadata."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:4 of
+msgid ""
+"*args: Positional arguments forwarded to ``nn.Module.to``. **kwargs: "
+"Keyword arguments forwarded to ``nn.Module.to``."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:8 of
+msgid "QDiffusion: The moved module instance."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:1 of
+msgid "基类：:py:class:`object`"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:1 of
+msgid "Configuration for energy-guided discrete generation."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:3 of
+msgid "Attributes:"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:4 of
+msgid "num_diffusion_timesteps: Number of discrete noising steps used by the"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:5 of
+msgid "training objective."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:6 of
+msgid ""
+"use_coupled_sampling: Whether to use the coupled corruption variant. "
+"num_candidates: Number of proposal candidates sampled at each decode "
+"step. proposal_temperature: Temperature used for proposal-side sampling. "
+"proposal_noise_scale: Gumbel noise scale used during proposal sampling. "
+"energy_temperature: Temperature used when converting energies into"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:11 of
+msgid "reranking weights."
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:12 of
+msgid ""
+"disable_resample: Whether to disable repetition-collapse resampling. "
+"resample_ratio: Frequency threshold that triggers resampling. "
+"resample_top_p: Top-p cutoff used during resampling. decoding_strategy: "
+"Skeptical-remasking strategy string."
 msgstr ""
 
 #: kaiwu.torch_plugin.qvae.QVAE:1 of
@@ -421,11 +677,6 @@ msgstr ""
 msgid "numpy.ndarray: The transformed data after passing through all RBM layers."
 msgstr ""
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:9
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:12 of
-msgid "Raises:"
-msgstr ""
-
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:10 of
 msgid "ValueError: If the model has not been built or trained yet."
 msgstr ""
@@ -530,5 +781,17 @@ msgstr ""
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:7 of
 msgid "numpy.ndarray: The transformed data."
+msgstr ""
+
+#: kaiwu.torch_plugin.usage_stats.disable_usage_stats:1 of
+msgid "Disable kpp usage statistics. No data will be reported after disabling."
+msgstr ""
+
+#: kaiwu.torch_plugin.usage_stats.enable_usage_stats:1 of
+msgid "Enable kpp usage statistics (enabled by default; usually not needed)."
+msgstr ""
+
+#: kaiwu.torch_plugin.usage_stats.is_usage_stats_enabled:1 of
+msgid "Return whether usage statistics are currently enabled."
 msgstr ""
 

@@ -1,0 +1,266 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 16:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:10
+msgid "1.1 The Spin-Glass Analogy"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:12
+msgid ""
+"The conceptual bridge between statistical physics and neural networks "
+"rests on a powerful analogy: neurons can be treated as tiny magnets, and "
+"their collective behavior can be described using the language of "
+"statistical mechanics. This connection, first fully exploited by John "
+"Hopfield in 1982, provides the foundational framework for understanding "
+"the Boltzmann Machine."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:14
+msgid "<b>The Ising Model of Magnetism</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:16
+#, python-brace-format
+msgid ""
+"In condensed matter physics, the Ising model describes a system of "
+"interacting magnetic spins. Each spin $s_i$ resides on a lattice site and"
+" can point either \"up\" $(s_i = +1 )$ or \"down\" $( s_i = -1)$. The "
+"energy of a particular spin configuration $\\mathbf{s} = (s_1, s_2, "
+"\\ldots, s_N)$is given by the Hamiltonian:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:18
+#, python-brace-format
+msgid "E(\\mathbf{s}) = -\\sum_{i<j} J_{ij} s_i s_j - \\sum_i h_i s_i"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:20
+#, python-brace-format
+msgid ""
+"Here, $J_{ij}$ represents the interaction strength (coupling) between "
+"spins $i$and $j$. If $J_{ij} > 0$, the interaction is "
+"<b>ferromagnetic</b>: the spins prefer to align in the same direction to "
+"lower the energy. If $J_{ij} < 0$, the interaction is "
+"<b>antiferromagnetic</b>: the spins prefer opposite alignment. The term "
+"$h_i$ represents an external magnetic field biasing individual spins."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:22
+msgid ""
+"At thermal equilibrium with a heat bath at temperature $T$, the "
+"probability of observing a given spin configuration follows the "
+"<b>Boltzmann distribution</b>:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:24
+msgid ""
+"P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{s})}{k_B "
+"T}\\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:26
+msgid ""
+"where $k_B$ is Boltzmann's constant and $Z = \\sum_{\\mathbf{s}} "
+"\\exp(-E(\\mathbf{s})/k_B T)$ is the partition function. At low "
+"temperatures, the system freezes into low-energy, ordered states. At high"
+" temperatures, thermal fluctuations dominate and spins become randomly "
+"oriented."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:28
+msgid "<b>Neurons as Spins, Synapses as Couplings</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:30
+msgid ""
+"The transition from magnetic spins to neural networks requires only a "
+"change of interpretation:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:48
+msgid ""
+"With this dictionary, the energy function of a recurrent neural network "
+"becomes:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:50
+#, python-brace-format
+msgid "E(\\mathbf{x}) = -\\sum_{i<j} w_{ij} x_i x_j - \\sum_i b_i x_i"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:52
+msgid "or, in matrix form:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:54
+#, python-brace-format
+msgid ""
+"E_\\theta(\\mathbf{x}) = -\\mathbf{b}^\\top \\mathbf{x} - "
+"\\frac{1}{2}\\mathbf{x}^\\top \\mathbf{W} \\mathbf{x}"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:56
+#, python-brace-format
+msgid ""
+"where $\\mathbf{W}$ is a symmetric weight matrix with zero diagonal "
+"$(w_{ii} = 0)$. The symmetry requirement $w_{ij} = w_{ji}$ is crucial "
+"because it ensures that the system possesses a well-defined energy "
+"landscape and will eventually settle into an equilibrium distribution."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:58
+msgid "<b>Why Quadratic Energy?  </b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:60
+#, python-brace-format
+msgid ""
+"The energy function $E = -\\sum w_{ij}x_i x_j$ is the simplest possible "
+"form for a system with pairwise interactions. It represents the sum of "
+"interactions between every pair of units. This is the same form as the "
+"Ising Hamiltonian. More complex (higher-order) interactions are possible "
+"but are much harder to work with. This quadratic form is the 'first-"
+"order' approximation of a many-body system, making it the natural "
+"starting point for both physics and neural network models."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:62
+msgid "<b>Statistical Physics Foundations: The Microcanonical Ensemble</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:64
+msgid ""
+"To understand the probabilistic behavior of such a system, we must invoke"
+" the <b>fundamental assumption of statistical physics</b>: For an "
+"isolated system at equilibrium, all accessible microstates "
+"(configurations) consistent with the system's macroscopic constraints "
+"(e.g., total energy) are equally probable."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:66
+msgid ""
+"This principle gives rise to the <b>microcanonical ensemble</b>. For a "
+"system with fixed energy $E$, volume $V$, and number of particles $N$, "
+"the number of microstates with energy in the range $(E, E + \\delta E)$ "
+"is denoted $\\Omega(E, V, N)$. The <b>Boltzmann entropy</b> is then "
+"defined as:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:68
+msgid "S(E, V, N) = k \\log \\Omega(E, V, N)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:70
+msgid ""
+"where $k$ is Boltzmann's constant. This entropy measures the number of "
+"microscopic configurations consistent with a given macrostate."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:72
+#, python-brace-format
+msgid ""
+"For a macroscopic system (e.g., $N \\sim 10^{23}$), $\\Omega$ is an "
+"astronomically large number, and the entropy is extensive, i.e. it scales"
+" linearly with $N$. This is why the second law of thermodynamics holds: "
+"the system evolves toward the macrostate with the largest number of "
+"microstates (highest entropy)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:74
+msgid "<b>Spin Glasses and Frustration</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:76
+#, python-brace-format
+msgid ""
+"A <b>spin glass</b> is a magnetic system in which the coupling strengths "
+"$J_{ij}$ are random and contain both positive (ferromagnetic) and "
+"negative (antiferromagnetic) values. This mixture creates "
+"<b>frustration</b>: a single spin cannot simultaneously satisfy the "
+"competing demands of all its neighbors. As a result, the energy landscape"
+" of a spin glass is rugged, containing a vast number of <b>metastable "
+"states</b> (local minima) separated by energy barriers."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:78
+msgid ""
+"This is precisely the scenario we encounter in neural networks designed "
+"for associative memory. When we store multiple patterns using a Hebbian "
+"learning rule:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:80
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:82
+msgid ""
+"we are effectively engineering a spin glass whose low-energy "
+"configurations correspond to the stored memories $ "
+"\\{\\boldsymbol{\\xi}^\\mu\\}$. However, because the weight matrix mixes "
+"contributions from different memories, the energy landscape inevitably "
+"develops <b>spurious minima</b>—states that are not stored patterns but "
+"nevertheless trap the network dynamics."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:84
+msgid "<b>From Deterministic Dynamics to Stochastic Search</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:86
+msgid "Hopfield's original network employed deterministic, asynchronous updates:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:88
+#, python-brace-format
+msgid "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:90
+msgid ""
+"This dynamics is equivalent to moving strictly downhill in the energy "
+"landscape. The network will converge to the nearest local minimum, but it"
+" may get stuck in a spurious state rather than the intended memory."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:92
+msgid ""
+"The <b>Boltzmann Machine</b> introduces a crucial modification: updates "
+"become <b>stochastic</b>. At a finite temperature $T$, a neuron $i$ is "
+"set to state $1$ with probability:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:94
+msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:96
+msgid ""
+"where $ \\sigma(z) = 1/(1 + \\exp(-z))$ is the sigmoid function. Thermal "
+"noise occasionally pushes the system <em>uphill</em>, allowing it to "
+"escape shallow local minima and explore the energy landscape more "
+"thoroughly. As the temperature is gradually reduced (<b>simulated "
+"annealing</b>), the system is more likely to settle into a deep, low-"
+"energy state corresponding to a true memory."
+msgstr ""
+

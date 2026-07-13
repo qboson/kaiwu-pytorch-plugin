@@ -12,6 +12,7 @@ pydata-sphinx-theme==0.15.4
 sphinx-intl==2.3.1
 sphinxcontrib-jquery==4.1
 sphinxcontrib-mermaid==1.2.3
+sphinxcontrib-katex==0.9.11
 myst-parser==4.0.1
 jieba==0.42.1
 build==1.3.0

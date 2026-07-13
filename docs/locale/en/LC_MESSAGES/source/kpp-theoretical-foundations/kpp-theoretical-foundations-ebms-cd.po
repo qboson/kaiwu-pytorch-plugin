@@ -1,0 +1,500 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 16:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:10
+msgid "3.3 Contrastive Divergence"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:12
+msgid ""
+"Section [3.2 The Intractable Partition Function Problem](/kpp-"
+"theoretical-foundations\\kpp-theoretical-foundations-ebms-partition) "
+"established that exact maximum likelihood learning of Boltzmann machines "
+"is computationally infeasible due to the intractable partition function. "
+"The model expectation term in the gradient requires sampling from the "
+"equilibrium distribution $P_\\theta$, which in turn demands running a "
+"Markov chain to convergence, which is a prohibitively slow process. In "
+"this section, we introduce <b>contrastive divergence (CD)</b> , the "
+"algorithmic breakthrough that made Boltzmann machines practical for real-"
+"world applications. CD provides a simple, efficient approximation to the "
+"gradient that circumvents the need for equilibrium sampling, trading "
+"theoretical purity for empirical effectiveness."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:14
+msgid "<b>The Core Insight: Truncated Markov Chains</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:16
+msgid ""
+"The key observation behind contrastive divergence, introduced by Geoffrey"
+" Hinton in 2002, is that we need not run the Markov chain all the way to "
+"equilibrium. Instead, we can initialize the chain at a <b>data point</b> "
+"and run it for only a small number of steps, often just <b>one, </b>and "
+"then treat the resulting state as an approximate sample from the model "
+"distribution."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:18
+msgid ""
+"Why should this work? Consider the gradient of the negative log-"
+"likelihood:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:20
+msgid ""
+"\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} \\left[ \\frac{\\partial"
+" E_\\theta}{\\partial \\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+"\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:22
+msgid ""
+"The first term is an expectation over the data distribution, which is "
+"easy to compute. But the second term requires sampling from the model "
+"distribution."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:24
+msgid ""
+"In contrastive divergence, we replace the model expectation with an "
+"expectation over a distribution obtained after $k$ steps of Gibbs "
+"sampling initialized from the data, yielding the <b>CD-k</b> update rule:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:26
+msgid ""
+"\\Delta \\theta \\propto -\\mathbb{E}_{\\text{data}} \\left[ "
+"\\frac{\\partial E_\\theta}{\\partial \\theta} \\right] + "
+"\\mathbb{E}_{\\text{recon after } k \\text{ steps}} \\left[ "
+"\\frac{\\partial E_\\theta}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:28
+msgid ""
+"Note that this is equivalent to the standard CD update $\\Delta w_{ij} = "
+"\\eta (\\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j "
+"\\rangle_{\\text{recon}})$ because $\\frac{\\partial E_\\theta}{\\partial"
+" w_{ij}} = -v_i h_j$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:30
+msgid ""
+"The intuition is that the Markov chain, even after a few steps, moves "
+"away from the data distribution toward the model distribution. The "
+"difference between the data statistics and the statistics after $k$ steps"
+" approximates the true gradient direction. Remarkably, for $k = 1$, this "
+"simple heuristic works well enough to train useful generative models."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:32
+msgid "<b>The CD-k Algorithm in Detail</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:34
+msgid ""
+"The CD-k algorithm for training a Restricted Boltzmann Machine (RBM) or a"
+" general Boltzmann machine proceeds as follows:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:36
+msgid "<b>Algorithm: Contrastive Divergence (CD-k)</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:38
+#, python-brace-format
+msgid "For each training example $\\mathbf{v}^{(0)}$ (the visible state):"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:40
+msgid "<b>Positive Phase</b>:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:41
+#, python-brace-format
+msgid "Clamp the visible units to the data vector $\\mathbf{v}^{(0)}$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:42
+#, python-brace-format
+msgid ""
+"Compute the hidden unit activations $P(\\mathbf{h} \\mid "
+"\\mathbf{v}^{(0)})$ and sample a binary hidden state $\\mathbf{h}^{(0)}$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:43
+#, python-brace-format
+msgid ""
+"Record the outer product $\\mathbf{v}^{(0)} (\\mathbf{h}^{(0)})^\\top$ as"
+" the <b>positive statistics</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:45
+msgid "<b>Negative Phase</b> (Gibbs sampling for $k$ steps):"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:46
+msgid "For $t = 1$ to $k$:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:47
+#, python-brace-format
+msgid ""
+"Sample visible reconstruction $ \\mathbf{v}^{(t)} \\sim P(\\mathbf{v} "
+"\\mid \\mathbf{h}^{(t-1)})$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:48
+#, python-brace-format
+msgid ""
+"Sample hidden reconstruction $\\mathbf{h}^{(t)} \\sim P(\\mathbf{h} \\mid"
+" \\mathbf{v}^{(t)})$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:49
+#, python-brace-format
+msgid ""
+"Record the outer product $\\mathbf{v}^{(k)} (\\mathbf{h}^{(k)})^\\top$ as"
+" the <b>negative statistics</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:51
+msgid "<b>Weight Update</b>:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:53
+#, python-brace-format
+msgid ""
+"Update each weight $w_{ij}$ using the difference between positive and "
+"negative statistics:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:55
+msgid ""
+"\\Delta w_{ij} = \\eta \\left( \\langle v_i h_j \\rangle_{\\text{data}} -"
+" \\langle v_i h_j \\rangle_{\\text{recon}} \\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:57
+msgid ""
+"where $\\eta$ is the learning rate. Biases are updated similarly using "
+"unit activations."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:59
+msgid ""
+"For <b>CD-1</b> (the most common variant), the negative phase consists of"
+" a single round-trip:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:61
+#, python-brace-format
+msgid ""
+"$\\mathbf{v}^{(0)} \\rightarrow \\mathbf{h}^{(0)} \\rightarrow "
+"\\mathbf{v}^{(1)} \\rightarrow \\mathbf{h}^{(1)}$."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:63
+msgid "<b>Geometric Interpretation: Approximating the Gradient</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:65
+msgid ""
+"The contrastive divergence update can be understood geometrically. The "
+"true gradient of the log-likelihood points in the direction that reduces "
+"the energy of data configurations and increases the energy of "
+"configurations that the model currently deems probable. CD approximates "
+"this by comparing the data configurations to nearby <b>reconstructions, "
+"</b>which<b> </b>configurations obtained by following the Markov chain a "
+"short distance."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:67
+msgid ""
+"Consider the energy landscape. The data points sit in (or near) basins of"
+" low energy. Running Gibbs sampling for a few steps moves the state "
+"slightly away from the data, typically toward regions of higher energy if"
+" the model has not yet fully learned the data distribution. The CD update"
+" pushes the energy <b>down</b> at the data point and <b>up</b> at the "
+"nearby reconstruction. This effectively deepens the basin around the data"
+" while raising the energy of the surrounding region, creating a steeper "
+"attractor."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:69
+msgid ""
+"Crucially, CD does <b>not</b> attempt to raise the energy of <em>all</em>"
+" other configurations equally. It focuses only on those configurations "
+"that are easily reachable from the data via short MCMC trajectories. This"
+" local contrast is sufficient to learn a good model in practice, even "
+"though it introduces a bias relative to the true maximum likelihood "
+"gradient."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:71
+msgid "<b>Why Contrastive Divergence Works: A Heuristic Justification</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:73
+msgid ""
+"The empirical success of CD, especially CD-1, initially surprised many "
+"researchers. Several lines of reasoning help explain its effectiveness:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:75
+msgid ""
+"<b>Initialization at Data</b>: By starting the Markov chain at data "
+"points, we are sampling from regions of high data density. If the model "
+"distribution is already close to the data distribution, the chain will "
+"mix quickly, and a few steps suffice. If the model is far from the data, "
+"the chain moves away rapidly, providing a strong contrast signal."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:76
+msgid ""
+"<b>Gradient of the KL Divergence</b>: It can be shown that CD-k minimizes"
+" a different objective function: the difference between two Kullback-"
+"Leibler divergences:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:78
+msgid ""
+"\\text{CD}_k = \\text{KL}(P_{\\text{data}} \\| P_\\theta) - "
+"\\text{KL}(P_\\theta^{(k)} \\| P_\\theta)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:80
+#, python-brace-format
+msgid ""
+"where $P_\\theta^{(k)}$ is the distribution after $k$ steps of MCMC "
+"starting from the data. Minimizing this <b>contrastive divergence</b> "
+"encourages the model distribution to be close to the data distribution "
+"while simultaneously being far from the $k$ step distribution. This "
+"formulation justifies the name and provides a more principled foundation "
+"than a mere heuristic."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:82
+msgid ""
+"<b>Persistent Contrastive Divergence (PCD)</b>: An important variant, "
+"<b>persistent contrastive divergence</b>, maintains a persistent set of "
+"Markov chains whose states are retained across weight updates. Instead of"
+" reinitializing from data each time, the chains continue to evolve. PCD "
+"yields samples that are closer to the true model distribution and can "
+"improve the quality of the learned model, especially for deeper "
+"architectures."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:84
+msgid "<b>Limitations and Caveats</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:86
+msgid ""
+"Contrastive divergence is a pragmatic approximation, not an exact "
+"algorithm. It has several known limitations:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:88
+msgid ""
+"<b>Bias</b>: CD does not produce an unbiased estimate of the true log-"
+"likelihood gradient. The bias can be large for small $k$, and the "
+"resulting parameter estimates are not maximum likelihood estimates. The "
+"learned model may not assign the highest possible likelihood to the data."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:89
+msgid ""
+"<b>Not a Proper Gradient of Any Function</b>: For $k > 1$, the CD update "
+"is not the gradient of any fixed objective function. This makes "
+"theoretical analysis difficult and complicates convergence monitoring."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:90
+msgid ""
+"<b>Mixing and Mode Collapse</b>: If the model distribution has widely "
+"separated modes, short MCMC runs starting from data may fail to explore "
+"the full landscape, leading to mode collapse—the model learns only a "
+"subset of the data distribution."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:91
+msgid ""
+"<b>Dependence on k</b>: Larger values of $k$ reduce bias but increase "
+"computational cost. In practice, CD-1 or CD-5 are common compromises."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:93
+msgid ""
+"Despite these limitations, contrastive divergence remains a cornerstone "
+"algorithm for training restricted Boltzmann machines and deep belief "
+"networks. Its simplicity, speed, and empirical effectiveness enabled the "
+"mid-2000s renaissance of deep learning based on layer-wise pretraining."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:95
+msgid "<b>From Contrastive Divergence to Modern Approximations</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:97
+msgid ""
+"The success of CD inspired a family of related algorithms that improve "
+"upon its limitations:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:99
+msgid ""
+"<b>Persistent Contrastive Divergence (PCD)</b>: Uses persistent Markov "
+"chains to obtain better negative samples."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:100
+msgid ""
+"<b>Fast Persistent Contrastive Divergence (FPCD)</b>: Introduces "
+"additional fast-learning weights to improve mixing."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:101
+msgid ""
+"<b>Parallel Tempering</b>: Runs multiple chains at different temperatures"
+" to overcome energy barriers."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:102
+msgid ""
+"<b>Score Matching and Noise Contrastive Estimation</b>: Bypass the need "
+"for MCMC entirely, as mentioned in Section [3.2 The Intractable Partition"
+" Function Problem](/kpp-theoretical-foundations\\kpp-theoretical-"
+"foundations-ebms-partition)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:104
+msgid ""
+"These methods represent the ongoing evolution of techniques for training "
+"energy-based models, all stemming from the fundamental insight that we "
+"can trade exactness for tractability in learning."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:106
+msgid "<b>Practical Implementation: Mini-Batches and Sampling</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:108
+msgid ""
+"In practice, the expectation $\\mathbb{E}_{\\text{data}}$ is not computed"
+" over the full dataset, but over a <b>mini-batch</b> of $M$ samples. This"
+" reduces computational cost and provides a stochastic gradient that can "
+"often escape local minima. Typical mini-batch sizes range from 10 to 100."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:110
+msgid ""
+"For the Gibbs sampling in the negative phase, you will usually run the "
+"chain for $k$ steps (often $k=1$) starting from the data. This is the "
+"Contrastive Divergence-$k$ (CD-$k$) algorithm. While not strictly "
+"following the gradient of the log-likelihood, it works well in practice. "
+"When implementing the update, the weight change for a mini-batch becomes:"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:112
+msgid ""
+"\\Delta \\mathbf{W} = \\frac{\\eta}{M} \\sum_{m=1}^M \\left( \\langle "
+"\\mathbf{v}^{(m)} (\\mathbf{h}^{(m)})^\\top \\rangle_{\\text{data}} - "
+"\\langle \\mathbf{v}^{(m)}_k (\\mathbf{h}^{(m)}_k)^\\top "
+"\\rangle_{\\text{recon}} \\right)"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:114
+#, python-brace-format
+msgid ""
+"where $\\mathbf{v}^{(m)}_k, \\mathbf{h}^{(m)}_k$ are the final states "
+"after $k$ Gibbs steps. Using mini-batches is crucial for scaling to large"
+" datasets like MNIST or ImageNet."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:116
+msgid ""
+"<b>Efficiency tip</b>: In code (especially Python), try to vectorize the "
+"computation over the entire mini-batch using matrix operations rather "
+"than looping over individual examples. This can lead to orders-of-"
+"magnitude speedups."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:118
+msgid "<b>Summary</b>"
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:120
+msgid ""
+"<b>Contrastive divergence (CD)</b> is a practical approximation to the "
+"maximum likelihood gradient for training Boltzmann machines."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:121
+msgid ""
+"CD replaces the model expectation with an expectation over a <b>short "
+"Markov chain</b> initialized at the data, typically running for only $k$ "
+"steps (often $k=1$)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:122
+msgid ""
+"The CD-k algorithm alternates between a <b>positive phase</b> (clamped to"
+" data) and a <b>negative phase</b> (brief free-running reconstruction)."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:123
+msgid ""
+"Geometrically, CD deepens the energy basin at data points while raising "
+"energy in their immediate MCMC-accessible neighborhood."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:124
+msgid ""
+"CD minimizes a <b>difference of KL divergences</b> rather than the "
+"negative log-likelihood directly."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:125
+msgid ""
+"Limitations include <b>bias</b>, lack of a proper objective function for "
+"$ k>1$, and potential <b>mode collapse</b>."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:126
+msgid ""
+"<b>Persistent contrastive divergence (PCD)</b> improves sampling quality "
+"by maintaining persistent Markov chains across updates."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:127
+msgid ""
+"<b>Mini-batch training</b> and <b>vectorization</b> are key practical "
+"considerations for efficient implementation."
+msgstr ""
+
+#: ../../source/kpp-theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:128
+msgid ""
+"CD enabled the practical training of RBMs and deep belief networks, "
+"playing a pivotal role in the deep learning renaissance of the 2000s."
+msgstr ""
+

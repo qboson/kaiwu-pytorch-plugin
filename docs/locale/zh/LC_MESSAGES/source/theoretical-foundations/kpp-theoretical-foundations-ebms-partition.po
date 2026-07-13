@@ -1,0 +1,675 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:10
+msgid "3.2 The Intractable Partition Function Problem"
+msgstr "3.2 难以精确处理的配分函数问题"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:12
+msgid ""
+"Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-"
+"theoretical-foundations-ebms-def.md) introduced the maximum likelihood "
+"objective for energy-based models and revealed that the gradient of the "
+"negative log-likelihood contains a term involving an expectation under "
+"the model distribution. This expectation, in turn, requires summing over "
+"all possible configurations, a sum that is encoded in the **partition "
+"function** $Z_\\theta$. In this section, we examine why the partition "
+"function is computationally intractable, what consequences this "
+"intractability has for learning and inference, and why it constitutes the"
+" central algorithmic challenge for Boltzmann machines and energy-based "
+"models more broadly."
+msgstr ""
+"[3.1 定义目标：让真实数据具有低能量](kpp-theoretical-foundations-ebms-def.md) "
+"介绍了基于能量模型的最大似然目标，并指出负对数似然梯度包含模型分布下的期望项。该期望需要对所有可能构型求和，而这一求和正由 **配分函数** "
+"$Z_\\theta$ "
+"编码。本节讨论为什么配分函数在计算上不可处理，这种不可处理性对学习和推断意味着什么，以及为什么它构成了玻尔兹曼机和更广义基于能量模型的核心算法挑战。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:14
+msgid "The Partition Function: Definition and Its Implications"
+msgstr "配分函数：定义及其含义"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:15
+#, python-brace-format
+msgid ""
+"Recall the definition of the partition function for a Boltzmann machine "
+"with binary units $\\mathbf{x} \\in \\{0,1\\}^N$:"
+msgstr "回顾包含二值单元 $\\mathbf{x} \\in \\{0,1\\}^N$ 的玻尔兹曼机配分函数定义："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:17
+msgid ""
+"Z_\\theta = \\sum_{\\tilde{\\mathbf{x}} \\in \\{0,1\\}^N} "
+"\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:19
+msgid ""
+"The sum runs over **all** $2^N$ **possible binary vectors** of length "
+"$N$. For a modest network of $N=100$ visible units (a tiny image by "
+"modern standards, only $10 \\times 10$ pixels), the number of terms in "
+"this sum is:"
+msgstr ""
+"该求和遍历长度为 $N$ 的 **所有** $2^N$ **个可能二值向量**。对于一个仅有 $N=100$ 个可见单元的小型网络（按现代标准只是"
+" $10 \\times 10$ 像素的小图像），求和项数为："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:21
+#, python-brace-format
+msgid "2^{100} \\approx 1.27 \\times 10^{30}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:23
+msgid "To put this number in perspective:"
+msgstr "为了理解这个数量级："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:25
+#, python-brace-format
+msgid ""
+"The estimated number of stars in the observable universe is about "
+"$10^{22}$ to $10^{24}$."
+msgstr "可观测宇宙中恒星数量估计约为 $10^{22}$ 到 $10^{24}$。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:26
+#, python-brace-format
+msgid "The age of the universe is approximately $4.35 \\times 10^{17}$ seconds."
+msgstr "宇宙年龄约为 $4.35 \\times 10^{17}$ 秒。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:27
+#, python-brace-format
+msgid ""
+"Even if we could evaluate one trillion ($10^{12}$) configurations per "
+"second, enumerating $2^{100}$ configurations would take over "
+"$10^{10}$times the age of the universe."
+msgstr "即使每秒能评估一万亿（$10^{12}$）个构型，枚举 $2^{100}$ 个构型所需时间也会超过宇宙年龄的 $10^{10}$ 倍。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:29
+msgid ""
+"And $N = 100$ is **tiny**. Real-world Boltzmann machines and restricted "
+"Boltzmann machines often have hundreds of visible units and hundreds or "
+"thousands of hidden units, yielding state spaces of size "
+"$2^{N_{\\text{vis}} + N_{\\text{hid}}}$. The partition function is "
+"**exponentially large** in the number of units."
+msgstr ""
+"而 $N = 100$ 仍然非常小。现实中的玻尔兹曼机和受限玻尔兹曼机通常包含数百个可见单元，以及数百或数千个隐藏单元，状态空间规模为 "
+"$2^{N_{\\text{vis}} + N_{\\text{hid}}}$。配分函数随单元数量 **指数增长**。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:31
+msgid "Why the Partition Function Matters"
+msgstr "为什么配分函数重要"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:32
+msgid "The partition function appears in three critical contexts:"
+msgstr "配分函数在三个关键场景中出现："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:34
+#, python-brace-format
+msgid ""
+"**Probability Evaluation** To compute the probability "
+"$P_\\theta(\\mathbf{x})$ of a specific configuration, we must divide the "
+"Boltzmann factor by $Z_\\theta$:"
+msgstr "**概率评估**"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:36
+msgid "P_\\theta(\\mathbf{x}) = \\frac{\\exp(-E_\\theta(\\mathbf{x}))}{Z_\\theta}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:38
+msgid ""
+"Without $Z_\\theta$, we have only an unnormalized score. This means we "
+"cannot directly compute likelihoods on test data, making model comparison"
+" and hyperparameter tuning difficult."
+msgstr "若要计算特定构型的概率 $P_\\theta(\\mathbf{x})$，必须用 $Z_\\theta$ 归一化玻尔兹曼因子："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:40
+msgid ""
+"**Learning by Gradient Descent** Recall from Section [3.1 Defining the "
+"Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-"
+"def.md) that the gradient of the negative log-likelihood decomposes into "
+"a data term and a model term:"
+msgstr "没有 $Z_\\theta$，我们只有未归一化分数。这意味着无法直接计算测试数据似然，模型比较和超参数调优都会变得困难。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:42
+msgid ""
+"\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} \\left[ \\frac{\\partial"
+" E_\\theta}{\\partial \\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+"\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right]"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:44
+msgid ""
+"Note: $\\nabla f(\\theta) = -\\frac{\\partial \\mathcal{L}}{\\partial "
+"\\theta}$, where $\\mathcal{L}$ is the negative log-likelihood minimized "
+"in many textbooks."
+msgstr "**通过梯度下降学习**"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:46
+msgid ""
+"The first term is straightforward to estimate from the training set. The "
+"second term, i.e. the expectation under the model distribution "
+"$P_\\theta$, is the source of difficulty. As shown in the expression "
+"above, computing this expectation exactly requires summing over all $2^N$"
+" possible configurations, weighted by the Boltzmann factor. Both the "
+"numerator and the denominator involve the partition function $Z_\\theta$,"
+" making exact gradient evaluation computationally intractable for any "
+"non-trivial model."
+msgstr ""
+"如 [3.1 定义目标：让真实数据具有低能量](kpp-theoretical-foundations-ebms-def.md) "
+"所述，负对数似然梯度可分解为数据项和模型项："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:48
+msgid ""
+"The **model expectation** $\\mathbb{E}_{\\text{model}}[\\cdot]$*is an "
+"average over the model distribution*$P_\\theta$:"
+msgstr "**模型期望** $\\mathbb{E}_{\\text{model}}[\\cdot]$ 是模型分布 $P_\\theta$ 下的平均："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:50
+msgid ""
+"\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial E_\\theta}{\\partial"
+" \\theta} \\right] = \\sum_{\\tilde{\\mathbf{x}}} "
+"P_\\theta(\\tilde{\\mathbf{x}}) \\frac{\\partial "
+"E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta} = "
+"\\frac{1}{Z_\\theta} \\sum_{\\tilde{\\mathbf{x}}} "
+"\\exp(-E_\\theta(\\tilde{\\mathbf{x}})) \\frac{\\partial "
+"E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:52
+msgid ""
+"Both the numerator and the denominator involve sums over all $2^N$ "
+"configurations. Exact gradient computation is infeasible."
+msgstr "分子和分母都涉及对所有 $2^N$ 个构型求和，因此精确梯度计算不可行。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:54
+msgid ""
+"**Sampling and Inference** Generating samples from the model distribution"
+" typically requires Markov chain Monte Carlo (MCMC) methods, such as "
+"Gibbs sampling. While MCMC does not require computing $Z_\\theta$ "
+"explicitly, it does require running the Markov chain long enough to reach"
+" equilibrium. The time required to obtain independent samples scales with"
+" the **mixing time** of the chain, which can be exponentially long in the"
+" system size, especially when the energy landscape has high barriers."
+msgstr "**采样与推断**"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:56
+msgid "The Partition Function as a Free Energy Barrier"
+msgstr "配分函数作为自由能屏障"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:57
+msgid ""
+"In statistical physics, the partition function is intimately related to "
+"the **Helmholtz free energy** $F = -\\log Z$."
+msgstr "在统计物理中，配分函数与 **Helmholtz 自由能** $F = -\log Z$ 密切相关。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:59
+msgid ""
+"(Setting $ k_B T = 1$ for notational simplicity.) The free energy "
+"summarizes the balance between energy and entropy. For a given visible "
+"configuration $\\mathbf{v}$ in a Boltzmann machine with hidden units "
+"$\\mathbf{h}$, the **free energy** is defined analogously as "
+"$F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\tilde{\\mathbf{h}}} "
+"\\exp\\left(-E_\\theta(\\mathbf{v}, \\tilde{\\mathbf{h}})\\right)$."
+msgstr ""
+"（为简化记号，令 $ k_B T = 1$。）自由能概括了能量与熵之间的平衡。对于带隐藏单元 $\\mathbf{h}$ "
+"的玻尔兹曼机中给定可见构型 $\\mathbf{v}$，**自由能** 类似地定义为："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:61
+msgid "The probability of a visible vector is then:"
+msgstr "于是可见向量的概率为："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:63
+msgid ""
+"$P_\\theta(\\mathbf{v}) = "
+"\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
+"\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}$."
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:65
+msgid ""
+"Even with hidden units marginalized out, the denominator still sums over "
+"all $2^{N_{\\text{vis}}}$ visible configurations. The intractability "
+"remains."
+msgstr "即便隐藏单元已经被边缘化，分母仍然需要对所有 $2^{N_{\\text{vis}}}$ 个可见构型求和。不可处理性仍然存在。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:67
+msgid "The Consequence: Exact Maximum Likelihood Is Impossible"
+msgstr "后果：精确最大似然不可能"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:68
+msgid ""
+"The intractability of $Z_\\theta$ has a stark implication: **exact "
+"maximum likelihood learning of a Boltzmann machine is computationally "
+"impossible for all but the smallest toy problems.** Any practical "
+"training algorithm must rely on approximations."
+msgstr ""
+"其中 $\\mathbf{S}$ 是充分统计量向量，例如 $X_i$ 和 $X_i X_j$。这意味着 Hessian 是负定的，优化问题是 "
+"**凹** 的：当所有单元均可见时，不存在非全局局部极小值。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:70
+msgid ""
+"This is not merely an engineering inconvenience; it is a fundamental "
+"computational barrier. The partition function sum is a prototypical "
+"#P-complete problem in computational complexity theory, meaning it is at "
+"least as hard as counting the number of satisfying assignments to a "
+"Boolean formula."
+msgstr "然而，引入隐藏单元后，Hessian 变为："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:72
+msgid "Hessian and Non-Convexity"
+msgstr "驯服不可处理性的近似策略"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:74
+msgid ""
+"The difficulty extends beyond the gradient. The Hessian of the log-"
+"likelihood function also reveals the complexity of the optimization "
+"landscape. For a Boltzmann machine with only visible units, the Hessian "
+"has a simple and revealing form:"
+msgstr "面对这一屏障，研究者发展出多类近似策略。理解这些策略对于把握基于能量学习的技术版图至关重要。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:76
+#, python-brace-format
+msgid "\\nabla^2 f(\\theta) = -\\text{Cov}_\\theta(\\mathbf{S})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:78
+#, python-brace-format
+msgid ""
+"where $\\mathbf{S}$ is the vector of sufficient statistics (e.g., $X_i$ "
+"and $X_i X_j$). This means the Hessian is negative definite, and the "
+"optimization is **concave**—there are no non-global local minima when all"
+" units are visible."
+msgstr ""
+"其中 $\\mathbf{S}$ 是充分统计量向量（例如 $X_i$ 和 $X_i X_j$）。这意味着 Hessian 是负定的，优化问题是 "
+"**凹** 的；当所有单元都可见时，不存在非全局的局部极小值。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:80
+msgid "However, when hidden units are introduced, the Hessian becomes:"
+msgstr "然而，当引入隐藏单元后，Hessian 变为："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:82
+msgid ""
+"\\nabla^2 f(\\theta) = "
+"\\mathbb{E}_{\\text{target}}[\\text{Cov}_\\theta(\\mathbf{S}|\\mathbf{X})]"
+" - \\text{Cov}_\\theta(\\mathbf{S})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:84
+msgid ""
+"The first term is the conditional covariance given the visible units, and"
+" the second term is the unconditional covariance under the model. This "
+"expression is **not** necessarily negative semidefinite, meaning that "
+"**the log-likelihood is not concave** in the presence of hidden units. "
+"Consequently, gradient-based methods can converge to local optima, and "
+"the quality of the learned model depends crucially on the initialization "
+"and optimization algorithm."
+msgstr ""
+"第一项是在给定可见单元时的条件协方差，第二项是模型分布下的无条件协方差。这个表达式 **不一定** 是负半定的，这意味着存在隐藏单元时 "
+"**对数似然不是凹函数**。因此，基于梯度的方法可能收敛到局部最优，学习到的模型质量强烈依赖初始化与优化算法。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:86
+msgid "Approaches to Taming the Intractability"
+msgstr "驯服不可处理性的近似策略"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:87
+msgid ""
+"Faced with this barrier, researchers have developed several families of "
+"approximation strategies. Understanding these strategies is essential for"
+" navigating the landscape of energy-based learning."
+msgstr "面对这一障碍，研究者发展出几类近似策略。理解这些策略，对于把握基于能量学习的技术图景非常重要。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:89
+msgid ""
+"**Sampling-Based Approximations** Instead of summing over all "
+"configurations, we can **sample** configurations from the model "
+"distribution using MCMC. The model expectation is then approximated by an"
+" empirical average over the samples:"
+msgstr "**基于采样的近似** 不对所有构型求和，而是使用 MCMC 从模型分布中 **采样** 构型。模型期望随后用样本经验平均来近似："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:91
+msgid ""
+"\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial E_\\theta}{\\partial"
+" \\theta} \\right] \\approx \\frac{1}{K} \\sum_{k=1}^K \\frac{\\partial "
+"E_\\theta(\\tilde{\\mathbf{x}}^{(k)})}{\\partial \\theta}, \\quad "
+"\\tilde{\\mathbf{x}}^{(k)} \\sim P_\\theta"
+msgstr ""
+
+#: ../../source/theoretical-foundations-ebms-partition.md:93
+msgid ""
+"The challenge is that obtaining unbiased samples requires running the "
+"Markov chain to equilibrium for every gradient step, which is "
+"prohibitively slow. **Contrastive divergence** (Section [3.3 Contrastive "
+"Divergence](kpp-theoretical-foundations-ebms-cd.md)) and **persistent "
+"contrastive divergence** address this by using short MCMC runs "
+"initialized from the data or from previous model states."
+msgstr "难点在于，无偏样本要求每个梯度步骤都把 Markov 链运行到平衡，这非常慢。**对比散度**（见 [3.3"
+"对比散度](kpp-theoretical-foundations-ebms-cd.md)）和 **持久对比散度** 通过从数据或先前模型状态初始化短"
+"MCMC 链来缓解这一问题。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:95
+msgid ""
+"**Variational Approximations** Variational methods replace the "
+"intractable model distribution $P_\\theta$ with a simpler, tractable "
+"**variational distribution** $Q_\\phi$ from a restricted family. The "
+"parameters $ \\phi$ are optimized to make $Q_\\phi$ as close as possible "
+"to $P_\\theta$ in the sense of Kullback-Leibler divergence. This "
+"transforms the learning problem into an optimization over both $ \\theta$"
+" and $\\phi$."
+msgstr ""
+"**变分近似** 变分方法用来自受限族的、更简单且可处理的 **变分分布** $Q_\\phi$ 替代不可处理的模型分布 "
+"$P_\\theta$。通过优化参数 $ \\phi$，使 $Q_\\phi$ 在 Kullback-Leibler 散度意义下尽可能接近 "
+"$P_\\theta$。这把学习问题转化为同时关于 $ \\theta$ 和 $\\phi$ 的优化。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:97
+msgid ""
+"While variational methods provide a rigorous lower bound on the log-"
+"likelihood, they often require making strong independence assumptions "
+"(e.g., mean-field approximations) that can limit the model's expressive "
+"power."
+msgstr "虽然变分方法为对数似然提供严格下界，但通常需要强独立性假设（例如均值场近似），这可能限制模型表达能力。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:99
+#, python-brace-format
+msgid ""
+"**Architectural Constraints** By restricting the connectivity pattern of "
+"the Boltzmann machine, we can make certain computations tractable. The "
+"**Restricted Boltzmann Machine (RBM)** is the most celebrated example. By"
+" eliminating visible-visible and hidden-hidden connections, the "
+"conditional distributions $P(\\mathbf{h} \\mid \\mathbf{v})$ and "
+"$P(\\mathbf{v} \\mid \\mathbf{h})$ factorize into products of independent"
+" Bernoulli distributions. This allows efficient Gibbs sampling and "
+"enables the contrastive divergence algorithm."
+msgstr ""
+"**架构约束** 通过限制玻尔兹曼机的连接模式，可以让某些计算变得可处理。**受限玻尔兹曼机（RBM）** "
+"是最著名的例子。它去除了可见-可见和隐藏-隐藏连接，使条件分布 $P(\\mathbf{h} \\mid \\mathbf{v})$ 和 "
+"$P(\\mathbf{v} \\mid \\mathbf{h})$ 分解为独立 Bernoulli 分布的乘积。这允许高效 Gibbs "
+"采样，并支持对比散度算法。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:101
+msgid ""
+"**Score Matching and Noise Contrastive Estimation** These are alternative"
+" training criteria that circumvent the partition function entirely. "
+"**Score matching** minimizes the Fisher divergence between the model and "
+"data distributions by matching the gradients of their log-densities, "
+"which does not require $Z_\\theta$. **Noise contrastive estimation "
+"(NCE)** transforms the unsupervised learning problem into a supervised "
+"logistic regression task of distinguishing data samples from noise "
+"samples, where the partition function becomes a learnable parameter."
+msgstr ""
+"**Score Matching 与噪声对比估计** 这些是完全绕开配分函数的替代训练准则。**Score matching** "
+"通过匹配模型和数据对数密度梯度来最小化 Fisher 散度，不需要 $Z_\\theta$。**噪声对比估计（NCE）** "
+"把无监督学习问题转化为区分数据样本与噪声样本的监督逻辑回归任务，其中配分函数成为可学习参数。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:103
+msgid ""
+"**Annealed Importance Sampling** For model evaluation (rather than "
+"training), **annealed importance sampling (AIS)** provides an unbiased "
+"estimate of $Z_\\theta$. It works by gradually transforming a simple base"
+" distribution (e.g., uniform) into the model distribution through a "
+"sequence of intermediate distributions, using importance weights to "
+"correct for the sampling bias. While computationally expensive, AIS is a "
+"gold standard for evaluating generative models when exact likelihoods are"
+" required."
+msgstr ""
+"**退火重要性采样** 对于模型评估（而非训练），**退火重要性采样（AIS）** 提供了 $Z_\\theta$ "
+"的无偏估计。它通过一系列中间分布，把简单基准分布（如均匀分布）逐步转化为模型分布，并使用重要性权重校正采样偏差。AIS "
+"计算代价较高，但在需要精确似然评估的生成模型中是黄金标准。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:105
+msgid "The Partition Function in the Era of Deep Learning"
+msgstr "深度学习时代的配分函数"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:106
+msgid ""
+"It is worth noting that the intractability of the partition function is "
+"not unique to Boltzmann machines. Many modern deep generative models face"
+" analogous challenges:"
+msgstr "值得注意的是，配分函数的不可处理性并非玻尔兹曼机独有。许多现代深度生成模型也面临类似挑战："
+
+#: ../../source/theoretical-foundations-ebms-partition.md:108
+msgid ""
+"**Generative Adversarial Networks (GANs)** avoid the partition function "
+"entirely by using an adversarial training criterion that does not require"
+" likelihood evaluation."
+msgstr "**生成对抗网络（GANs）** 使用不需要似然评估的对抗训练准则，从而完全避开配分函数。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:109
+msgid ""
+"**Variational Autoencoders (VAEs)** use a variational lower bound that "
+"circumvents the partition function."
+msgstr "**变分自编码器（VAEs）** 使用变分下界来绕开配分函数。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:110
+msgid ""
+"**Normalizing Flows** design architectures where the Jacobian "
+"determinant, the analog of $Z_\\theta$, is tractable by construction."
+msgstr "**归一化流（Normalizing Flows）** 通过架构设计让 Jacobian 行列式（类似于 $Z_\\theta$ 的项）可处理。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:111
+msgid ""
+"**Diffusion Models** learn to reverse a gradual noising process, with a "
+"training objective that involves only tractable conditional "
+"distributions."
+msgstr "**扩散模型（Diffusion Models）** 学习反转逐步加噪过程，其训练目标只涉及可处理的条件分布。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:113
+msgid ""
+"The Boltzmann machine's struggle with the partition function thus "
+"foreshadows a central theme in deep generative modeling: the tension "
+"between expressive power and tractable normalization."
+msgstr "因此，玻尔兹曼机与配分函数的斗争，预示了深度生成建模中的核心主题：表达能力与可处理归一化之间的张力。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:115
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:116
+msgid ""
+"The **partition function** $Z_\\theta = \\sum_{\\mathbf{x}} "
+"\\exp(-E_\\theta(\\mathbf{x}))$ is a sum over an exponential number of "
+"configurations, making exact computation infeasible for non-trivial "
+"models."
+msgstr ""
+"**配分函数** $Z_\\theta = \\sum_{\\mathbf{x}} \\exp(-E_\\theta(\\mathbf{x}))$"
+" 是对指数数量构型的求和，因此非平凡模型无法精确计算。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:117
+msgid ""
+"The intractability of $Z_\\theta$ prevents exact **probability "
+"evaluation**, exact **gradient computation**, and efficient exact "
+"**sampling**."
+msgstr "$Z_\\theta$ 的不可处理性阻碍了精确 **概率评估**、精确 **梯度计算** 和高效精确 **采样**。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:118
+msgid ""
+"This computational barrier implies that **exact maximum likelihood "
+"learning is impossible** for general Boltzmann machines."
+msgstr "这一计算屏障意味着一般玻尔兹曼机无法进行 **精确最大似然学习**。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:119
+msgid ""
+"Approximation strategies fall into several categories: **sampling-based**"
+" (MCMC, contrastive divergence), **variational** (mean-field), "
+"**architectural constraints** (RBM), and **alternative objectives** "
+"(score matching, NCE)."
+msgstr ""
+"近似策略包括：**基于采样**（MCMC、对比散度）、**变分方法**（均值场）、**架构约束**（RBM）以及 **替代目标**（score "
+"matching、NCE）。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:120
+msgid ""
+"The partition function problem is a fundamental challenge that connects "
+"Boltzmann machines to contemporary deep generative models, many of which "
+"are designed explicitly to circumvent or tame this intractability."
+msgstr "这一计算屏障意味着一般玻尔兹曼机无法进行 **精确最大似然学习**。"
+
+#: ../../source/theoretical-foundations-ebms-partition.md:121
+msgid ""
+"The **Restricted Boltzmann Machine** and **contrastive divergence,** "
+"topics of the upcoming sections, provide a pragmatic and influential "
+"solution to this problem for a restricted but powerful class of "
+"architectures."
+msgstr ""
+"近似策略包括：**基于采样**（MCMC、对比散度）、**变分方法**（均值场）、**架构约束**（RBM）以及 **替代目标**（score "
+"matching、NCE）。"
+
+#~ msgid ""
+#~ "\\nabla f(\\theta) = -\\mathbb{E}_{\\text{data}} "
+#~ "\\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right] + \\mathbb{E}_{\\text{model}} "
+#~ "\\left[ \\frac{\\partial E_\\theta}{\\partial "
+#~ "\\theta} \\right]"
+#~ msgstr "**通过梯度下降学习**"
+
+#~ msgid ""
+#~ "\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial "
+#~ "E_\\theta}{\\partial \\theta} \\right] = "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} P_\\theta(\\tilde{\\mathbf{x}}) "
+#~ "\\frac{\\partial E_\\theta(\\tilde{\\mathbf{x}})}{\\partial "
+#~ "\\theta} = \\frac{1}{Z_\\theta} "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp(-E_\\theta(\\tilde{\\mathbf{x}})) \\frac{\\partial "
+#~ "E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+#~ msgstr ""
+#~ "\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial "
+#~ "E_\\theta}{\\partial \\theta} \\right] = "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} P_\\theta(\\tilde{\\mathbf{x}}) "
+#~ "\\frac{\\partial E_\\theta(\\tilde{\\mathbf{x}})}{\\partial "
+#~ "\\theta} = \\frac{1}{Z_\\theta} "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp(-E_\\theta(\\tilde{\\mathbf{x}})) \\frac{\\partial "
+#~ "E_\\theta(\\tilde{\\mathbf{x}})}{\\partial \\theta}"
+
+#~ msgid ""
+#~ "F_\\theta(\\mathbf{v}) = -\\log "
+#~ "\\sum_{\\tilde{\\mathbf{h}}} \\exp\\left(-E_\\theta(\\mathbf{v},"
+#~ " \\tilde{\\mathbf{h}})\\right)"
+#~ msgstr "即便隐藏单元已经被边缘化，分母仍然需要对所有 $2^{N_{\\text{vis}}}$ 个可见构型求和。不可处理性仍然存在。"
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{v}) = "
+#~ "\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}}"
+#~ " \\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
+#~ msgstr ""
+#~ "$Z_\\theta$ "
+#~ "的不可处理性带来一个清晰结论：**除了最小的玩具问题外，玻尔兹曼机的精确最大似然学习在计算上是不可能的。**任何实际训练算法都必须依赖近似。"
+
+#~ msgid "\\nabla^2 f(\\theta) = -\\text{Cov}_\\theta(\\mathbf{S})"
+#~ msgstr ""
+#~ "困难并不止于梯度。对数似然函数的 Hessian "
+#~ "也揭示了优化景观的复杂性。对于只有可见单元的玻尔兹曼机，Hessian 具有一个简单而有启发性的形式："
+
+#~ msgid ""
+#~ "\\nabla^2 f(\\theta) = "
+#~ "\\mathbb{E}_{\\text{target}}[\\text{Cov}_\\theta(\\mathbf{S}|\\mathbf{X})]"
+#~ " - \\text{Cov}_\\theta(\\mathbf{S})"
+#~ msgstr "然而，引入隐藏单元后，Hessian 变为："
+
+#~ msgid ""
+#~ "\\mathbb{E}_{\\text{model}} \\left[ \\frac{\\partial "
+#~ "E_\\theta}{\\partial \\theta} \\right] \\approx "
+#~ "\\frac{1}{K} \\sum_{k=1}^K \\frac{\\partial "
+#~ "E_\\theta(\\tilde{\\mathbf{x}}^{(k)})}{\\partial \\theta}, "
+#~ "\\quad \\tilde{\\mathbf{x}}^{(k)} \\sim P_\\theta"
+#~ msgstr "**基于采样的近似**"
+
+#~ msgid "::"
+#~ msgstr "::"
+
+#~ msgid "<b> Probability Evaluation</b>"
+#~ msgstr "<b>*</b><b>*</b><b>概</b><b>率</b><b>评</b><b>估</b><b>*</b><b>*</b>"
+
+#~ msgid "<b>Learning by Gradient Descent</b>"
+#~ msgstr "<b>*</b><b>*</b><b>通</b><b>过</b><b>梯</b><b>度</b><b>下</b><b>降</b><b>学</b><b>习</b><b>*</b><b>*</b>"
+
+#~ msgid "<b>Sampling and Inference</b>"
+#~ msgstr ""
+#~ "<b>在</b><b>统</b><b>计</b><b>物</b><b>理</b><b>中</b><b>，</b><b>配</b><b>分</b><b>函</b><b>数</b><b>与</b><b>"
+#~ " "
+#~ "</b><b>*</b><b>*</b><b>H</b><b>e</b><b>l</b><b>m</b><b>h</b><b>o</b><b>l</b><b>t</b><b>z</b><b>"
+#~ " </b><b>自</b><b>由</b><b>能</b><b>*</b><b>*</b><b> "
+#~ "</b><b>$</b><b>F</b><b>$</b><b> "
+#~ "</b><b>紧</b><b>密</b><b>相</b><b>关</b><b>：</b>"
+
+#~ msgid "<b>Sampling-Based Approximations</b>"
+#~ msgstr ""
+#~ "<b>难</b><b>点</b><b>在</b><b>于</b><b>，</b><b>无</b><b>偏</b><b>样</b><b>本</b><b>要</b><b>求</b><b>每</b><b>个</b><b>梯</b><b>度</b><b>步</b><b>骤</b><b>都</b><b>把</b><b>"
+#~ " </b><b>M</b><b>a</b><b>r</b><b>k</b><b>o</b><b>v</b><b> "
+#~ "</b><b>链</b><b>运</b><b>行</b><b>到</b><b>平</b><b>衡</b><b>，</b><b>这</b><b>太</b><b>慢</b><b>了</b><b>。</b><b>*</b><b>*</b><b>对</b><b>比</b><b>散</b><b>度</b><b>*</b><b>*</b><b>（</b><b>[</b><b>3</b><b>.</b><b>3</b><b>"
+#~ " "
+#~ "</b><b>对</b><b>比</b><b>散</b><b>度</b><b>]</b><b>(</b><b>/</b><b>k</b><b>p</b><b>p</b><b>-</b><b>t</b><b>h</b><b>e</b><b>o</b><b>r</b><b>e</b><b>t</b><b>i</b><b>c</b><b>a</b><b>l</b><b>-</b><b>f</b><b>o</b><b>u</b><b>n</b><b>d</b><b>a</b><b>t</b><b>i</b><b>o</b><b>n</b><b>s</b><b>s</b><b>e</b><b>c</b><b>t</b><b>i</b><b>o</b><b>n</b><b>3</b><b>.</b><b>3</b><b>-</b><b>k</b><b>p</b><b>p</b><b>-</b><b>t</b><b>h</b><b>e</b><b>o</b><b>r</b><b>e</b><b>t</b><b>i</b><b>c</b><b>a</b><b>l</b><b>-</b><b>f</b><b>o</b><b>u</b><b>n</b><b>d</b><b>a</b><b>t</b><b>i</b><b>o</b><b>n</b><b>s</b><b>-</b><b>e</b><b>b</b><b>m</b><b>s</b><b>-</b><b>c</b><b>d</b><b>)</b><b>）</b><b>和</b><b>*</b><b>*</b><b>持</b><b>久</b><b>对</b><b>比</b><b>散</b><b>度</b><b>*</b><b>*</b><b>通</b><b>过</b><b>从</b><b>数</b><b>据</b><b>或</b><b>先</b><b>前</b><b>模</b><b>型</b><b>状</b><b>态</b><b>初</b><b>始</b><b>化</b><b>短</b><b>"
+#~ " </b><b>M</b><b>C</b><b>M</b><b>C</b><b> "
+#~ "</b><b>链</b><b>来</b><b>缓</b><b>解</b><b>这</b><b>一</b><b>问</b><b>题</b><b>。</b>"
+
+#~ msgid "<b>Variational Approximations</b>"
+#~ msgstr "<b>*</b><b>*</b><b>架</b><b>构</b><b>约</b><b>束</b><b>*</b><b>*</b>"
+
+#~ msgid "<b>Architectural Constraints</b>"
+#~ msgstr ""
+#~ "<b>这</b><b>些</b><b>是</b><b>完</b><b>全</b><b>绕</b><b>开</b><b>配</b><b>分</b><b>函</b><b>数</b><b>的</b><b>替</b><b>代</b><b>训</b><b>练</b><b>准</b><b>则</b><b>。</b><b>*</b><b>*</b><b>S</b><b>c</b><b>o</b><b>r</b><b>e</b><b>"
+#~ " "
+#~ "</b><b>m</b><b>a</b><b>t</b><b>c</b><b>h</b><b>i</b><b>n</b><b>g</b><b>*</b><b>*</b><b>"
+#~ " "
+#~ "</b><b>通</b><b>过</b><b>匹</b><b>配</b><b>模</b><b>型</b><b>和</b><b>数</b><b>据</b><b>对</b><b>数</b><b>密</b><b>度</b><b>梯</b><b>度</b><b>来</b><b>最</b><b>小</b><b>化</b><b>"
+#~ " </b><b>F</b><b>i</b><b>s</b><b>h</b><b>e</b><b>r</b><b> "
+#~ "</b><b>散</b><b>度</b><b>，</b><b>不</b><b>需</b><b>要</b><b> "
+#~ "</b><b>$</b><b>Z</b><b>_</b><b>t</b><b>h</b><b>e</b><b>t</b><b>a</b><b>$</b><b>。</b><b>*</b><b>*</b><b>噪</b><b>声</b><b>对</b><b>比</b><b>估</b><b>计</b><b>（</b><b>N</b><b>C</b><b>E</b><b>）</b><b>*</b><b>*</b><b>"
+#~ " "
+#~ "</b><b>把</b><b>无</b><b>监</b><b>督</b><b>学</b><b>习</b><b>问</b><b>题</b><b>转</b><b>化</b><b>为</b><b>区</b><b>分</b><b>数</b><b>据</b><b>样</b><b>本</b><b>与</b><b>噪</b><b>声</b><b>样</b><b>本</b><b>的</b><b>监</b><b>督</b><b>逻</b><b>辑</b><b>回</b><b>归</b><b>任</b><b>务</b><b>，</b><b>其</b><b>中</b><b>配</b><b>分</b><b>函</b><b>数</b><b>成</b><b>为</b><b>可</b><b>学</b><b>习</b><b>参</b><b>数</b><b>。</b>"
+
+#~ msgid "<b>Score Matching and Noise Contrastive Estimation</b>"
+#~ msgstr ""
+#~ "<b>对</b><b>于</b><b>模</b><b>型</b><b>评</b><b>估</b><b>（</b><b>而</b><b>非</b><b>训</b><b>练</b><b>）</b><b>，</b><b>*</b><b>*</b><b>退</b><b>火</b><b>重</b><b>要</b><b>性</b><b>采</b><b>样</b><b>（</b><b>A</b><b>I</b><b>S</b><b>）</b><b>*</b><b>*</b><b>提</b><b>供</b><b>了</b><b>"
+#~ " "
+#~ "</b><b>$</b><b>Z</b><b>_</b><b>t</b><b>h</b><b>e</b><b>t</b><b>a</b><b>$</b><b>"
+#~ " "
+#~ "</b><b>的</b><b>无</b><b>偏</b><b>估</b><b>计</b><b>。</b><b>它</b><b>通</b><b>过</b><b>一</b><b>系</b><b>列</b><b>中</b><b>间</b><b>分</b><b>布</b><b>，</b><b>把</b><b>简</b><b>单</b><b>基</b><b>准</b><b>分</b><b>布</b><b>（</b><b>如</b><b>均</b><b>匀</b><b>分</b><b>布</b><b>）</b><b>逐</b><b>步</b><b>转</b><b>化</b><b>为</b><b>模</b><b>型</b><b>分</b><b>布</b><b>，</b><b>并</b><b>使</b><b>用</b><b>重</b><b>要</b><b>性</b><b>权</b><b>重</b><b>校</b><b>正</b><b>采</b><b>样</b><b>偏</b><b>差</b><b>。</b><b>A</b><b>I</b><b>S</b><b>"
+#~ " "
+#~ "</b><b>计</b><b>算</b><b>代</b><b>价</b><b>较</b><b>高</b><b>，</b><b>但</b><b>在</b><b>需</b><b>要</b><b>精</b><b>确</b><b>似</b><b>然</b><b>评</b><b>估</b><b>的</b><b>生</b><b>成</b><b>模</b><b>型</b><b>中</b><b>是</b><b>黄</b><b>金</b><b>标</b><b>准</b><b>。</b>"
+
+#~ msgid "<b>Annealed Importance Sampling</b>"
+#~ msgstr "<b>值</b><b>得</b><b>注</b><b>意</b><b>的</b><b>是</b><b>，</b><b>配</b><b>分</b><b>函</b><b>数</b><b>不</b><b>可</b><b>处</b><b>理</b><b>并</b><b>非</b><b>玻</b><b>尔</b><b>兹</b><b>曼</b><b>机</b><b>独</b><b>有</b><b>。</b><b>许</b><b>多</b><b>现</b><b>代</b><b>深</b><b>度</b><b>生</b><b>成</b><b>模</b><b>型</b><b>也</b><b>面</b><b>对</b><b>类</b><b>似</b><b>挑</b><b>战</b><b>：</b>"
+
+#~ msgid ""
+#~ "The <b>Restricted Boltzmann Machine</b> and"
+#~ " <b>contrastive divergence, </b>topics of "
+#~ "the upcoming sections, provide a "
+#~ "pragmatic and influential solution to "
+#~ "this problem for a restricted but "
+#~ "powerful class of architectures."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Z_\\theta = \\sum_{\\tilde{\\mathbf{x}} \\in "
+#~ "\\{0,1\\}^N} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+#~ msgstr ""
+#~ "Z_\\theta = \\sum_{\\tilde{\\mathbf{x}} \\in "
+#~ "\\{0,1\\}^N} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+
+#~ msgid "2^{100} \\approx 1.27 \\times 10^{30}"
+#~ msgstr "2^{100} \\approx 1.27 \\times 10^{30}"
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{x}) = "
+#~ "\\frac{\\exp(-E_\\theta(\\mathbf{x}))}{Z_\\theta}"
+#~ msgstr "若要计算特定构型的概率 $P_\\theta(\\mathbf{x})$，必须用 $Z_\\theta$ 归一化玻尔兹曼因子："
+
+#~ msgid "F = -\\log Z"
+#~ msgstr "在统计物理中，配分函数与 **Helmholtz 自由能** $F$ 紧密相关："
+

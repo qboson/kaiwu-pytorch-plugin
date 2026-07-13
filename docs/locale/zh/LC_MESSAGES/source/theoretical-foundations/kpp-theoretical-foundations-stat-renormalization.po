@@ -1,0 +1,309 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:10
+msgid ""
+"1.4 The Renormalization Group: From Microscopic Spins to Macroscopic "
+"Features"
+msgstr "1.4 重整化群：从微观自旋到宏观特征"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:12
+msgid ""
+"So far we have seen how the Ising model describes a system of interacting"
+" spins and how the Boltzmann distribution governs its equilibrium "
+"behaviour. But what happens when we **zoom out, i.e.** when we stop "
+"looking at every individual spin and instead focus on larger, coarse-"
+"grained blocks? This question is answered by the **Renormalization Group "
+"(RG)**, a powerful framework from statistical physics that explains why "
+"the laws of nature appear simple at different scales and why seemingly "
+"different systems can behave identically near a critical point. "
+"Remarkably, the RG also provides a deep physical analogy for the "
+"hierarchical feature learning performed by deep neural networks."
+msgstr ""
+"到目前为止，我们已经看到 Ising 模型如何描述相互作用的自旋系统，以及玻尔兹曼分布如何支配其平衡行为。但当我们 "
+"**放大观察尺度**，也就是不再关注每一个单独自旋，而是关注更大的粗粒化块时，会发生什么？这个问题由 **重整化群（Renormalization"
+" Group, RG）** "
+"回答。重整化群是统计物理中的强大框架，它解释了为什么自然规律在不同尺度上看起来很简单，以及为什么表面上不同的系统在临界点附近会表现出相同的行为。值得注意的是，重整化群也为深度神经网络中的层级特征学习提供了深刻的物理类比。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:14
+msgid "The Core Idea: Coarse-Graining"
+msgstr "核心思想：粗粒化"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:15
+msgid ""
+"Imagine a two-dimensional Ising model on a square lattice. Instead of "
+"observing every spin, we partition the lattice into blocks of size $2 "
+"\\times 2$, and replace each block with a single effective spin. This is "
+"called **coarse-graining**. The new effective spins interact with each "
+"other according to new, renormalized couplings $J'$ and fields $h'$. The "
+"key insight is that the rules of the universe – the Hamiltonian – change "
+"when you change your observational scale."
+msgstr ""
+"设想一个定义在二维方格上的 Ising 模型。我们不再观察每个自旋，而是把晶格划分为大小为 $2 \\times 2$ "
+"的块，并用一个有效自旋替代每个块。这称为 **粗粒化**。新的有效自旋之间按照新的、经过重整化的耦合 $J'$ 和场 $h'$ "
+"相互作用。核心观点：宇宙的运行规则（由哈密顿量描述）并非绝对不变，而是依赖于我们观察的尺度。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:17
+msgid "The process of coarse-graining is repeated iteratively:"
+msgstr "粗粒化过程可以迭代重复："
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:19
+msgid "Start with spins at the finest scale."
+msgstr "从最细尺度上的自旋开始。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:20
+msgid ""
+"Apply a coarse-graining transformation (e.g., block averaging or majority"
+" rule)."
+msgstr "应用粗粒化变换，例如块平均或多数规则。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:21
+msgid "Obtain a new, coarser Hamiltonian with new parameters."
+msgstr "得到带有新参数的、更粗尺度的哈密顿量。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:22
+msgid "Repeat."
+msgstr "重复上述过程。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:24
+msgid "This defines a **flow** in the space of Hamiltonians."
+msgstr "这就在哈密顿量空间中定义了一条 **流**。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:26
+msgid "Fixed Points and Universality"
+msgstr "不动点与普适性"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:27
+msgid ""
+"As the RG flow is iterated, the parameters $(J, h, \\ldots)$ move through"
+" the parameter space. The system may eventually reach a **fixed point**– "
+"a point where further coarse-graining leaves the Hamiltonian unchanged. "
+"Fixed points correspond to **critical points** of the system, where the "
+"correlation length diverges and the system becomes scale-invariant."
+msgstr ""
+"随着 RG 流不断迭代，参数 $(J, h, \\ldots)$ 会在参数空间中移动。系统最终可能到达一个 "
+"**不动点**，即进一步粗粒化后哈密顿量保持不变的点。不动点对应系统的 **临界点**，此时关联长度发散，系统呈现尺度不变性。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:29
+msgid ""
+"The profound consequence is **universality**: many different microscopic "
+"systems (different metals, different liquids) flow to the same fixed "
+"point. This is why we can compute properties of a liquid without knowing "
+"every detail of the molecules – the relevant physics at the macroscopic "
+"scale is determined by the fixed point, not by the microscopic details."
+msgstr ""
+"其深刻结果是 "
+"**普适性**：许多不同的微观系统，例如不同金属、不同液体，会流向同一个不动点。这解释了为什么我们不需要知道分子的每个细节，也能计算液体的性质。宏观尺度上的相关物理由不动点决定，而不是由微观细节决定。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:31
+msgid "The Renormalization Group and Deep Learning"
+msgstr "重整化群与深度学习"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:32
+msgid ""
+"The RG provides a striking physical analogy for the **hierarchical "
+"feature learning** performed by stacked RBMs (Deep Belief Networks, see "
+"Section [4.3 Beyond Single Layers: Stacking for Deep Learning](kpp-"
+"theoretical-foundations-bm-deep.md))."
+msgstr ""
+"RG 为堆叠 RBM（深度信念网络，见 [4.3 超越单层：面向深度学习的堆叠](kpp-theoretical-foundations-bm-"
+"deep.md)）所执行的 **层级特征学习** 提供了非常鲜明的物理类比。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Renormalization Group"
+msgstr "重整化群"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Deep Belief Network (Stacked RBM)"
+msgstr "深度信念网络（堆叠 RBM）"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Coarse-grain spin blocks"
+msgstr "对自旋块做粗粒化"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Pooling / abstracting features"
+msgstr "池化 / 抽象特征"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "New effective couplings"
+msgstr "新的有效耦合"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Higher-layer weights"
+msgstr "更高层的权重"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Fixed point (scale invariance)"
+msgstr "不动点（尺度不变性）"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Top-level, most abstract representation"
+msgstr "顶层、最抽象的表示"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid "Universality (same fixed point from many microstates)"
+msgstr "普适性（许多微观状态流向同一不动点）"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md
+msgid ""
+"Generalisation: same high-level features emerge from many training "
+"examples"
+msgstr "泛化：许多训练样本中涌现相同的高层特征"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:41
+msgid ""
+"In a DBN, each new hidden layer can be seen as a **coarse-graining "
+"operation** on the distribution of features from the layer below. The "
+"first hidden layer captures local edges and corners; the second layer "
+"combines these into mid-level shapes; the third layer forms high-level "
+"object representations. This process is directly analogous to an RG flow,"
+" where the “microscopic” data distribution is progressively simplified "
+"into a “macroscopic” abstract representation."
+msgstr ""
+"在 DBN 中，每个新的隐藏层都可以被看作对下层特征分布的一次 "
+"**粗粒化操作**。第一隐藏层捕捉局部边缘和角点；第二层把这些组合成中层形状；第三层形成高层对象表示。这个过程与 RG "
+"流直接类比：数据分布中的“微观”细节被逐步简化为“宏观”的抽象表示。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:43
+msgid ""
+"Just as the RG reveals that all critical points belong to a finite number"
+" of universality classes, deep learning shows that a well-trained network"
+" automatically discovers the universal structure of the data – the "
+"features that generalise across examples."
+msgstr "正如 RG 揭示所有临界点都属于有限数量的普适类，深度学习也表明，训练良好的网络会自动发现数据中的普适结构，也就是能跨样本泛化的特征。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:45
+msgid "Statistical Physics Foundations: Extensive and Intensive Variables"
+msgstr "统计物理基础：广延量与强度量"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:46
+msgid ""
+"To fully appreciate the RG analogy, we must distinguish between "
+"**extensive** and **intensive** variables in thermodynamics:"
+msgstr "为了充分理解 RG 类比，需要区分热力学中的 **广延量** 和 **强度量**："
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:48
+msgid ""
+"**Extensive variables** (e.g., volume $V$, energy $E$, entropy $S$, "
+"number of particles $N$) scale with the size of the system."
+msgstr "**广延量**，例如体积 $V$、能量 $E$、熵 $S$、粒子数 $N$，随系统大小而缩放。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:49
+msgid ""
+"**Intensive variables** (e.g., temperature $T$, pressure $p$, chemical "
+"potential $\\mu$) are independent of system size."
+msgstr "**强度量**，例如温度 $T$、压力 $p$、化学势 $\\mu$，与系统大小无关。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:51
+msgid ""
+"In the RG flow, the coarse-graining operation reduces the effective "
+"number of degrees of freedom—the \"system size\" decreases. Intensive "
+"variables like temperature and pressure remain invariant under scaling, "
+"while extensive variables like energy and entropy scale linearly with the"
+" number of effective spins."
+msgstr ""
+"在 RG "
+"流中，粗粒化操作减少了有效自由度数量，即“系统大小”减小。温度和压力等强度量在尺度变换下保持不变，而能量和熵等广延量会随有效自旋数量线性缩放。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:53
+msgid ""
+"This distinction is mirrored in deep learning: high-level representations"
+" are **intensive**—they capture invariant features of the data (e.g., "
+"\"catness\") that are independent of the input's spatial resolution or "
+"pixel count—while lower-level features are **extensive**, requiring more "
+"units to represent fine-grained details."
+msgstr ""
+"这种区别也反映在深度学习中：高层表示是 **强度式** "
+"的，它们捕捉数据的不变特征，例如“像猫的程度”，并且不依赖输入的空间分辨率或像素数量；低层特征则更 **广延式**，需要更多单元来表示细粒度细节。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:55
+msgid "The Connection to the Sampling Bottleneck"
+msgstr "与采样瓶颈的联系"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:56
+msgid ""
+"The RG also offers a physical perspective on the sampling problem "
+"introduced in later sections. Near a critical point, the correlation "
+"length diverges, and the system becomes difficult to simulate – Markov "
+"chains mix extremely slowly (critical slowing down). This is precisely "
+"the difficulty encountered when sampling from Boltzmann machines that are"
+" near their “critical” state, i.e., when the model has learned a rich, "
+"multimodal distribution. Understanding this slowdown is central to "
+"appreciating why alternative approaches – such as quantum sampling – are "
+"needed."
+msgstr ""
+"RG 也为后续章节引入的采样问题提供了物理视角。在临界点附近，关联长度发散，系统变得难以模拟，Markov "
+"链混合极其缓慢，即出现临界慢化。这正是从接近“临界”状态的玻尔兹曼机中采样时遇到的困难：此时模型已经学习到丰富的多模态分布。理解这种慢化，是理解为什么需要量子采样等替代方法的关键。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:58
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:59
+msgid ""
+"**Coarse-graining** transforms a system at one scale to an equivalent "
+"system at a larger scale."
+msgstr "**粗粒化** 把一个尺度上的系统变换为更大尺度上的等价系统。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:60
+msgid ""
+"**Renormalization Group** is the study of how the Hamiltonian changes "
+"under coarse-graining, leading to **fixed points** and **universality**."
+msgstr "**重整化群** 研究哈密顿量在粗粒化下如何变化，并由此产生 **不动点** 和 **普适性**。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:61
+msgid ""
+"The RG provides a deep physical analogy for **hierarchical feature "
+"learning** in deep neural networks: each layer coarse-grains the features"
+" from the layer below."
+msgstr "RG 为深度神经网络中的 **层级特征学习** 提供了深刻的物理类比：每一层都会对下层特征进行粗粒化。"
+
+#: ../../source/theoretical-foundations-stat-renormalization.md:62
+msgid ""
+"Critical slowing down in physical systems mirrors the **sampling "
+"bottleneck** in energy-based models, motivating the search for more "
+"efficient sampling methods."
+msgstr "物理系统中的临界慢化对应基于能量模型中的 **采样瓶颈**，从而推动我们寻找更高效的采样方法。"
+
+#~ msgid ""
+#~ "<b>Renormalization Group</b> is the study "
+#~ "of how the Hamiltonian changes under "
+#~ "coarse-graining, leading to <b>fixed "
+#~ "points</b> and <b>universality</b>."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The RG provides a deep physical "
+#~ "analogy for <b>hierarchical feature "
+#~ "learning</b> in deep neural networks: "
+#~ "each layer coarse-grains the features"
+#~ " from the layer below."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Critical slowing down in physical "
+#~ "systems mirrors the <b>sampling bottleneck</b>"
+#~ " in energy-based models, motivating "
+#~ "the search for more efficient sampling"
+#~ " methods."
+#~ msgstr ""
+

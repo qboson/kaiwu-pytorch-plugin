@@ -1,0 +1,626 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:42+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:10
+msgid "2.2 Recurrent Networks and Content-Addressable Memory"
+msgstr "2.2 循环网络与内容寻址记忆"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:12
+msgid ""
+"The perceptron exemplifies **feedforward** computation: information flows"
+" unidirectionally from input to output, and the network's state is "
+"entirely determined by the current input. This architecture is well-"
+"suited for pattern classification and function approximation, but it is "
+"fundamentally incapable of modeling temporal dependencies or exhibiting "
+"persistent internal states. To understand the architectural lineage that "
+"culminates in the Boltzmann machine, we must introduce **recurrent neural"
+" networks,** networks in which connections form directed cycles, allowing"
+" information to persist and dynamics to unfold over time. This section "
+"focuses on the recurrent architecture that directly precedes the "
+"Boltzmann machine, while the previous section 2.1 established the "
+"fundamental limitations of simple feedforward networks."
+msgstr ""
+"感知机体现了 **前馈** "
+"计算：信息从输入单向流向输出，网络状态完全由当前输入决定。这种架构适合模式分类和函数逼近，但从根本上无法建模时间依赖，也无法表现出持久的内部状态。要理解最终通向玻尔兹曼机的架构谱系，必须引入"
+" **循环神经网络**：连接中包含有向环路，使信息能够保持，动力学能够随时间展开。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:15
+msgid "From Feedforward to Recurrence"
+msgstr "从前馈到循环"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:16
+msgid ""
+"A recurrent neural network (RNN) differs from a feedforward network in a "
+"single, crucial respect: at least some of its connections form **feedback"
+" loops**. The output of a neuron at one time step can influence its own "
+"input, or the input of neurons earlier in the processing chain at "
+"subsequent time steps. This architectural difference has profound "
+"consequences:"
+msgstr ""
+"循环神经网络（RNN）与前馈网络的关键差异只有一个：至少一部分连接形成 "
+"**反馈环**。某个神经元在一个时间步的输出，可以在后续时间步影响自身输入，或影响处理链中更早神经元的输入。这一架构差异带来深刻后果："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:18
+msgid ""
+"**State persistence**: The network maintains an internal state that "
+"evolves over time, enabling it to process sequences of inputs or to "
+"settle into stable patterns even in the absence of external input."
+msgstr "**状态持久性**：网络维持一个随时间演化的内部状态，因此可以处理输入序列，或在没有外部输入时收敛到稳定模式。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:19
+msgid ""
+"**Dynamical systems**: An RNN is best understood not as a static function"
+" approximator but as a **dynamical system** whose state trajectory is "
+"governed by its weights and the initial conditions."
+msgstr "**动力系统**：RNN 最好被理解为一个 **动力系统**，其状态轨迹由权重和初始条件支配，而不是静态函数近似器。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:20
+msgid ""
+"**Memory**: Recurrence provides a form of **short-term memory** that "
+"extends beyond the single feedforward pass."
+msgstr "**记忆**：循环结构提供了一种 **短期记忆**，其作用超越单次前馈传递。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:22
+msgid "The Hopfield Network: A Prototypical Recurrent Architecture"
+msgstr "Hopfield 网络：典型循环架构"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:23
+msgid ""
+"The **Hopfield network**, introduced by John Hopfield in 1982, is the "
+"canonical example of a recurrent network designed for **associative "
+"memory**. Its elegant formulation and deep connection to statistical "
+"physics make it the direct conceptual precursor to the Boltzmann machine."
+msgstr ""
+"John Hopfield 于 1982 年提出的 **Hopfield 网络**，是为 **联想记忆** "
+"设计的循环网络的经典例子。它形式优雅，并与统计物理有深层联系，是玻尔兹曼机最直接的概念前身。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:25
+#, python-brace-format
+msgid ""
+"A Hopfield network consists of $N$ binary units, each taking values in "
+"$\\{-1, +1\\}$ (or equivalently $\\{0, 1\\}$). Every unit is connected to"
+" every other unit, forming a **fully connected recurrent graph**. The "
+"connections are **symmetric**:"
+msgstr ""
+"Hopfield 网络包含 $N$ 个二值单元，每个单元取值于 $\\{-1, +1\\}$（或等价地 $\\{0, "
+"1\\}$）。每个单元都与其他所有单元相连，形成 **全连接循环图**。连接是 **对称** 的："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:27
+#, python-brace-format
+msgid "w_{ij} = w_{ji},\\quad \\forall i, j"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:29
+#, python-brace-format
+msgid "and there are no self-connections: $w_{ii} = 0$."
+msgstr "并且没有自连接：$w_{ii} = 0$。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:31
+msgid ""
+"The network operates in discrete time. At each time step, a single unit "
+"is selected at random (or according to a fixed schedule) and its state is"
+" updated according to a deterministic rule:"
+msgstr "网络以离散时间运行。每个时间步随机选择一个单元（或按固定计划选择），并按照确定性规则更新其状态："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:33
+#, python-brace-format
+msgid ""
+"x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i "
+"\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:35
+#, python-brace-format
+msgid ""
+"This **asynchronous update** dynamics continues until the network reaches"
+" a **fixed point,** a state $\\mathbf{x}$ that remains unchanged under "
+"the update rule. The symmetry of the weight matrix guarantees that such "
+"fixed points exist and that the dynamics will converge to one from any "
+"initial state"
+msgstr ""
+"这种 **异步更新** 动力学持续进行，直到网络到达 **不动点**，即在更新规则下保持不变的状态 "
+"$\\mathbf{x}$。权重矩阵的对称性保证不动点存在，并保证动力学会从任意初始状态收敛到某个不动点。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:37
+msgid "Energy Landscape and Convergence"
+msgstr "能量景观与收敛"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:38
+msgid ""
+"The convergence of the Hopfield network is guaranteed by the existence of"
+" a **Lyapunov function** (or energy function) that decreases "
+"monotonically with each state update. For the Hopfield network, this "
+"energy is defined as:"
+msgstr "Hopfield 网络的收敛性由一个随每次状态更新单调下降的 **Lyapunov 函数**（或能量函数）保证。其能量定义为："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:40
+#, python-brace-format
+msgid ""
+"E(\\mathbf{x}) = -\\frac{1}{2} \\sum_{i \\neq j} w_{ij} x_i x_j - \\sum_i"
+" b_i x_i"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:42
+msgid "or, in matrix form:"
+msgstr "或写成矩阵形式："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:44
+#, python-brace-format
+msgid ""
+"E(\\mathbf{x}) = -\\frac{1}{2} \\mathbf{x}^\\top \\mathbf{W} \\mathbf{x} "
+"- \\mathbf{b}^\\top \\mathbf{x}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:46
+msgid ""
+"To verify that energy never increases, consider a flip of unit $i$from "
+"$x_i$ to $x_i' = -x_i$. The change in energy is:"
+msgstr "为了验证能量不会增加，考虑单元 $i$ 从 $x_i$ 翻转到 $x_i' = -x_i$。能量变化为："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:48
+#, python-brace-format
+msgid ""
+"\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = (x_i - x_i')\\left( "
+"\\sum_{j \\neq i} w_{ij} x_j + b_i \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:50
+#, python-brace-format
+msgid ""
+"If $x_i'$ is chosen to be $ \\text{sign}(\\sum w_{ij} x_j + b_i)$, then "
+"the term in parentheses has the same sign as $x_i'$. Since $x_i$ has the "
+"opposite sign, the product $(x_i - x_i')$ is non-zero and opposite in "
+"sign to the parenthesized term, ensuring $\\Delta E \\leq 0$. Energy "
+"strictly decreases unless the unit is already aligned with its input."
+msgstr ""
+"若 $x_i'$ 被选为 $ \\text{sign}(\\sum w_{ij} x_j + b_i)$，括号内项与 $x_i'$ 同号，而 "
+"$x_i$ 与其相反，因此乘积 $(x_i - x_i')$ 与括号项符号相反，保证 $\\Delta E \\leq "
+"0$。除非该单元已经与输入对齐，否则能量会严格下降。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:52
+msgid ""
+"Because the energy is bounded below (for finite weights and binary "
+"units), the network must eventually reach a **local minimum** of the "
+"energy function, where no single-unit flip can further lower the energy. "
+"These local minima are the **attractors** of the dynamic, which states "
+"toward which nearby initial configurations evolve."
+msgstr ""
+"由于能量对有限权重和二值单元而言有下界，网络最终必然到达能量函数的 "
+"**局部极小值**，此时任何单个单元翻转都无法进一步降低能量。这些局部极小值就是动力学的 **吸引子**，附近初始构型都会朝它们演化。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:54
+msgid "Storing Memories as Attractors"
+msgstr "将记忆存储为吸引子"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:55
+msgid ""
+"The Hopfield network is not merely a dynamical curiosity; it is a model "
+"of **content-addressable memory**. The goal is to store a set of desired "
+"patterns $\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
+"\\boldsymbol{\\xi}^P\\}$ as attractors of network dynamics. When "
+"presented with a corrupted or partial version of a stored pattern as the "
+"initial state, the network's deterministic descent down the energy "
+"landscape will restore the complete, original memory."
+msgstr ""
+"Hopfield 网络不仅是一个动力学奇观；它还是 **内容寻址记忆** 模型。目标是把一组期望模式 "
+"$\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
+"\\boldsymbol{\\xi}^P\\}$ "
+"存储为网络动力学的吸引子。当以某个存储模式的损坏版本或部分版本作为初始状态时，网络沿能量景观确定性下降，恢复完整的原始记忆。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:57
+#, python-brace-format
+msgid ""
+"The **Hebbian learning rule** provides a biologically inspired "
+"prescription for setting weights. For binary $ \\{-1, +1\\}$patterns, the"
+" weight between units $i$ and $j$ is set to:"
+msgstr ""
+"**Hebbian 学习规则** 提供了一种具有生物学启发的权重设置方案。对于二值 $\\{-1, +1\\}$ 模式，单元 $i$ 与 $j$ "
+"之间的权重为："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:59
+#, python-brace-format
+msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:61
+msgid ""
+"This rule is local, incremental, and plausible as a synaptic plasticity "
+"mechanism. Each stored pattern contributes $+1/N$ if units $i$ and $j$ "
+"have the same sign in that pattern, and $-1/N$ if they differ. The "
+"weights thus reflect the average correlation between units across the set"
+" of memories."
+msgstr ""
+"该规则是局部的、增量的，并且可被解释为突触可塑性机制。若单元 $i$ 和 $j$ 在某个模式中同号，该模式贡献 $+1/N$；若异号，则贡献 "
+"$-1/N$。因此，权重反映了记忆集合中单元之间的平均相关性。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:63
+msgid "Retrieval Dynamics: Pattern Completion and Error Correction"
+msgstr "检索动力学：模式补全与纠错"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:64
+#, python-brace-format
+msgid ""
+"Consider a stored pattern $\\boldsymbol{\\xi}^\\mu$. Under the Hebbian "
+"weight matrix, the input to unit $i$ when the network is in state "
+"$\\boldsymbol{\\xi}^\\mu$ is:"
+msgstr ""
+"考虑一个存储模式 $\\boldsymbol{\\xi}^\\mu$。在 Hebbian 权重矩阵下，网络处于状态 "
+"$\\boldsymbol{\\xi}^\\mu$ 时，单元 $i$ 的输入为："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:66
+#, python-brace-format
+msgid ""
+"\\sum_{j \\neq i} w_{ij} \\xi_j^\\mu = \\frac{1}{N} \\sum_{j \\neq i} "
+"\\sum_{\\nu=1}^P \\xi_i^\\nu \\xi_j^\\nu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:68
+msgid ""
+"This sum decomposes into a **signal** term (when $\\nu = \\mu$) and a "
+"**noise** or **crosstalk** term (when $\\nu \\neq \\mu$):"
+msgstr "该和可以分解为 **信号** 项（$\\nu = \\mu$）以及 **噪声** 或 **串扰** 项（$\\nu \\neq \\mu$）："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:70
+#, python-brace-format
+msgid ""
+"\\text{Signal} = \\frac{1}{N} \\sum_{j \\neq i} \\xi_i^\\mu "
+"(\\xi_j^\\mu)^2 = \\frac{N-1}{N} \\xi_i^\\mu \\approx \\xi_i^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:72
+#, python-brace-format
+msgid ""
+"\\text{Noise} = \\frac{1}{N} \\sum_{\\nu \\neq \\mu} \\sum_{j \\neq i} "
+"\\xi_i^\\nu \\xi_j^\\nu \\xi_j^\\mu"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:74
+#, python-brace-format
+msgid ""
+"If the stored patterns are random and uncorrelated, the noise term is "
+"approximately Gaussian with zero mean and variance proportional to $P/N$."
+" As long as the number of stored patterns $P$ is small compared to $N$, "
+"the signal dominates, and the pattern $\\boldsymbol{\\xi}^\\mu$ is a "
+"stable fixed point."
+msgstr ""
+"如果存储模式随机且不相关，噪声项近似为零均值高斯变量，方差与 $P/N$ 成正比。只要存储模式数量 $P$ 相比 $N$ "
+"足够小，信号项占主导，模式 $\\boldsymbol{\\xi}^\\mu$ 就是稳定不动点。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:76
+#, python-brace-format
+msgid ""
+"When the initial state is a **corrupted** version of "
+"$\\boldsymbol{\\xi}^\\mu$, say, with a fraction of bits flipped, the "
+"network dynamics drive the state back toward the original pattern. Each "
+"unit \"votes\" according to its connections, and the collective influence"
+" of the correctly recalled bits overwhelms the errors. This is **pattern "
+"completion**: the network fills in missing or noisy information by "
+"descending the energy landscape toward the nearest memory attractor."
+msgstr ""
+"当初始状态是 $\\boldsymbol{\\xi}^\\mu$ 的 "
+"**损坏版本**，例如一部分比特被翻转，网络动力学会把状态推回原始模式。每个单元根据连接进行“投票”，正确回忆比特的集体影响会压倒错误。这就是 "
+"**模式补全**：网络通过沿能量景观下降到最近的记忆吸引子，补齐缺失或带噪信息。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:78
+msgid "Content-Addressable vs. Address-Based Memory"
+msgstr "内容寻址记忆与地址式记忆"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:79
+msgid ""
+"Conventional computer memory is **address-based**: to retrieve an item, "
+"you must supply its exact memory address (or a pointer to it). If the "
+"address is corrupted or unknown, retrieval is impossible. Content-"
+"addressable memory, in contrast, allows retrieval based on **partial or "
+"approximate content**. You provide a fragment of the desired memory, and "
+"the system returns the complete item that best matches the fragment."
+msgstr ""
+"传统计算机内存是 **地址式** "
+"的：要取回某项内容，必须提供精确内存地址（或指向它的指针）。如果地址损坏或未知，检索就不可能。相反，内容寻址记忆允许基于 **部分或近似内容** "
+"进行检索。你提供目标记忆的一个片段，系统返回与该片段最匹配的完整项目。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:81
+msgid ""
+"The Hopfield network implements content-addressable memory in a "
+"distributed, fault-tolerant manner:"
+msgstr "Hopfield 网络以分布式、容错的方式实现内容寻址记忆："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:83
+msgid ""
+"**Distributed representation**: Each memory is stored across many "
+"synaptic weights, and each weight contributes to the storage of many "
+"memories."
+msgstr "**分布式表示**：每个记忆存储在许多突触权重中，而每个权重又参与许多记忆的存储。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:84
+msgid ""
+"**Graceful degradation**: As more memories are stored, retrieval becomes "
+"noisier but does not fail catastrophically until a critical capacity is "
+"exceeded."
+msgstr "**优雅退化**：存储记忆越多，检索噪声越大，但在超过临界容量前不会灾难性失败。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:85
+msgid ""
+"**Parallel processing**: All units update concurrently, allowing fast "
+"retrieval times that are independent of the number of stored memories."
+msgstr "**并行处理**：所有单元可并行更新，使检索时间不依赖于存储记忆的数量。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:87
+msgid "Capacity Limitations and Spurious Attractors"
+msgstr "容量限制与伪吸引子"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:88
+msgid ""
+"The Hopfield network's capacity is not infinite. As the number of stored "
+"patterns $P$ increases, the crosstalk noise grows. Beyond a critical "
+"**storage capacity** of approximately $ \\alpha_c \\approx 0.14 N$ (for "
+"random, unbiased patterns), the memories are no longer stable. The "
+"network undergoes a phase transition in which the intended attractors "
+"merge or disappear, and retrieval error rises abruptly."
+msgstr ""
+"Hopfield 网络容量并非无限。随着存储模式数 $P$ 增加，串扰噪声也会增加。超过约 $\\alpha_c \\approx 0.14 N$"
+" 的临界 **存储容量**（对于随机无偏模式）后，记忆不再稳定。网络发生相变，目标吸引子合并或消失，检索错误率突然上升。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:90
+msgid ""
+"Moreover, the Hebbian learning rule creates **spurious attractors,** "
+"stable states that do not correspond to any stored memory. These arise "
+"from:"
+msgstr "此外，Hebbian 学习规则会创造 **伪吸引子**，即不对应任何存储记忆的稳定状态。它们来源于："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:92
+msgid ""
+"**Mixture states**: Linear combinations of an odd number of stored "
+"patterns."
+msgstr "**混合状态**：奇数个存储模式的线性组合。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:93
+msgid ""
+"**Spin-reversed states**: The global negation of any stored pattern is "
+"also an attractor."
+msgstr "**自旋反转状态**：任意存储模式的全局取反也可能成为吸引子。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:94
+msgid ""
+"**Random valleys**: Intrinsic local minima of the disordered energy "
+"landscape."
+msgstr "**随机谷地**：无序能量景观固有的局部极小值。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:96
+msgid ""
+"These spurious attractors are the price of distributed, content-"
+"addressable storage. They limit the practical capacity of the network and"
+" can trap dynamics in unintended states."
+msgstr "这些伪吸引子是分布式内容寻址存储的代价。它们限制了网络的实际容量，并可能把动力学困在非预期状态。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:98
+msgid "From Hopfield to Boltzmann: The Missing Ingredient"
+msgstr "从 Hopfield 到 Boltzmann：缺失的成分"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:99
+msgid ""
+"The Hopfield network demonstrates that recurrent, symmetric networks can "
+"function as powerful associative memories. Yet it suffers from a critical"
+" limitation as a **generative model** of data: its dynamics are strictly "
+"deterministic and converge to the *nearest* local minimum, regardless of "
+"whether that minimum is a true memory, a spurious attractor, or merely a "
+"shallow basin in the energy landscape."
+msgstr ""
+"Hopfield 网络表明，循环对称网络可以作为强大的联想记忆。但作为数据的 "
+"**生成模型**，它有一个关键缺陷：动力学严格确定性地收敛到最近局部极小值，不管该极小值是真实记忆、伪吸引子，还是能量景观中的浅盆地。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:101
+msgid ""
+"The **Boltzmann machine** addresses this limitation by introducing "
+"**stochasticity** into the state updates, as previewed in Section [1.3 "
+"The Need for Noise: Escaping Spurious Minima](kpp-theoretical-"
+"foundations-stat-noise.md). Instead of deterministic thresholding, units "
+"update according to a probabilistic rule:"
+msgstr ""
+"**玻尔兹曼机** 通过在状态更新中引入 **随机性** 来解决这一问题，正如 [1.3 为什么需要噪声：逃离伪极小值](kpp-"
+"theoretical-foundations-stat-noise.md) "
+"所预告的。它不使用确定性阈值，而是按概率更新单元："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:103
+msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:105
+msgid ""
+"This single modification transforms the Hopfield network from a "
+"deterministic content-addressable memory into a **probabilistic "
+"generative model** capable of:"
+msgstr "这一单一修改把 Hopfield 网络从确定性的内容寻址记忆转变为 **概率生成模型**，具备以下能力："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:107
+msgid ""
+"**Sampling from a distribution**: The network no longer converges to a "
+"single fixed point but generates samples from the equilibrium Boltzmann "
+"distribution."
+msgstr "**从分布中采样**：网络不再收敛到单个不动点，而是从平衡玻尔兹曼分布中生成样本。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:108
+msgid ""
+"**Exploring multiple modes**: Thermal noise allows the network to visit "
+"different attractor basins, capturing the multimodal structure of complex"
+" data."
+msgstr "**探索多个模态**：热噪声允许网络访问不同吸引域，捕捉复杂数据的多模态结构。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:109
+msgid ""
+"**Learning by maximum likelihood**: The probabilistic formulation "
+"provides a principled objective function (maximizing the likelihood of "
+"observed data) and a learning algorithm based on contrasting clamped and "
+"free-running statistics."
+msgstr "**通过最大似然学习**：概率形式提供了原则化目标函数（最大化观测数据似然），以及基于固定统计与自由运行统计对比的学习算法。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:111
+msgid ""
+"Effectively, the Boltzmann machine allows the system to sample from a "
+"canonical ensemble (see Section [1.2 The Boltzmann Distribution and "
+"Equilibrium](kpp-theoretical-foundations-stat-boltzmann.md)) rather than "
+"simply descending into the nearest deterministic fixed point."
+msgstr "二者联系非常深刻：Hopfield 网络定义 **能量景观**，而玻尔兹曼机定义该景观上的 **概率分布**。两者由玻尔兹曼分布紧密连接："
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:113
+msgid ""
+"The connection is profound: the Hopfield network defines the **energy "
+"landscape**, while the Boltzmann machine defines the **probability "
+"distribution** over that landscape. The two are intimately related by the"
+" Boltzmann distribution:"
+msgstr "当 $T \\to 0$ 时，玻尔兹曼机退化为确定性 Hopfield 网络；在有限温度下，它成为灵活的数据概率模型。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:115
+#, python-brace-format
+msgid "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{x}) / T\\right)"
+msgstr ""
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:117
+msgid ""
+"As $T \\to 0$, the Boltzmann machine reduces to the deterministic "
+"Hopfield network. At finite temperatures, it becomes a flexible, "
+"probabilistic model of data."
+msgstr ""
+"换言之，玻尔兹曼机允许系统从正则系综中采样（见 [1.2 玻尔兹曼分布与平衡](kpp-theoretical-foundations-stat-"
+"boltzmann)），而不只是下降到最近的确定性不动点。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:119
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:120
+msgid ""
+"**Recurrent neural networks** introduce feedback loops, enabling "
+"persistent internal states and dynamical behavior over time."
+msgstr "**循环神经网络** 引入反馈环，使内部状态能够保持，并随时间表现出动力学行为。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:121
+msgid ""
+"The **Hopfield network** is a fully connected recurrent network with "
+"symmetric weights, designed for **content-addressable memory**."
+msgstr "**Hopfield 网络** 是具有对称权重的全连接循环网络，用于 **内容寻址记忆**。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:122
+msgid ""
+"The network's dynamics minimize an **energy function**, guaranteeing "
+"convergence to **local minima** that serve as attractors for stored "
+"memories."
+msgstr "网络动力学最小化 **能量函数**，保证收敛到作为记忆吸引子的 **局部极小值**。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:123
+msgid ""
+"The **Hebbian learning rule** stores patterns as correlations in the "
+"weight matrix, enabling pattern completion and error correction."
+msgstr "**Hebbian 学习规则** 把模式存储为权重矩阵中的相关性，使模式补全与纠错成为可能。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:124
+msgid ""
+"**Spurious attractors** and limited **storage capacity** are intrinsic "
+"drawbacks of the Hopfield model."
+msgstr "**伪吸引子** 和有限 **存储容量** 是 Hopfield 模型的内在缺点。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:125
+msgid ""
+"The **Boltzmann machine** extends the Hopfield network by replacing "
+"deterministic updates with **stochastic sampling**, transforming an "
+"associative memory into a **probabilistic generative model**."
+msgstr "**玻尔兹曼机** 通过用 **随机采样** 替代确定性更新扩展 Hopfield 网络，把联想记忆转化为 **概率生成模型**。"
+
+#: ../../source/theoretical-foundations-nn-recurrent.md:126
+msgid ""
+"The Hopfield energy function becomes the basis for the **Boltzmann "
+"distribution**, linking deterministic attractor dynamics to probabilistic"
+" inference."
+msgstr "Hopfield 能量函数成为 **玻尔兹曼分布** 的基础，将确定性吸引子动力学与概率推断连接起来。"
+
+#~ msgid "w_{ij} = w_{ji},\\quad \\forall i, j"
+#~ msgstr ""
+#~ "Hopfield 网络包含 $N$ 个二值单元，每个单元取值于 $\\{-1, "
+#~ "+1\\}$（或等价地 $\\{0, 1\\}$）。每个单元都与其他所有单元相连，形成 "
+#~ "**全连接循环图**。连接是 **对称** 的："
+
+#~ msgid ""
+#~ "x_i \\leftarrow \\text{sign}\\left( \\sum_{j "
+#~ "\\neq i} w_{ij} x_j + b_i \\right)"
+#~ msgstr "网络以离散时间运行。每个时间步随机选择一个单元（或按固定计划选择），并按照确定性规则更新其状态："
+
+#~ msgid ""
+#~ "E(\\mathbf{x}) = -\\frac{1}{2} \\sum_{i \\neq"
+#~ " j} w_{ij} x_i x_j - \\sum_i "
+#~ "b_i x_i"
+#~ msgstr "Hopfield 网络的收敛性由一个随每次状态更新单调下降的 **Lyapunov 函数**（或能量函数）保证。其能量定义为："
+
+#~ msgid ""
+#~ "E(\\mathbf{x}) = -\\frac{1}{2} \\mathbf{x}^\\top "
+#~ "\\mathbf{W} \\mathbf{x} - \\mathbf{b}^\\top "
+#~ "\\mathbf{x}"
+#~ msgstr "或写成矩阵形式："
+
+#~ msgid ""
+#~ "\\Delta E = E(\\mathbf{x}') - "
+#~ "E(\\mathbf{x}) = (x_i - x_i')\\left( "
+#~ "\\sum_{j \\neq i} w_{ij} x_j + b_i"
+#~ " \\right)"
+#~ msgstr "为了验证能量不会增加，考虑单元 $i$ 从 $x_i$ 翻转到 $x_i' = -x_i$。能量变化为："
+
+#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+#~ msgstr ""
+#~ "**Hebbian 学习规则** 提供了一种具有生物学启发的权重设置方案。对于二值 $\\{-1,"
+#~ " +1\\}$ 模式，单元 $i$ 与 $j$ 之间的权重为："
+
+#~ msgid ""
+#~ "\\sum_{j \\neq i} w_{ij} \\xi_j^\\mu ="
+#~ " \\frac{1}{N} \\sum_{j \\neq i} "
+#~ "\\sum_{\\nu=1}^P \\xi_i^\\nu \\xi_j^\\nu \\xi_j^\\mu"
+#~ msgstr ""
+#~ "考虑一个存储模式 $\\boldsymbol{\\xi}^\\mu$。在 Hebbian "
+#~ "权重矩阵下，网络处于状态 $\\boldsymbol{\\xi}^\\mu$ 时，单元 $i$ "
+#~ "的输入为："
+
+#~ msgid ""
+#~ "\\text{Signal} = \\frac{1}{N} \\sum_{j \\neq"
+#~ " i} \\xi_i^\\mu (\\xi_j^\\mu)^2 = "
+#~ "\\frac{N-1}{N} \\xi_i^\\mu \\approx \\xi_i^\\mu"
+#~ msgstr "该和可以分解为 **信号** 项（$\\nu = \\mu$）以及 **噪声** 或 **串扰** 项（$\\nu \\neq \\mu$）："
+
+#~ msgid ""
+#~ "\\text{Noise} = \\frac{1}{N} \\sum_{\\nu \\neq"
+#~ " \\mu} \\sum_{j \\neq i} \\xi_i^\\nu "
+#~ "\\xi_j^\\nu \\xi_j^\\mu"
+#~ msgstr ""
+#~ "$\\text{Signal} = \\frac{1}{N} \\sum_{j \\neq"
+#~ " i} \\xi_i^\\mu (\\xi_j^\\mu)^2 = "
+#~ "\\frac{N-1}{N} \\xi_i^\\mu \\approx \\xi_i^\\mu$"
+
+#~ msgid ""
+#~ "P(x_i = 1) = \\sigma\\left( "
+#~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
+#~ "\\right)"
+#~ msgstr ""
+#~ "**玻尔兹曼机** 通过在状态更新中引入 **随机性** 来解决这一问题，正如 [1.3"
+#~ " 为什么需要噪声：逃离伪极小值](/kpp-theoretical-"
+#~ "foundations\\section1.3-kpp-theoretical-foundations-"
+#~ "stat-noise) 所预告的。它不使用确定性阈值，而是按概率更新单元："
+
+#~ msgid "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{x}) / T\\right)"
+#~ msgstr "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{x}) / T\\right)"
+
+#~ msgid "::"
+#~ msgstr "::"

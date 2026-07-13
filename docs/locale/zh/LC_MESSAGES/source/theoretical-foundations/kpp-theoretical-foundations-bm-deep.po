@@ -1,0 +1,556 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the Kaiwu Pytorch
+# Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu Pytorch Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-10 10:39+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/theoretical-foundations-bm-deep.md:10
+msgid "4.3 Beyond Single Layers: Stacking for Deep Learning"
+msgstr "4.3 超越单层：面向深度学习的堆叠"
+
+#: ../../source/theoretical-foundations-bm-deep.md:12
+msgid ""
+"The Restricted Boltzmann Machine, as presented in Section [4.2 Restricted"
+" Boltzmann Machine (RBM)](kpp-theoretical-foundations-bm-restricted.md), is "
+"a powerful generative model with a single layer of latent variables. "
+"However, many real-world datasets, i.e. images, speech, natural language,"
+" exhibit **hierarchical structure**. Low-level features (edges, phonemes,"
+" word fragments) combine to form mid-level features (shapes, syllables, "
+"phrases), which in turn combine to form high-level concepts (objects, "
+"words, semantics). A single-layer latent variable model, no matter how "
+"many hidden units it possesses, may struggle to capture such multi-level "
+"abstractions efficiently. This limitation motivates the **stacking** of "
+"RBMs to form **Deep Belief Networks (DBNs)** and **Deep Boltzmann "
+"Machines (DBMs)**. Stacking transforms a shallow generative model into a "
+"deep, hierarchical one, capable of learning progressively more abstract "
+"representations of the data. This section describes the greedy layer-wise"
+" training procedure that made deep generative models practical, and "
+"explains how stacked RBMs connect to the broader landscape of deep "
+"learning."
+msgstr ""
+"如 [4.2 受限玻尔兹曼机（RBM）](kpp-theoretical-foundations-bm-restricted.md) 所述，RBM "
+"是一种具有单层潜变量的强大生成模型。然而，许多现实数据集，例如图像、语音和自然语言，都具有 "
+"**层级结构**。低层特征（边缘、音素、词片段）组合成中层特征（形状、音节、短语），再进一步组合成高层概念（物体、词语、语义）。无论隐藏单元数量多大，单层潜变量模型都可能难以高效捕捉这种多层抽象。"
+" 这一局限促成了 RBM 的 **堆叠**，形成 **深度置信网络（Deep Belief Networks, DBNs）** 和 "
+"**深度玻尔兹曼机（Deep Boltzmann Machines, "
+"DBMs）**。堆叠把浅层生成模型转化为深层层级模型，能够学习逐渐抽象的数据表示。本节介绍使深度生成模型变得实用的贪婪逐层训练过程，并说明堆叠 "
+"RBM 与更广阔深度学习版图的联系。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:15
+msgid "The Motivation: Hierarchical Feature Learning"
+msgstr "动机：层级特征学习"
+
+#: ../../source/theoretical-foundations-bm-deep.md:16
+msgid ""
+"Consider the task of modeling a collection of face images. A shallow RBM "
+"with a single hidden layer might learn localized Gabor-like edge "
+"detectors as its hidden features. These are useful, but they fail to "
+"capture the higher-order regularities of faces: the spatial arrangement "
+"of eyes, nose, and mouth, or the characteristic symmetries of facial "
+"structure."
+msgstr ""
+"考虑建模一组人脸图像。单隐藏层的浅层 RBM 可能学习到局部 Gabor "
+"风格的边缘检测器。这些特征有用，但无法捕捉人脸的高阶规律：眼睛、鼻子和嘴的空间排列，或面部结构的典型对称性。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:18
+msgid ""
+"A deep architecture, by contrast, can learn a **hierarchy of "
+"representations**:"
+msgstr "相比之下，深层架构可以学习 **表示层级**："
+
+#: ../../source/theoretical-foundations-bm-deep.md:20
+msgid ""
+"**First hidden layer**: Detects low-level features such as oriented edges"
+" and corners."
+msgstr "**第一隐藏层**：检测低层特征，如有方向的边缘和角点。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:21
+msgid ""
+"**Second hidden layer**: Combines edges to form mid-level features like "
+"facial parts (eye, nose, mouth detectors)."
+msgstr "**第二隐藏层**：组合边缘，形成中层特征，如面部部件（眼、鼻、嘴检测器）。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:22
+msgid ""
+"**Third hidden layer**: Combines facial parts to form high-level, "
+"abstract representations of whole faces."
+msgstr "**第三隐藏层**：组合面部部件，形成整张人脸的高层抽象表示。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:24
+msgid ""
+"This hierarchical composition mirrors the structure of the visual cortex "
+"and enables the model to represent complex data distributions with "
+"exponentially fewer parameters than a shallow model of comparable "
+"representational power."
+msgstr "这种层级组合与视觉皮层结构相似，并使模型能够用比同等表达能力的浅层模型少得多的参数表示复杂数据分布。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:26
+msgid "Deep Belief Networks: Composition of RBMs"
+msgstr "深度置信网络：RBM 的组合"
+
+#: ../../source/theoretical-foundations-bm-deep.md:27
+msgid ""
+"A **Deep Belief Network (DBN)** is a generative model composed of "
+"multiple layers of stochastic, latent variables. The top two layers form "
+"an **undirected** RBM, while the lower layers form a **directed** sigmoid"
+" belief network. Specifically, a DBN with $L$ hidden layers is defined "
+"as:"
+msgstr ""
+"**深度置信网络（DBN）** 是由多层随机潜变量组成的生成模型。最顶端两层形成一个 **无向** RBM，而较低层构成 **有向** "
+"sigmoid 置信网络。具体而言，包含 $L$ 个隐藏层的 DBN 定义为："
+
+#: ../../source/theoretical-foundations-bm-deep.md:29
+#, python-brace-format
+msgid ""
+"The top two layers, $\\mathbf{h}^{(L-1)}$ and $\\mathbf{h}^{(L)}$, form "
+"an RBM."
+msgstr "顶部两层 $\\mathbf{h}^{(L-1)}$ 和 $\\mathbf{h}^{(L)}$ 形成一个 RBM。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:30
+#, python-brace-format
+msgid ""
+"The remaining layers are connected via directed, top-down generative "
+"weights: $\\mathbf{h}^{(l)}$ generates $\\mathbf{h}^{(l-1)}$ for $l = "
+"L-1, \\ldots, 1$, with $\\mathbf{h}^{(0)} = \\mathbf{v}$."
+msgstr ""
+"其余层通过自顶向下的有向生成权重连接：$\\mathbf{h}^{(l)}$ 生成 $\\mathbf{h}^{(l-1)}$，其中 $l = "
+"L-1, \\ldots, 1$，并令 $\\mathbf{h}^{(0)} = \\mathbf{v}$。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:32
+msgid "The joint distribution factorizes as:"
+msgstr "联合分布分解为："
+
+#: ../../source/theoretical-foundations-bm-deep.md:34
+#, python-brace-format
+msgid ""
+"P(\\mathbf{v}, \\mathbf{h}^{(1)}, \\ldots, \\mathbf{h}^{(L)}) = "
+"P(\\mathbf{h}^{(L-1)}, \\mathbf{h}^{(L)}) \\prod_{l=1}^{L-2} "
+"P(\\mathbf{h}^{(l)} \\mid \\mathbf{h}^{(l+1)})"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:36
+#, python-brace-format
+msgid ""
+"where $P(\\mathbf{h}^{(L-1)}, \\mathbf{h}^{(L)})$ is the RBM distribution"
+" at the top, and the conditional distributions $P(\\mathbf{h}^{(l)} \\mid"
+" \\mathbf{h}^{(l+1)})$ are those of a sigmoid belief network."
+msgstr ""
+"其中 $P(\\mathbf{h}^{(L-1)}, \\mathbf{h}^{(L)})$ 是顶层 RBM 分布，条件分布 "
+"$P(\\mathbf{h}^{(l)} \\mid \\mathbf{h}^{(l+1)})$ 来自 sigmoid 置信网络。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:38
+#, python-brace-format
+msgid ""
+"The directed connections enable efficient **ancestral sampling**: to "
+"generate a sample, one first samples from the top RBM to obtain "
+"$\\mathbf{h}^{(L-1)}$ and $\\mathbf{h}^{(L)}$, then propagates downward "
+"through the directed layers, sampling each layer in turn."
+msgstr ""
+"有向连接支持高效的 **祖先采样**：生成样本时，先从顶层 RBM 中采样得到 $\\mathbf{h}^{(L-1)}$ 与 "
+"$\\mathbf{h}^{(L)}$，再沿有向层向下传播，逐层采样。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:40
+msgid "Greedy Layer-Wise Training"
+msgstr "贪婪逐层训练"
+
+#: ../../source/theoretical-foundations-bm-deep.md:41
+msgid ""
+"Training a deep generative model with many layers of latent variables is "
+"challenging due to the **explaining-away** effect and the intractability "
+"of exact inference. The breakthrough that made DBNs practical was "
+"**greedy layer-wise pre-training**, introduced by Hinton, Osindero, and "
+"Teh in 2006."
+msgstr ""
+"训练包含多层潜变量的深度生成模型很困难，原因包括 **解释消除** 效应和精确推断不可处理。Hinton、Osindero 和 Teh 在 "
+"2006 年提出的 **贪婪逐层预训练** 使 DBN 变得实用。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:43
+msgid ""
+"The core idea is elegantly simple: **train one RBM at a time, and stack "
+"them**."
+msgstr "核心思想非常简洁：**一次训练一个 RBM，然后把它们堆叠起来**。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:45
+msgid "**Algorithm: Greedy Layer-Wise Training of a DBN**"
+msgstr "**算法：DBN 的贪婪逐层训练**"
+
+#: ../../source/theoretical-foundations-bm-deep.md:47
+msgid "**Train the first RBM**:"
+msgstr "**训练第一个 RBM**："
+
+#: ../../source/theoretical-foundations-bm-deep.md:48
+#, python-brace-format
+msgid ""
+"Treat the visible data $\\mathbf{v}$ as the visible layer and introduce a"
+" hidden layer $\\mathbf{h}^{(1)}$."
+msgstr "把可见数据 $\\mathbf{v}$ 作为可见层，并引入隐藏层 $\\mathbf{h}^{(1)}$。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:49
+msgid "Train an RBM on the data using contrastive divergence."
+msgstr "使用对比散度在数据上训练 RBM。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:50
+#, python-brace-format
+msgid ""
+"After training, the RBM defines a generative model $P(\\mathbf{v}, "
+"\\mathbf{h}^{(1)})$ and an inference model $P(\\mathbf{h}^{(1)} \\mid "
+"\\mathbf{v})$."
+msgstr ""
+"训练后，RBM 定义了生成模型 $P(\\mathbf{v}, \\mathbf{h}^{(1)})$ 和推断模型 "
+"$P(\\mathbf{h}^{(1)} \\mid \\mathbf{v})$。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:52
+msgid "**Generate training data for the next layer**:"
+msgstr "**为下一层生成训练数据**："
+
+#: ../../source/theoretical-foundations-bm-deep.md:53
+#, python-brace-format
+msgid ""
+"Use the trained inference model to compute the posterior probabilities "
+"$P(\\mathbf{h}^{(1)} \\mid \\mathbf{v})$ for each training example."
+msgstr "使用训练好的推断模型，为每个训练样本计算后验概率 $P(\\mathbf{h}^{(1)} \\mid \\mathbf{v})$。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:54
+msgid ""
+"These posterior probabilities (or samples from them) become the \"data\" "
+"for training the next RBM. They represent the data in the feature space "
+"learned by the first hidden layer."
+msgstr "这些后验概率（或从中采样得到的状态）成为训练下一层 RBM 的“数据”。它们是在第一隐藏层学习到的特征空间中的数据表示。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:56
+msgid "**Train the second RBM**:"
+msgstr "**训练第二个 RBM**："
+
+#: ../../source/theoretical-foundations-bm-deep.md:57
+#, python-brace-format
+msgid ""
+"Treat the vectors $\\mathbf{h}^{(1)}$ as visible units and introduce a "
+"second hidden layer $\\mathbf{h}^{(2)}$."
+msgstr "把向量 $\\mathbf{h}^{(1)}$ 当作可见单元，并引入第二隐藏层 $\\mathbf{h}^{(2)}$。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:58
+msgid "Train an RBM on these feature vectors."
+msgstr "在这些特征向量上训练 RBM。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:60
+msgid "**Repeat** for as many layers as desired."
+msgstr "**按需重复**，训练更多层。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:62
+msgid ""
+"After this unsupervised pre-training, the stacked RBMs can be converted "
+"into a DBN by discarding the bottom-up recognition weights of all but the"
+" first layer, and using the top-down generative weights to define the "
+"directed model. Alternatively, weights can be used to initialize a deep "
+"neural network for **discriminative fine-tuning** using backpropagation."
+msgstr ""
+"无监督预训练完成后，可以把堆叠的 RBM 转换为 "
+"DBN：除第一层外，丢弃自底向上的识别权重，并使用自顶向下的生成权重定义有向模型。也可以用这些权重初始化一个深层神经网络，再通过反向传播进行 "
+"**判别式微调**。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:64
+msgid "Why Greedy Layer-Wise Training Works"
+msgstr "为什么贪婪逐层训练有效"
+
+#: ../../source/theoretical-foundations-bm-deep.md:65
+msgid ""
+"The effectiveness of greedy layer-wise training can be understood from "
+"several perspectives:"
+msgstr "贪婪逐层训练的有效性可以从多个角度理解："
+
+#: ../../source/theoretical-foundations-bm-deep.md:67
+msgid ""
+"**Variational Lower Bound**: Adding a new hidden layer and training it as"
+" an RBM on the inferred features of the previous layer can be shown to "
+"improve a variational lower bound on the log-likelihood of the data under"
+" the expanded model. Each additional layer tightens the bond."
+msgstr ""
+"**变分下界**：添加新隐藏层，并在上一层推断出的特征上把它训练为 "
+"RBM，可以证明会改善扩展模型下数据对数似然的变分下界。每增加一层都会收紧这个下界。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:68
+msgid ""
+"**Feature Abstraction**: Each RBM learns to model the distribution of "
+"features produced by the layer below. Since these features are already "
+"somewhat abstract and decorrelated, the next RBM can focus on capturing "
+"higher-order dependencies among them."
+msgstr "**特征抽象**：每个 RBM 学习建模下一层产生的特征分布。由于这些特征已经更抽象、相关性更弱，下一层 RBM 可以专注捕捉它们之间的高阶依赖。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:69
+msgid ""
+"**Avoiding Local Minima**: Deep supervised networks trained from random "
+"initializations often get stuck in poor local minima due to the complex, "
+"non-convex loss landscape. Pre-training initializes the weights in a "
+"region of parameter space that corresponds to a sensible generative model"
+" of the data, providing a far better starting point for subsequent "
+"discriminative fine-tuning."
+msgstr "**避免差的局部极小值**：从随机初始化训练深层监督网络时，复杂非凸损失景观常使优化陷入差的局部极小值。预训练把权重初始化到能够合理生成数据的参数区域，为后续判别式微调提供更好的起点。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:71
+msgid "Deep Boltzmann Machines (DBMs)"
+msgstr "深度玻尔兹曼机（DBM）"
+
+#: ../../source/theoretical-foundations-bm-deep.md:72
+msgid ""
+"A closely related architecture is the **Deep Boltzmann Machine (DBM)**, "
+"introduced by Salakhutdinov and Hinton in 2009. Unlike a DBN, where only "
+"the top two layers form an undirected RBM, a DBM is a **fully "
+"undirected** model with multiple hidden layers. All connections are "
+"symmetric, and there are no directed edges."
+msgstr ""
+"一个相关架构是 Salakhutdinov 与 Hinton 于 2009 年提出的 **深度玻尔兹曼机（DBM）**。不同于只有顶部两层为无向 "
+"RBM 的 DBN，DBM 是包含多层隐藏变量的 **完全无向** 模型。所有连接都是对称的，没有有向边。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:74
+msgid "The energy function for a DBM with two hidden layers is:"
+msgstr "包含两层隐藏层的 DBM 能量函数为："
+
+#: ../../source/theoretical-foundations-bm-deep.md:76
+#, python-brace-format
+msgid ""
+"E(\\mathbf{v}, \\mathbf{h}^{(1)}, \\mathbf{h}^{(2)}) = -\\mathbf{v}^\\top"
+" \\mathbf{W}^{(1)} \\mathbf{h}^{(1)} - (\\mathbf{h}^{(1)})^\\top "
+"\\mathbf{W}^{(2)} \\mathbf{h}^{(2)} - \\mathbf{b}^\\top \\mathbf{v} - "
+"(\\mathbf{c}^{(1)})^\\top \\mathbf{h}^{(1)} - (\\mathbf{c}^{(2)})^\\top "
+"\\mathbf{h}^{(2)}"
+msgstr ""
+
+#: ../../source/theoretical-foundations-bm-deep.md:78
+msgid ""
+"DBMs retain the full undirected nature of the Boltzmann machine, which "
+"makes them more principled probabilistic models than DBNs. However, exact"
+" inference is even more challenging, and training typically requires a "
+"more sophisticated procedure, often involving mean-field approximations "
+"or persistent contrastive divergence with carefully designed "
+"initialization."
+msgstr ""
+"DBM 保留玻尔兹曼机完整的无向性质，因此从概率模型角度比 DBN "
+"更原则化。然而，精确推断更加困难，训练通常需要更复杂过程，例如均值场近似，或配合精心初始化的持久对比散度。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:80
+msgid ""
+"In practice, DBNs have been more widely adopted due to their simpler "
+"training procedure and direct compatibility with feedforward neural "
+"network initialization."
+msgstr "实践中，DBN 因训练过程更简单，并能直接用于前馈神经网络初始化，应用更广泛。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:82
+msgid "From Unsupervised Pre-Training to Discriminative Fine-Tuning"
+msgstr "从无监督预训练到判别式微调"
+
+#: ../../source/theoretical-foundations-bm-deep.md:83
+msgid ""
+"One of the most impactful applications of stacked RBMs was **unsupervised"
+" pre-training for deep supervised learning**. Before the widespread "
+"adoption of techniques like batch normalization, ReLU activations, and "
+"large labeled datasets (e.g., ImageNet), training deep neural networks "
+"with many hidden layers was notoriously difficult. Gradients would vanish"
+" or explode, and optimization would stall in poor local minima."
+msgstr ""
+"堆叠 RBM 最有影响力的应用之一，是用于深层监督学习的 **无监督预训练**。在批归一化、ReLU 激活、大规模有标签数据集（如 "
+"ImageNet）广泛使用之前，训练多隐藏层深度神经网络非常困难。梯度可能消失或爆炸，优化也容易停在差的局部极小值。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:85
+msgid "The RBM pre-training pipeline provided a solution:"
+msgstr "RBM 预训练流程提供了解法："
+
+#: ../../source/theoretical-foundations-bm-deep.md:87
+msgid ""
+"**Pre-train** a stack of RBMs in an unsupervised manner on unlabeled data"
+" (which was often abundant)."
+msgstr "在无标签数据上以无监督方式 **预训练** 一组 RBM（无标签数据通常更丰富）。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:88
+msgid ""
+"**Unroll** the stacked RBMs to form a deep feedforward network with the "
+"same weights. This network effectively implements the bottom-up inference"
+" pathway."
+msgstr "将堆叠 RBM **展开** 为具有相同权重的深层前馈网络；该网络实现自底向上的推断路径。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:89
+msgid "**Add a classification layer** on top of the highest-level features."
+msgstr "在最高层特征上添加分类层。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:90
+msgid ""
+"**Fine-tune** the entire network using backpropagation on the labeled "
+"data."
+msgstr "使用有标签数据对整个网络进行反向传播 **微调**。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:92
+msgid ""
+"This approach achieved state-of-the-art results on MNIST and, more "
+"impressively, enabled the first significant reduction in error rates on "
+"the TIMIT speech recognition benchmark. It demonstrated that deep "
+"architectures could be trained effectively if initialized properly, "
+"paving the way for the deep learning revolution."
+msgstr ""
+"该方法在 MNIST 上取得当时领先结果，并在 TIMIT "
+"语音识别基准上显著降低错误率。它证明了只要初始化得当，深层架构可以有效训练，为深度学习革命铺平道路。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:94
+msgid "The End of the Pre-Training Era and the Legacy of Stacked RBMs"
+msgstr "预训练时代的结束与堆叠 RBM 的遗产"
+
+#: ../../source/theoretical-foundations-bm-deep.md:95
+msgid ""
+"By the early 2010s, advances in optimization (momentum, RMSprop, Adam), "
+"activation functions (ReLU and variants), regularization (dropout), and "
+"the availability of massive labeled datasets made unsupervised pre-"
+"training less necessary for many supervised tasks. End-to-end supervised "
+"training of deep networks from random initialization became the norm."
+msgstr ""
+"到 2010 年代初，优化方法（momentum、RMSprop、Adam）、激活函数（ReLU "
+"及其变体）、正则化（dropout）以及海量有标签数据的进步，使许多监督任务不再需要无监督预训练。从随机初始化进行端到端监督训练成为常态。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:97
+msgid "However, the conceptual legacy of stacked RBMs endures:"
+msgstr "然而，堆叠 RBM 的概念遗产仍然存在："
+
+#: ../../source/theoretical-foundations-bm-deep.md:99
+msgid ""
+"They established the **viability of deep architectures** and the "
+"importance of **hierarchical feature learning**."
+msgstr "它们证明了 **深层架构的可行性**，以及 **层级特征学习** 的重要性。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:100
+msgid ""
+"They demonstrated the value of **unsupervised representation learning** "
+"as a precursor to supervised tasks."
+msgstr "它们展示了 **无监督表示学习** 作为监督任务前置步骤的价值。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:101
+msgid ""
+"They introduced **contrastive divergence** and **greedy layer-wise "
+"training**, which remain valuable tools in the generative modeling "
+"toolkit."
+msgstr "它们引入了 **对比散度** 和 **贪婪逐层训练**，这些仍是生成建模工具箱中的重要思想。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:102
+msgid ""
+"They inspired subsequent generative models, including **Variational "
+"Autoencoders (VAEs)** and **Generative Adversarial Networks (GANs)**, "
+"which also learn hierarchical latent representations, albeit with "
+"different training objectives."
+msgstr "它们启发了后续生成模型，包括 **变分自编码器（VAEs）** 和 **生成对抗网络（GANs）**；这些模型也学习层级潜表示，尽管训练目标不同。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:104
+msgid ""
+"Moreover, in domains where labeled data is scarce but unlabeled data is "
+"plentiful, unsupervised pre-training with RBMs or their modern "
+"descendants (e.g., deep belief networks, deep Boltzmann machines) remains"
+" a relevant and effective strategy."
+msgstr "此外，在标签稀缺而无标签数据充足的领域，使用 RBM 或其现代后继模型（如 DBN、DBM）进行无监督预训练仍然是一种相关且有效的策略。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:106
+msgid "Stacking Beyond RBMs: The General Principle"
+msgstr "超越 RBM 的堆叠：一般原则"
+
+#: ../../source/theoretical-foundations-bm-deep.md:107
+msgid ""
+"The principle of stacking simple modules to build deep, hierarchical "
+"models extends far beyond RBMs. Modern deep learning is built on this "
+"exact idea:"
+msgstr "把简单模块堆叠成深层层级模型的原则远超 RBM。现代深度学习正建立在这一思想上："
+
+#: ../../source/theoretical-foundations-bm-deep.md:109
+msgid ""
+"**Convolutional neural networks** stack convolutional layers to learn "
+"increasingly complex visual features."
+msgstr "**卷积神经网络** 堆叠卷积层，学习越来越复杂的视觉特征。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:110
+msgid ""
+"**Transformers** stack self-attention layers to capture hierarchical "
+"linguistic structure."
+msgstr "**Transformer** 堆叠自注意力层，捕捉层级语言结构。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:111
+msgid ""
+"**Diffusion models** stack denoising steps to gradually refine generated "
+"samples."
+msgstr "**扩散模型** 堆叠去噪步骤，逐步细化生成样本。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:113
+msgid ""
+"The RBM stack was the first practical demonstration that **greedy layer-"
+"wise construction** could bootstrap the training of deep generative "
+"models. This insight remains a cornerstone of deep learning methodology."
+msgstr "RBM 堆叠是最早证明 **贪婪逐层构建** 可以启动深度生成模型训练的实践示范。这一洞见仍是深度学习方法论的重要基石。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:115
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/theoretical-foundations-bm-deep.md:116
+msgid ""
+"**Stacking RBMs** forms **Deep Belief Networks (DBNs)** and **Deep "
+"Boltzmann Machines (DBMs)**, enabling hierarchical feature learning."
+msgstr "**堆叠 RBM** 形成 **深度置信网络（DBN）** 和 **深度玻尔兹曼机（DBM）**，支持层级特征学习。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:117
+msgid ""
+"**Greedy layer-wise training** trains one RBM at a time, using the "
+"inferred features of one layer as data for the next."
+msgstr "**贪婪逐层训练** 一次训练一个 RBM，并把一层推断出的特征作为下一层数据。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:118
+msgid ""
+"DBNs combine an undirected top RBM with directed lower layers, while DBMs"
+" are fully undirected."
+msgstr "DBN 由无向顶层 RBM 和有向低层组成；DBM 则完全无向。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:119
+msgid ""
+"Pre-trained stacks of RBMs provided effective **weight initializations** "
+"for deep supervised networks, fueling early deep learning successes."
+msgstr "预训练的 RBM 堆叠为深层监督网络提供有效 **权重初始化**，推动早期深度学习成功。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:120
+msgid ""
+"Although largely supplanted by end-to-end supervised training on large "
+"datasets, stacked RBMs remain historically significant and practically "
+"useful in label-scarce regimes."
+msgstr "尽管在大数据端到端监督训练中已不再主流，堆叠 RBM 在标签稀缺场景仍具历史意义和实践价值。"
+
+#: ../../source/theoretical-foundations-bm-deep.md:121
+msgid ""
+"The concept of **hierarchical representation learning** pioneered by "
+"stacked RBMs is foundational to modern deep learning architectures."
+msgstr "堆叠 RBM 所开创的 **层级表示学习** 理念，是现代深度学习架构的基础。"
+
+#~ msgid ""
+#~ "P(\\mathbf{v}, \\mathbf{h}^{(1)}, \\ldots, "
+#~ "\\mathbf{h}^{(L)}) = P(\\mathbf{h}^{(L-1)}, "
+#~ "\\mathbf{h}^{(L)}) \\prod_{l=1}^{L-2} P(\\mathbf{h}^{(l)}"
+#~ " \\mid \\mathbf{h}^{(l+1)})"
+#~ msgstr "联合分布分解为："
+
+#~ msgid ""
+#~ "E(\\mathbf{v}, \\mathbf{h}^{(1)}, \\mathbf{h}^{(2)}) "
+#~ "= -\\mathbf{v}^\\top \\mathbf{W}^{(1)} "
+#~ "\\mathbf{h}^{(1)} - (\\mathbf{h}^{(1)})^\\top "
+#~ "\\mathbf{W}^{(2)} \\mathbf{h}^{(2)} - "
+#~ "\\mathbf{b}^\\top \\mathbf{v} - "
+#~ "(\\mathbf{c}^{(1)})^\\top \\mathbf{h}^{(1)} - "
+#~ "(\\mathbf{c}^{(2)})^\\top \\mathbf{h}^{(2)}"
+#~ msgstr "包含两层隐藏层的 DBM 能量函数为："
+
+#~ msgid "::"
+#~ msgstr "::"
+
