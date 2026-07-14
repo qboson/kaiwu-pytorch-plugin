@@ -6,14 +6,14 @@ network components, and configuration management.
 """
 
 # Import key classes for easy access
-from .model import QVAE
+from .model import MnistQVAE
 from .feature_extractor import FeatureExtractor
 from .networks import BasicEncoder, BasicDecoder
 from .config import Config
 
 # Define public API
 __all__ = [
-    "QVAE",
+    "MnistQVAE",
     "FeatureExtractor",
     "BasicEncoder",
     "BasicDecoder",
