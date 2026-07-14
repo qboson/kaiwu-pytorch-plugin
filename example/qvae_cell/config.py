@@ -6,9 +6,8 @@ class Config:
     """Configuration for training the QVAE model on single-cell data."""
 
     # dataset
-    dataset = "immune"
-    data_path = "/Users/chang137/Documents/kaiwu-pytorch-plugin/example/_qvae_cell/immune_processed.h5ad"
-    # data_path = "./immune_processed.h5ad"
+    name = "immune"
+    data_path = "./immune_processed.h5ad"
 
     # output
     output_dir = "./outputs_immune_notebook"
