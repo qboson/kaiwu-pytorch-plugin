@@ -473,7 +473,7 @@ def evaluate_qvae_fid(trainer, fake_imgs, real_imgs, device, save_path=None, bat
         fid_result_path = os.path.join(save_path, "fid_results.txt")
         with open(fid_result_path, "w") as f:
             f.write(f"FID分数: {fid_score:.4f}\n")
-            f.write(f"训练轮次: {trainer.num_epochs}\n")
+            f.write(f"训练轮次: {trainer.config.num_epochs}\n")
             f.write(f"潜在维度: {trainer.model._latent_dimensions}\n")
             f.write(f"评估时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         print(f"Saved FID result to {fid_result_path}")
