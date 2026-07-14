@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Kaiwu PyTorch plugin public API."""
+"""Kaiwu-Pytorch-Plugin public API."""
 
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine

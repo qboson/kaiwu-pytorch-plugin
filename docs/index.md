@@ -1,4 +1,4 @@
-# 欢迎使用 Kaiwu Pytorch Plugin
+# 欢迎使用 Kaiwu-Pytorch-Plugin
 
 ```{toctree}
 :maxdepth: 2

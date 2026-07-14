@@ -1,4 +1,4 @@
-# Kaiwu Pytorch Plugin 文档框架
+# Kaiwu-Pytorch-Plugin 文档框架
 
 本文档使用 Sphinx 文档框架搭建，参考了 kaiwu_community 项目的文档结构。
 

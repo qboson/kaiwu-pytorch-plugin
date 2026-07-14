@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu Pytorch Plugin 0.1.0\n"
+"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-07 16:34+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -20,6 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../index.rst:7
-msgid "欢迎使用 Kaiwu Pytorch Plugin"
-msgstr "Welcome to Kaiwu PyTorch Plugin"
+msgid "欢迎使用 Kaiwu-Pytorch-Plugin"
+msgstr "Welcome to Kaiwu-Pytorch-Plugin"
 
