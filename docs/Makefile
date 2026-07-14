@@ -21,6 +21,6 @@ help:
 
 update-doc:
 	python -m sphinx -M gettext "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-	sphinx-intl update -p "$(BUILDDIR)/gettext" -l zh -l en
-	python -m sphinx -b html -D language=zh "$(SOURCEDIR)" "$(BUILDDIR)/html/zh" $(SPHINXOPTS) $(O)
+	sphinx-intl update -p "$(BUILDDIR)/gettext" -l zh_CN -l en
+	python -m sphinx -b html -D language=zh_CN "$(SOURCEDIR)" "$(BUILDDIR)/html/zh" $(SPHINXOPTS) $(O)
 	python -m sphinx -b html -D language=en "$(SOURCEDIR)" "$(BUILDDIR)/html/en" $(SPHINXOPTS) $(O)
