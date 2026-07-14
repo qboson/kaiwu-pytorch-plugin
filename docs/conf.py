@@ -18,8 +18,11 @@ author = 'QBoson Inc'
 release = __version__
 version = __version__
 
-# language 默认语言
-language = 'zh_CN'
+# Read the Docs 为每个语言项目提供该环境变量；本地构建时默认使用中文。
+# Sphinx 的语言代码与 Read the Docs 的项目语言代码略有差异，需将 zh-cn
+# 映射到已有的 gettext 目录 docs/locale/zh。
+rtd_language = os.environ.get('READTHEDOCS_LANGUAGE', 'zh_CN')
+language = 'zh' if rtd_language == 'zh-cn' else rtd_language
 
 # 启用 gettext
 locale_dirs = ['locale/']
