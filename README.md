@@ -4,7 +4,7 @@
 
 **Language Versions**: [Chinese](README_ZH.md) | [English](README.md)
 
-For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/).
+For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/).
 
 ## Project Overview
 

@@ -25,7 +25,7 @@ msgid "Module contents"
 msgstr "模块内容"
 
 #: kaiwu.torch_plugin:1 of
-msgid "Kaiwu PyTorch plugin public API."
+msgid "Kaiwu-Pytorch-Plugin public API."
 msgstr "开物 PyTorch 插件公共 API。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1 of
