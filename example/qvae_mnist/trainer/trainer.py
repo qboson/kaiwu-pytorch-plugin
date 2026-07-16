@@ -100,8 +100,6 @@ class Trainer:
             model = QVAE(
                 input_dimension=input_dim,
                 activation_fct=self.config.activation_fct,
-                bm_type=self.config.bm_type,
-                sampler_type=self.config.sampler_type,
                 config=self.config
             )
         elif self.config.type == 'CellQVAE':

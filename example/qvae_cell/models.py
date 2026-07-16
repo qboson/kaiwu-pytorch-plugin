@@ -1,22 +1,18 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
-#
-# SPDX-License-Identifier: Apache-2.0
-"""
-QVAE model implementation for MNIST using BasicEncoder, BasicDecoder and RBM.
-"""
-
-from torch import nn
+import torch
+import torch.nn as nn
 import torch.nn.functional as F
+from kaiwu.torch_plugin import QVAE
 
-import kaiwu as kw
-from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.torch_plugin import RestrictedBoltzmannMachine, BoltzmannMachine, QVAE
-from kaiwu.torch_plugin.qvae_dist_util import MixtureGeneric, FactorialBernoulliUtil
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 class QVAEEncoder(nn.Module):
-    """单细胞表达矩阵到 QVAE 潜变量 logits 的编码器。"""
+    """将单细胞表达矩阵编码为 QVAE 潜变量 logits。
+
+    Args:
+        input_dim: 输入基因特征数。
+        hidden_dim: 隐藏层维度。
+        latent_dim: 潜变量维度。
+        normalization_method: 归一化方式，可选 ``layer`` 或 ``batch``。
+    """
 
     def __init__(self, input_dim, hidden_dim, latent_dim, normalization_method="layer"):
         super().__init__()
@@ -32,6 +28,14 @@ class QVAEEncoder(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, latent_dim)
 
     def forward(self, x):
+        """执行编码器前向传播。
+
+        Args:
+            x: 形状为 ``(batch_size, input_dim)`` 的表达矩阵。
+
+        Returns:
+            形状为 ``(batch_size, latent_dim)`` 的潜变量 logits。
+        """
         h = self.fc1(x)
         h = self.norm(h)
         h = F.relu(h)
@@ -41,7 +45,14 @@ class QVAEEncoder(nn.Module):
 
 
 class QVAEDecoder(nn.Module):
-    """从 QVAE 潜变量重构输入表达矩阵的解码器。"""
+    """从 QVAE 潜变量重构单细胞表达矩阵。
+
+    Args:
+        latent_dim: 解码器输入维度，包含潜变量和可选 batch one-hot。
+        hidden_dim: 隐藏层维度。
+        output_dim: 输出基因特征数。
+        normalization_method: 归一化方式，可选 ``layer`` 或 ``batch``。
+    """
 
     def __init__(
         self, latent_dim, hidden_dim, output_dim, normalization_method="layer"
@@ -58,6 +69,14 @@ class QVAEDecoder(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, zeta):
+        """执行解码器前向传播。
+
+        Args:
+            zeta: 潜变量及可选 batch 条件组成的输入张量。
+
+        Returns:
+            重构表达值或 Bernoulli logits。
+        """
         h = self.fc1(zeta)
         h = self.norm(h)
         h = F.relu(h)
@@ -67,116 +86,128 @@ class QVAEDecoder(nn.Module):
 
 
 class CellQVAE(QVAE):
-    """面向单细胞数据的 QVAE，支持 batch 条件与两阶段训练。"""
-    
+    """面向单细胞数据并支持 batch 条件解码的 QVAE。
+
+    Args:
+        input_dimension: 输入基因特征数。
+        activation_fct: 网络使用的激活函数。
+        config: QVAE 配置，包含潜变量维度、损失类型和损失权重。
+        encoder: 单细胞编码器。
+        decoder: 单细胞解码器。
+        bm: 玻尔兹曼机先验。
+        sampler: BM 负相采样器。
+        sampler_type: 采样器类型标识。
+        n_batches: 数据批次数；大于 0 时向解码器追加 batch one-hot。
+    """
+
     def __init__(
-            self, 
-            input_dimension, 
-            activation_fct, 
-            config, 
-            # n_batches=0, 
-            **kwargs
+        self,
+        input_dimension,
+        activation_fct,
+        config,
+        encoder=None,
+        decoder=None,
+        bm=None,
+        sampler=None,
+        sampler_type="sa",
+        n_batches=0,
     ):
-        sampler_type = kwargs.pop('sampler_type', 'sa')
-        n_batches = kwargs.pop('n_batches', 0)
-        super().__init__(input_dimension, activation_fct, config, sampler_type=sampler_type, n_batches=n_batches, **kwargs)
+        super().__init__(
+            input_dimension=input_dimension,
+            activation_fct=activation_fct,
+            config=config,
+            encoder=encoder,
+            decoder=decoder,
+            bm=bm,
+            sampler=sampler,
+            sampler_type=sampler_type,
+        )
+        self.n_batches = n_batches
         self._model_type = "CellQVAE"
-        # self.n_batches = n_batches
-        self.bm = self._create_bm(bm_type='bm')
-        # self.sampler = self._create_sampler(self.sampler_type)
 
-        # 替换 encoder/decoder 为自定义结构
-        self.encoder = self._create_custom_encoder()
-        self.decoder = self._create_custom_decoder()
-        # 保存 batch 索引供 forward 使用
+    def _decoder_input(self, zeta, batch_idx=None):
+        """构造包含 batch 条件的解码器输入。
 
-    # def _create_bm(self):
-    #     """创建玻尔兹曼机 (BM)"""
-    #     # 使用 RBM 或全连接 BM，这里沿用原 QVAE 的设计
-    #     return BoltzmannMachine(num_nodes=self._latent_dimensions)
-    def _create_bm(self, bm_type='rbm'):
-        """
-        Create BM with latent dimension.
+        Args:
+            zeta: QVAE 潜变量。
+            batch_idx: 每个样本的 batch 整数索引。
 
         Returns:
-            RestrictedBoltzmannMachine: RBM instance.
+            原始潜变量，或拼接 batch one-hot 后的张量。
+
+        Raises:
+            ValueError: 配置了 batch 条件但没有传入 ``batch_idx``。
         """
-        n_vis = self._latent_dimensions // 2
-        n_hid = self._latent_dimensions - n_vis
-
-        if bm_type =="rbm":
-            bm = RestrictedBoltzmannMachine(num_visible=n_vis, num_hidden=n_hid)
-        elif bm_type =="bm":
-            bm = BoltzmannMachine(num_nodes=self._latent_dimensions)
-        else:
-            raise ValueError(f"Unsupported bm type: {bm_type}")
-        return bm
-
-    def _create_sampler(self, sampler_type):
-        """创建采样器 (SA 或 CIM)"""
-        if sampler_type == 'cim':
-            kw.common.CheckpointManager.save_dir = './tmp'
-            sampler = CIMOptimizer(task_name="qvae_sampling", wait=True)
-            sampler = PrecisionReducer(
-                sampler,
-                precision=8,
-                truncated_precision=10,
-                target_bits=550,
-                only_feasible_solution=False
-            )
-            return sampler
-        elif sampler_type == 'sa':
-            return SimulatedAnnealingOptimizer(alpha=0.95)
-        else:
-            raise ValueError(f"Unsupported sampler type: {sampler_type}")
-
-    def _create_custom_encoder(self):
-        """重写父类方法，返回自定义编码器"""
-        return QVAEEncoder(
-            input_dim=self._input_dimension,
-            hidden_dim=self._config.hidden_dim,
-            latent_dim=self._latent_dimensions,
-            normalization_method=getattr(self._config, 'normalization_method', 'layer')
+        # 若存在 batch 信息，把 one-hot batch 拼到潜变量后面，帮助 decoder 消化批次差异。
+        if self.n_batches <= 0:
+            return zeta
+        if batch_idx is None:
+            raise ValueError("batch_idx is required when n_batches > 0")
+        batch_one_hot = (
+            F.one_hot(batch_idx, num_classes=self.n_batches).float().to(zeta.device)
         )
+        return torch.cat([zeta, batch_one_hot], dim=-1)
 
-    def _create_custom_decoder(self):
-        """重写父类方法，返回自定义解码器，输入维度为 latent_dim + n_batches"""
-        decoder_input_dim = self._latent_dimensions + self.n_batches
-        return QVAEDecoder(
-            latent_dim=decoder_input_dim,
-            hidden_dim=self._config.hidden_dim,
-            output_dim=self._input_dimension,
-            normalization_method=getattr(self._config, 'normalization_method', 'layer')
-        )
+    def _encode(self, x):
+        """按照配置的重构损失编码输入。
 
-    # # ------ 两阶段训练方法 ------
-    # def cell_loss(self, x, batch_idx, loss_type, kl_beta):
-    #     """用于第一阶段 VAE 参数更新的损失（返回 total_loss, kl, recon_loss）"""
-    #     recon_logits, posterior, q, zeta = self.forward(x, batch_idx)
-    #     if loss_type == 'mse':
-    #         recon_loss = F.mse_loss(recon_logits, x.view(-1, self._input_dimension), reduction='sum') / x.size(0)
-    #     else:  # bernoulli
-    #         output_dist = FactorialBernoulliUtil(recon_x)
-    #         recon_loss = -output_dist.log_prob_per_var(x.view(-1, self._input_dimension)).sum(dim=1).mean()
-    #     kl_loss = self._kl_dist_from(posterior).mean()
-    #     total_loss = recon_loss + kl_beta * kl_loss
-    #     return total_loss, kl_loss, recon_loss, q
+        Args:
+            x: 单细胞表达矩阵。
 
-    # def bm_phase_loss(self, q, bm_weight_decay=0.0):
-    #     """用于第二阶段 BM 参数更新的损失"""
-    #     # 使用硬阈值采样作为正样本
-    #     positive_state = (q.detach() > 0).float()
-    #     loss = self.bm.objective(positive_state, self.bm.sample(self.sampler))
-    #     if bm_weight_decay > 0:
-    #         loss += bm_weight_decay * (torch.sum(self.bm.quadratic_coef**2) + torch.sum(self.bm.linear_bias**2))
-    #     return loss
+        Returns:
+            ``(q, posterior, zeta)``，分别为编码器 logits、后验分布和潜变量样本。
 
-    # def energy(self, x, loss_type):
-    #     """计算 BM 能量（用于评估）"""
-    #     x = x.view(-1, self._input_dimension)
-    #     if self._train_bias is not None:
-    #         x_centered = x - self._dataset_mean
-    #     else:
-    #         x_centered = x
-    #     q = self.encoder(x_centered)
-    #     return self.bm((q > 0).float())
+        Raises:
+            ValueError: 配置了不支持的损失类型。
+        """
+        x = x.view(-1, self._input_dimension)
+        if self.config.loss_type == "mse":
+            encoder_x = x
+        elif self.config.loss_type == "bernoulli":
+            encoder_x = x
+            if self._dataset_mean is not None:
+                encoder_x = encoder_x - torch.as_tensor(
+                    self._dataset_mean,
+                    dtype=x.dtype,
+                    device=x.device,
+                )
+        else:
+            raise ValueError(f"Unsupported loss type: {self.config.loss_type}")
+        q = self.encoder(encoder_x)
+        posterior, zeta = self.posterior(q, self.config.dist_beta)
+        return q, posterior, zeta
+
+    def forward(self, x, batch_idx=None):
+        """执行带可选 batch 条件的 QVAE 前向传播。
+
+        Args:
+            x: 单细胞表达矩阵。
+            batch_idx: 每个样本的 batch 整数索引。
+
+        Returns:
+            ``(recon_x, posterior, q, zeta)``，分别为重构结果、后验分布、
+            编码器 logits 和潜变量样本。
+        """
+        q, posterior, zeta = self._encode(x)
+        recon_x = self.decoder(self._decoder_input(zeta, batch_idx))
+        if self.config.loss_type == "bernoulli":
+            recon_x = recon_x + self._train_bias
+        return recon_x, posterior, q, zeta
+
+    def energy(self, x, loss_type):
+        """计算单细胞样本在 BM 潜空间中的能量。
+
+        Args:
+            x: 单细胞表达矩阵。
+            loss_type: 损失类型，必须与模型配置一致。
+
+        Returns:
+            每个样本对应的 BM 能量。
+
+        Raises:
+            ValueError: ``loss_type`` 与模型配置不一致。
+        """
+        if loss_type != self.config.loss_type:
+            raise ValueError("loss_type must match model.config.loss_type")
+        q, _, _ = self._encode(x)
+        return self.bm((q > 0).float())

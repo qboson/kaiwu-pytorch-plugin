@@ -25,31 +25,16 @@ class MnistQVAE(QVAE):
         activation_fct (callable, optional): Activation function for hidden layers.
         config (object): Configuration object (must contain encoder_hidden_nodes,
             decoder_hidden_nodes, etc.).
-        sampler_type (str, optional): Sampler type ('sa' or 'cim').
-        n_batches (int, optional): Number of conditional batches. Default 0.
-        **kwargs: Additional kwargs passed to BaseQVAE.
+        The BM type and sampler type are read from ``config``.
     """
     def __init__(
         self,
         input_dimension,
         activation_fct,
         config,
-        **kwargs,
     ):
-        # 调用父类 __init__，父类会调用 create_networks()
-        # Optional parameters extracted from kwargs or using defaults
-        bm_type = kwargs.pop('bm_type', 'rbm')
-        sampler_type = kwargs.pop('sampler_type', 'sa')
-        n_batches = kwargs.pop('n_batches', 0)
-        super().__init__(
-            input_dimension=input_dimension,
-            activation_fct=activation_fct,
-            config=config,
-            bm_type=bm_type,
-            sampler_type=sampler_type,
-            n_batches=n_batches,
-            **kwargs,
-        )
+        """Initialize the MNIST QVAE from a complete configuration."""
+        super().__init__(input_dimension, activation_fct, config)
         self._model_type = "QVAE"
 
     def _create_encoder(self):
@@ -62,7 +47,7 @@ class MnistQVAE(QVAE):
         # 根据 config.encoder_hidden_nodes 构造节点序列
         enc_nodes = (
             [self._input_dimension]
-            + self._config.encoder_hidden_nodes
+            + self.config.encoder_hidden_nodes
             + [self._latent_dimensions]
         )
         node_pairs = [
@@ -84,7 +69,7 @@ class MnistQVAE(QVAE):
         """
         dec_nodes = (
             [self._latent_dimensions]
-            + self._config.decoder_hidden_nodes
+            + self.config.decoder_hidden_nodes
             + [self._input_dimension]
         )
         node_pairs = [
@@ -98,7 +83,7 @@ class MnistQVAE(QVAE):
             weight_decay=self.weight_decay
         )  # 输出 logits
 
-    def _create_bm(self, bm_type='rbm'):
+    def _create_bm(self):
         """
         Create RBM with visible and hidden units split from latent dimension.
 
@@ -108,15 +93,16 @@ class MnistQVAE(QVAE):
         n_vis = self._latent_dimensions // 2
         n_hid = self._latent_dimensions - n_vis
 
-        if bm_type =="rbm":
+        bm_type = getattr(self.config, "bm_type", "rbm")
+        if bm_type == "rbm":
             bm = RestrictedBoltzmannMachine(num_visible=n_vis, num_hidden=n_hid)
-        elif bm_type =="bm":
+        elif bm_type == "bm":
             bm = BoltzmannMachine(num_nodes=self._latent_dimensions)
         else:
             raise ValueError(f"Unsupported bm type: {bm_type}")
         return bm
 
-    def _create_sampler(self, sampler_type='sa'):
+    def _create_sampler(self, sampler_type=None):
         """
         Create sampler based on type.
 
@@ -129,6 +115,7 @@ class MnistQVAE(QVAE):
         Raises:
             ValueError: If sampler_type is unknown.
         """
+        sampler_type = sampler_type or getattr(self.config, "sampler_type", "sa")
         if sampler_type == 'cim':
             kw.common.CheckpointManager.save_dir = './tmp'
             sampler = CIMOptimizer(task_name="qvae_sampling", wait=True)
