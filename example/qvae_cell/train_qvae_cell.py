@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 import torch
-import torch.nn as nn
 
 from trainer import Trainer, set_seed
 from visualization import (
@@ -55,7 +54,7 @@ def parse_args():
     parser.add_argument("--rbm-lr", type=float, default=1e-3)
     parser.add_argument("--bm-weight-decay", type=float, default=0.0)
     parser.add_argument("--loss-type", default="mse", choices=["mse", "bernoulli"])
-    parser.add_argument("--feature_type", default="q", choices=["zeta", "q"])
+    parser.add_argument("--representation", default="q", choices=["zeta", "q"])
     parser.add_argument("--load-weights", action="store_true")
     parser.add_argument("--sampler-type", default="sa", choices=["sa", "cim"])
     parser.add_argument("--sa-initial-temperature", type=float, default=1000)
@@ -72,10 +71,6 @@ def parse_args():
     parser.add_argument("--truncated-precision", type=int, default=10)
     parser.add_argument("--target-bits", type=int, default=550)
     parser.add_argument("--tmp-dir", default="./tmp")
-
-    parser.add_argument("--activation_fct", default=nn.ReLU())
-    parser.add_argument("--num_latent_units", default=256)
-    # parser.add_argument("--num_epochs", default=100)
     return parser.parse_args()
 
 
