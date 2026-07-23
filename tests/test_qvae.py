@@ -69,6 +69,10 @@ class TestQVAE(unittest.TestCase):
     def setUp(self):
         self.input_dim = 8
         self.latent_dim = 4
+        # BM 维度分解：可见单元数 V，隐藏单元数 H，必须满足 V + H == L
+        self.num_visible = self.latent_dim // 2  # V = 2
+        self.num_hidden = self.latent_dim - self.num_visible  # H = 2
+
         self.config = types.SimpleNamespace(
             num_latent_units=self.latent_dim,
             loss_type="bernoulli",
@@ -78,7 +82,7 @@ class TestQVAE(unittest.TestCase):
         )
         self.encoder = DummyEncoder(self.latent_dim)
         self.decoder = DummyDecoder(self.input_dim)
-        self.rbm = RestrictedBoltzmannMachine(2, 2)
+        self.rbm = RestrictedBoltzmannMachine(self.num_visible, self.num_hidden)
         self.sampler = DummySampler()
         self.qvae = DummyQVAE(
             input_dimension=self.input_dim,
@@ -109,8 +113,8 @@ class TestQVAE(unittest.TestCase):
 
         expected_bias = torch.full((self.input_dim,), -torch.log(torch.tensor(3.0)))
         torch.testing.assert_close(recon_x, expected_bias.expand_as(recon_x))
-        self.assertEqual(q.shape, (2, self.latent_dim))
-        self.assertEqual(zeta.shape, (2, self.latent_dim))
+        self.assertEqual(q.shape, (x.size(0), self.latent_dim))
+        self.assertEqual(zeta.shape, (x.size(0), self.latent_dim))
         self.assertEqual(posterior.logit_mu.shape, q.shape)
         self.assertIn("_train_bias", dict(self.qvae.named_buffers()))
 
@@ -128,7 +132,7 @@ class TestQVAE(unittest.TestCase):
         x = torch.ones(2, self.input_dim)
         energy = self.qvae.energy(x)
 
-        self.assertEqual(energy.shape, (2,))
+        self.assertEqual(energy.shape, (x.size(0),))
         torch.testing.assert_close(self.encoder.inputs[-1], x - 0.5)
         torch.testing.assert_close(self.qvae.energy(x, loss_type="bernoulli"), energy)
         with self.assertRaises(ValueError):
