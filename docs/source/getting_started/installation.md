@@ -76,7 +76,9 @@
 ```
 ## 3. 安装 Kaiwu SDK（必需）
 
-Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力，您需要单独安装 Kaiwu SDK。
+Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力。
+
+现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装，其他版本的Kaiwu SDK 的下载和安装步骤如下：
 
 ### 3.1 获取 SDK
 
