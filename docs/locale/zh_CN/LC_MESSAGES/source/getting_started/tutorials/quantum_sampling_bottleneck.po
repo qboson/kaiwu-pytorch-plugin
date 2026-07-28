@@ -1,0 +1,132 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the
+# Kaiwu-Pytorch-Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-28 16:47+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:1
+msgid "为什么需要量子采样"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:3
+msgid ""
+"玻尔兹曼机的训练并不只取决于模型定义；从模型分布中获得足够好的样本同样关键。本章连接理论基础与后续实践，说明采样为何会成为瓶颈，以及 Kaiwu-"
+"PyTorch-Plugin（KPP）如何让经典与相干伊辛机（CIM）采样器使用同一训练流程。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:5
+msgid "精确最大似然学习中的采样问题"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:7
+msgid "对于基于能量的模型，负对数似然梯度可分为数据分布与模型分布上的两项期望："
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:9
+msgid ""
+"\n"
+"\\frac{\\partial \\mathcal{L}}{\\partial \\theta} =\n"
+"\\mathbb{E}_{\\mathrm{data}}\\left[\\frac{\\partial E_\\theta}{\\partial "
+"\\theta}\\right] -\n"
+"\\mathbb{E}_{\\mathrm{model}}\\left[\\frac{\\partial E_\\theta}{\\partial"
+" \\theta}\\right].\n"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:15
+msgid ""
+"数据项可由 mini-batch 直接近似。模型项则要求从当前玻尔兹曼分布 $P_\\theta$ "
+"采样；精确计算通常需要枚举指数数量的构型。因此，训练质量取决于样本是否足够接近目标分布，以及取得这些样本的成本。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:17
+msgid "经典采样与近似训练"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:19
+msgid ""
+"Gibbs 采样等 Markov Chain Monte "
+"Carlo（MCMC）方法通过局部更新逐步接近目标分布。在能量景观存在多个模态和高能垒时，链可能长时间停留在局部区域，导致混合缓慢。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:21
+msgid ""
+"对比散度（CD）以少量 MCMC "
+"步数换取训练速度，但得到的是近似梯度；持久对比散度（PCD）通过保留链状态改善这一近似，仍需为每次参数更新付出采样成本。它们是实用方法，但不应与平衡分布的精确采样混为一谈。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:23
+msgid "从玻尔兹曼机到 Ising 哈密顿量"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:25
+#, python-brace-format
+msgid ""
+"二值变量 $x_i \\in \\{0, 1\\}$ 可通过 $s_i = 2x_i - 1$ 转换为 Ising 自旋 $s_i \\in "
+"\\{-1, +1\\}$。相应的二次能量可写为："
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:27
+#, python-brace-format
+msgid ""
+"\n"
+"H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij}s_i s_j + "
+"\\mathrm{const}.\n"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:31
+#, python-brace-format
+msgid ""
+"其中 $h_i$ 与 $J_{ij}$ 分别表示局部场和耦合。KPP 会从模型参数构造 Ising 矩阵，并将其交给 Kaiwu SDK "
+"优化器求解；用户无需手工完成变量转换。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:33
+msgid "KPP 中的经典与量子采样器"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:35
+msgid ""
+"KPP 通过同一个 `sample(sampler)` 调用使用不同采样后端。`SimulatedAnnealingOptimizer` "
+"适合本地调试和建立基线；`CIMOptimizer` 需要有效的 Kaiwu SDK "
+"凭据及真机访问权限。两者的样本质量、延迟和成本应在相同模型、采样预算与评价指标下比较，不能仅由采样器类型推断优劣。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:45
+msgid "小结"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:47
+msgid "玻尔兹曼机训练需要近似模型分布上的期望，采样成本是关键限制。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:48
+msgid "MCMC、CD 与 PCD 在速度和近似误差之间取舍。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:49
+msgid "KPP 将模型参数转换为 Ising 问题，并通过统一的采样接口连接经典与量子后端。"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:50
+msgid "是否使用真机采样应由可用硬件、端到端延迟、样本质量和实验目标共同决定。"
+msgstr ""
+
+#~ msgid "为什么需要量子采样：重新审视采样瓶颈"
+#~ msgstr ""
+

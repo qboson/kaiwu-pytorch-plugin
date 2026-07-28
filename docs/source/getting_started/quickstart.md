@@ -17,7 +17,7 @@
 
 ```{literalinclude} ../../../example/run_bm.py
 ```
-## 3. 使用不同的采样器
+## 2. 使用不同的采样器
 
 Kaiwu SDK 提供多种采样器，您可以根据需求选择：
 
@@ -32,7 +32,27 @@ Kaiwu SDK 提供多种采样器，您可以根据需求选择：
  # from kaiwu.cim import CIMOptimizer
 
 ```
-## 4. 下一步
+
+如果已配置 Kaiwu SDK 授权并取得真机访问权限，可将经典采样器替换为 README 中使用的 CIM 采样器，并使用 `PrecisionReducer` 适配硬件精度：
+
+```{code-block} python
+
+ from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
+ quantum_sampler = CIMOptimizer(task_name="my_experiment", wait=True)
+ sampler = PrecisionReducer(
+     quantum_sampler,
+     precision=8,
+     truncated_precision=10,
+     target_bits=550,
+     only_feasible_solution=False,
+ )
+
+```
+
+详细的采样器接口与训练循环请参阅 {doc}`tutorials/quantum_sampling_pytorch`。
+
+## 3. 下一步
 
 恭喜您完成了快速开始！接下来，您可以：
 

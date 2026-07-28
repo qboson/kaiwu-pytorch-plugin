@@ -50,13 +50,12 @@ msgstr ""
 "Given an input vector $\\mathbf{x} \\in \\mathbb{R}^n$, its output is:"
 
 #: ../../source/getting_started/background.md:13
-#, fuzzy, python-brace-format
 msgid ""
 "\n"
 "\n"
 "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)\n"
 "\n"
-msgstr "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)"
+msgstr ""
 
 #: ../../source/getting_started/background.md:18
 #, python-brace-format

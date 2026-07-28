@@ -42,27 +42,24 @@ QVAE 包括以下关键组件：
    使用 **量子玻尔兹曼机 (QBM)** 建模潜变量 $\mathbf{z}$ 的先验分布。哈密顿量为：
 
    $$
-
    \mathcal{H}_\theta = \sum_l \Gamma_l \sigma_l^x + \sum_l h_l \sigma_l^z + \sum_{l<m} W_{lm} \sigma_l^z \sigma_m^z
-
    $$
+
 3. **解码器（Decoder）**  
    将潜变量 $\mathbf{z}$ （或其连续松弛变量 $\boldsymbol{\zeta}$ ）映射回数据空间，并使用解码器重建原始数据：
 
    $$
-
    p_\theta(\mathbf{x} | \boldsymbol{\zeta}) \sim \text{Bernoulli}(f_\theta(\boldsymbol{\zeta}))
-
    $$
+
 ### 训练目标：Q-ELBO
 
 QVAE 使用一个 **量子下界 (Q-ELBO)** 来近似最大化对数似然：
 
 $$
-
 \mathcal{L}_{\text{Q-ELBO}} = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x} | \boldsymbol{\zeta})] - \tilde{H}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}))
-
 $$
+
 ### QBM 采样与训练
 
 - **正相（positive phase）**：从编码器采样 $\mathbf{z} \sim q_\phi(\mathbf{z}|\mathbf{x})$

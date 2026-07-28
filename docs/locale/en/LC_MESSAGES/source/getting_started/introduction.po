@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 10:35+0800\n"
+"POT-Creation-Date: 2026-07-28 15:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -29,20 +29,15 @@ msgstr "Kaiwu-PyTorch-Plugin (KPP)"
 
 #: ../../source/getting_started/introduction.md:4
 msgid ""
-"Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子计算机上训练和评估玻尔兹曼机（Boltzmann "
-"Machine, BM）及其受限形式（Restricted Boltzmann Machine, RBM）。它通过 Kaiwu SDK "
-"调用量子硬件执行玻尔兹曼分布采样，其余计算（如参数更新）在标准 PyTorch 流程中完成。"
-msgstr ""
-"Kaiwu-PyTorch-Plugin (KPP) is a PyTorch plugin for training and "
-"evaluating Boltzmann Machines (BM) and their restricted variant (RBM) on "
-"coherent photonic quantum computers.  It uses the Kaiwu SDK to offload "
-"Boltzmann-distribution sampling to quantum hardware, while all remaining "
-"computations (e.g. parameter updates) stay within the standard PyTorch "
-"workflow."
+"Kaiwu-PyTorch-Plugin（KPP）是一个基于 PyTorch 和 Kaiwu SDK "
+"的量子计算编程套件。它提供玻尔兹曼机（Boltzmann Machine, BM）、受限玻尔兹曼机（Restricted Boltzmann "
+"Machine, RBM）、深度信念网络（DBN）、量子变分自编码器（Q-VAE）和 Q-Diffusion 的模型组件与示例。对于 BM 和 "
+"RBM，KPP 通过 Kaiwu SDK 调用采样器执行模型分布采样，其余计算（如参数更新）仍在标准 PyTorch 流程中完成。"
+msgstr "Kaiwu-PyTorch-Plugin (KPP) is a quantum-computing programming suite based on PyTorch and the Kaiwu SDK. It provides model components and examples for Boltzmann Machines (BM), Restricted Boltzmann Machines (RBM), Deep Belief Networks (DBN), Quantum Variational Autoencoders (Q-VAE), and Q-Diffusion. For BM and RBM, KPP uses Kaiwu SDK samplers for model-distribution sampling, while remaining computation, such as parameter updates, stays in the standard PyTorch workflow."
 
 #: ../../source/getting_started/introduction.md:6
 msgid "1. 设计目标"
-msgstr "1\. Design Goals"
+msgstr "1\\. Design Goals"
 
 #: ../../source/getting_started/introduction.md:8
 msgid "在保持 PyTorch 原生编程体验的前提下，接入光量子采样能力。"
@@ -60,7 +55,7 @@ msgstr "Offer extensible interfaces for swapping samplers or energy functions."
 
 #: ../../source/getting_started/introduction.md:12
 msgid "2. 功能特性"
-msgstr "2\. Features"
+msgstr "2\\. Features"
 
 #: ../../source/getting_started/introduction.md:19
 msgid "模型支持"
@@ -99,129 +94,141 @@ msgstr ""
 "differentiation, GPU acceleration and seamless composition with other "
 "PyTorch modules."
 
+#: ../../source/getting_started/introduction.md:27
+msgid "扩展模型"
+msgstr "Extended models"
+
 #: ../../source/getting_started/introduction.md:28
-msgid "3. 扩展机制"
-msgstr "3\. Extension Mechanisms"
+msgid "提供 DBN、Q-VAE 和用于能量引导离散序列生成的 `QDiffusion` 组件。"
+msgstr "Provides DBN, Q-VAE, and the `QDiffusion` component for energy-guided discrete sequence generation."
 
 #: ../../source/getting_started/introduction.md:30
+msgid "3. 扩展机制"
+msgstr "3\\. Extension Mechanisms"
+
+#: ../../source/getting_started/introduction.md:32
 msgid "能量函数（如 Ising 形式）与采样器解耦。"
 msgstr "Energy functions (e.g. Ising form) are decoupled from samplers."
 
-#: ../../source/getting_started/introduction.md:31
+#: ../../source/getting_started/introduction.md:33
 msgid "用户可通过实现标准接口替换采样策略（例如切换为经典 MCMC 或其他后端）。"
 msgstr ""
 "Users can replace sampling strategies (e.g. switch to classical MCMC or "
 "another backend) by implementing standard interfaces."
 
-#: ../../source/getting_started/introduction.md:32
+#: ../../source/getting_started/introduction.md:34
 msgid "支持自定义能量项，适用于非标准 BM 变体。"
 msgstr "Custom energy terms are supported for non-standard BM variants."
 
-#: ../../source/getting_started/introduction.md:35
-msgid "4. 示例用例"
-msgstr "4\. Example Use-Cases"
-
 #: ../../source/getting_started/introduction.md:37
+msgid "4. 示例用例"
+msgstr "4\\. Example Use-Cases"
+
+#: ../../source/getting_started/introduction.md:39
 msgid "手写数字生成（基于 MNIST 的 RBM 训练）"
 msgstr "Hand-written digit generation (RBM trained on MNIST)"
 
-#: ../../source/getting_started/introduction.md:38
+#: ../../source/getting_started/introduction.md:40
 msgid "Q-VAE（量子变分自编码器）训练流程"
 msgstr "Q-VAE (quantum variational auto-encoder) training pipeline"
 
-#: ../../source/getting_started/introduction.md:40
-msgid "5. 适用用户"
-msgstr "5\. Target Users"
+#: ../../source/getting_started/introduction.md:41
+msgid "Q-Diffusion：使用 DPLM 骨干网络进行能量引导的蛋白质序列生成"
+msgstr "Q-Diffusion: energy-guided protein sequence generation with DPLM backbones"
 
-#: ../../source/getting_started/introduction.md:47
+#: ../../source/getting_started/introduction.md:43
+msgid "5. 适用用户"
+msgstr "5\\. Target Users"
+
+#: ../../source/getting_started/introduction.md:50
 msgid "研究人员"
 msgstr "Researchers"
 
-#: ../../source/getting_started/introduction.md:48
+#: ../../source/getting_started/introduction.md:51
 msgid "验证量子采样对能量模型训练的影响。"
 msgstr "Investigate the impact of quantum sampling on energy-based model training."
 
-#: ../../source/getting_started/introduction.md:49
+#: ../../source/getting_started/introduction.md:52
 msgid "开发者"
 msgstr "Developers"
 
-#: ../../source/getting_started/introduction.md:50
+#: ../../source/getting_started/introduction.md:53
 msgid "构建混合经典-量子生成模型。"
 msgstr "Build hybrid classical-quantum generative models."
 
-#: ../../source/getting_started/introduction.md:51
+#: ../../source/getting_started/introduction.md:54
 msgid "教育者与学生"
 msgstr "Educators & Students"
 
-#: ../../source/getting_started/introduction.md:52
+#: ../../source/getting_started/introduction.md:55
 msgid "教学玻尔兹曼机原理与量子采样实践。"
 msgstr "Teach Boltzmann-machine principles and hands-on quantum sampling."
 
-#: ../../source/getting_started/introduction.md:54
+#: ../../source/getting_started/introduction.md:57
 msgid "6. 典型使用流程"
-msgstr "6\. Typical Workflow"
+msgstr "6\\. Typical Workflow"
 
-#: ../../source/getting_started/introduction.md:56
+#: ../../source/getting_started/introduction.md:59
 msgid "使用 Kaiwu-PyTorch-Plugin 进行能量神经网络训练的典型流程如下："
 msgstr ""
 "The typical workflow for training energy-based neural networks with "
 "Kaiwu-PyTorch-Plugin is:"
 
-#: ../../source/getting_started/introduction.md:58
+#: ../../source/getting_started/introduction.md:61
 msgid "**数据准备**：加载并预处理训练数据，转换为模型输入格式"
 msgstr ""
 "**Data preparation**: load and preprocess training data, convert to model"
 " input format"
 
-#: ../../source/getting_started/introduction.md:59
+#: ../../source/getting_started/introduction.md:62
 msgid "**模型定义**：实例化 RBM 或 BM 模型，设置可见层和隐藏层维度"
 msgstr ""
 "**Model definition**: instantiate an RBM or BM and set visible/hidden "
 "layer sizes"
 
-#: ../../source/getting_started/introduction.md:60
+#: ../../source/getting_started/introduction.md:63
 msgid "**优化器配置**：使用 PyTorch 优化器（如 SGD、Adam）管理模型参数"
 msgstr ""
 "**Optimizer setup**: use a PyTorch optimizer (SGD, Adam, etc.) to manage "
 "model parameters"
 
-#: ../../source/getting_started/introduction.md:61
+#: ../../source/getting_started/introduction.md:64
 msgid "**训练循环**："
 msgstr "**Training loop**:"
 
-#: ../../source/getting_started/introduction.md:63
+#: ../../source/getting_started/introduction.md:66
 msgid "从训练数据计算隐藏层表示（正相）"
 msgstr "Compute hidden representations from training data (positive phase)"
 
-#: ../../source/getting_started/introduction.md:64
+#: ../../source/getting_started/introduction.md:67
 msgid "使用采样器从模型分布生成样本（负相）"
 msgstr ""
 "Generate samples from the model distribution with the sampler (negative "
 "phase)"
 
-#: ../../source/getting_started/introduction.md:65
+#: ../../source/getting_started/introduction.md:68
 msgid "计算目标函数并反向传播梯度"
 msgstr "Compute the objective and back-propagate gradients"
 
-#: ../../source/getting_started/introduction.md:66
+#: ../../source/getting_started/introduction.md:69
 msgid "更新模型参数"
 msgstr "Update model parameters"
 
-#: ../../source/getting_started/introduction.md:68
+#: ../../source/getting_started/introduction.md:71
 msgid "**模型评估**：使用训练好的模型进行特征提取、分类或生成任务"
 msgstr ""
 "**Model evaluation**: use the trained model for feature extraction, "
 "classification or generation tasks"
 
-#: ../../source/getting_started/introduction.md:98
+#: ../../source/getting_started/introduction.md:101
 msgid "7. 引用方式"
-msgstr "7\. Citation"
+msgstr "7\\. Citation"
 
-#: ../../source/getting_started/introduction.md:100
+#: ../../source/getting_started/introduction.md:103
 msgid "如果 Kaiwu-PyTorch-Plugin 对您的学术研究有帮助，欢迎引用："
 msgstr "If Kaiwu-PyTorch-Plugin is useful for your research, please cite:"
 
-#: ../../source/getting_started/introduction.md:112
+#: ../../source/getting_started/introduction.md:115
 msgid "相关研究论文："
 msgstr "Related papers:"
 

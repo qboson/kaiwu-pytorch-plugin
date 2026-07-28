@@ -19,7 +19,7 @@
 * - NumPy
   - 2.2.6
 * - Kaiwu SDK
-  - v1.2.0+
+  - 1.3.1
 
 ```
 检查 Python 版本：
@@ -74,6 +74,20 @@
  pip install .
 
 ```
+### 2.5 使用 Docker（可选）
+
+README 提供了基于 Jupyter Notebook 的 Docker 配置，用于获得隔离、可复现的环境。进入 `requirements/` 目录后构建并启动服务：
+
+```{code-block} bash
+
+ cd requirements
+ docker compose build
+ docker compose up
+
+```
+
+服务启动后可通过 `http://localhost:8888` 访问。停止服务时按下 `Ctrl+C`，再执行 `docker compose down`。
+
 ## 3. 安装 Kaiwu SDK（必需）
 
 Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力。
@@ -169,7 +183,7 @@ Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力。
 
 ```{code-block} bash
 
- pylint kaiwu/
+ pylint src/kaiwu/
 
 ```
 ## 7. 常见问题

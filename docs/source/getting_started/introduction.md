@@ -1,7 +1,7 @@
 # 概述
 # Kaiwu-PyTorch-Plugin (KPP)
 
-Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子计算机上训练和评估玻尔兹曼机（Boltzmann Machine, BM）及其受限形式（Restricted Boltzmann Machine, RBM）。它通过 Kaiwu SDK 调用量子硬件执行玻尔兹曼分布采样，其余计算（如参数更新）在标准 PyTorch 流程中完成。
+Kaiwu-PyTorch-Plugin（KPP）是一个基于 PyTorch 和 Kaiwu SDK 的量子计算编程套件。它提供玻尔兹曼机（Boltzmann Machine, BM）、受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）、深度信念网络（DBN）、量子变分自编码器（Q-VAE）和 Q-Diffusion 的模型组件与示例。对于 BM 和 RBM，KPP 通过 Kaiwu SDK 调用采样器执行模型分布采样，其余计算（如参数更新）仍在标准 PyTorch 流程中完成。
 
 ## 1. 设计目标
 
@@ -23,6 +23,8 @@ Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子
   - 负相采样通过 Kaiwu SDK 在相干光量子计算机上执行。
 * - PyTorch 集成
   - 模型参数为 `torch.nn.Parameter`，支持自动微分、GPU 加速，并可与其他 PyTorch 模块组合使用。
+* - 扩展模型
+  - 提供 DBN、Q-VAE 和用于能量引导离散序列生成的 `QDiffusion` 组件。
 
 ```
 ## 3. 扩展机制
@@ -36,6 +38,7 @@ Kaiwu-PyTorch-Plugin（KPP）是一个 PyTorch 插件，用于在相干光量子
 
 - 手写数字生成（基于 MNIST 的 RBM 训练）
 - Q-VAE（量子变分自编码器）训练流程
+- Q-Diffusion：使用 DPLM 骨干网络进行能量引导的蛋白质序列生成
 
 ## 5. 适用用户
 
