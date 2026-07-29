@@ -1,5 +1,5 @@
 ---
-title: 3.3 Contrastive Divergence
+title: '3.3 Contrastive Divergence: Classical Training Method'
 slug: kpp-theoretical-foundations-ebms-cd
 sidebar_position: 9
 hide: false
@@ -7,7 +7,7 @@ hide_child: false
 ---
 
 
-# 3.3 Contrastive Divergence
+# 3.3 Contrastive Divergence: Classical Training Method
 
 > Section [3.2 The Intractable Partition Function Problem](kpp-theoretical-foundations-ebms-partition.md) established that exact maximum likelihood learning of Boltzmann machines is computationally infeasible due to the intractable partition function. The model expectation term in the gradient requires sampling from the equilibrium distribution $P_\theta$, which in turn demands running a Markov chain to convergence, which is a prohibitively slow process. In this section, we introduce **contrastive divergence (CD)**, the algorithmic breakthrough that made Boltzmann machines practical for real-world applications. CD provides a simple, efficient approximation to the gradient that circumvents the need for equilibrium sampling, trading theoretical purity for empirical effectiveness.
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-Pytorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 10:36+0800\n"
+"POT-Creation-Date: 2026-07-29 19:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -20,11 +20,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:10
-msgid "1.1 The Spin-Glass Analogy"
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:10
+msgid "1.1 The Relationship Between Statistical Physics and Neural Networks"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:12
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:12
 msgid ""
 "The conceptual bridge between statistical physics and neural networks "
 "rests on a powerful analogy: neurons can be treated as tiny magnets, and "
@@ -34,11 +34,11 @@ msgid ""
 "the Boltzmann Machine."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:14
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:14
 msgid "The Ising Model of Magnetism"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:15
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:15
 #, python-brace-format
 msgid ""
 "In condensed matter physics, the Ising model describes a system of "
@@ -48,12 +48,12 @@ msgid ""
 "\\ldots, s_N)$is given by the Hamiltonian:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:17
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:17
 #, python-brace-format
 msgid "E(\\mathbf{s}) = -\\sum_{i<j} J_{ij} s_i s_j - \\sum_i h_i s_i"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:19
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:19
 #, python-brace-format
 msgid ""
 "Here, $J_{ij}$ represents the interaction strength (coupling) between "
@@ -64,20 +64,20 @@ msgid ""
 "biasing individual spins."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:21
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:21
 msgid ""
 "At thermal equilibrium with a heat bath at temperature $T$, the "
 "probability of observing a given spin configuration follows the "
 "**Boltzmann distribution**:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:23
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:23
 msgid ""
 "P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{s})}{k_B "
 "T}\\right)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:25
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:25
 msgid ""
 "where $k_B$ is Boltzmann's constant and $Z = \\sum_{\\mathbf{s}} "
 "\\exp(-E(\\mathbf{s})/k_B T)$ is the partition function. At low "
@@ -86,83 +86,83 @@ msgid ""
 "oriented."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:27
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:27
 msgid "Neurons as Spins, Synapses as Couplings"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:28
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:28
 msgid ""
 "The transition from magnetic spins to neural networks requires only a "
 "change of interpretation:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 msgid "Physics (Ising Model)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 msgid "Neural Network (Hopfield/Boltzmann)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 #, python-brace-format
 msgid "Spin $s_i \\in {-1, +1}$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 #, python-brace-format
 msgid "Neuron state $x_i \\in {0, 1}$ or ${-1, +1}$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 #, python-brace-format
 msgid "Coupling strength $J_{ij}$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 #, python-brace-format
 msgid "Synaptic weight $w_{ij}$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 msgid "External field $h_i$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 msgid "Neuron bias $b_i$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 msgid "Thermal fluctuation $k_B T$"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md
 msgid "Stochasticity (inverse temperature $\\beta = 1/T$)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:37
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:37
 msgid ""
 "With this dictionary, the energy function of a recurrent neural network "
 "becomes:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:39
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:39
 #, python-brace-format
 msgid "E(\\mathbf{x}) = -\\sum_{i<j} w_{ij} x_i x_j - \\sum_i b_i x_i"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:41
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:41
 msgid "or, in matrix form:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:43
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:43
 #, python-brace-format
 msgid ""
 "E_\\theta(\\mathbf{x}) = -\\mathbf{b}^\\top \\mathbf{x} - "
 "\\frac{1}{2}\\mathbf{x}^\\top \\mathbf{W} \\mathbf{x}"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:45
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:45
 #, python-brace-format
 msgid ""
 "where $\\mathbf{W}$ is a symmetric weight matrix with zero diagonal "
@@ -171,11 +171,11 @@ msgid ""
 "landscape and will eventually settle into an equilibrium distribution."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:47
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:47
 msgid "Why Quadratic Energy?"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:48
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:48
 #, python-brace-format
 msgid ""
 "The energy function $E = -\\sum w_{ij}x_i x_j$ is the simplest possible "
@@ -187,11 +187,11 @@ msgid ""
 "starting point for both physics and neural network models."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:50
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:50
 msgid "Statistical Physics Foundations: The Microcanonical Ensemble"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:51
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:51
 msgid ""
 "To understand the probabilistic behavior of such a system, we must invoke"
 " the **fundamental assumption of statistical physics**: For an isolated "
@@ -200,7 +200,7 @@ msgid ""
 " are equally probable."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:53
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:53
 msgid ""
 "This principle gives rise to the **microcanonical ensemble**. For a "
 "system with fixed energy $E$, volume $V$, and number of particles $N$, "
@@ -209,17 +209,17 @@ msgid ""
 "as:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:55
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:55
 msgid "S(E, V, N) = k \\log \\Omega(E, V, N)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:57
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:57
 msgid ""
 "where $k$ is Boltzmann's constant. This entropy measures the number of "
 "microscopic configurations consistent with a given macrostate."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:59
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:59
 #, python-brace-format
 msgid ""
 "For a macroscopic system (e.g., $N \\sim 10^{23}$), $\\Omega$ is an "
@@ -229,11 +229,11 @@ msgid ""
 "microstates (highest entropy)."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:61
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:61
 msgid "Spin Glasses and Frustration"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:62
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:62
 #, python-brace-format
 msgid ""
 "A **spin glass** is a magnetic system in which the coupling strengths "
@@ -245,19 +245,19 @@ msgid ""
 "states** (local minima) separated by energy barriers."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:64
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:64
 msgid ""
 "This is precisely the scenario we encounter in neural networks designed "
 "for associative memory. When we store multiple patterns using a Hebbian "
 "learning rule:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:66
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:66
 #, python-brace-format
 msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:68
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:68
 msgid ""
 "we are effectively engineering a spin glass whose low-energy "
 "configurations correspond to the stored memories $ "
@@ -267,38 +267,38 @@ msgid ""
 "nevertheless trap the network dynamics."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:70
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:70
 msgid "From Deterministic Dynamics to Stochastic Search"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:71
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:71
 msgid "Hopfield's original network employed deterministic, asynchronous updates:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:73
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:73
 #, python-brace-format
 msgid "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:75
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:75
 msgid ""
 "This dynamics is equivalent to moving strictly downhill in the energy "
 "landscape. The network will converge to the nearest local minimum, but it"
 " may get stuck in a spurious state rather than the intended memory."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:77
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:77
 msgid ""
 "The **Boltzmann Machine** introduces a crucial modification: updates "
 "become **stochastic**. At a finite temperature $T$, a neuron $i$ is set "
 "to state $1$ with probability:"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:79
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:79
 msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:81
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:81
 msgid ""
 "where $ \\sigma(z) = 1/(1 + \\exp(-z))$ is the sigmoid function. Thermal "
 "noise occasionally pushes the system *uphill*, allowing it to escape "
@@ -308,11 +308,11 @@ msgid ""
 "corresponding to a true memory."
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:83
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:83
 msgid "Summary"
 msgstr ""
 
-#: ../../source/theoretical-foundations-stat-spinglass.md:84
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:84
 msgid ""
 "This spin-glass analogy provides the essential intuition for the "
 "Boltzmann Machine: it is a neural network that, through the introduction "
@@ -468,5 +468,8 @@ msgstr ""
 #~ "P(x_i = 1) = \\sigma\\left( "
 #~ "\\frac{\\sum_j w_{ij} x_j + b_i}{T} "
 #~ "\\right)"
+#~ msgstr ""
+
+#~ msgid "1.1 The Spin-Glass Analogy"
 #~ msgstr ""
 

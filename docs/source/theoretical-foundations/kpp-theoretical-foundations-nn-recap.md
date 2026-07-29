@@ -1,5 +1,5 @@
 ---
-title: '2.1 A Brief Recap: Linear Neurons and Limitations'
+title: '2.1 Linear Neuron Recap and Its Limitations'
 slug: kpp-theoretical-foundations-nn-recap
 sidebar_position: 4
 hide: false
@@ -7,7 +7,7 @@ hide_child: false
 ---
 
 
-# 2.1 A Brief Recap: Linear Neurons and Limitations
+# 2.1 Linear Neuron Recap and Its Limitations
 
 > The previous chapter situated the Boltzmann machine within the conceptual landscape of statistical physics—a landscape defined by energy functions, equilibrium distributions, and thermal fluctuations. Before we delve deeper into energy-based learning, it is essential to revisit the elementary building blocks of neural computation. Understanding the simplest neuron models, their capabilities, and—crucially—their limitations provides the necessary contrast to appreciate why the Boltzmann machine adopts such a radically different computational paradigm.
 

@@ -1,5 +1,5 @@
 ---
-title: 1.1 The Spin-Glass Analogy
+title: 1.1 The Relationship Between Statistical Physics and Neural Networks
 slug: kpp-theoretical-foundations-stat-spinglass
 sidebar_position: 0
 hide: false
@@ -7,7 +7,7 @@ hide_child: false
 ---
 
 
-# 1.1 The Spin-Glass Analogy
+# 1.1 The Relationship Between Statistical Physics and Neural Networks
 
 > The conceptual bridge between statistical physics and neural networks rests on a powerful analogy: neurons can be treated as tiny magnets, and their collective behavior can be described using the language of statistical mechanics. This connection, first fully exploited by John Hopfield in 1982, provides the foundational framework for understanding the Boltzmann Machine.
 
