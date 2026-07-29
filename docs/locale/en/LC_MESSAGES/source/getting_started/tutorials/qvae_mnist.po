@@ -124,15 +124,13 @@ msgstr ""
 " is:"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:44
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l "
 "\\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
 "   "
 msgstr ""
-"\\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l "
-"\\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:48
 #, python-brace-format
@@ -145,15 +143,13 @@ msgstr ""
 "reconstructs the original data via:"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:51
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim "
 "\\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
 "   "
 msgstr ""
-"p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim "
-"\\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:55
 msgid "训练目标：Q-ELBO"
@@ -166,7 +162,7 @@ msgstr ""
 "Lower Bound (Q-ELBO)**:"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:59
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\\mathcal{L}_{\\text{Q-ELBO}} = "
@@ -174,10 +170,6 @@ msgid ""
 "p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - "
 "\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
 msgstr ""
-"\\mathcal{L}_{\\text{Q-ELBO}} = "
-"\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log "
-"p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - "
-"\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:63
 msgid "QBM 采样与训练"
@@ -388,4 +380,3 @@ msgid ""
 msgstr ""
 "**Related paper**: [Quantum-Boosted High-Fidelity Deep "
 "Learning](https://arxiv.org/abs/2508.11190)"
-
