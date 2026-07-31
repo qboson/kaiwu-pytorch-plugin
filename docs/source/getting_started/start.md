@@ -4,7 +4,7 @@
 ```
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/) [![License](https://img.shields.io/badge/License-Apache%202.0-green)](https://opensource.org/licenses/Apache-2.0)
 
-# Kaiwu-Pytorch-Plugin
+# Kaiwu-PyTorch-Plugin
 
 **Language Versions**: [Chinese](README_ZH.md) | [English](README.md)
 
@@ -52,7 +52,7 @@ The above diagram shows the project file structure:
 
 - **Flexible Configuration**: Sampling methods and energy functions are implemented separately, making it easy to add new energy functions or sampling methods. Widely used BMs and RBMs are implemented, and can be integrated into other models by defining objective functions.
 - **Example References**: The plugin provides relevant examples, such as digits and qvae training, which can serve as references for your own work.
-- **Cutting-edge Algorithm Support**: The plugin provides a solid platform for implementing and applying cutting-edge algorithms. For example, innovative methods that replace the Gaussian assumption in VAE with a Boltzmann distribution are implemented based on Kaiwu-Pytorch-Plugin. The plugin supports end-to-end model training for large-scale, high-noise single-cell data, lowering the barrier for algorithm development and application.
+- **Cutting-edge Algorithm Support**: The plugin provides a solid platform for implementing and applying cutting-edge algorithms. For example, innovative methods that replace the Gaussian assumption in VAE with a Boltzmann distribution are implemented based on Kaiwu-PyTorch-Plugin. The plugin supports end-to-end model training for large-scale, high-noise single-cell data, lowering the barrier for algorithm development and application.
 
 ## Quick Start
 

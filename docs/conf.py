@@ -14,7 +14,7 @@ from sphinx import addnodes
 sys.path.insert(0, os.path.abspath("../src"))
 from kaiwu.torch_plugin import __version__
 
-project = "Kaiwu-Pytorch-Plugin"
+project = "Kaiwu-PyTorch-Plugin"
 copyright = "2025 Beijing QBoson Quantum Technology Co., Ltd"
 author = "QBoson Inc"
 release = __version__
