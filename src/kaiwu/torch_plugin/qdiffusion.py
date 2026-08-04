@@ -204,9 +204,9 @@ class QDiffusion(nn.Module):
     - a proposal model that predicts token logits for the current noisy state
     - an energy model that reranks candidate reconstructions
 
-    It exposes both training-oriented APIs such as :meth:`objective` and
-    decoding-oriented APIs such as :meth:`initialize_state`, :meth:`step`, and
-    :meth:`generate`.
+    It exposes both training-oriented APIs such as ``objective`` and
+    decoding-oriented APIs such as ``initialize_state``, ``step``, and
+    ``generate``.
 
     Args:
         proposal_model: Backbone used to predict proposal logits.
@@ -271,8 +271,8 @@ class QDiffusion(nn.Module):
         """Moves the module and refreshes cached device/dtype metadata.
 
         Args:
-            *args: Positional arguments forwarded to ``nn.Module.to``.
-            **kwargs: Keyword arguments forwarded to ``nn.Module.to``.
+            ``*args``: Positional arguments forwarded to ``nn.Module.to``.
+            ``**kwargs``: Keyword arguments forwarded to ``nn.Module.to``.
 
         Returns:
             QDiffusion: The moved module instance.
@@ -290,8 +290,7 @@ class QDiffusion(nn.Module):
 
         Args:
             noisy_tokens: Current noisy token tensor.
-            **kwargs: Additional keyword arguments forwarded to the proposal
-                model.
+            ``**kwargs``: Additional keyword arguments forwarded to the proposal model.
 
         Returns:
             torch.Tensor: Proposal logits over the token vocabulary.
@@ -304,12 +303,11 @@ class QDiffusion(nn.Module):
         raise TypeError("proposal_model must implement forward().")
 
     def proposal(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
-        """Semantic alias around :meth:`forward` for proposal-side calls.
+        """Semantic alias around ``forward`` for proposal-side calls.
 
         Args:
             noisy_tokens: Current noisy token tensor.
-            **kwargs: Additional keyword arguments forwarded to the proposal
-                model.
+            ``**kwargs``: Additional keyword arguments forwarded to the proposal model.
 
         Returns:
             torch.Tensor: Proposal logits over the token vocabulary.
@@ -432,7 +430,7 @@ class QDiffusion(nn.Module):
             temperature: Sampling temperature stored in the state payload.
 
         Returns:
-            dict[str, Any]: A mutable state dictionary suitable for repeated :meth:`step` calls.
+            dict[str, Any]: A mutable state dictionary suitable for repeated ``step`` calls.
         """
         output_tokens, output_scores = self._initialize_output_tokens(
             input_tokens, partial_masks=partial_masks
@@ -458,7 +456,7 @@ class QDiffusion(nn.Module):
         """Runs one denoising/reranking step and returns updated state.
 
         Args:
-            state: Current decode state created by :meth:`initialize_state`.
+            state: Current decode state created by ``initialize_state``.
             partial_masks: Optional boolean mask of fixed positions.
 
         Returns:
@@ -540,8 +538,7 @@ class QDiffusion(nn.Module):
 
         Args:
             output_tokens: Token tensor to inspect.
-            partial_masks: Optional boolean mask of positions that should remain
-                fixed.
+            partial_masks: Optional boolean mask of positions that should remain fixed.
 
         Returns:
             torch.Tensor: A boolean mask where ``True`` marks editable non-special positions.

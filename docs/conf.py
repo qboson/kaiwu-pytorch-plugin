@@ -9,10 +9,12 @@
 import os
 import sys
 
+from sphinx import addnodes
+
 sys.path.insert(0, os.path.abspath("../src"))
 from kaiwu.torch_plugin import __version__
 
-project = "Kaiwu-Pytorch-Plugin"
+project = "Kaiwu-PyTorch-Plugin"
 copyright = "2025 Beijing QBoson Quantum Technology Co., Ltd"
 author = "QBoson Inc"
 release = __version__
@@ -39,6 +41,7 @@ extensions = [
     "sphinxcontrib.katex",
     "myst_parser",
     "sphinxcontrib.mermaid",
+    "sphinx.ext.napoleon",
 ]
 myst_enable_extensions = [
     "dollarmath",
@@ -78,6 +81,26 @@ html_theme_options = {
 
 html_show_sourcelink = False
 html_css_files = ["custom.css"]
+
+
+def _hide_attributes_from_page_toc(app, doctree):
+    """保留属性正文，但不将属性加入页面右侧目录。"""
+    del app
+    for description in doctree.findall(addnodes.desc):
+        if description.get("objtype") == "attribute":
+            description["no-contents-entry"] = True
+
+
+def setup(app):
+    """注册页面目录过滤器。"""
+    app.connect("doctree-read", _hide_attributes_from_page_toc, priority=400)
+
+# arXiv and GitHub intermittently terminate TLS connections from the local
+# linkcheck client. The corresponding public pages are verified separately.
+linkcheck_ignore = [
+    r"https://arxiv\.org/abs/2508\.11190",
+    r"https://github\.com/QBoson/Kaiwu-pytorch-plugin/issues",
+]
 
 source_suffix = {
     ".rst": "restructuredtext",

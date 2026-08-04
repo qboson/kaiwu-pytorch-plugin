@@ -5,10 +5,10 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
 msgid ""
-msgstr ""
-"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
+msgstr "The main entry point is `example/rbm_digits/rbm_digits.ipynb`; the classification pipeline is also available in `train_classifier` within `example/rbm_digits/rbm_classifier.py`."
+"Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 10:35+0800\n"
+"POT-Creation-Date: 2026-07-14 18:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -25,7 +25,7 @@ msgstr "RBM Classification: Handwritten Digit Recognition"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:3
 msgid "本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。"
-msgstr ""
+msgstr "2\\. Principles Overview"
 "This tutorial demonstrates how to use a Restricted Boltzmann Machine "
 "(RBM) for feature learning and classification on the handwritten-digit "
 "dataset. It is suitable for beginners to understand the workflow of "
@@ -69,16 +69,22 @@ msgstr "**Dependencies**:"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:25
 msgid "1. 数据准备"
-msgstr "1\. Data Preparation"
+msgstr "1\\. Data Preparation"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:27
+msgid ""
+"本示例的主入口是 `example/rbm_digits/rbm_digits.ipynb`；分类流水线也可以直接参考 "
+"`example/rbm_digits/rbm_classifier.py` 中的 `train_classifier`。"
+msgstr "The main entry point is `example/rbm_digits/rbm_digits.ipynb`; the classification pipeline is also available in `train_classifier` within `example/rbm_digits/rbm_classifier.py`."
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:29
 msgid "此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。"
 msgstr ""
 "This section shows how to load the classic handwritten-digit dataset and "
 "expand it with simple data-augmentation techniques (e.g., shifting images"
 " in four directions) to improve the model’s generalization ability."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:29
+#: ../../source/getting_started/tutorials/rbm_classification.md:31
 msgid ""
 "首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。 "
 "接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。 "
@@ -91,17 +97,33 @@ msgstr ""
 "training and test sets, and normalized so that every feature value lies "
 "in the interval [0, 1], readying the data for subsequent model training."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:36
-msgid "2. 模型训练"
-msgstr "2\. Model Training"
+#: ../../source/getting_started/tutorials/rbm_classification.md:35
+msgid "2. 原理概览"
+msgstr "2\\. Principles Overview"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:38
+#: ../../source/getting_started/tutorials/rbm_classification.md:37
+msgid ""
+"RBM "
+"是一个二部能量模型。可见层和隐层之间有连接，但同一层内部没有连接，因此给定一层后，另一层的各个单元可以并行采样。模型通过能量函数定义样本概率：低能量状态具有更高概率，隐层则将像素组合成更抽象的特征。"
+msgstr "An RBM is a bipartite energy model. Connections exist between the visible and hidden layers, but not within either layer, so units in one layer can be sampled in parallel when the other is given. The energy function defines sample probabilities: lower-energy states are more probable, and hidden units combine pixels into more abstract features."
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:39
+msgid ""
+"训练时使用对比散度近似最大似然梯度：正相统计真实数据及其隐层表示，负相从模型采样并统计重构数据，二者的差异用于更新权重和偏置。训练完成后，`RBMRunner.transform`"
+" 输出隐层特征，再交给逻辑回归等传统分类器。"
+msgstr "Training uses contrastive divergence to approximate the maximum-likelihood gradient: the positive phase collects statistics from real data and its hidden representations, while the negative phase collects statistics from model samples and reconstructions. Their difference updates weights and biases. After training, `RBMRunner.transform` produces hidden features for a conventional classifier such as logistic regression."
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:44
+msgid "2. 模型训练"
+msgstr "2\\. Model Training"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:46
 msgid "此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。"
 msgstr ""
 "This section shows how to train a Restricted Boltzmann Machine (RBM) "
 "model."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:40
+#: ../../source/getting_started/tutorials/rbm_classification.md:48
 msgid ""
 "首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。 "
 "接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数， "
@@ -115,7 +137,7 @@ msgstr ""
 "parameters so as to minimize an objective function that includes the "
 "negative log-likelihood plus weight- and bias-decay terms."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:44
+#: ../../source/getting_started/tutorials/rbm_classification.md:52
 msgid ""
 "在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息， "
 "并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。"
@@ -125,15 +147,15 @@ msgstr ""
 "images together with model parameters are visualized, making it easy to "
 "monitor learning progress and effectiveness in real time."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:50
+#: ../../source/getting_started/tutorials/rbm_classification.md:58
 msgid "3. 特征提取与分类"
-msgstr "3\. Feature Extraction and Classification"
+msgstr "3\\. Feature Extraction and Classification"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:52
+#: ../../source/getting_started/tutorials/rbm_classification.md:60
 msgid "3.1 训练分类器"
 msgstr "3.1 Training the Classifier"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:54
+#: ../../source/getting_started/tutorials/rbm_classification.md:62
 msgid "本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。"
 msgstr ""
 "This subsection shows how to build and train a two-stage classification "
@@ -141,7 +163,7 @@ msgstr ""
 "compares its performance with a logistic-regression model that uses only "
 "the raw pixel features."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:56
+#: ../../source/getting_started/tutorials/rbm_classification.md:64
 msgid ""
 "首先，通过 `RBMRunner` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 `Pipeline` "
 "中，再接上逻辑回归分类器。 训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
@@ -152,7 +174,7 @@ msgstr ""
 " for both approaches is recorded, and accuracy together with a "
 "classification report are evaluated on the test set."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:59
+#: ../../source/getting_started/tutorials/rbm_classification.md:67
 msgid "该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。"
 msgstr ""
 "The experiment aims to verify whether the high-level features learned by "
@@ -160,22 +182,22 @@ msgstr ""
 "provides an intuitive example for understanding the role of unsupervised "
 "pre-training in deep learning."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:64
+#: ../../source/getting_started/tutorials/rbm_classification.md:72
 msgid "3.2 可视化权重"
 msgstr "3.2 Visualizing Weights"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:66
+#: ../../source/getting_started/tutorials/rbm_classification.md:74
 msgid "该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。"
 msgstr ""
 "This function visualizes the weights associated with each hidden unit of "
 "the RBM as 8×8 images, giving an intuitive view of the feature patterns "
 "learned from the data. The result can be saved as a high-resolution PDF."
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:71
+#: ../../source/getting_started/tutorials/rbm_classification.md:79
 msgid "3.2 可视化混淆矩阵"
 msgstr "3.2 Visualizing the Confusion Matrix"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:73
+#: ../../source/getting_started/tutorials/rbm_classification.md:81
 msgid ""
 "该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。 "
 "支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。"
@@ -184,4 +206,3 @@ msgstr ""
 "a heat-map, clearly showing prediction accuracy and confusion among "
 "classes. A custom suffix can be added to the title, and the figure can be"
 " saved as a high-resolution PDF."
-

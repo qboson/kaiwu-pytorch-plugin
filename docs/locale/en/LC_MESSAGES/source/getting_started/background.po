@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
+"Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-09 12:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -50,13 +50,12 @@ msgstr ""
 "Given an input vector $\\mathbf{x} \\in \\mathbb{R}^n$, its output is:"
 
 #: ../../source/getting_started/background.md:13
-#, fuzzy, python-brace-format
 msgid ""
 "\n"
 "\n"
 "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)\n"
 "\n"
-msgstr "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)"
+msgstr ""
 
 #: ../../source/getting_started/background.md:18
 #, python-brace-format
@@ -70,13 +69,13 @@ msgstr ""
 "commonly used:"
 
 #: ../../source/getting_started/background.md:20
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
 "\\sigma(z) = \\frac{1}{1 + e^{-z}}\n"
 "\n"
-msgstr "\\sigma(z) = \\frac{1}{1 + e^{-z}}"
+msgstr ""
 
 #: ../../source/getting_started/background.md:25
 msgid "1.2 基于能量的模型"
@@ -93,7 +92,7 @@ msgstr ""
 "$E(\\mathbf{x}; \\theta)$:"
 
 #: ../../source/getting_started/background.md:29
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
@@ -101,21 +100,19 @@ msgid ""
 "\\theta))}{Z(\\theta)}\n"
 "\n"
 msgstr ""
-"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; "
-"\\theta))}{Z(\\theta)}"
 
 #: ../../source/getting_started/background.md:34
 msgid "其中配分函数（partition function）:"
 msgstr "where the partition function is:"
 
 #: ../../source/getting_started/background.md:36
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
 "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))\n"
 "\n"
-msgstr "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))"
+msgstr ""
 
 #: ../../source/getting_started/background.md:41
 msgid "确保概率归一化。低能量状态对应高概率。"
@@ -159,7 +156,7 @@ msgstr ""
 "independent given the visible variables, with conditional probability:"
 
 #: ../../source/getting_started/background.md:57
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -167,15 +164,13 @@ msgid ""
 "\\right)\n"
 "\n"
 msgstr ""
-"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j "
-"\\right)"
 
 #: ../../source/getting_started/background.md:62
 msgid "同理，"
 msgstr "Similarly,"
 
 #: ../../source/getting_started/background.md:64
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -183,8 +178,6 @@ msgid ""
 "\\right)\n"
 "\n"
 msgstr ""
-"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i "
-"\\right)"
 
 #: ../../source/getting_started/background.md:69
 msgid "3. 能量函数与概率分布"
@@ -199,7 +192,7 @@ msgid "RBM 的能量函数定义为："
 msgstr "The RBM energy function is defined as:"
 
 #: ../../source/getting_started/background.md:75
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -207,8 +200,6 @@ msgid ""
 "\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 "\n"
 msgstr ""
-"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
-"\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
 
 #: ../../source/getting_started/background.md:80
 #, python-brace-format
@@ -225,14 +216,14 @@ msgid "联合概率分布通过玻尔兹曼分布给出："
 msgstr "The joint probability distribution is given by the Boltzmann distribution:"
 
 #: ../../source/getting_started/background.md:84
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
 "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
 "\n"
 "\n"
-msgstr "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
+msgstr ""
 
 #: ../../source/getting_started/background.md:89
 msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
@@ -241,13 +232,13 @@ msgstr ""
 " distribution over the visible layer is:"
 
 #: ../../source/getting_started/background.md:91
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
 "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
 "\n"
-msgstr "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})"
+msgstr ""
 
 #: ../../source/getting_started/background.md:96
 msgid "通过最大化似然函数学习参数 $W,b,c$ 。目标函数为负对数似然："
@@ -256,13 +247,13 @@ msgstr ""
 "objective is the negative log-likelihood:"
 
 #: ../../source/getting_started/background.md:98
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
 "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})\n"
 "\n"
-msgstr "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
+msgstr ""
 
 #: ../../source/getting_started/background.md:103
 msgid "采用对比散度（CD）算法近似梯度，更新规则为："
@@ -271,7 +262,7 @@ msgstr ""
 "update rule is:"
 
 #: ../../source/getting_started/background.md:105
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
@@ -280,9 +271,6 @@ msgid ""
 "\\right)\n"
 "\n"
 msgstr ""
-"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
-"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
-"\\right)"
 
 #: ../../source/getting_started/background.md:110
 msgid ""
@@ -303,20 +291,20 @@ msgid "能量模型的概率可以写成："
 msgstr "The probability of an energy model can be written as:"
 
 #: ../../source/getting_started/background.md:116
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
 "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)\n"
 "\n"
-msgstr "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)"
+msgstr ""
 
 #: ../../source/getting_started/background.md:121
 msgid "其梯度为："
 msgstr "Its gradient is:"
 
 #: ../../source/getting_started/background.md:123
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -324,8 +312,6 @@ msgid ""
 " \\theta) - \\nabla_\\theta \\log Z\n"
 "\n"
 msgstr ""
-"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x;"
-" \\theta) - \\nabla_\\theta \\log Z"
 
 #: ../../source/getting_started/background.md:128
 msgid "配分函数的梯度难以直接计算"
@@ -374,7 +360,7 @@ msgid "综上，"
 msgstr "Putting it together,"
 
 #: ../../source/getting_started/background.md:155
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 " \\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
@@ -382,10 +368,6 @@ msgid ""
 "\\hat{p}(x; \\theta)\n"
 "\n"
 msgstr ""
-"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
-"\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
-"\\hat{p}(x; \\theta)\n"
-"\n"
 
 #: ../../source/getting_started/background.md:159
 #, python-brace-format
@@ -398,7 +380,7 @@ msgstr ""
 "distribution.  Thus the equation can be rewritten as:"
 
 #: ../../source/getting_started/background.md:161
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
@@ -407,25 +389,18 @@ msgid ""
 " \\theta)\n"
 "\n"
 msgstr ""
-"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
-"p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - "
-"\\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x;"
-" \\theta)\n"
-"\n"
 
 #: ../../source/getting_started/background.md:165
 msgid "这里我们考虑玻尔兹曼机的能量函数，容易求得"
 msgstr "Considering the Boltzmann-machine energy function, we can easily obtain:"
 
 #: ../../source/getting_started/background.md:167
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
 "\n"
 msgstr ""
-"\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
-"\n"
 
 #: ../../source/getting_started/background.md:171
 msgid "只要分别得到 $p_{\\text{data}}$, $p_{\\text{model}}$ 分布下的 $v$ 和 $h$ 的值即可计算梯度。即为："
@@ -435,7 +410,7 @@ msgstr ""
 "gradient, namely:"
 
 #: ../../source/getting_started/background.md:174
-#, fuzzy
+#,
 msgid ""
 "\n"
 "\n"
@@ -443,17 +418,3 @@ msgid ""
 "\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
 "\\right)\n"
 msgstr ""
-"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
-"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
-"\\right)"
-
-#~ msgid ""
-#~ "\\Delta W_{ij} = \\epsilon \\left( "
-#~ "\\langle v_i h_j \\rangle_{\\text{data}} - "
-#~ "\\langle v_i h_j \\rangle_{\\text{recon}} "
-#~ "\\right)\n"
-#~ msgstr ""
-#~ "\\Delta W_{ij} = \\epsilon \\left( "
-#~ "\\langle v_i h_j \\rangle_{\\text{data}} - "
-#~ "\\langle v_i h_j \\rangle_{\\text{recon}} "
-#~ "\\right)"

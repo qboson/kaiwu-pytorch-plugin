@@ -30,7 +30,10 @@
 **初学者路径**：
 
 1. 先完成 {doc}`../quickstart` 了解基本 API
-2. 学习 {doc}`rbm_classification` 理解 RBM 的应用流程
+2. 学习 {doc}`quantum_sampling_bottleneck` 理解模型训练中的采样瓶颈
+3. 学习 {doc}`simulated_annealing` 建立本地采样基线
+4. 学习 {doc}`quantum_sampling_pytorch` 了解如何接入 CIM 采样器
+5. 学习 {doc}`rbm_classification` 理解 RBM 的应用流程
 
 **生成模型路径**：
 
@@ -45,6 +48,9 @@
 :maxdepth: 2
 :hidden:
 
+quantum_sampling_bottleneck
+simulated_annealing
+quantum_sampling_pytorch
 rbm_classification
 dbn_classification
 bm_generation

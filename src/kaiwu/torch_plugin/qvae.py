@@ -32,7 +32,7 @@ class AutoEncoderBase(nn.Module):
         activation_fct (callable, optional): Activation function for hidden layers.
         config (object): Configuration object with hyperparameters.
             Must contain `num_latent_units` (int > 0) and `loss_type` (str).
-        **kwargs: Additional keyword arguments for nn.Module.
+        ``**kwargs``: Additional keyword arguments for nn.Module.
     """
 
     def __init__(
@@ -102,12 +102,9 @@ class QVAE(AutoEncoderBase):
     Args:
         input_dimension (int or list of int): Dimensionality of input features.
         activation_fct (callable, optional): Activation function for hidden layers.
-        config (object): Configuration object containing:
-            - num_latent_units (int)
-            - loss_type (str): 'bernoulli' or 'mse'
-            - dist_beta (float)
-            - kl_beta (float)
-            - weight_decay (float)
+        config (object): Configuration with ``num_latent_units`` (int),
+            ``loss_type`` (``'bernoulli'`` or ``'mse'``), ``dist_beta``
+            (float), ``kl_beta`` (float), and ``weight_decay`` (float).
         encoder (nn.Module, optional): Pre-created encoder. Created by the
             subclass factory when omitted.
         decoder (nn.Module, optional): Pre-created decoder. Created by the
@@ -194,9 +191,7 @@ class QVAE(AutoEncoderBase):
 
         x = x.view(-1, self._input_dimension)
         if configured_loss_type == "bernoulli" and self._dataset_mean is not None:
-            x = x - torch.as_tensor(
-                self._dataset_mean, dtype=x.dtype, device=x.device
-            )
+            x = x - torch.as_tensor(self._dataset_mean, dtype=x.dtype, device=x.device)
         elif configured_loss_type != "mse":
             raise ValueError(f"Unsupported loss type: {configured_loss_type}")
 
@@ -230,12 +225,10 @@ class QVAE(AutoEncoderBase):
 
         Args:
             x (torch.Tensor): Input tensor of shape (batch_size, input_dim).
+
         Returns:
-            tuple: (recon_x, posterior, q, zeta)
-                - recon_x: Reconstructed logits (batch_size, input_dim)
-                - posterior: Posterior distribution object (MixtureGeneric)
-                - q: Encoder output logits (batch_size, latent_dim)
-                - zeta: Reparameterized latent sample (batch_size, latent_dim)
+            tuple: Reconstructed logits, posterior distribution, encoder logits,
+                and reparameterized latent sample.
         """
         x = x.view(-1, self._input_dimension)
 
@@ -311,6 +304,7 @@ class QVAE(AutoEncoderBase):
         Args:
             q (torch.Tensor): Encoder output logits (batch_size, latent_dim).
                 Must be detached to prevent gradients flowing to encoder.
+
             bm_weight_decay (float, optional): L2 regularization coefficient for BM parameters.
 
         Returns:
@@ -338,9 +332,7 @@ class QVAE(AutoEncoderBase):
             beta (float): Mixture parameter for MixtureGeneric.
 
         Returns:
-            tuple: (posterior_dist, zeta)
-                - posterior_dist: MixtureGeneric object
-                - zeta: Reparameterized sample (batch_size, latent_dim)
+            tuple: Posterior distribution and reparameterized latent sample.
         """
         posterior_dist = MixtureGeneric(q_logits, beta)
         zeta = posterior_dist.reparameterize(self.training)

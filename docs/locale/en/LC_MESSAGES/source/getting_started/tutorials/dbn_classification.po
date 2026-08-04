@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
+"Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 14:54+0800\n"
+"POT-Creation-Date: 2026-07-14 18:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -33,56 +33,73 @@ msgstr ""
 "learning capability."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:4
+msgid ""
+"**示例位置**: `example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 "
+"`example/dbn_digits/dbn_trainer.py` 和 "
+"`example/dbn_digits/supervised_dbn_digits.py`。"
+msgstr "**Example location**: `example/dbn_digits/supervised_dbn_digits.ipynb`. The core implementation is in `example/dbn_digits/dbn_trainer.py` and `example/dbn_digits/supervised_dbn_digits.py`."
+
+#: ../../source/getting_started/tutorials/dbn_classification.md:6
+msgid ""
+"该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 "
+"`DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 "
+"`SupervisedDBNClassification` 完成分类训练和评估。"
+msgstr "The example first uses `load_data` to read sklearn's 8×8 handwritten-digit data, then applies translation augmentation, normalization, and a train/test split. `DBNPretrainer.fit` trains RBMs one layer at a time, `transform` provides the next layer's input, and `SupervisedDBNClassification` completes classification training and evaluation."
+
+#: ../../source/getting_started/tutorials/dbn_classification.md:8
 msgid "目标"
 msgstr "Objectives"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:6
+#: ../../source/getting_started/tutorials/dbn_classification.md:10
 msgid "一、RBM 原理概述"
 msgstr "I. RBM Principles Overview"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:8
+#: ../../source/getting_started/tutorials/dbn_classification.md:12
 msgid ""
 "受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible "
-"Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。"
+"Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。DBN "
+"的关键思想是把上一层 RBM 输出的隐层概率或采样结果作为下一层 RBM 的可见层，逐层学习越来越抽象的表示。"
 msgstr ""
 "A Restricted Boltzmann Machine (RBM) is an energy-based probabilistic "
 "graphical model consisting of a Visible Layer and a Hidden Layer with no "
 "intra-layer connections and full inter-layer connections.  Its core task "
 "is to learn the latent feature distribution of data via unsupervised "
-"learning."
+"learning. A DBN uses the hidden probabilities or samples from one RBM as "
+"the visible input of the next, learning increasingly abstract features "
+"layer by layer."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:10
+#: ../../source/getting_started/tutorials/dbn_classification.md:14
 msgid "1. 模型结构"
 msgstr "1\\. Model Structure"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:12
+#: ../../source/getting_started/tutorials/dbn_classification.md:16
 msgid "**可见层（`v`）**：输入数据的显式表示（如像素值）。"
 msgstr ""
 "**Visible layer (``v``)**: explicit representation of input data (e.g. "
 "pixel values)."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:13
+#: ../../source/getting_started/tutorials/dbn_classification.md:17
 msgid "**隐层（`h`）**：提取的潜在特征。"
 msgstr "**Hidden layer (``h``)**: extracted latent features."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:14
+#: ../../source/getting_started/tutorials/dbn_classification.md:18
 msgid "**权重矩阵（`W`）**：连接可见层与隐层的权重。"
 msgstr "**Weight matrix (``W``)**: weights connecting visible and hidden layers."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:15
+#: ../../source/getting_started/tutorials/dbn_classification.md:19
 msgid "**偏置**：可见层偏置（`b`）和隐层偏置（`c`）。"
 msgstr "**Biases**: visible bias (``b``) and hidden bias (``c``)."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:17
+#: ../../source/getting_started/tutorials/dbn_classification.md:21
 msgid "2. 能量函数与概率分布"
 msgstr "2\\. Energy Function & Probability Distribution"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:19
+#: ../../source/getting_started/tutorials/dbn_classification.md:23
 msgid "RBM 的能量函数定义为："
 msgstr "The RBM energy function is defined as:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:21
-#, fuzzy, python-brace-format
+#: ../../source/getting_started/tutorials/dbn_classification.md:25
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -92,12 +109,11 @@ msgstr ""
 "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - "
 "\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:25
+#: ../../source/getting_started/tutorials/dbn_classification.md:29
 msgid "联合概率分布通过玻尔兹曼分布给出："
 msgstr "The joint probability is given by the Boltzmann distribution:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:27
-#, fuzzy
+#: ../../source/getting_started/tutorials/dbn_classification.md:31
 msgid ""
 "\n"
 "\n"
@@ -107,40 +123,39 @@ msgstr ""
 "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} "
 "}{Z}"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:31
+#: ../../source/getting_started/tutorials/dbn_classification.md:35
 msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
 msgstr ""
 "where $Z$ is the partition function (normalization constant).  The "
 "marginal distribution over the visible layer is:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:33
-#, fuzzy
+#: ../../source/getting_started/tutorials/dbn_classification.md:37
 msgid ""
 "\n"
 "\n"
 "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
 msgstr "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:37
+#: ../../source/getting_started/tutorials/dbn_classification.md:41
 msgid "3. 条件独立性"
 msgstr "3\\. Conditional Independence"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:39
+#: ../../source/getting_started/tutorials/dbn_classification.md:43
 msgid "由于层内无连接，给定可见层时隐层条件独立，反之亦然："
 msgstr ""
 "Because there are no within-layer connections, the hidden units are "
 "conditionally independent given the visible layer, and vice versa:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:41
-#, fuzzy, python-brace-format
+#: ../../source/getting_started/tutorials/dbn_classification.md:45
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
 "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij} v_i + c_j\\right)\n"
 msgstr "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij} v_i + c_j\\right)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:45
-#, fuzzy, python-brace-format
+#: ../../source/getting_started/tutorials/dbn_classification.md:49
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -148,22 +163,21 @@ msgid ""
 "\n"
 msgstr "P(v_i=1|\\mathbf{h}) = \\sigma\\left(\\sum_j W_{ij} h_j + b_i\\right)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:50
+#: ../../source/getting_started/tutorials/dbn_classification.md:54
 msgid "其中 $\\sigma(x) = \\frac{1}{1+e^{-x}}$ 为 Sigmoid 激活函数。"
 msgstr "where $\\sigma(x)=\\frac{1}{1+e^{-x}}$ is the sigmoid activation function."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:52
+#: ../../source/getting_started/tutorials/dbn_classification.md:56
 msgid "4. 训练目标"
 msgstr "4\\. Training Objective"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:54
+#: ../../source/getting_started/tutorials/dbn_classification.md:58
 msgid "通过最大化似然函数学习参数（`W`, `b`, `c`）。目标函数为负对数似然："
 msgstr ""
 "Parameters (``W``, ``b``, ``c``) are learned by maximizing the "
 "likelihood.  The objective is the negative log-likelihood:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:56
-#, fuzzy
+#: ../../source/getting_started/tutorials/dbn_classification.md:60
 msgid ""
 "\n"
 "\n"
@@ -171,14 +185,13 @@ msgid ""
 "\n"
 msgstr "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:61
+#: ../../source/getting_started/tutorials/dbn_classification.md:65
 msgid "采用对比散度（CD）算法近似梯度，更新规则为："
 msgstr ""
 "Contrastive Divergence (CD) is used to approximate gradients.  The update"
 " rule is:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:63
-#, fuzzy
+#: ../../source/getting_started/tutorials/dbn_classification.md:67
 msgid ""
 "\n"
 "\n"
@@ -191,7 +204,7 @@ msgstr ""
 "\\rangle_{\\text{data}} - \\langle v_i h_j "
 "\\rangle_{\\text{recon}}\\right)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:68
+#: ../../source/getting_started/tutorials/dbn_classification.md:72
 msgid ""
 "其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle"
 " \\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
@@ -201,28 +214,28 @@ msgstr ""
 "denote expectations under the data and reconstruction distributions, "
 "respectively."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:70
+#: ../../source/getting_started/tutorials/dbn_classification.md:74
 msgid "二、整体模块架构与训练模式"
 msgstr "II. Overall Module Architecture & Training Modes"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:72
+#: ../../source/getting_started/tutorials/dbn_classification.md:76
 msgid "代码实现了基于 PyTorch 的深度信念网络（DBN），采用分层架构设计，支持从无监督预训练到有监督学习的完整流程。"
 msgstr ""
 "The code implements a PyTorch-based Deep Belief Network with a layered "
 "architecture that supports the complete pipeline from unsupervised pre-"
 "training to supervised learning."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:74
+#: ../../source/getting_started/tutorials/dbn_classification.md:78
 msgid "**模块架构**："
 msgstr "**Module Architecture**:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:76
+#: ../../source/getting_started/tutorials/dbn_classification.md:80
 msgid "**`DBNPretrainer`**   实现多层 RBM 的堆叠与逐层无监督预训练，提供特征提取接口。"
 msgstr ""
 "**``DBNPretrainer``** stacks multiple RBMs and performs layer-wise "
 "unsupervised pre-training, exposing a feature-extraction interface."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:79
+#: ../../source/getting_started/tutorials/dbn_classification.md:83
 msgid ""
 "**`AbstractSupervisedDBN`**   定义 DBN "
 "监督学习的通用接口，用于支持多模式训练策略，包括预训练、微调、分类器训练与预测等抽象方法。"
@@ -231,7 +244,7 @@ msgstr ""
 "supervised learning, supporting multi-mode training strategies including "
 "pre-training, fine-tuning, classifier training, and prediction."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:82
+#: ../../source/getting_started/tutorials/dbn_classification.md:86
 msgid ""
 "**`AbstractSupervisedDBNClassifier`**   基于 `AbstractSupervisedDBN`，实现 "
 "PyTorch 下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
@@ -241,281 +254,284 @@ msgstr ""
 "extraction and classifier integration (logistic regression, SVM, random "
 "forest, etc.)."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:85
+#: ../../source/getting_started/tutorials/dbn_classification.md:89
 msgid "**`SupervisedDBNClassification`**   具体分类任务实现、微调网络构建以及训练。"
 msgstr ""
 "**``SupervisedDBNClassification``** implements the concrete "
 "classification task, fine-tuned network construction, and training."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:88
+#: ../../source/getting_started/tutorials/dbn_classification.md:92
 msgid "**训练模式**："
 msgstr "**Training Modes**:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:90
+#: ../../source/getting_started/tutorials/dbn_classification.md:94
 msgid "**无监督模式**：仅预训练，用于特征提取。"
 msgstr "**Unsupervised mode**: pre-training only, for feature extraction."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:91
+#: ../../source/getting_started/tutorials/dbn_classification.md:95
 msgid "**分类器模式**：预训练 + 下游分类器训练。"
 msgstr "**Classifier mode**: pre-training + downstream classifier training."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:92
+#: ../../source/getting_started/tutorials/dbn_classification.md:96
 msgid "**微调网络模式**：预训练 + 网络反向传播微调。"
 msgstr ""
 "**Fine-tuning mode**: pre-training + back-propagation fine-tuning of the "
 "entire network."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:94
+#: ../../source/getting_started/tutorials/dbn_classification.md:98
 msgid "三、核心类功能和接口概述"
 msgstr "III. Core Classes & Interface Overview"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:96
+#: ../../source/getting_started/tutorials/dbn_classification.md:100
 msgid "1. DBNPretrainer 无监督训练DBN"
 msgstr "1\\. DBNPretrainer – Unsupervised DBN Training"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:98
-#: ../../source/getting_started/tutorials/dbn_classification.md:132
-#: ../../source/getting_started/tutorials/dbn_classification.md:143
+#: ../../source/getting_started/tutorials/dbn_classification.md:102
+#: ../../source/getting_started/tutorials/dbn_classification.md:139
+#: ../../source/getting_started/tutorials/dbn_classification.md:150
 msgid "**关键参数**："
 msgstr "**Key Parameters**:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:100
+#: ../../source/getting_started/tutorials/dbn_classification.md:104
 msgid "`hidden_layers_structure`：隐层单元数（默认两层 `[100, 100]`）"
 msgstr ""
 "``hidden_layers_structure``: number of hidden units per layer (default "
 "two layers ``[100, 100]``)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:101
+#: ../../source/getting_started/tutorials/dbn_classification.md:105
 msgid "`learning_rate_rbm`：RBM 学习率（默认 0.1）"
 msgstr "``learning_rate_rbm``: RBM learning rate (default 0.1)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:102
+#: ../../source/getting_started/tutorials/dbn_classification.md:106
 msgid "`n_epochs_rbm`：每层 RBM 训练轮数（默认 10）"
 msgstr "``n_epochs_rbm``: training epochs per RBM layer (default 10)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:103
+#: ../../source/getting_started/tutorials/dbn_classification.md:107
 msgid "`batch_size`：批大小（默认 100）"
 msgstr "``batch_size``: mini-batch size (default 100)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:104
+#: ../../source/getting_started/tutorials/dbn_classification.md:108
 msgid "`verbose`：打印训练信息（默认 True）"
 msgstr "``verbose``: print training logs (default True)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:105
+#: ../../source/getting_started/tutorials/dbn_classification.md:109
 msgid "`shuffle`：数据打乱（默认 True）"
 msgstr "``shuffle``: shuffle data each epoch (default True)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:106
+#: ../../source/getting_started/tutorials/dbn_classification.md:110
 msgid "`drop_last`：是否丢弃最后不足 batch 的样本（默认 False）"
 msgstr "``drop_last``: drop last incomplete batch (default False)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:107
+#: ../../source/getting_started/tutorials/dbn_classification.md:111
 msgid "`random_state`：随机种子"
 msgstr "``random_state``: random seed"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:109
+#: ../../source/getting_started/tutorials/dbn_classification.md:113
 msgid "**设备支持**：自动选择 GPU（`cuda`）或 CPU"
 msgstr "**Device support**: automatically chooses GPU (``cuda``) or CPU"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:111
+#: ../../source/getting_started/tutorials/dbn_classification.md:115
 msgid "**核心方法**："
 msgstr "**Core Methods**:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:113
+#: ../../source/getting_started/tutorials/dbn_classification.md:117
 msgid ""
-"**创建 RBM 层（`create_rbm_layer` 方法）**   初始化 RBM：使用 "
-"`RestrictedBoltzmannMachine` 定义可见层与隐层维度。"
+"`DBNTrainer` 内部负责创建 RBM 层以及 `_train_batch`、`_train_rbm_layer` "
+"等单层训练步骤；对外使用的 `DBNPretrainer` 则封装了逐层预训练接口。"
 msgstr ""
-"**Creating an RBM layer (``create_rbm_layer``)** initializes an RBM by "
-"using ``RestrictedBoltzmannMachine`` to set visible and hidden "
-"dimensions."
+"`DBNTrainer` creates RBM layers and implements single-layer training steps "
+"such as `_train_batch` and `_train_rbm_layer`; `DBNPretrainer` exposes the "
+"layer-wise pretraining interface for users."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:116
-msgid "**单批次训练步骤（`_train_batch` 方法）**"
-msgstr "**Single-batch training step (``_train_batch``)**"
+#: ../../source/getting_started/tutorials/dbn_classification.md:119
+msgid "**单层训练过程**"
+msgstr "**Single-layer training process**"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:118
+#: ../../source/getting_started/tutorials/dbn_classification.md:121
 #, python-brace-format
 msgid "**正相（Positive Phase）**：计算隐层激活概率 $P(\\mathbf{h}|\\mathbf{v})$。"
 msgstr ""
 "**Positive phase**: compute hidden activation probability "
 "$P(\\mathbf{h}|\\mathbf{v})$."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:119
+#: ../../source/getting_started/tutorials/dbn_classification.md:122
 msgid "**负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。"
 msgstr ""
 "**Negative phase**: generate reconstructed samples via the "
 "``SimulatedAnnealingOptimizer`` sampler."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:120
+#: ../../source/getting_started/tutorials/dbn_classification.md:123
 msgid "**目标函数**：最小化能量函数加权重衰减（L2 正则化）。"
 msgstr "**Objective**: minimize energy plus weight decay (L2 regularization)."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:121
+#: ../../source/getting_started/tutorials/dbn_classification.md:124
 msgid "**反向传播**：更新权重和偏置。"
 msgstr "**Back-propagation**: update weights and biases."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:123
-msgid "**单层 RBM 训练（`_train_rbm_layer` 方法）**"
-msgstr "**Single-layer RBM training (``_train_rbm_layer``)**"
-
-#: ../../source/getting_started/tutorials/dbn_classification.md:124
-msgid "初始化优化器：采用随机梯度下降（SGD）优化参数。"
+#: ../../source/getting_started/tutorials/dbn_classification.md:126
+msgid ""
+"`DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader 处理批量数据；`DBNPretrainer` "
+"只暴露逐层预训练和特征变换接口。"
 msgstr ""
-"Initialize the optimizer: use stochastic gradient descent (SGD) to "
-"optimize the parameters."
-
-#: ../../source/getting_started/tutorials/dbn_classification.md:125
-msgid "DataLoader 处理批量数据。"
-msgstr "DataLoader handles mini-batch data."
-
-#: ../../source/getting_started/tutorials/dbn_classification.md:127
-msgid "**预训练堆叠 RBM（`fit` 方法）**"
-msgstr "**Pre-train stacked RBMs (``fit``)**"
+"Single-layer training in `DBNTrainer` initializes an optimizer and processes "
+"mini-batches through a DataLoader; `DBNPretrainer` exposes only layer-wise "
+"pretraining and feature-transformation interfaces."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:128
-msgid "**特征变换，逐层提取特征（`transform` 方法）**"
-msgstr "**Feature transformation, layer-wise extraction (``transform``)**"
+msgid "**预训练堆叠 RBM（`fit` 方法）**：`DBNPretrainer.fit` 依次训练各个 RBM 层，并保存训练好的层。"
+msgstr ""
+"**Pretrain stacked RBMs (`fit`)**: `DBNPretrainer.fit` trains each RBM layer "
+"in sequence and retains the trained layers."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:130
+#: ../../source/getting_started/tutorials/dbn_classification.md:129
+msgid "**特征变换（`transform` 方法）**：`DBNPretrainer.transform` 依次通过各 RBM，将输入转换为深层特征。"
+msgstr ""
+"**Feature transformation (`transform`)**: `DBNPretrainer.transform` passes "
+"inputs through each RBM in sequence to obtain deep features."
+
+#: ../../source/getting_started/tutorials/dbn_classification.md:131
+msgid "`DBNPretrainer` 的实际接口可以直接参考："
+msgstr ""
+
+#: ../../source/getting_started/tutorials/dbn_classification.md:137
 msgid "2. AbstractSupervisedDBN 抽象接口定义"
 msgstr "2\\. AbstractSupervisedDBN – Abstract Interface Definition"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:134
+#: ../../source/getting_started/tutorials/dbn_classification.md:141
 msgid "`fine_tuning`：模式选择（默认 False）"
 msgstr "``fine_tuning``: mode selection (default False)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:135
+#: ../../source/getting_started/tutorials/dbn_classification.md:142
 msgid "`learning_rate`：微调学习率（默认 0.1）"
 msgstr "``learning_rate``: fine-tuning learning rate (default 0.1)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:136
+#: ../../source/getting_started/tutorials/dbn_classification.md:143
 msgid "`n_iter_backprop`：反向传播迭代次数（默认 100）"
 msgstr "``n_iter_backprop``: back-prop iterations (default 100)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:137
+#: ../../source/getting_started/tutorials/dbn_classification.md:144
 msgid "`l2_regularization`：L2 正则化（默认 1e-4）"
 msgstr "``l2_regularization``: L2 regularization (default 1e-4)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:138
+#: ../../source/getting_started/tutorials/dbn_classification.md:145
 msgid "`activation_function`：激活函数（默认 `'sigmoid'`）"
 msgstr "``activation_function``: activation function (default ``'sigmoid'``)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:139
+#: ../../source/getting_started/tutorials/dbn_classification.md:146
 msgid "`dropout_p`：Dropout 概率（默认 0.0）"
 msgstr "``dropout_p``: Dropout probability (default 0.0)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:141
+#: ../../source/getting_started/tutorials/dbn_classification.md:148
 msgid "3. AbstractSupervisedDBNClassifier 分类器模式具体实现，以及微调网络构建工具"
 msgstr ""
 "3\\. AbstractSupervisedDBNClassifier – Classifier-Mode Implementation & "
 "Fine-Tuning Utilities"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:145
+#: ../../source/getting_started/tutorials/dbn_classification.md:152
 msgid "`classifier_type`：支持多种分类器（默认逻辑回归）"
 msgstr "``classifier_type``: choice of classifier (default logistic regression)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:146
+#: ../../source/getting_started/tutorials/dbn_classification.md:153
 msgid "`clf_C`：正则化强度（默认 1.0）"
 msgstr "``clf_C``: regularization strength (default 1.0)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:147
+#: ../../source/getting_started/tutorials/dbn_classification.md:154
 msgid "`clf_iter`：迭代次数（默认 100）"
 msgstr "``clf_iter``: iterations (default 100)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:149
+#: ../../source/getting_started/tutorials/dbn_classification.md:156
 msgid "4. SupervisedDBNClassification 具体分类实现"
 msgstr "4\\. SupervisedDBNClassification – Concrete Classification Implementation"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:151
+#: ../../source/getting_started/tutorials/dbn_classification.md:158
 msgid "**微调网络构建**：使用预训练的权重来初始化（默认两层 RBM，以及无 Dropout 层）"
 msgstr ""
 "**Fine-tuned network construction**: initialized with pre-trained weights"
 " (default two RBM layers, no Dropout)"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:153
+#: ../../source/getting_started/tutorials/dbn_classification.md:160
 msgid "网络结构：输入层 → [线性层 + 激活函数 + Dropout] × N → 输出层"
 msgstr "Network: Input → [Linear + Activation + Dropout] × N → Output"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:154
+#: ../../source/getting_started/tutorials/dbn_classification.md:161
 msgid "线性层：使用对应的 RBM 的权重初始化"
 msgstr "Linear layers: initialized with corresponding RBM weights"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:155
+#: ../../source/getting_started/tutorials/dbn_classification.md:162
 msgid "输出层：随机初始化，在微调阶段学习"
 msgstr "Output layer: randomly initialized and learned during fine-tuning"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:157
+#: ../../source/getting_started/tutorials/dbn_classification.md:164
 msgid "**训练策略**："
 msgstr "**Training Strategy**:"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:159
+#: ../../source/getting_started/tutorials/dbn_classification.md:166
 msgid "使用预训练权重初始化"
 msgstr "Initialize with pre-trained weights"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:160
+#: ../../source/getting_started/tutorials/dbn_classification.md:167
 msgid "`CrossEntropyLoss` 损失函数"
 msgstr "``CrossEntropyLoss`` loss function"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:161
+#: ../../source/getting_started/tutorials/dbn_classification.md:168
 msgid "SGD 优化器 + L2 正则化"
 msgstr "SGD optimizer + L2 regularization"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:162
+#: ../../source/getting_started/tutorials/dbn_classification.md:169
 msgid "支持 Dropout 防止过拟合"
 msgstr "Dropout supported for over-fitting prevention"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:164
+#: ../../source/getting_started/tutorials/dbn_classification.md:171
 msgid "5. 其他内容"
 msgstr "5\\. Additional Topics"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:166
+#: ../../source/getting_started/tutorials/dbn_classification.md:173
 msgid "**数据加载（`load_data` 方法）**"
 msgstr "**Data loading (``load_data``)**"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:168
+#: ../../source/getting_started/tutorials/dbn_classification.md:175
 msgid "数据集：使用 `sklearn.datasets.load_digits` （8×8 手写数字图像）。"
 msgstr "Dataset: ``sklearn.datasets.load_digits`` (8×8 handwritten digit images)."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:169
+#: ../../source/getting_started/tutorials/dbn_classification.md:176
 msgid "增强：对原始图像进行上下左右平移，扩展数据集。"
 msgstr "Augmentation: shifts images up, down, left, right to enlarge the dataset."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:171
+#: ../../source/getting_started/tutorials/dbn_classification.md:178
 msgid "**训练过程可视化（`_visualize_training_progress` 方法，设置 `plot_img=True`）**"
 msgstr ""
 "**Training visualization (``_visualize_training_progress``, set "
 "``plot_img=True``)**"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:173
+#: ../../source/getting_started/tutorials/dbn_classification.md:180
 msgid "权重与梯度：实时监控权重矩阵及其梯度变化。"
 msgstr ""
 "Weights & gradients: real-time monitoring of weight matrices and their "
 "gradients."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:174
+#: ../../source/getting_started/tutorials/dbn_classification.md:181
 msgid "生成样本：实时展示模型“生成”新样本的能力。"
 msgstr ""
 "Generated samples: real-time display of the model’s ability to generate "
 "new samples."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:175
+#: ../../source/getting_started/tutorials/dbn_classification.md:182
 msgid "重建样本：可视化重建误差的演变。"
 msgstr "Reconstructions: visual evolution of reconstruction error."
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:177
+#: ../../source/getting_started/tutorials/dbn_classification.md:184
 msgid "**结果可视化（`RBMVisualizer` 类）**"
 msgstr "**Result visualization (``RBMVisualizer`` class)**"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:179
+#: ../../source/getting_started/tutorials/dbn_classification.md:186
 msgid "训练后 RBM 权重可视化"
 msgstr "Post-training RBM weight visualization"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:180
+#: ../../source/getting_started/tutorials/dbn_classification.md:187
 msgid "分类任务结果：混淆矩阵可视化"
 msgstr "Classification results: confusion-matrix visualization"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:181
+#: ../../source/getting_started/tutorials/dbn_classification.md:188
 msgid "重建样本：训练完成后对测试图像进行编码-解码得到的重建"
 msgstr "Reconstructions: encode-decode of test images after training"
 
@@ -528,3 +544,32 @@ msgstr "Reconstructions: encode-decode of test images after training"
 #~ " optimizer and uses a DataLoader for"
 #~ " mini-batches."
 
+#~ msgid ""
+#~ "**创建 RBM 层（`create_rbm_layer` 方法）**   初始化 "
+#~ "RBM：使用 `RestrictedBoltzmannMachine` 定义可见层与隐层维度。"
+#~ msgstr ""
+#~ "**Creating an RBM layer "
+#~ "(``create_rbm_layer``)** initializes an RBM by"
+#~ " using ``RestrictedBoltzmannMachine`` to set "
+#~ "visible and hidden dimensions."
+
+#~ msgid "**单批次训练步骤（`_train_batch` 方法）**"
+#~ msgstr "**Single-batch training step (``_train_batch``)**"
+
+#~ msgid "**单层 RBM 训练（`_train_rbm_layer` 方法）**"
+#~ msgstr "**Single-layer RBM training (``_train_rbm_layer``)**"
+
+#~ msgid "初始化优化器：采用随机梯度下降（SGD）优化参数。"
+#~ msgstr ""
+#~ "Initialize the optimizer: use stochastic "
+#~ "gradient descent (SGD) to optimize the"
+#~ " parameters."
+
+#~ msgid "DataLoader 处理批量数据。"
+#~ msgstr "DataLoader handles mini-batch data."
+
+#~ msgid "**预训练堆叠 RBM（`fit` 方法）**"
+#~ msgstr "**Pre-train stacked RBMs (``fit``)**"
+
+#~ msgid "**特征变换，逐层提取特征（`transform` 方法）**"
+#~ msgstr "**Feature transformation, layer-wise extraction (``transform``)**"

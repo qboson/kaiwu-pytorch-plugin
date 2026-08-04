@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
+"Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-10 14:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -218,15 +218,13 @@ msgstr ""
 "combination:"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:79
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) "
 "\\cdot \\text{NCL}\n"
 "  "
 msgstr ""
-"\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) "
-"\\cdot \\text{NCL}"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:82
 msgid "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"

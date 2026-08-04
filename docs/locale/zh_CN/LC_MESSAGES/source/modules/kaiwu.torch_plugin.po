@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-10 18:58+0800\n"
+"POT-Creation-Date: 2026-07-24 18:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,10 +25,12 @@ msgid "Module contents"
 msgstr "模块内容"
 
 #: kaiwu.torch_plugin:1 of
-msgid "Kaiwu-Pytorch-Plugin public API."
+msgid "Kaiwu-PyTorch-Plugin public API."
 msgstr "开物 PyTorch 插件公共 API。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1 of
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1
+#: of
 msgid "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
 msgstr "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
 
@@ -36,109 +38,120 @@ msgstr "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.Abstr
 msgid "Boltzmann Machine."
 msgstr "玻尔兹曼机。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:5 kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:3 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:3
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.step:3 kaiwu.torch_plugin.qdiffusion.QDiffusion.to:3 kaiwu.torch_plugin.qvae.QVAE:3 kaiwu.torch_plugin.qvae.QVAE.forward:3 kaiwu.torch_plugin.qvae.QVAE.neg_elbo:3 kaiwu.torch_plugin.qvae.QVAE.posterior:3 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:3 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:3 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:3 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:3 of
-msgid "Args:"
-msgstr "Args:"
+#: ../../source/modules/kaiwu.torch_plugin.md
+msgid "参数"
+msgstr ""
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:4 of
-msgid "num_nodes (int): Total number of nodes in the model."
-msgstr "num_nodes (int): 模型中的节点总数。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:3 of
+msgid "Total number of nodes in the model."
+msgstr "模型中的节点总数。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:6 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:8 of
-msgid "quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,"
-msgstr "quadratic_coef (torch.FloatTensor, optional): 二次项系数，"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:5 of
+msgid "Quadratic coefficient with shape ``[num_nodes, num_nodes]``."
+msgstr "形状为 ``[num_nodes, num_nodes]`` 的二次项系数。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:7 of
-msgid "shape is [num_nodes, num_nodes]"
-msgstr "形状为 [num_nodes, num_nodes]"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:8 of
+msgid "linear bias, shape is [num_nodes]"
+msgstr "线性偏置，形状为 [num_nodes]。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:9 of
-msgid "linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_nodes]"
-msgstr "linear_bias (torch.FloatTensor, optional): 线性偏置，形状为 [num_nodes]"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:10 of
+msgid "Device for tensor construction; uses CPU when ``None``."
+msgstr "用于构造张量的设备；为 ``None`` 时使用 CPU。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:11 of
-msgid "device (torch.device, optional): Device for tensor construction. If ``None``, uses CPU."
-msgstr "device (torch.device, optional): 构造张量所用的设备。若为 ``None``，则使用 CPU。"
-
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:1 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:1 of
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:1
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:1
+#: of
 msgid "Clip linear and quadratic bias weights in-place."
 msgstr "原地裁剪线性和二次偏置权重。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:4 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:4 of
-msgid "h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1] j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]"
-msgstr "h_range (tuple[float, float]): 二次项权重范围，例如 [-1, 1]。j_range (tuple[float, float]): 线性权重范围，例如 [-1, 1]。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:3
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:3
+#: of
+msgid "Range for quadratic weights. for example, [-1, 1]"
+msgstr "二次项权重的范围，例如 [-1, 1]。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:1 of
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:5
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:5
+#: of
+msgid "Range for linear weights. for example, [-1, 1]"
+msgstr "线性权重的范围，例如 [-1, 1]。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:1
+#: of
 msgid "Sample from the Boltzmann Machine given some nodes."
 msgstr "在给定部分节点的条件下从玻尔兹曼机中采样。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:4 of
-msgid "sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model. s_visible: State of the visible layer."
-msgstr "sampler (kaiwu.core.Optimizer): 用于采样的优化器。s_visible: 可见层状态。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:3
+#: of
+msgid "Optimizer used for sampling from the model."
+msgstr "用于从模型中采样的优化器。"
 
-#: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:3 kaiwu.torch_plugin.UnsupervisedDBN.output_dim:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:6 kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:6 kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:6 kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:3 kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:9 kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:11 kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:6 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:7 kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:7 kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:8 kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:8 kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:10 kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:8 kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:9 kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:7
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:8 kaiwu.torch_plugin.qdiffusion.QDiffusion.step:7 kaiwu.torch_plugin.qdiffusion.QDiffusion.to:7 kaiwu.torch_plugin.qvae.QVAE.forward:6 kaiwu.torch_plugin.qvae.QVAE.neg_elbo:8 kaiwu.torch_plugin.qvae.QVAE.posterior:8 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:7 of
-msgid "Returns:"
-msgstr "Returns:"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:5
+#: of
+msgid "State of the visible layer."
+msgstr "可见层状态。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:8 of
-msgid "torch.Tensor: Spins sampled from the model"
-msgstr "torch.Tensor: 从模型中采样得到的自旋"
+#: ../../source/modules/kaiwu.torch_plugin.md
+msgid "返回"
+msgstr ""
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:9 of
-msgid "(shape determined by ``sampler`` and ``sample_params``)."
-msgstr "（形状由 ``sampler`` 和 ``sample_params`` 决定）。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:7
+#: of
+msgid ""
+"Spins sampled from the model     (shape determined by ``sampler`` and "
+"``sample_params``)."
+msgstr "从模型中采样的自旋（形状由 ``sampler`` 和 ``sample_params`` 决定）。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:1 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:1 of
+#: ../../source/modules/kaiwu.torch_plugin.md
+msgid "返回类型"
+msgstr ""
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:1
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:1
+#: of
 msgid "Compute the Hamiltonian."
 msgstr "计算哈密顿量。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:4 of
-msgid "s_all (torch.tensor): Tensor of shape (B, N), where B is batch size,"
-msgstr "s_all (torch.tensor): 形状为 (B, N) 的张量，其中 B 为批次大小，"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:3 of
+msgid ""
+"Tensor of shape (B, N), where B is batch size, N is the number of "
+"variables in the model."
+msgstr "形状为 (B, N) 的张量，其中 B 是批次大小，N 是模型中的变量数。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:5 of
-msgid "N is the number of variables in the model."
-msgstr "N 为模型中的变量数。"
-
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:8 kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:8 of
-msgid "torch.tensor: Hamiltonian of shape (B,)."
-msgstr "torch.tensor: 形状为 (B,) 的哈密顿量。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:7
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:7
+#: of
+msgid "Hamiltonian of shape (B,)."
+msgstr "形状为 (B,) 的哈密顿量。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:1 of
 msgid "Sample from the Boltzmann Machine."
 msgstr "从玻尔兹曼机中采样。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:4 of
-msgid "num_steps (int): Number of Gibbs sampling steps."
-msgstr "num_steps (int): 吉布斯采样步数。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:3 of
+msgid "Number of Gibbs sampling steps."
+msgstr "吉布斯采样步数。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:6 of
-msgid "s_visible (torch.Tensor, optional): State of the visible layer,"
-msgstr "s_visible (torch.Tensor, optional): 可见层状态，"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:5 of
+msgid ""
+"State of the visible layer, shape (B, num_visible). If ``None``, randomly"
+" initialize visible layer."
+msgstr "可见层状态，形状为 (B, num_visible)。若为 ``None``，则随机初始化可见层。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:7 of
-msgid "shape (B, num_visible). If ``None``, randomly initialize visible layer."
-msgstr "形状为 (B, num_visible)。若为 ``None``，则随机初始化可见层。"
-
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:9 of
-msgid "num_sample (int, optional): Number of samples."
-msgstr "num_sample (int, optional): 样本数。"
-
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:10 of
-msgid "If ``None``, uses batch size of s_visible."
-msgstr "若为 ``None``，则使用 s_visible 的批次大小。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.gibbs_sample:8 of
+msgid "Number of samples. If ``None``, uses batch size of s_visible."
+msgstr "样本数量；若为 ``None``，则使用 s_visible 的批次大小。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:1 of
 msgid "Get the hidden bias."
 msgstr "获取隐藏层偏置。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:4 of
-msgid "num_hidden (int): Number of hidden nodes."
-msgstr "num_hidden (int): 隐藏节点数。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.hidden_bias:3 of
+msgid "Number of hidden nodes."
+msgstr "隐藏节点数。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.symmetrized_quadratic_coef:1 of
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.symmetrized_quadratic_coef:1
+#: of
 msgid "Quadratic coefficient"
 msgstr "二次项系数"
 
@@ -146,11 +159,13 @@ msgstr "二次项系数"
 msgid "Get the visible bias."
 msgstr "获取可见层偏置。"
 
-#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:4 of
-msgid "num_visible (int): Number of visible nodes."
-msgstr "num_visible (int): 可见节点数。"
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.visible_bias:3 of
+msgid "Number of visible nodes."
+msgstr "可见节点数。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1 kaiwu.torch_plugin.qdiffusion.EnergyModel:1 kaiwu.torch_plugin.qdiffusion.QDiffusion:1 kaiwu.torch_plugin.qvae.QVAE:1 of
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1
+#: kaiwu.torch_plugin.qdiffusion.EnergyModel:1
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:1 of
 msgid "基类：:py:class:`~torch.nn.modules.module.Module`"
 msgstr "基类：:py:class:`~torch.nn.modules.module.Module`"
 
@@ -183,140 +198,219 @@ msgid "Scores visible logits under the conditioned BM energy model."
 msgstr "在条件玻尔兹曼机能量模型下对可见层 logits 进行评分。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion:1 of
-msgid "Energy-guided discrete diffusion wrapper over generic sequence backbones."
-msgstr "基于通用序列骨干网络的能量引导离散扩散封装。"
+msgid ""
+"Energy-guided discrete diffusion wrapper over generic sequence backbones."
+" Initializes a QDiffusion model."
+msgstr "基于通用序列骨干网络的能量引导离散扩散封装。初始化 QDiffusion 模型。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:3 of
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:4 of
 msgid "The class combines two backbone roles:"
 msgstr "该类组合了两种骨干网络角色："
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:5 of
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:6 of
 msgid "a proposal model that predicts token logits for the current noisy state"
 msgstr "预测当前噪声状态 token logits 的提议模型"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:6 of
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:7 of
 msgid "an energy model that reranks candidate reconstructions"
 msgstr "对候选重建结果重新排序的能量模型"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:8 of
-msgid "It exposes both training-oriented APIs such as :meth:`objective` and decoding-oriented APIs such as :meth:`initialize_state`, :meth:`step`, and :meth:`generate`."
-msgstr "该类同时提供面向训练的 API（如 :meth:`objective`）和面向解码的 API（如 :meth:`initialize_state`、:meth:`step` 和 :meth:`generate`）。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:9 of
+msgid ""
+"It exposes both training-oriented APIs such as ``objective`` and "
+"decoding-oriented APIs such as ``initialize_state``, ``step``, and "
+"``generate``."
+msgstr ""
+"该类同时提供面向训练的 API，例如 ``objective``；也提供面向解码的 API，例如 "
+"``initialize_state``、``step`` 和 ``generate``。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:13 of
+msgid "Backbone used to predict proposal logits."
+msgstr "用于预测提议 logits 的骨干网络。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:14 of
+msgid "Energy-side model used to encode and score candidates."
+msgstr "用于编码和评估候选项的能量侧模型。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:15 of
+msgid "Special-token metadata required by the generator."
+msgstr "生成器所需的特殊 token 元数据。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:16 of
+msgid "Optional generation/training configuration."
+msgstr "可选的生成/训练配置。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:17 of
+msgid "Floating point dtype tracked by the wrapper."
+msgstr "封装器跟踪的浮点数据类型。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:18 of
+msgid "Optional target device. When omitted, infer from parameters."
+msgstr "可选的目标设备；省略时从参数中推断。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion:19 of
+msgid "Whether to freeze proposal model parameters."
+msgstr "是否冻结提议模型参数。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:1 of
 msgid "Scores candidate reconstructions conditioned on the noisy state."
 msgstr "对以噪声状态为条件的候选重建结果进行评分。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:4 of
-msgid "noisy_tokens: Noisy token tensor used as conditioning input. candidate_tokens: Candidate clean token tensor to score. attention_mask: Optional attention mask for the energy model."
-msgstr "noisy_tokens: 用作条件输入的噪声 token 张量。candidate_tokens: 待评分的候选干净 token 张量。attention_mask: 能量模型的可选注意力掩码。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:3 of
+msgid "Noisy token tensor used as conditioning input."
+msgstr "用作条件输入的噪声 token 张量。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:9 of
-msgid "torch.Tensor: A tensor of scalar energies with shape ``[batch, 1]``."
-msgstr "torch.Tensor: 形状为 ``[batch, 1]`` 的标量能量张量。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:4 of
+msgid "Candidate clean token tensor to score."
+msgstr "待评估的候选干净 token 张量。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:5 of
+msgid "Optional attention mask for the energy model."
+msgstr "能量模型的可选注意力掩码。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:7 of
+msgid "A tensor of scalar energies with shape ``[batch, 1]``."
+msgstr "形状为 ``[batch, 1]`` 的标量能量张量。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:1 of
 msgid "Runs the proposal model on the current noisy state."
 msgstr "在当前噪声状态上运行提议模型。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:4 kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:4 of
-msgid "noisy_tokens: Current noisy token tensor. **kwargs: Additional keyword arguments forwarded to the proposal"
-msgstr "noisy_tokens: 当前噪声 token 张量。**kwargs: 转发给提议"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:3 of
+msgid "Current noisy token tensor."
+msgstr "当前的噪声 token 张量。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:6 kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:6 of
-msgid "model."
-msgstr "模型的其他关键字参数。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:4
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:4 of
+msgid "Additional keyword arguments forwarded to the proposal model."
+msgstr "转发给提议模型的附加关键字参数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:9 kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:9 of
-msgid "torch.Tensor: Proposal logits over the token vocabulary."
-msgstr "torch.Tensor: token 词表上的提议 logits。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:6
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:6 of
+msgid "Proposal logits over the token vocabulary."
+msgstr "token 词表上的提议 logits。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:9 kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:12 kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:11 of
-msgid "Raises:"
-msgstr "Raises:"
+#: ../../source/modules/kaiwu.torch_plugin.md
+msgid "抛出"
+msgstr ""
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:12 of
-msgid "TypeError: If the proposal model does not implement ``forward``."
-msgstr "TypeError: 提议模型未实现 ``forward`` 时抛出。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:9 of
+msgid "If the proposal model does not implement ``forward``."
+msgstr "当提议模型未实现 ``forward`` 时。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:1 of
 msgid "Runs a complete iterative decoding loop inside the core class."
 msgstr "在核心类中运行完整的迭代解码循环。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:4 of
-msgid "input_tokens: Initial token tensor. max_steps: Number of decode iterations to run. partial_masks: Optional boolean mask of fixed positions. temperature: Sampling temperature stored in the decode state. return_state: Whether to return the full final state dictionary."
-msgstr "input_tokens: 初始 token 张量。max_steps: 解码迭代次数。partial_masks: 固定位置的可选布尔掩码。temperature: 解码状态中的采样温度。return_state: 是否返回完整最终状态字典。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:3
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:3 of
+msgid "Initial token tensor."
+msgstr "初始 token 张量。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:11 of
-msgid "torch.Tensor | dict[str, Any]: Either the final token tensor or the full decode state."
-msgstr "torch.Tensor | dict[str, Any]: 最终 token 张量或完整解码状态。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:4 of
+msgid "Number of decode iterations to run."
+msgstr "要执行的解码迭代次数。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:5
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:4
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:4 of
+msgid "Optional boolean mask of fixed positions."
+msgstr "固定位置的可选布尔掩码。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:6 of
+msgid "Sampling temperature stored in the decode state."
+msgstr "存储在解码状态中的采样温度。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:7 of
+msgid "Whether to return the full final state dictionary."
+msgstr "是否返回完整的最终状态字典。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:9 of
+msgid "Either the final token tensor or the full decode state."
+msgstr "最终 token 张量或完整解码状态。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:1 of
 msgid "Returns a boolean mask of editable non-special-token positions."
 msgstr "返回可编辑非特殊 token 位置的布尔掩码。"
 
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:3 of
+msgid "Token tensor to inspect."
+msgstr "待检查的 token 张量。"
+
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:4 of
-msgid "output_tokens: Token tensor to inspect. partial_masks: Optional boolean mask of positions that should remain"
-msgstr "output_tokens: 待检查的 token 张量。partial_masks: 应保持"
+msgid "Optional boolean mask of positions that should remain fixed."
+msgstr "应保持固定位置的可选布尔掩码。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:6 of
-msgid "fixed."
-msgstr "固定的位置的可选布尔掩码。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:9 of
-msgid "torch.Tensor: A boolean mask where ``True`` marks editable non-special positions."
-msgstr "torch.Tensor: 布尔掩码，其中 ``True`` 表示可编辑的非特殊位置。"
+msgid "A boolean mask where ``True`` marks editable non-special positions."
+msgstr "布尔掩码，其中 ``True`` 表示可编辑的非特殊位置。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:1 of
 msgid "Creates the initial decoding state for an external generation loop."
 msgstr "为外部生成循环创建初始解码状态。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:4 of
-msgid "input_tokens: Initial token tensor. partial_masks: Optional boolean mask of fixed positions. max_steps: Planned number of decode iterations. temperature: Sampling temperature stored in the state payload."
-msgstr "input_tokens: 初始 token 张量。partial_masks: 固定位置的可选布尔掩码。max_steps: 计划的解码迭代次数。temperature: 状态载荷中的采样温度。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:5 of
+msgid "Planned number of decode iterations."
+msgstr "计划执行的解码迭代次数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:10 of
-msgid "dict[str, Any]: A mutable state dictionary suitable for repeated :meth:`step` calls."
-msgstr "dict[str, Any]: 适用于重复调用 :meth:`step` 的可变状态字典。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:6 of
+msgid "Sampling temperature stored in the state payload."
+msgstr "存储在状态载荷中的采样温度。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:8 of
+msgid "A mutable state dictionary suitable for repeated ``step`` calls."
+msgstr "适用于重复调用 ``step`` 的可变状态字典。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:1 of
 msgid "Builds the one-step training objective used by an external loop."
 msgstr "构建外部循环使用的单步训练目标。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:4 of
-msgid "batch: Batch dictionary containing at least ``batch[\"targets\"]``. weighting: Per-sample timestep weighting mode."
-msgstr "batch: 至少包含 ``batch[\"targets\"]`` 的批次字典。weighting: 逐样本时间步加权模式。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:3 of
+msgid "Batch dictionary containing at least ``batch[\"targets\"]``."
+msgstr "至少包含 ``batch[\"targets\"]`` 的批次字典。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:8 of
-msgid "dict[str, torch.Tensor]: A dictionary containing proposal logits, supervision masks, loss weights, and the EBM objective term."
-msgstr "dict[str, torch.Tensor]: 包含提议 logits、监督掩码、损失权重和 EBM 目标项的字典。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:4 of
+msgid "Per-sample timestep weighting mode."
+msgstr "逐样本时间步加权模式。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:6 of
+msgid ""
+"A dictionary containing proposal logits, supervision masks, loss weights,"
+" and the EBM objective term."
+msgstr "包含提议 logits、监督掩码、损失权重和 EBM 目标项的字典。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:1 of
-msgid "Semantic alias around :meth:`forward` for proposal-side calls."
-msgstr ":meth:`forward` 的语义别名，用于提议侧调用。"
+msgid "Semantic alias around ``forward`` for proposal-side calls."
+msgstr "``forward`` 的语义别名，用于提议侧调用。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:1 of
 msgid "Runs one denoising/reranking step and returns updated state."
 msgstr "执行一步去噪/重排序并返回更新后的状态。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:4 of
-msgid "state: Current decode state created by :meth:`initialize_state`. partial_masks: Optional boolean mask of fixed positions."
-msgstr "state: 由 :meth:`initialize_state` 创建的当前解码状态。partial_masks: 固定位置的可选布尔掩码。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:3 of
+msgid "Current decode state created by ``initialize_state``."
+msgstr "由 ``initialize_state`` 创建的当前解码状态。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:8 of
-msgid "dict[str, Any]: The updated decode state after one iteration."
-msgstr "dict[str, Any]: 一次迭代后更新的解码状态。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:6 of
+msgid "The updated decode state after one iteration."
+msgstr "一次迭代后更新的解码状态。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:1 of
 msgid "Moves the module and refreshes cached device/dtype metadata."
 msgstr "移动模块并刷新缓存的设备和 dtype 元数据。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:4 of
-msgid "*args: Positional arguments forwarded to ``nn.Module.to``. **kwargs: Keyword arguments forwarded to ``nn.Module.to``."
-msgstr "*args: 转发给 ``nn.Module.to`` 的位置参数。**kwargs: 转发给 ``nn.Module.to`` 的关键字参数。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:3 of
+msgid "Positional arguments forwarded to ``nn.Module.to``."
+msgstr "转发给 ``nn.Module.to`` 的位置参数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:8 of
-msgid "QDiffusion: The moved module instance."
-msgstr "QDiffusion: 移动后的模块实例。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:4 of
+msgid "Keyword arguments forwarded to ``nn.Module.to``."
+msgstr "转发给 ``nn.Module.to`` 的关键字参数。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:6 of
+msgid "The moved module instance."
+msgstr "移动后的模块实例。"
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:1 of
 msgid "基类：:py:class:`object`"
@@ -326,151 +420,278 @@ msgstr "基类：:py:class:`object`"
 msgid "Configuration for energy-guided discrete generation."
 msgstr "能量引导离散生成的配置。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:3 of
-msgid "Attributes:"
-msgstr "Attributes:"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:4 of
-msgid "num_diffusion_timesteps: Number of discrete noising steps used by the"
-msgstr "num_diffusion_timesteps: 训练目标使用的离散加噪步数"
-
 #: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:5 of
-msgid "training objective."
-msgstr "。"
+msgid "Number of discrete noising steps used by the training objective."
+msgstr "训练目标使用的离散加噪步数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:6 of
-msgid "use_coupled_sampling: Whether to use the coupled corruption variant. num_candidates: Number of proposal candidates sampled at each decode step. proposal_temperature: Temperature used for proposal-side sampling. proposal_noise_scale: Gumbel noise scale used during proposal sampling. energy_temperature: Temperature used when converting energies into"
-msgstr "use_coupled_sampling: 是否使用耦合扰动变体。num_candidates: 每个解码步骤采样的候选提议数。proposal_temperature: 提议侧采样温度。proposal_noise_scale: Gumbel 噪声尺度。energy_temperature: 将能量转换为"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig of
+msgid "type"
+msgstr "类型"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:11 of
-msgid "reranking weights."
-msgstr "重排序权重时使用的温度。"
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:8
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:20 of
+msgid "int"
+msgstr ""
 
 #: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:12 of
-msgid "disable_resample: Whether to disable repetition-collapse resampling. resample_ratio: Frequency threshold that triggers resampling. resample_top_p: Top-p cutoff used during resampling. decoding_strategy: Skeptical-remasking strategy string."
-msgstr "disable_resample: 是否禁用重复坍缩重采样。resample_ratio: 触发重采样的频率阈值。resample_top_p: 重采样的 top-p 截断值。decoding_strategy: 审慎重掩码策略字符串。"
+msgid "Whether to use the coupled corruption variant."
+msgstr "是否使用耦合的加噪变体。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:14
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:45 of
+msgid "bool"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:18 of
+msgid "Number of proposal candidates sampled at each decode step."
+msgstr "每个解码步骤采样的提议候选项数量。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:24 of
+msgid "Temperature used for proposal-side sampling."
+msgstr "提议侧采样使用的温度。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:26
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:32
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:39
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:51
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:57 of
+msgid "float"
+msgstr ""
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:30 of
+msgid "Gumbel noise scale used during proposal sampling."
+msgstr "提议采样期间使用的 Gumbel 噪声尺度。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:36 of
+msgid "Temperature used when converting energies into reranking weights."
+msgstr "将能量转换为重排序权重时使用的温度。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:43 of
+msgid "Whether to disable repetition-collapse resampling."
+msgstr "是否禁用重复坍缩重采样。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:49 of
+msgid "Frequency threshold that triggers resampling."
+msgstr "触发重采样的频率阈值。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:55 of
+msgid "Top-p cutoff used during resampling."
+msgstr "重采样期间使用的 Top-p 截止值。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:61 of
+msgid "Skeptical-remasking strategy string."
+msgstr "怀疑式重新掩码策略字符串。"
+
+#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:63 of
+msgid "str"
+msgstr ""
 
 #: kaiwu.torch_plugin.qvae.QVAE:1 of
-msgid "Quantum Variational Autoencoder (QVAE) Model"
-msgstr "量子变分自编码器（QVAE）模型"
+msgid "基类：:py:class:`~kaiwu.torch_plugin.qvae.AutoEncoderBase`"
+msgstr "基类：:py:class:`~kaiwu.torch_plugin.qvae.AutoEncoderBase`"
 
-#: kaiwu.torch_plugin.qvae.QVAE:4 of
-msgid "encoder: Encoder module"
-msgstr "encoder: 编码器模块"
+#: kaiwu.torch_plugin.qvae.QVAE:1 of
+msgid "Quantum Variational Autoencoder integrated into AutoEncoderBase framework."
+msgstr "集成到 AutoEncoderBase 框架中的量子变分自编码器。"
 
-#: kaiwu.torch_plugin.qvae.QVAE:6 of
-msgid "decoder: Decoder module"
-msgstr "decoder: 解码器模块"
+#: kaiwu.torch_plugin.qvae.QVAE:3 of
+msgid "Dimensionality of input features."
+msgstr "输入特征的维度。"
 
-#: kaiwu.torch_plugin.qvae.QVAE:8 of
-msgid "bm (AbstractBoltzmannMachine): Boltzmann machine"
-msgstr "bm (AbstractBoltzmannMachine): 玻尔兹曼机"
+#: kaiwu.torch_plugin.qvae.QVAE:5 of
+msgid "Activation function for hidden layers."
+msgstr "隐藏层的激活函数。"
 
-#: kaiwu.torch_plugin.qvae.QVAE:10 of
-msgid "sampler: Sampler"
-msgstr "sampler: 采样器"
+#: kaiwu.torch_plugin.qvae.QVAE:7 of
+#, 
+msgid ""
+"Configuration with ``num_latent_units`` (int), ``loss_type`` "
+"(``'bernoulli'`` or ``'mse'``), ``dist_beta`` (float), ``kl_beta`` "
+"(float), and ``weight_decay`` (float)."
+msgstr "包含 ``num_latent_units``（int）、``loss_type``（``'bernoulli'`` 或 ``'mse'``）、``dist_beta``（float）、``kl_beta``（float）和 ``weight_decay``（float）的配置对象。"
 
-#: kaiwu.torch_plugin.qvae.QVAE:12 of
-msgid "dist_beta: Beta parameter for the distribution"
-msgstr "dist_beta: 分布的 Beta 参数"
+#: kaiwu.torch_plugin.qvae.QVAE:11 of
+msgid "Pre-created encoder. Created by the subclass factory when omitted."
+msgstr "预先创建的编码器。未提供时由子类工厂创建。"
 
 #: kaiwu.torch_plugin.qvae.QVAE:14 of
-msgid "mean_x (torch.Tensor): Bias of training data"
-msgstr "mean_x (torch.Tensor): 训练数据的偏置"
+msgid "Pre-created decoder. Created by the subclass factory when omitted."
+msgstr "预先创建的解码器。未提供时由子类工厂创建。"
 
-#: kaiwu.torch_plugin.qvae.QVAE:16 of
-msgid "num_vis (int): Number of visible variables in the Boltzmann machine"
-msgstr "num_vis (int): 玻尔兹曼机中的可见变量数"
+#: kaiwu.torch_plugin.qvae.QVAE:17 of
+msgid ""
+"Pre-created Boltzmann machine. Created by the subclass factory when "
+"omitted."
+msgstr "预先创建的玻尔兹曼机。未提供时由子类工厂创建。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:20 of
+msgid "Pre-created sampler. Created by the subclass factory when omitted."
+msgstr "预先创建的采样器。未提供时由子类工厂创建。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:23 of
+msgid "Type of sampler for BM ('sa' or 'cim')."
+msgstr "BM 的采样器类型（``sa`` 或 ``cim``）。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.bm_loss:1 of
+msgid "Compute BM loss for updating BM parameters separately."
+msgstr "计算用于单独更新 BM 参数的 BM 损失。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.bm_loss:3 of
+msgid ""
+"Encoder output logits (batch_size, latent_dim). Must be detached to "
+"prevent gradients flowing to encoder."
+msgstr "编码器输出 logits，形状为 (batch_size, latent_dim)。必须分离以防止梯度流向编码器。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.bm_loss:6 of
+msgid "L2 regularization coefficient for BM parameters."
+msgstr "BM 参数的 L2 正则化系数。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.bm_loss:9 of
+msgid "BM loss scalar."
+msgstr "BM 损失标量。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.create_networks:1 of
+msgid "Create components that were not supplied to the constructor."
+msgstr "创建未提供给构造函数的组件。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.energy:1 of
+msgid "Compute the Boltzmann-machine energy for each input sample."
+msgstr "计算每个输入样本的玻尔兹曼机能量。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.energy:3 of
+msgid "Input samples with the input feature dimension."
+msgstr "具有输入特征维度的输入样本。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.energy:5 of
+msgid ""
+"Loss type to validate against the model configuration. Defaults to the "
+"configured loss type."
+msgstr "用于与模型配置进行校验的损失类型。默认使用配置的损失类型。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.energy:9 of
+msgid "One energy value per input sample."
+msgstr "每个输入样本对应一个能量值。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.forward:1 of
-msgid "Forward propagation"
-msgstr "前向传播"
+msgid "Forward pass through the QVAE."
+msgstr "执行 QVAE 的前向传播。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.forward:4 kaiwu.torch_plugin.qvae.QVAE.neg_elbo:4 of
-msgid "x (torch.Tensor): Input data"
-msgstr "x (torch.Tensor): 输入数据"
+#: kaiwu.torch_plugin.qvae.QVAE.forward:3 of
+msgid "Input tensor of shape (batch_size, input_dim)."
+msgstr "形状为 (batch_size, input_dim) 的输入张量。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.forward:7 of
-msgid "tuple: (recon_x, posterior, q, zeta)"
-msgstr "tuple: (recon_x, posterior, q, zeta)"
+#: kaiwu.torch_plugin.qvae.QVAE.forward:6 of
+msgid ""
+"Reconstructed logits, posterior distribution, encoder logits,     and "
+"reparameterized latent sample."
+msgstr "重建 logits、后验分布、编码器 logits 和重参数化的潜变量样本。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.forward:8 of
-msgid "recon_x: Reconstructed data posterior: Posterior distribution object q: Encoder output zeta: Posterior sample"
-msgstr "recon_x: 重建数据 posterior: 后验分布对象 q: 编码器输出 zeta: 后验样本"
+#: kaiwu.torch_plugin.qvae.QVAE.loss:1 of
+msgid "Compute total loss (reconstruction + KL + weight decay)."
+msgstr "计算总损失（重建损失 + KL 损失 + 权重衰减）。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:1 of
-msgid "Compute negative ELBO loss"
-msgstr "计算负 ELBO 损失"
+#: kaiwu.torch_plugin.qvae.QVAE.loss:3 of
+msgid "Input tensor (batch_size, input_dim)."
+msgstr "输入张量，形状为 (batch_size, input_dim)。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:6 of
-msgid "kl_beta (float): Weight coefficient for KL term"
-msgstr "kl_beta (float): KL 项的权重系数"
+#: kaiwu.torch_plugin.qvae.QVAE.loss:5 of
+msgid "Reconstructed logits (batch_size, input_dim)."
+msgstr "重建 logits，形状为 (batch_size, input_dim)。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:9 of
-msgid "tuple: (output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta)"
-msgstr "tuple: (output, recon_x, neg_elbo, wd_loss, total_kl, cost, q, zeta)"
+#: kaiwu.torch_plugin.qvae.QVAE.loss:7 of
+msgid "Posterior distribution object."
+msgstr "后验分布对象。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.neg_elbo:10 of
-msgid "output: Reconstructed output (sigmoid activated) recon_x: Reconstructed data neg_elbo: Negative ELBO loss wd_loss: Weight decay loss total_kl: KL divergence cost: Reconstruction loss q: Encoder output zeta: Posterior sample"
-msgstr "output: 重建输出（经 sigmoid 激活）recon_x: 重建数据 neg_elbo: 负 ELBO 损失 wd_loss: 权重衰减损失 total_kl: KL 散度 cost: 重建损失 q: 编码器输出 zeta: 后验样本"
+#: kaiwu.torch_plugin.qvae.QVAE.loss:9 of
+msgid "Encoder logits (batch_size, latent_dim)."
+msgstr "编码器 logits，形状为 (batch_size, latent_dim)。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.loss:11 of
+msgid "Latent sample (batch_size, latent_dim)."
+msgstr "潜变量样本，形状为 (batch_size, latent_dim)。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.loss:14 of
+msgid "Total loss scalar."
+msgstr "总损失标量。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.loss:17 of
+msgid "If loss_type is not supported."
+msgstr "当不支持 ``loss_type`` 时。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.posterior:1 of
-msgid "Compute posterior distribution and its reparameterized sample"
-msgstr "计算后验分布及其重参数化样本"
+msgid "Compute posterior distribution and reparameterized sample."
+msgstr "计算后验分布和重参数化样本。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.posterior:4 of
-msgid "q_logits (torch.Tensor): Encoder output, log-odds"
-msgstr "q_logits (torch.Tensor): 编码器输出，即对数几率"
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:3 of
+msgid "Encoder output logits (batch_size, latent_dim)."
+msgstr "编码器输出 logits，形状为 (batch_size, latent_dim)。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.posterior:6 of
-msgid "beta: Beta parameter for the distribution"
-msgstr "beta: 分布的 Beta 参数"
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:5 of
+msgid "Mixture parameter for MixtureGeneric."
+msgstr "MixtureGeneric 的混合参数。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.posterior:9 of
-msgid "tuple: (Posterior distribution object, Sampled result zeta)"
-msgstr "tuple: （后验分布对象，采样结果 zeta）"
+#: kaiwu.torch_plugin.qvae.QVAE.posterior:8 of
+msgid "Posterior distribution and reparameterized latent sample."
+msgstr "后验分布和重参数化的潜变量样本。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1 of
+#: kaiwu.torch_plugin.qvae.QVAE.set_train_bias:1 of
+msgid "Compute train bias from dataset mean for Bernoulli reconstruction."
+msgstr "根据数据集均值计算伯努利重建的训练偏置。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1
+#: of
 msgid "Create a Restricted Boltzmann Machine."
 msgstr "创建受限玻尔兹曼机。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:4 of
-msgid "num_visible (int): Number of visible nodes in the model."
-msgstr "num_visible (int): 模型中的可见节点数。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:3
+#: of
+msgid "Number of visible nodes in the model."
+msgstr "模型中的可见节点数。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:6 of
-msgid "num_hidden (int): Number of hidden nodes in the model."
-msgstr "num_hidden (int): 模型中的隐藏节点数。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:5
+#: of
+msgid "Number of hidden nodes in the model."
+msgstr "模型中的隐藏节点数。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:9 of
-msgid "shape is [num_visible, num_hidden]"
-msgstr "形状为 [num_visible, num_hidden]"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:7
+#: of
+msgid "quadratic coefficent, shape is [num_visible, num_hidden]"
+msgstr "二次项系数，形状为 [num_visible, num_hidden]。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:11 of
-msgid "linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_hidden]"
-msgstr "linear_bias (torch.FloatTensor, optional): 线性偏置，形状为 [num_hidden]"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:10
+#: of
+msgid "linear bias, shape is [num_hidden]"
+msgstr "线性偏置，形状为 [num_hidden]。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:13 of
-msgid "device (torch.device, optional): Device to construct tensors."
-msgstr "device (torch.device, optional): 构造张量所用的设备。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:12
+#: of
+msgid "Device to construct tensors."
+msgstr "用于构造张量的设备。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:4 of
-msgid "s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,"
-msgstr "s_all (torch.tensor): 形状为 (B, N) 的张量，其中 B 为批次大小，"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:3
+#: of
+msgid ""
+"Tensor of shape (B, N), where B is the batch size, and N is the number of"
+" variables in the model."
+msgstr "形状为 (B, N) 的张量，其中 B 是批次大小，N 是模型中的变量数。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:5 of
-msgid "and N is the number of variables in the model."
-msgstr "N 为模型中的变量数。"
-
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:1 of
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:1
+#: of
 msgid "Propagate visible spins to the hidden layer."
 msgstr "将可见层自旋传播到隐藏层。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:4 of
-msgid "s_visible: Visible layer tensor. requires_grad: Whether to allow gradient backpropagation."
-msgstr "s_visible: 可见层张量。requires_grad: 是否允许梯度反向传播。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:3
+#: of
+msgid "Visible layer tensor."
+msgstr "可见层张量。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_visible:1 of
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:4
+#: of
+msgid "Whether to allow gradient backpropagation."
+msgstr "是否允许梯度反向传播。"
+
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_visible:1
+#: of
 msgid "Propagate hidden spins to the visible layer."
 msgstr "将隐藏层自旋传播到可见层。"
 
@@ -490,137 +711,125 @@ msgstr "通用的无监督深度信念网络（DBN）架构。"
 msgid "This model is a stack of Restricted Boltzmann Machines (RBMs)."
 msgstr "该模型由受限玻尔兹曼机（RBM）堆叠而成。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:6 of
-msgid "hidden_layers_structure (list, optional): A list of integers"
-msgstr "hidden_layers_structure (list, optional): 整数列表，"
-
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:7 of
-msgid "representing the number of hidden units in each layer. Defaults to [100, 100]."
-msgstr "表示每层的隐藏单元数。默认为 [100, 100]。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:5 of
+msgid ""
+"A list of integers representing the number of hidden units in each layer."
+" Defaults to [100, 100]."
+msgstr "表示每层隐藏单元数量的整数列表，默认为 [100, 100]。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:1 of
 msgid "Creates the layers of RBMs for the DBN."
 msgstr "为 DBN 创建各个 RBM 层。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:4 of
-msgid "input_dim (int): The dimension of the input data (number of visible units)."
-msgstr "input_dim (int): 输入数据维度（可见单元数）。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:3 of
+msgid "The dimension of the input data (number of visible units)."
+msgstr "输入数据的维度（可见单元数量）。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:7 of
-msgid "UnsupervisedDBN: The instance itself with the RBM layers created."
-msgstr "UnsupervisedDBN: 已创建 RBM 层的实例本身。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.create_rbm_layer:6 of
+msgid "The instance itself with the RBM layers created."
+msgstr "已创建 RBM 层的实例本身。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:1 of
 msgid "Performs a forward pass to transform the input data."
 msgstr "执行前向传播以转换输入数据。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:4 kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:6 kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:4 of
-msgid "data_in (numpy.ndarray): The input data."
-msgstr "data_in (numpy.ndarray): 输入数据。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:3
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:5
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:3 of
+msgid "The input data."
+msgstr "输入数据。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:7 of
-msgid "numpy.ndarray: The transformed data after passing through all RBM layers."
-msgstr "numpy.ndarray: 经过所有 RBM 层后的转换数据。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:6 of
+msgid "The transformed data after passing through all RBM layers."
+msgstr "经过所有 RBM 层后的转换数据。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:10 of
-msgid "ValueError: If the model has not been built or trained yet."
-msgstr "ValueError: 模型尚未构建或训练时抛出。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.forward:9 of
+msgid "If the model has not been built or trained yet."
+msgstr "当模型尚未构建或训练时。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:1 of
 msgid "Gets the RBM layer at the specified index."
 msgstr "获取指定索引处的 RBM 层。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:4 of
-msgid "index (int): The index of the RBM layer."
-msgstr "index (int): RBM 层索引。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:3 of
+msgid "The index of the RBM layer."
+msgstr "RBM 层的索引。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:7 of
-msgid "RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise None."
-msgstr "RestrictedBoltzmannMachine or None: 找到时返回 RBM 层，否则返回 None。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.get_rbm_layer:6 of
+msgid "The RBM layer if found, otherwise None."
+msgstr "找到时返回 RBM 层，否则返回 None。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:1 of
 msgid "Marks the model as trained."
 msgstr "将模型标记为已训练。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:4 of
-msgid "UnsupervisedDBN: The instance itself."
-msgstr "UnsupervisedDBN: 实例本身。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.mark_as_trained:3 of
+msgid "The instance itself."
+msgstr "实例本身。"
 
 #: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:1 of
 msgid "Returns the number of RBM layers."
 msgstr "返回 RBM 层数。"
 
-#: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:4 of
-msgid "int: The number of layers."
-msgstr "int: 层数。"
+#: kaiwu.torch_plugin.UnsupervisedDBN.num_layers:3 of
+msgid "The number of layers."
+msgstr "层数。"
 
 #: kaiwu.torch_plugin.UnsupervisedDBN.output_dim:1 of
 msgid "Returns the output dimension of the DBN."
 msgstr "返回 DBN 的输出维度。"
 
-#: kaiwu.torch_plugin.UnsupervisedDBN.output_dim:4 of
-msgid "int: The dimension of the final hidden layer."
-msgstr "int: 最终隐藏层的维度。"
+#: kaiwu.torch_plugin.UnsupervisedDBN.output_dim:3 of
+msgid "The dimension of the final hidden layer."
+msgstr "最终隐藏层的维度。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:1 of
 msgid "Reconstructs the input from a specified RBM layer."
 msgstr "从指定 RBM 层重建输入。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:4 of
-msgid "data_in (numpy.ndarray): The input data to be reconstructed."
-msgstr "data_in (numpy.ndarray): 待重建的输入数据。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:3 of
+msgid "The input data to be reconstructed."
+msgstr "待重建的输入数据。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:6 of
-msgid "layer_index (int, optional): The index of the RBM layer to use for reconstruction."
-msgstr "layer_index (int, optional): 用于重建的 RBM 层索引。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:5 of
+msgid "The index of the RBM layer to use for reconstruction. Defaults to 0."
+msgstr "用于重建的 RBM 层索引，默认为 0。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:7 of
-msgid "Defaults to 0."
-msgstr "默认为 0。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:9 of
+msgid "The reconstructed data."
+msgstr "重建后的数据。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:10 of
-msgid "numpy.ndarray: The reconstructed data."
-msgstr "numpy.ndarray: 重建后的数据。"
-
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:13 of
-msgid "ValueError: If the model has no RBM layers or the layer index is out of range."
-msgstr "ValueError: 模型没有 RBM 层或层索引超出范围时抛出。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct:12 of
+msgid "If the model has no RBM layers or the layer index is out of range."
+msgstr "当模型没有 RBM 层或层索引超出范围时。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:1 of
 msgid "Reconstructs data using a single RBM."
 msgstr "使用单个 RBM 重建数据。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:4 of
-msgid "rbm (RestrictedBoltzmannMachine): The trained RBM model."
-msgstr "rbm (RestrictedBoltzmannMachine): 已训练的 RBM 模型。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:3 of
+msgid "The trained RBM model."
+msgstr "训练完成的 RBM 模型。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:8 of
-msgid "device (torch.device, optional): The device to perform computation on."
-msgstr "device (torch.device, optional): 执行计算所用的设备。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:7 of
+msgid ""
+"The device to perform computation on. If None, uses the RBM's device. "
+"Defaults to None."
+msgstr "执行计算的设备；若为 None，则使用 RBM 的设备，默认为 None。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:9 of
-msgid "If None, uses the RBM's device. Defaults to None."
-msgstr "若为 None，则使用 RBM 的设备。默认为 None。"
-
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:12 of
-msgid "tuple[numpy.ndarray, numpy.ndarray]: A tuple containing:"
-msgstr "tuple[numpy.ndarray, numpy.ndarray]: 包含以下内容的元组："
-
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:13 of
-msgid "The reconstructed visible layer data."
-msgstr "重建后的可见层数据。"
-
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:14 of
-msgid "The reconstruction error for each sample."
-msgstr "每个样本的重建误差。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.reconstruct_with_rbm:11 of
+msgid ""
+"A tuple containing:     - The reconstructed visible layer data.     - The"
+" reconstruction error for each sample."
+msgstr "包含以下内容的元组：重建后的可见层数据，以及每个样本的重建误差。"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:1 of
 msgid "An sklearn-compatible transform method."
 msgstr "兼容 sklearn 的 transform 方法。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:7 of
-msgid "numpy.ndarray: The transformed data."
-msgstr "numpy.ndarray: 转换后的数据。"
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN.transform:6 of
+msgid "The transformed data."
+msgstr "转换后的数据。"
 
 #: kaiwu.torch_plugin.usage_stats.disable_usage_stats:1 of
 msgid "Disable kpp usage statistics. No data will be reported after disabling."

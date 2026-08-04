@@ -1,5 +1,5 @@
 ---
-title: 3.3 Contrastive Divergence
+title: '3.3 Contrastive Divergence: Classical Training Method'
 slug: kpp-theoretical-foundations-ebms-cd
 sidebar_position: 9
 hide: false
@@ -7,11 +7,11 @@ hide_child: false
 ---
 
 
-# 3.3 Contrastive Divergence
+# 3.3 Contrastive Divergence: Classical Training Method
 
 > Section [3.2 The Intractable Partition Function Problem](kpp-theoretical-foundations-ebms-partition.md) established that exact maximum likelihood learning of Boltzmann machines is computationally infeasible due to the intractable partition function. The model expectation term in the gradient requires sampling from the equilibrium distribution $P_\theta$, which in turn demands running a Markov chain to convergence, which is a prohibitively slow process. In this section, we introduce **contrastive divergence (CD)**, the algorithmic breakthrough that made Boltzmann machines practical for real-world applications. CD provides a simple, efficient approximation to the gradient that circumvents the need for equilibrium sampling, trading theoretical purity for empirical effectiveness.
 
-### The Core Insight: Truncated Markov Chains
+## The Core Insight: Truncated Markov Chains
 The key observation behind contrastive divergence, introduced by Geoffrey Hinton in 2002, is that we need not run the Markov chain all the way to equilibrium. Instead, we can initialize the chain at a **data point** and run it for only a small number of steps, often just **one,** and then treat the resulting state as an approximate sample from the model distribution.
 
 Why should this work? Consider the gradient of the negative log-likelihood:
@@ -28,7 +28,7 @@ $$\Delta \theta \propto -\mathbb{E}_{\text{data}} \left[ \frac{\partial E_\theta
 
 The intuition is that the Markov chain, even after a few steps, moves away from the data distribution toward the model distribution. The difference between the data statistics and the statistics after $k$ steps approximates the true gradient direction. Remarkably, for $k = 1$, this simple heuristic works well enough to train useful generative models.
 
-### The CD-k Algorithm in Detail
+## The CD-k Algorithm in Detail
 The CD-k algorithm for training a Restricted Boltzmann Machine (RBM) or a general Boltzmann machine proceeds as follows: **Algorithm: Contrastive Divergence (CD-k)** For each training example $\mathbf{v}^{(0)}$ (the visible state):
 
 1. **Positive Phase**: 
@@ -54,14 +54,14 @@ For **CD-1** (the most common variant), the negative phase consists of a single 
 
 $\mathbf{v}^{(0)} \rightarrow \mathbf{h}^{(0)} \rightarrow \mathbf{v}^{(1)} \rightarrow \mathbf{h}^{(1)}$.
 
-### Geometric Interpretation: Approximating the Gradient
+## Geometric Interpretation: Approximating the Gradient
 The contrastive divergence update can be understood geometrically. The true gradient of the log-likelihood points in the direction that reduces the energy of data configurations and increases the energy of configurations that the model currently deems probable. CD approximates this by comparing the data configurations to nearby **reconstructions**, which are configurations obtained by following the Markov chain a short distance.
 
 Consider the energy landscape. The data points sit in (or near) basins of low energy. Running Gibbs sampling for a few steps moves the state slightly away from the data, typically toward regions of higher energy if the model has not yet fully learned the data distribution. The CD update pushes the energy **down** at the data point and **up** at the nearby reconstruction. This effectively deepens the basin around the data while raising the energy of the surrounding region, creating a steeper attractor.
 
 Crucially, CD does **not** attempt to raise the energy of *all* other configurations equally. It focuses only on those configurations that are easily reachable from the data via short MCMC trajectories. This local contrast is sufficient to learn a good model in practice, even though it introduces a bias relative to the true maximum likelihood gradient.
 
-### Why Contrastive Divergence Works: A Heuristic Justification
+## Why Contrastive Divergence Works: A Heuristic Justification
 The empirical success of CD, especially CD-1, initially surprised many researchers. Several lines of reasoning help explain its effectiveness:
 
 1. **Initialization at Data**: By starting the Markov chain at data points, we are sampling from regions of high data density. If the model distribution is already close to the data distribution, the chain will mix quickly, and a few steps suffice. If the model is far from the data, the chain moves away rapidly, providing a strong contrast signal.
@@ -73,7 +73,7 @@ where $P_\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting from
 
 1. **Persistent Contrastive Divergence (PCD)**: An important variant, **persistent contrastive divergence**, maintains a persistent set of Markov chains whose states are retained across weight updates. Instead of reinitializing from data each time, the chains continue to evolve. PCD yields samples that are closer to the true model distribution and can improve the quality of the learned model, especially for deeper architectures.
 
-### Limitations and Caveats
+## Limitations and Caveats
 Contrastive divergence is a pragmatic approximation, not an exact algorithm. It has several known limitations:
 
 1. **Bias**: CD does not produce an unbiased estimate of the true log-likelihood gradient. The bias can be large for small $k$, and the resulting parameter estimates are not maximum likelihood estimates. The learned model may not assign the highest possible likelihood to the data.
@@ -83,7 +83,7 @@ Contrastive divergence is a pragmatic approximation, not an exact algorithm. It 
 
 Despite these limitations, contrastive divergence remains a cornerstone algorithm for training restricted Boltzmann machines and deep belief networks. Its simplicity, speed, and empirical effectiveness enabled the mid-2000s renaissance of deep learning based on layer-wise pretraining.
 
-### From Contrastive Divergence to Modern Approximations
+## From Contrastive Divergence to Modern Approximations
 The success of CD inspired a family of related algorithms that improve upon its limitations:
 
 - **Persistent Contrastive Divergence (PCD)**: Uses persistent Markov chains to obtain better negative samples.
@@ -93,7 +93,7 @@ The success of CD inspired a family of related algorithms that improve upon its 
 
 These methods represent the ongoing evolution of techniques for training energy-based models, all stemming from the fundamental insight that we can trade exactness for tractability in learning.
 
-### Practical Implementation: Mini-Batches and Sampling
+## Practical Implementation: Mini-Batches and Sampling
 In practice, the expectation $\mathbb{E}_{\text{data}}$ is not computed over the full dataset, but over a **mini-batch** of $M$ samples. This reduces computational cost and provides a stochastic gradient that can often escape local minima. Typical mini-batch sizes range from 10 to 100.
 
 For the Gibbs sampling in the negative phase, you will usually run the chain for $k$ steps (often $k=1$) starting from the data. This is the Contrastive Divergence-$k$ (CD-$k$) algorithm. While not strictly following the gradient of the log-likelihood, it works well in practice. When implementing the update, the weight change for a mini-batch becomes:
@@ -102,7 +102,7 @@ $$\Delta \mathbf{W} = \frac{\eta}{M} \sum_{m=1}^M \left( \langle \mathbf{v}^{(m)
 
 where $\mathbf{v}^{(m)}_k, \mathbf{h}^{(m)}_k$ are the final states after $k$ Gibbs steps. Using mini-batches is crucial for scaling to large datasets like MNIST or ImageNet. **Efficiency tip**: In code (especially Python), try to vectorize the computation over the entire mini-batch using matrix operations rather than looping over individual examples. This can lead to orders-of-magnitude speedups.
 
-### Summary
+## Summary
 - **Contrastive divergence (CD)** is a practical approximation to the maximum likelihood gradient for training Boltzmann machines.
 - CD replaces the model expectation with an expectation over a **short Markov chain** initialized at the data, typically running for only $k$ steps (often $k=1$).
 - The CD-k algorithm alternates between a **positive phase** (clamped to data) and a **negative phase** (brief free-running reconstruction).

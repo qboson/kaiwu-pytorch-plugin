@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.1.0\n"
+"Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 10:35+0800\n"
+"POT-Creation-Date: 2026-07-28 10:48+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -108,28 +108,43 @@ msgstr ""
 
 #: ../../source/getting_started/tutorials/index.md:33
 #, python-brace-format
-msgid "学习 {doc}`rbm_classification` 理解 RBM 的应用流程"
+msgid "学习 {doc}`quantum_sampling_bottleneck` 理解模型训练中的采样瓶颈"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/index.md:34
+#, python-brace-format
+msgid "学习 {doc}`simulated_annealing` 建立本地采样基线"
 msgstr ""
 
 #: ../../source/getting_started/tutorials/index.md:35
+#, python-brace-format
+msgid "学习 {doc}`quantum_sampling_pytorch` 了解如何接入 CIM 采样器"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/index.md:36
+#, python-brace-format
+msgid "学习 {doc}`rbm_classification` 理解 RBM 的应用流程"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/index.md:38
 msgid "**生成模型路径**："
 msgstr ""
 
-#: ../../source/getting_started/tutorials/index.md:37
+#: ../../source/getting_started/tutorials/index.md:40
 #, python-brace-format
 msgid "学习 {doc}`bm_generation` 了解玻尔兹曼机的生成能力"
 msgstr ""
 
-#: ../../source/getting_started/tutorials/index.md:38
+#: ../../source/getting_started/tutorials/index.md:41
 #, python-brace-format
 msgid "进阶到 {doc}`qvae_mnist` 学习更强大的生成模型"
 msgstr ""
 
-#: ../../source/getting_started/tutorials/index.md:40
+#: ../../source/getting_started/tutorials/index.md:43
 msgid "**完整学习路径**："
 msgstr ""
 
-#: ../../source/getting_started/tutorials/index.md:42
+#: ../../source/getting_started/tutorials/index.md:45
 msgid "按顺序完成所有教程，全面掌握 Kaiwu-PyTorch-Plugin 的功能。"
 msgstr ""
 

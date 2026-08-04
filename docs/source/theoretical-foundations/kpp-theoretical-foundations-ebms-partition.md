@@ -11,7 +11,7 @@ hide_child: false
 
 > Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) introduced the maximum likelihood objective for energy-based models and revealed that the gradient of the negative log-likelihood contains a term involving an expectation under the model distribution. This expectation, in turn, requires summing over all possible configurations, a sum that is encoded in the **partition function** $Z_\theta$. In this section, we examine why the partition function is computationally intractable, what consequences this intractability has for learning and inference, and why it constitutes the central algorithmic challenge for Boltzmann machines and energy-based models more broadly.
 
-### The Partition Function: Definition and Its Implications
+## The Partition Function: Definition and Its Implications
 Recall the definition of the partition function for a Boltzmann machine with binary units $\mathbf{x} \in \{0,1\}^N$:
 
 $$Z_\theta = \sum_{\tilde{\mathbf{x}} \in \{0,1\}^N} \exp\left(-E_\theta(\tilde{\mathbf{x}})\right)$$
@@ -28,7 +28,7 @@ To put this number in perspective:
 
 And $N = 100$ is **tiny**. Real-world Boltzmann machines and restricted Boltzmann machines often have hundreds of visible units and hundreds or thousands of hidden units, yielding state spaces of size $2^{N_{\text{vis}} + N_{\text{hid}}}$. The partition function is **exponentially large** in the number of units.
 
-### Why the Partition Function Matters
+## Why the Partition Function Matters
 The partition function appears in three critical contexts:
 
 1. **Probability Evaluation** To compute the probability $P_\theta(\mathbf{x})$ of a specific configuration, we must divide the Boltzmann factor by $Z_\theta$:
@@ -53,7 +53,7 @@ Both the numerator and the denominator involve sums over all $2^N$ configuration
 
 1. **Sampling and Inference** Generating samples from the model distribution typically requires Markov chain Monte Carlo (MCMC) methods, such as Gibbs sampling. While MCMC does not require computing $Z_\theta$ explicitly, it does require running the Markov chain long enough to reach equilibrium. The time required to obtain independent samples scales with the **mixing time** of the chain, which can be exponentially long in the system size, especially when the energy landscape has high barriers.
 
-### The Partition Function as a Free Energy Barrier
+## The Partition Function as a Free Energy Barrier
 In statistical physics, the partition function is intimately related to the **Helmholtz free energy** $F = -\log Z$.
 
 (Setting $ k_B T = 1$ for notational simplicity.) The free energy summarizes the balance between energy and entropy. For a given visible configuration $\mathbf{v}$ in a Boltzmann machine with hidden units $\mathbf{h}$, the **free energy** is defined analogously as $F_\theta(\mathbf{v}) = -\log \sum_{\tilde{\mathbf{h}}} \exp\left(-E_\theta(\mathbf{v}, \tilde{\mathbf{h}})\right)$.
@@ -64,12 +64,12 @@ $P_\theta(\mathbf{v}) = \frac{\exp(-F_\theta(\mathbf{v}))}{\sum_{\tilde{\mathbf{
 
 Even with hidden units marginalized out, the denominator still sums over all $2^{N_{\text{vis}}}$ visible configurations. The intractability remains.
 
-### The Consequence: Exact Maximum Likelihood Is Impossible
+## The Consequence: Exact Maximum Likelihood Is Impossible
 The intractability of $Z_\theta$ has a stark implication: **exact maximum likelihood learning of a Boltzmann machine is computationally impossible for all but the smallest toy problems.** Any practical training algorithm must rely on approximations.
 
 This is not merely an engineering inconvenience; it is a fundamental computational barrier. The partition function sum is a prototypical #P-complete problem in computational complexity theory, meaning it is at least as hard as counting the number of satisfying assignments to a Boolean formula.
 
-### Hessian and Non-Convexity
+## Hessian and Non-Convexity
 
 The difficulty extends beyond the gradient. The Hessian of the log-likelihood function also reveals the complexity of the optimization landscape. For a Boltzmann machine with only visible units, the Hessian has a simple and revealing form:
 
@@ -83,7 +83,7 @@ $$\nabla^2 f(\theta) = \mathbb{E}_{\text{target}}[\text{Cov}_\theta(\mathbf{S}|\
 
 The first term is the conditional covariance given the visible units, and the second term is the unconditional covariance under the model. This expression is **not** necessarily negative semidefinite, meaning that **the log-likelihood is not concave** in the presence of hidden units. Consequently, gradient-based methods can converge to local optima, and the quality of the learned model depends crucially on the initialization and optimization algorithm.
 
-### Approaches to Taming the Intractability
+## Approaches to Taming the Intractability
 Faced with this barrier, researchers have developed several families of approximation strategies. Understanding these strategies is essential for navigating the landscape of energy-based learning.
 
 1. **Sampling-Based Approximations** Instead of summing over all configurations, we can **sample** configurations from the model distribution using MCMC. The model expectation is then approximated by an empirical average over the samples:
@@ -102,7 +102,7 @@ While variational methods provide a rigorous lower bound on the log-likelihood, 
 
 1. **Annealed Importance Sampling** For model evaluation (rather than training), **annealed importance sampling (AIS)** provides an unbiased estimate of $Z_\theta$. It works by gradually transforming a simple base distribution (e.g., uniform) into the model distribution through a sequence of intermediate distributions, using importance weights to correct for the sampling bias. While computationally expensive, AIS is a gold standard for evaluating generative models when exact likelihoods are required.
 
-### The Partition Function in the Era of Deep Learning
+## The Partition Function in the Era of Deep Learning
 It is worth noting that the intractability of the partition function is not unique to Boltzmann machines. Many modern deep generative models face analogous challenges:
 
 - **Generative Adversarial Networks (GANs)** avoid the partition function entirely by using an adversarial training criterion that does not require likelihood evaluation.
@@ -112,7 +112,7 @@ It is worth noting that the intractability of the partition function is not uniq
 
 The Boltzmann machine's struggle with the partition function thus foreshadows a central theme in deep generative modeling: the tension between expressive power and tractable normalization.
 
-### Summary
+## Summary
 - The **partition function** $Z_\theta = \sum_{\mathbf{x}} \exp(-E_\theta(\mathbf{x}))$ is a sum over an exponential number of configurations, making exact computation infeasible for non-trivial models.
 - The intractability of $Z_\theta$ prevents exact **probability evaluation**, exact **gradient computation**, and efficient exact **sampling**.
 - This computational barrier implies that **exact maximum likelihood learning is impossible** for general Boltzmann machines.

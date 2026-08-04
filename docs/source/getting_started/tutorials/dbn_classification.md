@@ -1,11 +1,15 @@
 # DBN 分类：深度信念网络
 在 RBM 分类的基础上，进一步构建深度信念网络（Deep Belief Network, DBN），通过堆叠多层 RBM 实现更强大的特征学习能力。
 
+**示例位置**: `example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 `example/dbn_digits/dbn_trainer.py` 和 `example/dbn_digits/supervised_dbn_digits.py`。
+
+该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 `DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 `SupervisedDBNClassification` 完成分类训练和评估。
+
 ## 目标
 
 ## 一、RBM 原理概述
 
-受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。
+受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。DBN 的关键思想是把上一层 RBM 输出的隐层概率或采样结果作为下一层 RBM 的可见层，逐层学习越来越抽象的表示。
 
 ### 1. 模型结构
 
@@ -110,22 +114,25 @@ $$
 
 - **核心方法**：
 
-  - **创建 RBM 层（`create_rbm_layer` 方法）**  
-    初始化 RBM：使用 `RestrictedBoltzmannMachine` 定义可见层与隐层维度。
+  `DBNTrainer` 内部负责创建 RBM 层以及 `_train_batch`、`_train_rbm_layer` 等单层训练步骤；对外使用的 `DBNPretrainer` 则封装了逐层预训练接口。
 
-  - **单批次训练步骤（`_train_batch` 方法）**
+  - **单层训练过程**
 
     1. **正相（Positive Phase）**：计算隐层激活概率 $P(\mathbf{h}|\mathbf{v})$。
     2. **负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。
     3. **目标函数**：最小化能量函数加权重衰减（L2 正则化）。
     4. **反向传播**：更新权重和偏置。
 
-  - **单层 RBM 训练（`_train_rbm_layer` 方法）**  
-    - 初始化优化器：采用随机梯度下降（SGD）优化参数。
-    - DataLoader 处理批量数据。
+  `DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader 处理批量数据；`DBNPretrainer` 只暴露逐层预训练和特征变换接口。
 
-  - **预训练堆叠 RBM（`fit` 方法）**
-  - **特征变换，逐层提取特征（`transform` 方法）**
+  - **预训练堆叠 RBM（`fit` 方法）**：`DBNPretrainer.fit` 依次训练各个 RBM 层，并保存训练好的层。
+  - **特征变换（`transform` 方法）**：`DBNPretrainer.transform` 依次通过各 RBM，将输入转换为深层特征。
+
+  `DBNPretrainer` 的实际接口可以直接参考：
+
+```{literalinclude} ../../../../example/dbn_digits/dbn_trainer.py
+:pyobject: DBNPretrainer.fit
+```
 
 ### 2. AbstractSupervisedDBN 抽象接口定义
 

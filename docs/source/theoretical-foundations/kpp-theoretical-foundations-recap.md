@@ -15,7 +15,7 @@ hide_child: false
 > - **Energy-Based Models** formalized the learning objective: shape the energy function so that real data occupies deep valleys. The gradient involves an expectation under the model distribution, which is intractable to compute exactly due to the partition function sum over exponentially many configurations.
 > - **Boltzmann Machine Architecture** evolved from the computationally prohibitive full Boltzmann Machine to the Restricted Boltzmann Machine (RBM), which serves as the critical building block for stacking deep generative architectures.
 
-### The Core Tension: Expressiveness vs. Sampling Tractability
+## The Core Tension: Expressiveness vs. Sampling Tractability
 Despite architectural simplifications, all Boltzmann machines share a fundamental bottleneck: **sampling from high‑dimensional Boltzmann distributions is hard**. Classical Markov Chain Monte Carlo (MCMC) methods, such as Gibbs sampling, suffer from:
 
 - **Slow mixing** at low temperatures, where energy barriers trap the chain in isolated modes.
@@ -26,7 +26,7 @@ This is not merely a software optimisation problem; it is a **physical phenomeno
 
 These sampling limitations cap the practical expressiveness of energy‑based models and motivate the search for fundamentally different sampling strategies.
 
-### A Principled Classical Alternative: Simulated Annealing
+## A Principled Classical Alternative: Simulated Annealing
 
 **Simulated annealing (SA)** is a classical metaheuristic that can be used to sample from Ising Hamiltonians. Instead of relying on a single Markov chain, SA mimics the physical annealing process:
 
@@ -38,13 +38,13 @@ When the system is cooled sufficiently slowly, the final distribution of states 
 
 However, SA still relies on **thermal activation** to escape local minima, which becomes exponentially slow for high energy barriers (the critical slowing down phenomenon). This limitation opens the door to more advanced methods, including quantum sampling.
 
-### Beyond Classical Sampling: Quantum Sampling
+## Beyond Classical Sampling: Quantum Sampling
 
 **Quantum sampling** offers a physically grounded alternative that can overcome the limitations of classical MCMC and simulated annealing. Instead of simulating a Markov chain, one can encode the energy function as an Ising Hamiltonian and let a quantum physical system evolve toward its low‑energy states. Devices such as **quantum annealers**, i.e. Coherent Ising Machines (CIMs), realize this principle in hardware.
 
 The full details of quantum sampling, including its physical implementation, integration with PyTorch, and practical performance benefits, are **covered in the hands‑on tutorials of Part II**. You will learn how to replace the classical `SimulatedAnnealingOptimizer` with a quantum sampler (e.g., `CIMOptimizer`) and observe the potential speed‑up and improved sample quality.
 
-### Part II Preview: Quantum‑Enhanced Hands‑on Tutorials
+## Part II Preview: Quantum‑Enhanced Hands‑on Tutorials
 Part II [KPP Hands-on Tutorials](../getting_started/tutorials/index.md) shifts from theory to practice. you will use the **Kaiwu-PyTorch-Plugin** to replace classical sampling (Gibbs, CD, and simulated annealing) with quantum‑enhanced sampling. The plugin abstracts away the hardware details, allowing you to switch between classical and quantum samplers with minimal code changes.
 
 Moreover, four sophisticated tasks will be covered:

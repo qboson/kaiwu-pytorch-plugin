@@ -24,7 +24,7 @@
  pip install torchvision==0.22.0 torchmetrics[image]
 
 ```
-### 1、QVAE 原理概括
+## 1. QVAE 原理概括
 
 QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型** 引入 **变分自编码器 (VAE)** 潜空间的生成模型。其核心思想是：
 
@@ -42,27 +42,24 @@ QVAE 包括以下关键组件：
    使用 **量子玻尔兹曼机 (QBM)** 建模潜变量 $\mathbf{z}$ 的先验分布。哈密顿量为：
 
    $$
-
    \mathcal{H}_\theta = \sum_l \Gamma_l \sigma_l^x + \sum_l h_l \sigma_l^z + \sum_{l<m} W_{lm} \sigma_l^z \sigma_m^z
-
    $$
+
 3. **解码器（Decoder）**  
    将潜变量 $\mathbf{z}$ （或其连续松弛变量 $\boldsymbol{\zeta}$ ）映射回数据空间，并使用解码器重建原始数据：
 
    $$
-
    p_\theta(\mathbf{x} | \boldsymbol{\zeta}) \sim \text{Bernoulli}(f_\theta(\boldsymbol{\zeta}))
-
    $$
+
 ### 训练目标：Q-ELBO
 
 QVAE 使用一个 **量子下界 (Q-ELBO)** 来近似最大化对数似然：
 
 $$
-
 \mathcal{L}_{\text{Q-ELBO}} = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x} | \boldsymbol{\zeta})] - \tilde{H}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}))
-
 $$
+
 ### QBM 采样与训练
 
 - **正相（positive phase）**：从编码器采样 $\mathbf{z} \sim q_\phi(\mathbf{z}|\mathbf{x})$
@@ -71,11 +68,11 @@ $$
 把能量作为目标函数，objective 的梯度即为基于正相和负相采样计算的梯度。
 
 
-### 2. 模型架构
+## 2. 模型架构
 
 定义了用于自编码器架构的 `Encoder` 和 `Decoder` 两个模块，均继承自 `nn.Module`。
 
-两者结构对称：包含一个全连接层、层归一化（LayerNorm）和双曲正切激活函数，并支持通过 L2 权重衰减进行正则化。
+示例中的 `BasicEncoder` 和 `BasicDecoder` 都由多层全连接层、可配置激活函数和权重衰减组成；具体网络深度和激活函数由配置传入，并不固定包含 LayerNorm。
 编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。
 每个模块提供 `get_weight_decay` 方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。
 
@@ -87,90 +84,43 @@ $$
 ### 2.2 解码器
 
 ```{literalinclude} ../../../../example/qvae_mnist/model/networks.py
-:pyobject: Decoder
+:pyobject: BasicDecoder
 ```
 ### 2.3 Q-VAE 完整模型
 
 参考模块手册中的QVAE类。
 
-### 3. 数据准备
+## 3. 数据准备
 
-该函数封装了 MNIST 数据集的加载与预处理流程，返回训练和测试用的 `DataLoader`。
+`loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST 的加载与预处理流程，返回训练和测试用的 `DataLoader`。
 
 数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` 将 28×28 图像展平为 784 维向量，适配全连接网络输入。
-训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性。
+训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性；`num_evts_train` 和 `num_evts_test` 还可以限制样本数量，方便快速验证代码。
 
-```{code-block} python
-
-def setup_data_loaders(root, download=True, batch_size=256, use_cuda=False):
-   """
-   设置MNIST数据集的数据加载器
-
-   Args:
-      root (str): 数据存储根目录
-      download (bool): 如果数据不存在是否下载，默认为True
-      batch_size (int): 每个批次的样本数量，默认为128
-      use_cuda (bool): 是否使用GPU，决定是否启用pin_memory优化
-
-   Returns:
-      tuple: (train_loader, test_loader) 训练和测试数据加载器
-   """
-   # 数据预处理
-   transform = transforms.Compose([
-      transforms.ToTensor(),             # 转换为Tensor
-      transforms.Lambda(flatten_tensor)  # 展平：将28x28图像展平成784维向量
-      # 等效于：x.reshape(-1) 或 x.flatten()
-   ])
-
-   # 加载训练集
-   train_set = datasets.MNIST(
-      root=root,           # 数据存储路径
-      train=True,          # 加载训练集（共60000个样本）
-      transform=transform, # 应用定义的数据变换
-      download=download    # 如果数据不存在则自动下载
-   )
-
-   # 加载测试集
-   test_set = datasets.MNIST(
-      root=root,           # 数据存储路径  
-      train=False,         # 加载测试集（共10000个样本）
-      transform=transform  # 应用相同的数据变换
-   )
-
-   # 数据加载器配置参数
-   # 根据是否使用GPU选择不同的优化参数
-   # 将num_workers设为0避免多进程问题
-   kwargs = {'num_workers': 0, 'pin_memory': True} if use_cuda else {'num_workers': 0}
-
-   # 创建训练数据加载器
-   train_loader = DataLoader(
-      dataset=train_set,     # 训练数据集
-      batch_size=batch_size, # 每个批次的样本数
-      shuffle=True,          # 每个epoch打乱数据顺序，防止模型记忆顺序
-      **kwargs               # 解包上述配置参数
-   )
-
-   # 创建测试数据加载器
-   test_loader = DataLoader(
-      dataset=test_set,      # 测试数据集
-      batch_size=batch_size, # 批次大小（通常与训练集相同）
-      shuffle=False,         # 测试集不需要打乱，保证可重复性
-      **kwargs               # 解包配置参数
-   )
-
-   return train_loader, test_loader
-
+```{literalinclude} ../../../../example/qvae_mnist/utils/loadMNIST.py
+:pyobject: loadMNIST
 ```
-### 4. 模型训练
+
+## 4. 模型训练
 
 该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。
-模型结合了经典神经网络编码器/解码器与受限玻尔兹曼机（RBM），通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。
+模型结合了经典神经网络编码器/解码器与 RBM 或 BM 先验，通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 `--sampler-type sa` 或 `--sampler-type cim` 选择采样器。
 训练过程中记录各项损失指标并定期保存至文件。
+
+命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 `loadMNIST` 展平数据，再由 `get_full_pipeline` 组装 QVAE 和 MLP 分类器：
+
+```{code-block} bash
+
+cd example/qvae_mnist
+python run_pipeline.py --epochs 50 --run-tsne
+```
+
+完整参数可运行 `python run_pipeline.py --help` 查看；首次运行需要根据数据集配置下载或准备数据。
 
 ```{literalinclude} ../../../../example/qvae_mnist/trainer/trainer.py
 :pyobject: Trainer.train
 ```
-### 5. 可视化与评估
+## 5. 可视化与评估
 本节提供两类关键可视化工具：
 一是通过 `plot_training_curves` 绘制训练/验证损失与准确率曲线，用于监控模型收敛情况；
 二是利用 `t_SNE` 对 QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。
@@ -186,18 +136,18 @@ def setup_data_loaders(root, download=True, batch_size=256, use_cuda=False):
 ```{literalinclude} ../../../../example/qvae_mnist/utils/helpers.py
 :pyobject: t_SNE
 ```
-### 6. 表征学习与分类
+## 6. 表征学习与分类
 
 Q-VAE 学到的表征可用于下游分类任务：
 
-该函数 `train_mlp_classifier` 用于训练一个多层感知机(MLP)分类器，输入特征是通过QVAE模型提取的数据表征。
+`MLPClassifier.fit` 用于训练一个多层感知机(MLP)分类器，输入特征是通过 QVAE 模型提取的数据表征。
 它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。
 在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。
 
 ```{literalinclude} ../../../../example/qvae_mnist/downstream/classifier.py
 :pyobject: MLPClassifier.fit
 ```
-### 7. 科研应用：QBM-VAE
+## 7. 科研应用：QBM-VAE
 
 Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 
@@ -207,4 +157,4 @@ Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 - 检测传统方法无法辨识的新型细胞亚型
 - 为靶点发现提供新线索
 
-**相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/pdf/2508.11190)
+**相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)

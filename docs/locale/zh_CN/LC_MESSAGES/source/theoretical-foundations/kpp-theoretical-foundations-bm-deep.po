@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Kaiwu-Pytorch-Plugin 0.2.0\n"
+"Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-07-10 10:39+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
@@ -533,24 +533,4 @@ msgid ""
 "The concept of **hierarchical representation learning** pioneered by "
 "stacked RBMs is foundational to modern deep learning architectures."
 msgstr "堆叠 RBM 所开创的 **层级表示学习** 理念，是现代深度学习架构的基础。"
-
-#~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}^{(1)}, \\ldots, "
-#~ "\\mathbf{h}^{(L)}) = P(\\mathbf{h}^{(L-1)}, "
-#~ "\\mathbf{h}^{(L)}) \\prod_{l=1}^{L-2} P(\\mathbf{h}^{(l)}"
-#~ " \\mid \\mathbf{h}^{(l+1)})"
-#~ msgstr "联合分布分解为："
-
-#~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}^{(1)}, \\mathbf{h}^{(2)}) "
-#~ "= -\\mathbf{v}^\\top \\mathbf{W}^{(1)} "
-#~ "\\mathbf{h}^{(1)} - (\\mathbf{h}^{(1)})^\\top "
-#~ "\\mathbf{W}^{(2)} \\mathbf{h}^{(2)} - "
-#~ "\\mathbf{b}^\\top \\mathbf{v} - "
-#~ "(\\mathbf{c}^{(1)})^\\top \\mathbf{h}^{(1)} - "
-#~ "(\\mathbf{c}^{(2)})^\\top \\mathbf{h}^{(2)}"
-#~ msgstr "包含两层隐藏层的 DBM 能量函数为："
-
-#~ msgid "::"
-#~ msgstr "::"
 
