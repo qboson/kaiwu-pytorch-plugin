@@ -1,0 +1,75 @@
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import torch
+from kaiwu.cim._optimizer_adapter import TaskMode
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from maifs import FeatureSelectionWrapper
+
+KAIWU_PROJECT_NAME = "RDSA260204015"
+KAIWU_PROJECT_NO = "26071422"
+
+sample_count = 20
+image_size = 8
+feature_dim = image_size * image_size
+signal_pixels = [10, 45]
+
+x = torch.randn(sample_count, feature_dim)
+score = x[:, signal_pixels[0]] - x[:, signal_pixels[1]]
+y = (score > 0).long()
+
+loader = DataLoader(TensorDataset(x, y), batch_size=10, shuffle=False)
+
+
+class TinyCNN(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(1, 8, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(8 * image_size * image_size, 2),
+        )
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        images = inputs.view(-1, 1, image_size, image_size)
+        return self.net(images)
+
+
+selector = FeatureSelectionWrapper(
+    TinyCNN(),
+    feature_dim=feature_dim,
+    cardinality_k=len(signal_pixels),
+    solver="kaiwu_cim",
+    solver_kwargs={
+        "target_precision": 8,
+        "max_bits": 1000,
+        "max_precision": 8,
+        "precision_step": 4,
+        "sample_number": 10,
+        "task_mode": TaskMode.SAMPLE,
+        "project_no": KAIWU_PROJECT_NO,
+    },
+    mask_update_epochs=5,
+)
+
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(selector.model.parameters(), lr=0.01)
+
+selector.fit_weights(loader, loss_fn, optimizer, epochs=20)
+logits = selector(x)
+accuracy = (logits.argmax(dim=1) == y).float().mean().item()
+
+print(f"Kaiwu project: {KAIWU_PROJECT_NAME} ({KAIWU_PROJECT_NO})")
+print("solver: kaiwu_cim")
+print("loss after:", float(loss_fn(logits, y).detach()))
+print("accuracy:", accuracy)
+print("true signal pixels:", signal_pixels)
+print("selected pixels:", selector.selected_indices().tolist())
+print("selected mask:", selector.get_support().astype(int).tolist())
