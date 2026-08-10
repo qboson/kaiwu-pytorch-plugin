@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-# pylint: disable=too-many-lines
+# pylint: disable=too-many-lines,import-outside-toplevel
 
+import hashlib
 import os
 import shutil
 import tempfile
@@ -621,7 +622,9 @@ def _solve_ising_kaiwu_cim(
     if save_dir is not None or kw.common.CheckpointManager.save_dir is None:
         kw.common.CheckpointManager.save_dir = str(resolved_save_dir)
 
-    task_hash = kw.cim.CIMOptimizer._ising_to_md5_hash(submit_matrix)
+    task_hash = hashlib.md5(
+        np.ascontiguousarray(submit_matrix).tobytes()
+    ).hexdigest()
     task_name = f"feature_selection_qubo_cim_{task_hash[:16]}_{time_ns()}"
     cim_kwargs = {
         "task_name": task_name,

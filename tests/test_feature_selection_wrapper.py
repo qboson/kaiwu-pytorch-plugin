@@ -5,8 +5,8 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from maifs import plugin
-from maifs.plugin import FeatureSelectionWrapper
+from kaiwu.torch_plugin import FeatureSelectionWrapper
+from kaiwu.torch_plugin.maifs import plugin
 
 
 def test_wrapper_applies_mask_before_base_model() -> None:

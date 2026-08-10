@@ -8,9 +8,9 @@ from kaiwu.cim._optimizer_adapter import TaskMode
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from maifs import FeatureSelectionWrapper
+from kaiwu.torch_plugin import FeatureSelectionWrapper
 
 KAIWU_PROJECT_NAME = "RDSA260204015"
 KAIWU_PROJECT_NO = "26071422"

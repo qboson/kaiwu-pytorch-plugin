@@ -3,13 +3,10 @@
 
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine
+from .maifs import FeatureSelectionWrapper, QuadraticLinearSolver
 from .qdiffusion import EnergyModel, QDiffusion, QDiffusionConfig
 from .qvae import QVAE
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
-from maifs import (
-    FeatureSelectionWrapper,
-    QuadraticLinearSolver
-)
 
 from .usage_stats import (
     enable_usage_stats,

@@ -8,9 +8,9 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from maifs import FeatureSelectionWrapper
+from kaiwu.torch_plugin import FeatureSelectionWrapper
 
 sample_count = 1024
 feature_dim = 100
