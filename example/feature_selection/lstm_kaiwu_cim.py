@@ -12,8 +12,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from kaiwu.torch_plugin import FeatureSelectionWrapper
 
-KAIWU_PROJECT_NAME = "RDSA260204015"
-KAIWU_PROJECT_NO = "26071422"
+KAIWU_PROJECT_NAME = "Your Project Name"
+KAIWU_PROJECT_NO = "Your Project No"
 
 sample_count = 20
 sequence_length = 6
