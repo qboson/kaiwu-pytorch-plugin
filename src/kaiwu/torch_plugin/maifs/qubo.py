@@ -3,7 +3,6 @@ from __future__ import annotations
 # pylint: disable=too-many-lines,import-outside-toplevel
 
 import hashlib
-import os
 import shutil
 import tempfile
 from dataclasses import dataclass
@@ -27,60 +26,25 @@ DEFAULT_CIM_PRECISION_STEP = 4
 DEFAULT_CIM_SAMPLE_NUMBER = 512
 
 
-def _init_kaiwu_license_from_env() -> None:
-    """使用环境变量初始化 Kaiwu license。
-
-    该函数只在同时存在 LICENSE_USER_ID 和 LICENSE_SDK_CODE 时调用 Kaiwu 初始化，
-    不会读取或打印具体密钥内容。
-
-    Args:
-        无。
-
-    Returns:
-        None: 函数只修改 Kaiwu 运行时授权状态，不返回值。
-
-    Raises:
-        RuntimeError: 当 Kaiwu license 初始化失败时抛出。
-    """
-    user_id = os.environ.get("LICENSE_USER_ID")
-    sdk_code = os.environ.get("LICENSE_SDK_CODE")
-    if not user_id or not sdk_code:
-        return
-
-    import kaiwu.license as license_manager
-
-    try:
-        license_manager.init(user_id, sdk_code)
-    except Exception as exc:
-        raise RuntimeError(
-            "Kaiwu license initialization failed. Check whether LICENSE_USER_ID "
-            "and LICENSE_SDK_CODE are correct, and whether the machine can reach "
-            "the Kaiwu license server."
-        ) from exc
-
-
 @dataclass
 class PrecisionSplitPlan:
-    """保存 Kaiwu CIM 提交前的精度调整和变量拆分方案。
+    """Store a Kaiwu CIM precision-adjustment and variable-splitting plan.
 
-    该类只保存一次精度拆分搜索的结果，不负责执行 CIM 求解。
+    The plan records one precision search result. It does not execute the CIM
+    solver by itself.
 
     Args:
-        source_precision (int): 原始 Ising 矩阵被调整到的源精度。
-        target_precision (int): 拆分后提交矩阵的目标精度。
-        max_bits (int): 拆分后允许的最大变量数量。
-        adjusted_matrix (np.ndarray): 精度调整后的 Ising 矩阵。
-        split_matrix (np.ndarray): 变量拆分后的 Ising 矩阵。
-        last_var_idx (np.ndarray): 拆分变量到原始变量的映射。
-        split_size (int): 拆分后矩阵的变量数量。
-        precision_info (dict[str, Any]): Kaiwu 精度计算返回的信息。
-        history (list[dict[str, Any]]): 精度搜索过程记录。
-
-    Returns:
-        PrecisionSplitPlan: 精度拆分方案数据对象。
-
-    Raises:
-        无。
+        source_precision: Source precision used to adjust the original Ising
+            matrix.
+        target_precision: Target precision for the split matrix submitted to
+            Kaiwu CIM.
+        max_bits: Maximum allowed variable count after splitting.
+        adjusted_matrix: Ising matrix after precision adjustment.
+        split_matrix: Ising matrix after variable splitting.
+        last_var_idx: Mapping from split variables back to original variables.
+        split_size: Variable count after splitting.
+        precision_info: Metadata returned by Kaiwu precision calculation.
+        history: Precision search attempt history.
     """
 
     source_precision: int
@@ -95,28 +59,24 @@ class PrecisionSplitPlan:
 
 
 class PrecisionSplitExplorer:
-    """Find a feasible kaiwu precision/split plan under a bit-size limit.
+    """Find a feasible Kaiwu precision/split plan under a bit-size limit.
 
-    This is a local copy of the helper used in ``kaiwu_test``. It delays kaiwu
-    imports until use, so the default non-CIM QUBO backends do not require kaiwu.
+    This is a local copy of the helper used in ``kaiwu_test``. It delays Kaiwu
+    imports until use, so the default non-CIM QUBO backends do not require Kaiwu.
 
     Args:
-        target_precision (int, optional): 拆分后的目标精度。默认为 8。
-        max_bits (int | None, optional): 拆分后允许的最大变量数量。默认为 None。
-        max_precision (int, optional): 搜索时允许的最大源精度。默认为 32。
-        min_precision (int | None, optional): 兼容原版的起始精度。默认为 None。
-        min_increment (float | None, optional): 指定拆分最小增量。默认为 None。
-        penalty (float | None, optional): 拆分惩罚系数。默认为 None。
-        round_to_increment (bool, optional): 是否按增量取整。默认为 True。
-        start_precision (int | None, optional): 搜索起始精度。默认为 None。
-        precision_step (int, optional): 精度搜索步长。默认为 4。
-
-    Returns:
-        PrecisionSplitExplorer: 精度拆分搜索器实例。
+        target_precision: Target precision after variable splitting.
+        max_bits: Maximum allowed variable count after splitting.
+        max_precision: Maximum source precision to test during search.
+        min_precision: Backward-compatible alias for the starting precision.
+        min_increment: Optional minimum increment passed to Kaiwu splitting.
+        penalty: Optional splitting penalty coefficient.
+        round_to_increment: Whether Kaiwu should round values to the increment.
+        start_precision: Starting source precision for the search.
+        precision_step: Coarse-search precision step.
 
     Raises:
-        ValueError: 当精度范围、步长或变量数量限制不合法时抛出。
-
+        ValueError: If precision bounds, precision step, or bit limit are invalid.
     """
 
     def __init__(
@@ -131,27 +91,23 @@ class PrecisionSplitExplorer:
         start_precision: int | None = None,
         precision_step: int = 4,
     ) -> None:
-        """初始化 Kaiwu 精度拆分搜索器。
-
-        该函数用于 MAIFS 特征选择流程，保持输入校验、计算逻辑和返回结果一致。
+        """Initialize a Kaiwu precision-split explorer.
 
         Args:
-            target_precision (int, optional): 拆分后的目标精度。默认为 8。
-            max_bits (int | None, optional): 拆分后允许的最大变量数量。默认为 None。
-            max_precision (int, optional): 搜索时允许的最大源精度。默认为 32。
-            min_precision (int | None, optional): 兼容原版的起始精度。默认为 None。
-            min_increment (float | None, optional): 指定拆分最小增量。默认为 None。
-            penalty (float | None, optional): 拆分惩罚系数。默认为 None。
-            round_to_increment (bool, optional): 是否按增量取整。默认为 True。
-            start_precision (int | None, optional): 搜索起始精度。默认为 None。
-            precision_step (int, optional): 粗搜索时精度递增步长。默认为 4。
-
-        Returns:
-            None: 函数只修改对象状态，不返回值。
+            target_precision: Target precision after variable splitting.
+            max_bits: Maximum allowed variable count after splitting.
+            max_precision: Maximum source precision to test during search.
+            min_precision: Backward-compatible alias for the starting precision.
+            min_increment: Optional minimum increment passed to Kaiwu splitting.
+            penalty: Optional splitting penalty coefficient.
+            round_to_increment: Whether Kaiwu should round values to the
+                increment.
+            start_precision: Starting source precision for the search.
+            precision_step: Coarse-search precision step.
 
         Raises:
-            ValueError: 当精度或变量数量配置不合法时抛出。
-            TypeError: 当 precision_step 不是整数时抛出。
+            ValueError: If precision or bit-count settings are invalid.
+            TypeError: If ``precision_step`` is not an integer.
         """
         if max_bits is None:
             raise ValueError("max_bits is required")
@@ -188,20 +144,14 @@ class PrecisionSplitExplorer:
         ising_matrix: np.ndarray,
         min_increment: float | None,
     ) -> float:
-        """计算精度拆分时使用的最小增量。
-
-        该函数用于 MAIFS 特征选择流程，保持输入校验、计算逻辑和返回结果一致。
+        """Resolve the minimum increment used during precision splitting.
 
         Args:
-            ising_matrix (np.ndarray): 输入 Ising 矩阵。
-            min_increment (float | None): 用户指定的最小增量。
+            ising_matrix: Input Ising matrix.
+            min_increment: User-provided minimum increment, if any.
 
         Returns:
-            float: 用于 Kaiwu 拆分接口的最小增量。
-
-        Raises:
-            ValueError: 当输入参数不合法时抛出。
-
+            Minimum increment passed to Kaiwu splitting.
         """
         if min_increment is not None:
             return min_increment
@@ -219,19 +169,17 @@ class PrecisionSplitExplorer:
         ising_matrix: np.ndarray,
         precision: int,
     ) -> tuple[np.ndarray, dict[str, Any]]:
-        """把 Ising 矩阵调整到指定整数精度。
-
-        该函数用于 MAIFS 特征选择流程，保持输入校验、计算逻辑和返回结果一致。
+        """Adjust an Ising matrix to a target integer precision.
 
         Args:
-            ising_matrix (np.ndarray): 原始 Ising 矩阵。
-            precision (int): 目标整数精度。
+            ising_matrix: Original Ising matrix.
+            precision: Target integer precision.
+
         Returns:
-            tuple[np.ndarray, dict[str, Any]]: 精度调整后的矩阵和精度信息。
+            A tuple containing the adjusted matrix and Kaiwu precision metadata.
 
         Raises:
-            ImportError: 当 Kaiwu 精度处理接口不可用时抛出。
-
+            ImportError: If the Kaiwu precision helpers are unavailable.
         """
         try:
             from kaiwu.preprocess import (
@@ -257,19 +205,17 @@ class PrecisionSplitExplorer:
         ising_matrix: np.ndarray,
         source_precision: int,
     ) -> PrecisionSplitPlan:
-        """构造一次精度调整和变量拆分方案。
-
-        该函数用于 MAIFS 特征选择流程，保持输入校验、计算逻辑和返回结果一致。
+        """Build one precision-adjustment and variable-splitting plan.
 
         Args:
-            ising_matrix (np.ndarray): 原始 Ising 矩阵。
-            source_precision (int): 本次尝试的源精度。
+            ising_matrix: Original Ising matrix.
+            source_precision: Source precision for this attempt.
+
         Returns:
-            PrecisionSplitPlan: 拆分后的矩阵、变量映射和变量数量。
+            The split matrix, variable mapping, and related search metadata.
 
         Raises:
-            ImportError: 当 Kaiwu 拆分接口不可用时抛出。
-
+            ImportError: If the Kaiwu splitting helper is unavailable.
         """
         from kaiwu.preprocess import perform_precision_adaption_split
 
@@ -306,20 +252,19 @@ class PrecisionSplitExplorer:
         source_precision: int,
         phase: str,
     ) -> PrecisionSplitPlan:
-        """构造拆分方案并记录本次精度搜索历史。
-
-        该函数是 search() 的内部步骤，用于记录 coarse 或 fine 阶段的尝试结果。
+        """Build a split plan and record the precision-search attempt.
 
         Args:
-            ising_matrix (np.ndarray): 原始 Ising 矩阵。
-            source_precision (int): 本次尝试使用的源精度。
-            phase (str): 搜索阶段名称，例如 "coarse" 或 "fine"。
+            ising_matrix: Original Ising matrix.
+            source_precision: Source precision for this attempt.
+            phase: Search phase name, such as ``"coarse"`` or ``"fine"``.
+
         Returns:
-            PrecisionSplitPlan: 本次精度尝试得到的拆分方案。
+            The precision-split plan produced by this attempt.
 
         Raises:
-            ValueError: 当 Ising 矩阵或精度参数不合法时抛出。
-            RuntimeError: 当 Kaiwu 预处理接口执行失败时抛出。
+            ValueError: If the Ising matrix or precision arguments are invalid.
+            RuntimeError: If a Kaiwu preprocessing helper fails.
         """
         plan = self._build_plan(ising_matrix, source_precision)
         attempt = {
@@ -336,20 +281,18 @@ class PrecisionSplitExplorer:
         self,
         ising_matrix: np.ndarray,
     ) -> PrecisionSplitPlan:
-        """搜索满足变量数量限制的最高可行拆分精度。
-
-        该函数用于 MAIFS 特征选择流程，保持输入校验、计算逻辑和返回结果一致。
+        """Search for the highest feasible split precision under ``max_bits``.
 
         Args:
-            ising_matrix (np.ndarray): 原始 Ising 矩阵。
+            ising_matrix: Original Ising matrix.
 
         Returns:
-            PrecisionSplitPlan: 搜索得到的拆分方案。
+            The best feasible precision-split plan found by the search.
 
         Raises:
-            ValueError: 当原始矩阵规模已经超过 max_bits 时抛出。
-            RuntimeError: 当没有找到可行精度时抛出。
-
+            ValueError: If the original matrix is not square or already exceeds
+                ``max_bits``.
+            RuntimeError: If no feasible precision is found.
         """
         ising_matrix = np.asarray(ising_matrix)
         if ising_matrix.ndim != 2 or ising_matrix.shape[0] != ising_matrix.shape[1]:
@@ -413,19 +356,18 @@ class PrecisionSplitExplorer:
         raise RuntimeError(msg)
 
     def restore_solution(self, solution: np.ndarray, vote: bool = False) -> np.ndarray:
-        """把拆分后问题的解恢复到原始变量空间。
-
-        该函数用于 MAIFS 特征选择流程，保持输入校验、计算逻辑和返回结果一致。
+        """Restore a split-problem solution to the original variable space.
 
         Args:
-            solution (np.ndarray): 拆分后问题的解。
+            solution: Solution vector for the split problem.
+            vote: Whether to use Kaiwu voting restoration when supported.
+
         Returns:
-            np.ndarray: 恢复后的原始变量解。
+            Restored solution over the original variables.
 
         Raises:
-            ValueError: 当尚未执行 search 时抛出。
-            ImportError: 当 Kaiwu 恢复接口不可用时抛出。
-
+            ValueError: If ``search`` has not been called.
+            ImportError: If the Kaiwu restoration helper is unavailable.
         """
         try:
             from kaiwu.preprocess import restore_splitted_solution
@@ -440,13 +382,22 @@ class PrecisionSplitExplorer:
             raise ValueError("search or fit must be called before restoring")
         return restore_split_solution(solution, self.plan.last_var_idx)
 
+
 class QuadraticLinearSolver:  # pylint: disable=too-few-public-methods
-    """定义 q、c 到 Ising 矩阵的转换 Adapter。
-    """
+    """Convert QUBO quadratic and linear terms to an Ising matrix."""
 
     @staticmethod
     def _qubo_matrix_to_ising_matrix(qubo_matrix: np.ndarray) -> np.ndarray:
-        """用本地公式把 QUBO 上三角矩阵转换为带辅助自旋的 Ising 矩阵。
+        """Convert an upper-triangular QUBO matrix to an auxiliary-spin Ising matrix.
+
+        Args:
+            qubo_matrix: Upper-triangular QUBO matrix.
+
+        Returns:
+            Ising matrix with one auxiliary spin appended.
+
+        Raises:
+            ValueError: If ``qubo_matrix`` is not a finite square matrix.
         """
         qubo_matrix = np.asarray(qubo_matrix, dtype=float)
         if qubo_matrix.ndim != 2 or qubo_matrix.shape[0] != qubo_matrix.shape[1]:
@@ -472,12 +423,19 @@ class QuadraticLinearSolver:  # pylint: disable=too-few-public-methods
 
     def solve(
         self,
-        q: np.ndarray,
-        c: np.ndarray,
+        quadratic_matrix: np.ndarray,
+        linear_vector: np.ndarray,
     ) -> np.ndarray:
-        """接收 q、c 并返回转换后的 Ising 矩阵。
+        """Convert QUBO terms to the equivalent Ising matrix.
+
+        Args:
+            quadratic_matrix: QUBO quadratic term.
+            linear_vector: QUBO linear term.
+
+        Returns:
+            Ising matrix with one auxiliary spin appended.
         """
-        qubo_matrix = _qubo_terms_to_matrix(q, c)
+        qubo_matrix = _qubo_terms_to_matrix(quadratic_matrix, linear_vector)
         return self._qubo_matrix_to_ising_matrix(qubo_matrix)
 
 
@@ -486,7 +444,20 @@ def _solve_ising_local_search(
     initial_binary: np.ndarray | None = None,
     max_iter: int = 2000,
 ) -> np.ndarray:
-    """使用本地贪心翻转求解 Ising 矩阵。"""
+    """Solve an Ising matrix with local greedy spin flips.
+
+    Args:
+        ising_matrix: Square Ising matrix with an auxiliary spin.
+        initial_binary: Optional initial binary state for the original QUBO
+            variables.
+        max_iter: Maximum number of greedy-improvement iterations.
+
+    Returns:
+        One or more spin solutions encoded as ``-1`` and ``1`` values.
+
+    Raises:
+        ValueError: If input shapes or values are invalid.
+    """
     if max_iter < 1:
         raise ValueError("max_iter must be a positive integer")
     matrix = np.asarray(ising_matrix, dtype=float)
@@ -506,6 +477,14 @@ def _solve_ising_local_search(
     weights = np.triu(matrix)
 
     def objective(candidate: np.ndarray) -> float:
+        """Evaluate the Ising objective for a candidate spin vector.
+
+        Args:
+            candidate: Candidate spin vector encoded with ``-1`` and ``1``.
+
+        Returns:
+            Ising objective value for ``candidate``.
+        """
         return float(np.sum(weights * np.outer(candidate, candidate)))
 
     current_value = objective(spins)
@@ -537,7 +516,21 @@ def _solve_ising_sa(
     max_iter: int = 2000,
     random_state: int = 0,
 ) -> np.ndarray:
-    """使用普通本地模拟退火求解 Ising 矩阵。"""
+    """Solve an Ising matrix with local simulated annealing.
+
+    Args:
+        ising_matrix: Square Ising matrix with an auxiliary spin.
+        initial_binary: Optional initial binary state for the original QUBO
+            variables.
+        max_iter: Maximum number of annealing steps.
+        random_state: Seed for the NumPy random number generator.
+
+    Returns:
+        One or more spin solutions encoded as ``-1`` and ``1`` values.
+
+    Raises:
+        ValueError: If input shapes or values are invalid.
+    """
     if max_iter < 1:
         raise ValueError("max_iter must be a positive integer")
     rng = np.random.default_rng(int(random_state))
@@ -558,6 +551,14 @@ def _solve_ising_sa(
     weights = np.triu(matrix)
 
     def objective(candidate: np.ndarray) -> float:
+        """Evaluate the Ising objective for a candidate spin vector.
+
+        Args:
+            candidate: Candidate spin vector encoded with ``-1`` and ``1``.
+
+        Returns:
+            Ising objective value for ``candidate``.
+        """
         return float(np.sum(weights * np.outer(candidate, candidate)))
 
     current_value = objective(spins)
@@ -570,7 +571,7 @@ def _solve_ising_sa(
         candidate[index] *= -1
         candidate_value = objective(candidate)
         delta = candidate_value - current_value
-        temperature = max(1e-6, 1.0 * (0.995 ** step))
+        temperature = max(1e-6, 1.0 * (0.995**step))
 
         if delta <= 0.0 or rng.random() < float(np.exp(-delta / temperature)):
             spins = candidate
@@ -595,7 +596,28 @@ def _solve_ising_kaiwu_cim(
     task_mode: Any = "sample",
     interval: int | None = None,
 ) -> np.ndarray:
-    """精度拆分 Ising 矩阵后直接调用 Kaiwu CIMOptimizer。"""
+    """Split Ising precision and solve directly with Kaiwu CIMOptimizer.
+
+    Args:
+        ising_matrix: Ising matrix to submit after precision splitting.
+        target_precision: Target precision for the split Ising matrix.
+        max_bits: Maximum allowed split variable count.
+        max_precision: Maximum source precision to test.
+        precision_step: Coarse-search precision step.
+        sample_number: Number of solutions requested from Kaiwu CIM.
+        save_dir: Optional directory used by Kaiwu checkpoint records.
+        cleanup_records: Whether to delete generated checkpoint records.
+        project_no: Optional Kaiwu project number.
+        task_mode: Kaiwu CIM task mode.
+        interval: Optional Kaiwu polling interval.
+
+    Returns:
+        Restored spin solutions over the original variables.
+
+    Raises:
+        ImportError: If the optional Kaiwu package is unavailable.
+        RuntimeError: If Kaiwu CIM does not return a solution.
+    """
     try:
         import kaiwu as kw
     except ImportError as exc:
@@ -610,7 +632,6 @@ def _solve_ising_kaiwu_cim(
         precision_step=precision_step,
     )
     plan = explorer.search(ising_matrix)
-    _init_kaiwu_license_from_env()
 
     submit_matrix = np.asarray(np.round(plan.split_matrix), dtype=int)
     resolved_save_dir = Path(
@@ -657,54 +678,121 @@ def _solve_ising_kaiwu_cim(
                         pass
 
 
-def qubo_objective(s: np.ndarray, q: np.ndarray, c: np.ndarray) -> float:
-    """计算二进制 QUBO 目标函数值。
+def qubo_objective(
+    binary_state: np.ndarray,
+    quadratic_matrix: np.ndarray,
+    linear_vector: np.ndarray,
+) -> float:
+    """Compute a binary QUBO objective value.
+
+    Args:
+        binary_state: Binary candidate vector.
+        quadratic_matrix: QUBO quadratic term.
+        linear_vector: QUBO linear term.
+
+    Returns:
+        Objective value computed from the binary state, quadratic matrix, and
+        linear vector.
     """
-    return float(0.5 * s @ q @ s + c @ s)
+    return float(
+        0.5 * binary_state @ quadratic_matrix @ binary_state
+        + linear_vector @ binary_state
+    )
 
 
-def _qubo_terms_to_matrix(q: np.ndarray, c: np.ndarray) -> np.ndarray:
-    """把 QUBO 二次项和一次项转换为上三角矩阵形式。
+def _qubo_terms_to_matrix(
+    quadratic_matrix: np.ndarray,
+    linear_vector: np.ndarray,
+) -> np.ndarray:
+    """Convert QUBO quadratic and linear terms to upper-triangular form.
+
+    Args:
+        quadratic_matrix: QUBO quadratic term.
+        linear_vector: QUBO linear term.
+
+    Returns:
+        Upper-triangular QUBO matrix.
+
+    Raises:
+        ValueError: If terms have incompatible shapes or non-finite values.
     """
-    q = np.asarray(q, dtype=float)
-    c = np.asarray(c, dtype=float)
-    if q.ndim != 2 or q.shape[0] != q.shape[1]:
-        raise ValueError("q must be a square matrix")
-    if c.ndim != 1 or c.shape[0] != q.shape[0]:
-        raise ValueError("c must be a vector with length matching q")
-    if not np.all(np.isfinite(q)) or not np.all(np.isfinite(c)):
-        raise ValueError("q and c must contain only finite values")
+    quadratic_matrix = np.asarray(quadratic_matrix, dtype=float)
+    linear_vector = np.asarray(linear_vector, dtype=float)
+    if quadratic_matrix.ndim != 2 or (
+        quadratic_matrix.shape[0] != quadratic_matrix.shape[1]
+    ):
+        raise ValueError("quadratic_matrix must be a square matrix")
+    if (
+        linear_vector.ndim != 1
+        or linear_vector.shape[0] != quadratic_matrix.shape[0]
+    ):
+        raise ValueError(
+            "linear_vector must be a vector with length matching quadratic_matrix"
+        )
+    if not np.all(np.isfinite(quadratic_matrix)) or not np.all(
+        np.isfinite(linear_vector)
+    ):
+        raise ValueError(
+            "quadratic_matrix and linear_vector must contain only finite values"
+        )
 
-    hessian = 0.5 * (q + q.T)
-    qubo_matrix = np.triu(hessian, 1)
-    np.fill_diagonal(qubo_matrix, c + 0.5 * np.diag(hessian))
+    symmetric_quadratic = 0.5 * (quadratic_matrix + quadratic_matrix.T)
+    qubo_matrix = np.triu(symmetric_quadratic, 1)
+    np.fill_diagonal(
+        qubo_matrix,
+        linear_vector + 0.5 * np.diag(symmetric_quadratic),
+    )
     return qubo_matrix
 
 
 def solve_qubo(
-    q: np.ndarray,
-    c: np.ndarray,
-    s0: np.ndarray,
+    quadratic_matrix: np.ndarray,
+    linear_vector: np.ndarray,
+    initial_state: np.ndarray,
     solver: str = "local_search",
     **solver_kwargs: object,
 ) -> np.ndarray:
     # pylint: disable=too-many-branches,too-many-statements
-    """校验 QUBO 输入并使用指定内置求解器求解。
+    """Validate QUBO inputs and solve them with a built-in solver.
+
+    Args:
+        quadratic_matrix: QUBO quadratic term.
+        linear_vector: QUBO linear term.
+        initial_state: Initial binary state used by local solvers.
+        solver: Built-in solver name. Supported values are listed in
+            ``AVAILABLE_SOLVERS``.
+        **solver_kwargs: Solver-specific keyword arguments.
+
+    Returns:
+        Best binary state found by the selected solver.
+
+    Raises:
+        ValueError: If inputs or the solver name are invalid.
+        ImportError: If ``solver="kaiwu_cim"`` is requested without Kaiwu.
+        RuntimeError: If solver execution fails or returns an invalid solution.
     """
-    q = np.asarray(q, dtype=float)
-    c = np.asarray(c, dtype=float)
-    s0 = np.asarray(s0, dtype=int)
-    if q.ndim != 2 or q.shape[0] != q.shape[1]:
-        raise ValueError("q must be a square matrix")
-    if c.shape != (q.shape[0],):
-        raise ValueError("c must have one entry per QUBO variable")
-    if s0.shape != c.shape:
-        raise ValueError("s0 must have the same shape as c")
-    if not np.all(np.isfinite(q)) or not np.all(np.isfinite(c)):
-        raise ValueError("q and c must contain only finite values")
-    if not np.all((s0 == 0) | (s0 == 1)):
-        raise ValueError("s0 must contain only binary 0/1 values")
-    q = 0.5 * (q + q.T)
+    quadratic_matrix = np.asarray(quadratic_matrix, dtype=float)
+    linear_vector = np.asarray(linear_vector, dtype=float)
+    initial_state = np.asarray(initial_state, dtype=int)
+    if quadratic_matrix.ndim != 2 or (
+        quadratic_matrix.shape[0] != quadratic_matrix.shape[1]
+    ):
+        raise ValueError("quadratic_matrix must be a square matrix")
+    if linear_vector.shape != (quadratic_matrix.shape[0],):
+        raise ValueError(
+            "linear_vector must have one entry per QUBO variable"
+        )
+    if initial_state.shape != linear_vector.shape:
+        raise ValueError("initial_state must have the same shape as linear_vector")
+    if not np.all(np.isfinite(quadratic_matrix)) or not np.all(
+        np.isfinite(linear_vector)
+    ):
+        raise ValueError(
+            "quadratic_matrix and linear_vector must contain only finite values"
+        )
+    if not np.all((initial_state == 0) | (initial_state == 1)):
+        raise ValueError("initial_state must contain only binary 0/1 values")
+    quadratic_matrix = 0.5 * (quadratic_matrix + quadratic_matrix.T)
 
     solver_name = str(solver)
     if solver_name not in AVAILABLE_SOLVERS:
@@ -714,18 +802,21 @@ def solve_qubo(
         )
 
     try:
-        ising_matrix = QuadraticLinearSolver().solve(q, c)
+        ising_matrix = QuadraticLinearSolver().solve(
+            quadratic_matrix,
+            linear_vector,
+        )
 
         if solver_name == "local_search":
             spin_solutions = _solve_ising_local_search(
                 ising_matrix,
-                initial_binary=s0,
+                initial_binary=initial_state,
                 max_iter=int(solver_kwargs.get("max_iter", 2000)),
             )
         elif solver_name == "sa":
             spin_solutions = _solve_ising_sa(
                 ising_matrix,
-                initial_binary=s0,
+                initial_binary=initial_state,
                 max_iter=int(solver_kwargs.get("max_iter", 2000)),
                 random_state=int(solver_kwargs.get("random_state", 0)),
             )
@@ -760,29 +851,32 @@ def solve_qubo(
     except Exception as exc:
         raise RuntimeError(
             f"MAIFS solver '{solver_name}' failed. "
-            f"Problem shape: q={q.shape}, c={c.shape}. "
+            f"Problem shape: quadratic_matrix={quadratic_matrix.shape}, "
+            f"linear_vector={linear_vector.shape}. "
             f"Original error: {type(exc).__name__}: {exc}"
         ) from exc
 
-    result = s0.copy()
+    result = initial_state.copy()
     best_value = float("inf")
     spin_array = np.asarray(spin_solutions)
     if spin_array.ndim == 1:
         spin_array = spin_array.reshape(1, -1)
     for spin_solution in spin_array:
         spin_solution = np.asarray(spin_solution, dtype=float)
-        if spin_solution.shape != (c.shape[0] + 1,):
+        if spin_solution.shape != (linear_vector.shape[0] + 1,):
             raise RuntimeError("spin solution must contain one auxiliary spin")
         if not np.all((spin_solution == -1) | (spin_solution == 1)):
             raise RuntimeError("spin solution must contain only -1/1 values")
         binary = np.rint((spin_solution[:-1] * spin_solution[-1] + 1.0) / 2.0)
         binary = binary.astype(int)
-        value = qubo_objective(binary, q, c)
+        value = qubo_objective(binary, quadratic_matrix, linear_vector)
         if value < best_value:
             best_value = value
             result = binary
 
     result = np.asarray(result, dtype=int)
-    if result.shape != c.shape or not np.all((result == 0) | (result == 1)):
-        raise RuntimeError("MAIFS solver must return a binary vector matching c.")
+    if result.shape != linear_vector.shape or not np.all((result == 0) | (result == 1)):
+        raise RuntimeError(
+            "MAIFS solver must return a binary vector matching linear_vector."
+        )
     return result

@@ -83,7 +83,7 @@ def test_fit_weights_updates_mask_with_solver_kwargs(monkeypatch) -> None:
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.SGD(selector.model.parameters(), lr=0.01)
 
-    mean_loss = selector.fit_weights(loader, loss_fn, optimizer, epochs=1)
+    mean_loss = selector.fit_weights(loader, loss_fn, optimizer, train_epochs=1)
 
     assert isinstance(mean_loss, float)
     assert len(calls) == 1
