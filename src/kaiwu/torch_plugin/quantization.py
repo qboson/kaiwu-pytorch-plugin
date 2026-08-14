@@ -12,12 +12,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
 
-import kaiwu as kw
 import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as torch_functional
 
+import kaiwu as kw
 
 @dataclass
 class _Problem:
