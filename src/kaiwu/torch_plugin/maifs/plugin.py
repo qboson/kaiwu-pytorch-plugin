@@ -49,14 +49,15 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
-    
+
     Returns:
-        FeatureSelectionWrapper: 初始化后的 PyTorch 特征选择包装器实例。
+        FeatureSelectionWrapper: Initialized PyTorch feature-selection wrapper.
 
     Raises:
-        TypeError: 当 model 不是 nn.Module 时抛出。
-        ValueError: 当特征数量、特征数量约束或求解器名称不合法时抛出。
-        
+        TypeError: If ``model`` is not an ``nn.Module``.
+        ValueError: If feature counts, feature-count bounds, or solver names are
+            invalid.
+
     Examples:
         >>> import torch
         >>> from torch import nn
@@ -92,7 +93,6 @@ class FeatureSelectionWrapper(nn.Module):
         input_feature_axis: int = -1,
         solver_kwargs: dict[str, object] | None = None,
     ) -> None:
-        
         super().__init__()
         explicit_min = min_selected_features is not None
         feature_dim = int(feature_dim)
