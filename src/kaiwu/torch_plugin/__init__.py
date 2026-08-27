@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Kaiwu-PyTorch-Plugin public API."""
-
+from .quantization import quantization
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine
 from .qdiffusion import EnergyModel, QDiffusion, QDiffusionConfig
@@ -23,6 +23,7 @@ __all__ = [
     "QDiffusion",
     "QDiffusionConfig",
     "enable_usage_stats",
+    "quantization",
     "disable_usage_stats",
     "is_usage_stats_enabled",
 ]
