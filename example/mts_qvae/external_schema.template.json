@@ -1,0 +1,7 @@
+{
+  "id_col": "ID",
+  "category_col": "Prediction",
+  "score_col": null,
+  "extra_cols": [],
+  "notes": "Fill these based on the actual offline tool output columns. This repo intentionally does not hardcode DeepLoc2/TargetP2 formats without official docs to avoid hallucinating."
+}
