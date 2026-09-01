@@ -1,4 +1,4 @@
-"""Regression tests for KPP-001: AbstractBoltzmannMachine.to() contract compliance."""
+"""Regression tests for AbstractBoltzmannMachine.to() contract compliance."""
 import unittest
 import torch
 import sys
