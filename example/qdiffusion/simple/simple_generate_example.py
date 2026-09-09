@@ -19,6 +19,8 @@ from pathlib import Path
 
 import torch
 
+from kaiwu.torch_plugin import QDiffusion
+
 from example.qdiffusion.dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and sequence helpers.
@@ -81,7 +83,7 @@ def first_usable_sequence(
     raise ValueError("No usable sequence found in FASTA.")
 
 
-def decode_tokens(generator, tokens: torch.Tensor) -> str:
+def decode_tokens(generator: QDiffusion, tokens: torch.Tensor) -> str:
     """Decodes one generated token tensor into sequence text.
 
     Args:

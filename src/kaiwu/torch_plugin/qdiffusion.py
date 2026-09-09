@@ -52,27 +52,17 @@ class QDiffusionConfig:
     """Configuration for energy-guided discrete generation.
 
     Attributes:
-
         num_diffusion_timesteps: Number of discrete noising steps used by the
             training objective.
-
         use_coupled_sampling: Whether to use the coupled corruption variant.
-
         num_candidates: Number of proposal candidates sampled at each decode step.
-
         proposal_temperature: Temperature used for proposal-side sampling.
-
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
-
         energy_temperature: Temperature used when converting energies into
             reranking weights.
-
         disable_resample: Whether to disable repetition-collapse resampling.
-
         resample_ratio: Frequency threshold that triggers resampling.
-
         resample_top_p: Top-p cutoff used during resampling.
-
         decoding_strategy: Skeptical-remasking strategy string.
     """
 
@@ -102,10 +92,8 @@ class EnergyModel(nn.Module):
         Args:
             bm_num_visible: Number of BM visible units; ``None`` for models
                 without an internal BM.
-
             bm_num_hidden: Number of BM hidden units; ``None`` disables BM
                 construction.
-
             sampler: Kaiwu sampler used to draw BM hidden states.
         """
         super().__init__()
@@ -126,9 +114,7 @@ class EnergyModel(nn.Module):
 
         Args:
             noisy_tokens: Noisy conditioning token ids.
-
             candidate_tokens: Candidate token ids to score.
-
             attention_mask: Padding mask over token positions.
 
         Returns:
@@ -150,9 +136,7 @@ class EnergyModel(nn.Module):
 
         Args:
             noisy_tokens: Noisy conditioning token ids.
-
             candidate_tokens: Candidate token ids to score.
-
             attention_mask: Padding mask over token positions.
 
         Returns:
@@ -226,7 +210,6 @@ class EnergyModel(nn.Module):
 
         Args:
             visible_state: Visible states drawn during the last pass.
-
             hidden_state: Hidden states sampled during the last pass.
         """
         self._last_stats = {
@@ -261,7 +244,6 @@ class EnergyModel(nn.Module):
         Args:
             visible_logits: Visible-unit logits shaped
                 ``[batch, num_visible]``.
-
             num_lowest: When set, averages only that many lowest-energy
                 solutions per row instead of all of them.
 
@@ -297,7 +279,6 @@ class EnergyModel(nn.Module):
 
 class QDiffusion(nn.Module):
     """Energy-guided discrete diffusion wrapper over generic sequence backbones.
-    Initializes a QDiffusion model.
 
     The class combines two backbone roles:
 
@@ -306,22 +287,8 @@ class QDiffusion(nn.Module):
 
     It exposes both training-oriented APIs such as ``objective`` and
     decoding-oriented APIs such as ``initialize_state``, ``step``, and
-    ``generate``.
-
-    Args:
-        proposal_model: Backbone used to predict proposal logits.
-
-        energy_model: Energy-side model used to encode and score candidates.
-
-        token_spec: Special-token metadata required by the generator.
-
-        config: Optional generation/training configuration.
-
-        dtype: Floating point dtype tracked by the wrapper.
-
-        device: Optional target device. When omitted, infer from parameters.
-
-        freeze_proposal: Whether to freeze proposal model parameters.
+    ``generate``. Constructor parameters and instance attributes are
+    documented on ``__init__``.
     """
 
     def __init__(
@@ -339,36 +306,24 @@ class QDiffusion(nn.Module):
         Args:
             proposal_model: Proposal backbone producing candidate logits;
                 frozen by default.
-
             energy_model: Energy-side scorer used for candidate reranking.
-
             token_spec: Token metadata carrying the tokenizer and
                 special-token ids.
-
             config: Generation/training configuration; defaults apply when
                 omitted.
-
             dtype: Floating dtype applied when a device move is requested.
-
             device: Device to place parameters on; ``None`` keeps the
                 current placement.
-
             freeze_proposal: Whether to freeze proposal parameters and keep
                 the proposal in eval mode.
 
         Attributes:
             tokenizer: Shortcut to ``token_spec.tokenizer``.
-
             mask_id: Mask token id from the spec.
-
             pad_id: Padding token id from the spec.
-
             bos_id: Beginning-of-sequence token id from the spec.
-
             eos_id: End-of-sequence token id from the spec.
-
             x_id: Unknown-token id from the spec.
-
             device: Resolved device of the module parameters.
         """
         super().__init__()
@@ -444,7 +399,6 @@ class QDiffusion(nn.Module):
 
         Returns:
             torch.Tensor: Proposal logits over the token vocabulary.
-
         """
         return self.proposal_model(noisy_tokens, **kwargs)
 
@@ -458,9 +412,7 @@ class QDiffusion(nn.Module):
 
         Args:
             noisy_tokens: Noisy token tensor used as conditioning input.
-
             candidate_tokens: Candidate clean token tensor to score.
-
             attention_mask: Optional attention mask for the energy model.
 
         Returns:

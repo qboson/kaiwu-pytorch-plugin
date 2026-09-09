@@ -16,7 +16,26 @@ VALID_SPLITS = {"train", "val"}
 
 @dataclass(frozen=True)
 class OutcomePair:
-    """A correct/wrong candidate pair captured at one identical proposal state."""
+    """A correct/wrong candidate pair captured at one identical proposal state.
+
+    Attributes:
+        problem_id: Identifier of the source problem.
+        split: Dataset split the problem belongs to, ``train`` or ``val``.
+        block_index: Diffusion block the state was captured in.
+        step_index: Decode step within the block.
+        state_hash: SHA-256 hash identifying the shared proposal state.
+        noisy_tokens: Noisy token ids of the captured state.
+        hidden_states: Frozen proposal hidden states of the captured state.
+        noisy_features: Token features of the noisy block.
+        positive_tokens: Candidate tokens judged correct.
+        negative_tokens: Candidate tokens judged wrong.
+        positive_candidate_features: Token features of ``positive_tokens``.
+        negative_candidate_features: Token features of ``negative_tokens``.
+        transfer_mask: Boolean mask of transfer positions in the candidates.
+        positive_logprob: Proposal log-probability of the positive candidate.
+        negative_logprob: Proposal log-probability of the negative candidate.
+        negative_kind: Strategy used to pick the negative candidate.
+    """
 
     problem_id: str
     split: str
@@ -36,7 +55,11 @@ class OutcomePair:
     negative_kind: str = "rollout_hard"
 
     def to_dict(self) -> dict[str, Any]:
-        """Returns the dictionary form persisted in pair artifacts."""
+        """Returns the dictionary form persisted in pair artifacts.
+
+        Returns:
+            Dict holding the schema version plus every field of this pair.
+        """
         return {"schema_version": PAIR_SCHEMA_VERSION, **asdict(self)}
 
 
@@ -66,13 +89,11 @@ def validate_pair(record: dict[str, Any], *, index: int | None = None) -> None:
 
     Args:
         record: Candidate pair record loaded from an artifact.
-
         index: Optional artifact position used in error messages.
 
     Raises:
         ValueError: If required fields, the schema version, the split, the
             state hash, or tensor shapes/dtypes are invalid.
-
         TypeError: If tensor fields are not ``torch.Tensor`` values.
     """
     label = f"pair {index}" if index is not None else "pair"
@@ -180,7 +201,6 @@ def load_pairs(path: str | Path) -> list[dict[str, Any]]:
 
     Raises:
         ValueError: If the artifact is empty or fails pair validation.
-
         TypeError: If a record is not a dictionary.
     """
     records = torch.load(path, map_location="cpu", weights_only=True)
@@ -199,7 +219,6 @@ def save_pairs(path: str | Path, records: Iterable[dict[str, Any]]) -> None:
 
     Args:
         path: Destination artifact path.
-
         records: Pair records to persist.
 
     Raises:

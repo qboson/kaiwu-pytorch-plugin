@@ -15,7 +15,15 @@ from math_verify import (
 
 
 def last_boxed_content(text: str) -> str | None:
-    """Extract the last ``\\boxed{...}``, including nested LaTeX braces."""
+    """Extract the last ``\\boxed{...}``, including nested LaTeX braces.
+
+    Args:
+        text: Model output text to scan.
+
+    Returns:
+        Content of the last complete ``\\boxed{...}`` group with surrounding
+        whitespace stripped, or ``None`` when no complete group exists.
+    """
     marker = r"\boxed{"
     start = 0
     matches: list[str] = []
@@ -41,11 +49,26 @@ def last_boxed_content(text: str) -> str | None:
 
 
 def require_math_verify() -> str:
-    """Fail before a run if the authoritative scorer is unavailable."""
+    """Fail before a run if the authoritative scorer is unavailable.
+
+    Returns:
+        Installed ``math-verify`` distribution version string.
+
+    Raises:
+        PackageNotFoundError: If ``math-verify`` is not installed.
+    """
     return version("math-verify")
 
 
 def _additional_math_verify_normalize(value: str) -> str:
+    """Strips percent signs and trailing periods from a plain answer.
+
+    Args:
+        value: Raw answer text.
+
+    Returns:
+        Normalized answer used before the exact-match fallback.
+    """
     percentage = re.fullmatch(r"(\d+\.?\d*)(?:\\%|%)", value)
     if percentage:
         value = percentage.group(1)
@@ -53,7 +76,15 @@ def _additional_math_verify_normalize(value: str) -> str:
 
 
 def math_equivalent(prediction_text: str, gold_answer: str) -> bool:
-    """Judge the final boxed answer with NeMo-compatible math verification."""
+    """Judge the final boxed answer with NeMo-compatible math verification.
+
+    Args:
+        prediction_text: Full model output containing a ``\\boxed{}`` answer.
+        gold_answer: Reference answer, either an option letter or LaTeX.
+
+    Returns:
+        ``True`` when the predicted boxed answer matches ``gold_answer``.
+    """
     predicted_answer = last_boxed_content(prediction_text)
     if predicted_answer is None:
         return False

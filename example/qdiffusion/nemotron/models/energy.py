@@ -91,8 +91,9 @@ class ContextualEnergyModel(EnergyModel):
         if invalid:
             raise ValueError(f"hyperparameters must be positive, got: {invalid}")
         if contextual_dim % contextual_heads:
-            # MultiheadAttention 仅在此处抛 AssertionError,且 python -O 下
-            # assert 会被剥离,提前以 ValueError 报出保持错误类型一致。
+            # MultiheadAttention only raises AssertionError here, and
+            # ``python -O`` strips asserts; raising ValueError up front keeps
+            # the error type consistent.
             raise ValueError(
                 "contextual_dim must be divisible by contextual_heads"
             )

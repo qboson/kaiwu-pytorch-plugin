@@ -89,7 +89,6 @@ def to_device(batch: dict[str, Any], device: torch.device) -> dict[str, Any]:
 
     Args:
         batch: Batch produced by ``collate_pairs``.
-
         device: Target torch device.
 
     Returns:
@@ -111,7 +110,6 @@ def score_pair_batch(
 
     Args:
         model: Contextual energy model used for scoring.
-
         batch: Batch produced by ``collate_pairs``.
 
     Returns:
@@ -144,7 +142,23 @@ def pair_loss(
     margin: float = 0.5,
     nce_weight: float = 0.01,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Outcome-pairwise margin loss plus a small energy-scale NCE regularizer."""
+    """Outcome-pairwise margin loss plus a small energy-scale NCE regularizer.
+
+    Args:
+        positive_energy: Positive-pair energies shaped ``[batch, 1]``.
+        negative_energy: Negative-pair energies shaped ``[batch, 1]``.
+        margin: Minimum energy gap enforced between negatives and positives.
+        nce_weight: Weight of the softplus NCE term that keeps energy
+            magnitudes finite.
+
+    Returns:
+        Tuple ``(loss, ranking, nce)`` with the combined loss and its two
+        unweighted components.
+
+    Raises:
+        ValueError: If ``margin`` is not positive or ``nce_weight`` is
+            negative.
+    """
 
     if margin <= 0 or nce_weight < 0:
         raise ValueError("margin must be positive and nce_weight non-negative")
@@ -164,9 +178,7 @@ def evaluate_rows(
 
     Args:
         model: Contextual energy model; switched to eval mode by this call.
-
         loader: DataLoader yielding collated pair batches.
-
         device: Device used for scoring.
 
     Returns:
@@ -231,9 +243,7 @@ def summarize_rows(
 
     Args:
         rows: Per-pair rows produced by ``evaluate_rows``.
-
         normalization: Energy mean/std from ``energy_normalization``.
-
         energy_lambda: Residual weight applied to the normalized energy gap.
 
     Returns:
@@ -325,6 +335,15 @@ def parse_args() -> argparse.Namespace:
 
 
 def _git_revision(path: Path) -> str | None:
+    """Returns the HEAD revision of the repository containing ``path``.
+
+    Args:
+        path: Path inside the repository to query.
+
+    Returns:
+        Full commit hash, or ``None`` when git is unavailable or the path
+        is not inside a repository.
+    """
     result = subprocess.run(
         ["git", "-C", str(path), "rev-parse", "HEAD"],
         check=False,
@@ -337,6 +356,17 @@ def _git_revision(path: Path) -> str | None:
 def _compatibility_config(
     args: argparse.Namespace, first: dict[str, Any]
 ) -> dict[str, Any]:
+    """Builds the compatibility metadata persisted with checkpoints.
+
+    Args:
+        args: Parsed CLI options.
+
+        first: First pair record, used to derive feature dimensions.
+
+    Returns:
+        Dict describing schema, artifact identity, architecture, and
+        optimization settings for resume compatibility checks.
+    """
     return {
         "pair_schema_version": PAIR_SCHEMA_VERSION,
         "pair_artifact": file_identity(args.pairs),
@@ -367,6 +397,21 @@ def _build_loaders(
     args: argparse.Namespace,
     generator: torch.Generator,
 ) -> dict[str, DataLoader[dict[str, Any]]]:
+    """Builds one loader per problem-grouped split.
+
+    Args:
+        records: Validated pair records.
+
+        args: Parsed CLI options supplying the batch size.
+
+        generator: Random generator driving training-set shuffling.
+
+    Returns:
+        Mapping from split name to its ``DataLoader``.
+
+    Raises:
+        ValueError: If the train or val split is empty.
+    """
     by_split = {
         split: [row for row in records if row["split"] == split]
         for split in ("train", "val")
@@ -394,6 +439,22 @@ def _train_epoch(
     device: torch.device,
     args: argparse.Namespace,
 ) -> dict[str, float]:
+    """Runs one optimization epoch over the training loader.
+
+    Args:
+        model: Contextual energy model trained in place.
+
+        loader: Training loader of pair batches.
+
+        optimizer: Optimizer stepped after each batch.
+
+        device: Device batches are moved to.
+
+        args: Parsed CLI options supplying loss and clipping settings.
+
+    Returns:
+        Dict with pair-count-weighted loss components and ranking accuracy.
+    """
     model.train()
     totals = {key: 0.0 for key in ("loss", "ranking_loss", "nce_loss", "wins")}
     count = 0

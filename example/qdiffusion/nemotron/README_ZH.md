@@ -154,7 +154,7 @@ python -m example.qdiffusion.nemotron.evaluate \
   --output-dir /path/to/eval_output \
   --device cuda:0 \
   --strategies native bm \
-  --K 4 \
+  --num-candidates 4 \
   --energy-lambda 2.0 \
   --max-new-tokens 8192
 ```

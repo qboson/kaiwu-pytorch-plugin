@@ -43,6 +43,7 @@
 |---|---|
 | `requirements.txt` | 本目录运行依赖(`math-verify` 等) |
 | `CHANGES.md` | 本文档 |
+| `QDIFFUSION_ARCH_REVIEW.md` | 一次性架构评审工作记录(约定全部条目处理完毕后删除) |
 
 ## 二、本分支对既有文件的改动
 
@@ -76,3 +77,27 @@
 - `example/qdiffusion/README.md` / `README_ZH.md`:入口唯一化说明、`pip install -e .` 前置要求、`python -m` 调用约定
 - `example/qdiffusion/requirements.txt`:新增 `fair-esm>=2.0`(ESM2 距离评估的可选依赖)
 - 仓库根 `.gitignore`:吸收本目录本地产物模式(`data/`、`runs/`、`checkpoints/`、`*.pt`、`*.jsonl`),子目录不再维护独立 `.gitignore`
+
+## 三、2026-09-07 架构评审批次(已评审,未提交)
+
+本批次由 `QDIFFUSION_ARCH_REVIEW.md` 的评审驱动,共 13 文件 +605/−131。
+**性质:文档/命名/风格/一致性维护,无算法行为变更**(但含一处破坏性 CLI 变更,见下)。
+评审时修复了批次引入的一处 `train.py:166` 不换行空格(U+00A0)导致的 SyntaxError。
+
+### 逐文件说明
+
+| 文件 | 改动 |
+|---|---|
+| `common/{answers,pairs,runtime}.py` | 全量补齐 Google 风格 docstring(Args/Returns/Raises),与实现逐条核对一致(含 `read_jsonl` 的 key 校验与空数据集 `ValueError` 声称);`OutcomePair` 补全 15 字段的 `Attributes:` |
+| `train.py` / `evaluate.py` / `prepare_pairs.py` | 同上,并为 `_partial_store`/`_append_item`/`ranked_branch_points` 等 resume/hook 方法补齐含 `Raises:` 的完整文档 |
+| `generation/candidates.py` | **`K` → `num_candidates` 全链路重命名**(解决 pylint C0103);docstring 补全 |
+| `evaluate.py` | **破坏性 CLI 变更:`--K` → `--num-candidates`**;resume 指纹字段 `"K"` → `"num_candidates"`——**旧 partial 文件续跑会报 fingerprint mismatch,需重跑或手工迁移 meta**;docstring 补全 |
+| `models/energy.py` | 整除校验注释中译英(语义不变) |
+| `README.md` | 英文版补全完整用法(方法边界/依赖/pair schema/三步流程/Notes),消除此前"EN 只有概述"的中英不对称 |
+| `simple_generate_example.py` | `decode_tokens` 增加 `QDiffusion` 类型标注(为标注导入该类) |
+| `pylintrc` | 注释中译英;补文件末尾换行 |
+| `src/.../qdiffusion.py` | docstring 风格收紧:Args 条目间去空行(更贴近 Google 官方紧凑式),类 docstring 措辞调整;**无功能变更** |
+
+### 待决事项(本批次仅记录、未实施)
+
+- 评审 H1:`QDiffusion.energy()` 门面无上下文通道,与 2026-09-02 B 方案(门面条件转发)存在决策漂移;文档建议门面加 `**context` 转发(基类保持三参)。**注意:此方向涉及 kwargs 使用与既有决策,尚待拍板**;本批次未做任何功能性改动,`guidance.py` 仍直达模型调用。

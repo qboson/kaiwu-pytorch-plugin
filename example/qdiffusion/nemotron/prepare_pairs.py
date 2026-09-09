@@ -36,7 +36,22 @@ from .generation.proposal import NativeGenerationSession, ProposalDecision, Prop
 
 @dataclass(frozen=True)
 class CapturedCandidateStep:
-    """CPU snapshot of one native proposal opportunity and its candidates."""
+    """CPU snapshot of one native proposal opportunity and its candidates.
+
+    Attributes:
+        block_index: Diffusion block the opportunity belongs to.
+        step_index: Decode step within the block.
+        nfe: Native function-evaluation counter at capture time.
+        noisy_tokens: Noisy block tokens at the native decision point.
+        candidates: Candidate token blocks; row ``0`` is the native decision.
+        transfer_index: Boolean mask of transfer positions in the native
+            decision.
+        proposal_scores: Per-candidate proposal scores normalized by the
+            transfer count; row ``0`` is the native decision.
+        diversity_stats: Counters describing candidate diversity filtering.
+        state_hash: SHA-256 hash of the noisy sequence identifying the state.
+        hidden_states: Optional frozen proposal hidden states for the state.
+    """
 
     block_index: int
     step_index: int
@@ -55,7 +70,11 @@ class CapturedCandidateStep:
 
         Larger values mean the native choice was clearly better than every
         recorded alternative; smaller values mark more ambiguous branch
-        points. ``inf`` when fewer than two candidates were recorded.
+        points.
+
+        Returns:
+            Gap between the native score and the best recorded alternative;
+            ``inf`` when fewer than two candidates were recorded.
         """
         if self.proposal_scores.numel() < 2:
             return float("inf")
@@ -63,7 +82,16 @@ class CapturedCandidateStep:
 
 
 class CandidateTraceHook:
-    """Preserve Native decisions while recording real rerank candidates."""
+    """Preserve Native decisions while recording real rerank candidates.
+
+    Args:
+        num_candidates: Number of candidates recorded per opportunity; the
+            native decision plus at least one alternative.
+        proposal_temperature: Temperature for alternative-token sampling.
+        proposal_noise_scale: Gumbel-noise scale for alternative sampling.
+        capture_hidden_states: Whether to also capture frozen proposal
+            hidden states for every recorded step.
+    """
 
     def __init__(
         self,
@@ -86,6 +114,11 @@ class CandidateTraceHook:
 
     @torch.no_grad()
     def __call__(self, step: ProposalStep) -> None:
+        """Records one proposal opportunity and its rerank candidates.
+
+        Args:
+            step: Native proposal step to observe.
+        """
         hidden_states = step.hidden_states
         if self.capture_hidden_states and hidden_states is None:
             raise RuntimeError(
@@ -127,7 +160,19 @@ class CandidateTraceHook:
         )
 
     def ranked_branch_points(self, limit: int) -> list[CapturedCandidateStep]:
-        """Return the most ambiguous point per block, then rank globally."""
+        """Return the most ambiguous point per block, then rank globally.
+
+        Args:
+            limit: Maximum number of branch points to return.
+
+        Returns:
+            The smallest-penalty captured step of every block, sorted by
+            ascending ``best_alternative_penalty`` and truncated to
+            ``limit`` entries.
+
+        Raises:
+            ValueError: If ``limit`` is not positive.
+        """
 
         if limit <= 0:
             raise ValueError("branch-point limit must be positive")
@@ -150,7 +195,12 @@ class CandidateTraceHook:
 
 
 class ForcedCandidateHook:
-    """Replay Native until one captured point, then force one candidate."""
+    """Replay Native until one captured point, then force one candidate.
+
+    Args:
+        captured_step: Previously captured step to replay until.
+        candidate_index: Non-native candidate row to force, ``1`` or higher.
+    """
 
     def __init__(
         self,
@@ -165,6 +215,19 @@ class ForcedCandidateHook:
 
     @torch.no_grad()
     def __call__(self, step: ProposalStep) -> ProposalDecision | None:
+        """Returns the forced decision at the captured point, else ``None``.
+
+        Args:
+            step: Native proposal step from the replay.
+
+        Returns:
+            Decision forcing the recorded candidate at the captured point,
+            or ``None`` while the replay has not reached it yet.
+
+        Raises:
+            RuntimeError: If the captured point is reached twice, or the
+                native replay diverges before reaching it.
+        """
         target = self.captured_step
         if (step.block_index, step.step_index, step.nfe) != (
             target.block_index,
@@ -230,6 +293,18 @@ def parse_args() -> argparse.Namespace:
 
 
 def _problem_id(index: int, row: dict[str, Any]) -> str:
+    """Builds the stable identifier used for one dataset row.
+
+    Args:
+        index: Row position in the dataset.
+
+        row: Dataset row holding an optional ``problem_id``.
+
+    Returns:
+        The explicit ``problem_id`` when present, otherwise a
+        ``private:<index>:<digest>`` identifier derived from the problem
+        text.
+    """
     if row.get("problem_id"):
         return str(row["problem_id"])
     digest = hashlib.sha256(str(row["problem"]).encode()).hexdigest()[:16]
@@ -237,6 +312,14 @@ def _problem_id(index: int, row: dict[str, Any]) -> str:
 
 
 def _rendered_config(args: argparse.Namespace) -> dict[str, Any]:
+    """Renders the resume configuration for one collector run.
+
+    Args:
+        args: Parsed CLI options.
+
+    Returns:
+        Dict capturing every setting that must stay stable across resumes.
+    """
     return {
         "schema_version": COLLECTOR_SCHEMA_VERSION,
         "collector": "same_state_candidate_rollout",
@@ -258,6 +341,21 @@ def _rendered_config(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _load_state(args: argparse.Namespace) -> dict[str, Any]:
+    """Loads collector state for resume, or initializes a fresh state.
+
+    Args:
+        args: Parsed CLI options supplying the output directory.
+
+    Returns:
+        Collector state with schema version, completed indices, items,
+        pairs, and accumulated walltime.
+
+    Raises:
+        FileExistsError: If output exists and matching ``--resume`` is off.
+
+        ValueError: If the persisted configuration or schema does not match
+            this run.
+    """
     args.output_dir.mkdir(parents=True, exist_ok=True)
     config = _rendered_config(args)
     config_path = args.output_dir / "run_config.json"
@@ -286,6 +384,21 @@ def _load_state(args: argparse.Namespace) -> dict[str, Any]:
 def _decode(
     tokenizer: Any, output: torch.Tensor, prompt_length: int, gold: str
 ) -> dict[str, Any]:
+    """Decodes one native rollout and judges it against the gold answer.
+
+    Args:
+        tokenizer: Tokenizer used to decode generated ids.
+
+        output: Generated token ids including the prompt.
+
+        prompt_length: Number of leading prompt tokens to skip.
+
+        gold: Gold answer used for reward scoring.
+
+    Returns:
+        Dict with the boxed ``prediction``, binary ``reward``, and full
+        ``final_text``.
+    """
     text = tokenizer.decode(output[0, prompt_length:], skip_special_tokens=True)
     return {
         "prediction": last_boxed_content(text),
@@ -302,6 +415,26 @@ def _materialize_pairs(
     candidate_features: torch.Tensor,
     noisy_features: torch.Tensor,
 ) -> list[dict[str, Any]]:
+    """Builds positive/negative pairs from one captured candidate step.
+
+    Args:
+        problem_id: Identifier recorded on every pair.
+
+        split: Dataset split recorded on every pair.
+
+        captured: Captured candidate step owning the shared state.
+
+        candidates: Rollout candidate rows with ``reward`` and
+            ``proposal_logprob`` fields.
+
+        candidate_features: Token features recorded per candidate.
+
+        noisy_features: Token features of the shared noisy block.
+
+    Returns:
+        Pair records crossing every correct candidate with every wrong
+        candidate, hardest negative first.
+    """
     positives = [row for row in candidates if row["reward"] == 1]
     negatives = sorted(
         (row for row in candidates if row["reward"] == 0),
@@ -344,6 +477,13 @@ def _materialize_pairs(
 
 
 def _save_state(args: argparse.Namespace, state: dict[str, Any]) -> None:
+    """Persists collector state, pair artifacts, and a run summary.
+
+    Args:
+        args: Parsed CLI options supplying the output directory.
+
+        state: Collector state to persist.
+    """
     atomic_torch_save(args.output_dir / "collector_state.pt", state)
     if state["pairs"]:
         save_pairs(args.output_dir / "pairs.pt", state["pairs"])

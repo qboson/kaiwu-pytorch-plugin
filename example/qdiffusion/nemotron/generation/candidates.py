@@ -10,11 +10,24 @@ from .proposal import ProposalStep
 
 def _sample_k_candidates(
     logits: torch.Tensor,
-    K: int,
+    num_candidates: int,
     temperature: float = 0.0,
     noise_scale: float = 1.0,
 ) -> tuple[torch.Tensor, torch.Tensor]:
-    expanded = logits.unsqueeze(0).expand(K, *logits.shape)
+    """Samples candidate token blocks from one block of proposal logits.
+
+    Args:
+        logits: Proposal logits shaped ``[block, vocab]``.
+        num_candidates: Number of independent samples to draw.
+        temperature: Sampling temperature; ``0.0`` picks the argmax of the
+            Gumbel-perturbed log probabilities.
+        noise_scale: Scale of the Gumbel noise added before sampling.
+
+    Returns:
+        Tuple ``(tokens, scores)`` shaped ``[num_candidates, block]`` with
+        sampled token ids and their per-position scores.
+    """
+    expanded = logits.unsqueeze(0).expand(num_candidates, *logits.shape)
     gumbel = -torch.log(-torch.log(torch.rand_like(expanded) + 1e-8) + 1e-8)
     noisy = expanded + noise_scale * gumbel
     if temperature > 0:
@@ -27,6 +40,16 @@ def _sample_k_candidates(
 
 
 def _mask_logits(logits: torch.Tensor, mask_id: int) -> torch.Tensor:
+    """Returns a copy of ``logits`` with the mask token suppressed.
+
+    Args:
+        logits: Proposal logits to filter.
+
+        mask_id: Token id whose logits are set to ``-inf``.
+
+    Returns:
+        Cloned logits with ``mask_id`` suppressed.
+    """
     logits = logits.clone()
     logits[..., mask_id] = -float("inf")
     return logits
@@ -37,6 +60,19 @@ def _gather_transfer_positions(
     block_tokens: torch.Tensor,
     transfer_index: torch.Tensor,
 ) -> torch.Tensor:
+    """Keeps candidate tokens on transfer positions, native tokens elsewhere.
+
+    Args:
+        candidate_tokens: Candidate blocks shaped ``[candidate, block]``.
+
+        block_tokens: Current block tokens used outside transfer positions.
+
+        transfer_index: Boolean mask marking the positions to commit.
+
+    Returns:
+        Candidate blocks holding sampled tokens on transfer positions and
+        copies of ``block_tokens`` everywhere else.
+    """
     result = candidate_tokens.clone()
     result[:, ~transfer_index] = block_tokens[~transfer_index]
     return result
@@ -87,24 +123,25 @@ class GumbelNoiseGenerator:
     def generate_hybrid(
         self,
         step: ProposalStep,
-        K: int,
+        num_candidates: int,
     ) -> torch.Tensor:
         """Generate candidates that always include the native proposal.
 
         Args:
             step: Current native proposal state.
-            K: Total candidate count, including the native proposal.
+            num_candidates: Total candidate count, including the native
+                proposal.
 
         Returns:
             Native proposal followed by sampled alternative blocks.
         """
 
-        if K == 1:
+        if num_candidates == 1:
             return step.native_decision.tokens.squeeze(0).unsqueeze(0)
         logits = _mask_logits(step.logits.squeeze(0), step.mask_token_id)
         sampled_tokens, _ = _sample_k_candidates(
             logits,
-            K - 1,
+            num_candidates - 1,
             temperature=self.temperature,
             noise_scale=self.noise_scale,
         )
@@ -122,6 +159,19 @@ def _same_transfer_tokens(
     second: torch.Tensor,
     transfer_mask: torch.Tensor,
 ) -> bool:
+    """Checks whether two candidates agree on every transfer position.
+
+    Args:
+        first: First candidate block.
+
+        second: Second candidate block.
+
+        transfer_mask: Boolean mask of the positions to compare.
+
+    Returns:
+        ``True`` when both candidates hold identical tokens on all
+        transfer positions.
+    """
     return bool(torch.equal(first[transfer_mask], second[transfer_mask]))
 
 

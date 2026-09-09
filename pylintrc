@@ -1,5 +1,5 @@
 [MISCELLANEOUS]
-# 接受的最大参数数量
+# Maximum accepted argument counts
 max-args=15
 max-positional-arguments=15
 max-attributes=30
@@ -7,7 +7,8 @@ max-locals=30
 max-branches=15
 
 [FORMAT]
-# qdiffusion.py 补全 Google 风格 docstring 后超过默认千行
+# qdiffusion.py exceeds the default 1000-line limit once its Google-style
+# docstrings were completed
 max-module-lines=1200
 
 [TYPECHECK]

@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-new-tokens", type=int, default=8192)
     parser.add_argument("--block-length", type=int, default=8)
     parser.add_argument("--threshold", type=float, default=0.9)
-    parser.add_argument("--K", type=int, default=4)
+    parser.add_argument("--num-candidates", type=int, default=4)
     parser.add_argument("--energy-lambda", type=float, default=2.0)
     parser.add_argument("--seed", type=int, default=20260803)
     parser.add_argument("--resume", action=argparse.BooleanOptionalAction, default=True)
@@ -59,10 +59,17 @@ def parse_args() -> argparse.Namespace:
 
 
 def _file_identity(path: Path | None) -> dict[str, Any] | None:
-    """Dataset/checkpoint identity keyed by file name.
+    """Builds the dataset/checkpoint identity keyed by file name.
 
     Keeps the field shape already persisted in existing partial meta files so
     their resume fingerprints stay valid.
+
+    Args:
+        path: File to identify, or ``None``.
+
+    Returns:
+        Dict with ``name``, ``size``, and ``sha256`` keys, or ``None`` when
+        ``path`` is ``None``.
     """
     if path is None:
         return None
@@ -75,6 +82,14 @@ def _file_identity(path: Path | None) -> dict[str, Any] | None:
 
 
 def _fingerprint(payload: dict[str, Any]) -> str:
+    """Hashes a config payload into a stable resume fingerprint.
+
+    Args:
+        payload: JSON-serializable configuration mapping.
+
+    Returns:
+        SHA-256 hex digest of the canonical JSON encoding.
+    """
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest()
 
@@ -117,6 +132,23 @@ def _load_partial_items(path: Path) -> list[dict[str, Any]]:
 def _partial_store(
     args: argparse.Namespace, strategy: str
 ) -> tuple[Path, list[dict[str, Any]], str]:
+    """Opens or initializes the append-only partial store for one strategy.
+
+    Args:
+        args: Parsed CLI options.
+
+        strategy: Evaluation strategy, ``native`` or ``bm``.
+
+    Returns:
+        Tuple ``(items_path, items, fingerprint)`` with the JSONL path, the
+        items completed so far, and the active configuration fingerprint.
+
+    Raises:
+        FileExistsError: If partial output exists and ``--resume`` is off.
+
+        ValueError: If the stored fingerprint does not match the current
+            configuration.
+    """
     config = {
         "schema_version": PARTIAL_SCHEMA_VERSION,
         "strategy": strategy,
@@ -126,7 +158,7 @@ def _partial_store(
         "max_new_tokens": args.max_new_tokens,
         "block_length": args.block_length,
         "threshold": args.threshold,
-        "K": args.K if strategy == "bm" else 1,
+        "num_candidates": args.num_candidates if strategy == "bm" else 1,
         "energy_lambda": args.energy_lambda if strategy == "bm" else None,
         "seed": args.seed,
         "limit": args.limit,
@@ -151,6 +183,14 @@ def _partial_store(
 
 
 def _append_item(path: Path, item: dict[str, Any]) -> None:
+    """Appends one item record to a partial JSONL file.
+
+    Args:
+        path: Destination JSONL file.
+
+        item: Evaluation item to persist; the record is flushed and
+            ``fsync``-ed before returning.
+    """
     record = {"schema_version": PARTIAL_SCHEMA_VERSION, "item": item}
     with path.open("a", encoding="utf-8") as stream:
         stream.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")))
@@ -162,6 +202,19 @@ def _append_item(path: Path, item: dict[str, Any]) -> None:
 def _summarize(
     strategy: str, items: list[dict[str, Any]], fingerprint: str
 ) -> dict[str, Any]:
+    """Aggregates completed items into a result summary.
+
+    Args:
+        strategy: Evaluation strategy the items belong to.
+
+        items: Completed evaluation items.
+
+        fingerprint: Configuration fingerprint recorded with the summary.
+
+    Returns:
+        Dict with accuracy, token/NFE averages, elapsed time, and the full
+        item list.
+    """
     return {
         "strategy": strategy,
         "total": len(items),
@@ -194,7 +247,7 @@ def main() -> None:
         load_nemotron_guidance(
             model,
             args.checkpoint,
-            num_candidates=args.K,
+            num_candidates=args.num_candidates,
             energy_lambda=args.energy_lambda,
         )
         if "bm" in args.strategies
