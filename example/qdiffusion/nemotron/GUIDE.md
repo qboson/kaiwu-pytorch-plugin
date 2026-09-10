@@ -13,11 +13,21 @@
 能量模型只在每个 block 的"改写决策点"上被咨询——它认为有显著更好的候选就覆盖,
 否则放行。LLM 权重全程冻结,只训练能量侧。
 
-对 main 的全部改动都是为支撑这个示例:
-`src/kaiwu/torch_plugin` 扩展了能量打分接口(`score_visible_logits(num_lowest=...)`,
-`train()` 冻结保护,`SequenceTokenSpec` 导出,删除无消费者的死 API);
-dplm/simple 做了入口收敛、checkpoint 标准化与文档补齐;根配置同步
-(`.gitignore`、pylintrc)。逐文件改动清单见 [CHANGES.md](CHANGES.md) 第二节。
+对 main 的全部改动都是为支撑这个示例,逐文件一行:
+
+| 文件(main → 本分支) | 改动 |
+|---|---|
+| `src/.../qdiffusion.py` | `score_visible_logits(num_lowest=...)`;`train()` 冻结保护;删除死 API(weight/temperature/history);`SequenceTokenSpec` 导出;全量 Google docstring |
+| `src/.../__init__.py` / `_qdiffusion_sampling.py` | 前者导出 `SequenceTokenSpec`;后者仅文件头 |
+| `tests/` 三个文件 | `score_visible_logits(num_lowest)`、`train()` 冻结保护、导出断言等契约测试 |
+| `dplm/models/esm_patch.py` | 重写为 SDPA 实现(镜像 4.39.2 签名) |
+| `dplm/utils/runtime.py` | checkpoint 版本字段 + 原子写 + 加载校验 |
+| `dplm/` 其余 + `simple/` | 入口收敛(删 2 个 re-export 壳 + 2 个 bootstrap)、import 拍平、docstring 补齐 |
+| `example/qdiffusion` 根 | README ×2 更新、requirements 增 fair-esm |
+| 仓库根 | `.gitignore`、pylintrc |
+| 删除 | `train_workflow.py`、`eval_esm2_distances.py`、`_example_bootstrap.py` ×2 |
+
+细节见 [CHANGES.md](CHANGES.md) 第二节。
 
 ---
 
@@ -63,7 +73,6 @@ dplm/simple 做了入口收敛、checkpoint 标准化与文档补齐;根配置�
 
 | 符号 | 作用 |
 |---|---|
-| `build_sa(**kwargs)` | `kaiwu.classical.SimulatedAnnealingOptimizer` 工厂 |
 | `ContextualEnergyModel(EnergyModel)` | 本示例的能量模型,结构:三个投影器(hidden/candidate/noisy)→ 位置嵌入 → `TransformerEncoder`(norm_first + GELU)→ 池化 → `contextual_to_visible` 得到 BM 可见单元 logits;BM 隐藏单元由 Kaiwu SA 采样(`sample_hidden_state`),能量取最低 `energy_num_lowest` 个解的均值 |
 | `__init__(...)` | 9 个超参的正数守卫(合并报错,直接列出违规参数名;含 BM 维度与采样数)+ 整除校验(以 ValueError 前置,因 PyTorch 只抛 AssertionError 且 `-O` 会剥离);超参存入实例供 `get_config` 序列化;`super().__init__` 接 BM 维度与 SA 采样器;末尾 `self.to(device)` + `energy_bm.device` 手工同步(指向 `fix/bm-device-sync` 的 TODO workaround) |
 | `discretize_visible_state(logits)` | **override 为 identity**:可见条件保持连续值(与 KPP NLP 工作流一致),梯度无二值化损失 |
@@ -89,7 +98,7 @@ dplm/simple 做了入口收敛、checkpoint 标准化与文档补齐;根配置�
 |---|---|
 | `ProposalDecision`(frozen) | 一次覆盖决策:`tokens` + `transfer_index` |
 | `ProposalStep`(frozen) | 一个决策点的完整快照:`block_index/step_index/nfe`、`block_tokens`、`sequence_tokens`、`hidden_states`、`native_decision`——hook 和候选生成的全部输入 |
-| `NativeGenerationSession` | 上下文管理器,包装冻结模型**原生的 generate**:cache、块级去噪节奏、停止条件全部由原生循环管理;`generate(hook, ...)` 在每个 transfer 决策点(候选已产生、token 未写回)调用 hook;`_capture_hidden_state` 抓冻结隐状态供上下文打分;`_validate_decision` 校验 hook 返回的决策合法性 |
+| `NativeGenerationSession` | 上下文管理器,包装冻结模型**原生的 generate**:cache、块级去噪节奏、停止条件全部由原生循环管理。hook 在**构造期注入**(`__init__(proposal_hook=...)`),`generate(...)` 驱动循环并在每个 transfer 决策点(候选已产生、token 未写回)回调 `self.proposal_hook(step)`;`_capture_hidden_state` 抓冻结隐状态供上下文打分;`_validate_decision` 校验 hook 返回决策的合法性 |
 | `close()` / `__enter__ / __exit__` | 释放原生资源 |
 
 ### `generation/candidates.py`(208 行)
@@ -193,6 +202,10 @@ CandidateTraceHook / ContextualEnergyHook.__call__(step)
         ├─ 没有候选显著更好 → None,原生照写
         └─ 有 → ProposalDecision 覆盖写回
 ```
+
+evaluate 的两种 strategy 就是这个注入开关:`native` 构造无 hook 的会话
+(`NativeGenerationSession(model)`),`bm` 注入 selection_hook——同一循环,
+只差"是否有人顾问"。
 
 ### 5.3 与 src 共享核心的依赖映射
 

@@ -15,19 +15,6 @@ SA_BACKEND = "kaiwu.classical.SimulatedAnnealingOptimizer"
 CHECKPOINT_FORMAT = "nemotron-contextual-energy-v2"
 
 
-def build_sa(**kwargs: Any) -> Any:
-    """Create the PyPI Kaiwu simulated-annealing backend.
-
-    Args:
-        **kwargs: Arguments accepted by SimulatedAnnealingOptimizer.
-
-    Returns:
-        Configured PyPI Kaiwu simulated-annealing optimizer.
-    """
-
-    return SimulatedAnnealingOptimizer(**kwargs)
-
-
 class ContextualEnergyModel(EnergyModel):
     """Score same-state token candidates with a contextual encoder and KPP BM.
 
@@ -117,7 +104,7 @@ class ContextualEnergyModel(EnergyModel):
         }
         self.sa_kwargs = sampler_kwargs
         if sampler is None:
-            sampler = build_sa(**sampler_kwargs)
+            sampler = SimulatedAnnealingOptimizer(**sampler_kwargs)
         super().__init__(bm_num_visible, bm_num_hidden, sampler=sampler)
 
         self.hidden_token_projector = nn.Linear(
