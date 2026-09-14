@@ -63,7 +63,7 @@ graph TD
         GBRBM["gbrbm.py<br>GaussianBernoulliRestricte"]
         DBN["dbn.py<br>UnsupervisedDBN"]
         FullBM["full_boltzmann_machine.py<br>BoltzmannMachine"]
-        QDiff["qdiffusion.py<br>QDDiffusion"]
+        QDiff["qdiffusion.py<br>QDiffusion"]
         QVAE["qvae.py<br>QVAE"]
     end
     subgraph Examples

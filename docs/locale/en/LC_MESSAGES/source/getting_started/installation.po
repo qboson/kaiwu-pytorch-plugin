@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 15:02+0800\n"
+"POT-Creation-Date: 2026-09-14 15:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -70,9 +70,8 @@ msgid "PyTorch"
 msgstr "PyTorch"
 
 #: ../../source/getting_started/installation.md
-#, fuzzy
 msgid "2.7"
-msgstr "2.7.0"
+msgstr "2.7"
 
 #: ../../source/getting_started/installation.md
 msgid "Tensor operations & automatic differentiation"
@@ -95,9 +94,8 @@ msgid "Kaiwu SDK"
 msgstr "Kaiwu SDK"
 
 #: ../../source/getting_started/installation.md
-#, fuzzy
 msgid "v1.3.1+"
-msgstr "1.3.1"
+msgstr "v1.3.1+"
 
 #: ../../source/getting_started/installation.md
 msgid "Ising optimization backend (classical SA + quantum CIM)"
@@ -126,9 +124,8 @@ msgstr ""
 " page</u>."
 
 #: ../../source/getting_started/installation.md:35
-#, fuzzy
 msgid "Install Kaiwu-PyTorch-Plugin"
-msgstr "2\\. Installing Kaiwu-PyTorch-Plugin"
+msgstr "Install Kaiwu-PyTorch-Plugin"
 
 #: ../../source/getting_started/installation.md:37
 msgid ""
@@ -254,7 +251,7 @@ msgstr "Press `Ctrl+C`, then run:"
 msgid "Project Structure & Package Layout"
 msgstr "Project Structure & Package Layout"
 
-#: ../../source/getting_started/installation.md:155
+#: ../../source/getting_started/installation.md:158
 msgid "Key Code Entities"
 msgstr "Key Code Entities"
 
@@ -306,11 +303,11 @@ msgstr ""
 "RBM variant with real-valued visible units (Gaussian distribution) and "
 "binary hidden units (Bernoulli distribution), or vice versa"
 
-#: ../../source/getting_started/installation.md:164
+#: ../../source/getting_started/installation.md:167
 msgid "Kaiwu SDK Configuration & License"
 msgstr "Kaiwu SDK Configuration & License"
 
-#: ../../source/getting_started/installation.md:166
+#: ../../source/getting_started/installation.md:169
 msgid ""
 "Kaiwu-PyTorch-Plugin depends on the **Kaiwu SDK** to provide quantum "
 "computing capabilities. The Kaiwu SDK is a proprietary backend that provides"
@@ -322,27 +319,27 @@ msgstr ""
 " both classical simulation (SA) and quantum execution (CIM), and must be "
 "installed separately."
 
-#: ../../source/getting_started/installation.md:168
+#: ../../source/getting_started/installation.md:171
 msgid "Step 1: Obtain & Install SDK"
 msgstr "Step 1: Obtain & Install SDK"
 
-#: ../../source/getting_started/installation.md:169
+#: ../../source/getting_started/installation.md:172
 msgid "Option A: Install from PyPI (Recommended)"
 msgstr "Option A: Install from PyPI (Recommended)"
 
-#: ../../source/getting_started/installation.md:171
+#: ../../source/getting_started/installation.md:174
 msgid "The Kaiwu SDK is available on PyPI. You can install it directly:"
 msgstr "The Kaiwu SDK is available on PyPI. You can install it directly:"
 
-#: ../../source/getting_started/installation.md:177
+#: ../../source/getting_started/installation.md:180
 msgid "Alternatively, add the following line to your `requirements.txt`:"
 msgstr "Alternatively, add the following line to your `requirements.txt`:"
 
-#: ../../source/getting_started/installation.md:183
+#: ../../source/getting_started/installation.md:186
 msgid "Option B: Install from Official Wheel"
 msgstr "Option B: Install from Official Wheel"
 
-#: ../../source/getting_started/installation.md:185
+#: ../../source/getting_started/installation.md:188
 msgid ""
 "If you need a specific version or have network restrictions, download the "
 "SDK wheel from the QBoson platform:"
@@ -350,11 +347,11 @@ msgstr ""
 "If you need a specific version or have network restrictions, download the "
 "SDK wheel from the QBoson platform:"
 
-#: ../../source/getting_started/installation.md:187
+#: ../../source/getting_started/installation.md:190
 msgid "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
 msgstr "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
 
-#: ../../source/getting_started/installation.md:188
+#: ../../source/getting_started/installation.md:191
 msgid ""
 "Download the wheel package suitable for your system (e.g., "
 "`kaiwu-1.3.1-py3-none-any.whl`)"
@@ -362,15 +359,15 @@ msgstr ""
 "Download the wheel package suitable for your system (e.g., "
 "`kaiwu-1.3.1-py3-none-any.whl`)"
 
-#: ../../source/getting_started/installation.md:189
+#: ../../source/getting_started/installation.md:192
 msgid "Install the wheel:"
 msgstr "Install the wheel:"
 
-#: ../../source/getting_started/installation.md:195
+#: ../../source/getting_started/installation.md:198
 msgid "Step 2: Set Environment Variables"
 msgstr "Step 2: Set Environment Variables"
 
-#: ../../source/getting_started/installation.md:197
+#: ../../source/getting_started/installation.md:200
 msgid ""
 "After installation, you need to configure the SDK authorization credentials."
 " Set the following environment variables:"
@@ -378,7 +375,7 @@ msgstr ""
 "After installation, you need to configure the SDK authorization credentials."
 " Set the following environment variables:"
 
-#: ../../source/getting_started/installation.md:204
+#: ../../source/getting_started/installation.md:207
 msgid ""
 "**Important:** The environment variable name is `SDK_CODE`, **not** "
 "`SDK_TOKEN`. Using the wrong variable name will cause authentication to "
@@ -388,15 +385,15 @@ msgstr ""
 "`SDK_TOKEN`. Using the wrong variable name will cause authentication to "
 "fail."
 
-#: ../../source/getting_started/installation.md:206
+#: ../../source/getting_started/installation.md:209
 msgid "Step 3: Initialize License in Code"
 msgstr "Step 3: Initialize License in Code"
 
-#: ../../source/getting_started/installation.md:208
+#: ../../source/getting_started/installation.md:211
 msgid "Then initialize the license in your code:"
 msgstr "Then initialize the license in your code:"
 
-#: ../../source/getting_started/installation.md:220
+#: ../../source/getting_started/installation.md:223
 msgid ""
 "**Note:** Always keep credentials in environment variables, never hardcode "
 "them in source code, as they could be accidentally committed to version "
@@ -408,15 +405,15 @@ msgstr ""
 "control. The credentials can be obtained from the <u>Kaiwu SDK page</u> on "
 "the QBoson platform."
 
-#: ../../source/getting_started/installation.md:222
+#: ../../source/getting_started/installation.md:225
 msgid "Obtain Quantum Computer Access"
 msgstr "Obtain Quantum Computer Access"
 
-#: ../../source/getting_started/installation.md:223
+#: ../../source/getting_started/installation.md:226
 msgid "How to Get QPU Access"
 msgstr "How to Get QPU Access"
 
-#: ../../source/getting_started/installation.md:224
+#: ../../source/getting_started/installation.md:227
 msgid ""
 "To experience true quantum computing capabilities, you need to obtain access"
 " to a quantum computer:"
@@ -424,11 +421,11 @@ msgstr ""
 "To experience true quantum computing capabilities, you need to obtain access"
 " to a quantum computer:"
 
-#: ../../source/getting_started/installation.md:226
+#: ../../source/getting_started/installation.md:229
 msgid "Register an account on the <u>QBoson platform</u>"
 msgstr "Register an account on the <u>QBoson platform</u>"
 
-#: ../../source/getting_started/installation.md:227
+#: ../../source/getting_started/installation.md:230
 msgid ""
 "Contact the official staff through the platform to request a quota for the "
 "real quantum device"
@@ -436,7 +433,7 @@ msgstr ""
 "Contact the official staff through the platform to request a quota for the "
 "real quantum device"
 
-#: ../../source/getting_started/installation.md:229
+#: ../../source/getting_started/installation.md:232
 msgid ""
 "**Note:** Before obtaining access to the real quantum device, you can use "
 "simulators for development and testing. The Kaiwu SDK provides various "
@@ -448,11 +445,11 @@ msgstr ""
 "classical optimizers (such as the simulated annealing optimizer) as "
 "classical alternatives to the quantum sampler."
 
-#: ../../source/getting_started/installation.md:231
+#: ../../source/getting_started/installation.md:234
 msgid "Development Workflow Recommendation:"
 msgstr "Development Workflow Recommendation:"
 
-#: ../../source/getting_started/installation.md:250
+#: ../../source/getting_started/installation.md:253
 msgid ""
 "**Note:** Always validate your model with the classical simulator before "
 "consuming QPU quota."
@@ -460,11 +457,11 @@ msgstr ""
 "**Note:** Always validate your model with the classical simulator before "
 "consuming QPU quota."
 
-#: ../../source/getting_started/installation.md:251
+#: ../../source/getting_started/installation.md:254
 msgid "Verify Installation"
 msgstr "Verify Installation"
 
-#: ../../source/getting_started/installation.md:253
+#: ../../source/getting_started/installation.md:256
 msgid ""
 "After installation, run the following code to verify that the installation "
 "was successful:"
@@ -472,21 +469,21 @@ msgstr ""
 "After installation, run the following code to verify that the installation "
 "was successful:"
 
-#: ../../source/getting_started/installation.md:255
+#: ../../source/getting_started/installation.md:258
 msgid "Three Verification Steps"
 msgstr "Three Verification Steps"
 
-#: ../../source/getting_started/installation.md:257
+#: ../../source/getting_started/installation.md:260
 msgid ""
-"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.0+) are loaded"
+"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded"
 msgstr ""
-"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.0+) are loaded"
+"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded"
 
-#: ../../source/getting_started/installation.md:258
+#: ../../source/getting_started/installation.md:261
 msgid "**Test SDK backend:** Verify the classical SA solver works"
 msgstr "**Test SDK backend:** Verify the classical SA solver works"
 
-#: ../../source/getting_started/installation.md:259
+#: ../../source/getting_started/installation.md:262
 msgid ""
 "**Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and "
 "initializes"
@@ -494,15 +491,15 @@ msgstr ""
 "**Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and "
 "initializes"
 
-#: ../../source/getting_started/installation.md:261
+#: ../../source/getting_started/installation.md:264
 msgid "Smoke-Test Code"
 msgstr "Smoke-Test Code"
 
-#: ../../source/getting_started/installation.md:286
+#: ../../source/getting_started/installation.md:289
 msgid "Expected Output"
 msgstr "Expected Output"
 
-#: ../../source/getting_started/installation.md:295
+#: ../../source/getting_started/installation.md:298
 msgid ""
 "If no error occurs, your environment is ready. You can now build models and "
 "validate with classical samplers, then switch to the quantum sampler."
@@ -510,11 +507,11 @@ msgstr ""
 "If no error occurs, your environment is ready. You can now build models and "
 "validate with classical samplers, then switch to the quantum sampler."
 
-#: ../../source/getting_started/installation.md:297
+#: ../../source/getting_started/installation.md:300
 msgid "Development Environment Setup (Optional)"
 msgstr "Development Environment Setup (Optional)"
 
-#: ../../source/getting_started/installation.md:299
+#: ../../source/getting_started/installation.md:302
 msgid ""
 "If you plan to participate in the development of the plugin, you can install"
 " the development dependencies:"
@@ -522,11 +519,11 @@ msgstr ""
 "If you plan to participate in the development of the plugin, you can install"
 " the development dependencies:"
 
-#: ../../source/getting_started/installation.md:305
+#: ../../source/getting_started/installation.md:308
 msgid "Run tests:"
 msgstr "Run tests:"
 
-#: ../../source/getting_started/installation.md:315
+#: ../../source/getting_started/installation.md:318
 msgid "Lint code style:"
 msgstr "Lint code style:"
 

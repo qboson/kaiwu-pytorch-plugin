@@ -8,337 +8,336 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-09 14:45+0800\n"
+"POT-Creation-Date: 2026-09-14 15:29+0800\n"
 "PO-Revision-Date: 2026-09-07 19:10+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:8
+#: ../../source/getting_started/quickstart.md:8
 msgid "Quick Start"
 msgstr "快速开始"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:10
+#: ../../source/getting_started/quickstart.md:10
 msgid ""
 "This chapter helps you get started quickly with `Kaiwu-PyTorch-Plugin` "
 "through simple examples."
 msgstr "本章通过简单示例帮助您快速上手 `Kaiwu-PyTorch-Plugin`。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:12
+#: ../../source/getting_started/quickstart.md:12
 msgid "Training Workflow & Concepts"
 msgstr "训练工作流与概念"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:14
+#: ../../source/getting_started/quickstart.md:14
 msgid "Training Flow Overview"
 msgstr "训练流程概览"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:42
+#: ../../source/getting_started/quickstart.md:42
 msgid "Three-Step Training Cycle"
 msgstr "三步训练循环"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "Step"
 msgstr "步骤"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:52
 msgid "Description"
 msgstr "说明"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "Code"
 msgstr "代码"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "**1. Positive Phase (PyTorch)**"
 msgstr "**1. 正相（PyTorch）**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "Compute hidden activations from data"
 msgstr "从数据计算隐藏层激活"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "`h = rbm.get_hidden(x, bernoulli=True)`"
 msgstr "`h = rbm.get_hidden(x, bernoulli=True)`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "**2. Negative Phase (SDK)**"
 msgstr "**2. 负相（SDK）**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "Sample from model distribution, offloaded to SA/CIM"
 msgstr "从模型分布采样，卸载到 SA/CIM"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "`s = rbm.sample(sampler)`"
 msgstr "`s = rbm.sample(sampler)`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "**3. Objective & Update (PyTorch)**"
 msgstr "**3. 目标函数与更新（PyTorch）**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "Compute objective, backpropagate, update parameters"
 msgstr "计算目标函数、反向传播、更新参数"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:16
+#: ../../source/getting_started/quickstart.md:16
 msgid "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
 msgstr "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:50
+#: ../../source/getting_started/quickstart.md:50
 msgid "Code Entity Mapping"
 msgstr "代码实体映射"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:75
+#: ../../source/getting_started/quickstart.md:75
 msgid "**Mapping Walkthrough:**"
 msgstr "**映射详解：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:77
-msgid "**Model Logic:** BM/RBM holds `quadratic_coef` (W) and `linear_bias` (b,c)"
+#: ../../source/getting_started/quickstart.md:77
+msgid ""
+"**Model Logic:** BM/RBM holds `quadratic_coef` (W) and `linear_bias` (b,c)"
 msgstr "**模型逻辑：** BM/RBM 持有 `quadratic_coef`（W）和 `linear_bias`（b,c）"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:78
+#: ../../source/getting_started/quickstart.md:78
 msgid ""
-"**Ising Conversion:** `_to_ising_matrix()` converts W,b,c into Ising J "
-"(coupling) and h (field) matrix"
+"**Ising Conversion:** `_to_ising_matrix()` converts W,b,c into "
+"Ising J (coupling) and h (field) matrix"
 msgstr "**伊辛转换：** `_to_ising_matrix()` 将 W,b,c 转换为伊辛 J（耦合）和 h（场）矩阵"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:79
+#: ../../source/getting_started/quickstart.md:79
 msgid ""
 "**Sampling Interface:** `model.sample(sampler)` passes J,h to the "
 "sampler's `solve()` method"
 msgstr "**采样接口：** `model.sample(sampler)` 将 J,h 传递给采样器的 `solve()` 方法"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:80
+#: ../../source/getting_started/quickstart.md:80
 msgid "**SDK Backend:**"
 msgstr "**SDK 后端：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:81
+#: ../../source/getting_started/quickstart.md:81
 msgid "Classical: `SimulatedAnnealingOptimizer`"
 msgstr "经典：`SimulatedAnnealingOptimizer`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:82
+#: ../../source/getting_started/quickstart.md:82
 msgid "Quantum: `CIMOptimizer`"
 msgstr "量子：`CIMOptimizer`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:83
+#: ../../source/getting_started/quickstart.md:83
 msgid "BM vs RBM: Key API Difference"
 msgstr "BM 与 RBM：关键 API 差异"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "RBM"
 msgstr "RBM"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "**BM**"
 msgstr "**BM**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Topology"
 msgstr "拓扑结构"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Bipartite"
 msgstr "二部图"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Fully connected"
 msgstr "全连接"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Positive phase"
 msgstr "正相"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "`get_hidden(x, bernoulli=True)`"
 msgstr "`get_hidden(x, bernoulli=True)`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "`condition_sample(sampler, x)`"
 msgstr "`condition_sample(sampler, x)`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Negative phase"
 msgstr "负相"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "`sample(sampler)`"
 msgstr "`sample(sampler)`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Objective"
 msgstr "目标函数"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "`objective(h, s)`"
 msgstr "`objective(h, s)`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:92
+#: ../../source/getting_started/quickstart.md:92
 msgid ""
 "**Note:** BM uses `condition_sample()` because fully-connected networks "
-"require sampling conditioned on visible units, not a deterministic "
-"hidden-layer computation."
+"require sampling conditioned on visible units, not a deterministic hidden-"
+"layer computation."
 msgstr "**注意：** BM 使用 `condition_sample()`，因为全连接网络需要基于可见单元进行条件采样，而非确定性的隐藏层计算。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:94
+#: ../../source/getting_started/quickstart.md:94
 msgid "Code Examples"
 msgstr "代码示例"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:96
+#: ../../source/getting_started/quickstart.md:96
 msgid "Restricted Boltzmann Machine (RBM)"
 msgstr "受限玻尔兹曼机（RBM）"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:98
+#: ../../source/getting_started/quickstart.md:98
 msgid ""
 "The following example demonstrates how to use the "
-"`RestrictedBoltzmannMachine` class for basic model training. You can "
-"define the number of visible and hidden nodes, and customize the "
-"initialization of quadratic terms and linear biases."
+"`RestrictedBoltzmannMachine` class for basic model training. You can define "
+"the number of visible and hidden nodes, and customize the initialization of "
+"quadratic terms and linear biases."
 msgstr ""
 "以下示例演示如何使用 `RestrictedBoltzmannMachine` "
 "类进行基本模型训练。您可以定义可见节点和隐藏节点的数量，并自定义二次项和线性偏置的初始化。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:162
+#: ../../source/getting_started/quickstart.md:163
 msgid "Boltzmann Machine (BM)"
 msgstr "玻尔兹曼机（BM）"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:164
+#: ../../source/getting_started/quickstart.md:165
 msgid ""
-"The following example demonstrates how to use the `BoltzmannMachine` "
-"class:"
+"The following example demonstrates how to use the `BoltzmannMachine` class:"
 msgstr "以下示例演示如何使用 `BoltzmannMachine` 类："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:209
+#: ../../source/getting_started/quickstart.md:210
 msgid "Sampler Switching"
 msgstr "采样器切换"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:211
+#: ../../source/getting_started/quickstart.md:212
 msgid ""
-"The Kaiwu SDK provides various samplers. You can choose according to your"
-" needs:"
+"The Kaiwu SDK provides various samplers. You can choose according to your "
+"needs:"
 msgstr "Kaiwu SDK 提供多种采样器，您可以根据需求选择："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:223
+#: ../../source/getting_started/quickstart.md:224
 msgid "Next Steps"
 msgstr "后续步骤"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:225
+#: ../../source/getting_started/quickstart.md:226
 msgid "Congratulations on completing the quick start! For the next step:"
 msgstr "恭喜您完成快速开始！接下来："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:227
+#: ../../source/getting_started/quickstart.md:228
 msgid ""
-"**Beginner Course:** Check out the [KPP Tutorials](tutorials/index.md) "
-"for more practical application examples. Start with `tests/test_rbm.py` "
-"for basic execution and `example/rbm_digits/rbm_digits.py` for a full RBM"
-" training script."
+"**Beginner Course:** Check out the [KPP Tutorials](tutorials/index.md) for "
+"more practical application examples. Start with `tests/test_rbm.py` for "
+"basic execution, then follow `example/rbm_digits/rbm_digits.ipynb` for a "
+"full RBM training walkthrough."
 msgstr ""
-"**入门课程：** 查看 [KPP 教程](tutorials/index.md) 获取更多实际应用示例。从 "
-"`tests/test_rbm.py` 了解基本执行，从 `example/rbm_digits/rbm_digits.py` 了解完整 RBM "
-"训练脚本。"
+"**入门课程：** 查看 [KPP 教程](tutorials/index.md) 获取更多实际应用示例。先从 `tests/test_rbm.py` "
+"了解基本执行，再跟随 `example/rbm_digits/rbm_digits.ipynb` 完成完整的 RBM 训练演练。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:228
+#: ../../source/getting_started/quickstart.md:229
 msgid ""
-"**Intermediate Tutorial:** Explore generative modeling with fully "
-"connected Boltzmann Machines in `example/bm_generation/` (e.g., RNA "
-"sequence data augmentation), and learn feature learning & classification "
-"with RBM/DBN stacks."
+"**Intermediate Tutorial:** Explore generative modeling with fully connected "
+"Boltzmann Machines in `example/bm_generation/` (e.g., RNA sequence data "
+"augmentation), and learn feature learning & classification with RBM/DBN "
+"stacks."
 msgstr ""
-"**中级教程：** 在 `example/bm_generation/` 中探索全连接玻尔兹曼机的生成建模（例如 RNA "
-"序列数据增强），并学习使用 RBM/DBN 堆叠进行特征学习与分类。"
+"**中级教程：** 在 `example/bm_generation/` 中探索全连接玻尔兹曼机的生成建模（例如 RNA 序列数据增强），并学习使用 "
+"RBM/DBN 堆叠进行特征学习与分类。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:229
+#: ../../source/getting_started/quickstart.md:230
 msgid ""
 "**Advanced Case Study:** Dive into the Q-VAE (Quantum Variational "
 "Autoencoder) training pipeline and Q-Diffusion for discrete sequence "
-"generation, where a Boltzmann Machine serves as a learnable prior or "
-"energy-guided sampler."
+"generation, where a Boltzmann Machine serves as a learnable prior or energy-"
+"guided sampler."
 msgstr ""
 "**高级案例：** 深入 Q-VAE（量子变分自编码器）训练流程和用于离散序列生成的 "
 "Q-Diffusion，其中玻尔兹曼机作为可学习先验或能量引导采样器。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:231
+#: ../../source/getting_started/quickstart.md:232
 msgid "Learning Paths"
 msgstr "学习路径"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Level"
 msgstr "级别"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Resources"
 msgstr "资源"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "**Beginner**"
 msgstr "**入门**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "`tests/test_rbm.py`, basic execution"
 msgstr "`tests/test_rbm.py`：基本执行"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Basic RBM execution"
 msgstr "RBM 基本执行"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
-msgid "`example/rbm_digits/rbm_digits.py`, full RBM script"
-msgstr "`example/rbm_digits/rbm_digits.py`：完整 RBM 脚本"
+#: ../../source/getting_started/quickstart.md:52
+msgid "`example/rbm_digits/rbm_digits.ipynb`, full RBM walkthrough"
+msgstr "`example/rbm_digits/rbm_digits.ipynb`：完整 RBM 训练演练"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
-msgid "Complete RBM training script"
-msgstr "完整 RBM 训练脚本"
+#: ../../source/getting_started/quickstart.md:52
+msgid "Complete RBM training"
+msgstr "完整 RBM 训练演练"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "**Intermediate**"
 msgstr "**中级**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "`example/bm_generation/`, generative modeling with BMs (RNA sequence)"
 msgstr "`example/bm_generation/`：使用 BM 进行生成建模（RNA 序列）"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Generative modeling"
 msgstr "生成建模"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "RBM & DBN: feature learning & classification"
 msgstr "RBM 与 DBN：特征学习与分类"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Feature learning & classification"
 msgstr "特征学习与分类"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "**Advanced**"
 msgstr "**高级**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Q-VAE: Quantum Variational Autoencoder"
 msgstr "Q-VAE：量子变分自编码器"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Quantum VAE training"
 msgstr "量子 VAE 训练"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Q-Diffusion: discrete sequence generation"
 msgstr "Q-Diffusion：离散序列生成"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:52
+#: ../../source/getting_started/quickstart.md:52
 msgid "Discrete sequence generation"
 msgstr "离散序列生成"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:242
+#: ../../source/getting_started/quickstart.md:243
 msgid "Official Resources"
 msgstr "官方资源"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:243
+#: ../../source/getting_started/quickstart.md:244
 msgid ""
 "**KPP GitHub:** [https://github.com/QBoson/Kaiwu-pytorch-"
 "plugin](https://github.com/QBoson/Kaiwu-pytorch-plugin)"
@@ -346,15 +345,15 @@ msgstr ""
 "**KPP GitHub：** [https://github.com/QBoson/Kaiwu-pytorch-"
 "plugin](https://github.com/QBoson/Kaiwu-pytorch-plugin)"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:244
+#: ../../source/getting_started/quickstart.md:245
 msgid ""
-"**KPP Docs:** [https://kaiwu-pytorch-plugin-docs.readthedocs.io](https"
-"://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
+"**KPP Docs:** [https://kaiwu-pytorch-plugin-"
+"docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
 msgstr ""
-"**KPP 文档：** [https://kaiwu-pytorch-plugin-docs.readthedocs.io](https"
-"://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
+"**KPP 文档：** [https://kaiwu-pytorch-plugin-"
+"docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/quickstart.md:245
+#: ../../source/getting_started/quickstart.md:246
 msgid ""
 "**SDK Docs:** [https://kaiwu-community.readthedocs.io](https://kaiwu-"
 "community.readthedocs.io/)"
@@ -363,17 +362,15 @@ msgstr ""
 "community.readthedocs.io/)"
 
 #~ msgid ""
-#~ "**Beginner Course:** Check out the [KPP"
-#~ " "
-#~ "Tutorials](https://icngzsrp9wst.feishu.cn/wiki/YKG2woyYoimFP3kO2vTcvWP8nbh)"
-#~ " for more practical application examples."
-#~ " Start with `tests/test_rbm.py` for basic"
-#~ " execution and `example/rbm_digits/rbm_digits.py` "
-#~ "for a full RBM training script."
+#~ "**Beginner Course:** Check out the [KPP "
+#~ "Tutorials](https://icngzsrp9wst.feishu.cn/wiki/YKG2woyYoimFP3kO2vTcvWP8nbh) "
+#~ "for more practical application examples. Start with `tests/test_rbm.py` for "
+#~ "basic execution and `example/rbm_digits/rbm_digits.py` for a full RBM "
+#~ "training script."
 #~ msgstr ""
 #~ "**入门课程：** 查看 [KPP "
-#~ "教程](https://icngzsrp9wst.feishu.cn/wiki/YKG2woyYoimFP3kO2vTcvWP8nbh)"
-#~ " 获取更多实际应用示例。从 `tests/test_rbm.py` 开始了解基本执行，从 "
+#~ "教程](https://icngzsrp9wst.feishu.cn/wiki/YKG2woyYoimFP3kO2vTcvWP8nbh) "
+#~ "获取更多实际应用示例。从 `tests/test_rbm.py` 开始了解基本执行，从 "
 #~ "`example/rbm_digits/rbm_digits.py` 开始了解完整的 RBM 训练脚本。"
 
 #~ msgid "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
@@ -381,4 +378,3 @@ msgstr ""
 
 #~ msgid "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
 #~ msgstr ""
-

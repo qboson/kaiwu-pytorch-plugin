@@ -177,9 +177,9 @@ msgstr "Recommended Learning Paths"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:76
 msgid ""
-"**Beginner Path** — from the sampling bottleneck to your first application:"
+"**Beginner Path**, from the sampling bottleneck to your first application:"
 msgstr ""
-"**Beginner Path** — from the sampling bottleneck to your first application:"
+"**Beginner Path**, from the sampling bottleneck to your first application:"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:78
 msgid ""
@@ -222,8 +222,8 @@ msgstr ""
 "end-to-end application"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:84
-msgid "**Advanced Path** — deeper architectures and generative models:"
-msgstr "**Advanced Path** — deeper architectures and generative models:"
+msgid "**Advanced Path**, deeper architectures and generative models:"
+msgstr "**Advanced Path**, deeper architectures and generative models:"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:86
 msgid ""

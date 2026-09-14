@@ -106,7 +106,7 @@ msgid "RBM 的能量函数定义为："
 msgstr "The RBM energy function is defined as:"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:25
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -121,7 +121,6 @@ msgstr ""
 "The joint probability distribution is given by the Boltzmann distribution:"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:31
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -135,7 +134,6 @@ msgstr ""
 "distribution of the visible layer is:"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:37
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -153,7 +151,7 @@ msgstr ""
 "conditionally independent given the visible layer, and vice versa:"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:45
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -161,7 +159,7 @@ msgid ""
 msgstr "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij} v_i + c_j\\right)"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:49
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "\n"
 "\n"
@@ -170,7 +168,6 @@ msgid ""
 msgstr "P(v_i=1|\\mathbf{h}) = \\sigma\\left(\\sum_j W_{ij} h_j + b_i\\right)"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:54
-#, fuzzy
 msgid "其中 $\\sigma(x) = \\frac{1}{1+e^{-x}}$ 为 Sigmoid 激活函数。"
 msgstr ""
 "where $\\sigma(x)=\\frac{1}{1+e^{-x}}$ is the sigmoid activation function."
@@ -186,7 +183,6 @@ msgstr ""
 "The objective is the negative log-likelihood:"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:60
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -195,14 +191,12 @@ msgid ""
 msgstr "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:65
-#, fuzzy
 msgid "采用对比散度（CD）算法近似梯度，更新规则为："
 msgstr ""
 "Contrastive Divergence (CD) is used to approximate gradients.  The update "
 "rule is:"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:67
-#, fuzzy
 msgid ""
 "\n"
 "\n"
@@ -213,7 +207,6 @@ msgstr ""
 " \\langle v_i h_j \\rangle_{\\text{recon}}\\right)"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:72
-#, fuzzy
 msgid ""
 "其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle "
 "\\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"

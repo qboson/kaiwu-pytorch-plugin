@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 15:02+0800\n"
+"POT-Creation-Date: 2026-09-14 15:29+0800\n"
 "PO-Revision-Date: 2026-09-07 19:10+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -233,7 +233,7 @@ msgstr "按 `Ctrl+C`，然后运行："
 msgid "Project Structure & Package Layout"
 msgstr "项目结构与包布局"
 
-#: ../../source/getting_started/installation.md:155
+#: ../../source/getting_started/installation.md:158
 msgid "Key Code Entities"
 msgstr "关键代码实体"
 
@@ -281,11 +281,11 @@ msgid ""
 "binary hidden units (Bernoulli distribution), or vice versa"
 msgstr "RBM 变体，具有实值可见单元（高斯分布）和二元隐藏单元（伯努利分布），反之亦然"
 
-#: ../../source/getting_started/installation.md:164
+#: ../../source/getting_started/installation.md:167
 msgid "Kaiwu SDK Configuration & License"
 msgstr "Kaiwu SDK 配置与授权"
 
-#: ../../source/getting_started/installation.md:166
+#: ../../source/getting_started/installation.md:169
 msgid ""
 "Kaiwu-PyTorch-Plugin depends on the **Kaiwu SDK** to provide quantum "
 "computing capabilities. The Kaiwu SDK is a proprietary backend that provides"
@@ -295,72 +295,72 @@ msgstr ""
 "Kaiwu-PyTorch-Plugin 依赖 **Kaiwu SDK** 提供量子计算能力。Kaiwu SDK "
 "是一个专有后端，同时提供经典模拟（SA）和量子执行（CIM），必须单独安装。"
 
-#: ../../source/getting_started/installation.md:168
+#: ../../source/getting_started/installation.md:171
 msgid "Step 1: Obtain & Install SDK"
 msgstr "步骤 1：获取并安装 SDK"
 
-#: ../../source/getting_started/installation.md:169
+#: ../../source/getting_started/installation.md:172
 msgid "Option A: Install from PyPI (Recommended)"
 msgstr "方案 A：从 PyPI 安装（推荐）"
 
-#: ../../source/getting_started/installation.md:171
+#: ../../source/getting_started/installation.md:174
 msgid "The Kaiwu SDK is available on PyPI. You can install it directly:"
 msgstr "Kaiwu SDK 已在 PyPI 上发布。您可以直接安装："
 
-#: ../../source/getting_started/installation.md:177
+#: ../../source/getting_started/installation.md:180
 msgid "Alternatively, add the following line to your `requirements.txt`:"
 msgstr "或者，将以下行添加到您的 `requirements.txt`："
 
-#: ../../source/getting_started/installation.md:183
+#: ../../source/getting_started/installation.md:186
 msgid "Option B: Install from Official Wheel"
 msgstr "方案 B：从官方 Wheel 安装"
 
-#: ../../source/getting_started/installation.md:185
+#: ../../source/getting_started/installation.md:188
 msgid ""
 "If you need a specific version or have network restrictions, download the "
 "SDK wheel from the QBoson platform:"
 msgstr "如果您需要特定版本或有网络限制，请从 QBoson 平台下载 SDK wheel："
 
-#: ../../source/getting_started/installation.md:187
+#: ../../source/getting_started/installation.md:190
 msgid "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
 msgstr "访问 QBoson 平台上的 <u>Kaiwu SDK 下载页面</u>"
 
-#: ../../source/getting_started/installation.md:188
+#: ../../source/getting_started/installation.md:191
 msgid ""
 "Download the wheel package suitable for your system (e.g., "
 "`kaiwu-1.3.1-py3-none-any.whl`)"
 msgstr "下载适合您系统的 wheel 包（例如 `kaiwu-1.3.1-py3-none-any.whl`）"
 
-#: ../../source/getting_started/installation.md:189
+#: ../../source/getting_started/installation.md:192
 msgid "Install the wheel:"
 msgstr "安装 wheel："
 
-#: ../../source/getting_started/installation.md:195
+#: ../../source/getting_started/installation.md:198
 msgid "Step 2: Set Environment Variables"
 msgstr "步骤 2：设置环境变量"
 
-#: ../../source/getting_started/installation.md:197
+#: ../../source/getting_started/installation.md:200
 msgid ""
 "After installation, you need to configure the SDK authorization credentials."
 " Set the following environment variables:"
 msgstr "安装完成后，您需要配置 SDK 授权凭证。设置以下环境变量："
 
-#: ../../source/getting_started/installation.md:204
+#: ../../source/getting_started/installation.md:207
 msgid ""
 "**Important:** The environment variable name is `SDK_CODE`, **not** "
 "`SDK_TOKEN`. Using the wrong variable name will cause authentication to "
 "fail."
 msgstr "**重要：** 环境变量名称是 `SDK_CODE`，**不是** `SDK_TOKEN`。使用错误的变量名将导致认证失败。"
 
-#: ../../source/getting_started/installation.md:206
+#: ../../source/getting_started/installation.md:209
 msgid "Step 3: Initialize License in Code"
 msgstr "步骤 3：在代码中初始化授权"
 
-#: ../../source/getting_started/installation.md:208
+#: ../../source/getting_started/installation.md:211
 msgid "Then initialize the license in your code:"
 msgstr "然后在代码中初始化授权："
 
-#: ../../source/getting_started/installation.md:220
+#: ../../source/getting_started/installation.md:223
 msgid ""
 "**Note:** Always keep credentials in environment variables, never hardcode "
 "them in source code, as they could be accidentally committed to version "
@@ -370,31 +370,31 @@ msgstr ""
 "**注意：** 始终将凭证保存在环境变量中，切勿硬编码在源代码中，以免意外提交到版本控制。凭证可在 QBoson 平台的 <u>Kaiwu SDK "
 "页面</u> 获取。"
 
-#: ../../source/getting_started/installation.md:222
+#: ../../source/getting_started/installation.md:225
 msgid "Obtain Quantum Computer Access"
 msgstr "获取量子计算机访问权限"
 
-#: ../../source/getting_started/installation.md:223
+#: ../../source/getting_started/installation.md:226
 msgid "How to Get QPU Access"
 msgstr "如何获取 QPU 访问权限"
 
-#: ../../source/getting_started/installation.md:224
+#: ../../source/getting_started/installation.md:227
 msgid ""
 "To experience true quantum computing capabilities, you need to obtain access"
 " to a quantum computer:"
 msgstr "要体验真正的量子计算能力，您需要获取量子计算机的访问权限："
 
-#: ../../source/getting_started/installation.md:226
+#: ../../source/getting_started/installation.md:229
 msgid "Register an account on the <u>QBoson platform</u>"
 msgstr "在 <u>QBoson 平台</u> 注册账号"
 
-#: ../../source/getting_started/installation.md:227
+#: ../../source/getting_started/installation.md:230
 msgid ""
 "Contact the official staff through the platform to request a quota for the "
 "real quantum device"
 msgstr "通过平台联系官方工作人员申请真机配额"
 
-#: ../../source/getting_started/installation.md:229
+#: ../../source/getting_started/installation.md:232
 msgid ""
 "**Note:** Before obtaining access to the real quantum device, you can use "
 "simulators for development and testing. The Kaiwu SDK provides various "
@@ -404,74 +404,74 @@ msgstr ""
 "**注意：** 在获取真机访问权限之前，您可以使用模拟器进行开发和测试。Kaiwu SDK "
 "提供多种经典优化器（如模拟退火优化器）作为量子采样器的经典替代方案。"
 
-#: ../../source/getting_started/installation.md:231
+#: ../../source/getting_started/installation.md:234
 msgid "Development Workflow Recommendation:"
 msgstr "开发工作流建议："
 
-#: ../../source/getting_started/installation.md:250
+#: ../../source/getting_started/installation.md:253
 msgid ""
 "**Note:** Always validate your model with the classical simulator before "
 "consuming QPU quota."
 msgstr "**注意：** 在消耗 QPU 配额之前，请始终使用经典模拟器验证您的模型。"
 
-#: ../../source/getting_started/installation.md:251
+#: ../../source/getting_started/installation.md:254
 msgid "Verify Installation"
 msgstr "验证安装"
 
-#: ../../source/getting_started/installation.md:253
+#: ../../source/getting_started/installation.md:256
 msgid ""
 "After installation, run the following code to verify that the installation "
 "was successful:"
 msgstr "安装完成后，运行以下代码验证安装是否成功："
 
-#: ../../source/getting_started/installation.md:255
+#: ../../source/getting_started/installation.md:258
 msgid "Three Verification Steps"
 msgstr "三个验证步骤"
 
-#: ../../source/getting_started/installation.md:257
+#: ../../source/getting_started/installation.md:260
 msgid ""
-"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.0+) are loaded"
-msgstr "**检查版本：** 确认 PyTorch（2.x）和 Kaiwu SDK（v1.3.0+）已加载"
+"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded"
+msgstr "**检查版本：** 确认 PyTorch（2.x）和 Kaiwu SDK（v1.3.1+）已加载"
 
-#: ../../source/getting_started/installation.md:258
+#: ../../source/getting_started/installation.md:261
 msgid "**Test SDK backend:** Verify the classical SA solver works"
 msgstr "**测试 SDK 后端：** 验证经典 SA 求解器正常工作"
 
-#: ../../source/getting_started/installation.md:259
+#: ../../source/getting_started/installation.md:262
 msgid ""
 "**Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and "
 "initializes"
 msgstr "**实例化 KPP 模型：** 确认 `RestrictedBoltzmannMachine` 可导入并初始化"
 
-#: ../../source/getting_started/installation.md:261
+#: ../../source/getting_started/installation.md:264
 msgid "Smoke-Test Code"
 msgstr "冒烟测试代码"
 
-#: ../../source/getting_started/installation.md:286
+#: ../../source/getting_started/installation.md:289
 msgid "Expected Output"
 msgstr "预期输出"
 
-#: ../../source/getting_started/installation.md:295
+#: ../../source/getting_started/installation.md:298
 msgid ""
 "If no error occurs, your environment is ready. You can now build models and "
 "validate with classical samplers, then switch to the quantum sampler."
 msgstr "如果没有报错，您的环境已就绪。现在可以构建模型并使用经典采样器验证，然后切换到量子采样器。"
 
-#: ../../source/getting_started/installation.md:297
+#: ../../source/getting_started/installation.md:300
 msgid "Development Environment Setup (Optional)"
 msgstr "开发环境设置（可选）"
 
-#: ../../source/getting_started/installation.md:299
+#: ../../source/getting_started/installation.md:302
 msgid ""
 "If you plan to participate in the development of the plugin, you can install"
 " the development dependencies:"
 msgstr "如果您计划参与插件的开发，可以安装开发依赖："
 
-#: ../../source/getting_started/installation.md:305
+#: ../../source/getting_started/installation.md:308
 msgid "Run tests:"
 msgstr "运行测试："
 
-#: ../../source/getting_started/installation.md:315
+#: ../../source/getting_started/installation.md:318
 msgid "Lint code style:"
 msgstr "代码风格检查："
 

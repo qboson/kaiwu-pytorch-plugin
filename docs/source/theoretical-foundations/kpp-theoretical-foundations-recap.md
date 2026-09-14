@@ -49,9 +49,12 @@ Part II [KPP Hands-on Tutorials](../getting_started/tutorials/index.md) shifts f
 
 Moreover, four sophisticated tasks will be covered:
 
-1. **Quantum Sampling for EBMs:** Understand the annealing principle and integrate quantum samplers into PyTorch.
-2. **Full Boltzmann Machine:** Model a 2D mixture distribution and observe quantum speed‑up.
-3. **RBMs and DBNs:** Learn hierarchical features from MNIST digits; compare quantum‑accelerated training against classical CD.
+1. **Quantum Sampling for EBMs:** Revisit the sampling bottleneck, establish the SA baseline, and integrate quantum samplers into PyTorch.
+2. **Full Boltzmann Machine:** Train a fully connected BM for unsupervised generation of tabular data, combining a KL‑divergence term with a negative conditional likelihood (NCL) objective, and support conditional generation by fixing part of the visible units.
+3. **RBMs and DBNs:** Learn hierarchical features from MNIST digits.<!-- ; compare quantum‑accelerated training against classical CD. -->
 4. **Quantum Variational Autoencoder (Q‑VAE):** Replace the Gaussian prior of a VAE with a discrete quantum RBM and apply it to image generation and single‑cell transcriptomics.
 
-Each tutorial is self‑contained in a Jupyter notebook that you can run, modify, and extend. By the end of Part II, you will have experienced first‑hand how quantum sampling alleviates the classical mixing bottleneck and enables more expressive generative models.
+<!-- Each tutorial is self‑contained in a Jupyter notebook  -->
+Each hands‑on chapter pairs a documentation page with a runnable Jupyter notebook (or Python script) that you can run, modify, and extend. By the end of this tutorial, you will have experienced first‑hand how quantum sampling alleviates the classical mixing bottleneck and enables more expressive generative models.
+
+

@@ -73,7 +73,7 @@ The [Tutorials](tutorials/index.md) section is designed for users who have alrea
 
 ## Recommended Learning Paths
 
-**Beginner Path** — from the sampling bottleneck to your first application:
+**Beginner Path**, from the sampling bottleneck to your first application:
 
 1. Complete the [Quick Start](quickstart.md) to understand the basic API and training loop
 2. Study [Why Quantum? Revisiting the Sampling Bottleneck](tutorials/quantum_sampling_bottleneck.md)
@@ -81,7 +81,7 @@ The [Tutorials](tutorials/index.md) section is designed for users who have alrea
 4. Learn [Integrating Quantum Samplers into PyTorch](tutorials/quantum_sampling_pytorch.md) to integrate the CIM sampler
 5. Apply [RBM Classification](tutorials/rbm_classification.md) for your first end-to-end application
 
-**Advanced Path** — deeper architectures and generative models:
+**Advanced Path**, deeper architectures and generative models:
 
 1. [DBN Classification](tutorials/dbn_classification.md): extend RBM into deep hierarchical features
 2. [BM Generation](tutorials/bm_generation.md): generative modeling with a fully connected Boltzmann Machine

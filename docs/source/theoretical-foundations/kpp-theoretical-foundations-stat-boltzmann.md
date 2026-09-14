@@ -64,7 +64,7 @@ Its role is purely normalizing, it ensures that the probabilities over all state
 
 $$\sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}}) = \frac{1}{Z} \sum_{\tilde{\mathbf{x}}} \exp\left(-\frac{E(\tilde{\mathbf{x}})}{k_B T}\right) = 1$$
 
-While mathematically simple in definition, the partition function is computationally formidable. For a system of $N$binary units, the sum runs over $2^N$ distinct configurations. For even modest $N$(say, $N=100$, this number exceeds the estimated number of atoms in the observable universe. **The intractability of the partition function is the central computational challenge** that shapes every aspect of Boltzmann machine learning, from training algorithms to architectural constraints.
+While mathematically simple in definition, the partition function is computationally formidable. For a system of $N$binary units, the sum runs over $2^N$ distinct configurations. This exponential growth is already severe at modest sizes: For even modest $N$(say, $N=100$, this number exceeds the estimated number of stars in the observable universe. The intractability of **exact** partition-function computation is the central computational challenge that shapes every aspect of Boltzmann machine learning, from training algorithms to architectural constraints.
 
 ## The Thermodynamic Limit and Ensemble Equivalence
 For a macroscopic system (large $N$), the canonical and microcanonical ensembles become equivalent. This is because the energy fluctuations in the canonical ensemble scale as:

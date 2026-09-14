@@ -17,6 +17,35 @@ The defining characteristic of an RBM is its **restricted connectivity**: the ne
 Formally, let the visible units be $\mathbf{v} = (v_1, v_2, \ldots, v_{N_v})$ with biases $\mathbf{b} = (b_1, \ldots, b_{N_v})$, and the hidden units be $\mathbf{h} = (h_1, h_2, \ldots, h_{N_h})$ with biases $\mathbf{c} = (c_1, \ldots, c_{N_h})$. The weight matrix $\mathbf{W}$ is of size $N_v \times N_h$, where $w_{ij}$ connects visible unit $i$ to hidden unit $j$. There is no weight matrix for visible-visible or hidden-hidden pairs.
 
 This restricted topology is illustrated below:
+```{mermaid}
+graph LR
+    subgraph V [Visible Units]
+        v1((v1))
+        v2((v2))
+        v3((v3))
+        v4((v4))
+    end
+
+    subgraph H [Hidden Units]
+        h1((h1))
+        h2((h2))
+        h3((h3))
+    end
+
+    %% 使用双箭头表示双向对称权重
+    v1 <--> h1
+    v1 <--> h2
+    v1 <--> h3
+    v2 <--> h1
+    v2 <--> h2
+    v2 <--> h3
+    v3 <--> h1
+    v3 <--> h2
+    v3 <--> h3
+    v4 <--> h1
+    v4 <--> h2
+    v4 <--> h3
+```
 
 This restricted topology yields a crucial property: **conditional independence**. Given the visible units, the hidden units become independent of each other. Conversely, given the hidden units, the visible units become independent.
 

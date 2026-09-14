@@ -108,7 +108,6 @@ msgstr ""
 "P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}\n"
 
 #: ../../source/getting_started/background.md:31
-#, fuzzy
 msgid "where the partition function is:"
 msgstr "where the partition function is:"
 
@@ -281,14 +280,12 @@ msgstr ""
 
 #: ../../source/getting_started/background.md:96
 #: ../../source/getting_started/background.md:159
-#, fuzzy
 msgid ""
 "\n"
 "\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
 msgstr ""
-"where $\\epsilon$ is the learning rate, and $\\langle \\cdot "
-"\\rangle_{\\text{data}}$, $\\langle \\cdot \\rangle_{\\text{recon}}$ denote "
-"expectations under the data and reconstruction distributions, respectively."
+"\n"
+"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
 
 #: ../../source/getting_started/background.md:100
 msgid ""

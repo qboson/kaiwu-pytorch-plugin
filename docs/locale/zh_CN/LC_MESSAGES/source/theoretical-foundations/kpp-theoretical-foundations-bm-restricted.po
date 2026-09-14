@@ -784,6 +784,8 @@ msgid ""
 "p(h|v) = \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} "
 "\\exp(-E(v, h'))}"
 msgstr ""
+"p(h|v) = \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} "
+"\\exp(-E(v, h'))}"
 
 msgid ""
 "Because there are no hidden-hidden connections in an RBM, this distribution "
@@ -791,7 +793,7 @@ msgid ""
 msgstr "由于 RBM 中不存在隐藏单元之间的连接，该分布可以分解为"
 
 msgid "p(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),"
-msgstr ""
+msgstr "p(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),"
 
 msgid ""
 "where $p(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} "
@@ -806,7 +808,7 @@ msgid ""
 msgstr "**给定隐藏单元时可见单元的分布** $p(v|h)$：类似地，我们有"
 
 msgid "p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid \\mathbf{h})"
-msgstr ""
+msgstr "p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid \\mathbf{h})"
 
 msgid ""
 "where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j} w_{ij} "

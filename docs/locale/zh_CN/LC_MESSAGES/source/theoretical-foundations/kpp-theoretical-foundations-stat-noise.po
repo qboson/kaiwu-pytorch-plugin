@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 15:02+0800\n"
+"POT-Creation-Date: 2026-09-14 15:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -37,6 +37,19 @@ msgstr ""
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:14
 msgid "The Hopfield Network: Deterministic Descent"
 msgstr "Hopfield 网络：确定性下降"
+
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:15
+#, python-brace-format
+msgid ""
+"A Hopfield network is a recurrent neural network with symmetric weights "
+"$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves "
+"via the deterministic sign update (Eq. {eq}`eq-sign-update`, Section 1.1): "
+"asynchronous updates: at each time step, a single unit $i$is selected and "
+"its new state is determined by the sign of its total input:"
+msgstr ""
+"Hopfield 网络是一种具有对称权重 $w_{ij} = w_{ji}$ 且无自连接 $w_{ii} = 0$ "
+"的循环神经网络。其状态通过确定性符号更新规则 (Eq. {eq}`eq-sign-update`，第 1.1 节) "
+"演化：异步更新：在每个时间步，选择一个单元 $i$，其新状态由总输入的符号决定："
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:17
 #, python-brace-format
@@ -73,6 +86,17 @@ msgstr ""
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:25
 msgid "Memories as Energy Minima"
 msgstr "作为能量极小值的记忆"
+
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:26
+msgid ""
+"The Hopfield network was originally proposed as a model of **associative "
+"memory**. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
+"\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
+"learning rule (Eq. {eq}`eq-hebbian`, Section 1.1):"
+msgstr ""
+"Hopfield 网络最初被提出作为**联想记忆**的模型。通过 Hebbian 学习规则 (Eq. {eq}`eq-hebbian`，第 1.1 节)"
+" 存储一组模式 $\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
+"\\boldsymbol{\\xi}^P\\}$："
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:28
 #, python-brace-format
@@ -181,6 +205,17 @@ msgstr ""
 msgid "Enter Noise: Stochastic Dynamics and Thermal Fluctuations"
 msgstr "引入噪声：随机动力学与热涨落"
 
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:49
+#, python-brace-format
+msgid ""
+"The Boltzmann machine resolves this impasse by introducing **thermal "
+"noise**. Instead of setting a neuron deterministically to the sign of its "
+"input (Eq. {eq}`eq-sign-update`, Section 1.1), the state is sampled "
+"stochastically (Eq. {eq}`eq-stoch-update`):"
+msgstr ""
+"玻尔兹曼机通过引入**热噪声**解决了这一困境。与其按输入的符号确定性地设置神经元状态 (Eq. {eq}`eq-sign-update`，第 1.1 "
+"节)，不如按随机规则采样状态 (Eq. {eq}`eq-stoch-update`)："
+
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:51
 msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
 msgstr "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
@@ -251,17 +286,19 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:66
 msgid ""
-"P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\frac{\\exp(-E(x_i=1, "
-"\\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0,"
-" \\mathbf{x}_{-i})/T)} = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} "
-"\\right)"
+"\n"
+"\\begin{align*}\n"
+"P(x_i = 1 \\mid \\mathbf{x}_{-i}) &= \\frac{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0, \\mathbf{x}_{-i})/T)} \\\\\n"
+"&= \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)\n"
+"\\end{align*}\n"
 msgstr ""
-"P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\frac{\\exp(-E(x_i=1, "
-"\\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0,"
-" \\mathbf{x}_{-i})/T)} = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} "
-"\\right)"
+"\n"
+"\\begin{align*}\n"
+"P(x_i = 1 \\mid \\mathbf{x}_{-i}) &= \\frac{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0, \\mathbf{x}_{-i})/T)} \\\\\n"
+"&= \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)\n"
+"\\end{align*}\n"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:68
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:73
 msgid ""
 "Thus, the noise is **not** a heuristic; it is the physical manifestation of "
 "the system being in thermal equilibrium with its environment. The "
@@ -272,11 +309,11 @@ msgstr ""
 "因此，噪声 **不是** "
 "启发式补丁，而是系统与环境处于热平衡时的物理表现。向上爬升的概率恰好由玻尔兹曼因子比值决定，从而保证系统满足细致平衡并收敛到正确的平衡分布。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:70
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:75
 msgid "Simulated Annealing: From Exploration to Exploitation"
 msgstr "模拟退火：从探索到利用"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:71
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:76
 msgid ""
 "Noise alone, however, is not a panacea. If the temperature remains high, the"
 " network never settles. it wanders endlessly across the energy landscape, "
@@ -287,7 +324,7 @@ msgstr ""
 "不过，仅有噪声并不是万能药。如果温度始终很高，网络永远不会稳定下来，而是在能量景观中无休止游走，近似均匀地采样各种构型。为了得到有意义的低能状态，必须随时间逐渐降低温度，这一过程称为"
 " **模拟退火**。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:73
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:78
 msgid ""
 "The annealing schedule typically starts with a high temperature "
 "$T_{\\text{high}}$, where the system easily escapes local minima and "
@@ -297,12 +334,12 @@ msgstr ""
 "退火调度通常从高温 $T_{\\text{high}}$ "
 "开始，此时系统容易逃离局部极小值并探索能量景观的全局结构。随后按照冷却计划缓慢降低温度，常见的是几何降温："
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:75
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:80
 #, python-brace-format
 msgid "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
 msgstr "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:77
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:82
 msgid ""
 "As $T \\to 0$, the stochastic dynamics approach the deterministic Hopfield "
 "limit, and the network freezes into the nearest local minimum. If the "
@@ -313,7 +350,7 @@ msgstr ""
 "当 $T \\to 0$ 时，随机动力学接近确定性 Hopfield 极限，网络冻结到最近的局部极小值。如果退火足够缓慢，系统将以高概率收敛到 "
 "**全局最小值**，这一点由马尔可夫链蒙特卡洛（MCMC）理论形式化保证。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:79
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:84
 msgid ""
 "In practice, true global optimization is rarely achievable for large "
 "networks due to the exponential slowdown of mixing times at low temperatures"
@@ -323,18 +360,18 @@ msgid ""
 msgstr ""
 "实践中，由于低温下混合时间会指数级变慢（临界慢化），大型网络几乎无法实现真正的全局优化。即便如此，模拟退火仍然是寻找深层低能状态的强大启发式方法，这些状态对应模型学习分布下的高概率构型。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:81
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:86
 msgid "The Dual Role of Noise in Learning"
 msgstr "噪声在学习中的双重作用"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:82
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:87
 msgid ""
 "In the context of Boltzmann machine *learning*, noise serves a second, "
 "equally vital purpose. The learning algorithm relies on comparing two "
 "distinct phases of network operation:"
 msgstr "在玻尔兹曼机学习语境中，噪声还有第二个同样重要的作用。学习算法依赖于比较网络运行的两个阶段："
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:84
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:89
 msgid ""
 "**Positive phase (clamped)**: Visible units are held fixed to a training "
 "example, and hidden units are allowed to fluctuate. Noise ensures the hidden"
@@ -343,14 +380,14 @@ msgid ""
 msgstr ""
 "**正相（固定）**：可见单元固定为某个训练样本，隐藏单元允许涨落。噪声保证隐藏单元探索与可见数据一致的所有构型，从而为依赖数据的统计量提供无偏估计。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:85
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:90
 msgid ""
 "**Negative phase (free-running)**: The entire network runs freely without "
 "external input. Noise drives the system toward its equilibrium distribution,"
 " generating samples that reflect the model's current beliefs about the data."
 msgstr "**负相（自由运行）**：整个网络在没有外部输入的情况下自由运行。噪声驱动系统走向自身的平衡分布，生成反映模型当前“信念”的样本。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:87
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:92
 msgid ""
 "Without stochasticity, the network would simply collapse to the nearest "
 "deterministic attractor in both phases, failing to capture the full "
@@ -360,11 +397,11 @@ msgid ""
 msgstr ""
 "如果没有随机性，网络在两个阶段都会简单坍缩到最近的确定性吸引子，既无法捕捉隐藏原因的完整分布，也无法生成多样化样本。**噪声不是需要消除的缺陷，而是使玻尔兹曼机能够表示和学习复杂概率分布的必要特性。**"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:89
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:94
 msgid "Summary: From Deterministic Traps to Stochastic Freedom"
 msgstr "小结：从确定性陷阱到随机自由"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:90
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:95
 msgid ""
 "The deterministic Hopfield network demonstrates that symmetric recurrent "
 "networks can store memories as energy minima, but its greedy descent "
@@ -376,24 +413,24 @@ msgstr ""
 "网络表明，对称循环网络可以把记忆存储为能量极小值，但其贪婪下降动力学使它脆弱且容易陷入伪状态。玻尔兹曼机继承了基于能量的架构，但用 "
 "**受温度控制的随机采样** 取代了确定性更新。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:92
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:97
 msgid "This single modification confers two transformative capabilities:"
 msgstr "这一单一修改带来两种根本能力："
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:94
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:99
 msgid ""
 "**Escape from local minima** during inference, enabling the network to find "
 "globally consistent interpretations of ambiguous inputs."
 msgstr "**推断时逃离局部极小值**，使网络能够为模糊输入找到全局一致的解释。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:95
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:100
 msgid ""
 "**Exploration of the full state space** during learning, providing the "
 "statistical samples required for gradient estimation in the presence of an "
 "intractable partition function."
 msgstr "**学习时探索完整状态空间**，在配分函数不可处理的情况下提供梯度估计所需的统计样本。"
 
-#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:97
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:102
 msgid ""
 "The following sections will formalize the energy functions used in Boltzmann"
 " machines and introduce the specific architectures—most notably the "
@@ -401,37 +438,6 @@ msgid ""
 "computationally tractable."
 msgstr "后续章节将形式化玻尔兹曼机使用的能量函数，并介绍使随机采样在计算上可行的具体架构，尤其是受限玻尔兹曼机（RBM）。"
 
-msgid ""
-"A Hopfield network is a recurrent neural network with symmetric weights "
-"$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves "
-"via the deterministic sign update (Eq. {eq}`eq-sign-update`, Section 1.1): "
-"asynchronous updates: at each time step, a single unit $i$is selected and "
-"its new state is determined by the sign of its total input:"
-msgstr ""
-"Hopfield 网络是一种具有对称权重 $w_{ij} = w_{ji}$ 且无自连接 $w_{ii} = 0$ "
-"的循环神经网络。其状态通过确定性符号更新规则 (Eq. {eq}`eq-sign-update`，第 1.1 节) "
-"演化：异步更新：在每个时间步，选择一个单元 $i$，其新状态由总输入的符号决定："
-
-msgid ""
-"The Hopfield network was originally proposed as a model of **associative "
-"memory**. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
-"\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
-"learning rule (Eq. {eq}`eq-hebbian`, Section 1.1):"
-msgstr ""
-"Hopfield 网络最初被提出作为**联想记忆**的模型。通过 Hebbian 学习规则 (Eq. {eq}`eq-hebbian`，第 1.1 节)"
-" 存储一组模式 $\\{\\boldsymbol{\\xi}^1, \\boldsymbol{\\xi}^2, \\ldots, "
-"\\boldsymbol{\\xi}^P\\}$："
-
-msgid ""
-"The Boltzmann machine resolves this impasse by introducing **thermal "
-"noise**. Instead of setting a neuron deterministically to the sign of its "
-"input (Eq. {eq}`eq-sign-update`, Section 1.1), the state is sampled "
-"stochastically (Eq. {eq}`eq-stoch-update`):"
-msgstr ""
-"玻尔兹曼机通过引入**热噪声**解决了这一困境。与其按输入的符号确定性地设置神经元状态 (Eq. {eq}`eq-sign-update`，第 1.1 "
-"节)，不如按随机规则采样状态 (Eq. {eq}`eq-stoch-update`)："
-
-#, python-brace-format
 #~ msgid ""
 #~ "A Hopfield network is a recurrent neural network with symmetric weights "
 #~ "$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves "

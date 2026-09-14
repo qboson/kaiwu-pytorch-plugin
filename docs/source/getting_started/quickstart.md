@@ -155,8 +155,9 @@ if __name__ == "__main__":
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
     objective = rbm.objective(x, s)
-    # Update model weights with a step of stochastic gradient descent
     objective.backward()
+    # Update model weights with a step of stochastic gradient descent
+    opt_rbm.step()
 ```
 
 ### Boltzmann Machine (BM)
@@ -183,26 +184,26 @@ if __name__ == "__main__":
     x = 1.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
 
     # Instantiate the model
-    rbm = BoltzmannMachine(num_nodes)
+    bm = BoltzmannMachine(num_nodes)
 
     # Instantiate the optimizer
-    opt_rbm = SGD(rbm.parameters())
+    opt_bm = SGD(bm.parameters())
 
     # Example of one iteration in a training loop
     # Generate a sample set from the model
 
-    x = rbm.condition_sample(sampler, x)
-    s = rbm.sample(sampler)
-    opt_rbm.zero_grad()
+    x = bm.condition_sample(sampler, x)
+    s = bm.sample(sampler)
+    opt_bm.zero_grad()
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
-    objective = rbm.objective(x, s)
+    objective = bm.objective(x, s)
     # Backpropagate gradients
     print("call backward")
     objective.backward()
     print("after backward")
     # Update model weights with a step of stochastic gradient descent
-    opt_rbm.step()
+    opt_bm.step()
     print(objective)
 ```
 
@@ -224,7 +225,7 @@ sampler_sa = SimulatedAnnealingOptimizer()
 
 Congratulations on completing the quick start! For the next step:
 
-- **Beginner Course:** Check out the [KPP Tutorials](tutorials/index.md) for more practical application examples. Start with `tests/test_rbm.py` for basic execution and `example/rbm_digits/rbm_digits.py` for a full RBM training script.
+- **Beginner Course:** Check out the [KPP Tutorials](tutorials/index.md) for more practical application examples. Start with `tests/test_rbm.py` for basic execution, then follow `example/rbm_digits/rbm_digits.ipynb` for a full RBM training walkthrough.
 - **Intermediate Tutorial:** Explore generative modeling with fully connected Boltzmann Machines in `example/bm_generation/` (e.g., RNA sequence data augmentation), and learn feature learning & classification with RBM/DBN stacks.
 - **Advanced Case Study:** Dive into the Q-VAE (Quantum Variational Autoencoder) training pipeline and Q-Diffusion for discrete sequence generation, where a Boltzmann Machine serves as a learnable prior or energy-guided sampler.
 
@@ -233,7 +234,7 @@ Congratulations on completing the quick start! For the next step:
 | Level            | Resources                                                             | Description                       |
 | ---------------- | --------------------------------------------------------------------- | --------------------------------- |
 | **Beginner**     | `tests/test_rbm.py`, basic execution                                  | Basic RBM execution               |
-|                  | `example/rbm_digits/rbm_digits.py`, full RBM script                   | Complete RBM training script      |
+|                  | `example/rbm_digits/rbm_digits.ipynb`, full RBM walkthrough           | Complete RBM training      |
 | **Intermediate** | `example/bm_generation/`, generative modeling with BMs (RNA sequence) | Generative modeling               |
 |                  | RBM & DBN: feature learning & classification                          | Feature learning & classification |
 | **Advanced**     | Q-VAE: Quantum Variational Autoencoder                                | Quantum VAE training              |

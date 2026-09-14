@@ -44,10 +44,12 @@ The loop mirrors the [Quick Start](../quickstart.md) example: positive phase fro
 import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+from kaiwu.classical import SimulatedAnnealingOptimizer
 
 num_visible, num_hidden = 20, 30
 rbm = RestrictedBoltzmannMachine(num_visible, num_hidden)
 optimizer = SGD(rbm.parameters(), lr=0.01)
+sampler = SimulatedAnnealingOptimizer()
 
 v_data = torch.randint(0, 2, (16, num_visible)).float()
 s_positive = rbm.get_hidden(v_data, bernoulli=True)

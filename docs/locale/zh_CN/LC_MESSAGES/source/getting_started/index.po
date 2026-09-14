@@ -165,8 +165,8 @@ msgstr "推荐学习路径"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:76
 msgid ""
-"**Beginner Path** — from the sampling bottleneck to your first application:"
-msgstr "**入门路径**——从采样瓶颈到第一个应用："
+"**Beginner Path**, from the sampling bottleneck to your first application:"
+msgstr "**入门路径**，从采样瓶颈到第一个应用："
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:78
 msgid ""
@@ -200,8 +200,8 @@ msgid ""
 msgstr "应用 [RBM 分类](tutorials/rbm_classification.md)，完成第一个端到端应用"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:84
-msgid "**Advanced Path** — deeper architectures and generative models:"
-msgstr "**进阶路径**——更深的架构与生成模型："
+msgid "**Advanced Path**, deeper architectures and generative models:"
+msgstr "**进阶路径**，更深的架构与生成模型："
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:86
 msgid ""

@@ -135,15 +135,18 @@ Kaiwu-pytorch-plugin/
 ├── src/kaiwu/torch_plugin/   # Core library
 │   ├── __init__.py
 │   ├── abstract_boltzmann_machine.py
-│   ├── rbm.py                 # RestrictedBoltzmannMachine
-│   ├── gbrbm.py               # GaussianBernoulliRBM
-│   └── bm.py                  # BoltzmannMachine
+│   ├── restricted_boltzmann_machine.py
+│   ├── full_boltzmann_machine.py
+│   ├── gbrbm.py
+│   ├── dbn.py
+│   ├── qvae.py
+│   └── qdiffusion.py
 ├── example/                   # Application examples
-│   ├── rbm_digit
-│   ├── dbn_digit
+│   ├── rbm_digits
+│   ├── dbn_digits
 │   ├── bm_generation/
-│   └── qvae_mnist/
-│   └── qvae_cell/
+│   ├── qvae_mnist/
+│   ├── qvae_cell/
 │   └── qdiffusion/
 ├── tests/                      # Test suite
 │   └── test_rbm.py
@@ -254,7 +257,7 @@ After installation, run the following code to verify that the installation was s
 
 ### Three Verification Steps
 
-1. **Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.0+) are loaded
+1. **Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded
 2. **Test SDK backend:** Verify the classical SA solver works
 3. **Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and initializes
 
@@ -315,5 +318,5 @@ pytest tests/test_rbm.py
 ### Lint code style:
 
 ```bash
-pylint kaiwu/
+pylint src/kaiwu/
 ```

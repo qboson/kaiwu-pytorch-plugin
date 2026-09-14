@@ -24,7 +24,16 @@ To put this number in perspective:
 
 - The estimated number of stars in the observable universe is about $10^{22}$ to $10^{24}$.
 - The age of the universe is approximately $4.35 \times 10^{17}$ seconds.
-- Even if we could evaluate one trillion ($10^{12}$) configurations per second, enumerating $2^{100}$ configurations would take over $10^{10}$times the age of the universe.
+- Even if we could evaluate one trillion ($10^{12}$) configurations per second, enumerating $2^{100}$ configurations would take
+  \[
+  \frac{2^{100}}{10^{12}}\approx 1.27\times 10^{18}\ \text{seconds},
+  \]
+  about \(3\) times the age of the universe. At a more modest rate of \(10^9\) configurations per second, it would take
+  \[
+  \frac{2^{100}}{10^9}\approx 1.27\times 10^{21}\ \text{seconds},
+  \]
+  about \(2.9\times 10^3\) times the age of the universe.
+<!-- Thus, even for \(N=100\), brute-force enumeration is hopeless. Exact partition-function computation is therefore intractable; methods such as contrastive divergence approximate or bypass it rather than solve it exactly. -->
 
 And $N = 100$ is **tiny**. Real-world Boltzmann machines and restricted Boltzmann machines often have hundreds of visible units and hundreds or thousands of hidden units, yielding state spaces of size $2^{N_{\text{vis}} + N_{\text{hid}}}$. The partition function is **exponentially large** in the number of units.
 
