@@ -1,0 +1,303 @@
+{
+  "date": "2026-09-10",
+  "method": "All metric lines extracted by scanning each complete historical log. Each selected log contains exactly one mse/mae pair, which matches the aggregate result file. Full logs are not redistributed.",
+  "logs": [
+    {
+      "file": "weather_anderson_seed2023.log",
+      "bytes": 14101613,
+      "sha256": "6fb18a96699db3639142b043d84a7591774b7ac745245ff6cf1747174f3ff7ca",
+      "final_metrics": [
+        {
+          "mse": 0.17582795023918152,
+          "mae": 0.21430596709251404
+        }
+      ]
+    },
+    {
+      "file": "ECL_anderson_seed2023.log",
+      "bytes": 10078422,
+      "sha256": "92b9b90d4ea0c35894674538142f2d843c58dbdec7f46bd33474384393481d4b",
+      "final_metrics": [
+        {
+          "mse": 0.15046069025993347,
+          "mae": 0.241926372051239
+        }
+      ]
+    },
+    {
+      "file": "traffic_anderson_seed2023.log",
+      "bytes": 10423179,
+      "sha256": "00621e625accf820eca135a06369fb66d02e25831584bb9161b3418ddd772301",
+      "final_metrics": [
+        {
+          "mse": 0.3981347978115082,
+          "mae": 0.2702386677265167
+        }
+      ]
+    },
+    {
+      "file": "weather_ising_fp32_seed2023.log",
+      "bytes": 188024575,
+      "sha256": "47728cada73d50baf38ef621cd461b7d98982f0934e8ca2c198ff5fd58c7b24c",
+      "final_metrics": [
+        {
+          "mse": 0.1733599305152893,
+          "mae": 0.21380552649497986
+        }
+      ]
+    },
+    {
+      "file": "traffic_ising_fp32_seed2023.log",
+      "bytes": 92573761,
+      "sha256": "4e53d201721b3aab5232ed7460fb8af344a99ddb43a86bdc62ceafc13d3acc98",
+      "final_metrics": [
+        {
+          "mse": 0.39717525243759155,
+          "mae": 0.2698158025741577
+        }
+      ]
+    },
+    {
+      "file": "ECL_ising_fp32_seed2023.log",
+      "bytes": 218982527,
+      "sha256": "f6c4e0c6fafac3c05cb4b93b7ceb77b07362d37fb504eb6499d91b7c06af696b",
+      "final_metrics": [
+        {
+          "mse": 0.14907215535640717,
+          "mae": 0.2396341860294342
+        }
+      ]
+    },
+    {
+      "file": "weather_ising_int8_seed2023.log",
+      "bytes": 179650498,
+      "sha256": "a17bff49c3dcc839db17279581ca4657fa2e01e48f8ac51fa2b9a40b5b31b8a1",
+      "final_metrics": [
+        {
+          "mse": 0.17484866082668304,
+          "mae": 0.2149909883737564
+        }
+      ]
+    },
+    {
+      "file": "traffic_ising_int8_seed2023.log",
+      "bytes": 97649953,
+      "sha256": "6db430901c7a925957dea88bafd8846e00a495362112f673a75463b1a0157cff",
+      "final_metrics": [
+        {
+          "mse": 0.39654719829559326,
+          "mae": 0.26996859908103943
+        }
+      ]
+    },
+    {
+      "file": "weather_anderson_seed42.log",
+      "bytes": 10900906,
+      "sha256": "5b8e7ef4428ffc2a14f31c7d5fb5599c904ff3bfbc0f32aa78f50e363b5d045b",
+      "final_metrics": [
+        {
+          "mse": 0.17620810866355896,
+          "mae": 0.21698465943336487
+        }
+      ]
+    },
+    {
+      "file": "traffic_anderson_seed42.log",
+      "bytes": 6651674,
+      "sha256": "5d410a53f83af450caefeff07db58c6e61478ebc2dc9aa9d82109c31c1f33c40",
+      "final_metrics": [
+        {
+          "mse": 0.3997442424297333,
+          "mae": 0.2718328535556793
+        }
+      ]
+    },
+    {
+      "file": "traffic_ising_fp32_seed42.log",
+      "bytes": 96850035,
+      "sha256": "edac930ea4114497e946b7713e64cd427ee5866500adbb0695d67277304ccd46",
+      "final_metrics": [
+        {
+          "mse": 0.39797157049179077,
+          "mae": 0.2699418365955353
+        }
+      ]
+    },
+    {
+      "file": "ECL_ising_int8_seed2023.log",
+      "bytes": 220839546,
+      "sha256": "9fca420554f13f03a345eebeff06cdcf65cda31563e9edc7252e536a50d0284f",
+      "final_metrics": [
+        {
+          "mse": 0.14904846251010895,
+          "mae": 0.23998309671878815
+        }
+      ]
+    },
+    {
+      "file": "ECL_anderson_seed42.log",
+      "bytes": 8182659,
+      "sha256": "df303a37a0b6ee3c8d71f69b68ec4fe49ed7c9bef722fb0f1f9c4b48f59ff107",
+      "final_metrics": [
+        {
+          "mse": 0.15087388455867767,
+          "mae": 0.24265965819358826
+        }
+      ]
+    },
+    {
+      "file": "weather_ising_fp32_seed42.log",
+      "bytes": 246854055,
+      "sha256": "aa5f44500fa70a2188e16efea951fee5fcb270af9d8ddd0d9ce7d512b73c4481",
+      "final_metrics": [
+        {
+          "mse": 0.17480573058128357,
+          "mae": 0.21365393698215485
+        }
+      ]
+    },
+    {
+      "file": "traffic_ising_int8_seed42.log",
+      "bytes": 98768082,
+      "sha256": "0a43ca16d3507c1d823f8508363b935b93c815491cda07b441e76c8a6e9e7185",
+      "final_metrics": [
+        {
+          "mse": 0.3993634581565857,
+          "mae": 0.2712726593017578
+        }
+      ]
+    },
+    {
+      "file": "traffic_anderson_seed2024.log",
+      "bytes": 6651931,
+      "sha256": "a911771dffae2eea51c3fabc693ce899fac9582757b617357d74b242f8b58dde",
+      "final_metrics": [
+        {
+          "mse": 0.4003918766975403,
+          "mae": 0.2715208828449249
+        }
+      ]
+    },
+    {
+      "file": "weather_ising_int8_seed42.log",
+      "bytes": 178352504,
+      "sha256": "6a9d5d3949989fac21813e01621c8cc80280478636090988c7d81b80b9b059c4",
+      "final_metrics": [
+        {
+          "mse": 0.17548732459545135,
+          "mae": 0.21584244072437286
+        }
+      ]
+    },
+    {
+      "file": "weather_anderson_seed2024.log",
+      "bytes": 10900687,
+      "sha256": "1f2850cc035b014bf56739b3aaecc6328435f9ce9591b6ab57a883aafccc7fc0",
+      "final_metrics": [
+        {
+          "mse": 0.17974238097667694,
+          "mae": 0.21830226480960846
+        }
+      ]
+    },
+    {
+      "file": "ECL_ising_fp32_seed42.log",
+      "bytes": 211885038,
+      "sha256": "7b14f467b96d19b4da5ba0f58cd804dc7fc80ca068a01accb0c90879884b1f26",
+      "final_metrics": [
+        {
+          "mse": 0.14868386089801788,
+          "mae": 0.2398998737335205
+        }
+      ]
+    },
+    {
+      "file": "traffic_ising_fp32_seed2024.log",
+      "bytes": 103282450,
+      "sha256": "c79b47822b2aa1fc058e15a4e9bf75132c44cc587f1ca573df97df5072f5c426",
+      "final_metrics": [
+        {
+          "mse": 0.3981040120124817,
+          "mae": 0.2704237401485443
+        }
+      ]
+    },
+    {
+      "file": "traffic_ising_int8_seed2024.log",
+      "bytes": 100433769,
+      "sha256": "0d5ff7121e8c2f8ee6d7c97969667f25f9c35343debe19bd33f53a224f47b6ba",
+      "final_metrics": [
+        {
+          "mse": 0.39982879161834717,
+          "mae": 0.27140265703201294
+        }
+      ]
+    },
+    {
+      "file": "weather_ising_fp32_seed2024.log",
+      "bytes": 191278950,
+      "sha256": "29fe0da13970a74f8625a45ae653393363db1373f1ad5a94d3cc97680de0d501",
+      "final_metrics": [
+        {
+          "mse": 0.17267447710037231,
+          "mae": 0.2131064534187317
+        }
+      ]
+    },
+    {
+      "file": "ECL_ising_int8_seed42.log",
+      "bytes": 211996484,
+      "sha256": "b2da0ff830a12aefa590729630a82b7b16f44f80bda06e3f9bbe83341b85b473",
+      "final_metrics": [
+        {
+          "mse": 0.14864800870418549,
+          "mae": 0.23990775644779205
+        }
+      ]
+    },
+    {
+      "file": "ECL_anderson_seed2024.log",
+      "bytes": 8191821,
+      "sha256": "ab1109252157369999c9f3ca985cf451d0dcf95017102b80056e1f9033973164",
+      "final_metrics": [
+        {
+          "mse": 0.15128040313720703,
+          "mae": 0.24251623451709747
+        }
+      ]
+    },
+    {
+      "file": "weather_ising_int8_seed2024.log",
+      "bytes": 176624533,
+      "sha256": "7af0877ef2d016657a7699219b580b415cb437c320e95e1105cc8e26065b1f50",
+      "final_metrics": [
+        {
+          "mse": 0.17570899426937103,
+          "mae": 0.2156396210193634
+        }
+      ]
+    },
+    {
+      "file": "ECL_ising_fp32_seed2024.log",
+      "bytes": 242654560,
+      "sha256": "5c6ff55ec0918d888e846c959d3726c7d08e4d499b733c2b17ba47fbc2165095",
+      "final_metrics": [
+        {
+          "mse": 0.14904992282390594,
+          "mae": 0.24031202495098114
+        }
+      ]
+    },
+    {
+      "file": "ECL_ising_int8_seed2024.log",
+      "bytes": 211652494,
+      "sha256": "d4bb373473bd97d4468839fc13be87c2319a7c05ccee3c4c35a1e92d5e825622",
+      "final_metrics": [
+        {
+          "mse": 0.14932359755039215,
+          "mae": 0.24052610993385315
+        }
+      ]
+    }
+  ]
+}

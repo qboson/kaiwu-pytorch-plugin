@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qdeq"
+version = "0.1.0"
+description = "Reusable Deep Equilibrium layers with pluggable Ising/SA and Anderson solvers"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [{name = "QDEQ contributors"}]
+dependencies = ["torch>=2.0", "numpy>=1.23"]
+
+[project.urls]
+Repository = "https://github.com/Renata1027/QDEQ"
+
+[tool.setuptools.packages.find]
+include = ["qdeq", "qdeq.*"]
+exclude = ["qdeq.tests", "qdeq.tests.*"]

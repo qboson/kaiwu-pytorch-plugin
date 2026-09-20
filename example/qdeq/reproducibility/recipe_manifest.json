@@ -1,0 +1,31 @@
+{
+  "audit_date": "2026-09-10",
+  "result_file": "result_long_term_forecast.txt",
+  "result_file_sha256": "8131f445994031b009a6b4d6d2696f6c27b8bda3a681a61e122fb74893a4d7a8",
+  "recipes": [
+    {
+      "file": "etth1_formal.sh",
+      "historical_script_sha256": "6bc7d2fcaa29299df8dd4d06efad65ae47d43b987212d44b583b8624974dbfab",
+      "required_dataset": "./dataset/ETT-small/ETTh1.csv",
+      "required_initial_checkpoint": "checkpoints/ETTh1_96_96_theta0_realign_iTransformer_ETTh1_M_ft96_sl48_ll96_pl256_dm8_nh1_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth"
+    },
+    {
+      "file": "ecl_multiseed.sh",
+      "historical_script_sha256": "a96131da9b7a933d7ede25ea63780f03262e0ca59b3a9fe2c1d428e75625558e",
+      "required_dataset": "./dataset/electricity/electricity.csv",
+      "required_initial_checkpoint": "checkpoints/ECL_96_96_theta0_anderson_iTransformer_custom_M_ft96_sl48_ll96_pl512_dm8_nh1_el1_dl512_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth"
+    },
+    {
+      "file": "weather_multiseed.sh",
+      "historical_script_sha256": "005c303cc28a3177f4a625bdc9df48a2f4d0569ac8a544703099229f429d38cf",
+      "required_dataset": "./dataset/weather/weather.csv",
+      "required_initial_checkpoint": "checkpoints/weather_96_96_theta0_anderson_iTransformer_custom_M_ft96_sl48_ll96_pl512_dm8_nh1_el1_dl512_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth"
+    },
+    {
+      "file": "traffic_multiseed_standalone.sh",
+      "historical_script_sha256": "f0308c0c28e71c54aa2bb0f91728844b9f31e713b540d6b1ed17ade8e220c6a9",
+      "required_dataset": "./dataset/traffic/traffic.csv",
+      "required_initial_checkpoint": "checkpoints/traffic_96_96_theta0_anderson_iTransformer_custom_M_ft96_sl48_ll96_pl512_dm8_nh1_el1_dl512_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth"
+    }
+  ]
+}
