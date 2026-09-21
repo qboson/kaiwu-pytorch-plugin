@@ -12,12 +12,12 @@ msgstr ""
 "POT-Creation-Date: 2026-07-09 10:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: ../../source/faq/faq.md:1
@@ -285,4 +285,33 @@ msgstr ""
 #: ../../source/faq/faq.md:148
 msgid "**联系邮箱**：developer@boseq.com"
 msgstr ""
+
+#~ msgid "确认已安装 Kaiwu-PyTorch-Plugin：``pip install .``"
+#~ msgstr ""
+
+#~ msgid "确认当前环境已激活：``conda activate quantum_env``"
+#~ msgstr ""
+
+#~ msgid "访问 `Kaiwu SDK 下载页面 <https://platform.qboson.com/sdkDownload>`_"
+#~ msgstr ""
+
+#~ msgid "在 `QBoson 平台 <https://platform.qboson.com/>`_ 注册账号"
+#~ msgstr ""
+
+#~ msgid "A: ``SimulatedAnnealingOptimizer`` 的主要参数："
+#~ msgstr ""
+
+#~ msgid "``alpha``：退火系数（0.9-0.999），越接近 1 收敛越慢但结果越优"
+#~ msgstr ""
+
+#~ msgid "``size_limit``：每次采样返回的样本数"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**GitHub Issues**：`提交问题 <https://github.com/QBoson"
+#~ "/Kaiwu-pytorch-plugin/issues>`_"
+#~ msgstr ""
+
+#~ msgid "**开发者社区**：玻声量子开发者社区"
+#~ msgstr ""
 

@@ -12,12 +12,12 @@ msgstr ""
 "POT-Creation-Date: 2026-07-09 10:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: ../../source/about/release_notes.md:1
@@ -32,8 +32,7 @@ msgstr ""
 msgid "版本 0.1.0（2025-12-24）"
 msgstr ""
 
-#: ../../source/about/release_notes.md:7
-#: ../../source/about/release_notes.md:21
+#: ../../source/about/release_notes.md:7 ../../source/about/release_notes.md:21
 msgid "**新功能**"
 msgstr ""
 
@@ -184,13 +183,31 @@ msgstr ""
 
 #: ../../source/about/release_notes.md:71
 msgid "Python 3.10"
-msgstr "Python 3.10"
+msgstr ""
 
 #: ../../source/about/release_notes.md:72
 msgid "PyTorch 2.7.0"
-msgstr "PyTorch 2.7.0"
+msgstr ""
 
 #: ../../source/about/release_notes.md:73
 msgid "Kaiwu SDK v1.2.0+"
-msgstr "Kaiwu SDK v1.2.0+"
+msgstr ""
+
+#~ msgid "``RestrictedBoltzmannMachine``：受限玻尔兹曼机实现"
+#~ msgstr ""
+
+#~ msgid "``BoltzmannMachine``：全连接玻尔兹曼机实现"
+#~ msgstr ""
+
+#~ msgid "``AbstractBoltzmannMachine``：抽象基类，支持自定义扩展"
+#~ msgstr ""
+
+#~ msgid "``rbm_digits``：手写数字识别示例"
+#~ msgstr ""
+
+#~ msgid "``qvae_mnist``：Q-VAE MNIST 生成示例"
+#~ msgstr ""
+
+#~ msgid "``bm_generation``：玻尔兹曼机数据生成示例"
+#~ msgstr ""
 
