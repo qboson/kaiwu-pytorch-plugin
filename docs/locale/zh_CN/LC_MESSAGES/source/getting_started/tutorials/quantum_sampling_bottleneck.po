@@ -14,11 +14,11 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:1
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:1
 msgid "Why Quantum? Revisiting the Sampling Bottleneck"
 msgstr "为什么需要量子采样：重温采样瓶颈"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:3
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:3
 msgid ""
 "By this point you have finished the [Getting Started](../index.md) guide and"
 " reviewed the [Prerequisites](../background.md). The [Theoretical "
@@ -34,11 +34,11 @@ msgstr ""
 "foundations/index.md)已经阐明：玻尔兹曼机概念上优雅，但在计算上受困于**采样瓶颈**。本章回顾这一结论，解释量子硬件带来了什么改变，并说明"
 " KPP 如何让你通过同一训练流程使用经典与相干伊辛机（CIM）采样器。本章起承上启下作用：完整推导在理论基础中，代码在接下来的两章中。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:5
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:5
 msgid "The Sampling Problem in Exact Maximum Likelihood Learning"
 msgstr "精确最大似然学习中的采样问题"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:9
 msgid ""
 "\\frac{\\partial \\mathcal{L}}{\\partial \\theta} =\n"
 "\\mathbb{E}_{\\mathrm{data}}\\!\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right] -\n"
@@ -48,7 +48,7 @@ msgstr ""
 "\\mathbb{E}_{\\mathrm{data}}\\!\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right] -\n"
 "\\mathbb{E}_{\\mathrm{model}}\\!\\left[ \\frac{\\partial E_\\theta}{\\partial \\theta} \\right]."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:18
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:18
 msgid ""
 "Classical approaches have known drawbacks (detailed in [Section "
 "4.1](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
@@ -61,14 +61,14 @@ msgstr ""
 "theoretical-foundations-bm-restricted.md)与[第 3.3 节](../../theoretical-"
 "foundations/kpp-theoretical-foundations-ebms-cd.md)）："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:20
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:20
 msgid ""
 "**MCMC / Gibbs sampling** converges to the target distribution, but mixing "
 "can be exponentially slow in rugged energy landscapes — *critical slowing "
 "down*."
 msgstr "**MCMC/Gibbs 采样**会收敛到目标分布，但在崎岖的能量景观中混合速度可能呈指数级缓慢——即*临界减速*。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:21
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:21
 msgid ""
 "**CD / PCD** trade bias for speed: a few MCMC steps initialized at data "
 "points, risking **mode collapse**; PCD keeps persistent chains but still "
@@ -76,17 +76,17 @@ msgid ""
 msgstr ""
 "**CD/PCD** 用偏差换取速度：从数据点初始化少量 MCMC 步，存在**模式坍缩**风险；PCD 保留持久链，但每次更新仍需付出采样成本。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:23
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:23
 msgid ""
 "These methods are practical, but they should not be confused with exact "
 "sampling from the equilibrium distribution."
 msgstr "这些方法实用，但不应与平衡分布的精确采样混为一谈。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:25
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:25
 msgid "The Quantum Alternative: Sampling by Physical Evolution"
 msgstr "量子替代方案：通过物理演化采样"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:27
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:27
 msgid ""
 "Instead of simulating a Markov chain, the energy function is encoded into a "
 "physical quantum system that evolves toward its low-energy states. Devices "
@@ -97,43 +97,43 @@ msgid ""
 msgstr ""
 "与模拟马尔可夫链不同，能量函数被编码进一个向低能态演化的物理量子系统。量子退火机与相干伊辛机（CIM）等设备即此思路的实现：模型变量映射到量子比特或光脉冲上，测量结果给出近似硬件有效温度下玻尔兹曼分布的样本："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:29
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:29
 msgid "P(\\mathbf{s}) \\propto \\exp\\left(-\\beta_{\\mathrm{eff}} H(\\mathbf{s})\\right),"
 msgstr "P(\\mathbf{s}) \\propto \\exp\\left(-\\beta_{\\mathrm{eff}} H(\\mathbf{s})\\right),"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:36
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:36
 msgid "The main promises are:"
 msgstr "其主要承诺在于："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:38
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:38
 msgid ""
 "**Direct physical sampling**: quantum tunneling may escape local minima more"
 " efficiently than thermal hopping."
 msgstr "**直接物理采样**：量子隧穿可能比热跃迁更高效地逃离局部极小。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:39
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:39
 msgid ""
 "**Inherent parallelism**: thousands of optical pulses interact "
 "simultaneously, versus sequential Gibbs updates."
 msgstr "**天然并行性**：数千个光脉冲同时相互作用，而 Gibbs 更新是串行的。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:40
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:40
 msgid ""
 "**Hardware-scale sampling**: problem sizes that would be prohibitively slow "
 "to simulate classically."
 msgstr "**硬件级采样规模**：支持经典模拟难以企及的问题规模。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:41
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:41
 msgid ""
 "**Avoiding CD bias**: near-equilibrium samples without data-dependent "
 "initialization, giving less biased gradient estimates."
 msgstr "**避免 CD 偏差**：无需依赖数据初始化即可获得接近平衡的样本，梯度估计偏差更小。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:43
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:43
 msgid "From Boltzmann Machines to Ising Hamiltonians"
 msgstr "从玻尔兹曼机到 Ising 哈密顿量"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:47
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:47
 msgid ""
 "H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij} s_i s_j + "
 "\\mathrm{const},"
@@ -141,7 +141,7 @@ msgstr ""
 "H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij} s_i s_j + "
 "\\mathrm{const},"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:52
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:52
 msgid ""
 "the form that quantum annealing hardware and CIMs are designed to handle. "
 "KPP constructs this Ising matrix from the model parameters and hands it to "
@@ -150,11 +150,11 @@ msgstr ""
 "这正是量子退火硬件与 CIM 所擅长处理的形式。KPP 会从模型参数构造该 Ising 矩阵并交给 **Kaiwu SDK "
 "求解器**；你无需手工完成转换。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:54
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:54
 msgid "Classical and Quantum Samplers in KPP"
 msgstr "KPP 中的经典与量子采样器"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:56
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:56
 msgid ""
 "KPP uses different sampling backends through the same `sample(sampler)` "
 "call, used in the [Quick Start](../quickstart.md) example. "
@@ -168,35 +168,35 @@ msgstr ""
 "适合本地调试与基线实验；`CIMOptimizer` 需要有效的 Kaiwu SDK "
 "凭据与真机访问权限。两者应在相同模型、采样预算与评价指标下比较，不能仅凭采样器类型推断优劣。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:66
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:66
 msgid "Summary"
 msgstr "小结"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:68
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:68
 msgid ""
 "Sampling from the model distribution is the central computational bottleneck"
 " of Boltzmann machine training (Eq. {eq}`eq-nll-gradient`)."
 msgstr "从模型分布采样是玻尔兹曼机训练的核心计算瓶颈（式 {eq}`eq-nll-gradient`）。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:69
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:69
 msgid ""
 "Classical MCMC suffers from slow mixing times, and practical approximations "
 "such as CD introduce bias and can cause mode collapse."
 msgstr "经典 MCMC 混合缓慢，CD 等实用近似会引入偏差并可能导致模式坍缩。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:70
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:70
 msgid ""
 "Quantum sampling encodes the energy as an Ising Hamiltonian and samples by "
 "physical evolution, promising better mixing, parallelism, and less bias."
 msgstr "量子采样将能量编码为 Ising 哈密顿量并通过物理演化采样，有望带来更好的混合、并行性与更小偏差。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:71
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:71
 msgid ""
 "KPP converts model parameters into an Ising problem and connects classical "
 "and quantum backends through a unified sampling interface."
 msgstr "KPP 将模型参数转换为 Ising 问题，并通过统一的采样接口连接经典与量子后端。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:72
+#: ../../source/getting_started/tutorials/quantum_sampling_bottleneck.md:72
 msgid ""
 "The next chapter establishes the classical baseline, [Simulated Annealing "
 "for Ising Models](simulated_annealing.md), before the quantum integration in"
@@ -253,44 +253,3 @@ msgstr ""
 "hamiltonian`）：二值变量 $x_i \\in \\{0, 1\\}$ 变为 Ising 自旋 $s_i = 2x_i - "
 "1$，将二次能量转化为 Ising Hamiltonian："
 
-#~ msgid ""
-#~ "Recall from [Section 3.1, Defining the Objective: Low Energy for Real "
-#~ "Data](../../theoretical-foundations/kpp-theoretical-foundations-ebms-def.md)"
-#~ " that the gradient of the negative log-likelihood for an energy-based model "
-#~ "decomposes into two expectations:"
-#~ msgstr ""
-#~ "回顾[第 3.1 节：定义目标：真实数据的低能量](../../theoretical-foundations/kpp-theoretical-"
-#~ "foundations-ebms-def.md)：基于能量的模型其负对数似然梯度可分解为两项期望："
-
-#~ msgid ""
-#~ "The data term is approximated by averaging over mini-batches. The model term"
-#~ " requires sampling from the current Boltzmann distribution, and computing it"
-#~ " exactly is #P-hard because it needs the partition function ([Section 3.2, "
-#~ "The Intractable Partition Function Problem](../../theoretical-"
-#~ "foundations/kpp-theoretical-foundations-ebms-partition.md)). We must "
-#~ "therefore sample, and training quality hinges on how close the samples are "
-#~ "to the target distribution, and how much they cost."
-#~ msgstr ""
-#~ "数据项可由 mini-batch 求平均近似。模型项要求从当前玻尔兹曼分布采样；精确计算需要配分函数，因而是 #P 难问题（[第 3.2 "
-#~ "节：难解的配分函数问题](../../theoretical-foundations/kpp-theoretical-foundations-ebms-"
-#~ "partition.md)）。因此我们必须采样，训练质量取决于样本与目标分布的接近程度，以及取得样本的成本。"
-
-#~ msgid ""
-#~ "where $\\beta_{\\mathrm{eff}}$ is the effective inverse temperature "
-#~ "([Section 1.2, The Boltzmann Distribution and "
-#~ "Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
-#~ "boltzmann.md))."
-#~ msgstr ""
-#~ "其中 $\\beta_{\\mathrm{eff}}$ 为有效逆温度（[第 1.2 节：玻尔兹曼分布与平衡](../../theoretical-"
-#~ "foundations/kpp-theoretical-foundations-stat-boltzmann.md)）。"
-
-#~ msgid ""
-#~ "The mapping follows directly from the spin-glass analogy ([Section 1.1, The "
-#~ "Relationship Between Statistical Physics and Neural "
-#~ "Networks](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
-#~ "spinglass.md)): binary variables $x_i \\in \\{0, 1\\}$ become Ising spins "
-#~ "$s_i = 2x_i - 1$, turning the quadratic energy into an Ising Hamiltonian:"
-#~ msgstr ""
-#~ "该映射直接源自自旋玻璃类比（[第 1.1 节：统计物理与神经网络的关系](../../theoretical-foundations/kpp-"
-#~ "theoretical-foundations-stat-spinglass.md)）：二值变量 $x_i \\in \\{0, 1\\}$ 变为 "
-#~ "Ising 自旋 $s_i = 2x_i - 1$，二次能量随之化为 Ising 哈密顿量："

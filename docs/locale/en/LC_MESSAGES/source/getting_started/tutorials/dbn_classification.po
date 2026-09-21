@@ -112,8 +112,6 @@ msgid ""
 "\n"
 "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 msgstr ""
-"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T "
-"\\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:29
 msgid "联合概率分布通过玻尔兹曼分布给出："
@@ -125,7 +123,7 @@ msgid ""
 "\n"
 "\n"
 "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
-msgstr "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:35
 msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
@@ -138,7 +136,7 @@ msgid ""
 "\n"
 "\n"
 "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
-msgstr "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:41
 msgid "3. 条件独立性"
@@ -156,7 +154,7 @@ msgid ""
 "\n"
 "\n"
 "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij} v_i + c_j\\right)\n"
-msgstr "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij} v_i + c_j\\right)"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:49
 #, python-brace-format
@@ -165,7 +163,7 @@ msgid ""
 "\n"
 "P(v_i=1|\\mathbf{h}) = \\sigma\\left(\\sum_j W_{ij} h_j + b_i\\right)\n"
 "\n"
-msgstr "P(v_i=1|\\mathbf{h}) = \\sigma\\left(\\sum_j W_{ij} h_j + b_i\\right)"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:54
 msgid "其中 $\\sigma(x) = \\frac{1}{1+e^{-x}}$ 为 Sigmoid 激活函数。"
@@ -188,7 +186,7 @@ msgid ""
 "\n"
 "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})\n"
 "\n"
-msgstr "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:65
 msgid "采用对比散度（CD）算法近似梯度，更新规则为："
@@ -203,8 +201,6 @@ msgid ""
 "\\Delta W_{ij} = \\epsilon \\left(\\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}}\\right)\n"
 "\n"
 msgstr ""
-"\\Delta W_{ij} = \\epsilon \\left(\\langle v_i h_j \\rangle_{\\text{data}} -"
-" \\langle v_i h_j \\rangle_{\\text{recon}}\\right)"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:72
 msgid ""
@@ -541,47 +537,3 @@ msgstr "Classification results: confusion-matrix visualization"
 msgid "重建样本：训练完成后对测试图像进行编码-解码得到的重建"
 msgstr "Reconstructions: encode-decode of test images after training"
 
-#~ msgid ""
-#~ "**单层 RBM 训练（``_train_rbm_layer`` 方法）** - 初始化优化器：采用随机梯度下降（SGD）优化参数。 - "
-#~ "DataLoader 处理批量数据。"
-#~ msgstr ""
-#~ "**Single-layer RBM training (``_train_rbm_layer``)** – initializes an SGD "
-#~ "optimizer and uses a DataLoader for mini-batches."
-
-#~ msgid ""
-#~ "**创建 RBM 层（`create_rbm_layer` 方法）**   初始化 RBM：使用 "
-#~ "`RestrictedBoltzmannMachine` 定义可见层与隐层维度。"
-#~ msgstr ""
-#~ "**Creating an RBM layer (``create_rbm_layer``)** initializes an RBM by using"
-#~ " ``RestrictedBoltzmannMachine`` to set visible and hidden dimensions."
-
-#~ msgid "**单批次训练步骤（`_train_batch` 方法）**"
-#~ msgstr "**Single-batch training step (``_train_batch``)**"
-
-#~ msgid "**单层 RBM 训练（`_train_rbm_layer` 方法）**"
-#~ msgstr "**Single-layer RBM training (``_train_rbm_layer``)**"
-
-#~ msgid "初始化优化器：采用随机梯度下降（SGD）优化参数。"
-#~ msgstr ""
-#~ "Initialize the optimizer: use stochastic gradient descent (SGD) to optimize "
-#~ "the parameters."
-
-#~ msgid "DataLoader 处理批量数据。"
-#~ msgstr "DataLoader handles mini-batch data."
-
-#~ msgid "**预训练堆叠 RBM（`fit` 方法）**"
-#~ msgstr "**Pre-train stacked RBMs (``fit``)**"
-
-#~ msgid "**特征变换，逐层提取特征（`transform` 方法）**"
-#~ msgstr "**Feature transformation, layer-wise extraction (``transform``)**"
-
-#~ msgid "联合概率分布通过玻尔兹曼分布给出："
-#~ msgstr "The joint probability is given by the Boltzmann distribution:"
-
-#~ msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
-#~ msgstr ""
-#~ "where $Z$ is the partition function (normalization constant).  The marginal "
-#~ "distribution over the visible layer is:"
-
-#~ msgid "$$"
-#~ msgstr ""

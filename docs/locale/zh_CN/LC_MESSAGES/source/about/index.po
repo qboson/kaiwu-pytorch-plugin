@@ -22,4 +22,4 @@ msgstr ""
 
 #: ../../source/about/index.rst:3
 msgid "关于"
-msgstr "关于"
+msgstr ""

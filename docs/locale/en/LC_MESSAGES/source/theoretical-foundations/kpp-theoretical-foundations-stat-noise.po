@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:10
 msgid "1.3 The Need for Noise: Escaping Spurious Minima"
-msgstr "1.3 The Need for Noise: Escaping Spurious Minima"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:12
 msgid ""
@@ -32,15 +32,10 @@ msgid ""
 "noise, we must first examine its absence: the deterministic Hopfield network"
 " and its notorious tendency to become trapped in **spurious minima**."
 msgstr ""
-"The Boltzmann distribution provides a probabilistic description of "
-"equilibrium, but it does not, by itself, explain *why* we must introduce "
-"stochasticity into neural dynamics. To appreciate the essential role of "
-"noise, we must first examine its absence: the deterministic Hopfield network"
-" and its notorious tendency to become trapped in **spurious minima**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:14
 msgid "The Hopfield Network: Deterministic Descent"
-msgstr "The Hopfield Network: Deterministic Descent"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:15
 #, python-brace-format
@@ -51,16 +46,11 @@ msgid ""
 "asynchronous updates: at each time step, a single unit $i$is selected and "
 "its new state is determined by the sign of its total input:"
 msgstr ""
-"A Hopfield network is a recurrent neural network with symmetric weights "
-"$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves "
-"via the deterministic sign update (Eq. {eq}`eq-sign-update`, Section 1.1): "
-"asynchronous updates: at each time step, a single unit $i$is selected and "
-"its new state is determined by the sign of its total input:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:17
 #, python-brace-format
 msgid "x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i \\right)"
-msgstr "x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i \\right)"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:19
 msgid ""
@@ -68,9 +58,6 @@ msgid ""
 "the network. To see this, consider the change in energy when unit $i$ flips "
 "from $x_i$ to $x_i'$:"
 msgstr ""
-"This update rule has a crucial property: it never increases the energy of "
-"the network. To see this, consider the change in energy when unit $i$ flips "
-"from $x_i$ to $x_i'$:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:21
 #, python-brace-format
@@ -78,8 +65,6 @@ msgid ""
 "\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = -(x_i' - x_i)\\left( \\sum_{j"
 " \\neq i} w_{ij} x_j + b_i \\right)"
 msgstr ""
-"\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = -(x_i' - x_i)\\left( \\sum_{j"
-" \\neq i} w_{ij} x_j + b_i \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:23
 msgid ""
@@ -89,15 +74,10 @@ msgid ""
 "network state slides inexorably downhill toward the nearest local minimum, "
 "where it remains indefinitely."
 msgstr ""
-"If the sign of the input matches the new state, the energy decreases; if it "
-"matches the old state, the energy remains unchanged. The dynamics therefore "
-"implements a strict **gradient descent** on the energy landscape: the "
-"network state slides inexorably downhill toward the nearest local minimum, "
-"where it remains indefinitely."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:25
 msgid "Memories as Energy Minima"
-msgstr "Memories as Energy Minima"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:26
 msgid ""
@@ -106,15 +86,11 @@ msgid ""
 "\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
 "learning rule (Eq. {eq}`eq-hebbian`, Section 1.1):"
 msgstr ""
-"The Hopfield network was originally proposed as a model of **associative "
-"memory**. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
-"\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
-"learning rule (Eq. {eq}`eq-hebbian`, Section 1.1):"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:28
 #, python-brace-format
 msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
-msgstr "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:30
 msgid ""
@@ -125,16 +101,10 @@ msgid ""
 "driven by similarity to the stored patterns rather than by an explicit "
 "address."
 msgstr ""
-"each stored pattern becomes a local minimum of the energy function. When "
-"presented with a corrupted or partial version of a memory as the initial "
-"state, the deterministic dynamics naturally flow downhill and restore the "
-"complete pattern. This is **content-addressable memory**: retrieval is "
-"driven by similarity to the stored patterns rather than by an explicit "
-"address."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:32
 msgid "The Curse of Spurious Minima"
-msgstr "The Curse of Spurious Minima"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:33
 #, python-brace-format
@@ -147,17 +117,10 @@ msgid ""
 "deterministic dynamics but do not correspond to any stored pattern. Such "
 "states are called **spurious minima** (or *spurious memories*)."
 msgstr ""
-"The Hebbian learning rule, however, is imperfect. The weight matrix "
-"$\\mathbf{W}$ contains not only the intended contributions from the stored "
-"patterns but also unwanted **cross-talk** terms arising from overlaps "
-"between different memories. These cross-talk terms create additional local "
-"minima in the energy landscape—states that are stable under the "
-"deterministic dynamics but do not correspond to any stored pattern. Such "
-"states are called **spurious minima** (or *spurious memories*)."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:35
 msgid "Spurious minima manifest in several forms:"
-msgstr "Spurious minima manifest in several forms:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:37
 #, python-brace-format
@@ -166,25 +129,18 @@ msgid ""
 "(e.g., $ \\text{sign}(\\xi^1 + \\xi^2 + \\xi^3)$) often form stable "
 "attractors."
 msgstr ""
-"**Mixture states**: Linear combinations of an odd number of stored patterns "
-"(e.g., $ \\text{sign}(\\xi^1 + \\xi^2 + \\xi^3)$) often form stable "
-"attractors."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:38
 msgid ""
 "**Spin-reversed states**: For every stored pattern, its global negation (all"
 " spins flipped) is also an energy minimum."
 msgstr ""
-"**Spin-reversed states**: For every stored pattern, its global negation (all"
-" spins flipped) is also an energy minimum."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:39
 msgid ""
 "**Random valleys**: Even random weight matrices produce numerous local "
 "minima purely due to quenched disorder."
 msgstr ""
-"**Random valleys**: Even random weight matrices produce numerous local "
-"minima purely due to quenched disorder."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:41
 msgid ""
@@ -195,16 +151,10 @@ msgid ""
 "and the landscape becomes dominated by spurious attractors. Retrieval fails "
 "entirely."
 msgstr ""
-"As the number of stored patterns $P$ increases relative to the number of "
-"neurons $N$, the density of spurious minima grows catastrophically. Beyond a"
-" critical **storage capacity** of approximately $0.14 N$, the network "
-"undergoes a phase transition: the intended memories are no longer stable, "
-"and the landscape becomes dominated by spurious attractors. Retrieval fails "
-"entirely."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:43
 msgid "The Limits of Deterministic Search"
-msgstr "The Limits of Deterministic Search"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:44
 msgid ""
@@ -216,13 +166,6 @@ msgid ""
 "models of complex data distributions, where the energy landscape is "
 "inherently rugged and multimodal."
 msgstr ""
-"Deterministic downhill dynamics face a fundamental limitation: once the "
-"state enters the basin of attraction of a spurious minimum, it can never "
-"escape. The network is **trapped**, and the only remedy is external "
-"intervention—resetting the state and hoping for a better trajectory. This "
-"brittleness makes deterministic Hopfield networks unsuitable as generative "
-"models of complex data distributions, where the energy landscape is "
-"inherently rugged and multimodal."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:46
 msgid ""
@@ -232,15 +175,10 @@ msgid ""
 "optimization terms, deterministic descent is a **local** search method with "
 "no capacity for global exploration."
 msgstr ""
-"The core problem is that the network lacks any mechanism for "
-"**exploration**. It always takes the greedy, myopic path downhill, never "
-"venturing uphill to discover potentially deeper valleys elsewhere. In "
-"optimization terms, deterministic descent is a **local** search method with "
-"no capacity for global exploration."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:48
 msgid "Enter Noise: Stochastic Dynamics and Thermal Fluctuations"
-msgstr "Enter Noise: Stochastic Dynamics and Thermal Fluctuations"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:49
 #, python-brace-format
@@ -250,22 +188,16 @@ msgid ""
 "input (Eq. {eq}`eq-sign-update`, Section 1.1), the state is sampled "
 "stochastically (Eq. {eq}`eq-stoch-update`):"
 msgstr ""
-"The Boltzmann machine resolves this impasse by introducing **thermal "
-"noise**. Instead of setting a neuron deterministically to the sign of its "
-"input (Eq. {eq}`eq-sign-update`, Section 1.1), the state is sampled "
-"stochastically (Eq. {eq}`eq-stoch-update`):"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:51
 msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
-msgstr "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:53
 msgid ""
 "where $\\sigma(z) = 1/(1+\\exp(-z))$ is the sigmoid function, and $T > 0$ is"
 " the **temperature** parameter."
 msgstr ""
-"where $\\sigma(z) = 1/(1+\\exp(-z))$ is the sigmoid function, and $T > 0$ is"
-" the **temperature** parameter."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:55
 msgid ""
@@ -273,14 +205,11 @@ msgid ""
 "*higher* energy is non-zero. Specifically, the ratio of probabilities for "
 "two states differing only in unit $i$satisfies:"
 msgstr ""
-"At finite temperature, the probability of transitioning to a state with "
-"*higher* energy is non-zero. Specifically, the ratio of probabilities for "
-"two states differing only in unit $i$satisfies:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:57
 #, python-brace-format
 msgid "\\frac{P(x_i = 1)}{P(x_i = 0)} = \\exp\\left( \\frac{\\Delta E_i}{T} \\right)"
-msgstr "\\frac{P(x_i = 1)}{P(x_i = 0)} = \\exp\\left( \\frac{\\Delta E_i}{T} \\right)"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:59
 #, python-brace-format
@@ -292,12 +221,6 @@ msgid ""
 "remains greater than zero. Thermal fluctuations occasionally push the system"
 " **uphill**."
 msgstr ""
-"where $\\Delta E_i = E_{x_i=0} - E_{x_i=1}$ is the energy *decrease* when "
-"unit $i$turns on. If $\\Delta E_i$ is positive (turning on lowers energy), "
-"the probability ratio favors the on state. Crucially, even if $\\Delta E_i$ "
-"is negative (turning on *increases* energy), the probability of turning on "
-"remains greater than zero. Thermal fluctuations occasionally push the system"
-" **uphill**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:61
 msgid ""
@@ -307,15 +230,10 @@ msgid ""
 "energy barrier and descend into a deeper, more favorable basin. The noise "
 "provides the **exploration** mechanism that deterministic dynamics lack."
 msgstr ""
-"This ability to climb energy barriers is precisely what enables escape from "
-"spurious minima. A network trapped in a shallow local minimum can, after a "
-"sequence of unfavorable thermal fluctuations, surmount the surrounding "
-"energy barrier and descend into a deeper, more favorable basin. The noise "
-"provides the **exploration** mechanism that deterministic dynamics lack."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:63
 msgid "Noise as Thermal Equilibrium"
-msgstr "Noise as Thermal Equilibrium"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:64
 #, python-brace-format
@@ -329,14 +247,6 @@ msgid ""
 "precisely the conditional probability $P(x_i = 1 \\mid \\mathbf{x}_{-i})$ "
 "derived from the Boltzmann distribution:"
 msgstr ""
-"The introduction of noise is not merely an algorithmic trick; it is a direct"
-" consequence of the **canonical ensemble** derived in Section [1.2 The "
-"Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
-"boltzmann.md). When a system is in thermal contact with a heat reservoir at "
-"temperature $T$, the probability of occupying any microstate is given by the"
-" Boltzmann distribution. The stochastic update rule for a single neuron is "
-"precisely the conditional probability $P(x_i = 1 \\mid \\mathbf{x}_{-i})$ "
-"derived from the Boltzmann distribution:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:66
 msgid ""
@@ -346,11 +256,6 @@ msgid ""
 "&= \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)\n"
 "\\end{align*}\n"
 msgstr ""
-"\n"
-"\\begin{align*}\n"
-"P(x_i = 1 \\mid \\mathbf{x}_{-i}) &= \\frac{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0, \\mathbf{x}_{-i})/T)} \\\\\n"
-"&= \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)\n"
-"\\end{align*}\n"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:73
 msgid ""
@@ -360,15 +265,10 @@ msgid ""
 " that the system obeys detailed balance and converges to the correct "
 "equilibrium distribution."
 msgstr ""
-"Thus, the noise is **not** a heuristic; it is the physical manifestation of "
-"the system being in thermal equilibrium with its environment. The "
-"probability of moving uphill is exactly the Boltzmann factor ratio, ensuring"
-" that the system obeys detailed balance and converges to the correct "
-"equilibrium distribution."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:75
 msgid "Simulated Annealing: From Exploration to Exploitation"
-msgstr "Simulated Annealing: From Exploration to Exploitation"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:76
 msgid ""
@@ -378,11 +278,6 @@ msgid ""
 " state, we must gradually reduce the temperature over time, a process known "
 "as **simulated annealing**."
 msgstr ""
-"Noise alone, however, is not a panacea. If the temperature remains high, the"
-" network never settles. it wanders endlessly across the energy landscape, "
-"sampling configurations roughly uniformly. To obtain a meaningful low-energy"
-" state, we must gradually reduce the temperature over time, a process known "
-"as **simulated annealing**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:78
 msgid ""
@@ -391,15 +286,11 @@ msgid ""
 "explores the global structure of the landscape. The temperature is then "
 "slowly lowered according to a cooling schedule, often geometric:"
 msgstr ""
-"The annealing schedule typically starts with a high temperature "
-"$T_{\\text{high}}$, where the system easily escapes local minima and "
-"explores the global structure of the landscape. The temperature is then "
-"slowly lowered according to a cooling schedule, often geometric:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:80
 #, python-brace-format
 msgid "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
-msgstr "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:82
 msgid ""
@@ -409,11 +300,6 @@ msgid ""
 "minimum** with high probability, which is a result formally guaranteed by "
 "the theory of Markov chain Monte Carlo (MCMC)."
 msgstr ""
-"As $T \\to 0$, the stochastic dynamics approach the deterministic Hopfield "
-"limit, and the network freezes into the nearest local minimum. If the "
-"annealing is sufficiently slow, the system converges to the **global "
-"minimum** with high probability, which is a result formally guaranteed by "
-"the theory of Markov chain Monte Carlo (MCMC)."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:84
 msgid ""
@@ -423,15 +309,10 @@ msgid ""
 "powerful heuristic for finding deep, low-energy states that correspond to "
 "likely configurations under the model's learned distribution."
 msgstr ""
-"In practice, true global optimization is rarely achievable for large "
-"networks due to the exponential slowdown of mixing times at low temperatures"
-" (critical slowing down). Nonetheless, simulated annealing provides a "
-"powerful heuristic for finding deep, low-energy states that correspond to "
-"likely configurations under the model's learned distribution."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:86
 msgid "The Dual Role of Noise in Learning"
-msgstr "The Dual Role of Noise in Learning"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:87
 msgid ""
@@ -439,9 +320,6 @@ msgid ""
 "equally vital purpose. The learning algorithm relies on comparing two "
 "distinct phases of network operation:"
 msgstr ""
-"In the context of Boltzmann machine *learning*, noise serves a second, "
-"equally vital purpose. The learning algorithm relies on comparing two "
-"distinct phases of network operation:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:89
 msgid ""
@@ -450,10 +328,6 @@ msgid ""
 " units explore all configurations consistent with the visible data, "
 "providing an unbiased estimate of the *data-dependent* statistics."
 msgstr ""
-"**Positive phase (clamped)**: Visible units are held fixed to a training "
-"example, and hidden units are allowed to fluctuate. Noise ensures the hidden"
-" units explore all configurations consistent with the visible data, "
-"providing an unbiased estimate of the *data-dependent* statistics."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:90
 msgid ""
@@ -461,9 +335,6 @@ msgid ""
 "external input. Noise drives the system toward its equilibrium distribution,"
 " generating samples that reflect the model's current beliefs about the data."
 msgstr ""
-"**Negative phase (free-running)**: The entire network runs freely without "
-"external input. Noise drives the system toward its equilibrium distribution,"
-" generating samples that reflect the model's current beliefs about the data."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:92
 msgid ""
@@ -473,15 +344,10 @@ msgid ""
 " a bug to be eliminated, but an essential feature that enables the Boltzmann"
 " machine to represent and learn complex probability distributions.**"
 msgstr ""
-"Without stochasticity, the network would simply collapse to the nearest "
-"deterministic attractor in both phases, failing to capture the full "
-"distribution of hidden causes or to generate diverse samples. **Noise is not"
-" a bug to be eliminated, but an essential feature that enables the Boltzmann"
-" machine to represent and learn complex probability distributions.**"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:94
 msgid "Summary: From Deterministic Traps to Stochastic Freedom"
-msgstr "Summary: From Deterministic Traps to Stochastic Freedom"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:95
 msgid ""
@@ -491,23 +357,16 @@ msgid ""
 "Boltzmann machine inherits the energy-based architecture but replaces "
 "deterministic updates with **stochastic sampling governed by temperature**."
 msgstr ""
-"The deterministic Hopfield network demonstrates that symmetric recurrent "
-"networks can store memories as energy minima, but its greedy descent "
-"dynamics render it brittle and prone to entrapment in spurious states. The "
-"Boltzmann machine inherits the energy-based architecture but replaces "
-"deterministic updates with **stochastic sampling governed by temperature**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:97
 msgid "This single modification confers two transformative capabilities:"
-msgstr "This single modification confers two transformative capabilities:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:99
 msgid ""
 "**Escape from local minima** during inference, enabling the network to find "
 "globally consistent interpretations of ambiguous inputs."
 msgstr ""
-"**Escape from local minima** during inference, enabling the network to find "
-"globally consistent interpretations of ambiguous inputs."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:100
 msgid ""
@@ -515,9 +374,6 @@ msgid ""
 "statistical samples required for gradient estimation in the presence of an "
 "intractable partition function."
 msgstr ""
-"**Exploration of the full state space** during learning, providing the "
-"statistical samples required for gradient estimation in the presence of an "
-"intractable partition function."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:102
 msgid ""
@@ -526,342 +382,4 @@ msgid ""
 "Restricted Boltzmann Machine (RBM), that make stochastic sampling "
 "computationally tractable."
 msgstr ""
-"The following sections will formalize the energy functions used in Boltzmann"
-" machines and introduce the specific architectures—most notably the "
-"Restricted Boltzmann Machine (RBM), that make stochastic sampling "
-"computationally tractable."
 
-#~ msgid ""
-#~ "A Hopfield network is a recurrent neural network with symmetric weights "
-#~ "$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves "
-#~ "via asynchronous updates: at each time step, a single unit $i$is selected "
-#~ "and its new state is determined by the sign of its total input:"
-#~ msgstr ""
-#~ "A Hopfield network is a recurrent neural network with symmetric weights "
-#~ "$w_{ij} = w_{ji}$ and no self-connections $w_{ii} = 0$. Its state evolves "
-#~ "via asynchronous updates: at each time step, a single unit $i$is selected "
-#~ "and its new state is determined by the sign of its total input:"
-
-#~ msgid ""
-#~ "The Hopfield network was originally proposed as a model of **associative "
-#~ "memory**. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
-#~ "\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
-#~ "learning rule:"
-#~ msgstr ""
-#~ "The Hopfield network was originally proposed as a model of **associative "
-#~ "memory**. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
-#~ "\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
-#~ "learning rule:"
-
-#~ msgid ""
-#~ "The Boltzmann machine resolves this impasse by introducing **thermal "
-#~ "noise**. Instead of setting a neuron deterministically to the sign of its "
-#~ "input, the state is sampled probabilistically:"
-#~ msgstr ""
-#~ "The Boltzmann machine resolves this impasse by introducing **thermal "
-#~ "noise**. Instead of setting a neuron deterministically to the sign of its "
-#~ "input, the state is sampled probabilistically:"
-
-#~ msgid ""
-#~ "The Boltzmann distribution provides a probabilistic description of "
-#~ "equilibrium, but it does not, by itself, explain <em>why</em> we must "
-#~ "introduce stochasticity into neural dynamics. To appreciate the essential "
-#~ "role of noise, we must first examine its absence: the deterministic Hopfield"
-#~ " network and its notorious tendency to become trapped in <b>spurious "
-#~ "minima</b>."
-#~ msgstr ""
-
-#~ msgid "<b>The Hopfield Network: Deterministic Descent</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "If the sign of the input matches the new state, the energy decreases; if it "
-#~ "matches the old state, the energy remains unchanged. The dynamics therefore "
-#~ "implements a strict <b>gradient descent</b> on the energy landscape: the "
-#~ "network state slides inexorably downhill toward the nearest local minimum, "
-#~ "where it remains indefinitely."
-#~ msgstr ""
-
-#~ msgid "<b>Memories as Energy Minima</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The Hopfield network was originally proposed as a model of <b>associative "
-#~ "memory</b>. By storing a set of patterns $\\{\\boldsymbol{\\xi}^1, "
-#~ "\\boldsymbol{\\xi}^2, \\ldots, \\boldsymbol{\\xi}^P\\}$ using the Hebbian "
-#~ "learning rule:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "each stored pattern becomes a local minimum of the energy function. When "
-#~ "presented with a corrupted or partial version of a memory as the initial "
-#~ "state, the deterministic dynamics naturally flow downhill and restore the "
-#~ "complete pattern. This is <b>content-addressable memory</b>: retrieval is "
-#~ "driven by similarity to the stored patterns rather than by an explicit "
-#~ "address."
-#~ msgstr ""
-
-#~ msgid "<b>The Curse of Spurious Minima</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The Hebbian learning rule, however, is imperfect. The weight matrix "
-#~ "$\\mathbf{W}$ contains not only the intended contributions from the stored "
-#~ "patterns but also unwanted <b>cross-talk</b> terms arising from overlaps "
-#~ "between different memories. These cross-talk terms create additional local "
-#~ "minima in the energy landscape—states that are stable under the "
-#~ "deterministic dynamics but do not correspond to any stored pattern. Such "
-#~ "states are called <b>spurious minima</b> (or <em>spurious memories</em>)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Mixture states</b>: Linear combinations of an odd number of stored "
-#~ "patterns (e.g., $ \\text{sign}(\\xi^1 + \\xi^2 + \\xi^3)$) often form stable"
-#~ " attractors."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Spin-reversed states</b>: For every stored pattern, its global negation "
-#~ "(all spins flipped) is also an energy minimum."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Random valleys</b>: Even random weight matrices produce numerous local "
-#~ "minima purely due to quenched disorder."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "As the number of stored patterns $P$ increases relative to the number of "
-#~ "neurons $N$, the density of spurious minima grows catastrophically. Beyond a"
-#~ " critical <b>storage capacity</b> of approximately $0.14 N$, the network "
-#~ "undergoes a phase transition: the intended memories are no longer stable, "
-#~ "and the landscape becomes dominated by spurious attractors. Retrieval fails "
-#~ "entirely."
-#~ msgstr ""
-
-#~ msgid "<b>The Limits of Deterministic Search</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Deterministic downhill dynamics face a fundamental limitation: once the "
-#~ "state enters the basin of attraction of a spurious minimum, it can never "
-#~ "escape. The network is <b>trapped</b>, and the only remedy is external "
-#~ "intervention—resetting the state and hoping for a better trajectory. This "
-#~ "brittleness makes deterministic Hopfield networks unsuitable as generative "
-#~ "models of complex data distributions, where the energy landscape is "
-#~ "inherently rugged and multimodal."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The core problem is that the network lacks any mechanism for "
-#~ "<b>exploration</b>. It always takes the greedy, myopic path downhill, never "
-#~ "venturing uphill to discover potentially deeper valleys elsewhere. In "
-#~ "optimization terms, deterministic descent is a <em>*local*</em> search "
-#~ "method with no capacity for global exploration."
-#~ msgstr ""
-
-#~ msgid "<b>Enter Noise: Stochastic Dynamics and Thermal Fluctuations</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The Boltzmann machine resolves this impasse by introducing <b>thermal "
-#~ "noise</b>. Instead of setting a neuron deterministically to the sign of its "
-#~ "input, the state is sampled probabilistically:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "where $\\sigma(z) = 1/(1+\\exp(-z))$ is the sigmoid function, and $T > 0$ is"
-#~ " the <b>temperature</b> parameter."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "At finite temperature, the probability of transitioning to a state with "
-#~ "<em>higher</em> energy is non-zero. Specifically, the ratio of probabilities"
-#~ " for two states differing only in unit $i$satisfies:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "where $\\Delta E_i = E_{x_i=0} - E_{x_i=1}$ is the energy <em>decrease</em> "
-#~ "when unit $i$turns on. If $\\Delta E_i$ is positive (turning on lowers "
-#~ "energy), the probability ratio favors the on state. Crucially, even if "
-#~ "$\\Delta E_i$ is negative (turning on <em>increases</em> energy), the "
-#~ "probability of turning on remains greater than zero. Thermal fluctuations "
-#~ "occasionally push the system <b>uphill</b>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This ability to climb energy barriers is precisely what enables escape from "
-#~ "spurious minima. A network trapped in a shallow local minimum can, after a "
-#~ "sequence of unfavorable thermal fluctuations, surmount the surrounding "
-#~ "energy barrier and descend into a deeper, more favorable basin. The noise "
-#~ "provides the <b>exploration</b> mechanism that deterministic dynamics lack."
-#~ msgstr ""
-
-#~ msgid "<b>Statistical Physics Foundations: Noise as Thermal Equilibrium</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The introduction of noise is not merely an algorithmic trick; it is a direct"
-#~ " consequence of the <b>canonical ensemble</b> derived in Section [1.2 The "
-#~ "Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
-#~ "boltzmann.md). When a system is in thermal contact with a heat reservoir at "
-#~ "temperature $T$, the probability of occupying any microstate is given by the"
-#~ " Boltzmann distribution. The stochastic update rule for a single neuron is "
-#~ "precisely the conditional probability $P(x_i = 1 \\mid \\mathbf{x}_{-i})$ "
-#~ "derived from the Boltzmann distribution:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Thus, the noise is <b>not</b> a heuristic; it is the physical manifestation "
-#~ "of the system being in thermal equilibrium with its environment. The "
-#~ "probability of moving uphill is exactly the Boltzmann factor ratio, ensuring"
-#~ " that the system obeys detailed balance and converges to the correct "
-#~ "equilibrium distribution."
-#~ msgstr ""
-
-#~ msgid "<b>Simulated Annealing: From Exploration to Exploitation</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Noise alone, however, is not a panacea. If the temperature remains high, the"
-#~ " network never settles. it wanders endlessly across the energy landscape, "
-#~ "sampling configurations roughly uniformly. To obtain a meaningful low-energy"
-#~ " state, we must gradually reduce the temperature over time, a process known "
-#~ "as <b>simulated annealing</b>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "As $T \\to 0$, the stochastic dynamics approach the deterministic Hopfield "
-#~ "limit, and the network freezes into the nearest local minimum. If the "
-#~ "annealing is sufficiently slow, the system converges to the <b>global "
-#~ "minimum</b> with high probability, which is a result formally guaranteed by "
-#~ "the theory of Markov chain Monte Carlo (MCMC)."
-#~ msgstr ""
-
-#~ msgid "<b>The Dual Role of Noise in Learning</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "In the context of Boltzmann machine <em>learning</em>, noise serves a "
-#~ "second, equally vital purpose. The learning algorithm relies on comparing "
-#~ "two distinct phases of network operation:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Positive phase (clamped)</b>: Visible units are held fixed to a training "
-#~ "example, and hidden units are allowed to fluctuate. Noise ensures the hidden"
-#~ " units explore all configurations consistent with the visible data, "
-#~ "providing an unbiased estimate of the <em>data-dependent</em> statistics."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Negative phase (free-running)</b>: The entire network runs freely without"
-#~ " external input. Noise drives the system toward its equilibrium "
-#~ "distribution, generating samples that reflect the model's current beliefs "
-#~ "about the data."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Without stochasticity, the network would simply collapse to the nearest "
-#~ "deterministic attractor in both phases, failing to capture the full "
-#~ "distribution of hidden causes or to generate diverse samples. <b>Noise is "
-#~ "not a bug to be eliminated, but an essential feature that enables the "
-#~ "Boltzmann machine to represent and learn complex probability "
-#~ "distributions.</b>"
-#~ msgstr ""
-
-#~ msgid "<b>Summary: From Deterministic Traps to Stochastic Freedom</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The deterministic Hopfield network demonstrates that symmetric recurrent "
-#~ "networks can store memories as energy minima, but its greedy descent "
-#~ "dynamics render it brittle and prone to entrapment in spurious states. The "
-#~ "Boltzmann machine inherits the energy-based architecture but replaces "
-#~ "deterministic updates with <b>stochastic sampling governed by "
-#~ "temperature</b>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Escape from local minima</b> during inference, enabling the network to "
-#~ "find globally consistent interpretations of ambiguous inputs."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Exploration of the full state space</b> during learning, providing the "
-#~ "statistical samples required for gradient estimation in the presence of an "
-#~ "intractable partition function."
-#~ msgstr ""
-
-#~ msgid "x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i \\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = -(x_i' - x_i)\\left( \\sum_{j"
-#~ " \\neq i} w_{ij} x_j + b_i \\right)"
-#~ msgstr ""
-
-#~ msgid "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
-#~ msgstr ""
-
-#~ msgid "P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)"
-#~ msgstr ""
-
-#~ msgid "\\frac{P(x_i = 1)}{P(x_i = 0)} = \\exp\\left( \\frac{\\Delta E_i}{T} \\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\frac{\\exp(-E(x_i=1, "
-#~ "\\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0,"
-#~ " \\mathbf{x}_{-i})/T)} = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} "
-#~ "\\right)"
-#~ msgstr ""
-
-#~ msgid "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
-#~ msgstr ""
-
-#~ msgid "::"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The introduction of noise is not merely an algorithmic trick; it is a direct"
-#~ " consequence of the **canonical ensemble** derived in Section [1.2 The "
-#~ "Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
-#~ "boltzmann.md). When a system is in thermal contact with a heat reservoir at "
-#~ "temperature $T$, the probability of occupying any microstate is given by the"
-#~ " Boltzmann distribution. The stochastic update rule for a single neuron is "
-#~ "precisely the conditional probability $P(x_i = 1 \\mid \\mathbf{x}_{-i})$ "
-#~ "derived from the Boltzmann distribution:"
-#~ msgstr ""
-
-#~ msgid "Statistical Physics Foundations: Noise as Thermal Equilibrium"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$x_i \\leftarrow \\text{sign}\\left( \\sum_{j \\neq i} w_{ij} x_j + b_i "
-#~ "\\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$\\Delta E = E(\\mathbf{x}') - E(\\mathbf{x}) = -(x_i' - x_i)\\left( "
-#~ "\\sum_{j \\neq i} w_{ij} x_j + b_i \\right)$$"
-#~ msgstr ""
-
-#~ msgid "$$w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu$$"
-#~ msgstr ""
-
-#~ msgid "$$P(x_i = 1) = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} \\right)$$"
-#~ msgstr ""
-
-#~ msgid "$$\\frac{P(x_i = 1)}{P(x_i = 0)} = \\exp\\left( \\frac{\\Delta E_i}{T} \\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$P(x_i = 1 \\mid \\mathbf{x}_{-i}) = \\frac{\\exp(-E(x_i=1, "
-#~ "\\mathbf{x}_{-i})/T)}{\\exp(-E(x_i=1, \\mathbf{x}_{-i})/T) + \\exp(-E(x_i=0,"
-#~ " \\mathbf{x}_{-i})/T)} = \\sigma\\left( \\frac{\\sum_j w_{ij} x_j + b_i}{T} "
-#~ "\\right)$$"
-#~ msgstr ""
-
-#~ msgid "$$T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1$$"
-#~ msgstr ""

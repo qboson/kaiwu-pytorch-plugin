@@ -19,11 +19,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:9
+#: ../../source/getting_started/introduction.md:9
 msgid "Introduction"
 msgstr "概览导引"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:11
+#: ../../source/getting_started/introduction.md:11
 msgid ""
 "**Kaiwu-PyTorch-Plugin (KPP)** is a PyTorch plugin designed for training "
 "and evaluating quantum-native energy models and enhanced AI models on "
@@ -32,7 +32,7 @@ msgstr ""
 "**Kaiwu-PyTorch-Plugin（KPP）** 是一个 PyTorch "
 "插件，旨在**专用量子计算机（SPQC）**上训练和评估量子原生能量模型及增强型 AI 模型。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:13
+#: ../../source/getting_started/introduction.md:13
 msgid ""
 "It offloads Boltzmann sampling to the **Coherent Ising Machine (CIM)** "
 "through the **Kaiwu SDK**, while keeping all other computations, "
@@ -42,112 +42,112 @@ msgstr ""
 "它通过 **Kaiwu SDK** 将玻尔兹曼采样卸载到**相干伊辛机（CIM）**，同时将所有其他计算、参数更新、自动微分、数据加载保留在标准 "
 "**PyTorch** 工作流中。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:15
+#: ../../source/getting_started/introduction.md:15
 msgid "General Overview"
 msgstr "总体概览"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:16
+#: ../../source/getting_started/introduction.md:16
 msgid "Design Goals"
 msgstr "设计目标"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:18
+#: ../../source/getting_started/introduction.md:18
 msgid ""
 "**Integrate quantum sampling capabilities** while preserving the native "
 "PyTorch programming experience."
 msgstr "**集成量子采样能力**，同时保留原生 PyTorch 编程体验。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:19
+#: ../../source/getting_started/introduction.md:19
 msgid "**Support definition, training, and inference** of standard BM/RBM models"
 msgstr "**支持标准 BM/RBM 模型的定义、训练与推理**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:20
+#: ../../source/getting_started/introduction.md:20
 msgid "**Extensible interfaces** for swapping samplers or energy functions"
 msgstr "**可扩展接口**，便于替换采样器或能量函数"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:21
+#: ../../source/getting_started/introduction.md:21
 msgid ""
 "**Decoupled architecture**: energy model definition is **separated** from"
 " sampling execution"
 msgstr "**解耦架构**：能量模型定义与采样执行**分离**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:23
+#: ../../source/getting_started/introduction.md:23
 msgid "Features"
 msgstr "功能特性"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:28
+#: ../../source/getting_started/introduction.md:28
 msgid "Feature"
 msgstr "特性"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:29
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:229
+#: ../../source/getting_started/introduction.md:29
+#: ../../source/getting_started/introduction.md:229
 msgid "Description"
 msgstr "说明"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:30
+#: ../../source/getting_started/introduction.md:30
 msgid "**Model Support**"
 msgstr "**模型支持**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:31
+#: ../../source/getting_started/introduction.md:31
 msgid "Standard RBM and fully connected BM"
 msgstr "标准 RBM 和全连接 BM"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:32
+#: ../../source/getting_started/introduction.md:32
 msgid "**Layer Configuration**"
 msgstr "**层配置**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:33
+#: ../../source/getting_started/introduction.md:33
 msgid "Customizable visible and hidden layer dimensions"
 msgstr "可见层与隐藏层维度可自定义"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:34
+#: ../../source/getting_started/introduction.md:34
 msgid "**Sampling**"
 msgstr "**采样**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:35
+#: ../../source/getting_started/introduction.md:35
 msgid "Negative-phase sampling executed on SPQC via Kaiwu SDK"
 msgstr "负相采样通过 Kaiwu SDK 在 SPQC 上执行"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:36
+#: ../../source/getting_started/introduction.md:36
 msgid "**PyTorch Integration**"
 msgstr "**PyTorch 集成**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:37
+#: ../../source/getting_started/introduction.md:37
 msgid ""
 "Model parameters are `torch.nn.Parameter`; supports autograd, GPU "
 "acceleration, and combination with other PyTorch modules"
 msgstr "模型参数为 `torch.nn.Parameter`；支持自动微分、GPU 加速，并可与其他 PyTorch 模块组合使用"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:38
+#: ../../source/getting_started/introduction.md:38
 msgid "**Extended Models**"
 msgstr "**扩展模型**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:39
+#: ../../source/getting_started/introduction.md:39
 msgid "DBN, Q-VAE, Q-Diffusion"
 msgstr "DBN、Q-VAE、Q-Diffusion"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:41
+#: ../../source/getting_started/introduction.md:41
 msgid "Extension Mechanisms"
 msgstr "扩展机制"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:43
+#: ../../source/getting_started/introduction.md:43
 msgid "Decouple the energy function (e.g., Ising form) from the sampler."
 msgstr "将能量函数（如伊辛形式）与采样器解耦。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:44
+#: ../../source/getting_started/introduction.md:44
 msgid ""
 "Allow users to replace sampling strategies by implementing standard "
 "interfaces (e.g., switching to classical MCMC or other backends)."
 msgstr "允许用户通过实现标准接口替换采样策略（例如切换为经典 MCMC 或其他后端）。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:45
+#: ../../source/getting_started/introduction.md:45
 msgid "Support custom energy terms suitable for non-standard BM variants."
 msgstr "支持适用于非标准 BM 变体的自定义能量项。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:47
+#: ../../source/getting_started/introduction.md:47
 msgid "System Architecture & Component Interaction"
 msgstr "系统架构与组件交互"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:49
+#: ../../source/getting_started/introduction.md:49
 msgid ""
 "KPP follows a **decoupled architecture** where energy model definition is"
 " separated from sampling execution (hardware or simulation). Researchers "
@@ -157,23 +157,23 @@ msgstr ""
 "KPP 采用**解耦架构**，能量模型定义与采样执行（硬件或模拟）分离。研究人员可以在标准 PyTorch "
 "工作流中将量子采样器视为**可插拔后端**。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:97
+#: ../../source/getting_started/introduction.md:97
 msgid "**Layer Breakdown:**"
 msgstr "**层级分解：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:101
+#: ../../source/getting_started/introduction.md:101
 msgid "Layer"
 msgstr "层级"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:102
+#: ../../source/getting_started/introduction.md:102
 msgid "Contents"
 msgstr "内容"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:103
+#: ../../source/getting_started/introduction.md:103
 msgid "**Application Layer**"
 msgstr "**应用层**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:104
+#: ../../source/getting_started/introduction.md:104
 msgid ""
 "`rbm_digits`, `dbn_digits`, `bm_generation`, `qvae_mnist`, `qvae_cell`, "
 "`qdiffusion`"
@@ -181,11 +181,11 @@ msgstr ""
 "`rbm_digits`, `dbn_digits`, `bm_generation`, `qvae_mnist`, `qvae_cell`, "
 "`qdiffusion`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:105
+#: ../../source/getting_started/introduction.md:105
 msgid "**KPP Layer**"
 msgstr "**KPP 层**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:106
+#: ../../source/getting_started/introduction.md:106
 msgid ""
 "`AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, "
 "`BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, `QDiffusion`; "
@@ -195,345 +195,286 @@ msgstr ""
 "`BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, `QDiffusion`; "
 "`_to_ising_matrix()`, `sample()`, `objective()`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:107
+#: ../../source/getting_started/introduction.md:107
 msgid "**Kaiwu SDK Layer**"
 msgstr "**Kaiwu SDK 层**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:108
+#: ../../source/getting_started/introduction.md:108
 msgid "Classical (SA) & Quantum (CIM) optimizers"
 msgstr "经典（SA）与量子（CIM）优化器"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:111
+#: ../../source/getting_started/introduction.md:111
 msgid "Core Concept 1: Quantum-Classical Hybrid Workflow"
 msgstr "核心概念 1：量子-经典混合工作流"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:113
+#: ../../source/getting_started/introduction.md:113
 msgid ""
 "KPP follows the standard energy-based model training loop, with a "
 "quantum-accelerated negative phase."
 msgstr "KPP 遵循标准的基于能量的模型训练循环，其中负相由量子加速。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:115
+#: ../../source/getting_started/introduction.md:115
 msgid "Three-Step Training Cycle:"
 msgstr "三步训练循环："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:117
+#: ../../source/getting_started/introduction.md:117
 msgid "**Positive Phase (PyTorch, CPU/GPU):**"
 msgstr "**正相（PyTorch，CPU/GPU）：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:118
+#: ../../source/getting_started/introduction.md:118
 msgid "Compute hidden layer representations from training data."
 msgstr "从训练数据计算隐藏层表示。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:119
+#: ../../source/getting_started/introduction.md:119
 msgid "`h = rbm.get_hidden(x)` → data statistics, no sampling needed."
 msgstr "`h = rbm.get_hidden(x)` → 数据统计量，无需采样。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:121
+#: ../../source/getting_started/introduction.md:121
 msgid "**Negative Phase (Offloaded to SDK):**"
 msgstr "**负相（卸载到 SDK）：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:122
+#: ../../source/getting_started/introduction.md:122
 msgid "Generate samples from the model distribution."
 msgstr "从模型分布生成样本。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:123
+#: ../../source/getting_started/introduction.md:123
 msgid "`s = rbm.sample(sampler)`."
 msgstr "`s = rbm.sample(sampler)`。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:124
+#: ../../source/getting_started/introduction.md:124
 msgid ""
 "Internally, `_to_ising_matrix()` prepares the J/h matrix and dispatches "
 "it to a **CIM** (quantum) or **SA** (classical) solver."
 msgstr "内部由 `_to_ising_matrix()` 准备 J/h 矩阵，并将其分发给 **CIM**（量子）或 **SA**（经典）求解器。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:126
+#: ../../source/getting_started/introduction.md:126
 msgid "**Parameter Update (PyTorch, CPU/GPU):**"
 msgstr "**参数更新（PyTorch，CPU/GPU）：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:127
+#: ../../source/getting_started/introduction.md:127
 msgid "`objective = rbm.objective(h, s)`."
 msgstr "`objective = rbm.objective(h, s)`。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:128
+#: ../../source/getting_started/introduction.md:128
 msgid "`objective.backward()`."
 msgstr "`objective.backward()`。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:129
+#: ../../source/getting_started/introduction.md:129
 msgid "`optimizer.step()`."
 msgstr "`optimizer.step()`。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:185
+#: ../../source/getting_started/introduction.md:185
 msgid ""
 "**Key Insight:** The only quantum part is `rbm.sample(sampler)`. "
 "Everything else is standard PyTorch."
 msgstr "**关键洞察：** 唯一的量子部分是 `rbm.sample(sampler)`。其余都是标准 PyTorch。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:187
+#: ../../source/getting_started/introduction.md:187
 msgid "Core Concept 2: Energy Model Hierarchy"
 msgstr "核心概念 2：能量模型层级"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:189
+#: ../../source/getting_started/introduction.md:189
 msgid ""
 "KPP provides a structured class hierarchy. All models share "
 "`sample(sampler)` and `objective(h, s)` interfaces."
 msgstr "KPP 提供结构化的类层级。所有模型共享 `sample(sampler)` 和 `objective(h, s)` 接口。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:223
+#: ../../source/getting_started/introduction.md:223
 msgid "**Model Descriptions:**"
 msgstr "**模型说明：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:228
+#: ../../source/getting_started/introduction.md:228
 msgid "Model"
 msgstr "模型"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:230
+#: ../../source/getting_started/introduction.md:230
 msgid "**RBM**"
 msgstr "**RBM**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:231
+#: ../../source/getting_started/introduction.md:231
 msgid "Bipartite graph, layer-wise connections only"
 msgstr "二部图，仅层间连接"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:232
+#: ../../source/getting_started/introduction.md:232
 msgid "**BM**"
 msgstr "**BM**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:233
+#: ../../source/getting_started/introduction.md:233
 msgid "Fully connected stochastic network; uses `condition_sample()`"
 msgstr "全连接随机网络；使用 `condition_sample()`"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:234
+#: ../../source/getting_started/introduction.md:234
 msgid "**QVAE**"
 msgstr "**QVAE**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:235
+#: ../../source/getting_started/introduction.md:235
 msgid "BM as prior in a VAE"
 msgstr "BM 作为 VAE 中的先验"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:236
+#: ../../source/getting_started/introduction.md:236
 msgid "**QDiffusion**"
 msgstr "**QDiffusion**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:237
+#: ../../source/getting_started/introduction.md:237
 msgid "Energy-guided sampling for discrete sequence generation"
 msgstr "用于离散序列生成的能量引导采样"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:240
+#: ../../source/getting_started/introduction.md:240
 msgid "Core Concept 3: Hardware Abstraction & Extension"
 msgstr "核心概念 3：硬件抽象与扩展"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:242
+#: ../../source/getting_started/introduction.md:242
 msgid ""
 "**Hardware abstraction:** KPP communicates with quantum hardware via "
 "Kaiwu SDK; swap samplers (SA/CIM) without code changes."
 msgstr "**硬件抽象：** KPP 通过 Kaiwu SDK 与量子硬件通信；无需修改代码即可切换采样器（SA/CIM）。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:243
+#: ../../source/getting_started/introduction.md:243
 msgid "**Sampler interface:**"
 msgstr "**采样器接口：**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:260
+#: ../../source/getting_started/introduction.md:260
 msgid ""
 "**Extension mechanisms:** Decoupled energy function, swappable samplers, "
 "custom energy terms."
 msgstr "**扩展机制：** 解耦的能量函数、可切换采样器、自定义能量项。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:262
+#: ../../source/getting_started/introduction.md:262
 msgid "Applications & Workflow"
 msgstr "应用与工作流"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:263
+#: ../../source/getting_started/introduction.md:263
 msgid "Example Use Cases"
 msgstr "示例用例"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:265
+#: ../../source/getting_started/introduction.md:265
 msgid ""
 "**RNA sequence data augmentation (BM):** Generative modeling with fully "
 "connected Boltzmann Machines for biological sequence augmentation."
 msgstr "**RNA 序列数据增强（BM）：** 使用全连接玻尔兹曼机进行生物序列增强的生成建模。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:266
+#: ../../source/getting_started/introduction.md:266
 msgid ""
 "**Handwritten digit classification (RBM / DBN):** Train Restricted "
 "Boltzmann Machines and Deep Belief Networks on the MNIST dataset for "
 "feature learning and classification."
 msgstr "**手写数字分类（RBM / DBN）：** 在 MNIST 数据集上训练受限玻尔兹曼机和深度信念网络，用于特征学习与分类。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:267
+#: ../../source/getting_started/introduction.md:267
 msgid ""
 "**Q-VAE training pipeline:** Use a Boltzmann Machine as a learnable prior"
 " within a variational autoencoder."
 msgstr "**Q-VAE 训练流程：** 在变分自编码器中使用玻尔兹曼机作为可学习先验。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:268
+#: ../../source/getting_started/introduction.md:268
 msgid "**Q-Diffusion:** Energy-guided sampling for discrete sequence generation."
 msgstr "**Q-Diffusion：** 用于离散序列生成的能量引导采样。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:270
+#: ../../source/getting_started/introduction.md:270
 msgid "Target Users"
 msgstr "目标用户"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:275
+#: ../../source/getting_started/introduction.md:275
 msgid "User Type"
 msgstr "用户类型"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:276
+#: ../../source/getting_started/introduction.md:276
 msgid "Use Case"
 msgstr "用例"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:277
+#: ../../source/getting_started/introduction.md:277
 msgid "**Researchers**"
 msgstr "**研究人员**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:278
+#: ../../source/getting_started/introduction.md:278
 msgid "Validate the impact of quantum sampling on energy-based model training"
 msgstr "验证量子采样对基于能量的模型训练的影响"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:279
+#: ../../source/getting_started/introduction.md:279
 msgid "**Developers**"
 msgstr "**开发者**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:280
+#: ../../source/getting_started/introduction.md:280
 msgid "Build hybrid classical-quantum generative models"
 msgstr "构建混合经典-量子生成模型"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:281
+#: ../../source/getting_started/introduction.md:281
 msgid "**Educators & Students**"
 msgstr "**教育者与学生**"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:282
+#: ../../source/getting_started/introduction.md:282
 msgid "Teach Boltzmann machine principles and quantum sampling practice"
 msgstr "教授玻尔兹曼机原理与量子采样实践"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:285
+#: ../../source/getting_started/introduction.md:285
 msgid "Typical Usage Workflow"
 msgstr "典型使用流程"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:287
+#: ../../source/getting_started/introduction.md:287
 msgid ""
 "The typical workflow for training energy-based models using the Kaiwu-"
 "PyTorch-Plugin is as follows:"
 msgstr "使用 Kaiwu-PyTorch-Plugin 训练基于能量的模型的典型流程如下："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:289
+#: ../../source/getting_started/introduction.md:289
 msgid ""
 "<b>Data Preparation</b>: Load and preprocess the training data, "
 "converting it into the model input format"
 msgstr "<b>数据准备</b>：加载并预处理训练数据，转换为模型输入格式"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:290
+#: ../../source/getting_started/introduction.md:290
 msgid ""
 "<b>Model Definition</b>: Instantiate an RBM or BM model, setting the "
 "dimensions of the visible and hidden layers."
 msgstr "<b>模型定义</b>：实例化 RBM 或 BM 模型，设置可见层和隐藏层的维度。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:291
+#: ../../source/getting_started/introduction.md:291
 msgid ""
 "<b>Optimizer Configuration</b>: Use PyTorch optimizers (such as SGD, "
 "Adam) to manage model parameters"
 msgstr "<b>优化器配置</b>：使用 PyTorch 优化器（如 SGD、Adam）管理模型参数"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:292
+#: ../../source/getting_started/introduction.md:292
 msgid "<b>Training Loop</b>:"
 msgstr "<b>训练循环</b>："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:293
+#: ../../source/getting_started/introduction.md:293
 msgid ""
 "Compute hidden layer representations from the training data (positive "
 "phase)."
 msgstr "从训练数据计算隐藏层表示（正相）。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:294
+#: ../../source/getting_started/introduction.md:294
 msgid ""
 "Use a sampler to generate samples from the model distribution (negative "
 "phase)."
 msgstr "使用采样器从模型分布生成样本（负相）。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:295
+#: ../../source/getting_started/introduction.md:295
 msgid "Calculate the loss function and backpropagate the gradients."
 msgstr "计算损失函数并反向传播梯度。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:296
+#: ../../source/getting_started/introduction.md:296
 msgid "Update model parameters"
 msgstr "更新模型参数"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:298
+#: ../../source/getting_started/introduction.md:298
 msgid ""
 "<b>Model Evaluation</b>: Use the trained model to perform feature "
 "extraction, classification, or generation tasks"
 msgstr "<b>模型评估</b>：使用训练好的模型进行特征提取、分类或生成任务"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:333
+#: ../../source/getting_started/introduction.md:333
 msgid "Citation"
 msgstr "引用方式"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:335
+#: ../../source/getting_started/introduction.md:335
 msgid ""
 "If Kaiwu-PyTorch-Plugin is helpful for your academic research, you are "
 "welcome to cite it:"
 msgstr "如果 Kaiwu-PyTorch-Plugin 对您的学术研究有帮助，欢迎引用："
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/introduction.md:346
+#: ../../source/getting_started/introduction.md:346
 msgid "Related research papers:"
 msgstr "相关研究论文："
-
-#~ msgid ""
-#~ "`rbm_digits`, `dbn_digits`, `bm_generation`, "
-#~ "`qvae_mnist`, `qvae_cell`, `qdiffusion`"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "`AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, "
-#~ "`BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, "
-#~ "`QDiffusion`; `_to_ising_matrix()`, `sample()`, "
-#~ "`objective()`"
-#~ msgstr ""
-
-#~ msgid "KPP Overview"
-#~ msgstr "KPP 概述"
-
-#~ msgid ""
-#~ "`rbm_digits`, `dbn_digits`, `bm_generation`, "
-#~ "`qvae_mnist`, `qvae_cell`, `qdiffusion`"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "`AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, "
-#~ "`BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, "
-#~ "`QDiffusion`; `_to_ising_matrix()`, `sample()`, "
-#~ "`objective()`"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "**Positive Phase (PyTorch, CPU/GPU)**    - "
-#~ "Compute hidden layer representations from "
-#~ "training data    - `h = "
-#~ "rbm.get_hidden(x)`, data statistics, no "
-#~ "sampling needed"
-#~ msgstr ""
-#~ "**正相（PyTorch，CPU/GPU）**    - 从训练数据计算隐藏层表示    - "
-#~ "`h = rbm.get_hidden(x)`，数据统计，无需采样"
-
-#~ msgid ""
-#~ "**Negative Phase (Offloaded to SDK)**    "
-#~ "- Generate samples from the model "
-#~ "distribution    - `s = rbm.sample(sampler)`"
-#~ "    - Internally: `_to_ising_matrix()` prepares"
-#~ " J/h matrix → dispatched to **CIM**"
-#~ " (quantum) or **SA** (classical) solver"
-#~ msgstr ""
-#~ "**负相（卸载到 SDK）**    - 从模型分布生成样本    - `s"
-#~ " = rbm.sample(sampler)`    - "
-#~ "内部：`_to_ising_matrix()` 准备 J/h 矩阵 → 分派给"
-#~ " **CIM**（量子）或 **SA**（经典）求解器"
-
-#~ msgid ""
-#~ "**Parameter Update (PyTorch, CPU/GPU)**    -"
-#~ " `objective = rbm.objective(h, s)`    - "
-#~ "`objective.backward()`    - `optimizer.step()`"
-#~ msgstr ""
-#~ "**参数更新（PyTorch，CPU/GPU）**    - `objective = "
-#~ "rbm.objective(h, s)`    - `objective.backward()`"
-#~ "    - `optimizer.step()`"
 

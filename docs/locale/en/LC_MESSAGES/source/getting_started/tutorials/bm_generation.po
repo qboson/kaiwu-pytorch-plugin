@@ -79,7 +79,7 @@ msgstr "1\\. Introduction to Fully-Connected Boltzmann Machines"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:29
 msgid "1.1 BM vs RBM"
-msgstr "1.1 BM vs RBM"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/bm_generation.md:36
 msgid "特性"
@@ -224,9 +224,6 @@ msgid ""
 "   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 "  "
 msgstr ""
-"\n"
-"   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
-"  "
 
 #: ../../source/getting_started/tutorials/bm_generation.md:82
 msgid "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"
@@ -394,19 +391,3 @@ msgstr ""
 "appends the loss of every step to the ``loss.txt`` log file, enabling "
 "visualization and performance tracking of the training process."
 
-#~ msgid ""
-#~ "\n"
-#~ "   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
-#~ "  "
-#~ msgstr ""
-
-#~ msgid "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"
-#~ msgstr ""
-#~ "where $\\alpha$ is controlled by ``cost_param[\"alpha\"]``, balancing "
-#~ "generative power and conditional consistency."
-
-#~ msgid ""
-#~ "$$    \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) "
-#~ "\\cdot \\text{NCL}   $$    其中 $\\alpha$ 由 `cost_param[\"alpha\"]` "
-#~ "控制，平衡生成能力与条件一致性。"
-#~ msgstr ""

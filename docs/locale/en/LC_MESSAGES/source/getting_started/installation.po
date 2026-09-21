@@ -21,85 +21,82 @@ msgstr ""
 
 #: ../../source/getting_started/installation.md:9
 msgid "Installation Guide"
-msgstr "Installation Guide"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:11
 msgid ""
 "This chapter describes how to install Kaiwu-PyTorch-Plugin and its "
 "dependencies."
 msgstr ""
-"This chapter describes how to install Kaiwu-PyTorch-Plugin and its "
-"dependencies."
 
 #: ../../source/getting_started/installation.md:13
 msgid "System Requirements"
-msgstr "System Requirements"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:15
 msgid ""
 "Before installation, ensure your system meets the following requirements:"
 msgstr ""
-"Before installation, ensure your system meets the following requirements:"
 
 #: ../../source/getting_started/installation.md
 msgid "Dependency"
-msgstr "Dependency"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Required Version"
-msgstr "Required Version"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Role"
-msgstr "Role"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Python"
-msgstr "Python"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "3.10"
-msgstr "3.10"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Base runtime (tested against 3.10 specifically)"
-msgstr "Base runtime (tested against 3.10 specifically)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "PyTorch"
-msgstr "PyTorch"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "2.7"
-msgstr "2.7"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Tensor operations & automatic differentiation"
-msgstr "Tensor operations & automatic differentiation"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "NumPy"
-msgstr "NumPy"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "2.2.6"
-msgstr "2.2.6"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Linear algebra & SDK interfacing"
-msgstr "Linear algebra & SDK interfacing"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Kaiwu SDK"
-msgstr "Kaiwu SDK"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "v1.3.1+"
-msgstr "v1.3.1+"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Ising optimization backend (classical SA + quantum CIM)"
-msgstr "Ising optimization backend (classical SA + quantum CIM)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:24
 msgid ""
@@ -107,205 +104,184 @@ msgid ""
 "`requirements/requirements.txt`. Kaiwu SDK v1.3.1 is the current recommended"
 " release."
 msgstr ""
-"**Note:** Exact versions of PyTorch and NumPy are pinned in "
-"`requirements/requirements.txt`. Kaiwu SDK v1.3.1 is the current recommended"
-" release."
 
 #: ../../source/getting_started/installation.md:26
 msgid "Check the Python version:"
-msgstr "Check the Python version:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:33
 msgid ""
 "If you need to install Python 3.10, please visit the <u>Python 3.10 download"
 " page</u>."
 msgstr ""
-"If you need to install Python 3.10, please visit the <u>Python 3.10 download"
-" page</u>."
 
 #: ../../source/getting_started/installation.md:35
 msgid "Install Kaiwu-PyTorch-Plugin"
-msgstr "Install Kaiwu-PyTorch-Plugin"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:37
 msgid ""
 "You can choose either local setup (conda/pip) or Docker setup (recommended "
 "for reproducibility and isolation)."
 msgstr ""
-"You can choose either local setup (conda/pip) or Docker setup (recommended "
-"for reproducibility and isolation)."
 
 #: ../../source/getting_started/installation.md:38
 msgid "Option 1: Local Setup (conda/pip)"
-msgstr "Option 1: Local Setup (conda/pip)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:40
 msgid "Step-by-Step Guide"
-msgstr "Step-by-Step Guide"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:42
 msgid ""
 "**Create and Activate Environment** It is recommended to use conda to create"
 " an isolated Python environment:"
 msgstr ""
-"**Create and Activate Environment** It is recommended to use conda to create"
-" an isolated Python environment:"
 
 #: ../../source/getting_started/installation.md:52
 msgid ""
 "**Clone the Repository** Clone the project from GitHub to your local "
 "machine:"
 msgstr ""
-"**Clone the Repository** Clone the project from GitHub to your local "
-"machine:"
 
 #: ../../source/getting_started/installation.md:59
 msgid "**Install Dependencies** Install the project dependencies:"
-msgstr "**Install Dependencies** Install the project dependencies:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:65
 msgid "**Install the Plugin**"
-msgstr "**Install the Plugin**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:70
 msgid "Checkpoint"
-msgstr "Checkpoint"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:72
 msgid "Run"
-msgstr "Run"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:76
 msgid "to confirm PyTorch is installed."
-msgstr "to confirm PyTorch is installed."
+msgstr ""
 
 #: ../../source/getting_started/installation.md:78
 msgid "Option 2: Docker Setup (no local environment required)"
-msgstr "Option 2: Docker Setup (no local environment required)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:80
 msgid ""
 "The Docker setup builds a pre‑configured Jupyter notebook environment with "
 "all dependencies (including the Kaiwu SDK) already installed."
 msgstr ""
-"The Docker setup builds a pre‑configured Jupyter notebook environment with "
-"all dependencies (including the Kaiwu SDK) already installed."
 
 #: ../../source/getting_started/installation.md:82
 msgid "Required Project Structure"
-msgstr "Required Project Structure"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:93
 msgid "Docker Commands"
-msgstr "Docker Commands"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:95
 msgid ""
 "**Clone the repository** Clone the project from GitHub to your local "
 "machine:"
 msgstr ""
-"**Clone the repository** Clone the project from GitHub to your local "
-"machine:"
 
 #: ../../source/getting_started/installation.md:102
 msgid "**Build the Docker image**"
-msgstr "**Build the Docker image**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:107
 msgid "**Start the Jupyter notebook server**"
-msgstr "**Start the Jupyter notebook server**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:112
 msgid "Access"
-msgstr "Access"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:114
 msgid "Open `http://localhost:8888` (no token required)"
-msgstr "Open `http://localhost:8888` (no token required)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:115
 msgid "Project root mounted at `/home/jovyan/work`"
-msgstr "Project root mounted at `/home/jovyan/work`"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:116
 msgid "Use JupyterLab Terminal for command-line work"
-msgstr "Use JupyterLab Terminal for command-line work"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:122
 msgid ""
 "This mounts your local repository into the container, so any changes you "
 "make locally will be reflected immediately inside Jupyter."
 msgstr ""
-"This mounts your local repository into the container, so any changes you "
-"make locally will be reflected immediately inside Jupyter."
 
 #: ../../source/getting_started/installation.md:124
 msgid "Stop the Server"
-msgstr "Stop the Server"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:126
 msgid "Press `Ctrl+C`, then run:"
-msgstr "Press `Ctrl+C`, then run:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:131
 msgid "Project Structure & Package Layout"
-msgstr "Project Structure & Package Layout"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:158
 msgid "Key Code Entities"
-msgstr "Key Code Entities"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Entity"
-msgstr "Entity"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Description"
-msgstr "Description"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "**`AbstractBoltzmannMachine`**"
-msgstr "**`AbstractBoltzmannMachine`**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Base class defining the interface for all models"
-msgstr "Base class defining the interface for all models"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "**`BoltzmannMachine`**"
-msgstr "**`BoltzmannMachine`**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "Fully connected; uses `condition_sample()` for positive phase"
-msgstr "Fully connected; uses `condition_sample()` for positive phase"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid "**`RestrictedBoltzmannMachine`**"
-msgstr "**`RestrictedBoltzmannMachine`**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid ""
 "Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy "
 "definition"
 msgstr ""
-"Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy "
-"definition"
 
 #: ../../source/getting_started/installation.md
 msgid "**`GaussianBernoulliRBM`**"
-msgstr "**`GaussianBernoulliRBM`**"
+msgstr ""
 
 #: ../../source/getting_started/installation.md
 msgid ""
 "RBM variant with real-valued visible units (Gaussian distribution) and "
 "binary hidden units (Bernoulli distribution), or vice versa"
 msgstr ""
-"RBM variant with real-valued visible units (Gaussian distribution) and "
-"binary hidden units (Bernoulli distribution), or vice versa"
 
 #: ../../source/getting_started/installation.md:167
 msgid "Kaiwu SDK Configuration & License"
-msgstr "Kaiwu SDK Configuration & License"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:169
 msgid ""
@@ -314,66 +290,56 @@ msgid ""
 " both classical simulation (SA) and quantum execution (CIM), and must be "
 "installed separately."
 msgstr ""
-"Kaiwu-PyTorch-Plugin depends on the **Kaiwu SDK** to provide quantum "
-"computing capabilities. The Kaiwu SDK is a proprietary backend that provides"
-" both classical simulation (SA) and quantum execution (CIM), and must be "
-"installed separately."
 
 #: ../../source/getting_started/installation.md:171
 msgid "Step 1: Obtain & Install SDK"
-msgstr "Step 1: Obtain & Install SDK"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:172
 msgid "Option A: Install from PyPI (Recommended)"
-msgstr "Option A: Install from PyPI (Recommended)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:174
 msgid "The Kaiwu SDK is available on PyPI. You can install it directly:"
-msgstr "The Kaiwu SDK is available on PyPI. You can install it directly:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:180
 msgid "Alternatively, add the following line to your `requirements.txt`:"
-msgstr "Alternatively, add the following line to your `requirements.txt`:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:186
 msgid "Option B: Install from Official Wheel"
-msgstr "Option B: Install from Official Wheel"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:188
 msgid ""
 "If you need a specific version or have network restrictions, download the "
 "SDK wheel from the QBoson platform:"
 msgstr ""
-"If you need a specific version or have network restrictions, download the "
-"SDK wheel from the QBoson platform:"
 
 #: ../../source/getting_started/installation.md:190
 msgid "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
-msgstr "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:191
 msgid ""
 "Download the wheel package suitable for your system (e.g., "
 "`kaiwu-1.3.1-py3-none-any.whl`)"
 msgstr ""
-"Download the wheel package suitable for your system (e.g., "
-"`kaiwu-1.3.1-py3-none-any.whl`)"
 
 #: ../../source/getting_started/installation.md:192
 msgid "Install the wheel:"
-msgstr "Install the wheel:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:198
 msgid "Step 2: Set Environment Variables"
-msgstr "Step 2: Set Environment Variables"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:200
 msgid ""
 "After installation, you need to configure the SDK authorization credentials."
 " Set the following environment variables:"
 msgstr ""
-"After installation, you need to configure the SDK authorization credentials."
-" Set the following environment variables:"
 
 #: ../../source/getting_started/installation.md:207
 msgid ""
@@ -381,17 +347,14 @@ msgid ""
 "`SDK_TOKEN`. Using the wrong variable name will cause authentication to "
 "fail."
 msgstr ""
-"**Important:** The environment variable name is `SDK_CODE`, **not** "
-"`SDK_TOKEN`. Using the wrong variable name will cause authentication to "
-"fail."
 
 #: ../../source/getting_started/installation.md:209
 msgid "Step 3: Initialize License in Code"
-msgstr "Step 3: Initialize License in Code"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:211
 msgid "Then initialize the license in your code:"
-msgstr "Then initialize the license in your code:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:223
 msgid ""
@@ -400,38 +363,30 @@ msgid ""
 "control. The credentials can be obtained from the <u>Kaiwu SDK page</u> on "
 "the QBoson platform."
 msgstr ""
-"**Note:** Always keep credentials in environment variables, never hardcode "
-"them in source code, as they could be accidentally committed to version "
-"control. The credentials can be obtained from the <u>Kaiwu SDK page</u> on "
-"the QBoson platform."
 
 #: ../../source/getting_started/installation.md:225
 msgid "Obtain Quantum Computer Access"
-msgstr "Obtain Quantum Computer Access"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:226
 msgid "How to Get QPU Access"
-msgstr "How to Get QPU Access"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:227
 msgid ""
 "To experience true quantum computing capabilities, you need to obtain access"
 " to a quantum computer:"
 msgstr ""
-"To experience true quantum computing capabilities, you need to obtain access"
-" to a quantum computer:"
 
 #: ../../source/getting_started/installation.md:229
 msgid "Register an account on the <u>QBoson platform</u>"
-msgstr "Register an account on the <u>QBoson platform</u>"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:230
 msgid ""
 "Contact the official staff through the platform to request a quota for the "
 "real quantum device"
 msgstr ""
-"Contact the official staff through the platform to request a quota for the "
-"real quantum device"
 
 #: ../../source/getting_started/installation.md:232
 msgid ""
@@ -440,351 +395,75 @@ msgid ""
 "classical optimizers (such as the simulated annealing optimizer) as "
 "classical alternatives to the quantum sampler."
 msgstr ""
-"**Note:** Before obtaining access to the real quantum device, you can use "
-"simulators for development and testing. The Kaiwu SDK provides various "
-"classical optimizers (such as the simulated annealing optimizer) as "
-"classical alternatives to the quantum sampler."
 
 #: ../../source/getting_started/installation.md:234
 msgid "Development Workflow Recommendation:"
-msgstr "Development Workflow Recommendation:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:253
 msgid ""
 "**Note:** Always validate your model with the classical simulator before "
 "consuming QPU quota."
 msgstr ""
-"**Note:** Always validate your model with the classical simulator before "
-"consuming QPU quota."
 
 #: ../../source/getting_started/installation.md:254
 msgid "Verify Installation"
-msgstr "Verify Installation"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:256
 msgid ""
 "After installation, run the following code to verify that the installation "
 "was successful:"
 msgstr ""
-"After installation, run the following code to verify that the installation "
-"was successful:"
 
 #: ../../source/getting_started/installation.md:258
 msgid "Three Verification Steps"
-msgstr "Three Verification Steps"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:260
 msgid ""
 "**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded"
 msgstr ""
-"**Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded"
 
 #: ../../source/getting_started/installation.md:261
 msgid "**Test SDK backend:** Verify the classical SA solver works"
-msgstr "**Test SDK backend:** Verify the classical SA solver works"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:262
 msgid ""
 "**Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and "
 "initializes"
 msgstr ""
-"**Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and "
-"initializes"
 
 #: ../../source/getting_started/installation.md:264
 msgid "Smoke-Test Code"
-msgstr "Smoke-Test Code"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:289
 msgid "Expected Output"
-msgstr "Expected Output"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:298
 msgid ""
 "If no error occurs, your environment is ready. You can now build models and "
 "validate with classical samplers, then switch to the quantum sampler."
 msgstr ""
-"If no error occurs, your environment is ready. You can now build models and "
-"validate with classical samplers, then switch to the quantum sampler."
 
 #: ../../source/getting_started/installation.md:300
 msgid "Development Environment Setup (Optional)"
-msgstr "Development Environment Setup (Optional)"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:302
 msgid ""
 "If you plan to participate in the development of the plugin, you can install"
 " the development dependencies:"
 msgstr ""
-"If you plan to participate in the development of the plugin, you can install"
-" the development dependencies:"
 
 #: ../../source/getting_started/installation.md:308
 msgid "Run tests:"
-msgstr "Run tests:"
+msgstr ""
 
 #: ../../source/getting_started/installation.md:318
 msgid "Lint code style:"
-msgstr "Lint code style:"
+msgstr ""
 
-#~ msgid "``pip list`` 或者 ``pip show kaiwu-torch-plugin``"
-#~ msgstr "``pip list`` or ``pip show kaiwu-torch-plugin``"
-
-#~ msgid "v1.2.0+"
-#~ msgstr "v1.2.0+"
-
-#~ msgid "安装指南"
-#~ msgstr "Installation Guide"
-
-#~ msgid "本章介绍如何安装 Kaiwu-PyTorch-Plugin 及其依赖项。"
-#~ msgstr ""
-#~ "This chapter explains how to install Kaiwu-PyTorch-Plugin and its "
-#~ "dependencies."
-
-#~ msgid "1. 环境要求"
-#~ msgstr "1\\. System Requirements"
-
-#~ msgid "在安装之前，请确保您的系统满足以下要求："
-#~ msgstr ""
-#~ "Before installation, make sure your system meets the following requirements:"
-
-#~ msgid "依赖项"
-#~ msgstr "Dependency"
-
-#~ msgid "版本要求"
-#~ msgstr "Version Required"
-
-#~ msgid "检查 Python 版本："
-#~ msgstr "Check your Python version:"
-
-#~ msgid ""
-#~ "如果需要安装 Python 3.10，请访问 [Python 3.10 "
-#~ "下载页面](https://www.python.org/downloads/release/python-31011/)。"
-#~ msgstr ""
-#~ "If you need to install Python 3.10, visit the `Python 3.10 download page "
-#~ "<https://www.python.org/downloads/release/python-31011/ >`_."
-
-#~ msgid "2.1 创建并激活环境"
-#~ msgstr "2.1 Create and Activate Environment"
-
-#~ msgid "推荐使用 conda 创建独立的 Python 环境："
-#~ msgstr "We recommend creating an isolated Python environment with conda:"
-
-#~ msgid "2.2 克隆仓库"
-#~ msgstr "2.2 Clone the Repository"
-
-#~ msgid "从 GitHub 克隆项目到本地："
-#~ msgstr "Clone the project from GitHub to your local machine:"
-
-#~ msgid "2.3 安装依赖"
-#~ msgstr "2.3 Install Dependencies"
-
-#~ msgid "安装项目依赖："
-#~ msgstr "Install project dependencies:"
-
-#~ msgid "2.4 安装插件"
-#~ msgstr "2.4 Install the Plugin"
-
-#~ msgid "2.5 使用 Docker（可选）"
-#~ msgstr "2\\.5 Using Docker (Optional)"
-
-#~ msgid ""
-#~ "README 提供了基于 Jupyter Notebook 的 Docker 配置，用于获得隔离、可复现的环境。进入 `requirements/` "
-#~ "目录后构建并启动服务："
-#~ msgstr ""
-#~ "The README provides a Jupyter Notebook-based Docker configuration for an "
-#~ "isolated and reproducible environment. Build and start the service from the "
-#~ "`requirements/` directory:"
-
-#~ msgid ""
-#~ "服务启动后可通过 `http://localhost:8888` 访问。停止服务时按下 `Ctrl+C`，再执行 `docker compose "
-#~ "down`。"
-#~ msgstr ""
-#~ "After the service starts, open `http://localhost:8888`. To stop it, press "
-#~ "`Ctrl+C`, then run `docker compose down`."
-
-#~ msgid "3. 安装 Kaiwu SDK（必需）"
-#~ msgstr "3\\. Install Kaiwu SDK (Required)"
-
-#~ msgid "Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力。"
-#~ msgstr ""
-#~ "Kaiwu-PyTorch-Plugin relies on Kaiwu SDK for quantum-computing capabilities."
-
-#~ msgid ""
-#~ "现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装，其他版本的Kaiwu SDK 的下载和安装步骤如下："
-#~ msgstr ""
-#~ "Kaiwu version 1.3.1 can now be installed directly via `pip install "
-#~ "kaiwu==1.3.1`. The download and installation steps for other versions of the"
-#~ " Kaiwu SDK are as follows:"
-
-#~ msgid "3.1 获取 SDK"
-#~ msgstr "3.1 Obtain the SDK"
-
-#~ msgid "访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)"
-#~ msgstr ""
-#~ "Visit the `Kaiwu SDK download page <https://platform.qboson.com/sdkDownload "
-#~ ">`_"
-
-#~ msgid "下载适合您系统的 SDK 安装包"
-#~ msgstr "Download the SDK package for your system"
-
-#~ msgid ""
-#~ "参考 [Kaiwu SDK 安装说明](https://kaiwu-sdk-"
-#~ "docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html)"
-#~ " 以完成安装"
-#~ msgstr ""
-#~ "Follow the [Kaiwu SDK installation guide](https://kaiwu-sdk-"
-#~ "docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html)"
-#~ " to complete installation"
-
-#~ msgid "3.2 配置授权信息"
-#~ msgstr "3.2 Configure Credentials"
-
-#~ msgid "安装完成后，您需要配置 SDK 授权信息："
-#~ msgstr "After installation, configure your SDK credentials:"
-
-#~ msgid ""
-#~ "请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的 [Kaiwu SDK "
-#~ "页面](https://platform.qboson.com/) 获取。"
-#~ msgstr ""
-#~ "Replace the placeholders with your actual credentials, which can be obtained"
-#~ " from the [Kaiwu SDK page](https://platform.qboson.com/ ) on the QBoson "
-#~ "platform."
-
-#~ msgid "4. 验证安装"
-#~ msgstr "4\\. Verify Installation"
-
-#~ msgid "安装完成后，运行以下代码验证安装是否成功："
-#~ msgstr "After installation, run the following code to verify success:"
-
-#~ msgid ""
-#~ "如果没有报错，至此您已经安装成功。后续您可以根据需求进行模型的构建，并使用经典计算器进行模型验证，验证通过后再根据如下步骤切换到量子计算器以利用量子计算资源。"
-#~ msgstr ""
-#~ "If no errors appear, installation is complete.  You can now build models and"
-#~ " validate them with classical simulators; once satisfied, switch to a "
-#~ "quantum backend to leverage real quantum resources."
-
-#~ msgid "5. 获取量子计算机访问"
-#~ msgstr "5\\. Obtain Quantum-Computer Access"
-
-#~ msgid "要体验真正的量子计算能力，您需要获取量子计算机的访问权限："
-#~ msgstr ""
-#~ "To experience genuine quantum computing power, you need access to a quantum "
-#~ "computer:"
-
-#~ msgid "在 [QBoson 平台](https://platform.qboson.com/) 注册账号"
-#~ msgstr ""
-#~ "Register an account on the [QBoson platform](https://platform.qboson.com/ )"
-
-#~ msgid "通过平台联系官方工作人员获取真机配额"
-#~ msgstr ""
-#~ "Contact official staff through the platform to obtain real-machine quota"
-
-#~ msgid ""
-#~ "在获取真机访问权限之前，您可以使用模拟器进行开发和测试验证。Kaiwu SDK 提供了多种经典优化器（如模拟退火优化器）作为量子采样器的经典替代方案。"
-#~ msgstr ""
-#~ "While awaiting real-machine access, you can develop and test with "
-#~ "simulators.  Kaiwu SDK provides several classical optimizers (e.g. "
-#~ "simulated-annealing optimizer) as classical substitutes for quantum "
-#~ "samplers."
-
-#~ msgid "6. 开发环境设置（可选）"
-#~ msgstr "6\\. Development Environment Setup (Optional)"
-
-#~ msgid "如果您计划参与插件的开发，可以安装开发依赖："
-#~ msgstr ""
-#~ "If you plan to contribute to the plugin, install the development "
-#~ "dependencies:"
-
-#~ msgid "运行测试："
-#~ msgstr "Run tests:"
-
-#~ msgid "代码风格检查："
-#~ msgstr "Code-style check:"
-
-#~ msgid "7. 常见问题"
-#~ msgstr "7\\. FAQ"
-
-#~ msgid "Q: 安装时提示 Python 版本不兼容？"
-#~ msgstr "Q: Installation reports incompatible Python version?"
-
-#~ msgid "A: 请确保："
-#~ msgstr "A: Please ensure that:"
-
-#~ msgid "当前环境已激活（`conda activate quantum_env`）"
-#~ msgstr "the environment is activated (``conda activate quantum_env``)"
-
-#~ msgid "Kaiwu SDK 已正确安装"
-#~ msgstr "Kaiwu SDK is correctly installed"
-
-#~ msgid "Q: 如何更新到最新版本？"
-#~ msgstr "Q: How do I update to the latest version?"
-
-#~ msgid "A: 进入项目目录并拉取最新代码："
-#~ msgstr "A: Enter the project directory and pull the latest code:"
-
-#~ msgid ""
-#~ "[!NOTE] Exact versions of PyTorch and NumPy are pinned in "
-#~ "`requirements/requirements.txt`. Kaiwu SDK v1.3.1 is the current recommended"
-#~ " release."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "[!IMPORTANT] The environment variable name is `SDK_CODE`, **not** "
-#~ "`SDK_TOKEN`. Using the wrong variable name will cause authentication to "
-#~ "fail."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "[!NOTE] Always keep credentials in environment variables, never hardcode "
-#~ "them in source code, as they could be accidentally committed to version "
-#~ "control. The credentials can be obtained from the <u>Kaiwu SDK page</u> on "
-#~ "the QBoson platform."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "[!NOTE] Before obtaining access to the real quantum device, you can use "
-#~ "simulators for development and testing. The Kaiwu SDK provides various "
-#~ "classical optimizers (such as the simulated annealing optimizer) as "
-#~ "classical alternatives to the quantum sampler."
-#~ msgstr ""
-
-#~ msgid "FAQ"
-#~ msgstr ""
-
-#~ msgid "Q: Python version incompatibility during installation?"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A: Kaiwu-PyTorch-Plugin currently works with Python 3.10. Use conda to "
-#~ "create a Python 3.10 environment:"
-#~ msgstr ""
-#~ "A: Kaiwu-PyTorch-Plugin currently requires Python 3.10.  Create a Python "
-#~ "3.10 environment with conda:"
-
-#~ msgid "Q: Cannot import kaiwu.torch_plugin?"
-#~ msgstr "Q: Cannot import kaiwu.torch_plugin?"
-
-#~ msgid "A: Please ensure that:"
-#~ msgstr ""
-
-#~ msgid "The current environment is activated (`conda activate quantum_env`)"
-#~ msgstr ""
-
-#~ msgid "The Kaiwu SDK is correctly installed"
-#~ msgstr ""
-
-#~ msgid "Kaiwu-PyTorch-Plugin is correctly installed (`pip install .`)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Check whether it is installed using `pip list` or `pip show kaiwu-torch-"
-#~ "plugin`"
-#~ msgstr ""
-#~ "Kaiwu-PyTorch-Plugin is correctly installed (``pip install .``); check with"
-
-#~ msgid "Q: How to update to the latest version?"
-#~ msgstr ""
-
-#~ msgid "A: Navigate to the project directory and pull the latest code:"
-#~ msgstr ""

@@ -454,21 +454,3 @@ msgid ""
 "**probabilistic modeling** of data distributions."
 msgstr "从确定性感知机到随机玻尔兹曼机的转变，也对应着从 **判别式分类** 到数据分布的 **概率建模** 的转变。"
 
-#~ msgid ""
-#~ "y = \\begin{cases}1 & \\text{if } \\sum_{j=1}^d w_j x_j + b \\geq 0 \\\\0 & "
-#~ "\\text{otherwise}\\end{cases}"
-#~ msgstr ""
-
-#~ msgid "y = \\mathbb{I}\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\geq 0 \\right)"
-#~ msgstr ""
-
-#~ msgid "E(\\mathbf{x}, y) = -y (\\mathbf{w}^\\top \\mathbf{x} + b)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$y = \\begin{cases}1 & \\text{if } \\sum_{j=1}^d w_j x_j + b \\geq 0 \\\\0 "
-#~ "& \\text{otherwise}\\end{cases}$$"
-#~ msgstr ""
-
-#~ msgid "$$E(\\mathbf{x}, y) = -y (\\mathbf{w}^\\top \\mathbf{x} + b)$$"
-#~ msgstr ""

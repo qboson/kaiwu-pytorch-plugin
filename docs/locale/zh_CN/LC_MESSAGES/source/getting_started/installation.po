@@ -475,39 +475,3 @@ msgstr "运行测试："
 msgid "Lint code style:"
 msgstr "代码风格检查："
 
-#~ msgid "FAQ"
-#~ msgstr "常见问题"
-
-#~ msgid "Q: Python version incompatibility during installation?"
-#~ msgstr "问：安装时提示 Python 版本不兼容？"
-
-#~ msgid ""
-#~ "A: Kaiwu-PyTorch-Plugin currently works with Python 3.10. Use conda to "
-#~ "create a Python 3.10 environment:"
-#~ msgstr "答：Kaiwu-PyTorch-Plugin 目前基于 Python 3.10。请使用 conda 创建 Python 3.10 环境："
-
-#~ msgid "Q: Cannot import kaiwu.torch_plugin?"
-#~ msgstr "问：无法导入 kaiwu.torch_plugin？"
-
-#~ msgid "A: Please ensure that:"
-#~ msgstr "答：请确保："
-
-#~ msgid "The current environment is activated (`conda activate quantum_env`)"
-#~ msgstr "当前环境已激活（`conda activate quantum_env`）"
-
-#~ msgid "The Kaiwu SDK is correctly installed"
-#~ msgstr "Kaiwu SDK 已正确安装"
-
-#~ msgid "Kaiwu-PyTorch-Plugin is correctly installed (`pip install .`)"
-#~ msgstr "Kaiwu-PyTorch-Plugin 已正确安装（`pip install .`）"
-
-#~ msgid ""
-#~ "Check whether it is installed using `pip list` or `pip show kaiwu-torch-"
-#~ "plugin`"
-#~ msgstr "使用 `pip list` 或 `pip show kaiwu-torch-plugin` 检查是否已安装"
-
-#~ msgid "Q: How to update to the latest version?"
-#~ msgstr "问：如何更新到最新版本？"
-
-#~ msgid "A: Navigate to the project directory and pull the latest code:"
-#~ msgstr "答：进入项目目录并拉取最新代码："

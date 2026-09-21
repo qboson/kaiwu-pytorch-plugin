@@ -21,170 +21,163 @@ msgstr ""
 
 #: ../../source/getting_started/quickstart.md:8
 msgid "Quick Start"
-msgstr "Quick Start"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:10
 msgid ""
 "This chapter helps you get started quickly with `Kaiwu-PyTorch-Plugin` "
 "through simple examples."
 msgstr ""
-"This chapter helps you get started quickly with `Kaiwu-PyTorch-Plugin` "
-"through simple examples."
 
 #: ../../source/getting_started/quickstart.md:12
 msgid "Training Workflow & Concepts"
-msgstr "Training Workflow & Concepts"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:14
 msgid "Training Flow Overview"
-msgstr "Training Flow Overview"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:42
 msgid "Three-Step Training Cycle"
-msgstr "Three-Step Training Cycle"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "Step"
-msgstr "Step"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 #: ../../source/getting_started/quickstart.md:52
 msgid "Description"
-msgstr "Description"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "Code"
-msgstr "Code"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "**1. Positive Phase (PyTorch)**"
-msgstr "**1. Positive Phase (PyTorch)**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "Compute hidden activations from data"
-msgstr "Compute hidden activations from data"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "`h = rbm.get_hidden(x, bernoulli=True)`"
-msgstr "`h = rbm.get_hidden(x, bernoulli=True)`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "**2. Negative Phase (SDK)**"
-msgstr "**2. Negative Phase (SDK)**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "Sample from model distribution, offloaded to SA/CIM"
-msgstr "Sample from model distribution, offloaded to SA/CIM"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "`s = rbm.sample(sampler)`"
-msgstr "`s = rbm.sample(sampler)`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "**3. Objective & Update (PyTorch)**"
-msgstr "**3. Objective & Update (PyTorch)**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "Compute objective, backpropagate, update parameters"
-msgstr "Compute objective, backpropagate, update parameters"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:16
 msgid "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
-msgstr "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:50
 msgid "Code Entity Mapping"
-msgstr "Code Entity Mapping"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:75
 msgid "**Mapping Walkthrough:**"
-msgstr "**Mapping Walkthrough:**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:77
 msgid ""
 "**Model Logic:** BM/RBM holds `quadratic_coef` (W) and `linear_bias` (b,c)"
 msgstr ""
-"**Model Logic:** BM/RBM holds `quadratic_coef` (W) and `linear_bias` (b,c)"
 
 #: ../../source/getting_started/quickstart.md:78
 msgid ""
 "**Ising Conversion:** `_to_ising_matrix()` converts W,b,c into "
 "Ising J (coupling) and h (field) matrix"
 msgstr ""
-"**Ising Conversion:** `_to_ising_matrix()` converts W,b,c into "
-"Ising J (coupling) and h (field) matrix"
 
 #: ../../source/getting_started/quickstart.md:79
 msgid ""
 "**Sampling Interface:** `model.sample(sampler)` passes J,h to the "
 "sampler's `solve()` method"
 msgstr ""
-"**Sampling Interface:** `model.sample(sampler)` passes J,h to the "
-"sampler's `solve()` method"
 
 #: ../../source/getting_started/quickstart.md:80
 msgid "**SDK Backend:**"
-msgstr "**SDK Backend:**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:81
 msgid "Classical: `SimulatedAnnealingOptimizer`"
-msgstr "Classical: `SimulatedAnnealingOptimizer`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:82
 msgid "Quantum: `CIMOptimizer`"
-msgstr "Quantum: `CIMOptimizer`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:83
 msgid "BM vs RBM: Key API Difference"
-msgstr "BM vs RBM: Key API Difference"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "RBM"
-msgstr "RBM"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "**BM**"
-msgstr "**BM**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Topology"
-msgstr "Topology"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Bipartite"
-msgstr "Bipartite"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Fully connected"
-msgstr "Fully connected"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Positive phase"
-msgstr "Positive phase"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`get_hidden(x, bernoulli=True)`"
-msgstr "`get_hidden(x, bernoulli=True)`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`condition_sample(sampler, x)`"
-msgstr "`condition_sample(sampler, x)`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Negative phase"
-msgstr "Negative phase"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`sample(sampler)`"
-msgstr "`sample(sampler)`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Objective"
-msgstr "Objective"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`objective(h, s)`"
-msgstr "`objective(h, s)`"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:92
 msgid ""
@@ -192,17 +185,14 @@ msgid ""
 "require sampling conditioned on visible units, not a deterministic hidden-"
 "layer computation."
 msgstr ""
-"**Note:** BM uses `condition_sample()` because fully-connected networks "
-"require sampling conditioned on visible units, not a deterministic hidden-"
-"layer computation."
 
 #: ../../source/getting_started/quickstart.md:94
 msgid "Code Examples"
-msgstr "Code Examples"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:96
 msgid "Restricted Boltzmann Machine (RBM)"
-msgstr "Restricted Boltzmann Machine (RBM)"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:98
 msgid ""
@@ -211,40 +201,33 @@ msgid ""
 "the number of visible and hidden nodes, and customize the initialization of "
 "quadratic terms and linear biases."
 msgstr ""
-"The following example demonstrates how to use the "
-"`RestrictedBoltzmannMachine` class for basic model training. You can define "
-"the number of visible and hidden nodes, and customize the initialization of "
-"quadratic terms and linear biases."
 
 #: ../../source/getting_started/quickstart.md:163
 msgid "Boltzmann Machine (BM)"
-msgstr "Boltzmann Machine (BM)"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:165
 msgid ""
 "The following example demonstrates how to use the `BoltzmannMachine` class:"
 msgstr ""
-"The following example demonstrates how to use the `BoltzmannMachine` class:"
 
 #: ../../source/getting_started/quickstart.md:210
 msgid "Sampler Switching"
-msgstr "Sampler Switching"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:212
 msgid ""
 "The Kaiwu SDK provides various samplers. You can choose according to your "
 "needs:"
 msgstr ""
-"The Kaiwu SDK provides various samplers. You can choose according to your "
-"needs:"
 
 #: ../../source/getting_started/quickstart.md:224
 msgid "Next Steps"
-msgstr "Next Steps"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:226
 msgid "Congratulations on completing the quick start! For the next step:"
-msgstr "Congratulations on completing the quick start! For the next step:"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:228
 msgid ""
@@ -253,10 +236,6 @@ msgid ""
 "basic execution, then follow `example/rbm_digits/rbm_digits.ipynb` for a "
 "full RBM training walkthrough."
 msgstr ""
-"**Beginner Course:** Check out the [KPP Tutorials](tutorials/index.md) for "
-"more practical application examples. Start with `tests/test_rbm.py` for "
-"basic execution, then follow `example/rbm_digits/rbm_digits.ipynb` for a "
-"full RBM training walkthrough."
 
 #: ../../source/getting_started/quickstart.md:229
 msgid ""
@@ -265,10 +244,6 @@ msgid ""
 "augmentation), and learn feature learning & classification with RBM/DBN "
 "stacks."
 msgstr ""
-"**Intermediate Tutorial:** Explore generative modeling with fully connected "
-"Boltzmann Machines in `example/bm_generation/` (e.g., RNA sequence data "
-"augmentation), and learn feature learning & classification with RBM/DBN "
-"stacks."
 
 #: ../../source/getting_started/quickstart.md:230
 msgid ""
@@ -277,225 +252,98 @@ msgid ""
 "generation, where a Boltzmann Machine serves as a learnable prior or energy-"
 "guided sampler."
 msgstr ""
-"**Advanced Case Study:** Dive into the Q-VAE (Quantum Variational "
-"Autoencoder) training pipeline and Q-Diffusion for discrete sequence "
-"generation, where a Boltzmann Machine serves as a learnable prior or energy-"
-"guided sampler."
 
 #: ../../source/getting_started/quickstart.md:232
 msgid "Learning Paths"
-msgstr "Learning Paths"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Level"
-msgstr "Level"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Resources"
-msgstr "Resources"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "**Beginner**"
-msgstr "**Beginner**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`tests/test_rbm.py`, basic execution"
-msgstr "`tests/test_rbm.py`, basic execution"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Basic RBM execution"
-msgstr "Basic RBM execution"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`example/rbm_digits/rbm_digits.ipynb`, full RBM walkthrough"
-msgstr "`example/rbm_digits/rbm_digits.ipynb`, full RBM walkthrough"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Complete RBM training"
-msgstr "Complete RBM training"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "**Intermediate**"
-msgstr "**Intermediate**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "`example/bm_generation/`, generative modeling with BMs (RNA sequence)"
-msgstr "`example/bm_generation/`, generative modeling with BMs (RNA sequence)"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Generative modeling"
-msgstr "Generative modeling"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "RBM & DBN: feature learning & classification"
-msgstr "RBM & DBN: feature learning & classification"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Feature learning & classification"
-msgstr "Feature learning & classification"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "**Advanced**"
-msgstr "**Advanced**"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Q-VAE: Quantum Variational Autoencoder"
-msgstr "Q-VAE: Quantum Variational Autoencoder"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Quantum VAE training"
-msgstr "Quantum VAE training"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Q-Diffusion: discrete sequence generation"
-msgstr "Q-Diffusion: discrete sequence generation"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:52
 msgid "Discrete sequence generation"
-msgstr "Discrete sequence generation"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:243
 msgid "Official Resources"
-msgstr "Official Resources"
+msgstr ""
 
 #: ../../source/getting_started/quickstart.md:244
 msgid ""
 "**KPP GitHub:** [https://github.com/QBoson/Kaiwu-pytorch-"
 "plugin](https://github.com/QBoson/Kaiwu-pytorch-plugin)"
 msgstr ""
-"**KPP GitHub:** [https://github.com/QBoson/Kaiwu-pytorch-"
-"plugin](https://github.com/QBoson/Kaiwu-pytorch-plugin)"
 
 #: ../../source/getting_started/quickstart.md:245
 msgid ""
 "**KPP Docs:** [https://kaiwu-pytorch-plugin-"
 "docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
 msgstr ""
-"**KPP Docs:** [https://kaiwu-pytorch-plugin-"
-"docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
 
 #: ../../source/getting_started/quickstart.md:246
 msgid ""
 "**SDK Docs:** [https://kaiwu-community.readthedocs.io](https://kaiwu-"
 "community.readthedocs.io/)"
 msgstr ""
-"**SDK Docs:** [https://kaiwu-community.readthedocs.io](https://kaiwu-"
-"community.readthedocs.io/)"
 
-#~ msgid ""
-#~ "**Beginner Course:** Check out the [KPP "
-#~ "Tutorials](https://icngzsrp9wst.feishu.cn/wiki/YKG2woyYoimFP3kO2vTcvWP8nbh) "
-#~ "for more practical application examples. Start with `tests/test_rbm.py` for "
-#~ "basic execution and `example/rbm_digits/rbm_digits.py` for a full RBM "
-#~ "training script."
-#~ msgstr ""
-
-#~ msgid "快速开始"
-#~ msgstr "Quick Start"
-
-#~ msgid "本章通过简单的代码示例，帮助您快速上手 Kaiwu-PyTorch-Plugin。"
-#~ msgstr ""
-#~ "This chapter gets you up and running with Kaiwu-PyTorch-Plugin through "
-#~ "short, self-contained examples."
-
-#~ msgid "1. 基本示例"
-#~ msgstr "1\\. Basic Examples"
-
-#~ msgid "1.1 受限玻尔兹曼机（RBM）"
-#~ msgstr "1.1 Restricted Boltzmann Machine (RBM)"
-
-#~ msgid ""
-#~ "以下示例展示了如何使用 `RestrictedBoltzmannMachine` 类进行基本的模型训练。 "
-#~ "可以定义可见节点、隐藏节点的个数，以及自定义二次项和一次项的初始化。"
-#~ msgstr ""
-#~ "The snippet below shows basic training with the "
-#~ "``RestrictedBoltzmannMachine`` class. You can set the number of visible and "
-#~ "hidden units and optionally supply custom initial values for the quadratic "
-#~ "and linear terms."
-
-#~ msgid "1.2 玻尔兹曼机（BM）"
-#~ msgstr "1.2 Boltzmann Machine (BM)"
-
-#~ msgid "2. 使用不同的采样器"
-#~ msgstr "2\\. Using Different Samplers"
-
-#~ msgid "Kaiwu SDK 提供多种采样器，您可以根据需求选择："
-#~ msgstr ""
-#~ "Kaiwu SDK offers several samplers; pick the one that best fits your needs:"
-
-#~ msgid ""
-#~ "如果已配置 Kaiwu SDK 授权并取得真机访问权限，可将经典采样器替换为 README 中使用的 CIM 采样器，并使用 "
-#~ "`PrecisionReducer` 适配硬件精度："
-#~ msgstr ""
-#~ "After configuring Kaiwu SDK authorization and obtaining real-hardware "
-#~ "access, you can replace the classical sampler with the CIM sampler used in "
-#~ "the README and use `PrecisionReducer` to adapt to hardware precision:"
-
-#~ msgid "详细的采样器接口与训练循环请参阅 {doc}`tutorials/quantum_sampling_pytorch`。"
-#~ msgstr ""
-#~ "For the detailed sampler interface and training loop, see "
-#~ "{doc}`tutorials/quantum_sampling_pytorch`."
-
-#~ msgid "3. 下一步"
-#~ msgstr "3\\. Next Steps"
-
-#~ msgid "恭喜您完成了快速开始！接下来，您可以："
-#~ msgstr "Congratulations—you have finished the quick-start!  Where to go next:"
-
-#~ msgid "**学习教程**：查看 {doc}`tutorials/index` 了解更多实际应用案例"
-#~ msgstr "**Tutorials**: read {doc}`tutorials/index` for more real-world cases"
-
-#~ msgid "**RBM 分类**：{doc}`tutorials/rbm_classification` - 使用 RBM 进行手写数字分类"
-#~ msgstr ""
-#~ "**RBM classification**: {doc}`tutorials/rbm_classification` – classify "
-#~ "handwritten digits with an RBM"
-
-#~ msgid "**DBN 分类**：{doc}`tutorials/dbn_classification` - 使用深度信念网络进行分类"
-#~ msgstr ""
-#~ "**DBN classification**: {doc}`tutorials/dbn_classification` – classify with "
-#~ "a Deep Belief Network"
-
-#~ msgid "**BM 生成**：{doc}`tutorials/bm_generation` - 使用玻尔兹曼机生成数据"
-#~ msgstr ""
-#~ "**BM generation**: {doc}`tutorials/bm_generation` – generate data with a "
-#~ "Boltzmann Machine"
-
-#~ msgid "**Q-VAE**：{doc}`tutorials/qvae_mnist` - 量子变分自编码器生成与表征学习"
-#~ msgstr ""
-#~ "**Q-VAE**: {doc}`tutorials/qvae_mnist` – quantum variational auto-encoder "
-#~ "for generation and representation learning"
-
-#~ msgid "**查阅 API 文档**：了解各模块的详细接口和参数"
-#~ msgstr "**API docs**: explore every module’s interface and parameters"
-
-#~ msgid "**探索示例代码**：项目 `example/` 目录包含更多完整示例"
-#~ msgstr ""
-#~ "**Example code**: the ``example/`` folder contains additional complete "
-#~ "examples"
-
-#~ msgid "Compute hidden activations from data, deterministic"
-#~ msgstr ""
-
-#~ msgid "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
-#~ msgstr ""
-
-#~ msgid "Quantum: `CIMOptimizer` (via `PrecisionReducer`)"
-#~ msgstr ""
-
-#~ msgid "`tests/test_rbm.py` — basic execution"
-#~ msgstr ""
-
-#~ msgid "`example/run_rbm.py` — full RBM script"
-#~ msgstr ""
-
-#~ msgid "`example/bm_generation/` — generative modeling with BMs (RNA sequence)"
-#~ msgstr ""
-
-#~ msgid "RBM & DBN: feature learning & classification (Tutorial 2)"
-#~ msgstr ""
-
-#~ msgid "Q-VAE: Quantum Variational Autoencoder (Tutorial 3)"
-#~ msgstr ""
-
-#~ msgid "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"
-#~ msgstr "`objective = rbm.objective(h, s)` → `backward()` → `optimizer.step()`"

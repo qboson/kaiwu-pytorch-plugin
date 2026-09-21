@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../../source/about/contributing.md:1
 msgid "贡献指南"
-msgstr "贡献指南"
+msgstr ""
 
 #: ../../source/about/contributing.md:3
 msgid ""
@@ -30,13 +30,10 @@ msgid ""
 "[Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) 和 Pull "
 "Requests，避免重复工作。"
 msgstr ""
-"感谢你对 Kaiwu-PyTorch-Plugin 的关注。欢迎提交代码、文档、示例、测试和问题反馈。提交前，请先搜索现有的 "
-"[Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) 和 Pull "
-"Requests，避免重复工作。"
 
 #: ../../source/about/contributing.md:5
 msgid "报告问题与提出建议"
-msgstr "报告问题与提出建议"
+msgstr ""
 
 #: ../../source/about/contributing.md:7
 msgid ""
@@ -44,74 +41,67 @@ msgid ""
 "报告可复现的问题或提出功能建议。请提供所用的 Python、PyTorch、Kaiwu SDK 和 Kaiwu-PyTorch-Plugin "
 "版本，以及最小复现步骤、实际结果和完整报错信息。"
 msgstr ""
-"请通过 [GitHub Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) "
-"报告可复现的问题或提出功能建议。请提供所用的 Python、PyTorch、Kaiwu SDK 和 Kaiwu-PyTorch-Plugin "
-"版本，以及最小复现步骤、实际结果和完整报错信息。"
 
 #: ../../source/about/contributing.md:9
 msgid "开始开发"
-msgstr "开始开发"
+msgstr ""
 
 #: ../../source/about/contributing.md:11
 msgid "请按项目安装文档使用 Python 3.10 和 conda 环境："
-msgstr "请按项目安装文档使用 Python 3.10 和 conda 环境："
+msgstr ""
 
 #: ../../source/about/contributing.md:22
 msgid "Kaiwu SDK 为必需依赖。可直接安装 1.3.1 版本："
-msgstr "Kaiwu SDK 为必需依赖。可直接安装 1.3.1 版本："
+msgstr ""
 
 #: ../../source/about/contributing.md:28
 msgid "其他版本的安装方式请参阅[安装指南](../getting_started/installation.md)。参与开发时，额外安装开发依赖："
 msgstr ""
-"其他版本的安装方式请参阅[安装指南](../getting_started/installation.md)。参与开发时，额外安装开发依赖："
 
 #: ../../source/about/contributing.md:34
 msgid "代码、测试与文档"
-msgstr "代码、测试与文档"
+msgstr ""
 
 #: ../../source/about/contributing.md:36
 msgid "为代码改动补充或更新对应的测试。提交前运行完整测试或受影响的测试："
-msgstr "为代码改动补充或更新对应的测试。提交前运行完整测试或受影响的测试："
+msgstr ""
 
 #: ../../source/about/contributing.md:43
 msgid "运行项目已有的代码风格检查："
-msgstr "运行项目已有的代码风格检查："
+msgstr ""
 
 #: ../../source/about/contributing.md:49
 msgid "遵循现有代码风格、类型标注和文档字符串格式；不要通过新增或扩大 pylint 的 `disable` 配置来规避检查。"
-msgstr "遵循现有代码风格、类型标注和文档字符串格式；不要通过新增或扩大 pylint 的 `disable` 配置来规避检查。"
+msgstr ""
 
 #: ../../source/about/contributing.md:50
 msgid "用户可见行为变化时，请同步更新对应的 README、示例或 Sphinx 文档。"
-msgstr "用户可见行为变化时，请同步更新对应的 README、示例或 Sphinx 文档。"
+msgstr ""
 
 #: ../../source/about/contributing.md:52
 msgid "更新或新增示例"
-msgstr "更新或新增示例"
+msgstr ""
 
 #: ../../source/about/contributing.md:56
 msgid "Q-Diffusion 的最小训练和生成示例可在仓库根目录执行："
-msgstr "Q-Diffusion 的最小训练和生成示例可在仓库根目录执行："
+msgstr ""
 
 #: ../../source/about/contributing.md:64
 msgid ""
 "新增示例时，请在 `example/` 中提供运行入口和依赖说明，并同步更新 `example/README_ZH.md` 与 "
 "`example/README.md`。"
 msgstr ""
-"新增示例时，请在 `example/` 中提供运行入口和依赖说明，并同步更新 `example/README_ZH.md` 与 "
-"`example/README.md`。"
 
 #: ../../source/about/contributing.md:66
 msgid "提交 Pull Request"
-msgstr "提交 Pull Request"
+msgstr ""
 
 #: ../../source/about/contributing.md:68
 msgid ""
 "请在 Pull Request 中说明改动目的、测试方式，以及对 README、示例或文档的更新。维护者会根据代码质量、测试覆盖和兼容性进行审阅。"
 msgstr ""
-"请在 Pull Request 中说明改动目的、测试方式，以及对 README、示例或文档的更新。维护者会根据代码质量、测试覆盖和兼容性进行审阅。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/about/contributing.md:54
+#: ../../source/about/contributing.md:54
 msgid ""
 "已有的基础脚本位于 `example/run_bm.py` 和 `example/run_rbm.py`。Digits、DBN、BM 生成和 Q-VAE"
 " 示例通过各自目录中的 Notebook 运行，具体入口见 "
@@ -119,88 +109,3 @@ msgid ""
 "plugin/blob/main/example/README_ZH.md)。"
 msgstr ""
 
-#~ msgid ""
-#~ "已有的基础脚本位于 `example/run_bm.py` 和 `example/run_rbm.py`。Digits、DBN、BM 生成和 Q-VAE"
-#~ " 示例通过各自目录中的 Notebook 运行，具体入口见 "
-#~ "[example/README_ZH.md](../../../example/README_ZH.md)。"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "感谢你对 Kaiwu-PyTorch-Plugin 的关注。我们欢迎代码、文档、示例、测试和问题反馈等各类贡献。提交前，请先搜索现有的 "
-#~ "[Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) 和 Pull "
-#~ "Requests，避免重复工作。"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "请通过 [GitHub Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) "
-#~ "报告可复现的问题或提出功能建议。问题描述应尽可能包含："
-#~ msgstr ""
-
-#~ msgid "Python、PyTorch、Kaiwu SDK 和本项目的版本；"
-#~ msgstr ""
-
-#~ msgid "操作系统、硬件及相关运行环境；"
-#~ msgstr ""
-
-#~ msgid "最小可复现示例、实际结果、预期结果和完整报错信息；"
-#~ msgstr ""
-
-#~ msgid "若涉及功能建议，请说明使用场景和预期收益。"
-#~ msgstr ""
-
-#~ msgid "请不要在公开 Issue 中提交密码、令牌、私钥或其他敏感信息。"
-#~ msgstr ""
-
-#~ msgid "Fork 仓库并克隆自己的 Fork："
-#~ msgstr ""
-
-#~ msgid "创建虚拟环境，安装开发依赖和项目："
-#~ msgstr ""
-
-#~ msgid "从最新的默认分支创建聚焦的功能分支："
-#~ msgstr ""
-
-#~ msgid "Windows PowerShell 中请使用 `.venv\\\\Scripts\\\\Activate.ps1` 激活虚拟环境。"
-#~ msgstr ""
-
-#~ msgid "保持改动范围小且目标明确；不要在同一个 Pull Request 中混入无关重构。"
-#~ msgstr ""
-
-#~ msgid "遵循仓库已有的代码风格、类型标注和文档字符串格式。不要为了通过 pylint 而新增或扩大 `disable` 配置。"
-#~ msgstr ""
-
-#~ msgid "为行为变更或缺陷修复补充相应测试，并在提交前运行受影响的测试；可行时运行完整测试套件："
-#~ msgstr ""
-
-#~ msgid "修改用户可见行为时，同步更新中英文 README、示例或 Sphinx 文档中相应的说明。"
-#~ msgstr ""
-
-#~ msgid "新增依赖时，请说明必要性、许可证兼容性以及对安装体积和运行环境的影响。"
-#~ msgstr ""
-
-#~ msgid "提交 Pull Request 前，请确认："
-#~ msgstr ""
-
-#~ msgid "分支基于最新默认分支，并已解决冲突；"
-#~ msgstr ""
-
-#~ msgid "提交信息简洁、使用祈使语气，并按逻辑拆分提交；"
-#~ msgstr ""
-
-#~ msgid "相关测试、静态检查和文档构建已通过；"
-#~ msgstr ""
-
-#~ msgid "PR 描述说明了问题背景、解决方案、测试方式，以及任何兼容性或性能影响；"
-#~ msgstr ""
-
-#~ msgid "如改动影响界面、示例输出或文档渲染，请附上必要的截图或输出片段。"
-#~ msgstr ""
-
-#~ msgid "维护者可能会提出修改建议。请保持讨论友善、聚焦技术问题，并及时回应反馈。合并时机由维护者根据代码质量、测试覆盖、兼容性和发布计划决定。"
-#~ msgstr ""
-
-#~ msgid "安全问题"
-#~ msgstr ""
-
-#~ msgid "请不要通过公开 Issue 披露潜在的安全漏洞。请联系项目维护者并提供受影响版本、复现条件和风险说明；在问题确认并修复前，请避免公开细节。"
-#~ msgstr ""

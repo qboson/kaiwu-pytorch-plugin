@@ -128,7 +128,7 @@ msgstr ""
 "and updates to README files, examples, or documentation. Maintainers review "
 "changes for code quality, test coverage, and compatibility."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/about/contributing.md:54
+#: ../../source/about/contributing.md:54
 msgid ""
 "已有的基础脚本位于 `example/run_bm.py` 和 `example/run_rbm.py`。Digits、DBN、BM 生成和 Q-VAE"
 " 示例通过各自目录中的 Notebook 运行，具体入口见 "
@@ -141,8 +141,3 @@ msgstr ""
 "[example/README_ZH.md](https://github.com/qboson/kaiwu-pytorch-"
 "plugin/blob/main/example/README_ZH.md) for entry points."
 
-#~ msgid ""
-#~ "已有的基础脚本位于 `example/run_bm.py` 和 `example/run_rbm.py`。Digits、DBN、BM 生成和 Q-VAE"
-#~ " 示例通过各自目录中的 Notebook 运行，具体入口见 "
-#~ "[example/README_ZH.md](../../../example/README_ZH.md)。"
-#~ msgstr ""

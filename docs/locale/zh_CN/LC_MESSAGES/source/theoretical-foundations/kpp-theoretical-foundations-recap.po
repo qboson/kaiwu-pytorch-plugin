@@ -253,7 +253,3 @@ msgstr ""
 "每个动手章节都配备一个可运行、可修改、可扩展的 Jupyter Notebook（或 Python "
 "脚本），与文档页一一对应。完成本教程后，你将亲身体验量子采样如何缓解经典混合瓶颈，并支持更具表达能力的生成模型。"
 
-#~ msgid ""
-#~ "**Full Boltzmann Machine:** Model a 2D mixture distribution and observe "
-#~ "quantum speed‑up."
-#~ msgstr "**全玻尔兹曼机：** 建模二维混合分布，并观察量子加速。"

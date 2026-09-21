@@ -14,11 +14,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:1
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:1
 msgid "Integrating Quantum Samplers into PyTorch"
-msgstr "Integrating Quantum Samplers into PyTorch"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:3
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:3
 msgid ""
 "The previous two chapters motivated quantum sampling ([Why "
 "Quantum?](quantum_sampling_bottleneck.md)) and introduced SA as the "
@@ -31,280 +31,226 @@ msgid ""
 "what happens behind the scenes when you replace the local SA sampler with a "
 "quantum one."
 msgstr ""
-"The previous two chapters motivated quantum sampling ([Why "
-"Quantum?](quantum_sampling_bottleneck.md)) and introduced SA as the "
-"classical baseline ([Simulated Annealing for Ising "
-"Models](simulated_annealing.md)). This chapter bridges physics and code: it "
-"introduces the **Kaiwu-PyTorch-Plugin (KPP)**, the software layer that plugs"
-" samplers, classical and quantum, into the PyTorch deep learning ecosystem. "
-"The [Quick Start](../quickstart.md) showed the basic training loop; here we "
-"explain the core interfaces, how to create and configure a CIM sampler, and "
-"what happens behind the scenes when you replace the local SA sampler with a "
-"quantum one."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:5
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:5
 msgid "Core Interfaces"
-msgstr "Core Interfaces"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid ""
 "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
 "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}."
 msgstr ""
-"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:14
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:14
 msgid "The interfaces most used in training are:"
-msgstr "The interfaces most used in training are:"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:16
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:16
 msgid ""
 "`get_hidden(s_visible, ...)`: builds the positive-phase state containing "
 "both visible and hidden states for an RBM."
 msgstr ""
-"`get_hidden(s_visible, ...)`: builds the positive-phase state containing "
-"both visible and hidden states for an RBM."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:17
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:17
 msgid ""
 "`sample(sampler)`: constructs the Ising matrix from the current model "
 "parameters, calls `sampler.solve()`, and returns the negative-phase state "
 "tensor."
 msgstr ""
-"`sample(sampler)`: constructs the Ising matrix from the current model "
-"parameters, calls `sampler.solve()`, and returns the negative-phase state "
-"tensor."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:18
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:18
 msgid ""
 "`objective(s_positive, s_negative)`: computes a surrogate objective whose "
 "gradient is equivalent to the negative log-likelihood gradient."
 msgstr ""
-"`objective(s_positive, s_negative)`: computes a surrogate objective whose "
-"gradient is equivalent to the negative log-likelihood gradient."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:20
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:20
 msgid ""
 "Note that `sample()` does **not** take a data state as input, nor does it "
 "return separate visible and hidden tensors; `objective()` takes exactly the "
 "two phase tensors."
 msgstr ""
-"Note that `sample()` does **not** take a data state as input, nor does it "
-"return separate visible and hidden tensors; `objective()` takes exactly the "
-"two phase tensors."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:22
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:22
 msgid "Creating a CIM Sampler"
-msgstr "Creating a CIM Sampler"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:24
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:24
 msgid ""
 "Real hardware quantum sampling requires configured Kaiwu SDK credentials and"
 " real-machine access. `PrecisionReducer` adapts the Ising parameters to "
 "hardware precision constraints:"
 msgstr ""
-"Real hardware quantum sampling requires configured Kaiwu SDK credentials and"
-" real-machine access. `PrecisionReducer` adapts the Ising parameters to "
-"hardware precision constraints:"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:39
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:39
 msgid "A Minimal Training Iteration"
-msgstr "A Minimal Training Iteration"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:41
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:41
 msgid ""
 "The loop mirrors the [Quick Start](../quickstart.md) example: positive phase"
 " from data, negative phase from `sample(sampler)`. Swap in "
 "`SimulatedAnnealingOptimizer()` to run the same loop locally."
 msgstr ""
-"The loop mirrors the [Quick Start](../quickstart.md) example: positive phase"
-" from data, negative phase from `sample(sampler)`. Swap in "
-"`SimulatedAnnealingOptimizer()` to run the same loop locally."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:62
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:62
 msgid "What Happens During `rbm.sample(sampler)`"
-msgstr "What Happens During `rbm.sample(sampler)`"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:64
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:64
 msgid ""
 "From the PyTorch perspective, `sample()` behaves like any other tensor-"
 "producing function."
 msgstr ""
-"From the PyTorch perspective, `sample()` behaves like any other tensor-"
-"producing function."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:66
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:66
 msgid ""
 "**Hamiltonian Construction**: weights and biases are converted into the "
 "Ising parameters $\\{h_i, J_{ij}\\}$ via the mapping described in the "
 "previous chapters."
 msgstr ""
-"**Hamiltonian Construction**: weights and biases are converted into the "
-"Ising parameters $\\{h_i, J_{ij}\\}$ via the mapping described in the "
-"previous chapters."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:67
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:67
 msgid ""
 "**Precision Scaling**: `PrecisionReducer` discretizes the parameters to the "
 "hardware's bit precision."
 msgstr ""
-"**Precision Scaling**: `PrecisionReducer` discretizes the parameters to the "
-"hardware's bit precision."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:68
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:68
 msgid ""
 "**Cloud Submission**: the Hamiltonian is sent via the Kaiwu SDK; the job "
 "queues for the next available CIM unit."
 msgstr ""
-"**Cloud Submission**: the Hamiltonian is sent via the Kaiwu SDK; the job "
-"queues for the next available CIM unit."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:69
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:69
 msgid ""
 "**Physical Sampling**: the CIM evolves optically, producing spin "
 "configurations drawn from the approximate Boltzmann distribution at the "
 "hardware's effective temperature."
 msgstr ""
-"**Physical Sampling**: the CIM evolves optically, producing spin "
-"configurations drawn from the approximate Boltzmann distribution at the "
-"hardware's effective temperature."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:70
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:70
 msgid ""
 "**Result Retrieval**: measured configurations return as PyTorch tensors."
 msgstr ""
-"**Result Retrieval**: measured configurations return as PyTorch tensors."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:72
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:72
 msgid "Choosing a Sampler"
-msgstr "Choosing a Sampler"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:74
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:74
 msgid ""
 "The table below consolidates the SA-vs-CIM comparison introduced in the "
 "[previous chapter](simulated_annealing.md):"
 msgstr ""
-"The table below consolidates the SA-vs-CIM comparison introduced in the "
-"[previous chapter](simulated_annealing.md):"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Consideration"
-msgstr "Consideration"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "`SimulatedAnnealingOptimizer`"
-msgstr "`SimulatedAnnealingOptimizer`"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "`CIMOptimizer`"
-msgstr "`CIMOptimizer`"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Run location"
-msgstr "Run location"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Local CPU"
-msgstr "Local CPU"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Kaiwu real-machine service (cloud processor)"
-msgstr "Kaiwu real-machine service (cloud processor)"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Prerequisite"
-msgstr "Prerequisite"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "None"
-msgstr "None"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "SDK credentials, access rights, quota"
-msgstr "SDK credentials, access rights, quota"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Escape from local minima"
-msgstr "Escape from local minima"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Thermal activation (barrier crossing $\\propto \\exp(-\\Delta E / T)$)"
-msgstr "Thermal activation (barrier crossing $\\propto \\exp(-\\Delta E / T)$)"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Quantum tunneling"
-msgstr "Quantum tunneling"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Suitable phase"
-msgstr "Suitable phase"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Debugging, baselines, small experiments"
-msgstr "Debugging, baselines, small experiments"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Comparative experiments with real-machine access"
-msgstr "Comparative experiments with real-machine access"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "End-to-end latency"
-msgstr "End-to-end latency"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "Determined by local problem size and settings"
-msgstr "Determined by local problem size and settings"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "High — job submission, queuing, and physical evolution"
-msgstr "High — job submission, queuing, and physical evolution"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:84
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:84
 msgid ""
 "A common workflow is to **develop and debug locally with SA**, verifying "
 "data handling, the model, and the training loop, then **switch to the CIM "
 "sampler in the same experimental setup** by changing only the sampler "
 "instantiation. This makes it far easier to isolate problems."
 msgstr ""
-"A common workflow is to **develop and debug locally with SA**, verifying "
-"data handling, the model, and the training loop, then **switch to the CIM "
-"sampler in the same experimental setup** by changing only the sampler "
-"instantiation. This makes it far easier to isolate problems."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:86
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:86
 msgid "Summary"
-msgstr "Summary"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:88
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:88
 msgid ""
 "KPP plugs samplers into the PyTorch training loop through `sample(sampler)`."
 msgstr ""
-"KPP plugs samplers into the PyTorch training loop through `sample(sampler)`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:89
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:89
 msgid ""
 "The negative phase comes from `sample()`, and the training objective is "
 "computed by `objective(s_positive, s_negative)`."
 msgstr ""
-"The negative phase comes from `sample()`, and the training objective is "
-"computed by `objective(s_positive, s_negative)`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:90
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:90
 msgid ""
 "Quantum sampling follows a five-step pipeline: construction, scaling, "
 "submission, evolution, retrieval. All handled automatically."
 msgstr ""
-"Quantum sampling follows a five-step pipeline: construction, scaling, "
-"submission, evolution, retrieval. All handled automatically."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:91
+#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:91
 msgid ""
 "CIM samples should always be compared against a classical baseline on the "
 "same task and metrics."
 msgstr ""
-"CIM samples should always be compared against a classical baseline on the "
-"same task and metrics."
 
 msgid ""
 "`RestrictedBoltzmannMachine` and `BoltzmannMachine` inherit from "
@@ -313,19 +259,4 @@ msgid ""
 "foundations/kpp-theoretical-foundations-bm-restricted.md) (Eq. {eq}`eq-rbm-"
 "energy-tf`):"
 msgstr ""
-"`RestrictedBoltzmannMachine` and `BoltzmannMachine` inherit from "
-"`AbstractBoltzmannMachine` (a `torch.nn.Module`). The RBM energy follows "
-"from [Section 4.2, Restricted Boltzmann Machine](../../theoretical-"
-"foundations/kpp-theoretical-foundations-bm-restricted.md) (Eq. {eq}`eq-rbm-"
-"energy-tf`):"
 
-#~ msgid ""
-#~ "`RestrictedBoltzmannMachine` and `BoltzmannMachine` inherit from "
-#~ "`AbstractBoltzmannMachine` (a `torch.nn.Module`). The RBM energy follows "
-#~ "from [Section 4.2, Restricted Boltzmann Machine](../../theoretical-"
-#~ "foundations/kpp-theoretical-foundations-bm-restricted.md):"
-#~ msgstr ""
-#~ "`RestrictedBoltzmannMachine` and `BoltzmannMachine` inherit from "
-#~ "`AbstractBoltzmannMachine` (a `torch.nn.Module`). The RBM energy follows "
-#~ "from [Section 4.2, Restricted Boltzmann Machine](../../theoretical-"
-#~ "foundations/kpp-theoretical-foundations-bm-restricted.md):"

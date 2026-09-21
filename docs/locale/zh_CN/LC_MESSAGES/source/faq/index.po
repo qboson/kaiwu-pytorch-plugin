@@ -22,4 +22,4 @@ msgstr ""
 
 #: ../../source/faq/index.rst:2
 msgid "常见问题"
-msgstr "常见问题"
+msgstr ""

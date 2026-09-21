@@ -130,9 +130,6 @@ msgid ""
 "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l \\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
 "   "
 msgstr ""
-"\n"
-"   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l \\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
-"   "
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:48
 #, python-brace-format
@@ -151,9 +148,6 @@ msgid ""
 "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
 "   "
 msgstr ""
-"\n"
-"   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
-"   "
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:55
 msgid "训练目标：Q-ELBO"
@@ -170,8 +164,6 @@ msgid ""
 "\n"
 "\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
 msgstr ""
-"\n"
-"\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:63
 msgid "QBM 采样与训练"
@@ -379,36 +371,3 @@ msgstr ""
 "**Related paper**: [Quantum-Boosted High-Fidelity Deep "
 "Learning](https://arxiv.org/abs/2508.11190)"
 
-#~ msgid ""
-#~ "\n"
-#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l \\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
-#~ "   "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
-#~ "   "
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\n"
-#~ "\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$ \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l "
-#~ "\\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z $$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$ p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim "
-#~ "\\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta})) $$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$ \\mathcal{L}_{\\text{Q-ELBO}} = "
-#~ "\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} "
-#~ "| \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| "
-#~ "p_\\theta(\\mathbf{z})) $$"
-#~ msgstr ""

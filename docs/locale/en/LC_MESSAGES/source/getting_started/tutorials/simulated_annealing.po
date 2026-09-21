@@ -14,11 +14,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:1
+#: ../../source/getting_started/tutorials/simulated_annealing.md:1
 msgid "Simulated Annealing for Ising Models"
-msgstr "Simulated Annealing for Ising Models"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:3
+#: ../../source/getting_started/tutorials/simulated_annealing.md:3
 msgid ""
 "[Why Quantum? Revisiting the Sampling "
 "Bottleneck](quantum_sampling_bottleneck.md) motivated the need for efficient"
@@ -27,130 +27,99 @@ msgid ""
 "also a natural reference point against which [quantum "
 "sampling](quantum_sampling_pytorch.md) is compared in the next chapter."
 msgstr ""
-"[Why Quantum? Revisiting the Sampling "
-"Bottleneck](quantum_sampling_bottleneck.md) motivated the need for efficient"
-" sampling from Boltzmann distributions. This chapter introduces **simulated "
-"annealing (SA)**, the local CPU/GPU-only sampling baseline in KPP, which is "
-"also a natural reference point against which [quantum "
-"sampling](quantum_sampling_pytorch.md) is compared in the next chapter."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:5
+#: ../../source/getting_started/tutorials/simulated_annealing.md:5
 msgid "The Ising Model at a Glance"
-msgstr "The Ising Model at a Glance"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:9
+#: ../../source/getting_started/tutorials/simulated_annealing.md:9
 msgid "H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij} s_i s_j."
-msgstr "H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij} s_i s_j."
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:16
+#: ../../source/getting_started/tutorials/simulated_annealing.md:16
 msgid "P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{H(\\mathbf{s})}{T}\\right)."
-msgstr "P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{H(\\mathbf{s})}{T}\\right)."
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:21
+#: ../../source/getting_started/tutorials/simulated_annealing.md:21
 msgid ""
 "KPP converts Boltzmann machine parameters into this Ising matrix; the "
 "sampler solves it via the Kaiwu SDK `solve()` method."
 msgstr ""
-"KPP converts Boltzmann machine parameters into this Ising matrix; the "
-"sampler solves it via the Kaiwu SDK `solve()` method."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:23
+#: ../../source/getting_started/tutorials/simulated_annealing.md:23
 msgid "The Simulated Annealing Algorithm"
-msgstr "The Simulated Annealing Algorithm"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:25
+#: ../../source/getting_started/tutorials/simulated_annealing.md:25
 msgid ""
 "Simulated annealing is a classical metaheuristic inspired by the annealing "
 "process in metallurgy. It proceeds in four steps:"
 msgstr ""
-"Simulated annealing is a classical metaheuristic inspired by the annealing "
-"process in metallurgy. It proceeds in four steps:"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:27
+#: ../../source/getting_started/tutorials/simulated_annealing.md:27
 msgid ""
 "**Initialization**: start at a high temperature $T_{\\mathrm{high}}$ with a "
 "random spin configuration."
 msgstr ""
-"**Initialization**: start at a high temperature $T_{\\mathrm{high}}$ with a "
-"random spin configuration."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:28
+#: ../../source/getting_started/tutorials/simulated_annealing.md:28
 msgid ""
 "**Metropolis updates**: propose single-spin flips $s_i \\to -s_i$; for an "
 "energy change $\\Delta E$, accept with probability"
 msgstr ""
-"**Metropolis updates**: propose single-spin flips $s_i \\to -s_i$; for an "
-"energy change $\\Delta E$, accept with probability"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:30
+#: ../../source/getting_started/tutorials/simulated_annealing.md:30
 msgid "P_{\\mathrm{accept}} = \\min\\left(1, \\exp\\left(-\\frac{\\Delta E}{T}\\right)\\right)."
 msgstr ""
-"P_{\\mathrm{accept}} = \\min\\left(1, \\exp\\left(-\\frac{\\Delta "
-"E}{T}\\right)\\right)."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:35
+#: ../../source/getting_started/tutorials/simulated_annealing.md:35
 msgid ""
 "**Cooling**: reduce the temperature by a schedule, e.g., geometric cooling "
 "$T_{k+1} = \\alpha T_k$ with $0 < \\alpha < 1$."
 msgstr ""
-"**Cooling**: reduce the temperature by a schedule, e.g., geometric cooling "
-"$T_{k+1} = \\alpha T_k$ with $0 < \\alpha < 1$."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:36
+#: ../../source/getting_started/tutorials/simulated_annealing.md:36
 msgid ""
 "**Termination**: stop when the temperature is low; the final configuration "
 "approximates a low-energy state."
 msgstr ""
-"**Termination**: stop when the temperature is low; the final configuration "
-"approximates a low-energy state."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:38
+#: ../../source/getting_started/tutorials/simulated_annealing.md:38
 msgid "From Optimization to Sampling"
-msgstr "From Optimization to Sampling"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:40
+#: ../../source/getting_started/tutorials/simulated_annealing.md:40
 msgid ""
 "Optimization and Boltzmann sampling have different goals. If the goal is "
 "optimization, you keep cooling to find the ground state. If the goal is "
 "approximate sampling for generative modeling, two adaptations are needed:"
 msgstr ""
-"Optimization and Boltzmann sampling have different goals. If the goal is "
-"optimization, you keep cooling to find the ground state. If the goal is "
-"approximate sampling for generative modeling, two adaptations are needed:"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:42
+#: ../../source/getting_started/tutorials/simulated_annealing.md:42
 msgid ""
 "**Stop at a finite effective temperature** $T_{\\mathrm{eff}}$ instead of "
 "cooling to zero."
 msgstr ""
-"**Stop at a finite effective temperature** $T_{\\mathrm{eff}}$ instead of "
-"cooling to zero."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:43
+#: ../../source/getting_started/tutorials/simulated_annealing.md:43
 msgid ""
 "**Collect multiple samples** from independent annealing runs (or from a "
 "single run after thermalization at $T_{\\mathrm{eff}}$)."
 msgstr ""
-"**Collect multiple samples** from independent annealing runs (or from a "
-"single run after thermalization at $T_{\\mathrm{eff}}$)."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:45
+#: ../../source/getting_started/tutorials/simulated_annealing.md:45
 msgid ""
 "When implemented carefully, the distribution of the collected samples "
 "approximates:"
 msgstr ""
-"When implemented carefully, the distribution of the collected samples "
-"approximates:"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:47
+#: ../../source/getting_started/tutorials/simulated_annealing.md:47
 msgid ""
 "P(\\mathbf{s}) \\propto "
 "\\exp\\left(-\\frac{H(\\mathbf{s})}{T_{\\mathrm{eff}}}\\right),"
 msgstr ""
-"P(\\mathbf{s}) \\propto "
-"\\exp\\left(-\\frac{H(\\mathbf{s})}{T_{\\mathrm{eff}}}\\right),"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:52
+#: ../../source/getting_started/tutorials/simulated_annealing.md:52
 msgid ""
 "which is precisely the Boltzmann distribution needed for training (Eq. "
 "{eq}`eq-boltzmann-prob`). The end-of-annealing configuration must not be "
@@ -158,41 +127,30 @@ msgid ""
 "schedule, number of independent runs, and sample correlation all need to be "
 "considered."
 msgstr ""
-"which is precisely the Boltzmann distribution needed for training (Eq. "
-"{eq}`eq-boltzmann-prob`). The end-of-annealing configuration must not be "
-"treated automatically as an unbiased Boltzmann sample: the temperature, "
-"schedule, number of independent runs, and sample correlation all need to be "
-"considered."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:54
+#: ../../source/getting_started/tutorials/simulated_annealing.md:54
 msgid "Using SA in KPP"
-msgstr "Using SA in KPP"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:56
+#: ../../source/getting_started/tutorials/simulated_annealing.md:56
 msgid ""
 "The [Quick Start](../quickstart.md) example already trains an RBM with "
 "`SimulatedAnnealingOptimizer`. `sample()` constructs the Ising matrix and "
 "calls the optimizer; you only pass the sampler to the model:"
 msgstr ""
-"The [Quick Start](../quickstart.md) example already trains an RBM with "
-"`SimulatedAnnealingOptimizer`. `sample()` constructs the Ising matrix and "
-"calls the optimizer; you only pass the sampler to the model:"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:68
+#: ../../source/getting_started/tutorials/simulated_annealing.md:68
 msgid ""
 "Here, `samples` is the state tensor returned by the model; KPP calls "
 "`sampler.solve(ising_mat)` internally, rather than "
 "`sampler.sample(hamiltonian)`."
 msgstr ""
-"Here, `samples` is the state tensor returned by the model; KPP calls "
-"`sampler.solve(ising_mat)` internally, rather than "
-"`sampler.sample(hamiltonian)`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:70
+#: ../../source/getting_started/tutorials/simulated_annealing.md:70
 msgid "Relationship to Quantum Sampling"
-msgstr "Relationship to Quantum Sampling"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:72
+#: ../../source/getting_started/tutorials/simulated_annealing.md:72
 msgid ""
 "SA is a suitable starting point for local development, debugging, and "
 "baseline experiments. Real quantum hardware, i.e., the CIM, requires "
@@ -201,46 +159,33 @@ msgid ""
 "latency. See the side-by-side comparison in [Integrating Quantum Samplers "
 "into PyTorch](quantum_sampling_pytorch.md) in the next chapter."
 msgstr ""
-"SA is a suitable starting point for local development, debugging, and "
-"baseline experiments. Real quantum hardware, i.e., the CIM, requires "
-"credentials, task queueing, and quota; whether it provides a benefit must be"
-" evaluated on the specific model, sample-quality metrics, and end-to-end "
-"latency. See the side-by-side comparison in [Integrating Quantum Samplers "
-"into PyTorch](quantum_sampling_pytorch.md) in the next chapter."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:74
+#: ../../source/getting_started/tutorials/simulated_annealing.md:74
 msgid "Summary"
-msgstr "Summary"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:76
+#: ../../source/getting_started/tutorials/simulated_annealing.md:76
 msgid ""
 "SA explores the Ising energy landscape via Metropolis updates and a cooling "
 "schedule."
 msgstr ""
-"SA explores the Ising energy landscape via Metropolis updates and a cooling "
-"schedule."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:77
+#: ../../source/getting_started/tutorials/simulated_annealing.md:77
 msgid ""
 "Optimization and Boltzmann sampling have different goals; finite-temperature"
 " settings and sample evaluation are essential."
 msgstr ""
-"Optimization and Boltzmann sampling have different goals; finite-temperature"
-" settings and sample evaluation are essential."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:78
+#: ../../source/getting_started/tutorials/simulated_annealing.md:78
 msgid "SA is used through `rbm.sample(sampler)` like any other optimizer."
-msgstr "SA is used through `rbm.sample(sampler)` like any other optimizer."
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:79
+#: ../../source/getting_started/tutorials/simulated_annealing.md:79
 msgid ""
 "The trade-offs between SA and quantum sampling: thermal activation vs. "
 "tunneling, local vs. cloud, latency, are compared in the [next "
 "chapter](quantum_sampling_pytorch.md)."
 msgstr ""
-"The trade-offs between SA and quantum sampling: thermal activation vs. "
-"tunneling, local vs. cloud, latency, are compared in the [next "
-"chapter](quantum_sampling_pytorch.md)."
 
 msgid ""
 "Recall from [Section 1.1, The Relationship Between Statistical Physics and "
@@ -249,11 +194,6 @@ msgid ""
 "\\in \\{-1, +1\\}$ with energy (Eq. {eq}`eq-ising-hamiltonian` in "
 "Theoretical Foundations):"
 msgstr ""
-"Recall from [Section 1.1, The Relationship Between Statistical Physics and "
-"Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-"
-"stat-spinglass.md) that the Ising model describes interacting spins $s_i "
-"\\in \\{-1, +1\\}$ with energy (Eq. {eq}`eq-ising-hamiltonian` in "
-"Theoretical Foundations):"
 
 msgid ""
 "At temperature $T$, the probability of a spin configuration follows the "
@@ -261,29 +201,4 @@ msgid ""
 "Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
 "boltzmann.md), Eq. {eq}`eq-boltzmann-dist`):"
 msgstr ""
-"At temperature $T$, the probability of a spin configuration follows the "
-"Boltzmann distribution (see [Section 1.2, The Boltzmann Distribution and "
-"Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
-"boltzmann.md), Eq. {eq}`eq-boltzmann-dist`):"
 
-#~ msgid ""
-#~ "Recall from [Section 1.1, The Relationship Between Statistical Physics and "
-#~ "Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-"
-#~ "stat-spinglass.md) that the Ising model describes interacting spins $s_i "
-#~ "\\in \\{-1, +1\\}$ with energy:"
-#~ msgstr ""
-#~ "Recall from [Section 1.1, The Relationship Between Statistical Physics and "
-#~ "Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-"
-#~ "stat-spinglass.md) that the Ising model describes interacting spins $s_i "
-#~ "\\in \\{-1, +1\\}$ with energy:"
-
-#~ msgid ""
-#~ "At temperature $T$, the probability of a spin configuration follows the "
-#~ "Boltzmann distribution (see [Section 1.2, The Boltzmann Distribution and "
-#~ "Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
-#~ "boltzmann.md)):"
-#~ msgstr ""
-#~ "At temperature $T$, the probability of a spin configuration follows the "
-#~ "Boltzmann distribution (see [Section 1.2, The Boltzmann Distribution and "
-#~ "Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
-#~ "boltzmann.md)):"

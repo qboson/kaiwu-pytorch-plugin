@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:10
 msgid "4.2 Restricted Boltzmann Machine (RBM)"
-msgstr "4.2 Restricted Boltzmann Machine (RBM)"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:12
 msgid ""
@@ -38,21 +38,10 @@ msgid ""
 "mathematical properties, and why it has become the workhorse of energy-based"
 " unsupervised learning."
 msgstr ""
-"The classic Boltzmann machine, as presented in Section [4.1 The Classic "
-"Boltzmann Machine: Visible and Hidden Symmetry](kpp-theoretical-foundations-"
-"bm-overall.md), is theoretically powerful but computationally intractable "
-"due to the need for equilibrium sampling over a fully connected graph. The "
-"**Restricted Boltzmann Machine (RBM)**, introduced by Paul Smolensky in 1986"
-" under the name *Harmonium* and later popularized by Geoffrey Hinton, "
-"imposes a simple but profound architectural constraint that dramatically "
-"reduces sampling complexity while preserving the ability to model complex "
-"probability distributions. This section details the RBM architecture, its "
-"mathematical properties, and why it has become the workhorse of energy-based"
-" unsupervised learning."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:14
 msgid "The Architectural Restriction: A Bipartite Graph"
-msgstr "The Architectural Restriction: A Bipartite Graph"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:15
 msgid ""
@@ -62,11 +51,6 @@ msgid ""
 "hidden units. There are **no visible-visible connections** and **no hidden-"
 "hidden connections**."
 msgstr ""
-"The defining characteristic of an RBM is its **restricted connectivity**: "
-"the network is organized as a **bipartite graph** with two layers, a visible"
-" layer and a hidden layer. Connections exist **only** between visible and "
-"hidden units. There are **no visible-visible connections** and **no hidden-"
-"hidden connections**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:17
 #, python-brace-format
@@ -79,17 +63,10 @@ msgid ""
 "hidden unit $j$. There is no weight matrix for visible-visible or hidden-"
 "hidden pairs."
 msgstr ""
-"Formally, let the visible units be $\\mathbf{v} = (v_1, v_2, \\ldots, "
-"v_{N_v})$ with biases $\\mathbf{b} = (b_1, \\ldots, b_{N_v})$, and the "
-"hidden units be $\\mathbf{h} = (h_1, h_2, \\ldots, h_{N_h})$ with biases "
-"$\\mathbf{c} = (c_1, \\ldots, c_{N_h})$. The weight matrix $\\mathbf{W}$ is "
-"of size $N_v \\times N_h$, where $w_{ij}$ connects visible unit $i$ to "
-"hidden unit $j$. There is no weight matrix for visible-visible or hidden-"
-"hidden pairs."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:19
 msgid "This restricted topology is illustrated below:"
-msgstr "This restricted topology is illustrated below:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:21
 msgid ""
@@ -98,14 +75,10 @@ msgid ""
 " of each other. Conversely, given the hidden units, the visible units become"
 " independent."
 msgstr ""
-"This restricted topology yields a crucial property: **conditional "
-"independence**. Given the visible units, the hidden units become independent"
-" of each other. Conversely, given the hidden units, the visible units become"
-" independent."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:23
 msgid "Energy Function and Joint Distribution"
-msgstr "Energy Function and Joint Distribution"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:24
 #, python-brace-format
@@ -113,8 +86,6 @@ msgid ""
 "The energy of a joint configuration $(\\mathbf{v}, \\mathbf{h})$ in an RBM "
 "with binary visible and binary hidden units is:"
 msgstr ""
-"The energy of a joint configuration $(\\mathbf{v}, \\mathbf{h})$ in an RBM "
-"with binary visible and binary hidden units is:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:26
 #, python-brace-format
@@ -122,12 +93,10 @@ msgid ""
 "E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} b_i v_i - \\sum_{j=1}^{N_h}"
 " c_j h_j - \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i w_{ij} h_j"
 msgstr ""
-"E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} b_i v_i - \\sum_{j=1}^{N_h}"
-" c_j h_j - \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i w_{ij} h_j"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:28
 msgid "In matrix notation:"
-msgstr "In matrix notation:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:30
 #, python-brace-format
@@ -135,8 +104,6 @@ msgid ""
 "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
 "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
 msgstr ""
-"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:34
 #, python-brace-format
@@ -144,20 +111,16 @@ msgid ""
 "P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
 "\\mathbf{h})\\right)"
 msgstr ""
-"P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
-"\\mathbf{h})\\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:38
 msgid ""
 "Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
 "\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)"
 msgstr ""
-"Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
-"\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:40
 msgid "Probability Distributions in RBMs"
-msgstr "Probability Distributions in RBMs"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:41
 msgid ""
@@ -166,19 +129,15 @@ msgid ""
 "them originate from the joint distribution $p(v, h)$, but they differ in "
 "their normalization."
 msgstr ""
-"To better understand the generative and training processes of an RBM, we "
-"need to clearly distinguish several key probability distributions. All of "
-"them originate from the joint distribution $p(v, h)$, but they differ in "
-"their normalization."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:43
 msgid "**Joint distribution** $p(v, h)$:"
-msgstr "**Joint distribution** $p(v, h)$:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:45
 #, python-brace-format
 msgid "p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))"
-msgstr "p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:47
 #, python-brace-format
@@ -186,20 +145,18 @@ msgid ""
 "where $Z = \\sum_{v,h} \\exp(-E(v, h))$. This is the most complete "
 "description of the model."
 msgstr ""
-"where $Z = \\sum_{v,h} \\exp(-E(v, h))$. This is the most complete "
-"description of the model."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:49
 msgid "**Marginal distribution** $p(v)$:"
-msgstr "**Marginal distribution** $p(v)$:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:53
 msgid "It is obtained by summing over all possible hidden unit states:"
-msgstr "It is obtained by summing over all possible hidden unit states:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:55
 msgid "p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}"
-msgstr "p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:57
 msgid ""
@@ -212,18 +169,10 @@ msgid ""
 " capture complex dependencies, but $p(v)$ is the ultimate evaluation "
 "criterion for the generative quality."
 msgstr ""
-"This is the distribution we care most about because it directly defines the "
-"probability that the RBM assigns to observed visible data (e.g., images, "
-"features) without reference to the hidden units. During training, our goal "
-"is to maximize $p(v)$ over the training data. Ideally, a well-trained RBM "
-"should be able to sample new visible configurations from $p(v)$ that look "
-"like real data. The hidden units only serve as latent auxiliary variables to"
-" capture complex dependencies, but $p(v)$ is the ultimate evaluation "
-"criterion for the generative quality."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:59
 msgid "**Conditional probabilities**:"
-msgstr "**Conditional probabilities**:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:61
 msgid ""
@@ -231,13 +180,10 @@ msgid ""
 "bipartite structure, they factorize into products of independent Bernoulli "
 "distributions."
 msgstr ""
-"These are the key to the computational efficiency of RBMs. Due to the "
-"bipartite structure, they factorize into products of independent Bernoulli "
-"distributions."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:72
 msgid "The Key Computational Advantage: Conditional Independence"
-msgstr "The Key Computational Advantage: Conditional Independence"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:73
 msgid ""
@@ -246,18 +192,12 @@ msgid ""
 "become independent of each other. Conversely, given the hidden units, the "
 "visible units become independent."
 msgstr ""
-"The absence of intra-layer connections yields a crucial property: "
-"**conditional independence**. Given the visible units, the hidden units "
-"become independent of each other. Conversely, given the hidden units, the "
-"visible units become independent."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:75
 msgid ""
 "Mathematically, the conditional probability of a hidden unit $h_j$ being "
 "active given the visible layer is:"
 msgstr ""
-"Mathematically, the conditional probability of a hidden unit $h_j$ being "
-"active given the visible layer is:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:77
 #, python-brace-format
@@ -265,21 +205,17 @@ msgid ""
 "P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i=1}^{N_v} w_{ij}"
 " v_i \\right)"
 msgstr ""
-"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i=1}^{N_v} w_{ij}"
-" v_i \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:81
 #, python-brace-format
 msgid "P(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} P(h_j \\mid \\mathbf{v})"
-msgstr "P(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} P(h_j \\mid \\mathbf{v})"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:83
 msgid ""
 "Similarly, the conditional probability of a visible unit being active given "
 "the hidden layer is:"
 msgstr ""
-"Similarly, the conditional probability of a visible unit being active given "
-"the hidden layer is:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:85
 #, python-brace-format
@@ -287,23 +223,20 @@ msgid ""
 "P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j=1}^{N_h} w_{ij}"
 " h_j \\right)"
 msgstr ""
-"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j=1}^{N_h} w_{ij}"
-" h_j \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:87
 msgid ""
 "and the visible units are conditionally independent given the hidden units:"
 msgstr ""
-"and the visible units are conditionally independent given the hidden units:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:89
 #, python-brace-format
 msgid "P(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} P(v_i \\mid \\mathbf{h})"
-msgstr "P(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} P(v_i \\mid \\mathbf{h})"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:91
 msgid "Efficient Gibbs Sampling: Block Updates"
-msgstr "Efficient Gibbs Sampling: Block Updates"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:92
 msgid ""
@@ -311,9 +244,6 @@ msgid ""
 " unit-by-unit process into a fast, **block-wise** process. A single round of"
 " Gibbs sampling consists of two parallel steps:"
 msgstr ""
-"The conditional independence property transforms Gibbs sampling from a slow,"
-" unit-by-unit process into a fast, **block-wise** process. A single round of"
-" Gibbs sampling consists of two parallel steps:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:94
 #, python-brace-format
@@ -322,9 +252,6 @@ msgid ""
 "compute $P(h_j = 1 \\mid \\mathbf{v})$ and sample $h_j \\in \\{0,1\\}$ "
 "accordingly. All hidden units can be sampled simultaneously."
 msgstr ""
-"**Sample hidden layer given visible layer**: For each hidden unit $j$, "
-"compute $P(h_j = 1 \\mid \\mathbf{v})$ and sample $h_j \\in \\{0,1\\}$ "
-"accordingly. All hidden units can be sampled simultaneously."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:95
 #, python-brace-format
@@ -333,9 +260,6 @@ msgid ""
 "compute $P(v_i = 1 \\mid \\mathbf{h})$ and sample $ v_i \\in \\{0,1\\}$. All"
 " visible units can be sampled simultaneously."
 msgstr ""
-"**Sample visible layer given hidden layer**: For each visible unit $i$, "
-"compute $P(v_i = 1 \\mid \\mathbf{h})$ and sample $ v_i \\in \\{0,1\\}$. All"
-" visible units can be sampled simultaneously."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:97
 #, python-brace-format
@@ -343,8 +267,6 @@ msgid ""
 "This pair of steps constitutes one full step of **block Gibbs sampling**. "
 "Starting from a visible vector $\\mathbf{v}^{(0)}$, the sequence is:"
 msgstr ""
-"This pair of steps constitutes one full step of **block Gibbs sampling**. "
-"Starting from a visible vector $\\mathbf{v}^{(0)}$, the sequence is:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:99
 msgid ""
@@ -353,10 +275,6 @@ msgid ""
 "\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(1)})} "
 "\\mathbf{h}^{(1)} \\rightarrow \\cdots"
 msgstr ""
-"\\mathbf{v}^{(0)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(0)})} "
-"\\mathbf{h}^{(0)} \\xrightarrow{P(\\mathbf{v} \\mid \\mathbf{h}^{(0)})} "
-"\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(1)})} "
-"\\mathbf{h}^{(1)} \\rightarrow \\cdots"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:101
 msgid ""
@@ -364,13 +282,10 @@ msgid ""
 "more efficient than the classic Boltzmann machine, where each unit update "
 "requires computing inputs from all other units."
 msgstr ""
-"Each half-step updates an entire layer in parallel, making the RBM vastly "
-"more efficient than the classic Boltzmann machine, where each unit update "
-"requires computing inputs from all other units."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:103
 msgid "Learning the RBM: Contrastive Divergence Revisited"
-msgstr "Learning the RBM: Contrastive Divergence Revisited"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:104
 msgid ""
@@ -379,18 +294,12 @@ msgid ""
 "foundations-ebms-cd.md). The gradient of the log-likelihood retains the same"
 " contrastive form:"
 msgstr ""
-"The RBM is trained using the **contrastive divergence (CD)** algorithm "
-"introduced in Section [3.3 Contrastive Divergence](kpp-theoretical-"
-"foundations-ebms-cd.md). The gradient of the log-likelihood retains the same"
-" contrastive form:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:106
 msgid ""
 "\\frac{\\partial \\log P(\\mathbf{v})}{\\partial w_{ij}} = \\langle v_i h_j "
 "\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{model}}"
 msgstr ""
-"\\frac{\\partial \\log P(\\mathbf{v})}{\\partial w_{ij}} = \\langle v_i h_j "
-"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{model}}"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:108
 msgid ""
@@ -400,11 +309,6 @@ msgid ""
 "then sampling all visible units given the hidden layer. This makes even CD-1"
 " remarkably effective. The weight update for a mini-batch is:"
 msgstr ""
-"Thanks to the conditional independence property of the RBM, the Gibbs "
-"sampling steps required by CD become **block-parallel** operations. A single"
-" round-trip consists of sampling all hidden units given the visible layer, "
-"then sampling all visible units given the hidden layer. This makes even CD-1"
-" remarkably effective. The weight update for a mini-batch is:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:110
 msgid ""
@@ -412,9 +316,6 @@ msgid ""
 "\\mathbf{h}^\\top]_{\\text{data}} - \\mathbb{E}[\\mathbf{v} "
 "\\mathbf{h}^\\top]_{\\text{recon}} \\right)"
 msgstr ""
-"\\Delta \\mathbf{W} = \\eta \\left( \\mathbb{E}[\\mathbf{v} "
-"\\mathbf{h}^\\top]_{\\text{data}} - \\mathbb{E}[\\mathbf{v} "
-"\\mathbf{h}^\\top]_{\\text{recon}} \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:114
 msgid ""
@@ -425,35 +326,26 @@ msgid ""
 "based on the difference between the initial and reconstructed pairwise "
 "products."
 msgstr ""
-"In practice, **CD-1**, i.e. k = 1, is often sufficient. The algorithm then "
-"becomes remarkably simple: for each data vector, compute hidden "
-"probabilities, sample hidden states, reconstruct visible probabilities, "
-"sample visible states, recompute hidden probabilities, and update weights "
-"based on the difference between the initial and reconstructed pairwise "
-"products."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:116
 msgid "Free Energy and Marginal Probability"
-msgstr "Free Energy and Marginal Probability"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:117
 #, python-brace-format
 msgid ""
 "For an RBM, the free energy of a visible vector $\\mathbf{v}$ is defined as:"
 msgstr ""
-"For an RBM, the free energy of a visible vector $\\mathbf{v}$ is defined as:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:119
 msgid ""
 "F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\mathbf{h}} "
 "\\exp\\left(-E_\\theta(\\mathbf{v}, \\mathbf{h})\\right)"
 msgstr ""
-"F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\mathbf{h}} "
-"\\exp\\left(-E_\\theta(\\mathbf{v}, \\mathbf{h})\\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:121
 msgid "The marginal probability of a visible vector is then:"
-msgstr "The marginal probability of a visible vector is then:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:123
 msgid ""
@@ -461,9 +353,6 @@ msgid ""
 "\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
 "\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
 msgstr ""
-"P_\\theta(\\mathbf{v}) = "
-"\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
-"\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:125
 #, python-brace-format
@@ -474,15 +363,10 @@ msgid ""
 "allows, for example, comparing the relative likelihood of different visible "
 "vectors, even though the absolute likelihood remains intractable."
 msgstr ""
-"While the denominator (partition function over visible states) remains "
-"intractable, i.e. still sums over all $2^{N_v}$ visible configurations, the "
-"free energy itself is cheap to compute for any given $\\mathbf{v}$. This "
-"allows, for example, comparing the relative likelihood of different visible "
-"vectors, even though the absolute likelihood remains intractable."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:127
 msgid "Free Energy and Its Analytical Form"
-msgstr "Free Energy and Its Analytical Form"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:128
 msgid ""
@@ -490,9 +374,6 @@ msgid ""
 "units. This allows us to sum out the hidden units analytically. Substituting"
 " the RBM energy function:"
 msgstr ""
-"In an RBM, the hidden units are conditionally independent given the visible "
-"units. This allows us to sum out the hidden units analytically. Substituting"
-" the RBM energy function:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:130
 #, python-brace-format
@@ -500,12 +381,10 @@ msgid ""
 "E_\\theta(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
 "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
 msgstr ""
-"E_\\theta(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:132
 msgid "We can sum out the hidden units analytically:"
-msgstr "We can sum out the hidden units analytically:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:134
 msgid ""
@@ -513,13 +392,10 @@ msgid ""
 "\\exp(\\mathbf{b}^\\top \\mathbf{v}) \\prod_{j=1}^{N_h} \\left( 1 + "
 "\\exp(c_j + \\sum_i v_i w_{ij}) \\right)"
 msgstr ""
-"\\sum_{\\mathbf{h}} \\exp(-E_\\theta(\\mathbf{v}, \\mathbf{h})) = "
-"\\exp(\\mathbf{b}^\\top \\mathbf{v}) \\prod_{j=1}^{N_h} \\left( 1 + "
-"\\exp(c_j + \\sum_i v_i w_{ij}) \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:136
 msgid "Thus, free energy has a closed-form expression:"
-msgstr "Thus, free energy has a closed-form expression:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:138
 #, python-brace-format
@@ -527,8 +403,6 @@ msgid ""
 "F_\\theta(\\mathbf{v}) = -\\mathbf{b}^\\top \\mathbf{v} - \\sum_{j=1}^{N_h} "
 "\\log \\left( 1 + \\exp\\left( c_j + \\sum_i v_i w_{ij} \\right) \\right)"
 msgstr ""
-"F_\\theta(\\mathbf{v}) = -\\mathbf{b}^\\top \\mathbf{v} - \\sum_{j=1}^{N_h} "
-"\\log \\left( 1 + \\exp\\left( c_j + \\sum_i v_i w_{ij} \\right) \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:140
 #, python-brace-format
@@ -539,15 +413,10 @@ msgid ""
 "enumerating the $2^{N_h}$ hidden configurations. However, **the absolute "
 "likelihood remains intractable**."
 msgstr ""
-"**This analytical form is a key computational advantage of the RBM over the "
-"classic Boltzmann machine.** It allows us to evaluate the relative "
-"likelihood of different visible vectors in $O(N_v N_h)$ **time**, without "
-"enumerating the $2^{N_h}$ hidden configurations. However, **the absolute "
-"likelihood remains intractable**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:142
 msgid "Free Energy vs. Expected Energy"
-msgstr "Free Energy vs. Expected Energy"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:144
 msgid ""
@@ -555,9 +424,6 @@ msgid ""
 "energy with the **expected energy** under the conditional distribution of "
 "hidden units:"
 msgstr ""
-"To gain deeper physical intuition, it is instructive to compare the free "
-"energy with the **expected energy** under the conditional distribution of "
-"hidden units:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:146
 #, python-brace-format
@@ -566,9 +432,6 @@ msgid ""
 " -\\mathbf{b}^\\top \\mathbf{v} - \\mathbf{c}^\\top \\mathbf{m}(\\mathbf{v})"
 " - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{m}(\\mathbf{v})"
 msgstr ""
-"\\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, \\mathbf{H}) \\mid \\mathbf{v}] ="
-" -\\mathbf{b}^\\top \\mathbf{v} - \\mathbf{c}^\\top \\mathbf{m}(\\mathbf{v})"
-" - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{m}(\\mathbf{v})"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:148
 #, python-brace-format
@@ -577,9 +440,6 @@ msgid ""
 "conditional expectation of hidden unit $j$ given $\\mathbf{v}$. The free "
 "energy and expected energy are related by:"
 msgstr ""
-"where $m_j(\\mathbf{v}) = \\sigma(c_j + \\sum_i v_i w_{ij})$ is the "
-"conditional expectation of hidden unit $j$ given $\\mathbf{v}$. The free "
-"energy and expected energy are related by:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:150
 #, python-brace-format
@@ -588,9 +448,6 @@ msgid ""
 "\\mathbf{H}) \\mid \\mathbf{v}] - \\text{Entropy}(P_\\theta(\\mathbf{H} "
 "\\mid \\mathbf{v}))"
 msgstr ""
-"F_\\theta(\\mathbf{v}) = \\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, "
-"\\mathbf{H}) \\mid \\mathbf{v}] - \\text{Entropy}(P_\\theta(\\mathbf{H} "
-"\\mid \\mathbf{v}))"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:152
 msgid ""
@@ -600,15 +457,10 @@ msgid ""
 "entropy. In the RBM, this entropy term accounts for uncertainty in the "
 "hidden unit activations."
 msgstr ""
-"The difference is precisely the **entropy** of the hidden layer given the "
-"visible layer. This aligns with the thermodynamic relation $F = U - TS$: "
-"free energy equals the expected energy minus the temperature-weighted "
-"entropy. In the RBM, this entropy term accounts for uncertainty in the "
-"hidden unit activations."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:154
 msgid "RBMs as Product of Experts"
-msgstr "RBMs as Product of Experts"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:155
 #, python-brace-format
@@ -619,19 +471,12 @@ msgid ""
 "pattern (encoded in the weight vector $\\mathbf{w}_{:j}$). The joint "
 "distribution is the product of these expert opinions, renormalized:"
 msgstr ""
-"An RBM can be interpreted as a **product of experts** (PoE). Each hidden "
-"unit $h_j$ acts as an \"expert\" that assigns a probability to a visible "
-"vector $\\mathbf{v}$ based on how well $\\mathbf{v}$ matches its preferred "
-"pattern (encoded in the weight vector $\\mathbf{w}_{:j}$). The joint "
-"distribution is the product of these expert opinions, renormalized:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:157
 msgid ""
 "P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} \\exp\\left( c_j h_j + \\sum_i "
 "v_i w_{ij} h_j \\right) \\bigg|_{h_j \\text{ summed out}}"
 msgstr ""
-"P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} \\exp\\left( c_j h_j + \\sum_i "
-"v_i w_{ij} h_j \\right) \\bigg|_{h_j \\text{ summed out}}"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:159
 msgid ""
@@ -641,15 +486,10 @@ msgid ""
 "bipartite restriction prevents experts from directly interacting, forcing "
 "them to coordinate only through the visible layer."
 msgstr ""
-"The product-of-experts view highlights the RBM's representational power: "
-"each hidden unit contributes a soft constraint, and the combination of many "
-"such constraints can model complex, high-dimensional distributions. The "
-"bipartite restriction prevents experts from directly interacting, forcing "
-"them to coordinate only through the visible layer."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:161
 msgid "Variants: Handling Different Data Types"
-msgstr "Variants: Handling Different Data Types"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:162
 msgid ""
@@ -658,10 +498,6 @@ msgid ""
 "framework extends naturally to other data types by modifying the energy "
 "function and the conditional distributions."
 msgstr ""
-"The basic RBM with binary visible units is suitable for modeling binary data"
-" (e.g., black-and-white images, binary feature vectors). However, the RBM "
-"framework extends naturally to other data types by modifying the energy "
-"function and the conditional distributions."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:164
 msgid ""
@@ -669,9 +505,6 @@ msgid ""
 "continuous features), the visible units are modeled as Gaussian with unit "
 "variance (or learned variance). The energy becomes:"
 msgstr ""
-"**Gaussian-Bernoulli RBM**: For real-valued data (e.g., grayscale images, "
-"continuous features), the visible units are modeled as Gaussian with unit "
-"variance (or learned variance). The energy becomes:"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:166
 #, python-brace-format
@@ -679,8 +512,6 @@ msgid ""
 "E(\\mathbf{v}, \\mathbf{h}) = \\sum_i \\frac{(v_i - b_i)^2}{2\\sigma_i^2} - "
 "\\sum_j c_j h_j - \\sum_{i,j} \\frac{v_i}{\\sigma_i} w_{ij} h_j"
 msgstr ""
-"E(\\mathbf{v}, \\mathbf{h}) = \\sum_i \\frac{(v_i - b_i)^2}{2\\sigma_i^2} - "
-"\\sum_j c_j h_j - \\sum_{i,j} \\frac{v_i}{\\sigma_i} w_{ij} h_j"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:167
 #, python-brace-format
@@ -688,8 +519,6 @@ msgid ""
 "The conditional $P(v_i \\mid \\mathbf{h})$ is Gaussian with mean $b_i + "
 "\\sigma_i \\sum_{j} w_{ij} h_j$"
 msgstr ""
-"The conditional $P(v_i \\mid \\mathbf{h})$ is Gaussian with mean $b_i + "
-"\\sigma_i \\sum_{j} w_{ij} h_j$"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:169
 msgid ""
@@ -697,9 +526,6 @@ msgid ""
 "word counts, user ratings), the visible layer can be a softmax unit over a "
 "vocabulary or rating scale."
 msgstr ""
-"**Softmax / Multinomial RBM**: For count data or categorical data (e.g., "
-"word counts, user ratings), the visible layer can be a softmax unit over a "
-"vocabulary or rating scale."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:170
 msgid ""
@@ -707,9 +533,6 @@ msgid ""
 " consists of a set of multinomial units, modeling the distribution of word "
 "counts."
 msgstr ""
-"**Replicated Softmax RBM**: For variable-length documents, the visible layer"
-" consists of a set of multinomial units, modeling the distribution of word "
-"counts."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:172
 msgid ""
@@ -717,17 +540,14 @@ msgid ""
 " properties, allowing the same efficient block Gibbs sampling and "
 "contrastive divergence training."
 msgstr ""
-"These variants preserve the bipartite structure and conditional independence"
-" properties, allowing the same efficient block Gibbs sampling and "
-"contrastive divergence training."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:174
 msgid "Limitations of the RBM"
-msgstr "Limitations of the RBM"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:175
 msgid "Despite its success, the RBM has limitations:"
-msgstr "Despite its success, the RBM has limitations:"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:177
 msgid ""
@@ -737,11 +557,6 @@ msgid ""
 "(DBN)** mitigates this (see Section [4.3 Beyond Single Layers: Stacking for "
 "Deep Learning](kpp-theoretical-foundations-bm-deep.md))."
 msgstr ""
-"**Shallow Architecture**: A single RBM is a shallow model with only one "
-"layer of latent variables. Its representational power is limited compared to"
-" deep architectures, although stacking RBMs to form a **Deep Belief Network "
-"(DBN)** mitigates this (see Section [4.3 Beyond Single Layers: Stacking for "
-"Deep Learning](kpp-theoretical-foundations-bm-deep.md))."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:178
 #, python-brace-format
@@ -751,10 +566,6 @@ msgid ""
 "While inference is efficient, model evaluation and comparison remain "
 "challenging."
 msgstr ""
-"**Partition Function Still Intractable**: The marginal likelihood "
-"$P(\\mathbf{v})$ still requires summing over all visible configurations. "
-"While inference is efficient, model evaluation and comparison remain "
-"challenging."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:179
 msgid ""
@@ -764,11 +575,6 @@ msgid ""
 "distribution. Persistent CD (PCD) improves this but adds computational "
 "overhead."
 msgstr ""
-"**Mode Collapse in CD Training**: As noted in Section [3.3 Contrastive "
-"Divergence](kpp-theoretical-foundations-ebms-cd.md), CD training can suffer "
-"from mode collapse, where the model fails to capture all modes of the data "
-"distribution. Persistent CD (PCD) improves this but adds computational "
-"overhead."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:180
 msgid ""
@@ -777,14 +583,10 @@ msgid ""
 "hidden units. Tuning these hyperparameters requires experience and careful "
 "validation."
 msgstr ""
-"**Hyperparameter Sensitivity**: The quality of the learned features depends "
-"sensitively on the learning rate, momentum, weight decay, and the number of "
-"hidden units. Tuning these hyperparameters requires experience and careful "
-"validation."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:182
 msgid "The RBM's Place in Deep Learning History"
-msgstr "The RBM's Place in Deep Learning History"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:183
 msgid ""
@@ -799,16 +601,6 @@ msgid ""
 "enabled the first successful training of truly deep architectures on "
 "challenging tasks like MNIST and later ImageNet."
 msgstr ""
-"The RBM played a pivotal role in the **deep learning renaissance** of the "
-"mid-2000s. Before the widespread adoption of rectified linear units (ReLUs),"
-" batch normalization, and improved optimizers for feedforward networks, "
-"training deep neural networks was notoriously difficult. The RBM provided an"
-" effective **unsupervised pre-training** method: by stacking RBMs trained "
-"layer by layer, one could initialize a deep network with sensible features "
-"extracted from the data distribution, rather than random weights. This pre-"
-"training, followed by discriminative fine-tuning with backpropagation, "
-"enabled the first successful training of truly deep architectures on "
-"challenging tasks like MNIST and later ImageNet."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:185
 msgid ""
@@ -820,25 +612,16 @@ msgid ""
 "collaborative filtering, dimensionality reduction, and generative modeling "
 "of small-to-medium datasets."
 msgstr ""
-"Although modern deep learning has largely moved away from RBM pre-training "
-"in favor of end-to-end supervised training with large labeled datasets, the "
-"conceptual contributions of the RBM, i.e. energy-based learning, contrastive"
-" divergence, and the power of distributed representations, remain "
-"foundational. Moreover, RBMs continue to find niche applications in "
-"collaborative filtering, dimensionality reduction, and generative modeling "
-"of small-to-medium datasets."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:187
 msgid "Summary"
-msgstr "Summary"
+msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:188
 msgid ""
 "The **Restricted Boltzmann Machine (RBM)** imposes a **bipartite "
 "connectivity** constraint: no visible-visible or hidden-hidden connections."
 msgstr ""
-"The **Restricted Boltzmann Machine (RBM)** imposes a **bipartite "
-"connectivity** constraint: no visible-visible or hidden-hidden connections."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:189
 #, python-brace-format
@@ -847,41 +630,30 @@ msgid ""
 "\\mathbf{v})$ and $P(\\mathbf{v} \\mid \\mathbf{h})$ factorize into products"
 " of independent Bernoulli distributions."
 msgstr ""
-"This restriction yields **conditional independence**: $P(\\mathbf{h} \\mid "
-"\\mathbf{v})$ and $P(\\mathbf{v} \\mid \\mathbf{h})$ factorize into products"
-" of independent Bernoulli distributions."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:190
 msgid ""
 "**Block Gibbs sampling** updates entire layers in parallel, dramatically "
 "accelerating inference and training."
 msgstr ""
-"**Block Gibbs sampling** updates entire layers in parallel, dramatically "
-"accelerating inference and training."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:191
 msgid ""
 "The RBM is trained using **contrastive divergence (CD)**, typically CD-1, "
 "which requires only one round-trip of block Gibbs sampling per data point."
 msgstr ""
-"The RBM is trained using **contrastive divergence (CD)**, typically CD-1, "
-"which requires only one round-trip of block Gibbs sampling per data point."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:192
 msgid ""
 "The **free energy** of a visible vector has a closed-form expression, "
 "enabling efficient comparison of relative likelihoods."
 msgstr ""
-"The **free energy** of a visible vector has a closed-form expression, "
-"enabling efficient comparison of relative likelihoods."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:193
 msgid ""
 "The RBM can be extended to handle **real-valued** (Gaussian-Bernoulli RBM) "
 "and **categorical** (Softmax RBM) data."
 msgstr ""
-"The RBM can be extended to handle **real-valued** (Gaussian-Bernoulli RBM) "
-"and **categorical** (Softmax RBM) data."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:194
 msgid ""
@@ -889,9 +661,6 @@ msgid ""
 " historic role in enabling unsupervised pre-training for deep neural "
 "networks."
 msgstr ""
-"RBMs served as the building blocks for **Deep Belief Networks** and played a"
-" historic role in enabling unsupervised pre-training for deep neural "
-"networks."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md:195
 msgid ""
@@ -899,720 +668,62 @@ msgid ""
 "remain important models for unsupervised learning, feature extraction, and "
 "understanding energy-based generative models."
 msgstr ""
-"While no longer the dominant paradigm for supervised deep learning, RBMs "
-"remain important models for unsupervised learning, feature extraction, and "
-"understanding energy-based generative models."
 
 msgid ""
 "The joint probability distribution is, as always, given by the Boltzmann "
 "distribution (Eq. {eq}`eq-boltzmann-dist`, Section 1.2):"
 msgstr ""
-"The joint probability distribution is, as always, given by the Boltzmann "
-"distribution (Eq. {eq}`eq-boltzmann-dist`, Section 1.2):"
 
 msgid "with the partition function (Eq. {eq}`eq-partition`, Section 3.2):"
-msgstr "with the partition function (Eq. {eq}`eq-partition`, Section 3.2):"
+msgstr ""
 
 msgid ""
 "with analogous updates for biases. For a full exposition of the CD-k "
 "algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-"
 "theoretical-foundations-ebms-cd.md) (Eq. {eq}`eq-cd-update`)."
 msgstr ""
-"with analogous updates for biases. For a full exposition of the CD-k "
-"algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-"
-"theoretical-foundations-ebms-cd.md) (Eq. {eq}`eq-cd-update`)."
 
 msgid "**Distribution of hidden units given visible units** $p(h|v)$:"
-msgstr "**Distribution of hidden units given visible units** $p(h|v)$:"
+msgstr ""
 
 msgid ""
 "p(h|v) = \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} "
 "\\exp(-E(v, h'))}"
 msgstr ""
-"p(h|v) = \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} "
-"\\exp(-E(v, h'))}"
 
 msgid ""
 "Because there are no hidden-hidden connections in an RBM, this distribution "
 "factorizes as"
 msgstr ""
-"Because there are no hidden-hidden connections in an RBM, this distribution "
-"factorizes as"
 
 msgid "p(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),"
-msgstr "p(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),"
+msgstr ""
 
 msgid ""
 "where $p(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} "
 "v_i \\right)$, enabling parallel sampling."
 msgstr ""
-"where $p(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} "
-"v_i \\right)$, enabling parallel sampling."
 
 msgid ""
 "**Distribution of visible units given hidden units** $p(v|h)$: Similarly, we"
 " have"
 msgstr ""
-"**Distribution of visible units given hidden units** $p(v|h)$: Similarly, we"
-" have"
 
 msgid "p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid \\mathbf{h})"
-msgstr "p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid \\mathbf{h})"
+msgstr ""
 
 msgid ""
 "where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j} w_{ij} "
 "h_j \\right)$"
 msgstr ""
-"where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j} w_{ij} "
-"h_j \\right)$"
 
 msgid ""
 "where $\\sigma(z) = 1/(1 + \\exp(-z))$ is the sigmoid function. Because "
 "there are no hidden-hidden connections, the joint conditional distribution "
 "over all hidden units factorizes:"
 msgstr ""
-"where $\\sigma(z) = 1/(1 + \\exp(-z))$ is the sigmoid function. Because "
-"there are no hidden-hidden connections, the joint conditional distribution "
-"over all hidden units factorizes:"
-
-#~ msgid ""
-#~ "The joint probability distribution is, as always, given by the Boltzmann "
-#~ "distribution:"
-#~ msgstr ""
-#~ "The joint probability distribution is, as always, given by the Boltzmann "
-#~ "distribution:"
-
-#~ msgid "with the partition function:"
-#~ msgstr "with the partition function:"
 
 #, python-brace-format
-#~ msgid ""
-#~ "This is the distribution we care most about. Because it directly defines the"
-#~ " probability that the RBM assigns to observed visible data (e.g., images, "
-#~ "features) without reference to the hidden units. During training, our goal "
-#~ "(maximum likelihood estimation) is to maximize $p(\\mathbf{v})$ over the "
-#~ "training data. A well-trained RBM should be able to sample new visible "
-#~ "configurations from $p(\\mathbf{v})$ that look like real data. The hidden "
-#~ "units are latent auxiliary variables that capture complex dependencies, but "
-#~ "$p(\\mathbf{v})$ is the ultimate evaluation criterion for the generative "
-#~ "quality."
-#~ msgstr ""
-#~ "This is the distribution we care most about. Because it directly defines the"
-#~ " probability that the RBM assigns to observed visible data (e.g., images, "
-#~ "features) without reference to the hidden units. During training, our goal "
-#~ "(maximum likelihood estimation) is to maximize $p(\\mathbf{v})$ over the "
-#~ "training data. A well-trained RBM should be able to sample new visible "
-#~ "configurations from $p(\\mathbf{v})$ that look like real data. The hidden "
-#~ "units are latent auxiliary variables that capture complex dependencies, but "
-#~ "$p(\\mathbf{v})$ is the ultimate evaluation criterion for the generative "
-#~ "quality."
-
-#~ msgid ""
-#~ "**Distribution of hidden units given visible units** $p(h|v)$: $$ p(h|v) = "
-#~ "\\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} \\exp(-E(v, "
-#~ "h'))}$$ Because there are no hidden-hidden connections in an RBM, this "
-#~ "distribution factorizes as  $$p(\\mathbf{h} \\mid \\mathbf{v}) = "
-#~ "\\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),$$ where $p(h_j = 1 \\mid "
-#~ "\\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} v_i \\right)$ , "
-#~ "enabling parallel sampling."
-#~ msgstr ""
-#~ "**Distribution of hidden units given visible units** $p(h|v)$: $$ p(h|v) = "
-#~ "\\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} \\exp(-E(v, "
-#~ "h'))}$$ Because there are no hidden-hidden connections in an RBM, this "
-#~ "distribution factorizes as  $$p(\\mathbf{h} \\mid \\mathbf{v}) = "
-#~ "\\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),$$ where $p(h_j = 1 \\mid "
-#~ "\\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} v_i \\right)$ , "
-#~ "enabling parallel sampling."
 
 #, python-brace-format
-#~ msgid ""
-#~ "**Distribution of visible units given hidden units** $p(v|h)$: Similarly, we"
-#~ " have $$p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid "
-#~ "\\mathbf{h})$$ where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + "
-#~ "\\sum_{j} w_{ij} h_j \\right)$"
-#~ msgstr ""
-#~ "**Distribution of visible units given hidden units** $p(v|h)$: Similarly, we"
-#~ " have $$p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid "
-#~ "\\mathbf{h})$$ where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + "
-#~ "\\sum_{j} w_{ij} h_j \\right)$"
 
-#~ msgid ""
-#~ "where \\( \\sigma(z) = 1/(1 + \\exp(-z)) \\) is the sigmoid function. "
-#~ "Because there are no hidden-hidden connections, the joint conditional "
-#~ "distribution over all hidden units factorizes:"
-#~ msgstr ""
-#~ "where \\( \\sigma(z) = 1/(1 + \\exp(-z)) \\) is the sigmoid function. "
-#~ "Because there are no hidden-hidden connections, the joint conditional "
-#~ "distribution over all hidden units factorizes:"
-
-#~ msgid ""
-#~ "with analogous updates for biases. For a full exposition of the CD-k "
-#~ "algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-"
-#~ "theoretical-foundations-ebms-cd.md)."
-#~ msgstr ""
-#~ "with analogous updates for biases. For a full exposition of the CD-k "
-#~ "algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-"
-#~ "theoretical-foundations-ebms-cd.md)."
-
-#~ msgid ""
-#~ "Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
-#~ "\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)"
-#~ msgstr ""
-
-#~ msgid "p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))"
-#~ msgstr ""
-
-#~ msgid "p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\\mathbf{v}^{(0)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(0)})} "
-#~ "\\mathbf{h}^{(0)} \\xrightarrow{P(\\mathbf{v} \\mid \\mathbf{h}^{(0)})} "
-#~ "\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(1)})} "
-#~ "\\mathbf{h}^{(1)} \\rightarrow \\cdots"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\mathbf{h}} "
-#~ "\\exp\\left(-E_\\theta(\\mathbf{v}, \\mathbf{h})\\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P_\\theta(\\mathbf{v}) = "
-#~ "\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
-#~ "\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "E_\\theta(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-#~ "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\\sum_{\\mathbf{h}} \\exp(-E_\\theta(\\mathbf{v}, \\mathbf{h})) = "
-#~ "\\exp(\\mathbf{b}^\\top \\mathbf{v}) \\prod_{j=1}^{N_h} \\left( 1 + "
-#~ "\\exp(c_j + \\sum_i v_i w_{ij}) \\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "F_\\theta(\\mathbf{v}) = -\\mathbf{b}^\\top \\mathbf{v} - \\sum_{j=1}^{N_h} "
-#~ "\\log \\left( 1 + \\exp\\left( c_j + \\sum_i v_i w_{ij} \\right) \\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, \\mathbf{H}) \\mid \\mathbf{v}] ="
-#~ " -\\mathbf{b}^\\top \\mathbf{v} - \\mathbf{c}^\\top \\mathbf{m}(\\mathbf{v})"
-#~ " - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{m}(\\mathbf{v})"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "F_\\theta(\\mathbf{v}) = \\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, "
-#~ "\\mathbf{H}) \\mid \\mathbf{v}] - \\text{Entropy}(P_\\theta(\\mathbf{H} "
-#~ "\\mid \\mathbf{v}))"
-#~ msgstr ""
-
-#~ msgid "::"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The classic Boltzmann machine, as presented in Section [4.1 The Classic "
-#~ "Boltzmann Machine: Visible and Hidden Symmetry](kpp-theoretical-foundations-"
-#~ "bm-overall), is theoretically powerful but computationally intractable due "
-#~ "to the need for equilibrium sampling over a fully connected graph. The "
-#~ "<b>Restricted Boltzmann Machine (RBM)</b>, introduced by Paul Smolensky in "
-#~ "1986 under the name <em>Harmonium</em> and later popularized by Geoffrey "
-#~ "Hinton, imposes a simple but profound architectural constraint that "
-#~ "dramatically reduces sampling complexity while preserving the ability to "
-#~ "model complex probability distributions. This section details the RBM "
-#~ "architecture, its mathematical properties, and why it has become the "
-#~ "workhorse of energy-based unsupervised learning."
-#~ msgstr ""
-
-#~ msgid "<b>The Architectural Restriction: A Bipartite Graph</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The defining characteristic of an RBM is its <b>restricted connectivity</b>:"
-#~ " the network is organized as a <b>bipartite graph</b> with two layers, a "
-#~ "visible layer and a hidden layer. Connections exist <b>only</b> between "
-#~ "visible and hidden units. There are <b>no visible-visible connections</b> "
-#~ "and <b>no hidden-hidden connections</b>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This restricted topology yields a crucial property: <b>conditional "
-#~ "independence</b>. Given the visible units, the hidden units become "
-#~ "independent of each other. Conversely, given the hidden units, the visible "
-#~ "units become independent."
-#~ msgstr ""
-
-#~ msgid "<b>Energy Function and Joint Distribution</b>"
-#~ msgstr ""
-
-#~ msgid "<b>Probability Distributions in RBMs</b>"
-#~ msgstr ""
-
-#~ msgid "<b>Joint distribution </b>$p(v, h)$:"
-#~ msgstr ""
-
-#~ msgid "<b>Marginal distribution </b>$p(v)$:"
-#~ msgstr ""
-
-#~ msgid "<b>Conditional probabilities</b>:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Distribution of hidden units given visible units </b>$p(h|v)$: $$  p(h|v)"
-#~ " = \\frac{p(v, h)}{p(v)} = \\frac{\\exp(-E(v, h))}{\\sum_{h'} \\exp(-E(v, "
-#~ "h'))}$$ Because there are no hidden-hidden connections in an RBM, this "
-#~ "distribution factorizes as  $$p(\\mathbf{h} \\mid \\mathbf{v}) = "
-#~ "\\prod_{j=1}^{N_h} p(h_j \\mid \\mathbf{v}),$$ where $p(h_j = 1 \\mid "
-#~ "\\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i} w_{ij} v_i \\right)$ , "
-#~ "enabling parallel sampling."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Distribution of visible units given hidden units </b>$p(v|h)$: Similarly,"
-#~ " we have $$p(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} p(v_i \\mid"
-#~ " \\mathbf{h})$$ where $p(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + "
-#~ "\\sum_{j} w_{ij} h_j \\right)$"
-#~ msgstr ""
-
-#~ msgid "<b>The Key Computational Advantage: Conditional Independence</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The absence of intra-layer connections yields a crucial property: "
-#~ "<b>conditional independence</b>. Given the visible units, the hidden units "
-#~ "become independent of each other. Conversely, given the hidden units, the "
-#~ "visible units become independent."
-#~ msgstr ""
-
-#~ msgid "<b>Efficient Gibbs Sampling: Block Updates</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The conditional independence property transforms Gibbs sampling from a slow,"
-#~ " unit-by-unit process into a fast, <b>block-wise</b> process. A single round"
-#~ " of Gibbs sampling consists of two parallel steps:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Sample hidden layer given visible layer</b>: For each hidden unit $j$, "
-#~ "compute $P(h_j = 1 \\mid \\mathbf{v})$ and sample $h_j \\in \\{0,1\\}$ "
-#~ "accordingly. All hidden units can be sampled simultaneously."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Sample visible layer given hidden layer</b>: For each visible unit $i$, "
-#~ "compute $P(v_i = 1 \\mid \\mathbf{h})$ and sample $ v_i \\in \\{0,1\\}$. All"
-#~ " visible units can be sampled simultaneously."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This pair of steps constitutes one full step of <b>block Gibbs sampling</b>."
-#~ " Starting from a visible vector $\\mathbf{v}^{(0)}$, the sequence is:"
-#~ msgstr ""
-
-#~ msgid "<b>Learning the RBM: Contrastive Divergence Revisited</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The RBM is trained using the <b>contrastive divergence (CD)</b> algorithm "
-#~ "introduced in Section [3.3 Contrastive Divergence](kpp-theoretical-"
-#~ "foundations-ebms-cd). The gradient of the log-likelihood retains the same "
-#~ "contrastive form:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Thanks to the conditional independence property of the RBM, the Gibbs "
-#~ "sampling steps required by CD become <b>block-parallel</b> operations. A "
-#~ "single round-trip consists of sampling all hidden units given the visible "
-#~ "layer, then sampling all visible units given the hidden layer. This makes "
-#~ "even CD-1 remarkably effective. The weight update for a mini-batch is:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "In practice, <b>CD-1</b>, i.e. k = 1, is often sufficient. The algorithm "
-#~ "then becomes remarkably simple: for each data vector, compute hidden "
-#~ "probabilities, sample hidden states, reconstruct visible probabilities, "
-#~ "sample visible states, recompute hidden probabilities, and update weights "
-#~ "based on the difference between the initial and reconstructed pairwise "
-#~ "products."
-#~ msgstr ""
-
-#~ msgid "<b>Free Energy and Marginal Probability</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "While the denominator  (partition function over visible states) remains "
-#~ "intractable, i.e. still sums over all $2^{N_v}$ visible configurations, the "
-#~ "free energy itself is cheap to compute for any given $\\mathbf{v}$. This "
-#~ "allows, for example, comparing the relative likelihood of different visible "
-#~ "vectors, even though the absolute likelihood remains intractable."
-#~ msgstr ""
-
-#~ msgid "<b>Free Energy and Its Analytical Form</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>This analytical form is a key computational advantage of the RBM over the"
-#~ " classic Boltzmann machine.</b> It allows us to evaluate the relative "
-#~ "likelihood of different visible vectors in $O(N_v N_h)$<b> time</b>, without"
-#~ " enumerating the $2^{N_h}$ hidden configurations. <del>However, it is "
-#~ "important to note that </del><b>the absolute likelihood remains "
-#~ "intractable</b><del>, due to the partition function over visible states. "
-#~ "Nevertheless, the closed-form free energy enables efficient comparison of "
-#~ "relative likelihoods, which is sufficient for many practical applications "
-#~ "such as model comparison and sampling.</del>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "To gain deeper physical intuition, it is instructive to compare the free "
-#~ "energy with the <b>expected energy</b> under the conditional distribution of"
-#~ " hidden units:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The difference is precisely the <b>entropy </b>of the hidden layer given the"
-#~ " visible layer. This aligns with the thermodynamic relation $F = U - TS$: "
-#~ "free energy equals the expected energy minus the temperature-weighted "
-#~ "entropy. In the RBM, this entropy term accounts for uncertainty in the "
-#~ "hidden unit activations."
-#~ msgstr ""
-
-#~ msgid "<b>RBMs as Product of Experts</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "An RBM can be interpreted as a <b>product of experts</b> (PoE). Each hidden "
-#~ "unit $h_j$ acts as an \"expert\" that assigns a probability to a visible "
-#~ "vector $\\mathbf{v}$ based on how well $\\mathbf{v}$ matches its preferred "
-#~ "pattern (encoded in the weight vector $\\mathbf{w}_{:j}$). The joint "
-#~ "distribution is the product of these expert opinions, renormalized:"
-#~ msgstr ""
-
-#~ msgid "<b>Variants: Handling Different Data Types</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Gaussian-Bernoulli RBM</b>: For real-valued data (e.g., grayscale images,"
-#~ " continuous features), the visible units are modeled as Gaussian with unit "
-#~ "variance (or learned variance). The energy becomes:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Softmax / Multinomial RBM</b>: For count data or categorical data (e.g., "
-#~ "word counts, user ratings), the visible layer can be a softmax unit over a "
-#~ "vocabulary or rating scale."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Replicated Softmax RBM</b>: For variable-length documents, the visible "
-#~ "layer consists of a set of multinomial units, modeling the distribution of "
-#~ "word counts."
-#~ msgstr ""
-
-#~ msgid "<b>Limitations of the RBM</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Shallow Architecture</b>: A single RBM is a shallow model with only one "
-#~ "layer of latent variables. Its representational power is limited compared to"
-#~ " deep architectures, although stacking RBMs to form a <b>Deep Belief Network"
-#~ " (DBN)</b> mitigates this (see Section [4.3 Beyond Single Layers: Stacking "
-#~ "for Deep Learning](/kpp-theoretical-foundations\\kpp-theoretical-"
-#~ "foundations-bm-deep))."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Partition Function Still Intractable</b>: The marginal likelihood "
-#~ "$P(\\mathbf{v})$ still requires summing over all visible configurations. "
-#~ "While inference is efficient, model evaluation and comparison remain "
-#~ "challenging."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Mode Collapse in CD Training</b>: As noted in Section [3.3 Contrastive "
-#~ "Divergence](kpp-theoretical-foundations-ebms-cd), CD training can suffer "
-#~ "from mode collapse, where the model fails to capture all modes of the data "
-#~ "distribution. Persistent CD (PCD) improves this but adds computational "
-#~ "overhead."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Hyperparameter Sensitivity</b>: The quality of the learned features "
-#~ "depends sensitively on the learning rate, momentum, weight decay, and the "
-#~ "number of hidden units. Tuning these hyperparameters requires experience and"
-#~ " careful validation."
-#~ msgstr ""
-
-#~ msgid "<b>The RBM's Place in Deep Learning History</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The RBM played a pivotal role in the <b>deep learning renaissance</b> of the"
-#~ " mid-2000s. Before the widespread adoption of rectified linear units "
-#~ "(ReLUs), batch normalization, and improved optimizers for feedforward "
-#~ "networks, training deep neural networks was notoriously difficult. The RBM "
-#~ "provided an effective <b>unsupervised pre-training</b> method: by stacking "
-#~ "RBMs trained layer by layer, one could initialize a deep network with "
-#~ "sensible features extracted from the data distribution, rather than random "
-#~ "weights. This pre-training, followed by discriminative fine-tuning with "
-#~ "backpropagation, enabled the first successful training of truly deep "
-#~ "architectures on challenging tasks like MNIST and later ImageNet."
-#~ msgstr ""
-
-#~ msgid "<b>Summary</b>"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The <b>Restricted Boltzmann Machine (RBM)</b> imposes a <b>bipartite "
-#~ "connectivity</b> constraint: no visible-visible or hidden-hidden "
-#~ "connections."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This restriction yields <b>conditional independence</b>: $P(\\mathbf{h} "
-#~ "\\mid \\mathbf{v})$ and $P(\\mathbf{v} \\mid \\mathbf{h})$ factorize into "
-#~ "products of independent Bernoulli distributions."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<b>Block Gibbs sampling</b> updates entire layers in parallel, dramatically "
-#~ "accelerating inference and training."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The RBM is trained using <b>contrastive divergence (CD)</b> , typically "
-#~ "CD-1, which requires only one round-trip of block Gibbs sampling per data "
-#~ "point."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The <b>free energy</b> of a visible vector has a closed-form expression, "
-#~ "enabling efficient comparison of relative likelihoods."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The RBM can be extended to handle <b>real-valued</b> (Gaussian-Bernoulli "
-#~ "RBM) and <b>categorical</b> (Softmax RBM) data."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "RBMs served as the building blocks for <b>Deep Belief Networks</b> and "
-#~ "played a historic role in enabling unsupervised pre-training for deep neural"
-#~ " networks."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} b_i v_i - \\sum_{j=1}^{N_h}"
-#~ " c_j h_j - \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i w_{ij} h_j"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-#~ "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
-#~ "\\mathbf{h})\\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i=1}^{N_v} w_{ij}"
-#~ " v_i \\right)"
-#~ msgstr ""
-
-#~ msgid "P(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} P(h_j \\mid \\mathbf{v})"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j=1}^{N_h} w_{ij}"
-#~ " h_j \\right)"
-#~ msgstr ""
-
-#~ msgid "P(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} P(v_i \\mid \\mathbf{h})"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\\frac{\\partial \\log P(\\mathbf{v})}{\\partial w_{ij}} = \\langle v_i h_j "
-#~ "\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{model}}"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "\\Delta \\mathbf{W} = \\eta \\left( \\mathbb{E}[\\mathbf{v} "
-#~ "\\mathbf{h}^\\top]_{\\text{data}} - \\mathbb{E}[\\mathbf{v} "
-#~ "\\mathbf{h}^\\top]_{\\text{recon}} \\right)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} \\exp\\left( c_j h_j + \\sum_i "
-#~ "v_i w_{ij} h_j \\right) \\bigg|_{h_j \\text{ summed out}}"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = \\sum_i \\frac{(v_i - b_i)^2}{2\\sigma_i^2} - "
-#~ "\\sum_j c_j h_j - \\sum_{i,j} \\frac{v_i}{\\sigma_i} w_{ij} h_j"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The classic Boltzmann machine, as presented in Section [4.1 The Classic "
-#~ "Boltzmann Machine: Visible and Hidden Symmetry](kpp-theoretical-foundations-"
-#~ "bm-overall), is theoretically powerful but computationally intractable due "
-#~ "to the need for equilibrium sampling over a fully connected graph. The "
-#~ "**Restricted Boltzmann Machine (RBM)**, introduced by Paul Smolensky in 1986"
-#~ " under the name *Harmonium* and later popularized by Geoffrey Hinton, "
-#~ "imposes a simple but profound architectural constraint that dramatically "
-#~ "reduces sampling complexity while preserving the ability to model complex "
-#~ "probability distributions. This section details the RBM architecture, its "
-#~ "mathematical properties, and why it has become the workhorse of energy-based"
-#~ " unsupervised learning."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The RBM is trained using the **contrastive divergence (CD)** algorithm "
-#~ "introduced in Section [3.3 Contrastive Divergence](kpp-theoretical-"
-#~ "foundations-ebms-cd). The gradient of the log-likelihood retains the same "
-#~ "contrastive form:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "with analogous updates for biases. For a full exposition of the CD-k "
-#~ "algorithm, refer back to Section [3.3 Contrastive Divergence](/kpp-"
-#~ "theoretical-foundationskpp-theoretical-foundations-ebms-cd)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "**Shallow Architecture**: A single RBM is a shallow model with only one "
-#~ "layer of latent variables. Its representational power is limited compared to"
-#~ " deep architectures, although stacking RBMs to form a **Deep Belief Network "
-#~ "(DBN)** mitigates this (see Section [4.3 Beyond Single Layers: Stacking for "
-#~ "Deep Learning](\\kpp-theoretical-foundations-bm-deep))."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "with analogous updates for biases. For a full exposition of the CD-k "
-#~ "algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-"
-#~ "theoretical-foundations-ebms-cd)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The conditional $P(v_i \\mid \\mathbf{h})$ is Gaussian with mean $b_i + "
-#~ "\\sigma_i \\sum_{j} w_{ij} h_j$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$E(\\mathbf{v}, \\mathbf{h}) = -\\sum_{i=1}^{N_v} b_i v_i - "
-#~ "\\sum_{j=1}^{N_h} c_j h_j - \\sum_{i=1}^{N_v} \\sum_{j=1}^{N_h} v_i w_{ij} "
-#~ "h_j$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-#~ "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$P(\\mathbf{v}, \\mathbf{h}) = \\frac{1}{Z} \\exp\\left(-E(\\mathbf{v}, "
-#~ "\\mathbf{h})\\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$Z = \\sum_{\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}}} "
-#~ "\\exp\\left(-E(\\tilde{\\mathbf{v}}, \\tilde{\\mathbf{h}})\\right)$$"
-#~ msgstr ""
-
-#~ msgid "$$p(v, h) = \\frac{1}{Z} \\exp(-E(v, h))$$"
-#~ msgstr ""
-
-#~ msgid "$$p(v) = \\frac{\\sum_{h} \\exp(-E(v, h))}{Z}$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( c_j + \\sum_{i=1}^{N_v} "
-#~ "w_{ij} v_i \\right)$$"
-#~ msgstr ""
-
-#~ msgid "$$P(\\mathbf{h} \\mid \\mathbf{v}) = \\prod_{j=1}^{N_h} P(h_j \\mid \\mathbf{v})$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( b_i + \\sum_{j=1}^{N_h} "
-#~ "w_{ij} h_j \\right)$$"
-#~ msgstr ""
-
-#~ msgid "$$P(\\mathbf{v} \\mid \\mathbf{h}) = \\prod_{i=1}^{N_v} P(v_i \\mid \\mathbf{h})$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$\\mathbf{v}^{(0)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(0)})} "
-#~ "\\mathbf{h}^{(0)} \\xrightarrow{P(\\mathbf{v} \\mid \\mathbf{h}^{(0)})} "
-#~ "\\mathbf{v}^{(1)} \\xrightarrow{P(\\mathbf{h} \\mid \\mathbf{v}^{(1)})} "
-#~ "\\mathbf{h}^{(1)} \\rightarrow \\cdots$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$\\frac{\\partial \\log P(\\mathbf{v})}{\\partial w_{ij}} = \\langle v_i "
-#~ "h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{model}}$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$\\Delta \\mathbf{W} = \\eta \\left( \\mathbb{E}[\\mathbf{v} "
-#~ "\\mathbf{h}^\\top]_{\\text{data}} - \\mathbb{E}[\\mathbf{v} "
-#~ "\\mathbf{h}^\\top]_{\\text{recon}} \\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$F_\\theta(\\mathbf{v}) = -\\log \\sum_{\\mathbf{h}} "
-#~ "\\exp\\left(-E_\\theta(\\mathbf{v}, \\mathbf{h})\\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$P_\\theta(\\mathbf{v}) = "
-#~ "\\frac{\\exp(-F_\\theta(\\mathbf{v}))}{\\sum_{\\tilde{\\mathbf{v}}} "
-#~ "\\exp(-F_\\theta(\\tilde{\\mathbf{v}}))}$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$E_\\theta(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-#~ "\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$\\sum_{\\mathbf{h}} \\exp(-E_\\theta(\\mathbf{v}, \\mathbf{h})) = "
-#~ "\\exp(\\mathbf{b}^\\top \\mathbf{v}) \\prod_{j=1}^{N_h} \\left( 1 + "
-#~ "\\exp(c_j + \\sum_i v_i w_{ij}) \\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$F_\\theta(\\mathbf{v}) = -\\mathbf{b}^\\top \\mathbf{v} - "
-#~ "\\sum_{j=1}^{N_h} \\log \\left( 1 + \\exp\\left( c_j + \\sum_i v_i w_{ij} "
-#~ "\\right) \\right)$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$\\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, \\mathbf{H}) \\mid \\mathbf{v}]"
-#~ " = -\\mathbf{b}^\\top \\mathbf{v} - \\mathbf{c}^\\top "
-#~ "\\mathbf{m}(\\mathbf{v}) - \\mathbf{v}^\\top \\mathbf{W} "
-#~ "\\mathbf{m}(\\mathbf{v})$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$F_\\theta(\\mathbf{v}) = \\mathbb{E}_\\theta[E_\\theta(\\mathbf{v}, "
-#~ "\\mathbf{H}) \\mid \\mathbf{v}] - \\text{Entropy}(P_\\theta(\\mathbf{H} "
-#~ "\\mid \\mathbf{v}))$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$P(\\mathbf{v}) \\propto \\prod_{j=1}^{N_h} \\exp\\left( c_j h_j + \\sum_i "
-#~ "v_i w_{ij} h_j \\right) \\bigg|_{h_j \\text{ summed out}}$$"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "$$E(\\mathbf{v}, \\mathbf{h}) = \\sum_i \\frac{(v_i - b_i)^2}{2\\sigma_i^2} "
-#~ "- \\sum_j c_j h_j - \\sum_{i,j} \\frac{v_i}{\\sigma_i} w_{ij} h_j$$ The "
-#~ "conditional $P(v_i \\mid \\mathbf{h})$ is Gaussian with mean $b_i + "
-#~ "\\sigma_i \\sum_{j} w_{ij} h_j$"
-#~ msgstr ""

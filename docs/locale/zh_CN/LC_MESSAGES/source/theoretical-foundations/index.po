@@ -215,5 +215,3 @@ msgstr ""
 msgid "References and Further Reading"
 msgstr "参考文献与延伸阅读"
 
-#~ msgid "理论基础"
-#~ msgstr "理论基础"
