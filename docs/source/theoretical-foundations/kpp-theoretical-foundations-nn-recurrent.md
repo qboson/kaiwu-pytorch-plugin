@@ -28,7 +28,7 @@ $$w_{ij} = w_{ji},\quad \forall i, j$$
 
 and there are no self-connections: $w_{ii} = 0$.
 
-The network operates in discrete time. At each time step, a single unit is selected at random (or according to a fixed schedule) and its state is updated according to a deterministic rule:
+The network operates in discrete time. At each time step, a single unit is selected at random (or according to a fixed schedule) and its state is updated according to the deterministic sign update (Eq. {eq}`eq-sign-update`, Section 1.1):
 
 $$x_i \leftarrow \text{sign}\left( \sum_{j \neq i} w_{ij} x_j + b_i \right)$$
 
@@ -54,7 +54,7 @@ Because the energy is bounded below (for finite weights and binary units), the n
 ## Storing Memories as Attractors
 The Hopfield network is not merely a dynamical curiosity; it is a model of **content-addressable memory**. The goal is to store a set of desired patterns $\{\boldsymbol{\xi}^1, \boldsymbol{\xi}^2, \ldots, \boldsymbol{\xi}^P\}$ as attractors of network dynamics. When presented with a corrupted or partial version of a stored pattern as the initial state, the network's deterministic descent down the energy landscape will restore the complete, original memory.
 
-The **Hebbian learning rule** provides a biologically inspired prescription for setting weights. For binary $ \{-1, +1\}$patterns, the weight between units $i$ and $j$ is set to:
+The **Hebbian learning rule** provides a biologically inspired prescription for setting weights. For binary $ \{-1, +1\}$patterns, the weight between units $i$ and $j$ is set by the Hebbian rule (Eq. {eq}`eq-hebbian`, Section 1.1):
 
 $$w_{ij} = \frac{1}{N} \sum_{\mu=1}^P \xi_i^\mu \xi_j^\mu$$
 
@@ -102,7 +102,7 @@ The **Boltzmann machine** addresses this limitation by introducing **stochastici
 
 $$P(x_i = 1) = \sigma\left( \frac{\sum_j w_{ij} x_j + b_i}{T} \right)$$
 
-This single modification transforms the Hopfield network from a deterministic content-addressable memory into a **probabilistic generative model** capable of:
+This single stochastic update (Eq. {eq}`eq-stoch-update`, Section 1.1) transforms the Hopfield network from a deterministic content-addressable memory into a **probabilistic generative model** capable of:
 
 1. **Sampling from a distribution**: The network no longer converges to a single fixed point but generates samples from the equilibrium Boltzmann distribution.
 2. **Exploring multiple modes**: Thermal noise allows the network to visit different attractor basins, capturing the multimodal structure of complex data.
@@ -110,7 +110,7 @@ This single modification transforms the Hopfield network from a deterministic co
 
 Effectively, the Boltzmann machine allows the system to sample from a canonical ensemble (see Section [1.2 The Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-boltzmann.md)) rather than simply descending into the nearest deterministic fixed point.
 
-The connection is profound: the Hopfield network defines the **energy landscape**, while the Boltzmann machine defines the **probability distribution** over that landscape. The two are intimately related by the Boltzmann distribution:
+The connection is profound: the Hopfield network defines the **energy landscape**, while the Boltzmann machine defines the **probability distribution** over that landscape. The two are intimately related by the Boltzmann distribution (Eq. {eq}`eq-boltzmann-dist`, Section 1.2):
 
 $$P(\mathbf{x}) = \frac{1}{Z} \exp\left(-E(\mathbf{x}) / T\right)$$
 

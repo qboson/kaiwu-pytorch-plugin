@@ -17,6 +17,35 @@ The defining characteristic of an RBM is its **restricted connectivity**: the ne
 Formally, let the visible units be $\mathbf{v} = (v_1, v_2, \ldots, v_{N_v})$ with biases $\mathbf{b} = (b_1, \ldots, b_{N_v})$, and the hidden units be $\mathbf{h} = (h_1, h_2, \ldots, h_{N_h})$ with biases $\mathbf{c} = (c_1, \ldots, c_{N_h})$. The weight matrix $\mathbf{W}$ is of size $N_v \times N_h$, where $w_{ij}$ connects visible unit $i$ to hidden unit $j$. There is no weight matrix for visible-visible or hidden-hidden pairs.
 
 This restricted topology is illustrated below:
+```{mermaid}
+graph LR
+    subgraph V [Visible Units]
+        v1((v1))
+        v2((v2))
+        v3((v3))
+        v4((v4))
+    end
+
+    subgraph H [Hidden Units]
+        h1((h1))
+        h2((h2))
+        h3((h3))
+    end
+
+    %% 使用双箭头表示双向对称权重
+    v1 <--> h1
+    v1 <--> h2
+    v1 <--> h3
+    v2 <--> h1
+    v2 <--> h2
+    v2 <--> h3
+    v3 <--> h1
+    v3 <--> h2
+    v3 <--> h3
+    v4 <--> h1
+    v4 <--> h2
+    v4 <--> h3
+```
 
 This restricted topology yields a crucial property: **conditional independence**. Given the visible units, the hidden units become independent of each other. Conversely, given the hidden units, the visible units become independent.
 
@@ -27,13 +56,13 @@ $$E(\mathbf{v}, \mathbf{h}) = -\sum_{i=1}^{N_v} b_i v_i - \sum_{j=1}^{N_h} c_j h
 
 In matrix notation:
 
-$$E(\mathbf{v}, \mathbf{h}) = -\mathbf{b}^\top \mathbf{v} - \mathbf{c}^\top \mathbf{h} - \mathbf{v}^\top \mathbf{W} \mathbf{h}$$
+$$E(\mathbf{v}, \mathbf{h}) = -\mathbf{b}^\top \mathbf{v} - \mathbf{c}^\top \mathbf{h} - \mathbf{v}^\top \mathbf{W} \mathbf{h}$$ (eq-rbm-energy-tf)
 
-The joint probability distribution is, as always, given by the Boltzmann distribution:
+The joint probability distribution is, as always, given by the Boltzmann distribution (Eq. {eq}`eq-boltzmann-dist`, Section 1.2):
 
 $$P(\mathbf{v}, \mathbf{h}) = \frac{1}{Z} \exp\left(-E(\mathbf{v}, \mathbf{h})\right)$$
 
-with the partition function:
+with the partition function (Eq. {eq}`eq-partition`, Section 3.2):
 
 $$Z = \sum_{\tilde{\mathbf{v}}, \tilde{\mathbf{h}}} \exp\left(-E(\tilde{\mathbf{v}}, \tilde{\mathbf{h}})\right)$$
 
@@ -46,37 +75,42 @@ $$p(v, h) = \frac{1}{Z} \exp(-E(v, h))$$
 
 where $Z = \sum_{v,h} \exp(-E(v, h))$. This is the most complete description of the model.
 
-1. **Marginal distribution** $p(v)$:
+2. **Marginal distribution** $p(v)$:
 
-This is the distribution we care most about. Because it directly defines the probability that the RBM assigns to observed visible data (e.g., images, features) without reference to the hidden units. During training, our goal (maximum likelihood estimation) is to maximize $p(\mathbf{v})$ over the training data. A well-trained RBM should be able to sample new visible configurations from $p(\mathbf{v})$ that look like real data. The hidden units are latent auxiliary variables that capture complex dependencies, but $p(\mathbf{v})$ is the ultimate evaluation criterion for the generative quality.
+This is the distribution we care most about because it directly defines the probability that the RBM assigns to observed visible data (e.g., images, features) without reference to the hidden units. During training, our goal is to maximize $p(v)$ over the training data. Ideally, a well-trained RBM should be able to sample new visible configurations from $p(v)$ that look like real data. The hidden units only serve as latent auxiliary variables to capture complex dependencies, but $p(v)$ is the ultimate evaluation criterion for the generative quality.
 
 It is obtained by summing over all possible hidden unit states:
 
 $$p(v) = \frac{\sum_{h} \exp(-E(v, h))}{Z}$$
 
-This is the distribution we care most about because it directly defines the probability that the RBM assigns to observed visible data (e.g., images, features) without reference to the hidden units. During training, our goal is to maximize $p(v)$ over the training data. Ideally, a well-trained RBM should be able to sample new visible configurations from $p(v)$ that look like real data. The hidden units only serve as latent auxiliary variables to capture complex dependencies, but $p(v)$ is the ultimate evaluation criterion for the generative quality.
-
-1. **Conditional probabilities**:
+3. **Conditional probabilities**:
 
 These are the key to the computational efficiency of RBMs. Due to the bipartite structure, they factorize into products of independent Bernoulli distributions.
-- **Distribution of hidden units given visible units** $p(h|v)$:
-$$ p(h|v) = \frac{p(v, h)}{p(v)} = \frac{\exp(-E(v, h))}{\sum_{h'} \exp(-E(v, h'))}$$
-Because there are no hidden-hidden connections in an RBM, this distribution factorizes as 
-$$p(\mathbf{h} \mid \mathbf{v}) = \prod_{j=1}^{N_h} p(h_j \mid \mathbf{v}),$$
-where $p(h_j = 1 \mid \mathbf{v}) = \sigma\left( c_j + \sum_{i} w_{ij} v_i \right)$
-, enabling parallel sampling.
-- **Distribution of visible units given hidden units** $p(v|h)$: Similarly, we have
-$$p(\mathbf{v} \mid \mathbf{h}) = \prod_{i=1}^{N_v} p(v_i \mid \mathbf{h})$$
-where $p(v_i = 1 \mid \mathbf{h}) = \sigma\left( b_i + \sum_{j} w_{ij} h_j \right)$
+
+   - **Distribution of hidden units given visible units** $p(h|v)$:
+
+     $$p(h|v) = \frac{p(v, h)}{p(v)} = \frac{\exp(-E(v, h))}{\sum_{h'} \exp(-E(v, h'))}$$
+
+     Because there are no hidden-hidden connections in an RBM, this distribution factorizes as
+
+     $$p(\mathbf{h} \mid \mathbf{v}) = \prod_{j=1}^{N_h} p(h_j \mid \mathbf{v}),$$
+
+     where $p(h_j = 1 \mid \mathbf{v}) = \sigma\left( c_j + \sum_{i} w_{ij} v_i \right)$, enabling parallel sampling.
+
+   - **Distribution of visible units given hidden units** $p(v|h)$: Similarly, we have
+
+     $$p(\mathbf{v} \mid \mathbf{h}) = \prod_{i=1}^{N_v} p(v_i \mid \mathbf{h})$$
+
+     where $p(v_i = 1 \mid \mathbf{h}) = \sigma\left( b_i + \sum_{j} w_{ij} h_j \right)$
 
 ## The Key Computational Advantage: Conditional Independence
 The absence of intra-layer connections yields a crucial property: **conditional independence**. Given the visible units, the hidden units become independent of each other. Conversely, given the hidden units, the visible units become independent.
 
 Mathematically, the conditional probability of a hidden unit $h_j$ being active given the visible layer is:
 
-$$P(h_j = 1 \mid \mathbf{v}) = \sigma\left( c_j + \sum_{i=1}^{N_v} w_{ij} v_i \right)$$
+$$P(h_j = 1 \mid \mathbf{v}) = \sigma\left( c_j + \sum_{i=1}^{N_v} w_{ij} v_i \right)$$ (eq-rbm-cond-h)
 
-where \( \sigma(z) = 1/(1 + \exp(-z)) \) is the sigmoid function. Because there are no hidden-hidden connections, the joint conditional distribution over all hidden units factorizes:
+where $\sigma(z) = 1/(1 + \exp(-z))$ is the sigmoid function. Because there are no hidden-hidden connections, the joint conditional distribution over all hidden units factorizes:
 
 $$P(\mathbf{h} \mid \mathbf{v}) = \prod_{j=1}^{N_h} P(h_j \mid \mathbf{v})$$
 
@@ -109,7 +143,7 @@ Thanks to the conditional independence property of the RBM, the Gibbs sampling s
 
 $$\Delta \mathbf{W} = \eta \left( \mathbb{E}[\mathbf{v} \mathbf{h}^\top]_{\text{data}} - \mathbb{E}[\mathbf{v} \mathbf{h}^\top]_{\text{recon}} \right)$$
 
-with analogous updates for biases. For a full exposition of the CD-k algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md).
+with analogous updates for biases. For a full exposition of the CD-k algorithm, refer back to Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md) (Eq. {eq}`eq-cd-update`).
 
 In practice, **CD-1**, i.e. k = 1, is often sufficient. The algorithm then becomes remarkably simple: for each data vector, compute hidden probabilities, sample hidden states, reconstruct visible probabilities, sample visible states, recompute hidden probabilities, and update weights based on the difference between the initial and reconstructed pairwise products.
 
@@ -135,7 +169,7 @@ $$\sum_{\mathbf{h}} \exp(-E_\theta(\mathbf{v}, \mathbf{h})) = \exp(\mathbf{b}^\t
 
 Thus, free energy has a closed-form expression:
 
-$$F_\theta(\mathbf{v}) = -\mathbf{b}^\top \mathbf{v} - \sum_{j=1}^{N_h} \log \left( 1 + \exp\left( c_j + \sum_i v_i w_{ij} \right) \right)$$
+$$F_\theta(\mathbf{v}) = -\mathbf{b}^\top \mathbf{v} - \sum_{j=1}^{N_h} \log \left( 1 + \exp\left( c_j + \sum_i v_i w_{ij} \right) \right)$$ (eq-rbm-free-energy)
 
 **This analytical form is a key computational advantage of the RBM over the classic Boltzmann machine.** It allows us to evaluate the relative likelihood of different visible vectors in $O(N_v N_h)$ **time**, without enumerating the $2^{N_h}$ hidden configurations. However, **the absolute likelihood remains intractable**.
 

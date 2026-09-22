@@ -1,58 +1,81 @@
-# 新手教程
+<!-- ```YAML
+title: Hands-on Tutorials — Quantum-accelerated Boltzmann Machines
+slug: kpp-hands-on-tutorials
+sidebar_position: 0
+layout: home
+hide: false
+keywords:
+  - KPP
+  - Hands-on
+``` -->
 
-本章提供详细的实践教程，帮助您深入了解 Kaiwu-PyTorch-Plugin 的各种应用场景。
+# Tutorials
 
-## 教程概览
+> This chapter provides detailed hands-on tutorials to help you gain an in-depth understanding of various application scenarios of Kaiwu-PyTorch-Plugin.
+>
+> Before you start, make sure you have KPP installed and have gone through the [Quick Start](../quickstart.md). For theoretical background, see [Theoretical Foundations](../../theoretical-foundations/index.md).
 
-```{list-table}
-:widths: 25 20 55
-:header-rows: 1
-
-* - 教程名称
-  - 任务类型
-  - 描述
-* - {doc}`rbm_classification`
-  - 分类
-  - 使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类
-* - {doc}`dbn_classification`
-  - 分类
-  - 使用深度信念网络（DBN）构建层次化特征表示并进行分类
-* - {doc}`bm_generation`
-  - 生成
-  - 使用全连接玻尔兹曼机（BM）进行数据生成
-* - {doc}`qvae_mnist`
-  - 生成/表征
-  - 使用量子变分自编码器（Q-VAE）进行图像生成与表征学习
-
-```
-## 推荐学习顺序
-
-**初学者路径**：
-
-1. 先完成 {doc}`../quickstart` 了解基本 API
-2. 学习 {doc}`quantum_sampling_bottleneck` 理解模型训练中的采样瓶颈
-3. 学习 {doc}`simulated_annealing` 建立本地采样基线
-4. 学习 {doc}`quantum_sampling_pytorch` 了解如何接入 CIM 采样器
-5. 学习 {doc}`rbm_classification` 理解 RBM 的应用流程
-
-**生成模型路径**：
-
-1. 学习 {doc}`bm_generation` 了解玻尔兹曼机的生成能力
-2. 进阶到 {doc}`qvae_mnist` 学习更强大的生成模型
-
-**完整学习路径**：
-
-按顺序完成所有教程，全面掌握 Kaiwu-PyTorch-Plugin 的功能。
+## Quantum Sampling for Energy-Based Models
 
 ```{toctree}
-:maxdepth: 2
+:maxdepth: 1
 :hidden:
 
 quantum_sampling_bottleneck
 simulated_annealing
 quantum_sampling_pytorch
+```
+
+- [Why Quantum? Revisiting the Sampling Bottleneck](quantum_sampling_bottleneck.md): The intractable partition function, slow MCMC mixing, and the quantum alternative.
+- [Simulated Annealing for Ising Models](simulated_annealing.md): Mapping energy functions to Ising Hamiltonians and building a local sampling baseline.
+- [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md): Swapping the local SA sampler for the CIM sampler within the KPP training loop, with the core interfaces explained.
+
+## Tutorial 1: Generative Modeling with a Full Boltzmann Machine
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
+bm_generation
+```
+
+- [BM Generation](bm_generation.md): Unsupervised data generation with a fully connected Boltzmann Machine. Example: `example/bm_generation/`.
+
+## Tutorial 2: Feature Learning and Classification with RBMs and DBNs
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
 rbm_classification
 dbn_classification
-bm_generation
+```
+
+- [RBM Classification: Handwritten Digit Recognition](rbm_classification.md): Feature learning and classification with a single RBM. Example: `example/rbm_digits/rbm_digits.ipynb`.
+- [DBN Classification: Deep Belief Networks](dbn_classification.md): Stacking RBMs into a Deep Belief Network for hierarchical features. Example: `example/dbn_digits/supervised_dbn_digits.ipynb`.
+
+## Tutorial 3: Quantum Variational Autoencoder (Q-VAE)
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
 qvae_mnist
 ```
+
+- [Q-VAE: Quantum Variational Autoencoder](qvae_mnist.md): Replacing the Gaussian prior with a quantum RBM for image generation and representation learning. Example: `example/qvae_mnist/run_pipeline.py`.
+
+## Coming Soon
+
+Planned tutorials, following the same structure as Tutorial 1–3:
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
+qvae_cell
+qdiffusion
+```
+
+- **Q-VAE for Single-Cell Transcriptomics**: single-cell representation learning with a QVAE: expression matrix → low-dimensional representations → UMAP → clustering evaluation. Example: `example/qvae_cell/train_qvae_cell.ipynb`.
+- **Q-Diffusion for Protein Sequence Generation**: discrete diffusion generation for proteins with the generic Q-Diffusion core and a DPLM backbone. Example: `example/qdiffusion/simple/simple_train_example.py`.

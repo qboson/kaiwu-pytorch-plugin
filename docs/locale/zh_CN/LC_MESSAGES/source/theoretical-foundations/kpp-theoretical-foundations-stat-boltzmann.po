@@ -8,294 +8,301 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 10:36+0800\n"
+"POT-Creation-Date: 2026-09-14 15:29+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:10
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:10
 msgid "1.2 The Boltzmann Distribution and Equilibrium"
 msgstr "1.2 玻尔兹曼分布与平衡"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:12
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:12
 msgid ""
-"Having established the analogy between magnetic spins and neural states, "
-"we now turn to the central probabilistic law that governs such systems at"
-" thermal equilibrium: the **Boltzmann distribution**. This distribution "
+"Having established the analogy between magnetic spins and neural states, we "
+"now turn to the central probabilistic law that governs such systems at "
+"thermal equilibrium: the **Boltzmann distribution**. This distribution "
 "provides the mathematical foundation for treating neural networks as "
-"probabilistic generative models rather than merely deterministic function"
-" approximators."
-msgstr "在建立磁自旋与神经状态之间的类比之后，我们转向支配这类系统热平衡行为的核心概率定律：**玻尔兹曼分布**。该分布为把神经网络视为概率生成模型，而不仅仅是确定性函数近似器，提供了数学基础。"
+"probabilistic generative models rather than merely deterministic function "
+"approximators."
+msgstr ""
+"在建立磁自旋与神经状态之间的类比之后，我们转向支配这类系统热平衡行为的核心概率定律：**玻尔兹曼分布**。该分布为把神经网络视为概率生成模型，而不仅仅是确定性函数近似器，提供了数学基础。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:14
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:14
 msgid "Thermal Equilibrium and the Canonical Ensemble"
 msgstr "热平衡与正则系综"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:15
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:15
 msgid ""
 "Consider a physical system in contact with a large heat-bath at absolute "
 "temperature $T$. The system constantly exchanges energy with the bath: "
-"microscopic fluctuations push it into higher-energy configurations, while"
-" the tendency to minimize energy pulls it back toward lower-energy "
-"states. After sufficient time, the system reaches **thermal "
-"equilibrium**, a condition in which macroscopic properties cease to "
-"change, even though microscopic configurations continue to fluctuate."
+"microscopic fluctuations push it into higher-energy configurations, while "
+"the tendency to minimize energy pulls it back toward lower-energy states. "
+"After sufficient time, the system reaches **thermal equilibrium**, a "
+"condition in which macroscopic properties cease to change, even though "
+"microscopic configurations continue to fluctuate."
 msgstr ""
 "考虑一个与大热源接触的物理系统，热源的绝对温度为 "
 "$T$。系统不断与热源交换能量：微观涨落会把系统推向更高能量的构型，而能量最小化倾向又会把它拉回较低能状态。经过足够长时间后，系统达到 "
 "**热平衡**：宏观性质不再变化，尽管微观构型仍在持续涨落。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:17
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:17
 #, python-brace-format
 msgid ""
 "In the framework of statistical mechanics, an equilibrium system is "
-"described by the **canonical ensemble**. The fundamental postulate is "
-"that all microstates with the same energy are equally probable, and the "
-"probability of the system occupying a specific microstate $\\mathbf{x}$ "
-"with energy $E(\\mathbf{x})$ depends only on that energy and the "
-"temperature. This dependence is expressed by the Boltzmann distribution."
+"described by the **canonical ensemble**. The fundamental postulate is that "
+"all microstates with the same energy are equally probable, and the "
+"probability of the system occupying a specific microstate $\\mathbf{x}$ with"
+" energy $E(\\mathbf{x})$ depends only on that energy and the temperature. "
+"This dependence is expressed by the Boltzmann distribution."
 msgstr ""
 "在统计力学框架中，处于平衡的系统由 **正则系综** 描述。其基本假设是：具有相同能量的所有微观状态等概率，而系统占据某个能量为 "
 "$E(\\mathbf{x})$ 的特定微观状态 $\\mathbf{x}$ 的概率，只取决于该能量和温度。这种依赖关系由玻尔兹曼分布表达。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:19
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:19
 msgid "The Boltzmann Distribution"
 msgstr "玻尔兹曼分布"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:20
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:20
 #, python-brace-format
 msgid ""
-"The probability of finding the system in state $\\mathbf{x}$ at "
-"temperature $T$ is:"
+"The probability of finding the system in state $\\mathbf{x}$ at temperature "
+"$T$ is:"
 msgstr "在温度 $T$ 下，系统处于状态 $\\mathbf{x}$ 的概率为："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:22
-msgid ""
-"P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{x})}{k_B "
-"T}\\right)"
-msgstr ""
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:22
+msgid "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{x})}{k_B T}\\right)"
+msgstr "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{x})}{k_B T}\\right)"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:24
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:24
 msgid "where:"
 msgstr "其中："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:26
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:26
 #, python-brace-format
 msgid "$E(\\mathbf{x})$ is the energy of configuration $\\mathbf{x}$."
 msgstr "$E(\\mathbf{x})$ 是构型 $\\mathbf{x}$ 的能量。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:27
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:27
 msgid ""
 "$k_B$ is the Boltzmann constant, which bridges temperature and energy "
 "scales."
 msgstr "$k_B$ 是玻尔兹曼常数，用于连接温度尺度与能量尺度。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:28
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:28
 msgid "$T$ is the absolute temperature in Kelvin."
 msgstr "$T$ 是以 Kelvin 为单位的绝对温度。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:29
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:29
 msgid ""
-"$Z$ is the **partition function** (from German *Zustandssumme*, \"sum "
-"over states\")."
+"$Z$ is the **partition function** (from German *Zustandssumme*, \"sum over "
+"states\")."
 msgstr "$Z$ 是 **配分函数**（来自德语 Zustandssumme，意为“状态求和”）。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:31
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:31
 #, python-brace-format
 msgid ""
 "The factor $\\exp(-E(\\mathbf{x})/k_B T)$ is called the **Boltzmann "
-"factor.** The negative sign in the exponent ensures that configurations "
-"with *lower energy* receive *higher probability*. The temperature $T$ "
-"modulates the steepness of this preference: at low temperatures, the "
-"distribution is sharply peaked around the lowest-energy states; at high "
-"temperatures, the distribution flattens, assigning non-negligible "
-"probability to a much broader range of configurations."
+"factor.** The negative sign in the exponent ensures that configurations with"
+" *lower energy* receive *higher probability*. The temperature $T$ modulates "
+"the steepness of this preference: at low temperatures, the distribution is "
+"sharply peaked around the lowest-energy states; at high temperatures, the "
+"distribution flattens, assigning non-negligible probability to a much "
+"broader range of configurations."
 msgstr ""
-"因子 $\\exp(-E(\\mathbf{x})/k_B T)$ 称为 "
-"**玻尔兹曼因子**。指数中的负号保证了能量越低的构型获得越高的概率。温度 $T$ "
-"控制这种偏好的陡峭程度：低温时，分布尖锐集中在最低能状态附近；高温时，分布变平，对更广泛的构型赋予不可忽略的概率。"
+"因子 $\\exp(-E(\\mathbf{x})/k_B T)$ 称为 **玻尔兹曼因子**。指数中的负号保证了能量越低的构型获得越高的概率。温度 "
+"$T$ 控制这种偏好的陡峭程度：低温时，分布尖锐集中在最低能状态附近；高温时，分布变平，对更广泛的构型赋予不可忽略的概率。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:33
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:33
 msgid ""
-"Statistical Physics Foundations: Derivation from the Microcanonical "
-"Ensemble"
+"Statistical Physics Foundations: Derivation from the Microcanonical Ensemble"
 msgstr "统计物理基础：从微正则系综推导"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:34
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:34
 msgid ""
-"The Boltzmann distribution is not an arbitrary choice; it follows "
-"directly from the microcanonical ensemble when a small system is placed "
-"in contact with a large heat reservoir."
+"The Boltzmann distribution is not an arbitrary choice; it follows directly "
+"from the microcanonical ensemble when a small system is placed in contact "
+"with a large heat reservoir."
 msgstr "玻尔兹曼分布并不是任意选择；当一个小系统与大型热源接触时，它可以直接从微正则系综推出。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:36
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:36
 msgid ""
-"Consider a small system $\\mathcal{S}$ with energy eigenstates "
-"$|i\\rangle$ and energies $E_i$, in thermal contact with a large "
-"reservoir $\\mathcal{R}$ at temperature $T$. The combined system "
-"$\\mathcal{S} + \\mathcal{R}$ is isolated, with total energy "
-"$E_{\\text{total}}$. By the fundamental assumption of the microcanonical "
-"ensemble, all microstates of the combined system with energy in the range"
-" $(E_{\\text{total}}, E_{\\text{total}} + \\delta E)$ are equally "
-"probable."
+"Consider a small system $\\mathcal{S}$ with energy eigenstates $|i\\rangle$ "
+"and energies $E_i$, in thermal contact with a large reservoir $\\mathcal{R}$"
+" at temperature $T$. The combined system $\\mathcal{S} + \\mathcal{R}$ is "
+"isolated, with total energy $E_{\\text{total}}$. By the fundamental "
+"assumption of the microcanonical ensemble, all microstates of the combined "
+"system with energy in the range $(E_{\\text{total}}, E_{\\text{total}} + "
+"\\delta E)$ are equally probable."
 msgstr ""
 "考虑一个小系统 $\\mathcal{S}$，其能量本征态为 $|i\\rangle$、能量为 $E_i$，并与温度为 $T$ 的大型热源 "
 "$\\mathcal{R}$ 热接触。组合系统 $\\mathcal{S} + \\mathcal{R}$ 是孤立的，总能量为 "
 "$E_{\\text{total}}$。根据微正则系综的基本假设，组合系统中能量落在 $(E_{\\text{total}}, "
 "E_{\\text{total}} + \\delta E)$ 范围内的所有微观状态等概率。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:38
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:38
 #, python-brace-format
 msgid ""
-"The number of microstates of the reservoir when $\\mathcal{S}$ is in "
-"state $|i\\rangle$ is:"
+"The number of microstates of the reservoir when $\\mathcal{S}$ is in state "
+"$|i\\rangle$ is:"
 msgstr "当 $\\mathcal{S}$ 处于状态 $|i\\rangle$ 时，热源的微观状态数为："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:40
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:40
 msgid ""
 "\\Omega_R(E_{\\text{total}} - E_i) = \\exp\\left[ k^{-1} "
 "S_R(E_{\\text{total}} - E_i) \\right]"
 msgstr ""
+"\\Omega_R(E_{\\text{total}} - E_i) = \\exp\\left[ k^{-1} "
+"S_R(E_{\\text{total}} - E_i) \\right]"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:42
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:42
 msgid ""
-"Since $E_i \\ll E_{\\text{total}}$, we expand the entropy of the "
-"reservoir:"
+"Since $E_i \\ll E_{\\text{total}}$, we expand the entropy of the reservoir:"
 msgstr "由于 $E_i \\ll E_{\\text{total}}$，可以展开热源的熵："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:44
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:44
 msgid ""
 "S_R(E_{\\text{total}} - E_i) \\approx S_R(E_{\\text{total}}) - \\left( "
-"\\frac{\\partial S_R}{\\partial E} \\right) E_i = S_R(E_{\\text{total}}) "
-"- \\frac{1}{T} E_i"
+"\\frac{\\partial S_R}{\\partial E} \\right) E_i = S_R(E_{\\text{total}}) - "
+"\\frac{1}{T} E_i"
 msgstr ""
+"S_R(E_{\\text{total}} - E_i) \\approx S_R(E_{\\text{total}}) - \\left( "
+"\\frac{\\partial S_R}{\\partial E} \\right) E_i = S_R(E_{\\text{total}}) - "
+"\\frac{1}{T} E_i"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:46
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:46
 msgid "where we have used the thermodynamic definition of temperature:"
 msgstr "这里使用了温度的热力学定义："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:48
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:48
 #, python-brace-format
 msgid "\\frac{1}{T} = \\left( \\frac{\\partial S}{\\partial E} \\right)_{V,N}"
-msgstr ""
+msgstr "\\frac{1}{T} = \\left( \\frac{\\partial S}{\\partial E} \\right)_{V,N}"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:50
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:50
 #, python-brace-format
 msgid ""
 "Thus, the probability that $\\mathcal{S}$ is in state $|i\\rangle$ is "
 "proportional to the number of reservoir microstates:"
 msgstr "因此，$\\mathcal{S}$ 处于状态 $|i\\rangle$ 的概率正比于热源的微观状态数："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:52
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:52
 msgid ""
 "P_i \\propto \\Omega_R(E_{\\text{total}} - E_i) \\propto \\exp\\left( "
 "-\\frac{E_i}{k_B T} \\right)"
 msgstr ""
+"P_i \\propto \\Omega_R(E_{\\text{total}} - E_i) \\propto \\exp\\left( "
+"-\\frac{E_i}{k_B T} \\right)"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:54
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:54
 msgid ""
 "Normalizing by the partition function $Z = \\sum_i \\exp(-E_i / k_B T)$ "
 "yields the Boltzmann distribution."
 msgstr "再用配分函数 $Z = \\sum_i \\exp(-E_i / k_B T)$ 归一化，即得到玻尔兹曼分布。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:56
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:56
 msgid ""
-"This derivation reveals a crucial insight: **the temperature** $T$ **and "
-"the thermal noise in the Boltzmann machine are not arbitrary heuristics; "
-"they emerge from the coupling of the neural system to an external heat "
-"bath.** Stochasticity is a physical necessity for maintaining thermal "
-"equilibrium."
+"This derivation reveals a crucial insight: **the temperature** $T$ **and the"
+" thermal noise in the Boltzmann machine are not arbitrary heuristics; they "
+"emerge from the coupling of the neural system to an external heat bath.** "
+"Stochasticity is a physical necessity for maintaining thermal equilibrium."
 msgstr ""
 "这个推导揭示了一个关键洞见：**玻尔兹曼机中的温度 **$T$** 和热噪声并不是任意启发式设置；它们来自神经系统与外部热源的耦合。** "
 "随机性是维持热平衡的物理必然。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:58
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:58
 msgid "The Partition Function: A Computational Bottleneck"
 msgstr "配分函数：计算瓶颈"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:59
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:59
 msgid ""
-"The partition function $Z$ is defined as the sum of Boltzmann factors "
-"over all possible states:"
+"The partition function $Z$ is defined as the sum of Boltzmann factors over "
+"all possible states:"
 msgstr "配分函数 $Z$ 定义为所有可能状态上的玻尔兹曼因子之和："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:61
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:61
 msgid ""
 "Z = \\sum_{\\tilde{\\mathbf{x}}} "
 "\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right)"
 msgstr ""
+"Z = \\sum_{\\tilde{\\mathbf{x}}} "
+"\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right)"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:63
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:63
 msgid ""
-"Its role is purely normalizing, it ensures that the probabilities over "
-"all states sum to one:"
+"Its role is purely normalizing, it ensures that the probabilities over all "
+"states sum to one:"
 msgstr "它的作用纯粹是归一化，确保所有状态的概率之和为 1："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:65
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:65
 msgid ""
 "\\sum_{\\tilde{\\mathbf{x}}} P(\\tilde{\\mathbf{x}}) = \\frac{1}{Z} "
 "\\sum_{\\tilde{\\mathbf{x}}} "
 "\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right) = 1"
 msgstr ""
+"\\sum_{\\tilde{\\mathbf{x}}} P(\\tilde{\\mathbf{x}}) = \\frac{1}{Z} "
+"\\sum_{\\tilde{\\mathbf{x}}} "
+"\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right) = 1"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:67
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:67
 msgid ""
 "While mathematically simple in definition, the partition function is "
-"computationally formidable. For a system of $N$binary units, the sum runs"
-" over $2^N$ distinct configurations. For even modest $N$(say, $N=100$, "
-"this number exceeds the estimated number of atoms in the observable "
-"universe. **The intractability of the partition function is the central "
-"computational challenge** that shapes every aspect of Boltzmann machine "
+"computationally formidable. For a system of $N$binary units, the sum runs "
+"over $2^N$ distinct configurations. This exponential growth is already "
+"severe at modest sizes: For even modest $N$(say, $N=100$, this number "
+"exceeds the estimated number of stars in the observable universe. The "
+"intractability of **exact** partition-function computation is the central "
+"computational challenge that shapes every aspect of Boltzmann machine "
 "learning, from training algorithms to architectural constraints."
 msgstr ""
-"虽然配分函数的数学定义很简单，但计算上极其困难。对于包含 $N$ 个二值单元的系统，求和需要遍历 $2^N$ 个不同构型。即便 $N$ "
-"只是中等规模（例如 "
-"$N=100$），该数量也会超过可观测宇宙中原子数的估计量级。**配分函数的不可处理性是玻尔兹曼机学习的核心计算挑战**，它影响训练算法、架构约束等几乎所有方面。"
+"虽然配分函数在数学定义上很简单，但在计算上极其棘手。对于包含 $N$ 个二值单元的系统，求和需要遍历 $2^N$ 个不同构型。这种指数增长在 $N$ "
+"不大时就已十分严峻：即便 $N$ 只是中等规模（例如 "
+"$N=100$），该数量也会超过可观测宇宙中恒星数的估计量级。**精确**配分函数计算的不可处理性，是塑造玻尔兹曼机学习方方面面（从训练算法到架构约束）的核心计算挑战。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:69
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:69
 msgid "The Thermodynamic Limit and Ensemble Equivalence"
 msgstr "热力学极限与系综等价"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:70
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:70
 msgid ""
 "For a macroscopic system (large $N$), the canonical and microcanonical "
-"ensembles become equivalent. This is because the energy fluctuations in "
-"the canonical ensemble scale as:"
+"ensembles become equivalent. This is because the energy fluctuations in the "
+"canonical ensemble scale as:"
 msgstr "对于宏观系统（大 $N$），正则系综与微正则系综会变得等价。这是因为正则系综中的能量涨落满足："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:72
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:72
 msgid "\\frac{\\Delta E}{\\langle E \\rangle} \\propto \\frac{1}{\\sqrt{N}}"
-msgstr ""
+msgstr "\\frac{\\Delta E}{\\langle E \\rangle} \\propto \\frac{1}{\\sqrt{N}}"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:74
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:74
 msgid ""
-"which becomes negligible as $N \\to \\infty$. This is the **thermodynamic"
-" limit**. In this limit, the energy of the system is essentially fixed, "
-"and the canonical ensemble gives the same results as the microcanonical "
+"which becomes negligible as $N \\to \\infty$. This is the **thermodynamic "
+"limit**. In this limit, the energy of the system is essentially fixed, and "
+"the canonical ensemble gives the same results as the microcanonical "
 "ensemble."
 msgstr ""
 "当 $N \\to \\infty$ 时，该涨落变得可以忽略。这就是 "
 "**热力学极限**。在这个极限下，系统能量实际上固定，正则系综与微正则系综给出相同结果。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:76
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:76
 msgid ""
-"This property is important for Boltzmann machines: when the number of "
-"units is large, the model's equilibrium distribution is sharply peaked "
-"around the mean energy, and the system behaves as if it were isolated "
-"with a fixed energy."
+"This property is important for Boltzmann machines: when the number of units "
+"is large, the model's equilibrium distribution is sharply peaked around the "
+"mean energy, and the system behaves as if it were isolated with a fixed "
+"energy."
 msgstr "这一性质对玻尔兹曼机很重要：当单元数量很大时，模型的平衡分布会在平均能量附近高度集中，系统的行为近似于一个具有固定能量的孤立系统。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:78
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:78
 msgid "The Boltzmann Distribution in Neural Networks"
 msgstr "神经网络中的玻尔兹曼分布"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:79
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:79
 #, python-brace-format
 msgid ""
 "Translating the physical expression into the language of neural networks "
@@ -303,87 +310,95 @@ msgid ""
 "binary units $\\mathbf{x} \\in \\{0,1\\}^N$ (or equivalently "
 "$\\{-1,+1\\}^N$), we absorb the Boltzmann constant into the temperature "
 "parameter and define the **energy function** $E_\\theta(\\mathbf{x})$ "
-"parameterized by biases $\\mathbf{b}$ and symmetric weights "
-"$\\mathbf{W}$:"
+"parameterized by biases $\\mathbf{b}$ and symmetric weights $\\mathbf{W}$:"
 msgstr ""
 "把物理表达式翻译成神经网络语言，只需要重新定义变量。对于一个包含二值单元 $\\mathbf{x} \\in \\{0,1\\}^N$（或等价地 "
 "$\\{-1,+1\\}^N$）的玻尔兹曼机，我们把玻尔兹曼常数吸收到温度参数中，并定义由偏置 $\\mathbf{b}$ 和对称权重 "
 "$\\mathbf{W}$ 参数化的 **能量函数** $E_\\theta(\\mathbf{x})$："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:81
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:81
 #, python-brace-format
 msgid ""
 "P_\\theta(\\mathbf{x}) = \\frac{1}{Z_\\theta} "
 "\\exp\\left(-E_\\theta(\\mathbf{x})\\right)"
 msgstr ""
+"P_\\theta(\\mathbf{x}) = \\frac{1}{Z_\\theta} "
+"\\exp\\left(-E_\\theta(\\mathbf{x})\\right)"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:83
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:83
 msgid "where the partition function becomes:"
 msgstr "其中配分函数变为："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:85
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:85
 msgid ""
 "Z_\\theta = \\sum_{\\tilde{\\mathbf{x}}} "
 "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
 msgstr ""
+"Z_\\theta = \\sum_{\\tilde{\\mathbf{x}}} "
+"\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:87
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:87
 msgid "and the energy is:"
 msgstr "能量为："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:89
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:89
 #, python-brace-format
 msgid "E_\\theta(\\mathbf{x}) = -\\sum_i b_i x_i - \\sum_{i<j} w_{ij} x_i x_j"
-msgstr ""
+msgstr "E_\\theta(\\mathbf{x}) = -\\sum_i b_i x_i - \\sum_{i<j} w_{ij} x_i x_j"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:91
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:91
 msgid ""
-"Here we have set $k_B T = 1$ for notational simplicity; the temperature "
-"can be reintroduced as a scaling factor on the energy or, equivalently, "
-"as an inverse temperature parameter $\\beta = 1/T$. In practice, the "
-"temperature is often treated as a hyperparameter controlling the "
-"stochasticity of sampling."
+"Here we have set $k_B T = 1$ for notational simplicity; the temperature can "
+"be reintroduced as a scaling factor on the energy or, equivalently, as an "
+"inverse temperature parameter $\\beta = 1/T$. In practice, the temperature "
+"is often treated as a hyperparameter controlling the stochasticity of "
+"sampling."
 msgstr ""
 "为了记号简洁，这里令 $k_B T = 1$；温度可以作为能量上的缩放因子重新引入，也可以等价地用逆温度参数 $\\beta = 1/T$ "
 "表示。实践中，温度通常被视为控制采样随机性的超参数。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:93
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:93
 msgid "The Meaning of Equilibrium in a Neural Context"
 msgstr "神经语境中的平衡含义"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:94
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:94
 #, python-brace-format
 msgid ""
 "When we say a Boltzmann machine samples from its **equilibrium "
-"distribution**, we mean that after running the stochastic update dynamics"
-" for a sufficiently long time, the probability of observing any "
-"particular configuration $\\mathbf{x}$ converges to "
-"$P_\\theta(\\mathbf{x})$. This property is guaranteed by the fact that "
-"the update rule satisfies **detailed balance,** a condition ensuring "
-"that, in equilibrium, the flow of probability from state $\\mathbf{x}$ to"
-" state $\\mathbf{x}'$ exactly balances the reverse flow:"
+"distribution**, we mean that after running the stochastic update dynamics "
+"for a sufficiently long time, the probability of observing any particular "
+"configuration $\\mathbf{x}$ converges to $P_\\theta(\\mathbf{x})$. This "
+"property is guaranteed by the fact that the update rule satisfies **detailed"
+" balance,** a condition ensuring that, in equilibrium, the flow of "
+"probability from state $\\mathbf{x}$ to state $\\mathbf{x}'$ exactly "
+"balances the reverse flow:"
 msgstr ""
-"当我们说玻尔兹曼机从其 **平衡分布** 中采样时，意思是：随机更新动力学运行足够长时间后，观测任意特定构型 $\\mathbf{x}$ "
-"的概率会收敛到 $P_\\theta(\\mathbf{x})$。这一性质由更新规则满足 **细致平衡** 来保证；细致平衡要求在平衡态下，从状态"
-" $\\mathbf{x}$ 流向状态 $\\mathbf{x}'$ 的概率流，恰好与反向概率流相抵消："
+"当我们说玻尔兹曼机从其 **平衡分布** 中采样时，意思是：随机更新动力学运行足够长时间后，观测任意特定构型 $\\mathbf{x}$ 的概率会收敛到"
+" $P_\\theta(\\mathbf{x})$。这一性质由更新规则满足 **细致平衡** 来保证；细致平衡要求在平衡态下，从状态 "
+"$\\mathbf{x}$ 流向状态 $\\mathbf{x}'$ 的概率流，恰好与反向概率流相抵消："
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:96
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:96
 #, python-brace-format
 msgid ""
 "P_\\theta(\\mathbf{x}) \\, P(\\mathbf{x} \\to \\mathbf{x}') = "
 "P_\\theta(\\mathbf{x}') \\, P(\\mathbf{x}' \\to \\mathbf{x})"
 msgstr ""
+"P_\\theta(\\mathbf{x}) \\, P(\\mathbf{x} \\to \\mathbf{x}') = "
+"P_\\theta(\\mathbf{x}') \\, P(\\mathbf{x}' \\to \\mathbf{x})"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:98
-msgid "The stochastic neuron update rule introduced earlier,"
-msgstr "前面引入的随机神经元更新规则："
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:98
+#, python-brace-format
+msgid ""
+"The stochastic neuron update rule introduced in Eq. {eq}`eq-stoch-update` "
+"(Section 1.1),"
+msgstr "第 1.1 节引入的随机神经元更新规则 (Eq. {eq}`eq-stoch-update`)，"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:100
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:100
 #, python-brace-format
 msgid "P(x_i = 1) = \\sigma\\left( \\sum_j w_{ij} x_j + b_i \\right)"
-msgstr ""
+msgstr "P(x_i = 1) = \\sigma\\left( \\sum_j w_{ij} x_j + b_i \\right)"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:102
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:102
 msgid ""
 "where $\\sigma(z) = 1/(1+\\exp(-z))$, is precisely designed to satisfy "
 "detailed balance with respect to the energy function $E_\\theta$. "
@@ -394,30 +409,30 @@ msgstr ""
 "其中 $\\sigma(z) = 1/(1+\\exp(-z))$，正是为了相对于能量函数 $E_\\theta$ "
 "满足细致平衡而设计的。因此，只要网络运行足够长，让它“遗忘”初始状态，它生成的构型就会按照 $P_\\theta$ 分布。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:104
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:104
 msgid "From Physics to Learning"
 msgstr "从物理到学习"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:105
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:105
 #, python-brace-format
 msgid ""
-"The Boltzmann distribution reframes the learning problem in probabilistic"
-" terms. Instead of asking \"how do we compute a function from inputs to "
-"outputs?\", we ask **\"how do we adjust the parameters** $\\theta$ **so "
-"that the equilibrium distribution** $P_\\theta$ **matches the empirical "
+"The Boltzmann distribution reframes the learning problem in probabilistic "
+"terms. Instead of asking \"how do we compute a function from inputs to "
+"outputs?\", we ask **\"how do we adjust the parameters** $\\theta$ **so that"
+" the equilibrium distribution** $P_\\theta$ **matches the empirical "
 "distribution of the observed data?\"** This shift in perspective is "
-"profound. The energy function $E_\\theta(\\mathbf{x})$ becomes a "
-"**scoring function**: data points that are typical of the training set "
-"should be assigned low energy (high probability), while atypical or "
-"impossible configurations should reside at high energy (low probability)."
-" Learning, then, consists of **sculpting the energy landscape** by "
-"adjusting the weights and biases so that the valleys of low energy "
-"coincide with regions of high data density."
+"profound. The energy function $E_\\theta(\\mathbf{x})$ becomes a **scoring "
+"function**: data points that are typical of the training set should be "
+"assigned low energy (high probability), while atypical or impossible "
+"configurations should reside at high energy (low probability). Learning, "
+"then, consists of **sculpting the energy landscape** by adjusting the "
+"weights and biases so that the valleys of low energy coincide with regions "
+"of high data density."
 msgstr ""
-"玻尔兹曼分布把学习问题重新表述为概率问题。我们不再问“如何从输入计算输出函数？”，而是问：**“如何调节参数 "
-"**$\\theta$**，使平衡分布 **$P_\\theta$** 匹配观测数据的经验分布？”**"
+"玻尔兹曼分布把学习问题重新表述为概率问题。我们不再问“如何从输入计算输出函数？”，而是问：**“如何调节参数 **$\\theta$**，使平衡分布 "
+"**$P_\\theta$** 匹配观测数据的经验分布？”**"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:107
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:107
 msgid ""
 "The challenge, as we shall see, lies in estimating how the partition "
 "function $Z_\\theta$ changes as we modify the parameters. Because "
@@ -426,49 +441,163 @@ msgid ""
 "measure, a study of how to circumvent this intractability through clever "
 "sampling techniques and architectural restrictions."
 msgstr ""
-"这种视角转变非常深刻。能量函数 $E_\\theta(\\mathbf{x})$ 变成一个 "
-"**评分函数**：训练集中典型的数据点应被赋予低能量（高概率），而不典型或不可能的构型应处于高能量（低概率）。因此，学习就是通过调整权重和偏置来 "
-"**雕塑能量景观**，使低能谷地与数据密度高的区域重合。"
+"正如我们即将看到的，挑战在于估计当我们修改参数时配分函数 $Z_\\theta$ 如何变化。由于 $Z_\\theta$ 依赖于所有 $2^N$ "
+"个状态，我们无法精确计算它或其梯度。本教程系列的其余部分，在很大程度上就是研究如何通过巧妙的采样技术和架构限制来绕开这种不可处理性。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:109
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:109
 msgid "Summary"
 msgstr "小结"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:110
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:110
 #, python-brace-format
 msgid ""
 "The **Boltzmann distribution** $P(\\mathbf{x}) \\propto "
-"\\exp(-E(\\mathbf{x})/T)$emerges naturally at thermal equilibrium and "
-"forms the probabilistic core of the Boltzmann machine."
+"\\exp(-E(\\mathbf{x})/T)$emerges naturally at thermal equilibrium and forms "
+"the probabilistic core of the Boltzmann machine."
 msgstr ""
 "**玻尔兹曼分布** $P(\\mathbf{x}) \\propto \\exp(-E(\\mathbf{x})/T)$ "
 "在热平衡中自然出现，并构成玻尔兹曼机的概率核心。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:111
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:111
 msgid ""
 "The **partition function** $Z$normalizes the distribution but requires "
 "summing over an exponential number of states, making exact computation "
 "infeasible for large systems."
 msgstr "**配分函数** $Z$ 对分布进行归一化，但需要对指数数量的状态求和，因此在大系统中无法精确计算。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:112
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:112
 msgid ""
 "In neural terms, **equilibrium** means the network's stochastic dynamics "
 "have converged to a stationary distribution defined by its weights and "
 "biases."
 msgstr "在神经网络语境中，**平衡** 意味着网络的随机动力学已经收敛到由权重和偏置定义的平稳分布。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:113
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:113
 msgid ""
 "Learning in a Boltzmann machine is equivalent to **energy landscape "
 "shaping**: lowering the energy of observed data configurations while "
 "implicitly raising the energy elsewhere."
 msgstr "玻尔兹曼机中的学习等价于 **塑造能量景观**：降低观测数据构型的能量，同时隐式提高其他区域的能量。"
 
-#: ../../source/theoretical-foundations-stat-boltzmann.md:114
+#: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md:114
 msgid ""
-"The intractability of $Z$ motivates the development of approximate "
-"inference and learning algorithms, which will be explored in subsequent "
-"sections."
+"The intractability of $Z$ motivates the development of approximate inference"
+" and learning algorithms, which will be explored in subsequent sections."
 msgstr "$Z$ 的不可处理性推动了近似推断和学习算法的发展，后续章节将继续讨论这些方法。"
 
+#~ msgid "The stochastic neuron update rule introduced earlier,"
+#~ msgstr "前面引入的随机神经元更新规则："
+
+#~ msgid "P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{x})}{k_B T}\\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\Omega_R(E_{\\text{total}} - E_i) = \\exp\\left[ k^{-1} "
+#~ "S_R(E_{\\text{total}} - E_i) \\right]"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "S_R(E_{\\text{total}} - E_i) \\approx S_R(E_{\\text{total}}) - \\left( "
+#~ "\\frac{\\partial S_R}{\\partial E} \\right) E_i = S_R(E_{\\text{total}}) - "
+#~ "\\frac{1}{T} E_i"
+#~ msgstr ""
+
+#~ msgid "\\frac{1}{T} = \\left( \\frac{\\partial S}{\\partial E} \\right)_{V,N}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P_i \\propto \\Omega_R(E_{\\text{total}} - E_i) \\propto \\exp\\left( "
+#~ "-\\frac{E_i}{k_B T} \\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Z = \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\sum_{\\tilde{\\mathbf{x}}} P(\\tilde{\\mathbf{x}}) = \\frac{1}{Z} "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right) = 1"
+#~ msgstr ""
+
+#~ msgid "\\frac{\\Delta E}{\\langle E \\rangle} \\propto \\frac{1}{\\sqrt{N}}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{x}) = \\frac{1}{Z_\\theta} "
+#~ "\\exp\\left(-E_\\theta(\\mathbf{x})\\right)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Z_\\theta = \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)"
+#~ msgstr ""
+
+#~ msgid "E_\\theta(\\mathbf{x}) = -\\sum_i b_i x_i - \\sum_{i<j} w_{ij} x_i x_j"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "P_\\theta(\\mathbf{x}) \\, P(\\mathbf{x} \\to \\mathbf{x}') = "
+#~ "P_\\theta(\\mathbf{x}') \\, P(\\mathbf{x}' \\to \\mathbf{x})"
+#~ msgstr ""
+
+#~ msgid "P(x_i = 1) = \\sigma\\left( \\sum_j w_{ij} x_j + b_i \\right)"
+#~ msgstr ""
+
+#~ msgid "$$P(\\mathbf{x}) = \\frac{1}{Z} \\exp\\left(-\\frac{E(\\mathbf{x})}{k_B T}\\right)$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$\\Omega_R(E_{\\text{total}} - E_i) = \\exp\\left[ k^{-1} "
+#~ "S_R(E_{\\text{total}} - E_i) \\right]$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$S_R(E_{\\text{total}} - E_i) \\approx S_R(E_{\\text{total}}) - \\left( "
+#~ "\\frac{\\partial S_R}{\\partial E} \\right) E_i = S_R(E_{\\text{total}}) - "
+#~ "\\frac{1}{T} E_i$$"
+#~ msgstr ""
+
+#~ msgid "$$\\frac{1}{T} = \\left( \\frac{\\partial S}{\\partial E} \\right)_{V,N}$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$P_i \\propto \\Omega_R(E_{\\text{total}} - E_i) \\propto \\exp\\left( "
+#~ "-\\frac{E_i}{k_B T} \\right)$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$Z = \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right)$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$\\sum_{\\tilde{\\mathbf{x}}} P(\\tilde{\\mathbf{x}}) = \\frac{1}{Z} "
+#~ "\\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-\\frac{E(\\tilde{\\mathbf{x}})}{k_B T}\\right) = 1$$"
+#~ msgstr ""
+
+#~ msgid "$$\\frac{\\Delta E}{\\langle E \\rangle} \\propto \\frac{1}{\\sqrt{N}}$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$P_\\theta(\\mathbf{x}) = \\frac{1}{Z_\\theta} "
+#~ "\\exp\\left(-E_\\theta(\\mathbf{x})\\right)$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$Z_\\theta = \\sum_{\\tilde{\\mathbf{x}}} "
+#~ "\\exp\\left(-E_\\theta(\\tilde{\\mathbf{x}})\\right)$$"
+#~ msgstr ""
+
+#~ msgid "$$E_\\theta(\\mathbf{x}) = -\\sum_i b_i x_i - \\sum_{i<j} w_{ij} x_i x_j$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$P_\\theta(\\mathbf{x}) \\, P(\\mathbf{x} \\to \\mathbf{x}') = "
+#~ "P_\\theta(\\mathbf{x}') \\, P(\\mathbf{x}' \\to \\mathbf{x})$$"
+#~ msgstr ""
+
+#~ msgid "$$P(x_i = 1) = \\sigma\\left( \\sum_j w_{ij} x_j + b_i \\right)$$"
+#~ msgstr ""

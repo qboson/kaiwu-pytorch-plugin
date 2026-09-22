@@ -7,29 +7,30 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-24 18:28+0800\n"
+"POT-Creation-Date: 2026-09-09 14:45+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../source/modules/kaiwu.torch_plugin.md:1
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/modules/kaiwu.torch_plugin.md:1
 msgid "模块手册"
 msgstr "模块手册"
 
-#: ../../source/modules/kaiwu.torch_plugin.md:3
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/modules/kaiwu.torch_plugin.md:3
 msgid "Module contents"
 msgstr "模块内容"
 
 #: kaiwu.torch_plugin:1 of
-msgid "Kaiwu-PyTorch-Plugin public API."
-msgstr "开物 PyTorch 插件公共 API。"
+msgid "玻尔兹曼机"
+msgstr "玻尔兹曼机"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:1
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:1
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:1
 #: of
 msgid "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
 msgstr "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.AbstractBoltzmannMachine`"
@@ -38,25 +39,33 @@ msgstr "基类：:py:class:`~kaiwu.torch_plugin.abstract_boltzmann_machine.Abstr
 msgid "Boltzmann Machine."
 msgstr "玻尔兹曼机。"
 
-#: ../../source/modules/kaiwu.torch_plugin.md
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/modules/kaiwu.torch_plugin.md
 msgid "参数"
-msgstr ""
+msgstr "参数"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:3 of
 msgid "Total number of nodes in the model."
 msgstr "模型中的节点总数。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:5 of
-msgid "Quadratic coefficient with shape ``[num_nodes, num_nodes]``."
-msgstr "形状为 ``[num_nodes, num_nodes]`` 的二次项系数。"
+msgid "quadratic coefficent,"
+msgstr "二次项系数"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:8 of
-msgid "linear bias, shape is [num_nodes]"
-msgstr "线性偏置，形状为 [num_nodes]。"
+msgid "shape is [num_nodes, num_nodes]"
+msgstr "形状为 [num_nodes, num_nodes]。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:10 of
-msgid "Device for tensor construction; uses CPU when ``None``."
-msgstr "用于构造张量的设备；为 ``None`` 时使用 CPU。"
+msgid ""
+"linear_bias (torch.FloatTensor, optional): linear bias, shape is "
+"[num_nodes]"
+msgstr "linear_bias（torch.FloatTensor，可选）：线性偏置，形状为 [num_nodes]。"
+
+#: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:12 of
+msgid ""
+"device (torch.device, optional): Device for tensor construction. If "
+"``None``, uses CPU."
+msgstr "device（torch.device，可选）：用于张量构建的设备。若为 ``None``，则使用 CPU。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.clip_parameters:1
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.clip_parameters:1
@@ -91,9 +100,9 @@ msgstr "用于从模型中采样的优化器。"
 msgid "State of the visible layer."
 msgstr "可见层状态。"
 
-#: ../../source/modules/kaiwu.torch_plugin.md
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/modules/kaiwu.torch_plugin.md
 msgid "返回"
-msgstr ""
+msgstr "返回"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.condition_sample:7
 #: of
@@ -102,12 +111,14 @@ msgid ""
 "``sample_params``)."
 msgstr "从模型中采样的自旋（形状由 ``sampler`` 和 ``sample_params`` 决定）。"
 
-#: ../../source/modules/kaiwu.torch_plugin.md
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/modules/kaiwu.torch_plugin.md
 msgid "返回类型"
-msgstr ""
+msgstr "返回类型"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:1
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:1
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.energy:1
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.forward:1
 #: of
 msgid "Compute the Hamiltonian."
 msgstr "计算哈密顿量。"
@@ -120,6 +131,8 @@ msgstr "形状为 (B, N) 的张量，其中 B 是批次大小，N 是模型中�
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine.forward:7
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:7
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.energy:10
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.forward:7
 #: of
 msgid "Hamiltonian of shape (B,)."
 msgstr "形状为 (B,) 的哈密顿量。"
@@ -163,328 +176,374 @@ msgstr "获取可见层偏置。"
 msgid "Number of visible nodes."
 msgstr "可见节点数。"
 
-#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel:1
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:1 of
-msgid "基类：:py:class:`~torch.nn.modules.module.Module`"
-msgstr "基类：:py:class:`~torch.nn.modules.module.Module`"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:1
+#: of
+msgid "Create a Gaussian-Bernoulli Restricted Boltzmann Machine."
+msgstr "创建高斯-伯努利受限玻尔兹曼机。"
 
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel:1 of
-msgid "Energy-side model interface used by QDiffusion candidate scoring."
-msgstr "用于 QDiffusion 候选项评分的能量侧模型接口。"
-
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel.discretize_visible_state:1 of
-msgid "Converts visible logits into normalized BM visible conditions."
-msgstr "将可见层 logits 转换为归一化的玻尔兹曼机可见层条件。"
-
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel.forward:1 of
-msgid "Runs conditioned energy scoring through the PyTorch module API."
-msgstr "通过 PyTorch 模块 API 执行条件能量评分。"
-
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel.get_last_stats:1 of
-msgid "Returns lightweight sampler diagnostics from the last score call."
-msgstr "返回上一次评分调用的轻量级采样器诊断信息。"
-
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel.sample_hidden_state:1 of
-msgid "Samples BM hidden states for each visible assignment."
-msgstr "为每个可见层赋值采样玻尔兹曼机隐藏层状态。"
-
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel.score_conditioned:1 of
-msgid "Scores candidates conditioned on noisy tokens."
-msgstr "对以噪声 token 为条件的候选项进行评分。"
-
-#: kaiwu.torch_plugin.qdiffusion.EnergyModel.score_visible_logits:1 of
-msgid "Scores visible logits under the conditioned BM energy model."
-msgstr "在条件玻尔兹曼机能量模型下对可见层 logits 进行评分。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:1 of
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:3
+#: of
 msgid ""
-"Energy-guided discrete diffusion wrapper over generic sequence backbones."
-" Initializes a QDiffusion model."
-msgstr "基于通用序列骨干网络的能量引导离散扩散封装。初始化 QDiffusion 模型。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:4 of
-msgid "The class combines two backbone roles:"
-msgstr "该类组合了两种骨干网络角色："
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:6 of
-msgid "a proposal model that predicts token logits for the current noisy state"
-msgstr "预测当前噪声状态 token logits 的提议模型"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:7 of
-msgid "an energy model that reranks candidate reconstructions"
-msgstr "对候选重建结果重新排序的能量模型"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:9 of
-msgid ""
-"It exposes both training-oriented APIs such as ``objective`` and "
-"decoding-oriented APIs such as ``initialize_state``, ``step``, and "
-"``generate``."
+"A Gaussian-Bernoulli Restricted Boltzmann Machine has one Gaussian "
+"partition and one Bernoulli partition. ``is_visible_gaussian`` indicates "
+"whether the visible nodes correspond to the Gaussian side."
 msgstr ""
-"该类同时提供面向训练的 API，例如 ``objective``；也提供面向解码的 API，例如 "
-"``initialize_state``、``step`` 和 ``generate``。"
+"高斯-伯努利受限玻尔兹曼机（Gaussian-Bernoulli "
+"RBM）包含一个高斯分区和一个伯努利分区。``is_visible_gaussian`` 指示可见节点是否对应高斯一侧。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:13 of
-msgid "Backbone used to predict proposal logits."
-msgstr "用于预测提议 logits 的骨干网络。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:7
+#: of
+msgid "Number of visible nodes in the model."
+msgstr "模型中的可见节点数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:14 of
-msgid "Energy-side model used to encode and score candidates."
-msgstr "用于编码和评估候选项的能量侧模型。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:5
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:9
+#: of
+msgid "Number of hidden nodes in the model."
+msgstr "模型中的隐藏节点数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:15 of
-msgid "Special-token metadata required by the generator."
-msgstr "生成器所需的特殊 token 元数据。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:11
+#: of
+msgid ""
+"Whether visible nodes are Gaussian and hidden nodes are Bernoulli. "
+"Defaults to True."
+msgstr "可见节点是否为高斯分布、隐节点是否为伯努利分布。默认为 True。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:16 of
-msgid "Optional generation/training configuration."
-msgstr "可选的生成/训练配置。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:14
+#: of
+msgid "Small value to avoid numerical issues. Defaults to 1e-8."
+msgstr "用于避免数值问题的小值。默认为 1e-8。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:17 of
-msgid "Floating point dtype tracked by the wrapper."
-msgstr "封装器跟踪的浮点数据类型。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:17
+#: of
+msgid "Data type for tensor construction. Defaults to torch.float32."
+msgstr "张量构建的数据类型。默认为 torch.float32。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:18 of
-msgid "Optional target device. When omitted, infer from parameters."
-msgstr "可选的目标设备；省略时从参数中推断。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:12
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine:20
+#: of
+msgid "Device to construct tensors."
+msgstr "用于构造张量的设备。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion:19 of
-msgid "Whether to freeze proposal model parameters."
-msgstr "是否冻结提议模型参数。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:1
+#: of
+msgid "Perform contrastive divergence Gibbs sampling."
+msgstr "执行对比散度（CD）Gibbs 采样。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:1 of
-msgid "Scores candidate reconstructions conditioned on the noisy state."
-msgstr "对以噪声状态为条件的候选重建结果进行评分。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:3
+#: of
+msgid "Number of Gibbs sampling steps to perform."
+msgstr "要执行的 Gibbs 采样步数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:3 of
-msgid "Noisy token tensor used as conditioning input."
-msgstr "用作条件输入的噪声 token 张量。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:5
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:5
+#: of
+msgid "Number of initial steps to discard."
+msgstr "需要丢弃的初始步数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:4 of
-msgid "Candidate clean token tensor to score."
-msgstr "待评估的候选干净 token 张量。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:7
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.conditional_gibbs_sample:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_gaussian:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.marginal_energy:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.positive_phase_energy_expectation:3
+#: of
+msgid "State of Gaussian nodes."
+msgstr "高斯节点的状态。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:5 of
-msgid "Optional attention mask for the energy model."
-msgstr "能量模型的可选注意力掩码。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:9
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.conditional_gibbs_sample:5
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_bernoulli:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.marginal_energy:5
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.positive_phase_energy_expectation:5
+#: of
+msgid "State of Bernoulli nodes."
+msgstr "伯努利节点的状态。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.energy:7 of
-msgid "A tensor of scalar energies with shape ``[batch, 1]``."
-msgstr "形状为 ``[batch, 1]`` 的标量能量张量。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:12
+#: of
+msgid "Samples generated through CD Gibbs sampling."
+msgstr "通过 CD Gibbs 采样生成的样本。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:1 of
-msgid "Runs the proposal model on the current noisy state."
-msgstr "在当前噪声状态上运行提议模型。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:3
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:3 of
-msgid "Current noisy token tensor."
-msgstr "当前的噪声 token 张量。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:4
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:4 of
-msgid "Additional keyword arguments forwarded to the proposal model."
-msgstr "转发给提议模型的附加关键字参数。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:6
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:6 of
-msgid "Proposal logits over the token vocabulary."
-msgstr "token 词表上的提议 logits。"
-
-#: ../../source/modules/kaiwu.torch_plugin.md
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/modules/kaiwu.torch_plugin.md
 msgid "抛出"
-msgstr ""
+msgstr "抛出"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.forward:9 of
-msgid "If the proposal model does not implement ``forward``."
-msgstr "当提议模型未实现 ``forward`` 时。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:1 of
-msgid "Runs a complete iterative decoding loop inside the core class."
-msgstr "在核心类中运行完整的迭代解码循环。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:3
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:3 of
-msgid "Initial token tensor."
-msgstr "初始 token 张量。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:4 of
-msgid "Number of decode iterations to run."
-msgstr "要执行的解码迭代次数。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:5
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:4
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:4 of
-msgid "Optional boolean mask of fixed positions."
-msgstr "固定位置的可选布尔掩码。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:6 of
-msgid "Sampling temperature stored in the decode state."
-msgstr "存储在解码状态中的采样温度。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:7 of
-msgid "Whether to return the full final state dictionary."
-msgstr "是否返回完整的最终状态字典。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.generate:9 of
-msgid "Either the final token tensor or the full decode state."
-msgstr "最终 token 张量或完整解码状态。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:1 of
-msgid "Returns a boolean mask of editable non-special-token positions."
-msgstr "返回可编辑非特殊 token 位置的布尔掩码。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:3 of
-msgid "Token tensor to inspect."
-msgstr "待检查的 token 张量。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:4 of
-msgid "Optional boolean mask of positions that should remain fixed."
-msgstr "应保持固定位置的可选布尔掩码。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.get_non_special_symbol_mask:6 of
-msgid "A boolean mask where ``True`` marks editable non-special positions."
-msgstr "布尔掩码，其中 ``True`` 表示可编辑的非特殊位置。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:1 of
-msgid "Creates the initial decoding state for an external generation loop."
-msgstr "为外部生成循环创建初始解码状态。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:5 of
-msgid "Planned number of decode iterations."
-msgstr "计划执行的解码迭代次数。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:6 of
-msgid "Sampling temperature stored in the state payload."
-msgstr "存储在状态载荷中的采样温度。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.initialize_state:8 of
-msgid "A mutable state dictionary suitable for repeated ``step`` calls."
-msgstr "适用于重复调用 ``step`` 的可变状态字典。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:1 of
-msgid "Builds the one-step training objective used by an external loop."
-msgstr "构建外部循环使用的单步训练目标。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:3 of
-msgid "Batch dictionary containing at least ``batch[\"targets\"]``."
-msgstr "至少包含 ``batch[\"targets\"]`` 的批次字典。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:4 of
-msgid "Per-sample timestep weighting mode."
-msgstr "逐样本时间步加权模式。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.objective:6 of
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.cd_gibbs_sample:15
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.conditional_gibbs_sample:14
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.positive_phase_energy_expectation:14
+#: of
 msgid ""
-"A dictionary containing proposal logits, supervision masks, loss weights,"
-" and the EBM objective term."
-msgstr "包含提议 logits、监督掩码、损失权重和 EBM 目标项的字典。"
+"If neither or both of s_gaussian and s_bernoulli are provided,     or if "
+"input tensors have incorrect shapes."
+msgstr "如果 s_gaussian 和 s_bernoulli 均未提供或同时提供，或输入张量形状不正确。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.proposal:1 of
-msgid "Semantic alias around ``forward`` for proposal-side calls."
-msgstr "``forward`` 的语义别名，用于提议侧调用。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.conditional_gibbs_sample:1
+#: of
+msgid ""
+"Perform conditional Gibbs sampling given either Gaussian or Bernoulli "
+"nodes."
+msgstr "在给定高斯节点或伯努利节点的条件下执行条件 Gibbs 采样。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:1 of
-msgid "Runs one denoising/reranking step and returns updated state."
-msgstr "执行一步去噪/重排序并返回更新后的状态。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.conditional_gibbs_sample:7
+#: of
+msgid "Whether to use deterministic sampling. Defaults to False."
+msgstr "是否使用确定性采样。默认为 False。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:3 of
-msgid "Current decode state created by ``initialize_state``."
-msgstr "由 ``initialize_state`` 创建的当前解码状态。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.conditional_gibbs_sample:11
+#: of
+msgid "Samples with fixed nodes and sampled complementary nodes."
+msgstr "包含固定节点与采样的互补节点的样本。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.step:6 of
-msgid "The updated decode state after one iteration."
-msgstr "一次迭代后更新的解码状态。"
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.diag_precision:1
+#: of
+msgid "Diagonal precision matrix (inverse variance)."
+msgstr "对角精度矩阵（方差的倒数）。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:1 of
-msgid "Moves the module and refreshes cached device/dtype metadata."
-msgstr "移动模块并刷新缓存的设备和 dtype 元数据。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:3 of
-msgid "Positional arguments forwarded to ``nn.Module.to``."
-msgstr "转发给 ``nn.Module.to`` 的位置参数。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:4 of
-msgid "Keyword arguments forwarded to ``nn.Module.to``."
-msgstr "转发给 ``nn.Module.to`` 的关键字参数。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusion.to:6 of
-msgid "The moved module instance."
-msgstr "移动后的模块实例。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:1 of
-msgid "基类：:py:class:`object`"
-msgstr "基类：:py:class:`object`"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:1 of
-msgid "Configuration for energy-guided discrete generation."
-msgstr "能量引导离散生成的配置。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:5 of
-msgid "Number of discrete noising steps used by the training objective."
-msgstr "训练目标使用的离散加噪步数。"
-
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig of
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.diag_precision
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.std
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.var of
 msgid "type"
 msgstr "类型"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:8
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:20 of
-msgid "int"
-msgstr ""
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.diag_precision:3
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.std:3
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.var:3 of
+msgid "torch.tensor"
+msgstr "torch.tensor"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:12 of
-msgid "Whether to use the coupled corruption variant."
-msgstr "是否使用耦合的加噪变体。"
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.energy:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.forward:3
+#: of
+msgid ""
+"Tensor of shape (B, N), where B is the batch size, and N is the number of"
+" variables in the model."
+msgstr "形状为 (B, N) 的张量，其中 B 是批次大小，N 是模型中的变量数。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:14
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:45 of
-msgid "bool"
-msgstr ""
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.energy:6
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:27
+#: of
+msgid "Whether to enable gradient computation. Defaults to False."
+msgstr "是否启用梯度计算。默认为 False。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:18 of
-msgid "Number of proposal candidates sampled at each decode step."
-msgstr "每个解码步骤采样的提议候选项数量。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.energy:13
+#: of
+msgid "If s_all is not a 2-D tensor or has inconsistent node numbers."
+msgstr "如果 s_all 不是二维张量或节点数量不一致。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:24 of
-msgid "Temperature used for proposal-side sampling."
-msgstr "提议侧采样使用的温度。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:1
+#: of
+msgid "Perform Gibbs sampling for the Gaussian-Bernoulli RBM."
+msgstr "为高斯-伯努利 RBM 执行 Gibbs 采样。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:26
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:32
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:39
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:51
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:57 of
-msgid "float"
-msgstr ""
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:7
+#: of
+msgid "Whether to start with Gaussian or Bernoulli nodes."
+msgstr "是否从高斯节点或伯努利节点开始。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:30 of
-msgid "Gumbel noise scale used during proposal sampling."
-msgstr "提议采样期间使用的 Gumbel 噪声尺度。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:9
+#: of
+msgid "External sampler for initialization if provided."
+msgstr "用于初始化的外部采样器（如果提供）。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:36 of
-msgid "Temperature used when converting energies into reranking weights."
-msgstr "将能量转换为重排序权重时使用的温度。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:11
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:25
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:25
+#: of
+msgid "Number of samples to generate."
+msgstr "要生成的样本数量。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:43 of
-msgid "Whether to disable repetition-collapse resampling."
-msgstr "是否禁用重复坍缩重采样。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:14
+#: of
+msgid "Samples generated through Gibbs sampling."
+msgstr "通过 Gibbs 采样生成的样本。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:49 of
-msgid "Frequency threshold that triggers resampling."
-msgstr "触发重采样的频率阈值。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample:17
+#: of
+msgid "If starting conditions are invalid."
+msgstr "如果起始条件无效。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:55 of
-msgid "Top-p cutoff used during resampling."
-msgstr "重采样期间使用的 Top-p 截止值。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_bernoulli:1
+#: of
+msgid "Sample according to given Bernoulli nodes."
+msgstr "根据给定的伯努利节点采样。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:61 of
-msgid "Skeptical-remasking strategy string."
-msgstr "怀疑式重新掩码策略字符串。"
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_bernoulli:5
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_gaussian:8
+#: of
+msgid ""
+"If True return optimal results, else return results with randomness. "
+"Defaults to False."
+msgstr "若为 True 返回最优结果，否则返回带随机性的结果。默认为 False。"
 
-#: kaiwu.torch_plugin.qdiffusion.QDiffusionConfig:63 of
-msgid "str"
-msgstr ""
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_bernoulli:9
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_gaussian:12
+#: of
+msgid "Complete state tensor with both Gaussian and Bernoulli nodes."
+msgstr "同时包含高斯节点与伯努利节点的完整状态张量。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_bernoulli:12
+#: of
+msgid "If s_bernoulli is not a 2-D tensor or has inconsistent node numbers."
+msgstr "如果 s_bernoulli 不是二维张量或节点数量不一致。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_gaussian:1
+#: of
+msgid "Sample according to given Gaussian nodes."
+msgstr "根据给定的高斯节点采样。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_gaussian:5
+#: of
+msgid "If True return 0/1, else return probability. Defaults to True."
+msgstr "若为 True 返回 0/1，否则返回概率。默认为 True。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.infer_from_gaussian:15
+#: of
+msgid "If s_gaussian is not a 2-D tensor or has inconsistent node numbers."
+msgstr "如果 s_gaussian 不是二维张量或节点数量不一致。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.init_parameter:1
+#: of
+msgid "Initialize model parameters with normal distribution."
+msgstr "使用正态分布初始化模型参数。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.init_parameter:3
+#: of
+msgid "Initial variance for Gaussian units. Defaults to 1."
+msgstr "高斯单元的初始方差。默认为 1。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.init_parameter:6
+#: of
+msgid "Standard deviation for parameter initialization. Defaults to 0.01."
+msgstr "参数初始化的标准差。默认为 0.01。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.init_parameter:9
+#: of
+msgid "Maximum factor for clipping parameters. Defaults to 16."
+msgstr "参数裁剪的最大因子。默认为 16。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.marginal_energy:1
+#: of
+msgid "Compute the Free Hamiltonian of given Gaussian or Bernoulli nodes."
+msgstr "计算给定高斯节点或伯努利节点的自由哈密顿量。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.marginal_energy:8
+#: of
+msgid "Free Hamiltonian of given Gaussian or Bernoulli nodes."
+msgstr "给定高斯节点或伯努利节点的自由哈密顿量。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.marginal_energy:11
+#: of
+msgid ""
+"If neither or both of s_gaussian and s_bernoulli are provided,     or if "
+"the input tensors have incorrect shapes."
+msgstr "如果 s_gaussian 和 s_bernoulli 均未提供或同时提供，或输入张量形状不正确。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.positive_phase_energy_expectation:1
+#: of
+msgid ""
+"Compute the expectation of Hamiltonian with given Gaussian or Bernoulli "
+"nodes."
+msgstr "计算给定高斯节点或伯努利节点的哈密顿量期望。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.positive_phase_energy_expectation:7
+#: of
+msgid "Whether to enable gradient computation. Defaults to True."
+msgstr "是否启用梯度计算。默认为 True。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.positive_phase_energy_expectation:11
+#: of
+msgid "Expected Hamiltonian values."
+msgstr "期望的哈密顿量值。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:1
+#: of
+msgid "General sampling method supporting different sampling strategies."
+msgstr "支持不同采样策略的通用采样方法。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:3
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:3
+#: of
+msgid "External sampler for customized sampling."
+msgstr "用于自定义采样的外部采样器。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:5
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:5
+#: of
+msgid ""
+"Sampling mode ('gibbs' or 'customized'). Defaults to ``\"gibbs\"`` when "
+"omitted."
+msgstr "采样模式（'gibbs' 或 'customized'）。省略时默认为 ``\"gibbs\"``。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:8
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:8
+#: of
+msgid ""
+"Purpose of sampling ('general', 'conditional' or 'cd'). Defaults to "
+"\"general\"."
+msgstr "采样目的（'general'、'conditional' 或 'cd'）。默认为 \"general\"。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:11
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:11
+#: of
+msgid "Number of Gibbs steps if using Gibbs sampling."
+msgstr "使用 Gibbs 采样时的采样步数。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:14
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:14
+#: of
+msgid "Number of burn-in steps if using Gibbs sampling."
+msgstr "使用 Gibbs 采样时的预热（burn-in）步数。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:17
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:17
+#: of
+msgid "Whether to start with Gaussian nodes."
+msgstr "是否从高斯节点开始。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:19
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:19
+#: of
+msgid "Gaussian nodes state for conditional sampling."
+msgstr "条件采样时的高斯节点状态。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:22
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:22
+#: of
+msgid "Bernoulli nodes state for conditional sampling."
+msgstr "条件采样时的伯努利节点状态。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:28
+#: of
+msgid "Generated samples."
+msgstr "生成的样本。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sample:31
+#: of
+msgid ""
+"If invalid sampling mode/purpose is provided or required     parameters "
+"are missing."
+msgstr "如果提供了无效的采样模式/目的，或缺少所需参数。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:1
+#: of
+msgid "Compute energy of samples generated by specified sampling strategy."
+msgstr "计算由指定采样策略生成的样本的能量。"
+
+#: kaiwu.torch_plugin.restricted_gaussian_bernoulli_boltzmann_machine.GaussianBernoulliRestrictedBoltzmannMachine.sampling_energy:31
+#: of
+msgid "Energy values of the generated samples."
+msgstr "生成样本的能量值。"
+
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.std:1 of
+msgid "Standard deviation of Gaussian units."
+msgstr "高斯单元的标准差。"
+
+#: kaiwu.torch_plugin.GaussianBernoulliRestrictedBoltzmannMachine.var:1 of
+msgid "Variance of Gaussian units, clipped to avoid numerical issues."
+msgstr "高斯单元的方差，经过裁剪以避免数值问题。"
 
 #: kaiwu.torch_plugin.qvae.QVAE:1 of
 msgid "基类：:py:class:`~kaiwu.torch_plugin.qvae.AutoEncoderBase`"
@@ -505,32 +564,41 @@ msgstr "隐藏层的激活函数。"
 #: kaiwu.torch_plugin.qvae.QVAE:7 of
 #, 
 msgid ""
-"Configuration with ``num_latent_units`` (int), ``loss_type`` "
-"(``'bernoulli'`` or ``'mse'``), ``dist_beta`` (float), ``kl_beta`` "
-"(float), and ``weight_decay`` (float)."
-msgstr "包含 ``num_latent_units``（int）、``loss_type``（``'bernoulli'`` 或 ``'mse'``）、``dist_beta``（float）、``kl_beta``（float）和 ``weight_decay``（float）的配置对象。"
-
-#: kaiwu.torch_plugin.qvae.QVAE:11 of
-msgid "Pre-created encoder. Created by the subclass factory when omitted."
-msgstr "预先创建的编码器。未提供时由子类工厂创建。"
+"Configuration object containing: - num_latent_units (int) - loss_type "
+"(str): 'bernoulli' or 'mse' - dist_beta (float, default=10.0) - kl_beta "
+"(float, default=1e-6) - weight_decay (float, default=0.01)"
+msgstr ""
+"配置对象，包含：- num_latent_units（int）- loss_type（str）：'bernoulli' 或 'mse'- "
+"dist_beta（float，默认 10.0）- kl_beta（float，默认 1e-6）- weight_decay（float，默认 "
+"0.01）"
 
 #: kaiwu.torch_plugin.qvae.QVAE:14 of
-msgid "Pre-created decoder. Created by the subclass factory when omitted."
-msgstr "预先创建的解码器。未提供时由子类工厂创建。"
-
-#: kaiwu.torch_plugin.qvae.QVAE:17 of
-msgid ""
-"Pre-created Boltzmann machine. Created by the subclass factory when "
-"omitted."
-msgstr "预先创建的玻尔兹曼机。未提供时由子类工厂创建。"
-
-#: kaiwu.torch_plugin.qvae.QVAE:20 of
-msgid "Pre-created sampler. Created by the subclass factory when omitted."
-msgstr "预先创建的采样器。未提供时由子类工厂创建。"
-
-#: kaiwu.torch_plugin.qvae.QVAE:23 of
 msgid "Type of sampler for BM ('sa' or 'cim')."
 msgstr "BM 的采样器类型（``sa`` 或 ``cim``）。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:16 of
+msgid "Number of batches for conditional decoding (0 = no conditioning)."
+msgstr "条件解码的批次数（0 = 无条件约束）。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:18 of
+msgid "Pre-created Boltzmann Machine."
+msgstr "预先创建的玻尔兹曼机。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:20 of
+msgid "Pre-created encoder."
+msgstr "预先创建的编码器。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:22 of
+msgid "Pre-created decoder."
+msgstr "预先创建的解码器。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:24 of
+msgid "Pre-created sampler."
+msgstr "预先创建的采样器。"
+
+#: kaiwu.torch_plugin.qvae.QVAE:26 of
+msgid "Additional keyword arguments for AutoEncoderBase."
+msgstr "传递给 AutoEncoderBase 的其他关键字参数。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.bm_loss:1 of
 msgid "Compute BM loss for updating BM parameters separately."
@@ -551,26 +619,12 @@ msgid "BM loss scalar."
 msgstr "BM 损失标量。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.create_networks:1 of
-msgid "Create components that were not supplied to the constructor."
-msgstr "创建未提供给构造函数的组件。"
+msgid "Create encoder, decoder, BM and sampler. Subclasses must override."
+msgstr "创建编码器、解码器、BM 和采样器。子类必须重写该方法。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.energy:1 of
-msgid "Compute the Boltzmann-machine energy for each input sample."
-msgstr "计算每个输入样本的玻尔兹曼机能量。"
-
-#: kaiwu.torch_plugin.qvae.QVAE.energy:3 of
-msgid "Input samples with the input feature dimension."
-msgstr "具有输入特征维度的输入样本。"
-
-#: kaiwu.torch_plugin.qvae.QVAE.energy:5 of
-msgid ""
-"Loss type to validate against the model configuration. Defaults to the "
-"configured loss type."
-msgstr "用于与模型配置进行校验的损失类型。默认使用配置的损失类型。"
-
-#: kaiwu.torch_plugin.qvae.QVAE.energy:9 of
-msgid "One energy value per input sample."
-msgstr "每个输入样本对应一个能量值。"
+msgid "计算 BM 能量（用于评估）"
+msgstr "计算 BM 能量（用于评估）"
 
 #: kaiwu.torch_plugin.qvae.QVAE.forward:1 of
 msgid "Forward pass through the QVAE."
@@ -580,11 +634,20 @@ msgstr "执行 QVAE 的前向传播。"
 msgid "Input tensor of shape (batch_size, input_dim)."
 msgstr "形状为 (batch_size, input_dim) 的输入张量。"
 
-#: kaiwu.torch_plugin.qvae.QVAE.forward:6 of
+#: kaiwu.torch_plugin.qvae.QVAE.forward:5 of
+msgid "Batch indices for conditional decoding. Required if n_batches > 0."
+msgstr "条件解码的批次索引。当 n_batches > 0 时必填。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:9 of
 msgid ""
-"Reconstructed logits, posterior distribution, encoder logits,     and "
-"reparameterized latent sample."
-msgstr "重建 logits、后验分布、编码器 logits 和重参数化的潜变量样本。"
+"(recon_x, posterior, q, zeta)     - recon_x: Reconstructed logits "
+"(batch_size, input_dim)     - posterior: Posterior distribution object "
+"(MixtureGeneric)     - q: Encoder output logits (batch_size, latent_dim)"
+"     - zeta: Reparameterized latent sample (batch_size, latent_dim)"
+msgstr ""
+"(recon_x, posterior, q, zeta)     - recon_x：重构的逻辑值（batch_size, input_dim）"
+"     - posterior：后验分布对象（MixtureGeneric）     - q：编码器输出的逻辑值（batch_size, "
+"latent_dim）     - zeta：重参数化的潜变量样本（batch_size, latent_dim）"
 
 #: kaiwu.torch_plugin.qvae.QVAE.loss:1 of
 msgid "Compute total loss (reconstruction + KL + weight decay)."
@@ -631,8 +694,12 @@ msgid "Mixture parameter for MixtureGeneric."
 msgstr "MixtureGeneric 的混合参数。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.posterior:8 of
-msgid "Posterior distribution and reparameterized latent sample."
-msgstr "后验分布和重参数化的潜变量样本。"
+msgid ""
+"(posterior_dist, zeta)     - posterior_dist: MixtureGeneric object     - "
+"zeta: Reparameterized sample (batch_size, latent_dim)"
+msgstr ""
+"(posterior_dist, zeta)     - posterior_dist：MixtureGeneric 对象     - "
+"zeta：重参数化样本（batch_size, latent_dim）"
 
 #: kaiwu.torch_plugin.qvae.QVAE.set_train_bias:1 of
 msgid "Compute train bias from dataset mean for Bernoulli reconstruction."
@@ -643,16 +710,6 @@ msgstr "根据数据集均值计算伯努利重建的训练偏置。"
 msgid "Create a Restricted Boltzmann Machine."
 msgstr "创建受限玻尔兹曼机。"
 
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:3
-#: of
-msgid "Number of visible nodes in the model."
-msgstr "模型中的可见节点数。"
-
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:5
-#: of
-msgid "Number of hidden nodes in the model."
-msgstr "模型中的隐藏节点数。"
-
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:7
 #: of
 msgid "quadratic coefficent, shape is [num_visible, num_hidden]"
@@ -662,18 +719,6 @@ msgstr "二次项系数，形状为 [num_visible, num_hidden]。"
 #: of
 msgid "linear bias, shape is [num_hidden]"
 msgstr "线性偏置，形状为 [num_hidden]。"
-
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:12
-#: of
-msgid "Device to construct tensors."
-msgstr "用于构造张量的设备。"
-
-#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.forward:3
-#: of
-msgid ""
-"Tensor of shape (B, N), where B is the batch size, and N is the number of"
-" variables in the model."
-msgstr "形状为 (B, N) 的张量，其中 B 是批次大小，N 是模型中的变量数。"
 
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.get_hidden:1
 #: of
@@ -695,6 +740,11 @@ msgstr "是否允许梯度反向传播。"
 msgid "Propagate hidden spins to the visible layer."
 msgstr "将隐藏层自旋传播到可见层。"
 
+#: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine.gibbs_step_with_grad:1
+#: of
+msgid "可微分Gibbs采样，输入为可见层概率（batch, num_visible），进行k步交替采样， 最后一步保留梯度至概率分布（STE）。"
+msgstr "可微分Gibbs采样，输入为可见层概率（batch, num_visible），进行k步交替采样， 最后一步保留梯度至概率分布（STE）。"
+
 #: kaiwu.torch_plugin.RestrictedBoltzmannMachine.hidden_bias:1 of
 msgid "Return the hidden bias."
 msgstr "返回隐藏层偏置。"
@@ -702,6 +752,10 @@ msgstr "返回隐藏层偏置。"
 #: kaiwu.torch_plugin.RestrictedBoltzmannMachine.visible_bias:1 of
 msgid "Return the visible bias."
 msgstr "返回可见层偏置。"
+
+#: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1 of
+msgid "基类：:py:class:`~torch.nn.modules.module.Module`"
+msgstr "基类：:py:class:`~torch.nn.modules.module.Module`"
 
 #: kaiwu.torch_plugin.dbn.UnsupervisedDBN:1 of
 msgid "A general unsupervised Deep Belief Network (DBN) architecture."
@@ -831,15 +885,323 @@ msgstr "兼容 sklearn 的 transform 方法。"
 msgid "The transformed data."
 msgstr "转换后的数据。"
 
-#: kaiwu.torch_plugin.usage_stats.disable_usage_stats:1 of
-msgid "Disable kpp usage statistics. No data will be reported after disabling."
-msgstr "禁用 kpp 使用情况统计。禁用后不会上报任何数据。"
+#~ msgid "Kaiwu-PyTorch-Plugin public API."
+#~ msgstr "开物 PyTorch 插件公共 API。"
 
-#: kaiwu.torch_plugin.usage_stats.enable_usage_stats:1 of
-msgid "Enable kpp usage statistics (enabled by default; usually not needed)."
-msgstr "启用 kpp 使用情况统计（默认启用，通常无需调用）。"
+#~ msgid "Quadratic coefficient with shape ``[num_nodes, num_nodes]``."
+#~ msgstr "形状为 ``[num_nodes, num_nodes]`` 的二次项系数。"
 
-#: kaiwu.torch_plugin.usage_stats.is_usage_stats_enabled:1 of
-msgid "Return whether usage statistics are currently enabled."
-msgstr "返回当前是否已启用使用情况统计。"
+#~ msgid "Device for tensor construction; uses CPU when ``None``."
+#~ msgstr "用于构造张量的设备；为 ``None`` 时使用 CPU。"
+
+#~ msgid "Energy-side model interface used by QDiffusion candidate scoring."
+#~ msgstr "用于 QDiffusion 候选项评分的能量侧模型接口。"
+
+#~ msgid "Converts visible logits into normalized BM visible conditions."
+#~ msgstr "将可见层 logits 转换为归一化的玻尔兹曼机可见层条件。"
+
+#~ msgid "Runs conditioned energy scoring through the PyTorch module API."
+#~ msgstr "通过 PyTorch 模块 API 执行条件能量评分。"
+
+#~ msgid "Returns lightweight sampler diagnostics from the last score call."
+#~ msgstr "返回上一次评分调用的轻量级采样器诊断信息。"
+
+#~ msgid "Samples BM hidden states for each visible assignment."
+#~ msgstr "为每个可见层赋值采样玻尔兹曼机隐藏层状态。"
+
+#~ msgid "Scores candidates conditioned on noisy tokens."
+#~ msgstr "对以噪声 token 为条件的候选项进行评分。"
+
+#~ msgid "Scores visible logits under the conditioned BM energy model."
+#~ msgstr "在条件玻尔兹曼机能量模型下对可见层 logits 进行评分。"
+
+#~ msgid ""
+#~ "Energy-guided discrete diffusion wrapper "
+#~ "over generic sequence backbones. Initializes"
+#~ " a QDiffusion model."
+#~ msgstr "基于通用序列骨干网络的能量引导离散扩散封装。初始化 QDiffusion 模型。"
+
+#~ msgid "The class combines two backbone roles:"
+#~ msgstr "该类组合了两种骨干网络角色："
+
+#~ msgid "a proposal model that predicts token logits for the current noisy state"
+#~ msgstr "预测当前噪声状态 token logits 的提议模型"
+
+#~ msgid "an energy model that reranks candidate reconstructions"
+#~ msgstr "对候选重建结果重新排序的能量模型"
+
+#~ msgid ""
+#~ "It exposes both training-oriented APIs"
+#~ " such as ``objective`` and decoding-"
+#~ "oriented APIs such as ``initialize_state``,"
+#~ " ``step``, and ``generate``."
+#~ msgstr ""
+#~ "该类同时提供面向训练的 API，例如 ``objective``；也提供面向解码的 API，例如 "
+#~ "``initialize_state``、``step`` 和 ``generate``。"
+
+#~ msgid "Backbone used to predict proposal logits."
+#~ msgstr "用于预测提议 logits 的骨干网络。"
+
+#~ msgid "Energy-side model used to encode and score candidates."
+#~ msgstr "用于编码和评估候选项的能量侧模型。"
+
+#~ msgid "Special-token metadata required by the generator."
+#~ msgstr "生成器所需的特殊 token 元数据。"
+
+#~ msgid "Optional generation/training configuration."
+#~ msgstr "可选的生成/训练配置。"
+
+#~ msgid "Floating point dtype tracked by the wrapper."
+#~ msgstr "封装器跟踪的浮点数据类型。"
+
+#~ msgid "Optional target device. When omitted, infer from parameters."
+#~ msgstr "可选的目标设备；省略时从参数中推断。"
+
+#~ msgid "Whether to freeze proposal model parameters."
+#~ msgstr "是否冻结提议模型参数。"
+
+#~ msgid "Scores candidate reconstructions conditioned on the noisy state."
+#~ msgstr "对以噪声状态为条件的候选重建结果进行评分。"
+
+#~ msgid "Noisy token tensor used as conditioning input."
+#~ msgstr "用作条件输入的噪声 token 张量。"
+
+#~ msgid "Candidate clean token tensor to score."
+#~ msgstr "待评估的候选干净 token 张量。"
+
+#~ msgid "Optional attention mask for the energy model."
+#~ msgstr "能量模型的可选注意力掩码。"
+
+#~ msgid "A tensor of scalar energies with shape ``[batch, 1]``."
+#~ msgstr "形状为 ``[batch, 1]`` 的标量能量张量。"
+
+#~ msgid "Runs the proposal model on the current noisy state."
+#~ msgstr "在当前噪声状态上运行提议模型。"
+
+#~ msgid "Current noisy token tensor."
+#~ msgstr "当前的噪声 token 张量。"
+
+#~ msgid "Proposal logits over the token vocabulary."
+#~ msgstr "token 词表上的提议 logits。"
+
+#~ msgid "If the proposal model does not implement ``forward``."
+#~ msgstr "当提议模型未实现 ``forward`` 时。"
+
+#~ msgid "Runs a complete iterative decoding loop inside the core class."
+#~ msgstr "在核心类中运行完整的迭代解码循环。"
+
+#~ msgid "Initial token tensor."
+#~ msgstr "初始 token 张量。"
+
+#~ msgid "Number of decode iterations to run."
+#~ msgstr "要执行的解码迭代次数。"
+
+#~ msgid "Optional boolean mask of fixed positions."
+#~ msgstr "固定位置的可选布尔掩码。"
+
+#~ msgid "Sampling temperature stored in the decode state."
+#~ msgstr "存储在解码状态中的采样温度。"
+
+#~ msgid "Whether to return the full final state dictionary."
+#~ msgstr "是否返回完整的最终状态字典。"
+
+#~ msgid "Either the final token tensor or the full decode state."
+#~ msgstr "最终 token 张量或完整解码状态。"
+
+#~ msgid "Returns a boolean mask of editable non-special-token positions."
+#~ msgstr "返回可编辑非特殊 token 位置的布尔掩码。"
+
+#~ msgid "Token tensor to inspect."
+#~ msgstr "待检查的 token 张量。"
+
+#~ msgid "Optional boolean mask of positions that should remain fixed."
+#~ msgstr "应保持固定位置的可选布尔掩码。"
+
+#~ msgid "A boolean mask where ``True`` marks editable non-special positions."
+#~ msgstr "布尔掩码，其中 ``True`` 表示可编辑的非特殊位置。"
+
+#~ msgid "Creates the initial decoding state for an external generation loop."
+#~ msgstr "为外部生成循环创建初始解码状态。"
+
+#~ msgid "Planned number of decode iterations."
+#~ msgstr "计划执行的解码迭代次数。"
+
+#~ msgid "Sampling temperature stored in the state payload."
+#~ msgstr "存储在状态载荷中的采样温度。"
+
+#~ msgid "A mutable state dictionary suitable for repeated ``step`` calls."
+#~ msgstr "适用于重复调用 ``step`` 的可变状态字典。"
+
+#~ msgid "Builds the one-step training objective used by an external loop."
+#~ msgstr "构建外部循环使用的单步训练目标。"
+
+#~ msgid "Batch dictionary containing at least ``batch[\"targets\"]``."
+#~ msgstr "至少包含 ``batch[\"targets\"]`` 的批次字典。"
+
+#~ msgid "Per-sample timestep weighting mode."
+#~ msgstr "逐样本时间步加权模式。"
+
+#~ msgid ""
+#~ "A dictionary containing proposal logits, "
+#~ "supervision masks, loss weights, and the"
+#~ " EBM objective term."
+#~ msgstr "包含提议 logits、监督掩码、损失权重和 EBM 目标项的字典。"
+
+#~ msgid "Semantic alias around ``forward`` for proposal-side calls."
+#~ msgstr "``forward`` 的语义别名，用于提议侧调用。"
+
+#~ msgid "Runs one denoising/reranking step and returns updated state."
+#~ msgstr "执行一步去噪/重排序并返回更新后的状态。"
+
+#~ msgid "Current decode state created by ``initialize_state``."
+#~ msgstr "由 ``initialize_state`` 创建的当前解码状态。"
+
+#~ msgid "The updated decode state after one iteration."
+#~ msgstr "一次迭代后更新的解码状态。"
+
+#~ msgid "Moves the module and refreshes cached device/dtype metadata."
+#~ msgstr "移动模块并刷新缓存的设备和 dtype 元数据。"
+
+#~ msgid "Positional arguments forwarded to ``nn.Module.to``."
+#~ msgstr "转发给 ``nn.Module.to`` 的位置参数。"
+
+#~ msgid "Keyword arguments forwarded to ``nn.Module.to``."
+#~ msgstr "转发给 ``nn.Module.to`` 的关键字参数。"
+
+#~ msgid "The moved module instance."
+#~ msgstr "移动后的模块实例。"
+
+#~ msgid "基类：:py:class:`object`"
+#~ msgstr "基类：:py:class:`object`"
+
+#~ msgid "Configuration for energy-guided discrete generation."
+#~ msgstr "能量引导离散生成的配置。"
+
+#~ msgid "Number of discrete noising steps used by the training objective."
+#~ msgstr "训练目标使用的离散加噪步数。"
+
+#~ msgid "int"
+#~ msgstr ""
+
+#~ msgid "Whether to use the coupled corruption variant."
+#~ msgstr "是否使用耦合的加噪变体。"
+
+#~ msgid "bool"
+#~ msgstr ""
+
+#~ msgid "Number of proposal candidates sampled at each decode step."
+#~ msgstr "每个解码步骤采样的提议候选项数量。"
+
+#~ msgid "Temperature used for proposal-side sampling."
+#~ msgstr "提议侧采样使用的温度。"
+
+#~ msgid "float"
+#~ msgstr ""
+
+#~ msgid "Gumbel noise scale used during proposal sampling."
+#~ msgstr "提议采样期间使用的 Gumbel 噪声尺度。"
+
+#~ msgid "Temperature used when converting energies into reranking weights."
+#~ msgstr "将能量转换为重排序权重时使用的温度。"
+
+#~ msgid "Whether to disable repetition-collapse resampling."
+#~ msgstr "是否禁用重复坍缩重采样。"
+
+#~ msgid "Frequency threshold that triggers resampling."
+#~ msgstr "触发重采样的频率阈值。"
+
+#~ msgid "Top-p cutoff used during resampling."
+#~ msgstr "重采样期间使用的 Top-p 截止值。"
+
+#~ msgid "Skeptical-remasking strategy string."
+#~ msgstr "怀疑式重新掩码策略字符串。"
+
+#~ msgid "str"
+#~ msgstr ""
+
+#~ msgid "Pre-created encoder. Created by the subclass factory when omitted."
+#~ msgstr "预先创建的编码器。未提供时由子类工厂创建。"
+
+#~ msgid "Pre-created decoder. Created by the subclass factory when omitted."
+#~ msgstr "预先创建的解码器。未提供时由子类工厂创建。"
+
+#~ msgid ""
+#~ "Pre-created Boltzmann machine. Created "
+#~ "by the subclass factory when omitted."
+#~ msgstr "预先创建的玻尔兹曼机。未提供时由子类工厂创建。"
+
+#~ msgid "Pre-created sampler. Created by the subclass factory when omitted."
+#~ msgstr "预先创建的采样器。未提供时由子类工厂创建。"
+
+#~ msgid "Create components that were not supplied to the constructor."
+#~ msgstr "创建未提供给构造函数的组件。"
+
+#~ msgid "Compute the Boltzmann-machine energy for each input sample."
+#~ msgstr "计算每个输入样本的玻尔兹曼机能量。"
+
+#~ msgid "Input samples with the input feature dimension."
+#~ msgstr "具有输入特征维度的输入样本。"
+
+#~ msgid ""
+#~ "Loss type to validate against the "
+#~ "model configuration. Defaults to the "
+#~ "configured loss type."
+#~ msgstr "用于与模型配置进行校验的损失类型。默认使用配置的损失类型。"
+
+#~ msgid ""
+#~ "Reconstructed logits, posterior distribution, "
+#~ "encoder logits,     and reparameterized latent"
+#~ " sample."
+#~ msgstr "重建 logits、后验分布、编码器 logits 和重参数化的潜变量样本。"
+
+#~ msgid "Posterior distribution and reparameterized latent sample."
+#~ msgstr "后验分布和重参数化的潜变量样本。"
+
+#~ msgid "Disable kpp usage statistics. No data will be reported after disabling."
+#~ msgstr "禁用 kpp 使用情况统计。禁用后不会上报任何数据。"
+
+#~ msgid "Enable kpp usage statistics (enabled by default; usually not needed)."
+#~ msgstr "启用 kpp 使用情况统计（默认启用，通常无需调用）。"
+
+#~ msgid "Return whether usage statistics are currently enabled."
+#~ msgstr "返回当前是否已启用使用情况统计。"
+
+#~ msgid "Spins sampled from the model"
+#~ msgstr "用于从模型中采样的优化器。"
+
+#~ msgid "(shape determined by ``sampler`` and ``sample_params``)."
+#~ msgstr "从模型中采样的自旋（形状由 ``sampler`` 和 ``sample_params`` 决定）。"
+
+#~ msgid "A tuple containing:"
+#~ msgstr ""
+
+#~ msgid "The reconstructed visible layer data."
+#~ msgstr "重建后的数据。"
+
+#~ msgid "The reconstruction error for each sample."
+#~ msgstr "重建后的数据。"
+
+#~ msgid "(recon_x, posterior, q, zeta)"
+#~ msgstr "(recon_x, posterior, q, zeta)"
+
+#~ msgid "recon_x: Reconstructed logits (batch_size, input_dim)"
+#~ msgstr "recon_x：重构的逻辑值（batch_size, input_dim）"
+
+#~ msgid "posterior: Posterior distribution object (MixtureGeneric)"
+#~ msgstr "posterior：后验分布对象（MixtureGeneric）"
+
+#~ msgid "q: Encoder output logits (batch_size, latent_dim)"
+#~ msgstr "q：编码器输出的逻辑值（batch_size, latent_dim）"
+
+#~ msgid "zeta: Reparameterized latent sample (batch_size, latent_dim)"
+#~ msgstr "zeta：重参数化的潜变量样本（batch_size, latent_dim）"
+
+#~ msgid "(posterior_dist, zeta)"
+#~ msgstr "(posterior_dist, zeta)"
+
+#~ msgid "posterior_dist: MixtureGeneric object"
+#~ msgstr "posterior_dist：MixtureGeneric 对象"
+
+#~ msgid "zeta: Reparameterized sample (batch_size, latent_dim)"
+#~ msgstr "zeta：重参数化样本（batch_size, latent_dim）"
 

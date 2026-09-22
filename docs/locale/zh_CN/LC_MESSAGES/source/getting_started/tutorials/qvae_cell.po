@@ -1,0 +1,43 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: KPP docs\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:1
+msgid "Q-VAE for Single-Cell Transcriptomics"
+msgstr "Q-VAE 单细胞转录组学"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:3
+msgid ""
+"**Status**: Coming soon — placeholder page; will be expanded into a full "
+"tutorial."
+msgstr "**状态**：即将推出——占位页，后续将扩展为完整教程。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:5
+msgid ""
+"Single-cell representation learning with a quantum variational autoencoder "
+"(QVAE): read a single-cell expression matrix, train a QVAE, extract low-"
+"dimensional representations, compute UMAP, analyze the energy distribution, "
+"and evaluate clustering quality against cell-type labels."
+msgstr ""
+"使用量子变分自编码器（QVAE）进行单细胞表征学习：读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 "
+"UMAP、分析能量分布，并使用细胞类型标签评估聚类质量。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:7
+msgid ""
+"**Example**: `example/qvae_cell/train_qvae_cell.ipynb` · "
+"`example/qvae_cell/evaluate_benchmark.py`"
+msgstr ""
+"**示例**：`example/qvae_cell/train_qvae_cell.ipynb` · "
+"`example/qvae_cell/evaluate_benchmark.py`"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:9
+msgid ""
+"**Data**: [Kaggle immune-"
+"data](https://www.kaggle.com/datasets/redwoodz/immune-data)"
+msgstr ""
+"**数据**：[Kaggle immune-data](https://www.kaggle.com/datasets/redwoodz/immune-"
+"data)"

@@ -1,38 +1,59 @@
-# 为什么需要量子采样
+# Why Quantum? Revisiting the Sampling Bottleneck
 
-玻尔兹曼机的训练并不只取决于模型定义；从模型分布中获得足够好的样本同样关键。本章连接理论基础与后续实践，说明采样为何会成为瓶颈，以及 Kaiwu-PyTorch-Plugin（KPP）如何让经典与相干伊辛机（CIM）采样器使用同一训练流程。
+> By this point you have finished the [Getting Started](../index.md) guide and reviewed the [Prerequisites](../background.md). The [Theoretical Foundations](../../theoretical-foundations/index.md) established that Boltzmann machines are conceptually elegant but computationally crippled by the **sampling bottleneck**. This chapter recaps that conclusion, explains what quantum hardware changes, and shows how KPP lets you use classical and Coherent Ising Machine (CIM) samplers through the same training workflow. It is a bridge: the full derivations live in Theoretical Foundations, and the code lives in the next two chapters.
 
-## 精确最大似然学习中的采样问题
+## The Sampling Problem in Exact Maximum Likelihood Learning
 
-对于基于能量的模型，负对数似然梯度可分为数据分布与模型分布上的两项期望：
+Recall from [Section 3.1, Defining the Objective: Low Energy for Real Data](../../theoretical-foundations/kpp-theoretical-foundations-ebms-def.md) that the gradient of the negative log-likelihood for an energy-based model decomposes into two expectations (Eq. {eq}`eq-nll-gradient-tf` in Theoretical Foundations):
 
-$$
+```{math}
+:label: eq-nll-gradient
 \frac{\partial \mathcal{L}}{\partial \theta} =
-\mathbb{E}_{\mathrm{data}}\left[\frac{\partial E_\theta}{\partial \theta}\right] -
-\mathbb{E}_{\mathrm{model}}\left[\frac{\partial E_\theta}{\partial \theta}\right].
-$$
+\mathbb{E}_{\mathrm{data}}\!\left[ \frac{\partial E_\theta}{\partial \theta} \right] -
+\mathbb{E}_{\mathrm{model}}\!\left[ \frac{\partial E_\theta}{\partial \theta} \right].
+```
 
-数据项可由 mini-batch 直接近似。模型项则要求从当前玻尔兹曼分布 $P_\theta$ 采样；精确计算通常需要枚举指数数量的构型。因此，训练质量取决于样本是否足够接近目标分布，以及取得这些样本的成本。
+The data term is approximated by averaging over mini-batches. The model term requires sampling from the current Boltzmann distribution, and computing it exactly is #P-hard because it needs the partition function (Eq. {eq}`eq-partition`; [Section 3.2, The Intractable Partition Function Problem](../../theoretical-foundations/kpp-theoretical-foundations-ebms-partition.md)). We must therefore sample, and training quality hinges on how close the samples are to the target distribution, and how much they cost.
 
-## 经典采样与近似训练
+Classical approaches have known drawbacks (detailed in [Section 4.1](../../theoretical-foundations/kpp-theoretical-foundations-bm-overall.md), [Section 4.2](../../theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md), and [Section 3.3](../../theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md)):
 
-Gibbs 采样等 Markov Chain Monte Carlo（MCMC）方法通过局部更新逐步接近目标分布。在能量景观存在多个模态和高能垒时，链可能长时间停留在局部区域，导致混合缓慢。
+- **MCMC / Gibbs sampling** converges to the target distribution, but mixing can be exponentially slow in rugged energy landscapes — *critical slowing down*.
+- **CD / PCD** trade bias for speed: a few MCMC steps initialized at data points, risking **mode collapse**; PCD keeps persistent chains but still pays a sampling cost per update.
 
-对比散度（CD）以少量 MCMC 步数换取训练速度，但得到的是近似梯度；持久对比散度（PCD）通过保留链状态改善这一近似，仍需为每次参数更新付出采样成本。它们是实用方法，但不应与平衡分布的精确采样混为一谈。
+These methods are practical, but they should not be confused with exact sampling from the equilibrium distribution.
 
-## 从玻尔兹曼机到 Ising 哈密顿量
+## The Quantum Alternative: Sampling by Physical Evolution
 
-二值变量 $x_i \in \{0, 1\}$ 可通过 $s_i = 2x_i - 1$ 转换为 Ising 自旋 $s_i \in \{-1, +1\}$。相应的二次能量可写为：
+Instead of simulating a Markov chain, the energy function is encoded into a physical quantum system that evolves toward its low-energy states. Devices such as quantum annealers and Coherent Ising Machines (CIMs) realize this: model variables are mapped to qubits or optical pulses, and measurements yield samples from a distribution approximating the Boltzmann distribution at the hardware's effective temperature:
 
-$$
-H(\mathbf{s}) = -\sum_i h_i s_i - \sum_{i<j} J_{ij}s_i s_j + \mathrm{const}.
-$$
+```{math}
+:label: eq-effective-boltzmann
+P(\mathbf{s}) \propto \exp\left(-\beta_{\mathrm{eff}} H(\mathbf{s})\right),
+```
 
-其中 $h_i$ 与 $J_{ij}$ 分别表示局部场和耦合。KPP 会从模型参数构造 Ising 矩阵，并将其交给 Kaiwu SDK 优化器求解；用户无需手工完成变量转换。
+where $\beta_{\mathrm{eff}}$ is the effective inverse temperature ([Section 1.2, The Boltzmann Distribution and Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md), Eq. {eq}`eq-boltzmann-dist`).
 
-## KPP 中的经典与量子采样器
+The main promises are:
 
-KPP 通过同一个 `sample(sampler)` 调用使用不同采样后端。`SimulatedAnnealingOptimizer` 适合本地调试和建立基线；`CIMOptimizer` 需要有效的 Kaiwu SDK 凭据及真机访问权限。两者的样本质量、延迟和成本应在相同模型、采样预算与评价指标下比较，不能仅由采样器类型推断优劣。
+- **Direct physical sampling**: quantum tunneling may escape local minima more efficiently than thermal hopping.
+- **Inherent parallelism**: thousands of optical pulses interact simultaneously, versus sequential Gibbs updates.
+- **Hardware-scale sampling**: problem sizes that would be prohibitively slow to simulate classically.
+- **Avoiding CD bias**: near-equilibrium samples without data-dependent initialization, giving less biased gradient estimates.
+
+## From Boltzmann Machines to Ising Hamiltonians
+
+The mapping follows directly from the spin-glass analogy ([Section 1.1, The Relationship Between Statistical Physics and Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md); Eq. {eq}`eq-ising-hamiltonian`): binary variables $x_i \in \{0, 1\}$ become Ising spins $s_i = 2x_i - 1$, turning the quadratic energy into an Ising Hamiltonian:
+
+```{math}
+:label: eq-ising
+H(\mathbf{s}) = -\sum_i h_i s_i - \sum_{i<j} J_{ij} s_i s_j + \mathrm{const},
+```
+
+the form that quantum annealing hardware and CIMs are designed to handle. KPP constructs this Ising matrix from the model parameters and hands it to the **Kaiwu SDK solver**; you never need to perform the conversion by hand.
+
+## Classical and Quantum Samplers in KPP
+
+KPP uses different sampling backends through the same `sample(sampler)` call, used in the [Quick Start](../quickstart.md) example. `SimulatedAnnealingOptimizer` suits local debugging and baseline experiments; `CIMOptimizer` requires valid Kaiwu SDK credentials and real-machine access. The two should be compared on the same model, sampling budget, and evaluation metrics, never inferred from the sampler type alone.
 
 ```python
 from kaiwu.classical import SimulatedAnnealingOptimizer
@@ -42,9 +63,10 @@ classical_sampler = SimulatedAnnealingOptimizer()
 quantum_sampler = CIMOptimizer(task_name="my_experiment", wait=True)
 ```
 
-## 小结
+## Summary
 
-- 玻尔兹曼机训练需要近似模型分布上的期望，采样成本是关键限制。
-- MCMC、CD 与 PCD 在速度和近似误差之间取舍。
-- KPP 将模型参数转换为 Ising 问题，并通过统一的采样接口连接经典与量子后端。
-- 是否使用真机采样应由可用硬件、端到端延迟、样本质量和实验目标共同决定。
+- Sampling from the model distribution is the central computational bottleneck of Boltzmann machine training (Eq. {eq}`eq-nll-gradient`).
+- Classical MCMC suffers from slow mixing times, and practical approximations such as CD introduce bias and can cause mode collapse.
+- Quantum sampling encodes the energy as an Ising Hamiltonian and samples by physical evolution, promising better mixing, parallelism, and less bias.
+- KPP converts model parameters into an Ising problem and connects classical and quantum backends through a unified sampling interface.
+- The next chapter establishes the classical baseline, [Simulated Annealing for Ising Models](simulated_annealing.md), before the quantum integration in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md).

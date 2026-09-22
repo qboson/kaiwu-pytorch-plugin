@@ -1,30 +1,59 @@
-# 用于 Ising 模型的模拟退火
+# Simulated Annealing for Ising Models
 
-模拟退火（simulated annealing，SA）是 KPP 中可本地运行的采样基线。它既可用于寻找低能构型，也可在合适的有限温度和采样设置下，为玻尔兹曼机训练提供近似样本。
+> [Why Quantum? Revisiting the Sampling Bottleneck](quantum_sampling_bottleneck.md) motivated the need for efficient sampling from Boltzmann distributions. This chapter introduces **simulated annealing (SA)**, the local CPU/GPU-only sampling baseline in KPP, which is also a natural reference point against which [quantum sampling](quantum_sampling_pytorch.md) is compared in the next chapter.
 
-## Ising 模型与玻尔兹曼分布
+## The Ising Model at a Glance
 
-Ising 模型使用自旋 $s_i \in \{-1, +1\}$ 表示变量：
+Recall from [Section 1.1, The Relationship Between Statistical Physics and Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md) that the Ising model describes interacting spins $s_i \in \{-1, +1\}$ with energy (Eq. {eq}`eq-ising-hamiltonian` in Theoretical Foundations):
 
-$$
-H(\mathbf{s}) = -\sum_i h_i s_i - \sum_{i<j} J_{ij}s_i s_j.
-$$
+```{math}
+:label: eq-ising-energy
+H(\mathbf{s}) = -\sum_i h_i s_i - \sum_{i<j} J_{ij} s_i s_j.
+```
 
-在温度 $T$ 下，构型的概率与 $\exp(-H(\mathbf{s}) / T)$ 成正比。KPP 将玻尔兹曼机的参数转换为相应的 Ising 矩阵；采样器接收该矩阵并由 Kaiwu SDK 的 `solve()` 方法求解。
+At temperature $T$, the probability of a spin configuration follows the Boltzmann distribution (see [Section 1.2, The Boltzmann Distribution and Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-boltzmann.md), Eq. {eq}`eq-boltzmann-dist`):
 
-## 从优化到采样
+```{math}
+:label: eq-boltzmann-prob
+P(\mathbf{s}) = \frac{1}{Z} \exp\left(-\frac{H(\mathbf{s})}{T}\right).
+```
 
-典型的模拟退火从高温随机构型开始，反复提出翻转一个自旋。对于能量变化 $\Delta E$，Metropolis 接受概率为：
+KPP converts Boltzmann machine parameters into this Ising matrix; the sampler solves it via the Kaiwu SDK `solve()` method.
 
-$$
+## The Simulated Annealing Algorithm
+
+Simulated annealing is a classical metaheuristic inspired by the annealing process in metallurgy. It proceeds in four steps:
+
+1. **Initialization**: start at a high temperature $T_{\mathrm{high}}$ with a random spin configuration.
+2. **Metropolis updates**: propose single-spin flips $s_i \to -s_i$; for an energy change $\Delta E$, accept with probability
+
+```{math}
+:label: eq-metropolis
 P_{\mathrm{accept}} = \min\left(1, \exp\left(-\frac{\Delta E}{T}\right)\right).
-$$
+```
 
-温度逐步降低时，算法更倾向保留低能构型。若目标是优化，可继续降温以寻找较低能量；若目标是近似玻尔兹曼采样，则必须明确温度、退火调度、独立运行次数和样本相关性。退火终点的构型不能自动视为无偏玻尔兹曼样本。
+3. **Cooling**: reduce the temperature by a schedule, e.g., geometric cooling $T_{k+1} = \alpha T_k$ with $0 < \alpha < 1$.
+4. **Termination**: stop when the temperature is low; the final configuration approximates a low-energy state.
 
-## 在 KPP 中使用 SA
+## From Optimization to Sampling
 
-KPP 的 `AbstractBoltzmannMachine.sample()` 会构造 Ising 矩阵并调用优化器。用户只需创建 `SimulatedAnnealingOptimizer` 并传入模型：
+Optimization and Boltzmann sampling have different goals. If the goal is optimization, you keep cooling to find the ground state. If the goal is approximate sampling for generative modeling, two adaptations are needed:
+
+- **Stop at a finite effective temperature** $T_{\mathrm{eff}}$ instead of cooling to zero.
+- **Collect multiple samples** from independent annealing runs (or from a single run after thermalization at $T_{\mathrm{eff}}$).
+
+When implemented carefully, the distribution of the collected samples approximates:
+
+```{math}
+:label: eq-sa-sampling
+P(\mathbf{s}) \propto \exp\left(-\frac{H(\mathbf{s})}{T_{\mathrm{eff}}}\right),
+```
+
+which is precisely the Boltzmann distribution needed for training (Eq. {eq}`eq-boltzmann-prob`). The end-of-annealing configuration must not be treated automatically as an unbiased Boltzmann sample: the temperature, schedule, number of independent runs, and sample correlation all need to be considered.
+
+## Using SA in KPP
+
+The [Quick Start](../quickstart.md) example already trains an RBM with `SimulatedAnnealingOptimizer`. `sample()` constructs the Ising matrix and calls the optimizer; you only pass the sampler to the model:
 
 ```python
 import torch
@@ -36,14 +65,15 @@ sampler = SimulatedAnnealingOptimizer()
 samples = rbm.sample(sampler)
 ```
 
-此处 `samples` 是模型返回的状态张量；KPP 在内部调用 `sampler.solve(ising_mat)`，而不是 `sampler.sample(hamiltonian)`。
+Here, `samples` is the state tensor returned by the model; KPP calls `sampler.solve(ising_mat)` internally, rather than `sampler.sample(hamiltonian)`.
 
-## 与真机采样的关系
+## Relationship to Quantum Sampling
 
-SA 是本地开发、调试和基线实验的合适起点。CIM 真机采样需要凭据、任务排队和配额；是否带来收益需要针对具体模型、样本质量指标和端到端耗时进行实验比较。
+SA is a suitable starting point for local development, debugging, and baseline experiments. Real quantum hardware, i.e., the CIM, requires credentials, task queueing, and quota; whether it provides a benefit must be evaluated on the specific model, sample-quality metrics, and end-to-end latency. See the side-by-side comparison in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md) in the next chapter.
 
-## 小结
+## Summary
 
-- SA 通过 Metropolis 更新和温度调度探索 Ising 能量景观。
-- 优化与玻尔兹曼采样的目标不同；有限温度设置与样本评估不可省略。
-- 在 KPP 中，SA 与其他优化器一样通过 `rbm.sample(sampler)` 使用。
+- SA explores the Ising energy landscape via Metropolis updates and a cooling schedule.
+- Optimization and Boltzmann sampling have different goals; finite-temperature settings and sample evaluation are essential.
+- SA is used through `rbm.sample(sampler)` like any other optimizer.
+- The trade-offs between SA and quantum sampling: thermal activation vs. tunneling, local vs. cloud, latency, are compared in the [next chapter](quantum_sampling_pytorch.md).

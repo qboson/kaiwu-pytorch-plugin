@@ -14,25 +14,34 @@
   - 数学公式支持 (sphinx.ext.imgmath)
   - Markdown 支持 (myst-parser)
   - 中文搜索支持 (jieba)
+  - Mermaid 流程图 (mermaid)
 
 ## 文档目录结构
 
 ```
 docs/
 ├── conf.py                      # Sphinx 配置文件
-├── index.md                    # 文档首页
+├── refs.bib                     # BibTeX 条目
+├── index.md                     # 文档首页
 ├── Makefile                     # 构建脚本
 ├── make.bat                     # Windows 构建脚本
 ├── _static/                     # 静态资源
-│   ├── custom.css              # 自定义样式
-│   └── sdk-logo.png            # 项目 Logo
+│   ├── custom.css               # 自定义样式
+│   └── sdk-logo.png             # 项目 Logo
 └── source/                      # 文档源文件
     ├── getting_started/         # 入门指南
     │   ├── index.md
     │   ├── introduction.md
     │   ├── installation.md
-    │   └── quickstart.md
-    ├── advanced/                # 进阶知识
+    │   ├── quickstart.md
+    │   └── tutorials/           # 教程
+    ├── theoretical-foundations/ # 理论基础
+    │   ├── index.md
+    │   ├── kpp-theoretical-foundations-stat-*.md 
+    │   ├── kpp-theoretical-foundations-nn-*.md 
+    │   ├── kpp-theoretical-foundations-bm-*.md 
+    │   └── kpp-theoretical-foundations-ebms-*.md   
+    ├── advanced/                # 进阶教程
     │   ├── index.md
     │   └── advanced_features.md
     ├── modules/                 # 模块手册
@@ -49,7 +58,18 @@ docs/
 
 ## 如何构建文档
 
-### 1. 安装依赖
+### 0. 激活 Python 虚拟环境
+
+本项目使用 Python Virtual Environment，所有构建命令必须在虚拟环境中执行：
+
+```bash
+cd /Users/chang137/GitHub
+source myenv/bin/activate
+```
+
+激活后命令行前缀显示 `(myenv)`。虚拟环境中已预装 Sphinx 8.1.3、sphinx-intl、myst-parser、pydata-sphinx-theme 等所有构建依赖。
+
+### 1. 安装依赖（如虚拟环境未配置）
 
 ```bash
 pip install -r requirements/devel.txt
@@ -115,18 +135,26 @@ API 文档通过 `sphinx.ext.autodoc` 自动生成，只需在 Markdown 文件�
 
 以下内容需要后续补充：
 
-1. **入门指南**
-   - [ ] 完善项目简介 (introduction.md)
-   - [ ] 完善安装指南 (installation.md)
-   - [ ] 完善快速开始 (quickstart.md)
+1. **入门指南 (Getting Started)** 
+   - [x] 完善项目简介 (introduction.md)
+   - [x] 完善安装指南 (installation.md)
+   - [x] 完善快速开始 (quickstart.md)
 
-2. **进阶知识**
+2. **理论基础 (Theoretical Foundations)**
+   - [x] 完善 index 页 (index.md)
+   - [ ] proof-reading 中文翻译
+
+3. **新手教程 (Tutorial for Beginners)**
+   - [ ] 完善量子采样教程 (quantum_sampling_*.md)
+   - [ ] 添加具体动手实践教程 (hands_on_tutorial_*.md)
+
+4. **进阶案例 (Advanced Examples)**
    - [ ] 添加高级功能文档 (advanced_features.md)
 
-3. **常见问题**
+5. **常见问题 (FAQ)**
    - [ ] 补充常见问题解答 (faq.md)
 
-4. **关于**
+6. **关于 (About)**
    - [ ] 更新发行说明 (release_notes.md)
 
 ## 注意事项

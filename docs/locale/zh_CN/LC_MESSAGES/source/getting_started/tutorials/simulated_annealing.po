@@ -1,116 +1,246 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
-# This file is distributed under the same license as the
-# Kaiwu-PyTorch-Plugin package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-28 10:48+0800\n"
+"POT-Creation-Date: 2026-09-10 10:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh_CN\n"
 "Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:1
-msgid "用于 Ising 模型的模拟退火"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:1
+msgid "Simulated Annealing for Ising Models"
+msgstr "用于 Ising 模型的模拟退火"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:3
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:3
 msgid ""
-"模拟退火（simulated annealing，SA）是 KPP "
-"中可本地运行的采样基线。它既可用于寻找低能构型，也可在合适的有限温度和采样设置下，为玻尔兹曼机训练提供近似样本。"
+"[Why Quantum? Revisiting the Sampling "
+"Bottleneck](quantum_sampling_bottleneck.md) motivated the need for efficient"
+" sampling from Boltzmann distributions. This chapter introduces **simulated "
+"annealing (SA)**, the local CPU/GPU-only sampling baseline in KPP, which is "
+"also a natural reference point against which [quantum "
+"sampling](quantum_sampling_pytorch.md) is compared in the next chapter."
 msgstr ""
+"[为什么需要量子采样：重温采样瓶颈](quantum_sampling_bottleneck.md)说明了高效采样玻尔兹曼分布的必要性。本章介绍**模拟退火（simulated"
+" annealing，SA）**——KPP 中仅使用本地 CPU/GPU "
+"的采样基线，也是下一章[量子采样](quantum_sampling_pytorch.md)的自然参照点。"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:5
-msgid "Ising 模型与玻尔兹曼分布"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:5
+msgid "The Ising Model at a Glance"
+msgstr "Ising 模型一览"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:7
-#, python-brace-format
-msgid "Ising 模型使用自旋 $s_i \\in \\{-1, +1\\}$ 表示变量："
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:9
+msgid "H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij} s_i s_j."
+msgstr "H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij} s_i s_j."
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:9
-#, python-brace-format
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:16
+msgid "P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{H(\\mathbf{s})}{T}\\right)."
+msgstr "P(\\mathbf{s}) = \\frac{1}{Z} \\exp\\left(-\\frac{H(\\mathbf{s})}{T}\\right)."
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:21
 msgid ""
-"\n"
-"H(\\mathbf{s}) = -\\sum_i h_i s_i - \\sum_{i<j} J_{ij}s_i s_j.\n"
-msgstr ""
+"KPP converts Boltzmann machine parameters into this Ising matrix; the "
+"sampler solves it via the Kaiwu SDK `solve()` method."
+msgstr "KPP 将玻尔兹曼机参数转换为该 Ising 矩阵；采样器接收该矩阵并由 Kaiwu SDK 的 `solve()` 方法求解。"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:13
-#, python-brace-format
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:23
+msgid "The Simulated Annealing Algorithm"
+msgstr "模拟退火算法"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:25
 msgid ""
-"在温度 $T$ 下，构型的概率与 $\\exp(-H(\\mathbf{s}) / T)$ 成正比。KPP 将玻尔兹曼机的参数转换为相应的 "
-"Ising 矩阵；采样器接收该矩阵并由 Kaiwu SDK 的 `solve()` 方法求解。"
-msgstr ""
+"Simulated annealing is a classical metaheuristic inspired by the annealing "
+"process in metallurgy. It proceeds in four steps:"
+msgstr "模拟退火是一种受冶金退火过程启发的经典元启发式算法，包含四步："
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:15
-msgid "从优化到采样"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/simulated_annealing.md:17
-msgid "典型的模拟退火从高温随机构型开始，反复提出翻转一个自旋。对于能量变化 $\\Delta E$，Metropolis 接受概率为："
-msgstr ""
-
-#: ../../source/getting_started/tutorials/simulated_annealing.md:19
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:27
 msgid ""
-"\n"
+"**Initialization**: start at a high temperature $T_{\\mathrm{high}}$ with a "
+"random spin configuration."
+msgstr "**初始化**：从高温 $T_{\\mathrm{high}}$ 与随机自旋构型开始。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:28
+msgid ""
+"**Metropolis updates**: propose single-spin flips $s_i \\to -s_i$; for an "
+"energy change $\\Delta E$, accept with probability"
+msgstr "**Metropolis 更新**：提出单自旋翻转 $s_i \\to -s_i$；对能量变化 $\\Delta E$，以概率接受"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:30
+msgid "P_{\\mathrm{accept}} = \\min\\left(1, \\exp\\left(-\\frac{\\Delta E}{T}\\right)\\right)."
+msgstr ""
 "P_{\\mathrm{accept}} = \\min\\left(1, \\exp\\left(-\\frac{\\Delta "
-"E}{T}\\right)\\right).\n"
-msgstr ""
+"E}{T}\\right)\\right)."
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:23
-msgid "温度逐步降低时，算法更倾向保留低能构型。若目标是优化，可继续降温以寻找较低能量；若目标是近似玻尔兹曼采样，则必须明确温度、退火调度、独立运行次数和样本相关性。退火终点的构型不能自动视为无偏玻尔兹曼样本。"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/simulated_annealing.md:25
-msgid "在 KPP 中使用 SA"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/simulated_annealing.md:27
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:35
 msgid ""
-"KPP 的 `AbstractBoltzmannMachine.sample()` 会构造 Ising 矩阵并调用优化器。用户只需创建 "
-"`SimulatedAnnealingOptimizer` 并传入模型："
-msgstr ""
+"**Cooling**: reduce the temperature by a schedule, e.g., geometric cooling "
+"$T_{k+1} = \\alpha T_k$ with $0 < \\alpha < 1$."
+msgstr "**降温**：按调度降低温度，例如几何降温 $T_{k+1} = \\alpha T_k$（$0 < \\alpha < 1$）。"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:39
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:36
 msgid ""
+"**Termination**: stop when the temperature is low; the final configuration "
+"approximates a low-energy state."
+msgstr "**终止**：当温度足够低时停止；最终构型近似低能状态。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:38
+msgid "From Optimization to Sampling"
+msgstr "从优化到采样"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:40
+msgid ""
+"Optimization and Boltzmann sampling have different goals. If the goal is "
+"optimization, you keep cooling to find the ground state. If the goal is "
+"approximate sampling for generative modeling, two adaptations are needed:"
+msgstr "优化与玻尔兹曼采样目标不同。若目标是优化，持续降温以寻找基态；若目标是为生成建模进行近似采样，则需要两项调整："
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:42
+msgid ""
+"**Stop at a finite effective temperature** $T_{\\mathrm{eff}}$ instead of "
+"cooling to zero."
+msgstr "**在有限有效温度** $T_{\\mathrm{eff}}$ **处停止**，而非冷却到零。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:43
+msgid ""
+"**Collect multiple samples** from independent annealing runs (or from a "
+"single run after thermalization at $T_{\\mathrm{eff}}$)."
+msgstr "**收集多个样本**：来自独立的退火运行（或单次运行在 $T_{\\mathrm{eff}}$ 热化后）。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:45
+msgid ""
+"When implemented carefully, the distribution of the collected samples "
+"approximates:"
+msgstr "若实现得当，收集到的样本分布近似："
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:47
+msgid ""
+"P(\\mathbf{s}) \\propto "
+"\\exp\\left(-\\frac{H(\\mathbf{s})}{T_{\\mathrm{eff}}}\\right),"
+msgstr ""
+"P(\\mathbf{s}) \\propto "
+"\\exp\\left(-\\frac{H(\\mathbf{s})}{T_{\\mathrm{eff}}}\\right),"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:52
+msgid ""
+"which is precisely the Boltzmann distribution needed for training (Eq. "
+"{eq}`eq-boltzmann-prob`). The end-of-annealing configuration must not be "
+"treated automatically as an unbiased Boltzmann sample: the temperature, "
+"schedule, number of independent runs, and sample correlation all need to be "
+"considered."
+msgstr ""
+"这正是训练所需的玻尔兹曼分布（式 {eq}`eq-boltzmann-"
+"prob`）。退火终点的构型不能自动视为无偏玻尔兹曼样本：温度、调度、独立运行次数与样本相关性都需纳入考量。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:54
+msgid "Using SA in KPP"
+msgstr "在 KPP 中使用 SA"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:56
+msgid ""
+"The [Quick Start](../quickstart.md) example already trains an RBM with "
+"`SimulatedAnnealingOptimizer`. `sample()` constructs the Ising matrix and "
+"calls the optimizer; you only pass the sampler to the model:"
+msgstr ""
+"[快速开始](../quickstart.md)示例已经用 `SimulatedAnnealingOptimizer` 训练 "
+"RBM。`sample()` 构造 Ising 矩阵并调用优化器；你只需把采样器传给模型："
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:68
+msgid ""
+"Here, `samples` is the state tensor returned by the model; KPP calls "
+"`sampler.solve(ising_mat)` internally, rather than "
+"`sampler.sample(hamiltonian)`."
+msgstr ""
 "此处 `samples` 是模型返回的状态张量；KPP 在内部调用 `sampler.solve(ising_mat)`，而不是 "
 "`sampler.sample(hamiltonian)`。"
-msgstr ""
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:41
-msgid "与真机采样的关系"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:70
+msgid "Relationship to Quantum Sampling"
+msgstr "与量子采样的关系"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:43
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:72
 msgid ""
+"SA is a suitable starting point for local development, debugging, and "
+"baseline experiments. Real quantum hardware, i.e., the CIM, requires "
+"credentials, task queueing, and quota; whether it provides a benefit must be"
+" evaluated on the specific model, sample-quality metrics, and end-to-end "
+"latency. See the side-by-side comparison in [Integrating Quantum Samplers "
+"into PyTorch](quantum_sampling_pytorch.md) in the next chapter."
+msgstr ""
 "SA 是本地开发、调试和基线实验的合适起点。CIM "
-"真机采样需要凭据、任务排队和配额；是否带来收益需要针对具体模型、样本质量指标和端到端耗时进行实验比较。"
-msgstr ""
+"真机采样需要凭据、任务排队和配额；是否带来收益需要针对具体模型、样本质量指标和端到端耗时进行实验比较。参见下一章[将量子采样器集成到 "
+"PyTorch](quantum_sampling_pytorch.md)中的并排对比。"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:45
-msgid "小结"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:74
+msgid "Summary"
+msgstr "小结"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:47
-msgid "SA 通过 Metropolis 更新和温度调度探索 Ising 能量景观。"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:76
+msgid ""
+"SA explores the Ising energy landscape via Metropolis updates and a cooling "
+"schedule."
+msgstr "SA 通过 Metropolis 更新和温度调度探索 Ising 能量景观。"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:48
-msgid "优化与玻尔兹曼采样的目标不同；有限温度设置与样本评估不可省略。"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:77
+msgid ""
+"Optimization and Boltzmann sampling have different goals; finite-temperature"
+" settings and sample evaluation are essential."
+msgstr "优化与玻尔兹曼采样的目标不同；有限温度设置与样本评估不可省略。"
 
-#: ../../source/getting_started/tutorials/simulated_annealing.md:49
-msgid "在 KPP 中，SA 与其他优化器一样通过 `rbm.sample(sampler)` 使用。"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:78
+msgid "SA is used through `rbm.sample(sampler)` like any other optimizer."
+msgstr "在 KPP 中，SA 与其他优化器一样通过 `rbm.sample(sampler)` 使用。"
 
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/simulated_annealing.md:79
+msgid ""
+"The trade-offs between SA and quantum sampling: thermal activation vs. "
+"tunneling, local vs. cloud, latency, are compared in the [next "
+"chapter](quantum_sampling_pytorch.md)."
+msgstr ""
+"SA 与量子采样的权衡: 热激活 vs. 隧穿、本地 vs. 云端、延迟, "
+"将在[下一章](quantum_sampling_pytorch.md)中进行比较。"
+
+msgid ""
+"Recall from [Section 1.1, The Relationship Between Statistical Physics and "
+"Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-"
+"stat-spinglass.md) that the Ising model describes interacting spins $s_i "
+"\\in \\{-1, +1\\}$ with energy (Eq. {eq}`eq-ising-hamiltonian` in "
+"Theoretical Foundations):"
+msgstr ""
+"回顾 [第 1.1 节：统计物理与神经网络的关系](../../theoretical-foundations/kpp-theoretical-"
+"foundations-stat-spinglass.md)，Ising 模型描述了相互作用的自旋 $s_i \\in \\{-1, "
+"+1\\}$，其能量为 (Eq. {eq}`eq-ising-hamiltonian`，见 Theoretical Foundations)："
+
+msgid ""
+"At temperature $T$, the probability of a spin configuration follows the "
+"Boltzmann distribution (see [Section 1.2, The Boltzmann Distribution and "
+"Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
+"boltzmann.md), Eq. {eq}`eq-boltzmann-dist`):"
+msgstr ""
+"在温度 $T$ 下，自旋构型的概率服从玻尔兹曼分布（参见 [第 1.2 节：玻尔兹曼分布与平衡](../../theoretical-"
+"foundations/kpp-theoretical-foundations-stat-boltzmann.md)，Eq. {eq}`eq-"
+"boltzmann-dist`）："
+
+#~ msgid ""
+#~ "Recall from [Section 1.1, The Relationship Between Statistical Physics and "
+#~ "Neural Networks](../../theoretical-foundations/kpp-theoretical-foundations-"
+#~ "stat-spinglass.md) that the Ising model describes interacting spins $s_i "
+#~ "\\in \\{-1, +1\\}$ with energy:"
+#~ msgstr ""
+#~ "回顾[第 1.1 节：统计物理与神经网络的关系](../../theoretical-foundations/kpp-theoretical-"
+#~ "foundations-stat-spinglass.md)：Ising 模型描述相互作用的自旋 $s_i \\in \\{-1, "
+#~ "+1\\}$，其能量为："
+
+#~ msgid ""
+#~ "At temperature $T$, the probability of a spin configuration follows the "
+#~ "Boltzmann distribution (see [Section 1.2, The Boltzmann Distribution and "
+#~ "Equilibrium](../../theoretical-foundations/kpp-theoretical-foundations-stat-"
+#~ "boltzmann.md)):"
+#~ msgstr ""
+#~ "在温度 $T$ 下，自旋构型的概率服从玻尔兹曼分布（参见[第 1.2 节：玻尔兹曼分布与平衡](../../theoretical-"
+#~ "foundations/kpp-theoretical-foundations-stat-boltzmann.md)）："

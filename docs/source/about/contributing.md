@@ -51,7 +51,7 @@ pylint src/kaiwu/
 
 ## 更新或新增示例
 
-已有的基础脚本位于 `example/run_bm.py` 和 `example/run_rbm.py`。Digits、DBN、BM 生成和 Q-VAE 示例通过各自目录中的 Notebook 运行，具体入口见 [example/README_ZH.md](../../../example/README_ZH.md)。
+已有的基础脚本位于 `example/run_bm.py` 和 `example/run_rbm.py`。Digits、DBN、BM 生成和 Q-VAE 示例通过各自目录中的 Notebook 运行，具体入口见 [example/README_ZH.md](https://github.com/qboson/kaiwu-pytorch-plugin/blob/main/example/README_ZH.md)。
 
 Q-Diffusion 的最小训练和生成示例可在仓库根目录执行：
 

@@ -12,279 +12,281 @@ msgstr ""
 "POT-Creation-Date: 2026-07-09 10:35+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: ../../source/faq/faq.md:1
 msgid "常见问题"
-msgstr ""
+msgstr "常见问题"
 
 #: ../../source/faq/faq.md:3
 msgid "本章汇总了使用 Kaiwu-PyTorch-Plugin 时的常见问题和解决方案。"
-msgstr ""
+msgstr "本章汇总了使用 Kaiwu-PyTorch-Plugin 时的常见问题和解决方案。"
 
 #: ../../source/faq/faq.md:5
 msgid "安装相关"
-msgstr ""
+msgstr "安装相关"
 
 #: ../../source/faq/faq.md:7
 msgid "Q: 安装时提示 Python 版本不兼容？"
-msgstr ""
+msgstr "Q: 安装时提示 Python 版本不兼容？"
 
 #: ../../source/faq/faq.md:9
 msgid "A: Kaiwu-PyTorch-Plugin 目前仅支持 **Python 3.10**。请使用 conda 创建对应版本的环境："
-msgstr ""
+msgstr "A: Kaiwu-PyTorch-Plugin 目前仅支持 **Python 3.10**。请使用 conda 创建对应版本的环境："
 
 #: ../../source/faq/faq.md:17
 msgid "Q: 无法导入 kaiwu.torch_plugin 模块？"
-msgstr ""
+msgstr "Q: 无法导入 kaiwu.torch_plugin 模块？"
 
 #: ../../source/faq/faq.md:19
 msgid "A: 请检查以下几点："
-msgstr ""
+msgstr "A: 请检查以下几点："
 
 #: ../../source/faq/faq.md:21
 msgid "确认已安装 Kaiwu-PyTorch-Plugin：`pip install .`"
-msgstr ""
+msgstr "确认已安装 Kaiwu-PyTorch-Plugin：`pip install .`"
 
 #: ../../source/faq/faq.md:22
 msgid "确认当前环境已激活：`conda activate quantum_env`"
-msgstr ""
+msgstr "确认当前环境已激活：`conda activate quantum_env`"
 
 #: ../../source/faq/faq.md:23
 msgid "确认 Kaiwu SDK 已正确安装"
-msgstr ""
+msgstr "确认 Kaiwu SDK 已正确安装"
 
 #: ../../source/faq/faq.md:25
 msgid "如果问题仍然存在，尝试重新安装："
-msgstr ""
+msgstr "如果问题仍然存在，尝试重新安装："
 
 #: ../../source/faq/faq.md:33
 msgid "Q: Kaiwu SDK 安装失败？"
-msgstr ""
+msgstr "Q: Kaiwu SDK 安装失败？"
 
 #: ../../source/faq/faq.md:35
 msgid "A: Kaiwu SDK 需要单独安装。请："
-msgstr ""
+msgstr "A: Kaiwu SDK 需要单独安装。请："
 
 #: ../../source/faq/faq.md:37
 msgid "访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)"
-msgstr ""
+msgstr "访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)"
 
 #: ../../source/faq/faq.md:38
 msgid "下载对应系统的安装包"
-msgstr ""
+msgstr "下载对应系统的安装包"
 
 #: ../../source/faq/faq.md:39
 msgid "按照页面说明进行安装"
-msgstr ""
+msgstr "按照页面说明进行安装"
 
 #: ../../source/faq/faq.md:41
 msgid "模型相关"
-msgstr ""
+msgstr "模型相关"
 
 #: ../../source/faq/faq.md:43
 msgid "Q: RBM 和 BM 有什么区别？应该使用哪个？"
-msgstr ""
+msgstr "Q: RBM 和 BM 有什么区别？应该使用哪个？"
 
 #: ../../source/faq/faq.md:45
 msgid "A: 主要区别如下："
-msgstr ""
+msgstr "A: 主要区别如下："
 
 #: ../../source/faq/faq.md:52
 msgid "特性"
-msgstr ""
+msgstr "特性"
 
 #: ../../source/faq/faq.md:53
 msgid "RBM（受限玻尔兹曼机）"
-msgstr ""
+msgstr "RBM（受限玻尔兹曼机）"
 
 #: ../../source/faq/faq.md:54
 msgid "BM（全连接玻尔兹曼机）"
-msgstr ""
+msgstr "BM（全连接玻尔兹曼机）"
 
 #: ../../source/faq/faq.md:55
 msgid "连接结构"
-msgstr ""
+msgstr "连接结构"
 
 #: ../../source/faq/faq.md:56
 msgid "层内无连接"
-msgstr ""
+msgstr "层内无连接"
 
 #: ../../source/faq/faq.md:57
 msgid "全连接"
-msgstr ""
+msgstr "全连接"
 
 #: ../../source/faq/faq.md:58
 msgid "推荐场景"
-msgstr ""
+msgstr "推荐场景"
 
 #: ../../source/faq/faq.md:59
 msgid "简单场景"
-msgstr ""
+msgstr "简单场景"
 
 #: ../../source/faq/faq.md:60
 msgid "生成任务以及需要建模复杂依赖时"
-msgstr ""
+msgstr "生成任务以及需要建模复杂依赖时"
 
 #: ../../source/faq/faq.md:62
 msgid "Q: 如何选择隐藏层节点数？"
-msgstr ""
+msgstr "Q: 如何选择隐藏层节点数？"
 
 #: ../../source/faq/faq.md:64
 msgid "A: 隐藏层节点数的选择取决于："
-msgstr ""
+msgstr "A: 隐藏层节点数的选择取决于："
 
 #: ../../source/faq/faq.md:66
 msgid "**数据复杂度**：复杂数据需要更多隐藏节点"
-msgstr ""
+msgstr "**数据复杂度**：复杂数据需要更多隐藏节点"
 
 #: ../../source/faq/faq.md:67
 msgid "**计算资源**：节点越多，计算量越大"
-msgstr ""
+msgstr "**计算资源**：节点越多，计算量越大"
 
 #: ../../source/faq/faq.md:69
 msgid "Q: 训练损失不下降怎么办？"
-msgstr ""
+msgstr "Q: 训练损失不下降怎么办？"
 
 #: ../../source/faq/faq.md:71 ../../source/faq/faq.md:120
 msgid "A: 尝试以下方法："
-msgstr ""
+msgstr "A: 尝试以下方法："
 
 #: ../../source/faq/faq.md:73
 msgid "**调整学习率**：尝试更小（如 0.001）或更大（如 0.1）的学习率"
-msgstr ""
+msgstr "**调整学习率**：尝试更小（如 0.001）或更大（如 0.1）的学习率"
 
 #: ../../source/faq/faq.md:74
 msgid "**增加权重衰减**：添加 L2 正则化防止过拟合"
-msgstr ""
+msgstr "**增加权重衰减**：添加 L2 正则化防止过拟合"
 
 #: ../../source/faq/faq.md:75
 msgid "**检查数据预处理**：确保数据已归一化到合适范围"
-msgstr ""
+msgstr "**检查数据预处理**：确保数据已归一化到合适范围"
 
 #: ../../source/faq/faq.md:76
 msgid "**增加训练轮次**：某些情况下需要更长的训练时间"
-msgstr ""
+msgstr "**增加训练轮次**：某些情况下需要更长的训练时间"
 
 #: ../../source/faq/faq.md:78
 msgid "采样相关"
-msgstr ""
+msgstr "采样相关"
 
 #: ../../source/faq/faq.md:80
 msgid "Q: 如何获取量子计算机访问权限？"
-msgstr ""
+msgstr "Q: 如何获取量子计算机访问权限？"
 
 #: ../../source/faq/faq.md:82
 msgid "A: 请按以下步骤操作："
-msgstr ""
+msgstr "A: 请按以下步骤操作："
 
 #: ../../source/faq/faq.md:84
 msgid "在 [QBoson 平台](https://platform.qboson.com/) 注册账号"
-msgstr ""
+msgstr "在 [QBoson 平台](https://platform.qboson.com/) 注册账号"
 
 #: ../../source/faq/faq.md:85
 msgid "通过平台联系官方工作人员"
-msgstr ""
+msgstr "通过平台联系官方工作人员"
 
 #: ../../source/faq/faq.md:86
 msgid "联系邮箱：developer@boseq.com"
-msgstr ""
+msgstr "联系邮箱：developer@boseq.com"
 
 #: ../../source/faq/faq.md:88
 msgid "在获取真机权限前，您可以使用模拟退火优化器进行开发和测试。"
-msgstr ""
+msgstr "在获取真机权限前，您可以使用模拟退火优化器进行开发和测试。"
 
 #: ../../source/faq/faq.md:90
 msgid "Q: 模拟退火采样器参数如何调整？"
-msgstr ""
+msgstr "Q: 模拟退火采样器参数如何调整？"
 
 #: ../../source/faq/faq.md:92
 msgid "A: `SimulatedAnnealingOptimizer` 的主要参数："
-msgstr ""
+msgstr "A: `SimulatedAnnealingOptimizer` 的主要参数："
 
 #: ../../source/faq/faq.md:94
 msgid "`alpha`：退火系数（0.9-0.999），越接近 1 收敛越慢但结果越优"
-msgstr ""
+msgstr "`alpha`：退火系数（0.9-0.999），越接近 1 收敛越慢但结果越优"
 
 #: ../../source/faq/faq.md:95
 msgid "`size_limit`：每次采样返回的样本数"
-msgstr ""
+msgstr "`size_limit`：每次采样返回的样本数"
 
 #: ../../source/faq/faq.md:108
 msgid "性能相关"
-msgstr ""
+msgstr "性能相关"
 
 #: ../../source/faq/faq.md:110
 msgid "Q: 如何加速训练？"
-msgstr ""
+msgstr "Q: 如何加速训练？"
 
 #: ../../source/faq/faq.md:112
 msgid "A: 几种加速方法："
-msgstr ""
+msgstr "A: 几种加速方法："
 
 #: ../../source/faq/faq.md:114
 msgid "**增大批大小**：在 GPU 内存允许的情况下增大 batch_size"
-msgstr ""
+msgstr "**增大批大小**：在 GPU 内存允许的情况下增大 batch_size"
 
 #: ../../source/faq/faq.md:116
 msgid "**减少采样次数**：可以适当减少采样的部署（如调整SimulatedAnnealingOptimizer的alpha参数等）"
-msgstr ""
+msgstr "**减少采样次数**：可以适当减少采样的部署（如调整SimulatedAnnealingOptimizer的alpha参数等）"
 
 #: ../../source/faq/faq.md:118
 msgid "Q: 显存不足怎么办？"
-msgstr ""
+msgstr "Q: 显存不足怎么办？"
 
 #: ../../source/faq/faq.md:122
 msgid "减小批大小（batch_size）"
-msgstr ""
+msgstr "减小批大小（batch_size）"
 
 #: ../../source/faq/faq.md:123
 msgid "减少隐藏层节点数"
-msgstr ""
+msgstr "减少隐藏层节点数"
 
 #: ../../source/faq/faq.md:124
 msgid "使用梯度累积"
-msgstr ""
+msgstr "使用梯度累积"
 
 #: ../../source/faq/faq.md:126
 msgid "其他问题"
-msgstr ""
+msgstr "其他问题"
 
 #: ../../source/faq/faq.md:128
 msgid "Q: 如何引用这个项目？"
-msgstr ""
+msgstr "Q: 如何引用这个项目？"
 
 #: ../../source/faq/faq.md:130
 msgid "A: 请使用以下 BibTeX 格式："
-msgstr ""
+msgstr "A: 请使用以下 BibTeX 格式："
 
 #: ../../source/faq/faq.md:142
 msgid "Q: 在哪里可以获取更多帮助？"
-msgstr ""
+msgstr "Q: 在哪里可以获取更多帮助？"
 
 #: ../../source/faq/faq.md:144
 msgid "A: 您可以通过以下渠道获取帮助："
-msgstr ""
+msgstr "A: 您可以通过以下渠道获取帮助："
 
 #: ../../source/faq/faq.md:146
 msgid ""
 "**GitHub Issues**：[提交问题](https://github.com/QBoson/Kaiwu-pytorch-"
 "plugin/issues)"
 msgstr ""
+"**GitHub Issues**：[提交问题](https://github.com/QBoson/Kaiwu-pytorch-"
+"plugin/issues)"
 
 #: ../../source/faq/faq.md:147
 msgid "**开发者社区**：玻色量子开发者社区"
-msgstr ""
+msgstr "**开发者社区**：玻色量子开发者社区"
 
 #: ../../source/faq/faq.md:148
 msgid "**联系邮箱**：developer@boseq.com"
-msgstr ""
+msgstr "**联系邮箱**：developer@boseq.com"
 
 #~ msgid "确认已安装 Kaiwu-PyTorch-Plugin：``pip install .``"
 #~ msgstr ""
@@ -308,10 +310,9 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "**GitHub Issues**：`提交问题 <https://github.com/QBoson"
-#~ "/Kaiwu-pytorch-plugin/issues>`_"
+#~ "**GitHub Issues**：`提交问题 <https://github.com/QBoson/Kaiwu-pytorch-"
+#~ "plugin/issues>`_"
 #~ msgstr ""
 
 #~ msgid "**开发者社区**：玻声量子开发者社区"
 #~ msgstr ""
-

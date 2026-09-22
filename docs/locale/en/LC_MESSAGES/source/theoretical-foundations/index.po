@@ -8,18 +8,250 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 19:30+0800\n"
+"POT-Creation-Date: 2026-09-08 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../source/theoretical-foundations/index.md:1
-msgid "理论基础"
+#: ../../source/theoretical-foundations/index.md:23
+msgid "Theoretical Foundations"
 msgstr "Theoretical Foundations"
 
+#: ../../source/theoretical-foundations/index.md:25
+msgid ""
+"This guide lays the theoretical groundwork for **KPP (Kaiwu-PyTorch-"
+"Plugin)**, covering statistical physics, neural networks, and energy‑based "
+"models."
+msgstr ""
+"This guide lays the theoretical groundwork for **KPP (Kaiwu-PyTorch-"
+"Plugin)**, covering statistical physics, neural networks, and energy‑based "
+"models."
+
+#: ../../source/theoretical-foundations/index.md:27
+msgid ""
+"It traces the chain from spin‑glass models to Boltzmann machines, "
+"establishing the conceptual basis for the quantum‑enhanced techniques "
+"covered in the subsequent tutorials."
+msgstr ""
+"It traces the chain from spin‑glass models to Boltzmann machines, "
+"establishing the conceptual basis for the quantum‑enhanced techniques "
+"covered in the subsequent tutorials."
+
+#: ../../source/theoretical-foundations/index.md:29
+msgid ""
+"For a step‑by‑step introduction to KPP, see the [Getting "
+"Started](../getting_started/index.md) guide."
+msgstr ""
+"For a step‑by‑step introduction to KPP, see the [Getting "
+"Started](../getting_started/index.md) guide."
+
+#: ../../source/theoretical-foundations/index.md:31
+msgid "Statistical Physics of Memory and Computation"
+msgstr "Statistical Physics of Memory and Computation"
+
+#: ../../source/theoretical-foundations/index.md:43
+msgid ""
+"[Spin-Glass Analogy](kpp-theoretical-foundations-stat-spinglass.md): Mapping"
+" Ising models to neural states, bridging physics and computation."
+msgstr ""
+"[Spin-Glass Analogy](kpp-theoretical-foundations-stat-spinglass.md): Mapping"
+" Ising models to neural states, bridging physics and computation."
+
+#: ../../source/theoretical-foundations/index.md:44
+msgid ""
+"[Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
+"boltzmann.md): Defining state probability via energy and the partition "
+"function."
+msgstr ""
+"[Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
+"boltzmann.md): Defining state probability via energy and the partition "
+"function."
+
+#: ../../source/theoretical-foundations/index.md:45
+msgid ""
+"[The Need for Noise](kpp-theoretical-foundations-stat-noise.md): From "
+"deterministic Hopfield traps to stochastic search, how noise helps escape "
+"local minima."
+msgstr ""
+"[The Need for Noise](kpp-theoretical-foundations-stat-noise.md): From "
+"deterministic Hopfield traps to stochastic search, how noise helps escape "
+"local minima."
+
+#: ../../source/theoretical-foundations/index.md:46
+msgid ""
+"[Renormalization Group](kpp-theoretical-foundations-stat-"
+"renormalization.md): From microscopic spins to macroscopic features via "
+"coarse-graining, analogous to hierarchical feature learning."
+msgstr ""
+"[Renormalization Group](kpp-theoretical-foundations-stat-"
+"renormalization.md): From microscopic spins to macroscopic features via "
+"coarse-graining, analogous to hierarchical feature learning."
+
+#: ../../source/theoretical-foundations/index.md:48
+msgid "Neural Network Fundamentals"
+msgstr "Neural Network Fundamentals"
+
+#: ../../source/theoretical-foundations/index.md:59
+msgid ""
+"[Linear Neurons Recap](kpp-theoretical-foundations-nn-recap.md): "
+"Perceptrons, the XOR problem, and the motivation for depth."
+msgstr ""
+"[Linear Neurons Recap](kpp-theoretical-foundations-nn-recap.md): "
+"Perceptrons, the XOR problem, and the motivation for depth."
+
+#: ../../source/theoretical-foundations/index.md:60
+msgid ""
+"[Recurrent Networks and Content-Addressable Memory](kpp-theoretical-"
+"foundations-nn-recurrent.md): Dynamics versus feed-forward computation."
+msgstr ""
+"[Recurrent Networks and Content-Addressable Memory](kpp-theoretical-"
+"foundations-nn-recurrent.md): Dynamics versus feed-forward computation."
+
+#: ../../source/theoretical-foundations/index.md:61
+msgid ""
+"[Hebbian Learning as Sculpting Energy](kpp-theoretical-foundations-nn-"
+"learning.md): How local synaptic rules shape the global energy landscape."
+msgstr ""
+"[Hebbian Learning as Sculpting Energy](kpp-theoretical-foundations-nn-"
+"learning.md): How local synaptic rules shape the global energy landscape."
+
+#: ../../source/theoretical-foundations/index.md:63
+msgid "Energy-Based Models (EBMs)"
+msgstr "Energy-Based Models (EBMs)"
+
+#: ../../source/theoretical-foundations/index.md:74
+msgid ""
+"[Defining the Objective: Low Energy for Real Data](kpp-theoretical-"
+"foundations-ebms-def.md): Shaping the energy landscape to fit observations."
+msgstr ""
+"[Defining the Objective: Low Energy for Real Data](kpp-theoretical-"
+"foundations-ebms-def.md): Shaping the energy landscape to fit observations."
+
+#: ../../source/theoretical-foundations/index.md:75
+msgid ""
+"[The Intractable Partition Function Problem](kpp-theoretical-foundations-"
+"ebms-partition.md): The computational barrier to exact inference."
+msgstr ""
+"[The Intractable Partition Function Problem](kpp-theoretical-foundations-"
+"ebms-partition.md): The computational barrier to exact inference."
+
+#: ../../source/theoretical-foundations/index.md:76
+msgid ""
+"[Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md): A "
+"practical shortcut, approximating gradients without equilibrium."
+msgstr ""
+"[Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md): A "
+"practical shortcut, approximating gradients without equilibrium."
+
+#: ../../source/theoretical-foundations/index.md:78
+msgid "Boltzmann Machine Architecture: The Full Spectrum"
+msgstr "Boltzmann Machine Architecture: The Full Spectrum"
+
+#: ../../source/theoretical-foundations/index.md:89
+msgid ""
+"[Classical Boltzmann Machine](kpp-theoretical-foundations-bm-overall.md): "
+"Symmetric connections between visible and hidden units, and the wake-sleep "
+"algorithm."
+msgstr ""
+"[Classical Boltzmann Machine](kpp-theoretical-foundations-bm-overall.md): "
+"Symmetric connections between visible and hidden units, and the wake-sleep "
+"algorithm."
+
+#: ../../source/theoretical-foundations/index.md:90
+msgid ""
+"[Restricted Boltzmann Machine (RBM)](kpp-theoretical-foundations-bm-"
+"restricted.md): The bipartite breakthrough enabling efficient layer-wise "
+"sampling."
+msgstr ""
+"[Restricted Boltzmann Machine (RBM)](kpp-theoretical-foundations-bm-"
+"restricted.md): The bipartite breakthrough enabling efficient layer-wise "
+"sampling."
+
+#: ../../source/theoretical-foundations/index.md:91
+msgid ""
+"[Beyond Single Layers: Stacking for Deep Learning](kpp-theoretical-"
+"foundations-bm-deep.md): Building Deep Belief Networks (DBNs) and the "
+"connection to modern pre-training."
+msgstr ""
+"[Beyond Single Layers: Stacking for Deep Learning](kpp-theoretical-"
+"foundations-bm-deep.md): Building Deep Belief Networks (DBNs) and the "
+"connection to modern pre-training."
+
+#: ../../source/theoretical-foundations/index.md:93
+msgid "Recap: From Statistical Physics to Sampling Bottlenecks"
+msgstr "Recap: From Statistical Physics to Sampling Bottlenecks"
+
+#: ../../source/theoretical-foundations/index.md:102
+msgid ""
+"[Read the Recap](kpp-theoretical-foundations-recap.md) for the key "
+"takeaways:"
+msgstr ""
+"[Read the Recap](kpp-theoretical-foundations-recap.md) for the key "
+"takeaways:"
+
+#: ../../source/theoretical-foundations/index.md:104
+msgid ""
+"Statistical physics provides the probabilistic lens (Boltzmann distribution)"
+" and the metaphor of the energy landscape."
+msgstr ""
+"Statistical physics provides the probabilistic lens (Boltzmann distribution)"
+" and the metaphor of the energy landscape."
+
+#: ../../source/theoretical-foundations/index.md:105
+msgid ""
+"Neural network fundamentals provide the structural components (units, "
+"biases, weights) and the biological inspiration (Hebbian learning)."
+msgstr ""
+"Neural network fundamentals provide the structural components (units, "
+"biases, weights) and the biological inspiration (Hebbian learning)."
+
+#: ../../source/theoretical-foundations/index.md:106
+msgid ""
+"Energy-based models frame the learning objective as minimizing energy for "
+"real data; the intractability of exact gradients motivates approximations "
+"like Contrastive Divergence, which provides a practical solution to the "
+"intractable partition function."
+msgstr ""
+"Energy-based models frame the learning objective as minimizing energy for "
+"real data; the intractability of exact gradients motivates approximations "
+"like Contrastive Divergence, which provides a practical solution to the "
+"intractable partition function."
+
+#: ../../source/theoretical-foundations/index.md:107
+msgid ""
+"Boltzmann Machine Architecture transitions from the computationally "
+"prohibitive full Boltzmann Machine to the Restricted Boltzmann Machine "
+"(RBM), which serves as the critical building block for stacking deep "
+"generative architectures."
+msgstr ""
+"Boltzmann Machine Architecture transitions from the computationally "
+"prohibitive full Boltzmann Machine to the Restricted Boltzmann Machine "
+"(RBM), which serves as the critical building block for stacking deep "
+"generative architectures."
+
+#: ../../source/theoretical-foundations/index.md:109
+msgid ""
+"These foundations expose a fundamental tension: **the expressiveness of "
+"energy-based models is bottlenecked by the difficulty of sampling from "
+"complex, high-dimensional Boltzmann distributions.** Classical Markov chain "
+"methods suffer from slow mixing and bias; quantum sampling offers a "
+"principled alternative by physically evolving a system toward equilibrium."
+msgstr ""
+"These foundations expose a fundamental tension: **the expressiveness of "
+"energy-based models is bottlenecked by the difficulty of sampling from "
+"complex, high-dimensional Boltzmann distributions.** Classical Markov chain "
+"methods suffer from slow mixing and bias; quantum sampling offers a "
+"principled alternative by physically evolving a system toward equilibrium."
+
+#: ../../source/theoretical-foundations/index.md:113
+msgid "References and Further Reading"
+msgstr "References and Further Reading"
+
+#~ msgid "理论基础"
+#~ msgstr "Theoretical Foundations"

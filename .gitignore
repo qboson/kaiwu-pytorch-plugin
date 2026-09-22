@@ -1,4 +1,11 @@
 ### Python ###
+# Docs workspace artifacts
+_theory_drafts/
+_tutorial-drafts/
+.obsidian/
+# macOS Finder metadata
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

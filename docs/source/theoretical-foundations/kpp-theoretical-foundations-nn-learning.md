@@ -30,7 +30,7 @@ $$\Delta w_{ij} \propto x_i x_j$$
 In both formulations, the essential principle is the same: **co-activation strengthens the connection**.
 
 ## Storing Multiple Patterns: The Outer Product Rule
-To store a set of $P$ patterns $\{\boldsymbol{\xi}^1, \boldsymbol{\xi}^2, \ldots, \boldsymbol{\xi}^P\}$, the Hebbian prescription is simply to sum the outer products of each pattern:
+To store a set of $P$ patterns $\{\boldsymbol{\xi}^1, \boldsymbol{\xi}^2, \ldots, \boldsymbol{\xi}^P\}$, the Hebbian prescription (Eq. {eq}`eq-hebbian`, Section 1.1) is simply to sum the outer products of each pattern:
 
 $$w_{ij} = \frac{1}{N} \sum_{\mu=1}^P \xi_i^\mu \xi_j^\mu$$
 
@@ -66,13 +66,13 @@ The Hebbian rule therefore accomplishes the following geometric transformation:
 In this precise sense, **Hebbian learning sculpts the energy landscape**. Each memory contributes a quadratic depression centered at the pattern vector. The collective effect of all stored memories is an additive superposition of these depressions, resulting in a rugged landscape whose local minima correspond, ideally, to the stored memories.
 
 ## The Mathematical Foundation for Hebb's Rule
-While Hebb's postulate is biologically motivated, the Boltzmann machine provides a rigorous mathematical justification for it. Recall from Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) the gradient of the log-likelihood for a Boltzmann machine:
+While Hebb's postulate is biologically motivated, the Boltzmann machine provides a rigorous mathematical justification for it. Recall from Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) the gradient of the log-likelihood for a Boltzmann machine (Eq. {eq}`eq-nll-gradient-tf`):
 
 $$\frac{\partial f}{\partial w_{ij}} = \langle x_i x_j \rangle_{\text{data}} - \langle x_i x_j \rangle_{\text{model}}$$
 
 This learning rule, often called the **contrastive Hebbian rule**, is a direct generalization of Hebb's original idea. The first term, $\langle x_i x_j \rangle_{\text{data}}$, is purely **Hebbian**: it strengthens the connection between two units when they are co-active in the data. The second term, $\langle x_i x_j \rangle_{\text{model}}$, is **anti-Hebbian**: it weakens connections that are spuriously co-active in the model's own generated fantasies.
 
-As derived in Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md), the stochastic gradient update for a Boltzmann machine can be written as:
+As derived in Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md) (Eq. {eq}`eq-cd-update`), the stochastic gradient update for a Boltzmann machine can be written as:
 
 $$\Delta w_{ij} = \eta \left( X_i(\omega) X_j(\omega) - \mathbb{E}_\theta [X_i X_j] \right)$$
 

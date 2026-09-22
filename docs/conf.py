@@ -36,19 +36,29 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinxcontrib.jquery",
-    #'sphinx.ext.imgmath',
-    #'sphinx.ext.mathjax',
-    "sphinxcontrib.katex",
+    # "sphinx.ext.imgmath",  # 不要同时启用
+    # "sphinx.ext.mathjax",  # 启用 MathJax
+    "sphinxcontrib.katex",   # 或启用 KaTeX，但不要同时启用两者
     "myst_parser",
-    "sphinxcontrib.mermaid",
     "sphinx.ext.napoleon",
+    'sphinxcontrib.mermaid',  # 启用 Mermaid 扩展
+    "sphinxcontrib.bibtex",   # 启用 BibTeX 支持
 ]
 myst_enable_extensions = [
     "dollarmath",
     "amsmath",
+    "colon_fence", 
+    "deflist", 
+    "substitution", 
+    "tasklist", 
 ]
+myst_fence_as_directive = ["mermaid"]
 katex_prerender = True
 
+# 公式编号：启用 Sphinx numfig，使公式编号全局唯一（跨页面连续递增），
+# 避免每个页面从 (1) 重新计数导致跨页引用歧义。
+numfig = True
+math_numfig = True
 
 templates_path = ["_templates"]
 exclude_patterns = [
@@ -81,6 +91,14 @@ html_theme_options = {
 
 html_show_sourcelink = False
 html_css_files = ["custom.css"]
+
+
+# -- Options for BibTeX -----------------------------------------------------------
+bibtex_bibfiles = ['refs.bib']
+bibtex_default_style = 'unsrt'   # 参考文献样式，可选：'plain', 'unsrt', 'alpha', 'unsrtalpha'
+bibtex_reference_style = 'label' # 引用样式，可选：'label', 'author_year', 'super'
+# 可选：如果需要中文编码，请保持默认，或根据 .bib 文件的实际编码设置
+# bibtex_encoding = 'utf-8-sig'
 
 
 def _hide_attributes_from_page_toc(app, doctree):
