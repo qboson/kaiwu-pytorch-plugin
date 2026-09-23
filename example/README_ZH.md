@@ -98,3 +98,34 @@ torchmetrics[image]
 ```
 torchvision==0.22.0
 ```
+
+---
+
+### 异常检测任务：基于能量监督 Q-VAE 的公开基准测试
+
+该示例在两个公开异常检测数据集（thyroid、creditcard）上演示CleanEnergyQVAE。它在 Q-VAE 隐变量模型基础上增加了自由能监督头：不是单纯用重构误差打分，而是通过 NCE 对比学习让正常样本的自由能更低、异常样本的自由能更高。主要内容包括：
+
+* **公开 AD 基准**：加载 `38_thyroid.npz`（ADBench）与 `creditcard.csv`（Kaggle），训练集按 1:20 划分正常/异常，验证/测试集平衡；
+* **能量监督 Q-VAE**：Residual MLP 编/解码器 + Bernoulli RBM 隐层，`lambda_anom` 平衡重构损失与能量 InfoNCE 损失；
+* **阈值搜索**：在验证集上对 200 个候选阈值做网格搜索，最大化 F1，并输出每一步候选的日志；
+* **评估与可视化**：PR/ROC 曲线、分数分布、混淆矩阵；每个数据集的产物分别落在 `outputs/<dataset>/` 下。
+
+一键运行训练+评估：
+
+```bash
+bash example/qvae_anomaly/run_public_ad.sh
+```
+
+交互式流程见 `example/qvae_anomaly/qvae_anomaly_demo.ipynb`。
+
+**依赖项**
+
+```
+torch
+scikit-learn
+matplotlib
+numpy
+pandas       # creditcard.csv
+```
+
+数据集下载地址与完整参数说明见 `example/qvae_anomaly/README.md`。
