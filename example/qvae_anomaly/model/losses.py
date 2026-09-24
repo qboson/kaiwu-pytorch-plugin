@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""QVAE-Anomaly 损失函数与 RBM 统计辅助。
+"""Loss functions and RBM statistics for the energy-supervised QVAE.
 
-从原 qvae_anomaly.py 拆出。仅依赖 torch/nn，不 import 模型类。
+Depends only on torch/nn; does not import the model class.
 """
 import torch
 import torch.nn.functional as F

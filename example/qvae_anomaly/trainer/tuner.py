@@ -13,6 +13,7 @@ logger = get_logger("anomaly_tuner")
 
 
 def make_loader(X, y, bs, shuffle):
+    """Build a DataLoader from numpy X/y tensors with basic shape checks."""
     if bs <= 0:
         raise ArgumentError(f"batch_size must be positive, got {bs}")
     if len(X) != len(y):
@@ -22,20 +23,41 @@ def make_loader(X, y, bs, shuffle):
 
 
 class AnomalyTuner:
+    """Single-epoch train / eval step on top of a CleanEnergyQVAE.
+
+    Keeps a reference to the model and optimizer so that repeated
+    :meth:`train_epoch` / :meth:`eval_pr` calls don't rebuild DataLoaders or
+    move tensors between devices. The multi-epoch loop lives in
+    :func:`trainer.trainer.train_model`.
+    """
     def __init__(self, device="cpu"):
         self.device = device
         self.model = None
         self.optimizer = None
 
     def register_model(self, model):
+        """Move ``model`` to ``self.device`` and store it for train/eval."""
         self.model = model.to(self.device)
         logger.debug("Registered model on device=%s", self.device)
 
     def register_optimizer(self, optimizer):
+        """Bind the optimizer (typically Adam/SGD over ``model.parameters()``)."""
         self.optimizer = optimizer
         logger.debug("Registered optimizer: %s", type(optimizer).__name__)
 
     def train_epoch(self, Xtr, ytr, batch_size, kl_beta):
+        """Run one training epoch.
+
+        Args:
+            Xtr:       (N, D) numpy training features.
+            ytr:       (N,) numpy labels, 1 = anomaly, 0 = normal.
+            batch_size: mini-batch size.
+            kl_beta:    weight on the KL / RBM-statistic term passed to
+                        ``model.loss_terms``.
+
+        Returns:
+            The mean total loss over the epoch (float).
+        """
         self.model.train()
         losses = []
         n_batches = 0
@@ -54,6 +76,19 @@ class AnomalyTuner:
 
     @torch.no_grad()
     def eval_pr(self, Xval, yval, score_type="energy"):
+        """Compute validation PR-AUC under a chosen scoring rule.
+
+        Args:
+            Xval:       (N, D) numpy validation features.
+            yval:       (N,) numpy binary labels.
+            score_type: one of
+                - ``"energy"``  — RBM free energy (recommended).
+                - ``"recon"``   — negative reconstruction MSE.
+                - ``"combined"``— z-score-normalized 0.5 * energy + 0.5 * recon.
+
+        Returns:
+            PR-AUC (average precision) as a float.
+        """
         self.model.eval()
         X = torch.from_numpy(Xval).to(self.device)
         if score_type == "energy":

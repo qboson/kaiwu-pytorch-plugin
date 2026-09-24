@@ -12,12 +12,31 @@ from utils.exception import ValueError, SizeError
 
 
 def set_seed(seed):
-    np.random.seed(seed); torch.manual_seed(seed)
+    """Seed numpy, torch CPU, and CUDA RNGs for reproducibility."""
+    np.random.seed(seed)
+    torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
 
 
 def train_model(model, cfg: Config, Xtr, ytr, Xval, yval, tag="model", log_file=None):
+    """Train ``model`` for ``cfg.epochs`` and return the best-epoch state_dict.
+
+    Each epoch runs one forward/backward pass via :class:`AnomalyTuner`,
+    tracks validation PR-AUC (energy score), and checkpoints the best epoch.
+    Training loss and val metrics are logged via ``utils.logging.get_logger``.
+
+    Args:
+        model: CleanEnergyQVAE instance.
+        cfg:   Config with epochs / batch_size / lr / kl_beta.
+        Xtr, ytr: training features and labels (numpy arrays).
+        Xval, yval: validation features and labels.
+        tag:   name prefix in log lines.
+        log_file: optional path to also append logs to a file.
+
+    Returns:
+        state_dict of the best-epoch model (already on CPU).
+    """
     logger = get_logger("trainer", log_file=log_file)
 
     # Validate inputs

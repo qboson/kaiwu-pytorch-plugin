@@ -1,8 +1,8 @@
-"""QVAE-Anomaly 配置（dataclass）
+"""Configuration dataclass for QVAE-Anomaly.
 
-同时承担：
-- 外部调用方传参；
-- 传给 kaiwu 基类 QVAE(config=...) 的底层属性。
+Serves two roles:
+- External parameter surface for the training / evaluation scripts.
+- Attribute bag passed to the kaiwu base class ``QVAE(config=...)``.
 """
 from __future__ import annotations
 from dataclasses import dataclass, field

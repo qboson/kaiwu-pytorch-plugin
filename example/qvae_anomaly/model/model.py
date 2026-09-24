@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
+# SPDX-License-Identifier: Apache-2.0
 """Clean Energy-Supervised QVAE.
 
 Only the model class lives here; loss/RBM-stat helpers are in losses.py.
@@ -28,7 +31,20 @@ logger = get_logger("model")
 
 
 class CleanEnergyQVAE(QVAE):
-    """Energy-supervised deterministic QVAE with a clean RBM latent split."""
+    """Energy-supervised deterministic QVAE with a clean RBM latent split.
+
+    Args:
+        input_dimension: size of the input feature vector (e.g. 74 for
+            thyroid, 30 for creditcard). Usually read from ``config``.
+        activation_fct:  activation function, passed through to the backbone.
+        config:  :class:`Config` dataclass. All energy-supervision
+            knobs (``lambda_anom``, ``energy_margin``, ``anomaly_loss_type``,
+            ``infonce_temperature``, ``negative_phase_mode`` ...) are read
+            from here.
+
+    Notes:
+        Use :func:`build_model` instead of constructing this class directly.
+    """
 
     def __init__(self, input_dimension=None, activation_fct=None, config=None, **kwargs):
         super().__init__(input_dimension=input_dimension, activation_fct=activation_fct,
