@@ -1,4 +1,6 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 """Factory helpers for the ``dplm`` example case."""
@@ -131,5 +133,3 @@ def build_qdiffusion(
 def build_dplm_qdiffusion(*args, **kwargs) -> QDiffusion:
     """Backward-compatible alias for the old builder name."""
     return build_qdiffusion(*args, **kwargs)
-
-

@@ -5,6 +5,9 @@
 本目录提供公开 `Q-Diffusion` 模块的示例与工作流脚本，重点展示如何将通用
 `Q-Diffusion` 核心接入 DPLM 骨干网络，用于蛋白质离散扩散生成任务。
 
+离散文本生成示例见 [`nemotron/`](nemotron/README_ZH.md)：冻结 Nemotron
+proposal，并使用 Contextual Energy Model、官方 KPP BM 与 PyPI Kaiwu SA 进行训练和推理。
+
 ## 数据
 
 [example/qdiffusion 使用的数据](https://www.uniprot.org/proteomes/UP000005640)
@@ -20,16 +23,22 @@ example/qdiffusion/data/UP000005640_9606.fasta
 
 ## 快速开始
 
+示例脚本需要从仓库 `src/` 目录导入 `kaiwu.torch_plugin`，因此运行前**必须**
+先做可编辑安装：
+
 ```bash
+pip install -e .
 pip install -r example/qdiffusion/requirements.txt
-python example/qdiffusion/simple/simple_train_example.py
-python example/qdiffusion/simple/simple_generate_example.py
 ```
 
-以上命令适用于两种常见使用方式：
+然后在仓库根目录以模块方式运行各入口脚本：
 
-- 开发态源码运行：直接在仓库根目录执行
-- 安装态运行：先执行 `pip install -e .`，再运行相同命令
+```bash
+python -m example.qdiffusion.simple.simple_train_example
+python -m example.qdiffusion.simple.simple_generate_example
+python -m example.qdiffusion.dplm.workflows.train
+python -m example.qdiffusion.dplm.workflows.esm2_eval
+```
 
 ## 目录结构与整体关系
 
@@ -67,9 +76,9 @@ factory helper 间接接入。
 - `dplm/utils/dplm_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具
 - `dplm/models/`：模型侧代码，按 backbone、energy reranker 和私有 ESM patch 分层
 - `dplm/utils/`：工作流侧工具，负责 FASTA I/O、checkpoint 和评估指标
-- `dplm/workflows/`：真正的训练和 ESM2 评估实现
-- `dplm/train_workflow.py`：完整训练与评估工作流的兼容入口
-- `dplm/eval_esm2_distances.py`：ESM2 distance 评估的兼容入口
+- `dplm/workflows/`：训练和 ESM2 评估实现
+- `dplm/workflows/train.py`：完整训练与评估工作流入口
+- `dplm/workflows/esm2_eval.py`：ESM2 distance 评估入口
 
 如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
@@ -87,7 +96,7 @@ factory helper 间接接入。
 
 ## 示例 ESM2 距离结果
 
-这个 DPLM 引导工作流提供 `dplm/eval_esm2_distances.py`，用于在 embedding
+这个 DPLM 引导工作流提供 `dplm/workflows/esm2_eval.py`，用于在 embedding
 层面比较生成序列与 reference proteome 的距离。当前一组示例评估使用了：
 
 - reference: `data/UP000005640_9606.fasta`

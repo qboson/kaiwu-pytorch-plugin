@@ -45,6 +45,19 @@ class BMConditionedEnergyModel(EnergyModel):
         candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
+        """Concatenates pooled noisy and candidate features for BM scoring.
+
+        Args:
+            noisy_tokens: Current noisy token ids.
+
+            candidate_tokens: Candidate clean token ids.
+
+            attention_mask: Padding mask for both sequences.
+
+        Returns:
+            torch.Tensor: Concatenated sequence features of shape
+            ``[batch, 2 * hidden_size]``.
+        """
         # Keep this helper explicit because it is the semantic bridge between
         # sequence modeling and BM scoring: everything after this point operates
         # on BM-space states rather than protein tokens.
@@ -66,6 +79,19 @@ class BMConditionedEnergyModel(EnergyModel):
         candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
+        """Projects conditioned features onto the BM visible units.
+
+        Args:
+            noisy_tokens: Current noisy token ids.
+
+            candidate_tokens: Candidate clean token ids.
+
+            attention_mask: Padding mask for both sequences.
+
+        Returns:
+            torch.Tensor: Visible-unit logits consumed by
+            ``discretize_visible_state``.
+        """
         # The projector turns one concatenated sequence feature into the visible
         # part of the BM state before discretization/sampling steps.
         conditioned_features = self.build_conditioned_features(

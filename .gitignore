@@ -181,3 +181,8 @@ example/qvae_cell/output*/
 example/qdiffusion/graph/
 *.h5ad
 article.md
+example/qdiffusion/nemotron/data/
+example/qdiffusion/nemotron/runs/
+example/qdiffusion/nemotron/checkpoints/
+*.pt
+*.jsonl

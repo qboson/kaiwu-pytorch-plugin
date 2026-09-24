@@ -12,6 +12,7 @@ def test_qdiffusion_names_are_exported():
     assert "QDiffusion" in module.__all__
     assert "QDiffusionConfig" in module.__all__
     assert "EnergyModel" in module.__all__
+    assert "SequenceTokenSpec" in module.__all__
 
 
 def test_qdiffusion_direct_import():
@@ -19,6 +20,7 @@ def test_qdiffusion_direct_import():
     assert module.QDiffusion.__name__ == "QDiffusion"
     assert module.QDiffusionConfig.__name__ == "QDiffusionConfig"
     assert module.EnergyModel.__name__ == "EnergyModel"
+    assert module.SequenceTokenSpec.__name__ == "SequenceTokenSpec"
 
 
 def test_qdiffusion_removed_dplm_classmethods():

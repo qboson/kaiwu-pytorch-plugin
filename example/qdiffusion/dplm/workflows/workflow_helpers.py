@@ -1,4 +1,6 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 """Small workflow helpers kept out of the reader-facing training script."""
@@ -14,24 +16,14 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
-try:
-    from ..utils.io import (
-        normalize_decoded_sequence,
-        save_markdown,
-        write_fasta_records,
-        write_tsv_rows,
-    )
-    from ..utils.metrics import QualitySummary
-    from ..utils.runtime import encode_sequence, seed_torch
-except ImportError:  # pragma: no cover - direct script-path compatibility
-    from utils.io import (
-        normalize_decoded_sequence,
-        save_markdown,
-        write_fasta_records,
-        write_tsv_rows,
-    )
-    from utils.metrics import QualitySummary
-    from utils.runtime import encode_sequence, seed_torch
+from ..utils.io import (
+    normalize_decoded_sequence,
+    save_markdown,
+    write_fasta_records,
+    write_tsv_rows,
+)
+from ..utils.metrics import QualitySummary
+from ..utils.runtime import encode_sequence, seed_torch
 
 
 def select_records(
@@ -41,6 +33,20 @@ def select_records(
     max_length: int,
     max_records: int | None,
 ) -> list[tuple[str, str]]:
+    """Selects records whose sequence length falls inside the bounds.
+
+    Args:
+        records: ``(header, sequence)`` FASTA records.
+
+        min_length: Minimum allowed sequence length.
+
+        max_length: Maximum allowed sequence length.
+
+        max_records: Optional cap on the number of selected records.
+
+    Returns:
+        list[tuple[str, str]]: Records within bounds, in input order.
+    """
     selected: list[tuple[str, str]] = []
     for header, sequence in records:
         if len(sequence) < min_length or len(sequence) > max_length:
@@ -58,6 +64,24 @@ def split_train_val_test(
     test_ratio: float,
     seed: int,
 ) -> tuple[list[tuple[str, str]], list[tuple[str, str]], list[tuple[str, str]]]:
+    """Splits records into deterministic train/val/test partitions.
+
+    Args:
+        records: ``(header, sequence)`` FASTA records.
+
+        val_ratio: Fraction of records assigned to validation.
+
+        test_ratio: Fraction of records assigned to test.
+
+        seed: Shuffle seed keeping the split reproducible.
+
+    Returns:
+        tuple: Train, validation, and test record lists.
+
+    Raises:
+        ValueError: If fewer than three records are supplied or the
+            val/test sizes would consume every record.
+    """
     if len(records) < 3:
         raise ValueError("Need at least 3 records to build train/val/test splits.")
 
@@ -76,6 +100,12 @@ def split_train_val_test(
 
 
 class FastaSequenceDataset(Dataset[dict[str, str]]):
+    """Dataset over ``(header, sequence)`` FASTA records.
+
+    Attributes:
+        records: The ``(header, sequence)`` pairs served per index.
+    """
+
     def __init__(self, records: list[tuple[str, str]]):
         self.records = records
 
@@ -90,6 +120,21 @@ class FastaSequenceDataset(Dataset[dict[str, str]]):
 def build_data_loader_from_records(
     generator, records, *, batch_size: int, shuffle: bool
 ) -> DataLoader:
+    """Builds a tokenizing DataLoader over FASTA records.
+
+    Args:
+        generator: Assembled ``QDiffusion`` whose tokenizer/device are used.
+
+        records: ``(header, sequence)`` FASTA records.
+
+        batch_size: Batch size forwarded to the DataLoader.
+
+        shuffle: Whether to shuffle the record order.
+
+    Returns:
+        DataLoader: Batches of ``{"headers", "targets"}`` on the generator
+        device.
+    """
     def collate(batch: list[dict[str, str]]) -> dict[str, Any]:
         sequences = [item["sequence"] for item in batch]
         headers = [item["header"] for item in batch]
@@ -120,11 +165,27 @@ def run_epoch(
     grad_clip_norm: float,
     description: str,
 ) -> dict[str, float]:
+    """Runs one training or evaluation epoch over a DataLoader.
+
+    Args:
+        generator: Assembled ``QDiffusion`` to train or evaluate.
+
+        data_loader: Batches of tokenized targets.
+
+        optimizer: Optimizer for training epochs; ``None`` for evaluation.
+
+        grad_clip_norm: Global-norm gradient clip; non-positive disables it.
+
+        description: Progress-bar label.
+
+    Returns:
+        dict[str, float]: Example-weighted objective mean plus the tracked
+        energy metrics.
+    """
     training = optimizer is not None
     if training:
+        # ``QDiffusion.train()`` keeps a frozen proposal model in eval mode.
         generator.train()
-        if getattr(generator, "proposal_model", None) is not None:
-            generator.proposal_model.eval()
     else:
         generator.eval()
 
@@ -175,19 +236,21 @@ def run_epoch(
 
 
 def summarize_objective(outputs: dict[str, torch.Tensor]) -> str:
+    """Renders one objective output dictionary as a compact log line."""
     logits = outputs["logits"]
     targets = outputs["targets"]
     loss_mask = outputs["loss_mask"]
-    weight = outputs["weight"]
     energy_objective = outputs["energy_objective"]
+    zero_energy = torch.tensor(0.0)
+    positive_energy = float(outputs.get("positive_energy_mean", zero_energy).item())
+    negative_energy = float(outputs.get("negative_energy_mean", zero_energy).item())
     return (
         f"logits={tuple(logits.shape)}, "
         f"targets={tuple(targets.shape)}, "
         f"masked_positions={int(loss_mask.sum().item())}, "
-        f"weight_mean={float(weight.mean().item()):.4f}, "
         f"energy_objective_mean={float(energy_objective.mean().item()):.4f}, "
-        f"positive_energy_mean={float(outputs.get('positive_energy_mean', torch.tensor(0.0)).item()):.4f}, "
-        f"negative_energy_mean={float(outputs.get('negative_energy_mean', torch.tensor(0.0)).item()):.4f}"
+        f"positive_energy_mean={positive_energy:.4f}, "
+        f"negative_energy_mean={negative_energy:.4f}"
     )
 
 
@@ -198,6 +261,20 @@ def run_structural_validation(
     max_length: int,
     steps: int,
 ) -> dict[str, Any]:
+    """Sanity-checks one record through both objective and generate.
+
+    Args:
+        generator: Assembled ``QDiffusion``.
+
+        record: ``(header, sequence)`` FASTA record to probe.
+
+        max_length: Maximum tokenization length.
+
+        steps: Decode steps for the generation probe.
+
+    Returns:
+        dict[str, Any]: Lengths, decoded prefixes, and an objective summary.
+    """
     header, sequence = record
     target_tokens = encode_sequence(generator, sequence, max_length=max_length)
     with torch.no_grad():
@@ -232,6 +309,29 @@ def run_generation_over_records(
     output_dir: Path,
     label: str,
 ) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
+    """Generates conditioned on each reference record and writes artifacts.
+
+    Deliberately distinct from
+    ``esm2_eval_helpers.run_masked_generation_over_records``: this variant
+    conditions on the reference sequence itself instead of all-mask inputs.
+
+    Args:
+        generator: Assembled ``QDiffusion``.
+
+        records: ``(header, sequence)`` reference FASTA records.
+
+        max_steps: Decode steps per sequence.
+
+        seed_base: Base seed; per-record seeds offset by the record index.
+
+        output_dir: Directory receiving the generated FASTA and summary TSV.
+
+        label: Filename prefix distinguishing baseline from guided runs.
+
+    Returns:
+        tuple: Generated ``(header, sequence)`` records and their per-record
+        summary rows.
+    """
     output_dir.mkdir(parents=True, exist_ok=True)
     generated_records: list[tuple[str, str]] = []
     rows: list[dict[str, Any]] = []
@@ -284,6 +384,36 @@ def write_markdown_report(
     test_count: int,
     best_checkpoint_path: Path | None,
 ) -> None:
+    """Writes the human-readable Markdown run report.
+
+    Args:
+        path: Destination Markdown path.
+
+        config: Workflow configuration snapshot.
+
+        validation_summary: Output of ``run_structural_validation``.
+
+        train_history: Per-epoch metric dictionaries.
+
+        baseline_quality: Quality metrics of the proposal-only run.
+
+        guided_quality: Quality metrics of the guided run.
+
+        comparison_summary: Baseline/guided difference summary.
+
+        selected_count: Number of records after length filtering.
+
+        train_count: Number of training records.
+
+        val_count: Number of validation records.
+
+        test_count: Number of test records.
+
+        best_checkpoint_path: Checkpoint selected on validation, if any.
+    """
+    best_checkpoint_text = (
+        str(best_checkpoint_path) if best_checkpoint_path is not None else "N/A"
+    )
     lines = [
         "# Full Example Report",
         "",
@@ -322,13 +452,21 @@ def write_markdown_report(
         "",
         "| Metric | Baseline | Guided |",
         "|---|---:|---:|",
-        f"| amino_acid_jsd | {baseline_quality.amino_acid_jsd:.5f} | {guided_quality.amino_acid_jsd:.5f} |",
-        f"| kmer2_jsd | {baseline_quality.kmer2_jsd:.5f} | {guided_quality.kmer2_jsd:.5f} |",
-        f"| kmer3_jsd | {baseline_quality.kmer3_jsd:.5f} | {guided_quality.kmer3_jsd:.5f} |",
-        f"| length_match_ratio | {baseline_quality.length_match_ratio:.5f} | {guided_quality.length_match_ratio:.5f} |",
-        f"| identity_to_reference_mean | {baseline_quality.identity_to_reference_mean:.5f} | {guided_quality.identity_to_reference_mean:.5f} |",
-        f"| uniqueness_ratio | {baseline_quality.uniqueness_ratio:.5f} | {guided_quality.uniqueness_ratio:.5f} |",
-        f"| repeat_ratio_ge4 | {baseline_quality.repeat_ratio_ge4:.5f} | {guided_quality.repeat_ratio_ge4:.5f} |",
+        f"| amino_acid_jsd | {baseline_quality.amino_acid_jsd:.5f} | "
+        f"{guided_quality.amino_acid_jsd:.5f} |",
+        f"| kmer2_jsd | {baseline_quality.kmer2_jsd:.5f} | "
+        f"{guided_quality.kmer2_jsd:.5f} |",
+        f"| kmer3_jsd | {baseline_quality.kmer3_jsd:.5f} | "
+        f"{guided_quality.kmer3_jsd:.5f} |",
+        f"| length_match_ratio | {baseline_quality.length_match_ratio:.5f} | "
+        f"{guided_quality.length_match_ratio:.5f} |",
+        f"| identity_to_reference_mean | "
+        f"{baseline_quality.identity_to_reference_mean:.5f} | "
+        f"{guided_quality.identity_to_reference_mean:.5f} |",
+        f"| uniqueness_ratio | {baseline_quality.uniqueness_ratio:.5f} | "
+        f"{guided_quality.uniqueness_ratio:.5f} |",
+        f"| repeat_ratio_ge4 | {baseline_quality.repeat_ratio_ge4:.5f} | "
+        f"{guided_quality.repeat_ratio_ge4:.5f} |",
         "",
         "## 5. Baseline vs Guided Difference",
         "",
@@ -343,7 +481,7 @@ def write_markdown_report(
         "",
         "| Item | Value |",
         "|---|---|",
-        f"| best_checkpoint | {best_checkpoint_path if best_checkpoint_path is not None else 'N/A'} |",
+        f"| best_checkpoint | {best_checkpoint_text} |",
         f"| train_num_candidates | {config.train.num_candidates} |",
         f"| guided_num_candidates | {config.generate.num_candidates} |",
         f"| generation_steps | {config.generate.steps} |",
