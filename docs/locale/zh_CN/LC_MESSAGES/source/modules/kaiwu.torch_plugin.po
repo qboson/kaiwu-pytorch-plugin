@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-24 18:28+0800\n"
+"POT-Creation-Date: 2026-09-23 18:46+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -508,7 +508,10 @@ msgid ""
 "Configuration with ``num_latent_units`` (int), ``loss_type`` "
 "(``'bernoulli'`` or ``'mse'``), ``dist_beta`` (float), ``kl_beta`` "
 "(float), and ``weight_decay`` (float)."
-msgstr "包含 ``num_latent_units``（int）、``loss_type``（``'bernoulli'`` 或 ``'mse'``）、``dist_beta``（float）、``kl_beta``（float）和 ``weight_decay``（float）的配置对象。"
+msgstr ""
+"包含 ``num_latent_units``（int）、``loss_type``（``'bernoulli'`` 或 "
+"``'mse'``）、``dist_beta``（float）、``kl_beta``（float）和 "
+"``weight_decay``（float）的配置对象。"
 
 #: kaiwu.torch_plugin.qvae.QVAE:11 of
 msgid "Pre-created encoder. Created by the subclass factory when omitted."
@@ -585,6 +588,16 @@ msgid ""
 "Reconstructed logits, posterior distribution, encoder logits,     and "
 "reparameterized latent sample."
 msgstr "重建 logits、后验分布、编码器 logits 和重参数化的潜变量样本。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:8 of
+#, fuzzy
+msgid "Reconstructed logits, posterior distribution, encoder logits,"
+msgstr "重建 logits、后验分布、编码器 logits 和重参数化的潜变量样本。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:9 of
+#, fuzzy
+msgid "and reparameterized latent sample."
+msgstr "后验分布和重参数化的潜变量样本。"
 
 #: kaiwu.torch_plugin.qvae.QVAE.loss:1 of
 msgid "Compute total loss (reconstruction + KL + weight decay)."
