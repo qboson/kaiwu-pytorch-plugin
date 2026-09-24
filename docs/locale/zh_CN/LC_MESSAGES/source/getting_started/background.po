@@ -9,276 +9,306 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 12:42+0800\n"
+"POT-Creation-Date: 2026-09-08 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: ../../source/getting_started/background.md:1
-msgid "预备知识"
-msgstr ""
+msgid "Prerequisites"
+msgstr "预备知识"
 
 #: ../../source/getting_started/background.md:3
 msgid ""
-"受限玻尔兹曼机（Restricted Boltzmann Machine）是一种基于能量的概率图模型，由可见层（Visible "
-"Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。 其核心是通过无监督学习学习数据的潜在特征分布。"
+"Restricted Boltzmann Machine (RBM) is an energy-based probabilistic "
+"graphical model, composed of a visible layer and a hidden layer, with no "
+"connections within each layer and full connections between layers. Its core "
+"objective is to learn the latent feature distribution of data through "
+"unsupervised learning."
 msgstr ""
+"受限玻尔兹曼机（Restricted Boltzmann Machine，RBM）是一种基于能量的概率图模型，由可见层（Visible "
+"Layer）和隐层（Hidden Layer）组成，层内无连接、层间全连接。其核心目标是通过无监督学习学习数据的潜在特征分布。"
 
 #: ../../source/getting_started/background.md:7
-msgid "1. 神经网络基础"
-msgstr ""
+msgid "1. Neural Network Basics"
+msgstr "1\\. 神经网络基础"
 
 #: ../../source/getting_started/background.md:9
-msgid "1.1 神经元模型"
-msgstr ""
+msgid "1.1 Neuron Model"
+msgstr "1.1 神经元模型"
 
 #: ../../source/getting_started/background.md:11
 #, python-brace-format
-msgid "人工神经元是神经网络的基本计算单元。给定输入向量 $\\mathbf{x} \\in \\mathbb{R}^n$，其输出为："
-msgstr ""
+msgid ""
+"An artificial neuron is the basic computational unit of a neural network. "
+"Given an input vector $\\mathbf{x} \\in \\mathbb{R}^n$, its output is:"
+msgstr "人工神经元是神经网络的基本计算单元。给定输入向量 $\\mathbf{x} \\in \\mathbb{R}^n$，其输出为："
 
 #: ../../source/getting_started/background.md:13
 #, python-brace-format
 msgid ""
 "\n"
+"a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)\n"
+msgstr ""
 "\n"
 "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)\n"
-"\n"
-msgstr ""
 
-#: ../../source/getting_started/background.md:18
+#: ../../source/getting_started/background.md:17
 #, python-brace-format
 msgid ""
-"其中 $\\mathbf{w} \\in \\mathbb{R}^n$ 为权重向量，$b \\in \\mathbb{R}$ "
-"为偏置项，$\\phi(\\cdot)$ 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数："
+"where $\\mathbf{w} \\in \\mathbb{R}^n$ is the weight vector, $b \\in "
+"\\mathbb{R}$ is the bias, and $\\phi(\\cdot)$ is the activation function. In"
+" probabilistic generative models, the Sigmoid activation function is "
+"commonly used:"
 msgstr ""
+"其中 $\\mathbf{w} \\in \\mathbb{R}^n$ 为权重向量，$b \\in \\mathbb{R}$ "
+"为偏置项，$\\phi(\\cdot)$ 为激活函数。在概率生成模型中，通常使用 Sigmoid 激活函数："
 
-#: ../../source/getting_started/background.md:20
+#: ../../source/getting_started/background.md:19
 msgid ""
-"\n"
 "\n"
 "\\sigma(z) = \\frac{1}{1 + e^{-z}}\n"
-"\n"
 msgstr ""
+"\n"
+"\\sigma(z) = \\frac{1}{1 + e^{-z}}\n"
+
+#: ../../source/getting_started/background.md:23
+msgid "1.2 Energy-Based Models"
+msgstr "1.2 基于能量的模型"
 
 #: ../../source/getting_started/background.md:25
-msgid "1.2 基于能量的模型"
+#, python-brace-format
+msgid ""
+"Unlike feedforward networks, Energy-Based Models (EBMs) define a probability"
+" distribution over data via a scalar energy function $E(\\mathbf{x}; "
+"\\theta)$:"
 msgstr ""
+"与前馈网络不同，能量基模型（Energy-Based Models，EBMs）通过标量能量函数 $E(\\mathbf{x}; \\theta)$ "
+"定义数据的概率分布："
 
 #: ../../source/getting_started/background.md:27
-#, python-brace-format
-msgid ""
-"与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 $E(\\mathbf{x}; "
-"\\theta)$ 定义数据的概率分布："
-msgstr ""
-
-#: ../../source/getting_started/background.md:29
 msgid ""
 "\n"
-"\n"
-"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; "
-"\\theta))}{Z(\\theta)}\n"
-"\n"
+"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}\n"
 msgstr ""
+"\n"
+"P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}\n"
 
-#: ../../source/getting_started/background.md:34
-msgid "其中配分函数（partition function）:"
-msgstr ""
+#: ../../source/getting_started/background.md:31
+msgid "where the partition function is:"
+msgstr "其中配分函数（partition function）为："
 
-#: ../../source/getting_started/background.md:36
+#: ../../source/getting_started/background.md:33
 msgid ""
-"\n"
 "\n"
 "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))\n"
-"\n"
 msgstr ""
+"\n"
+"Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))\n"
+
+#: ../../source/getting_started/background.md:37
+msgid ""
+"ensuring normalization. Low energy states correspond to high probability."
+msgstr "确保概率归一化。低能量状态对应高概率。"
 
 #: ../../source/getting_started/background.md:41
-msgid "确保概率归一化。低能量状态对应高概率。"
-msgstr ""
+msgid "2. Boltzmann Machine Architecture"
+msgstr "2\\. 玻尔兹曼机结构"
+
+#: ../../source/getting_started/background.md:43
+msgid ""
+"**Visible layer (v)**: explicit representation of input data (e.g., pixel "
+"values)."
+msgstr "**可见层（v）**：输入数据的显式表示（如像素值）。"
+
+#: ../../source/getting_started/background.md:44
+msgid "**Hidden layer (h)**: extracted latent features."
+msgstr "**隐层（h）**：提取的潜在特征。"
 
 #: ../../source/getting_started/background.md:45
-msgid "2. 玻尔兹曼机结构"
-msgstr ""
+msgid "**Weight matrix (W)**: connections between visible and hidden layers."
+msgstr "**权重矩阵（W）**：连接可见层与隐层的权重。"
 
-#: ../../source/getting_started/background.md:47
-msgid "可见层（**v**）：输入数据的显式表示（如像素值）。"
-msgstr ""
+#: ../../source/getting_started/background.md:46
+#, python-brace-format
+msgid "**Biases**: visible bias ($\\mathbf{b}$) and hidden bias ($\\mathbf{c}$)."
+msgstr "**偏置**：可见层偏置（$\\mathbf{b}$）和隐层偏置（$\\mathbf{c}$）。"
 
 #: ../../source/getting_started/background.md:48
-msgid "隐藏层（**h**）：提取的潜在特征。"
-msgstr ""
-
-#: ../../source/getting_started/background.md:49
-msgid "权重矩阵（**w**）：连接可见层与隐层的权重。"
-msgstr ""
+msgid ""
+"A Boltzmann Machine (BM) is fully connected, while a Restricted Boltzmann "
+"Machine (RBM) removes intra-layer connections, making Gibbs sampling more "
+"efficient."
+msgstr "玻尔兹曼机（BM）采用全连接拓扑，而受限玻尔兹曼机（RBM）去除了层内连接，使 Gibbs 采样更加高效。"
 
 #: ../../source/getting_started/background.md:50
-msgid "偏置：可见层偏置（**b**）和隐层偏置（**c**）。"
-msgstr ""
+msgid ""
+"Due to the restricted structure of RBM, hidden variables are mutually "
+"independent given the visible variables, and their conditional probabilities"
+" are:"
+msgstr "由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为："
 
 #: ../../source/getting_started/background.md:52
-msgid "玻尔兹曼机（BM)的拓扑结构是全连接的，而受限玻尔兹曼机通过去掉了可见层和隐藏层内部的链接， 让Gibbs采样的过程更加高效。"
-msgstr ""
-
-#: ../../source/getting_started/background.md:55
-msgid "由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为："
-msgstr ""
-
-#: ../../source/getting_started/background.md:57
 #, python-brace-format
 msgid ""
 "\n"
-"\n"
-"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j "
-"\\right)\n"
-"\n"
+"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j \\right)\n"
 msgstr ""
+"\n"
+"P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j \\right)\n"
 
-#: ../../source/getting_started/background.md:62
-msgid "同理，"
+#: ../../source/getting_started/background.md:56
+msgid "Similarly,"
+msgstr "同理，"
+
+#: ../../source/getting_started/background.md:58
+#, python-brace-format
+msgid ""
+"\n"
+"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i \\right)\n"
 msgstr ""
+"\n"
+"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i \\right)\n"
 
 #: ../../source/getting_started/background.md:64
+msgid "3. Energy Function and Probability Distribution"
+msgstr "3\\. 能量函数与概率分布"
+
+#: ../../source/getting_started/background.md:66
+msgid "3.1 Energy Function"
+msgstr "3.1 能量函数"
+
+#: ../../source/getting_started/background.md:68
+msgid "The energy function of an RBM is defined as:"
+msgstr "RBM 的能量函数定义为："
+
+#: ../../source/getting_started/background.md:70
 #, python-brace-format
 msgid ""
 "\n"
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
+msgstr ""
 "\n"
-"P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i "
-"\\right)\n"
-"\n"
-msgstr ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 
-#: ../../source/getting_started/background.md:69
-msgid "3. 能量函数与概率分布"
-msgstr ""
-
-#: ../../source/getting_started/background.md:71
-msgid "3.1 能量函数"
-msgstr ""
-
-#: ../../source/getting_started/background.md:73
-msgid "RBM 的能量函数定义为："
-msgstr ""
-
-#: ../../source/getting_started/background.md:75
+#: ../../source/getting_started/background.md:74
 #, python-brace-format
 msgid ""
-"\n"
-"\n"
-"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
-"\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
-"\n"
+"where $\\mathbf{v}, \\mathbf{h}$ are the states of the visible and hidden "
+"layers, $\\mathbf{W}$ is the connection weight, and $\\mathbf{b}, "
+"\\mathbf{c}$ are bias terms."
 msgstr ""
-
-#: ../../source/getting_started/background.md:80
-#, python-brace-format
-msgid ""
 "其中，$\\mathbf{v}, \\mathbf{h}$ 分别是可见层和隐层的状态，$\\mathbf{W}$ "
-"是连接的权重，$\\mathbf{b}, \\mathbf{c}$ 是一次项系数。"
+"是连接的权重，$\\mathbf{b}, \\mathbf{c}$ 为偏置项。"
+
+#: ../../source/getting_started/background.md:76
+msgid ""
+"The joint probability distribution is given by the Boltzmann distribution:"
+msgstr "联合概率分布由玻尔兹曼分布给出："
+
+#: ../../source/getting_started/background.md:78
+msgid ""
+"\n"
+"P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}\n"
 msgstr ""
+"\n"
+"P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}\n"
 
 #: ../../source/getting_started/background.md:82
-msgid "联合概率分布通过玻尔兹曼分布给出："
-msgstr ""
+msgid ""
+"where $Z$ is the partition function (normalization factor). The marginal "
+"distribution over the visible layer is:"
+msgstr "其中 $Z$ 为配分函数（归一化因子）。可见层上的边际分布为："
 
 #: ../../source/getting_started/background.md:84
 msgid ""
 "\n"
-"\n"
-"P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
-"\n"
-"\n"
+"P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
 msgstr ""
-
-#: ../../source/getting_started/background.md:89
-msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
-msgstr ""
-
-#: ../../source/getting_started/background.md:91
-msgid ""
-"\n"
 "\n"
 "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
-"\n"
-msgstr ""
 
-#: ../../source/getting_started/background.md:96
-msgid "通过最大化似然函数学习参数 $W,b,c$ 。目标函数为负对数似然："
-msgstr ""
-
-#: ../../source/getting_started/background.md:98
+#: ../../source/getting_started/background.md:88
 msgid ""
-"\n"
+"We learn parameters $W, b, c$ by maximizing the likelihood. The objective is"
+" the negative log-likelihood:"
+msgstr "我们通过最大化似然来学习参数 $W, b, c$。目标函数为负对数似然："
+
+#: ../../source/getting_started/background.md:90
+msgid ""
 "\n"
 "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})\n"
+msgstr ""
 "\n"
-msgstr ""
+"\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})\n"
 
-#: ../../source/getting_started/background.md:103
-msgid "采用对比散度（CD）算法近似梯度，更新规则为："
-msgstr ""
+#: ../../source/getting_started/background.md:94
+msgid ""
+"The Contrastive Divergence (CD) algorithm approximates the gradient, giving "
+"the update rule:"
+msgstr "对比散度（Contrastive Divergence，CD）算法对梯度进行近似，得到更新规则："
 
-#: ../../source/getting_started/background.md:105
+#: ../../source/getting_started/background.md:96
+#: ../../source/getting_started/background.md:159
 msgid ""
 "\n"
-"\n"
-"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
-"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
-"\\right)\n"
-"\n"
+"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
 msgstr ""
+"\n"
+"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
 
-#: ../../source/getting_started/background.md:110
+#: ../../source/getting_started/background.md:100
 msgid ""
-"其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle"
-" \\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
+"where $\\epsilon$ is the learning rate, $\\langle \\cdot "
+"\\rangle_{\\text{data}}$ and $\\langle \\cdot \\rangle_{\\text{recon}}$ are "
+"the expectations under the data distribution and the reconstruction "
+"distribution, respectively."
 msgstr ""
+"其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle "
+"\\cdot \\rangle_{\\text{recon}}$ 分别是数据分布与重构分布下的期望。"
 
-#: ../../source/getting_started/background.md:112
-msgid "3.2 梯度的推导"
-msgstr ""
+#: ../../source/getting_started/background.md:102
+msgid "3.2 Derivation of the Gradient"
+msgstr "3.2 梯度推导"
 
-#: ../../source/getting_started/background.md:114
-msgid "能量模型的概率可以写成："
-msgstr ""
+#: ../../source/getting_started/background.md:104
+msgid "For an energy-based model, the probability can be written as:"
+msgstr "对于基于能量的模型，概率可以写成："
 
-#: ../../source/getting_started/background.md:116
+#: ../../source/getting_started/background.md:106
 #, python-brace-format
 msgid ""
-"\n"
 "\n"
 "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)\n"
+msgstr ""
 "\n"
-msgstr ""
+"p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)\n"
 
-#: ../../source/getting_started/background.md:121
-msgid "其梯度为："
-msgstr ""
+#: ../../source/getting_started/background.md:110
+msgid "Its gradient is:"
+msgstr "其梯度为："
 
-#: ../../source/getting_started/background.md:123
+#: ../../source/getting_started/background.md:112
 #, python-brace-format
 msgid ""
 "\n"
-"\n"
-"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x;"
-" \\theta) - \\nabla_\\theta \\log Z\n"
-"\n"
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; \\theta) - \\nabla_\\theta \\log Z\n"
 msgstr ""
+"\n"
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; \\theta) - \\nabla_\\theta \\log Z\n"
 
-#: ../../source/getting_started/background.md:128
-msgid "配分函数的梯度难以直接计算"
-msgstr ""
+#: ../../source/getting_started/background.md:116
+msgid "The gradient of the partition function is not directly computable:"
+msgstr "配分函数的梯度无法直接计算："
 
-#: ../../source/getting_started/background.md:130
+#: ../../source/getting_started/background.md:118
 msgid ""
-"\n"
 "\n"
 "\\begin{aligned}\n"
 "\\nabla_\\theta \\log Z\n"
@@ -286,87 +316,103 @@ msgid ""
 "&= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\\n"
 "&= \\sum_x \\frac{\\nabla_\\theta \\tilde{p}(x)}{Z}\n"
 "\\end{aligned}\n"
-"\n"
 msgstr ""
+"\n"
+"\\begin{aligned}\n"
+"\\nabla_\\theta \\log Z\n"
+"&= \\frac{\\nabla_\\theta Z}{Z} \\\\\n"
+"&= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\sum_x \\frac{\\nabla_\\theta \\tilde{p}(x)}{Z}\n"
+"\\end{aligned}\n"
 
-#: ../../source/getting_started/background.md:140
+#: ../../source/getting_started/background.md:127
 #, python-brace-format
 msgid ""
-"对于保证所有的 $x$ 都有 $p(x) > 0$ 的模型，我们可以用 $\\exp(\\log \\tilde{p}(x))$ 代替 "
-"$\\tilde{p}(x)$。"
+"For models where $p(x) > 0$ for all $x$, we can replace $\\tilde{p}(x)$ with"
+" $\\exp(\\log \\tilde{p}(x))$:"
 msgstr ""
+"对于所有 $x$ 均满足 $p(x) > 0$ 的模型，可以用 $\\exp(\\log \\tilde{p}(x))$ 替换 "
+"$\\tilde{p}(x)$："
 
-#: ../../source/getting_started/background.md:142
+#: ../../source/getting_started/background.md:129
 msgid ""
-"\n"
 "\n"
 "\\begin{aligned}\n"
 "\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
-"&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log "
-"\\tilde{p}(x)}{Z} \\\\\n"
-"&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} "
-"\\\\\n"
+"&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
 "&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
 "&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)\n"
 "\\end{aligned}\n"
-"\n"
 msgstr ""
+"\n"
+"\\begin{aligned}\n"
+"\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
+"&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+"&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
+"&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)\n"
+"\\end{aligned}\n"
+
+#: ../../source/getting_started/background.md:139
+msgid "Therefore,"
+msgstr "因此，"
+
+#: ../../source/getting_started/background.md:141
+#, python-brace-format
+msgid ""
+"\n"
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+msgstr ""
+"\n"
+"\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+
+#: ../../source/getting_started/background.md:145
+msgid ""
+"The second term involves the model distribution $p(x; \\theta)$, while the "
+"first term is from the empirical data distribution. Thus,"
+msgstr "第二项涉及模型分布 $p(x; \\theta)$，第一项来自经验数据分布。因此，"
+
+#: ../../source/getting_started/background.md:147
+msgid ""
+"\n"
+"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+msgstr ""
+"\n"
+"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+
+#: ../../source/getting_started/background.md:151
+msgid "For the Boltzmann machine energy function, we easily obtain:"
+msgstr "对于玻尔兹曼机能量函数，我们容易得到："
 
 #: ../../source/getting_started/background.md:153
-msgid "综上，"
-msgstr ""
-
-#: ../../source/getting_started/background.md:155
-#, python-brace-format
-msgid ""
-"\n"
-" \\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
-"\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
-"\\hat{p}(x; \\theta)\n"
-"\n"
-msgstr ""
-
-#: ../../source/getting_started/background.md:159
-#, python-brace-format
-msgid ""
-"第二项中 $p(x; \\theta)$ 实际上是模型预测的 $\\mathbf{x}$ "
-"的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
-msgstr ""
-
-#: ../../source/getting_started/background.md:161
-msgid ""
-"\n"
-"\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
-"p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - "
-"\\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x;"
-" \\theta)\n"
-"\n"
-msgstr ""
-
-#: ../../source/getting_started/background.md:165
-msgid "这里我们考虑玻尔兹曼机的能量函数，容易求得"
-msgstr ""
-
-#: ../../source/getting_started/background.md:167
 #, python-brace-format
 msgid ""
 "\n"
 "\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
+msgstr ""
 "\n"
-msgstr ""
+"\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
 
-#: ../../source/getting_started/background.md:171
-msgid "只要分别得到 $p_{\\text{data}}$, $p_{\\text{model}}$ 分布下的 $v$ 和 $h$ 的值即可计算梯度。即为："
-msgstr ""
-
-#: ../../source/getting_started/background.md:174
+#: ../../source/getting_started/background.md:157
 msgid ""
-"\n"
-"\n"
-"\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j "
-"\\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} "
-"\\right)\n"
+"Hence, the gradient can be computed by sampling $v$ and $h$ under "
+"$p_{\\text{data}}$ and $p_{\\text{model}}$, leading to:"
 msgstr ""
+"因此，梯度可以通过在 $p_{\\text{data}}$ 和 $p_{\\text{model}}$ 下对 $v$ 和 $h$ 采样来计算，从而得到："
+
+#: ../../source/getting_started/background.md:163
+msgid "Further Reading"
+msgstr "延伸阅读"
+
+#: ../../source/getting_started/background.md:165
+msgid ""
+"For a comprehensive treatment of the theoretical foundations behind energy-"
+"based models, sampling, and quantum enhancement, refer to the [Theoretical "
+"Foundations](../theoretical-foundations/index.md) section of the "
+"documentation."
+msgstr ""
+"关于能量基模型、采样与量子增强背后的理论基础，请参阅文档中的[理论基础](../theoretical-foundations/index.md)章节。"
 
 #~ msgid "人工神经元是神经网络的基本计算单元。给定输入向量 :math:`\\mathbf{x} \\in \\mathbb{R}^n`，其输出为："
 #~ msgstr ""
@@ -375,55 +421,41 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "其中 :math:`\\mathbf{w} \\in \\mathbb{R}^n` "
-#~ "为权重向量，:math:`b \\in \\mathbb{R}` "
-#~ "为偏置项，:math:`\\phi(\\cdot)` 为激活函数。在概率生成模型中，常用 Sigmoid "
-#~ "激活函数："
+#~ "其中 :math:`\\mathbf{w} \\in \\mathbb{R}^n` 为权重向量，:math:`b \\in \\mathbb{R}` "
+#~ "为偏置项，:math:`\\phi(\\cdot)` 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数："
 #~ msgstr ""
 
 #~ msgid "\\sigma(z) = \\frac{1}{1 + e^{-z}}"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数"
-#~ " :math:`E(\\mathbf{x}; \\theta)` 定义数据的概率分布："
+#~ "与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 :math:`E(\\mathbf{x}; "
+#~ "\\theta)` 定义数据的概率分布："
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(\\mathbf{x}; \\theta) = "
-#~ "\\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}"
+#~ msgid "P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}"
 #~ msgstr ""
 
 #~ msgid "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(h_j = 1 \\mid \\mathbf{v}) = "
-#~ "\\sigma\\left( \\sum_i w_{ij} v_i + c_j"
-#~ " \\right)"
+#~ msgid "P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j \\right)"
+#~ msgstr ""
+
+#~ msgid "P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i \\right)"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "P(v_i = 1 \\mid \\mathbf{h}) = "
-#~ "\\sigma\\left( \\sum_j w_{ij} h_j + b_i"
-#~ " \\right)"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
+#~ "\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T "
-#~ "\\mathbf{W} \\mathbf{h} - \\mathbf{b}^T "
-#~ "\\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
+#~ "其中，:math:`\\mathbf{v}, \\mathbf{h}` 分别是可见层和隐层的状态，:math:`\\mathbf{W}` "
+#~ "是连接的权重，:math:`\\mathbf{b}, \\mathbf{c}` 是一次项系数。"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "其中，:math:`\\mathbf{v}, \\mathbf{h}` "
-#~ "分别是可见层和隐层的状态，:math:`\\mathbf{W}` 是连接的权重，:math:`\\mathbf{b}, "
-#~ "\\mathbf{c}` 是一次项系数。"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}) = "
-#~ "\\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
+#~ msgid "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}"
 #~ msgstr ""
 
 #~ msgid "其中 :math:`Z` 为配分函数（归一化因子）。可见层的边缘分布为："
@@ -439,18 +471,16 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "其中 :math:`\\epsilon` 为学习率，:math:`\\langle \\cdot "
-#~ "\\rangle_{\\text{data}}` 和 :math:`\\langle \\cdot"
-#~ " \\rangle_{\\text{recon}}` 分别为数据分布和重构分布的期望。"
+#~ "其中 :math:`\\epsilon` 为学习率，:math:`\\langle \\cdot \\rangle_{\\text{data}}` 和 "
+#~ ":math:`\\langle \\cdot \\rangle_{\\text{recon}}` 分别为数据分布和重构分布的期望。"
 #~ msgstr ""
 
 #~ msgid "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\nabla_\\theta \\log p(x; \\theta) = "
-#~ "\\nabla_\\theta \\log \\tilde{p}(x; \\theta) -"
-#~ " \\nabla_\\theta \\log Z"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; "
+#~ "\\theta) - \\nabla_\\theta \\log Z"
 #~ msgstr ""
 
 #~ msgid ""
@@ -461,40 +491,30 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "对于保证所有的 :math:`x` 都有 :math:`p(x) > 0`"
-#~ " 的模型，我们可以用 :math:`\\exp(\\log \\tilde{p}(x))` 代替"
-#~ " :math:`\\tilde{p}(x)`。"
+#~ "对于保证所有的 :math:`x` 都有 :math:`p(x) > 0` 的模型，我们可以用 :math:`\\exp(\\log "
+#~ "\\tilde{p}(x))` 代替 :math:`\\tilde{p}(x)`。"
 #~ msgstr ""
 
 #~ msgid ""
 #~ "\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
-#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) "
-#~ "\\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
-#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta "
-#~ "\\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
 #~ "&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
 #~ "&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\nabla_\\theta \\log p(x; \\theta) = "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta) -"
-#~ " \\mathbb{E}_{x \\sim p(x; \\theta)} "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
 #~ "\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "第二项中 :math:`p(x; \\theta)` 实际上是模型预测的 "
-#~ ":math:`\\mathbf{x}` 的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
+#~ "第二项中 :math:`p(x; \\theta)` 实际上是模型预测的 :math:`\\mathbf{x}` "
+#~ "的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\nabla_\\theta \\log p(x; \\theta) = "
-#~ "\\mathbb{E}_{x \\sim p_{\\text{data}}} "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta) -"
-#~ " \\mathbb{E}_{x \\sim p_{\\text{model}}} "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
 #~ "\n"
 #~ msgstr ""
 
@@ -504,8 +524,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "只要分别得到 :math:`p_{\\text{data}}`, :math:`p_{\\text{model}}`"
-#~ " 分布下的 :math:`v` 和 :math:`h` 的值即可计算梯度。即为："
+#~ "只要分别得到 :math:`p_{\\text{data}}`, :math:`p_{\\text{model}}` 分布下的 :math:`v` 和 "
+#~ ":math:`h` 的值即可计算梯度。即为："
 #~ msgstr ""
 
 #~ msgid "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)\n"
@@ -514,35 +534,24 @@ msgstr ""
 #~ msgid "\\sigma(z) = \\frac{1}{1 + e^{-z}}\n"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(\\mathbf{x}; \\theta) = "
-#~ "\\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}\n"
+#~ msgid "P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}\n"
 #~ msgstr ""
 
 #~ msgid "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))\n"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(h_j = 1 \\mid \\mathbf{v}) = "
-#~ "\\sigma\\left( \\sum_i w_{ij} v_i + c_j"
-#~ " \\right)\n"
+#~ msgid "P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j \\right)\n"
+#~ msgstr ""
+
+#~ msgid "P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i \\right)\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "P(v_i = 1 \\mid \\mathbf{h}) = "
-#~ "\\sigma\\left( \\sum_j w_{ij} h_j + b_i"
-#~ " \\right)\n"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - "
+#~ "\\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T "
-#~ "\\mathbf{W} \\mathbf{h} - \\mathbf{b}^T "
-#~ "\\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}) = "
-#~ "\\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}\n"
+#~ msgid "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}\n"
 #~ msgstr ""
 
 #~ msgid "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
@@ -552,19 +561,16 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\Delta W_{ij} = \\epsilon \\left( "
-#~ "\\langle v_i h_j \\rangle_{\\text{data}} - "
-#~ "\\langle v_i h_j \\rangle_{\\text{recon}} "
-#~ "\\right)\n"
+#~ "\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} "
+#~ "- \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
 #~ msgstr ""
 
 #~ msgid "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\nabla_\\theta \\log p(x; \\theta) = "
-#~ "\\nabla_\\theta \\log \\tilde{p}(x; \\theta) -"
-#~ " \\nabla_\\theta \\log Z\n"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; "
+#~ "\\theta) - \\nabla_\\theta \\log Z\n"
 #~ msgstr ""
 
 #~ msgid ""
@@ -576,37 +582,30 @@ msgstr ""
 
 #~ msgid ""
 #~ "\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
-#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) "
-#~ "\\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
-#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta "
-#~ "\\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
 #~ "&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
 #~ "&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ " \\nabla_\\theta \\log p(x; \\theta) ="
-#~ " \\nabla_\\theta \\log \\hat{p}(x; \\theta) "
-#~ "- \\mathbb{E}_{x \\sim p(x; \\theta)} "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+#~ " \\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
+#~ "\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
+#~ "\\hat{p}(x; \\theta)\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\nabla_\\theta \\log p(x; \\theta) = "
-#~ "\\mathbb{E}_{x \\sim p_{\\text{data}}} "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta) -"
-#~ " \\mathbb{E}_{x \\sim p_{\\text{model}}} "
-#~ "\\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim p_{\\text{data}}}"
+#~ " \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim "
+#~ "p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
 #~ msgstr ""
 
 #~ msgid "\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\Delta W_{ij} = \\epsilon \\left( "
-#~ "\\langle v_i h_j \\rangle_{\\text{data}} - "
-#~ "\\langle v_i h_j \\rangle_{\\text{recon}} "
-#~ "\\right)"
+#~ "\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} "
+#~ "- \\langle v_i h_j \\rangle_{\\text{recon}} \\right)"
 #~ msgstr ""
 
 #~ msgid ""
@@ -623,12 +622,370 @@ msgstr ""
 #~ "\n"
 #~ "\n"
 #~ "\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
-#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) "
-#~ "\\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
-#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta "
-#~ "\\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
 #~ "&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
 #~ "&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)\n"
 #~ "\n"
 #~ msgstr ""
 
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "a = \\phi\\left( \\mathbf{w}^\\top \\mathbf{x} + b \\right)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "其中 $\\mathbf{w} \\in \\mathbb{R}^n$ 为权重向量，$b \\in \\mathbb{R}$ "
+#~ "为偏置项，$\\phi(\\cdot)$ 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\sigma(z) = \\frac{1}{1 + e^{-z}}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "P(\\mathbf{x}; \\theta) = \\frac{\\exp(-E(\\mathbf{x}; \\theta))}{Z(\\theta)}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "其中配分函数（partition function）:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "Z(\\theta) = \\sum_{\\mathbf{x}} \\exp(-E(\\mathbf{x}; \\theta))\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "确保概率归一化。低能量状态对应高概率。"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "P(h_j = 1 \\mid \\mathbf{v}) = \\sigma\\left( \\sum_i w_{ij} v_i + c_j \\right)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "同理，"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "P(v_i = 1 \\mid \\mathbf{h}) = \\sigma\\left( \\sum_j w_{ij} h_j + b_i \\right)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T \\mathbf{W} \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "其中，$\\mathbf{v}, \\mathbf{h}$ 分别是可见层和隐层的状态，$\\mathbf{W}$ "
+#~ "是连接的权重，$\\mathbf{b}, \\mathbf{c}$ 是一次项系数。"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{e^{-E(\\mathbf{v}, \\mathbf{h})}}{Z}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "通过最大化似然函数学习参数 $W,b,c$ 。目标函数为负对数似然："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "采用对比散度（CD）算法近似梯度，更新规则为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle "
+#~ "\\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "p(x; \\theta) = \\frac{1}{Z} \\tilde{p}(x; \\theta)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "其梯度为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\tilde{p}(x; \\theta) - \\nabla_\\theta \\log Z\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "配分函数的梯度难以直接计算"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\begin{aligned}\n"
+#~ "\\nabla_\\theta \\log Z\n"
+#~ "&= \\frac{\\nabla_\\theta Z}{Z} \\\\\n"
+#~ "&= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\sum_x \\frac{\\nabla_\\theta \\tilde{p}(x)}{Z}\n"
+#~ "\\end{aligned}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "对于保证所有的 $x$ 都有 $p(x) > 0$ 的模型，我们可以用 $\\exp(\\log \\tilde{p}(x))$ 代替 "
+#~ "$\\tilde{p}(x)$。"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\begin{aligned}\n"
+#~ "\\frac{\\sum_x \\nabla_\\theta \\exp(\\log \\tilde{p}(x))}{Z}\n"
+#~ "&= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\frac{\\sum_x \\tilde{p}(x) \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\\n"
+#~ "&= \\sum_x p(x) \\nabla_\\theta \\log \\tilde{p}(x) \\\\\n"
+#~ "&= \\mathbb{E}_{x \\sim p(x)} \\nabla_\\theta \\log \\tilde{p}(x)\n"
+#~ "\\end{aligned}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "综上，"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ " \\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "第二项中 $p(x; \\theta)$ 实际上是模型预测的 $\\mathbf{x}$ "
+#~ "的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - \\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta)\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "这里我们考虑玻尔兹曼机的能量函数，容易求得"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}\n"
+#~ "\n"
+#~ msgstr ""
+
+#~ msgid "只要分别得到 $p_{\\text{data}}$, $p_{\\text{model}}$ 分布下的 $v$ 和 $h$ 的值即可计算梯度。即为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}} \\right)\n"
+#~ msgstr ""
+
+#~ msgid "预备知识"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "受限玻尔兹曼机（Restricted Boltzmann Machine）是一种基于能量的概率图模型，由可见层（Visible "
+#~ "Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。 其核心是通过无监督学习学习数据的潜在特征分布。"
+#~ msgstr ""
+
+#~ msgid "1. 神经网络基础"
+#~ msgstr ""
+
+#~ msgid "1.1 神经元模型"
+#~ msgstr ""
+
+#~ msgid "人工神经元是神经网络的基本计算单元。给定输入向量 $\\mathbf{x} \\in \\mathbb{R}^n$，其输出为："
+#~ msgstr ""
+
+#~ msgid "$$"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ 其中 $\\mathbf{w} \\in \\mathbb{R}^n$ 为权重向量，$b \\in \\mathbb{R}$ "
+#~ "为偏置项，$\\phi(\\cdot)$ 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数："
+#~ msgstr ""
+
+#~ msgid "1.2 基于能量的模型"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 $E(\\mathbf{x}; \\theta)$"
+#~ " 定义数据的概率分布："
+#~ msgstr ""
+
+#~ msgid "$$ 其中配分函数（partition function）:"
+#~ msgstr ""
+
+#~ msgid "$$ 确保概率归一化。低能量状态对应高概率。"
+#~ msgstr ""
+
+#~ msgid "2. 玻尔兹曼机结构"
+#~ msgstr ""
+
+#~ msgid "可见层（**v**）：输入数据的显式表示（如像素值）。"
+#~ msgstr ""
+
+#~ msgid "隐藏层（**h**）：提取的潜在特征。"
+#~ msgstr ""
+
+#~ msgid "权重矩阵（**w**）：连接可见层与隐层的权重。"
+#~ msgstr ""
+
+#~ msgid "偏置：可见层偏置（**b**）和隐层偏置（**c**）。"
+#~ msgstr ""
+
+#~ msgid "玻尔兹曼机（BM)的拓扑结构是全连接的，而受限玻尔兹曼机通过去掉了可见层和隐藏层内部的链接， 让Gibbs采样的过程更加高效。"
+#~ msgstr ""
+
+#~ msgid "由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为："
+#~ msgstr ""
+
+#~ msgid "$$ 同理，"
+#~ msgstr ""
+
+#~ msgid "3. 能量函数与概率分布"
+#~ msgstr ""
+
+#~ msgid "3.1 能量函数"
+#~ msgstr ""
+
+#~ msgid "RBM 的能量函数定义为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ 其中，$\\mathbf{v}, \\mathbf{h}$ 分别是可见层和隐层的状态，$\\mathbf{W}$ "
+#~ "是连接的权重，$\\mathbf{b}, \\mathbf{c}$ 是一次项系数。"
+#~ msgstr ""
+
+#~ msgid "联合概率分布通过玻尔兹曼分布给出："
+#~ msgstr ""
+
+#~ msgid "$$ 其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
+#~ msgstr ""
+
+#~ msgid "$$ 通过最大化似然函数学习参数 $W,b,c$ 。目标函数为负对数似然："
+#~ msgstr ""
+
+#~ msgid "$$ 采用对比散度（CD）算法近似梯度，更新规则为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ 其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle"
+#~ " \\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
+#~ msgstr ""
+
+#~ msgid "3.2 梯度的推导"
+#~ msgstr ""
+
+#~ msgid "能量模型的概率可以写成："
+#~ msgstr ""
+
+#~ msgid "$$ 其梯度为："
+#~ msgstr ""
+
+#~ msgid "$$ 配分函数的梯度难以直接计算"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\begin{aligned} \\nabla_\\theta \\log Z &= \\frac{\\nabla_\\theta Z}{Z} "
+#~ "\\\\ &= \\frac{\\nabla_\\theta \\sum_x \\tilde{p}(x)}{Z} \\\\ &= \\sum_x "
+#~ "\\frac{\\nabla_\\theta \\tilde{p}(x)}{Z} \\end{aligned}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ 对于保证所有的 $x$ 都有 $p(x) > 0$ 的模型，我们可以用 $\\exp(\\log \\tilde{p}(x))$ 代替 "
+#~ "$\\tilde{p}(x)$。"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\begin{aligned} \\frac{\\sum_x \\nabla_\\theta \\exp(\\log "
+#~ "\\tilde{p}(x))}{Z} &= \\frac{\\sum_x \\exp(\\log \\tilde{p}(x)) "
+#~ "\\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\ &= \\frac{\\sum_x \\tilde{p}(x)"
+#~ " \\nabla_\\theta \\log \\tilde{p}(x)}{Z} \\\\ &= \\sum_x p(x) "
+#~ "\\nabla_\\theta \\log \\tilde{p}(x) \\\\ &= \\mathbb{E}_{x \\sim p(x)} "
+#~ "\\nabla_\\theta \\log \\tilde{p}(x) \\end{aligned}"
+#~ msgstr ""
+
+#~ msgid "$$ 综上，"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$  \\nabla_\\theta \\log p(x; \\theta) = \\nabla_\\theta \\log \\hat{p}(x; "
+#~ "\\theta) - \\mathbb{E}_{x \\sim p(x; \\theta)} \\nabla_\\theta \\log "
+#~ "\\hat{p}(x; \\theta)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ 第二项中 $p(x; \\theta)$ 实际上是模型预测的 $\\mathbf{x}$ "
+#~ "的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ \\nabla_\\theta \\log p(x; \\theta) = \\mathbb{E}_{x \\sim "
+#~ "p_{\\text{data}}} \\nabla_\\theta \\log \\hat{p}(x; \\theta) - "
+#~ "\\mathbb{E}_{x \\sim p_{\\text{model}}} \\nabla_\\theta \\log \\hat{p}(x; "
+#~ "\\theta)"
+#~ msgstr ""
+
+#~ msgid "$$ 这里我们考虑玻尔兹曼机的能量函数，容易求得"
+#~ msgstr ""
+
+#~ msgid "$$ \\nabla_W \\log \\hat{p}(x; W) = v h^\\mathrm{T}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "$$ 只要分别得到 $p_{\\text{data}}$, $p_{\\text{model}}$ 分布下的 $v$ 和 $h$ "
+#~ "的值即可计算梯度。即为："
+#~ msgstr ""
+
+#~ msgid ""
+#~ "\\Delta W_{ij} = \\epsilon \\left( \\langle v_i h_j \\rangle_{\\text{data}} "
+#~ "- \\langle v_i h_j \\rangle_{\\text{recon}} \\right) $$"
+#~ msgstr ""

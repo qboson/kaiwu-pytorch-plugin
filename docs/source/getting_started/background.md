@@ -1,146 +1,132 @@
-# 预备知识
+# Prerequisites
 
-受限玻尔兹曼机（Restricted Boltzmann Machine）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。
-其核心是通过无监督学习学习数据的潜在特征分布。
+Restricted Boltzmann Machine (RBM) is an energy-based probabilistic graphical model, composed of a visible layer and a hidden layer, with no connections within each layer and full connections between layers. Its core objective is to learn the latent feature distribution of data through unsupervised learning.
 
+---
 
-# 1. 神经网络基础
+## 1. Neural Network Basics
 
-## 1.1 神经元模型
+### 1.1 Neuron Model
 
-人工神经元是神经网络的基本计算单元。给定输入向量 $\mathbf{x} \in \mathbb{R}^n$，其输出为：
+An artificial neuron is the basic computational unit of a neural network. Given an input vector $\mathbf{x} \in \mathbb{R}^n$, its output is:
 
 $$
-
 a = \phi\left( \mathbf{w}^\top \mathbf{x} + b \right)
-
-$$
-其中 $\mathbf{w} \in \mathbb{R}^n$ 为权重向量，$b \in \mathbb{R}$ 为偏置项，$\phi(\cdot)$ 为激活函数。在概率生成模型中，常用 Sigmoid 激活函数：
-
 $$
 
+where $\mathbf{w} \in \mathbb{R}^n$ is the weight vector, $b \in \mathbb{R}$ is the bias, and $\phi(\cdot)$ is the activation function. In probabilistic generative models, the Sigmoid activation function is commonly used:
+
+$$
 \sigma(z) = \frac{1}{1 + e^{-z}}
-
-$$
-## 1.2 基于能量的模型
-
-与前馈网络不同，能量基模型（Energy-Based Models, EBMs）通过一个标量能量函数 $E(\mathbf{x}; \theta)$ 定义数据的概率分布：
-
 $$
 
+### 1.2 Energy-Based Models
+
+Unlike feedforward networks, Energy-Based Models (EBMs) define a probability distribution over data via a scalar energy function $E(\mathbf{x}; \theta)$:
+
+$$
 P(\mathbf{x}; \theta) = \frac{\exp(-E(\mathbf{x}; \theta))}{Z(\theta)}
-
-$$
-其中配分函数（partition function）:
-
 $$
 
+where the partition function is:
+
+$$
 Z(\theta) = \sum_{\mathbf{x}} \exp(-E(\mathbf{x}; \theta))
-
-$$
-确保概率归一化。低能量状态对应高概率。
-
-
-
-# 2. 玻尔兹曼机结构
-
-- 可见层（**v**）：输入数据的显式表示（如像素值）。
-- 隐藏层（**h**）：提取的潜在特征。
-- 权重矩阵（**w**）：连接可见层与隐层的权重。
-- 偏置：可见层偏置（**b**）和隐层偏置（**c**）。
-
-玻尔兹曼机（BM)的拓扑结构是全连接的，而受限玻尔兹曼机通过去掉了可见层和隐藏层内部的链接，
-让Gibbs采样的过程更加高效。
-
-由于 RBM 的受限结构，隐变量在给定可见变量时相互独立，其条件概率为：
-
 $$
 
+ensuring normalization. Low energy states correspond to high probability.
+
+---
+
+## 2. Boltzmann Machine Architecture
+
+- **Visible layer (v)**: explicit representation of input data (e.g., pixel values).
+- **Hidden layer (h)**: extracted latent features.
+- **Weight matrix (W)**: connections between visible and hidden layers.
+- **Biases**: visible bias ($\mathbf{b}$) and hidden bias ($\mathbf{c}$).
+
+A Boltzmann Machine (BM) is fully connected, while a Restricted Boltzmann Machine (RBM) removes intra-layer connections, making Gibbs sampling more efficient.
+
+Due to the restricted structure of RBM, hidden variables are mutually independent given the visible variables, and their conditional probabilities are:
+
+$$
 P(h_j = 1 \mid \mathbf{v}) = \sigma\left( \sum_i w_{ij} v_i + c_j \right)
-
-$$
-同理，
-
 $$
 
+Similarly,
+
+$$
 P(v_i = 1 \mid \mathbf{h}) = \sigma\left( \sum_j w_{ij} h_j + b_i \right)
-
-$$
-# 3. 能量函数与概率分布
-
-## 3.1 能量函数
-
-RBM 的能量函数定义为：
-
 $$
 
+---
+
+## 3. Energy Function and Probability Distribution
+
+### 3.1 Energy Function
+
+The energy function of an RBM is defined as:
+
+$$
 E(\mathbf{v}, \mathbf{h}) = -\mathbf{v}^T \mathbf{W} \mathbf{h} - \mathbf{b}^T \mathbf{v} - \mathbf{c}^T \mathbf{h}
-
-$$
-其中，$\mathbf{v}, \mathbf{h}$ 分别是可见层和隐层的状态，$\mathbf{W}$ 是连接的权重，$\mathbf{b}, \mathbf{c}$ 是一次项系数。
-
-联合概率分布通过玻尔兹曼分布给出：
-
 $$
 
+where $\mathbf{v}, \mathbf{h}$ are the states of the visible and hidden layers, $\mathbf{W}$ is the connection weight, and $\mathbf{b}, \mathbf{c}$ are bias terms.
+
+The joint probability distribution is given by the Boltzmann distribution:
+
+$$
 P(\mathbf{v}, \mathbf{h}) = \frac{e^{-E(\mathbf{v}, \mathbf{h})}}{Z}
-
-$$
-其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为：
-
 $$
 
+where $Z$ is the partition function (normalization factor). The marginal distribution over the visible layer is:
+
+$$
 P(\mathbf{v}) = \sum_{\mathbf{h}} P(\mathbf{v}, \mathbf{h})
-
-$$
-通过最大化似然函数学习参数 $W,b,c$ 。目标函数为负对数似然：
-
 $$
 
+We learn parameters $W, b, c$ by maximizing the likelihood. The objective is the negative log-likelihood:
+
+$$
 \mathcal{L} = -\sum_{\mathbf{v}} \log P(\mathbf{v})
-
-$$
-采用对比散度（CD）算法近似梯度，更新规则为：
-
 $$
 
+The Contrastive Divergence (CD) algorithm approximates the gradient, giving the update rule:
+
+$$
 \Delta W_{ij} = \epsilon \left( \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{recon}} \right)
-
-$$
-其中 $\epsilon$ 为学习率，$\langle \cdot \rangle_{\text{data}}$ 和 $\langle \cdot \rangle_{\text{recon}}$ 分别为数据分布和重构分布的期望。
-
-## 3.2 梯度的推导
-
-能量模型的概率可以写成：
-
 $$
 
+where $\epsilon$ is the learning rate, $\langle \cdot \rangle_{\text{data}}$ and $\langle \cdot \rangle_{\text{recon}}$ are the expectations under the data distribution and the reconstruction distribution, respectively.
+
+### 3.2 Derivation of the Gradient
+
+For an energy-based model, the probability can be written as:
+
+$$
 p(x; \theta) = \frac{1}{Z} \tilde{p}(x; \theta)
-
-$$
-其梯度为：
-
 $$
 
+Its gradient is:
+
+$$
 \nabla_\theta \log p(x; \theta) = \nabla_\theta \log \tilde{p}(x; \theta) - \nabla_\theta \log Z
-
-$$
-配分函数的梯度难以直接计算
-
 $$
 
+The gradient of the partition function is not directly computable:
+
+$$
 \begin{aligned}
 \nabla_\theta \log Z
 &= \frac{\nabla_\theta Z}{Z} \\
 &= \frac{\nabla_\theta \sum_x \tilde{p}(x)}{Z} \\
 &= \sum_x \frac{\nabla_\theta \tilde{p}(x)}{Z}
 \end{aligned}
-
-$$
-对于保证所有的 $x$ 都有 $p(x) > 0$ 的模型，我们可以用 $\exp(\log \tilde{p}(x))$ 代替 $\tilde{p}(x)$。
-
 $$
 
+For models where $p(x) > 0$ for all $x$, we can replace $\tilde{p}(x)$ with $\exp(\log \tilde{p}(x))$:
+
+$$
 \begin{aligned}
 \frac{\sum_x \nabla_\theta \exp(\log \tilde{p}(x))}{Z}
 &= \frac{\sum_x \exp(\log \tilde{p}(x)) \nabla_\theta \log \tilde{p}(x)}{Z} \\
@@ -148,30 +134,32 @@ $$
 &= \sum_x p(x) \nabla_\theta \log \tilde{p}(x) \\
 &= \mathbb{E}_{x \sim p(x)} \nabla_\theta \log \tilde{p}(x)
 \end{aligned}
+$$
+
+Therefore,
 
 $$
-综上，
-
+\nabla_\theta \log p(x; \theta) = \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p(x; \theta)} \nabla_\theta \log \hat{p}(x; \theta)
 $$
- \nabla_\theta \log p(x; \theta) = \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p(x; \theta)} \nabla_\theta \log \hat{p}(x; \theta)
 
-$$
-第二项中 $p(x; \theta)$ 实际上是模型预测的 $\mathbf{x}$ 的分布，而训练中的第一项是服从实际的数据的分布的。即上式可以写成
+The second term involves the model distribution $p(x; \theta)$, while the first term is from the empirical data distribution. Thus,
 
 $$
 \nabla_\theta \log p(x; \theta) = \mathbb{E}_{x \sim p_{\text{data}}} \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p_{\text{model}}} \nabla_\theta \log \hat{p}(x; \theta)
-
 $$
-这里我们考虑玻尔兹曼机的能量函数，容易求得
+
+For the Boltzmann machine energy function, we easily obtain:
 
 $$
 \nabla_W \log \hat{p}(x; W) = v h^\mathrm{T}
-
-$$
-只要分别得到 $p_{\text{data}}$, $p_{\text{model}}$ 分布下的 $v$ 和 $h$ 的值即可计算梯度。即为：
-
-
 $$
 
+Hence, the gradient can be computed by sampling $v$ and $h$ under $p_{\text{data}}$ and $p_{\text{model}}$, leading to:
+
+$$
 \Delta W_{ij} = \epsilon \left( \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{recon}} \right)
 $$
+
+## Further Reading
+
+For a comprehensive treatment of the theoretical foundations behind energy-based models, sampling, and quantum enhancement, refer to the [Theoretical Foundations](../theoretical-foundations/index.md) section of the documentation.

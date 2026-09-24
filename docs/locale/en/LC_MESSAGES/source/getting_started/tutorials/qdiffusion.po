@@ -1,0 +1,47 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: KPP docs\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:1
+msgid "Q-Diffusion for Protein Sequence Generation"
+msgstr "Q-Diffusion for Protein Sequence Generation"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:3
+msgid ""
+"**Status**: Coming soon — placeholder page; will be expanded into a full "
+"tutorial."
+msgstr ""
+"**Status**: Coming soon — placeholder page; will be expanded into a full "
+"tutorial."
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:5
+msgid ""
+"Discrete diffusion generation for proteins with the generic `Q-Diffusion` "
+"core (`src/kaiwu/torch_plugin/qdiffusion.py`) and a DPLM backbone: load a "
+"UniProt proteome FASTA, train with the `objective(...)` interface, and "
+"generate sequences with `generate(...)`."
+msgstr ""
+"Discrete diffusion generation for proteins with the generic `Q-Diffusion` "
+"core (`src/kaiwu/torch_plugin/qdiffusion.py`) and a DPLM backbone: load a "
+"UniProt proteome FASTA, train with the `objective(...)` interface, and "
+"generate sequences with `generate(...)`."
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:7
+msgid ""
+"**Examples**: `example/qdiffusion/simple/simple_train_example.py` · "
+"`example/qdiffusion/simple/simple_generate_example.py`"
+msgstr ""
+"**Examples**: `example/qdiffusion/simple/simple_train_example.py` · "
+"`example/qdiffusion/simple/simple_generate_example.py`"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:9
+msgid ""
+"**DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome"
+" UP000005640"
+msgstr ""
+"**DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome"
+" UP000005640"

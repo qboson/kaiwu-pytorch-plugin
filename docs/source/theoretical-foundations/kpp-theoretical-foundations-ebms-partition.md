@@ -14,7 +14,7 @@ hide_child: false
 ## The Partition Function: Definition and Its Implications
 Recall the definition of the partition function for a Boltzmann machine with binary units $\mathbf{x} \in \{0,1\}^N$:
 
-$$Z_\theta = \sum_{\tilde{\mathbf{x}} \in \{0,1\}^N} \exp\left(-E_\theta(\tilde{\mathbf{x}})\right)$$
+$$Z_\theta = \sum_{\tilde{\mathbf{x}} \in \{0,1\}^N} \exp\left(-E_\theta(\tilde{\mathbf{x}})\right)$$ (eq-partition)
 
 The sum runs over **all** $2^N$ **possible binary vectors** of length $N$. For a modest network of $N=100$ visible units (a tiny image by modern standards, only $10 \times 10$ pixels), the number of terms in this sum is:
 
@@ -24,20 +24,31 @@ To put this number in perspective:
 
 - The estimated number of stars in the observable universe is about $10^{22}$ to $10^{24}$.
 - The age of the universe is approximately $4.35 \times 10^{17}$ seconds.
-- Even if we could evaluate one trillion ($10^{12}$) configurations per second, enumerating $2^{100}$ configurations would take over $10^{10}$times the age of the universe.
+- Even if we could evaluate one trillion ($10^{12}$) configurations per second, enumerating $2^{100}$ configurations would take
+  \[
+  \frac{2^{100}}{10^{12}}\approx 1.27\times 10^{18}\ \text{seconds},
+  \]
+  about \(3\) times the age of the universe. At a more modest rate of \(10^9\) configurations per second, it would take
+  \[
+  \frac{2^{100}}{10^9}\approx 1.27\times 10^{21}\ \text{seconds},
+  \]
+  about \(2.9\times 10^3\) times the age of the universe.
+<!-- Thus, even for \(N=100\), brute-force enumeration is hopeless. Exact partition-function computation is therefore intractable; methods such as contrastive divergence approximate or bypass it rather than solve it exactly. -->
 
 And $N = 100$ is **tiny**. Real-world Boltzmann machines and restricted Boltzmann machines often have hundreds of visible units and hundreds or thousands of hidden units, yielding state spaces of size $2^{N_{\text{vis}} + N_{\text{hid}}}$. The partition function is **exponentially large** in the number of units.
 
 ## Why the Partition Function Matters
 The partition function appears in three critical contexts:
 
-1. **Probability Evaluation** To compute the probability $P_\theta(\mathbf{x})$ of a specific configuration, we must divide the Boltzmann factor by $Z_\theta$:
+1. **Probability Evaluation** 
+To compute the probability $P_\theta(\mathbf{x})$ of a specific configuration, we must divide the Boltzmann factor by $Z_\theta$:
 
 $$P_\theta(\mathbf{x}) = \frac{\exp(-E_\theta(\mathbf{x}))}{Z_\theta}$$
 
 Without $Z_\theta$, we have only an unnormalized score. This means we cannot directly compute likelihoods on test data, making model comparison and hyperparameter tuning difficult.
 
-1. **Learning by Gradient Descent** Recall from Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) that the gradient of the negative log-likelihood decomposes into a data term and a model term:
+2. **Learning by Gradient Descent** 
+Recall from Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) that the gradient of the negative log-likelihood (Eq. {eq}`eq-nll-gradient-tf`, Section 3.1) decomposes into a data term and a model term:
 
 $$\nabla f(\theta) = -\mathbb{E}_{\text{data}} \left[ \frac{\partial E_\theta}{\partial \theta} \right] + \mathbb{E}_{\text{model}} \left[ \frac{\partial E_\theta}{\partial \theta} \right]$$
 
@@ -45,13 +56,14 @@ $$\nabla f(\theta) = -\mathbb{E}_{\text{data}} \left[ \frac{\partial E_\theta}{\
 
 The first term is straightforward to estimate from the training set. The second term, i.e. the expectation under the model distribution $P_\theta$, is the source of difficulty. As shown in the expression above, computing this expectation exactly requires summing over all $2^N$ possible configurations, weighted by the Boltzmann factor. Both the numerator and the denominator involve the partition function $Z_\theta$, making exact gradient evaluation computationally intractable for any non-trivial model.
 
-The **model expectation** $\mathbb{E}_{\text{model}}[\cdot]$*is an average over the model distribution*$P_\theta$:
+The **model expectation** $\mathbb{E}_{\text{model}}[\cdot]$ *is an average over the model distribution*$P_\theta$:
 
 $$\mathbb{E}_{\text{model}} \left[ \frac{\partial E_\theta}{\partial \theta} \right] = \sum_{\tilde{\mathbf{x}}} P_\theta(\tilde{\mathbf{x}}) \frac{\partial E_\theta(\tilde{\mathbf{x}})}{\partial \theta} = \frac{1}{Z_\theta} \sum_{\tilde{\mathbf{x}}} \exp(-E_\theta(\tilde{\mathbf{x}})) \frac{\partial E_\theta(\tilde{\mathbf{x}})}{\partial \theta}$$
 
 Both the numerator and the denominator involve sums over all $2^N$ configurations. Exact gradient computation is infeasible.
 
-1. **Sampling and Inference** Generating samples from the model distribution typically requires Markov chain Monte Carlo (MCMC) methods, such as Gibbs sampling. While MCMC does not require computing $Z_\theta$ explicitly, it does require running the Markov chain long enough to reach equilibrium. The time required to obtain independent samples scales with the **mixing time** of the chain, which can be exponentially long in the system size, especially when the energy landscape has high barriers.
+3. **Sampling and Inference** 
+Generating samples from the model distribution typically requires Markov chain Monte Carlo (MCMC) methods, such as Gibbs sampling. While MCMC does not require computing $Z_\theta$ explicitly, it does require running the Markov chain long enough to reach equilibrium. The time required to obtain independent samples scales with the **mixing time** of the chain, which can be exponentially long in the system size, especially when the energy landscape has high barriers.
 
 ## The Partition Function as a Free Energy Barrier
 In statistical physics, the partition function is intimately related to the **Helmholtz free energy** $F = -\log Z$.
@@ -59,8 +71,7 @@ In statistical physics, the partition function is intimately related to the **He
 (Setting $ k_B T = 1$ for notational simplicity.) The free energy summarizes the balance between energy and entropy. For a given visible configuration $\mathbf{v}$ in a Boltzmann machine with hidden units $\mathbf{h}$, the **free energy** is defined analogously as $F_\theta(\mathbf{v}) = -\log \sum_{\tilde{\mathbf{h}}} \exp\left(-E_\theta(\mathbf{v}, \tilde{\mathbf{h}})\right)$.
 
 The probability of a visible vector is then:
-
-$P_\theta(\mathbf{v}) = \frac{\exp(-F_\theta(\mathbf{v}))}{\sum_{\tilde{\mathbf{v}}} \exp(-F_\theta(\tilde{\mathbf{v}}))}$.
+$$P_\theta(\mathbf{v}) = \frac{\exp(-F_\theta(\mathbf{v}))}{\sum_{\tilde{\mathbf{v}}} \exp(-F_\theta(\tilde{\mathbf{v}}))}$$
 
 Even with hidden units marginalized out, the denominator still sums over all $2^{N_{\text{vis}}}$ visible configurations. The intractability remains.
 
@@ -86,21 +97,25 @@ The first term is the conditional covariance given the visible units, and the se
 ## Approaches to Taming the Intractability
 Faced with this barrier, researchers have developed several families of approximation strategies. Understanding these strategies is essential for navigating the landscape of energy-based learning.
 
-1. **Sampling-Based Approximations** Instead of summing over all configurations, we can **sample** configurations from the model distribution using MCMC. The model expectation is then approximated by an empirical average over the samples:
-
+1. **Sampling-Based Approximations** 
+Instead of summing over all configurations, we can **sample** configurations from the model distribution using MCMC. The model expectation is then approximated by an empirical average over the samples:
 $$\mathbb{E}_{\text{model}} \left[ \frac{\partial E_\theta}{\partial \theta} \right] \approx \frac{1}{K} \sum_{k=1}^K \frac{\partial E_\theta(\tilde{\mathbf{x}}^{(k)})}{\partial \theta}, \quad \tilde{\mathbf{x}}^{(k)} \sim P_\theta$$
 
 The challenge is that obtaining unbiased samples requires running the Markov chain to equilibrium for every gradient step, which is prohibitively slow. **Contrastive divergence** (Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md)) and **persistent contrastive divergence** address this by using short MCMC runs initialized from the data or from previous model states.
 
-1. **Variational Approximations** Variational methods replace the intractable model distribution $P_\theta$ with a simpler, tractable **variational distribution** $Q_\phi$ from a restricted family. The parameters $ \phi$ are optimized to make $Q_\phi$ as close as possible to $P_\theta$ in the sense of Kullback-Leibler divergence. This transforms the learning problem into an optimization over both $ \theta$ and $\phi$.
+2. **Variational Approximations** 
+Variational methods replace the intractable model distribution $P_\theta$ with a simpler, tractable **variational distribution** $Q_\phi$ from a restricted family. The parameters $ \phi$ are optimized to make $Q_\phi$ as close as possible to $P_\theta$ in the sense of Kullback-Leibler divergence. This transforms the learning problem into an optimization over both $ \theta$ and $\phi$.
 
 While variational methods provide a rigorous lower bound on the log-likelihood, they often require making strong independence assumptions (e.g., mean-field approximations) that can limit the model's expressive power.
 
-1. **Architectural Constraints** By restricting the connectivity pattern of the Boltzmann machine, we can make certain computations tractable. The **Restricted Boltzmann Machine (RBM)** is the most celebrated example. By eliminating visible-visible and hidden-hidden connections, the conditional distributions $P(\mathbf{h} \mid \mathbf{v})$ and $P(\mathbf{v} \mid \mathbf{h})$ factorize into products of independent Bernoulli distributions. This allows efficient Gibbs sampling and enables the contrastive divergence algorithm.
+3. **Architectural Constraints** 
+By restricting the connectivity pattern of the Boltzmann machine, we can make certain computations tractable. The **Restricted Boltzmann Machine (RBM)** is the most celebrated example. By eliminating visible-visible and hidden-hidden connections, the conditional distributions $P(\mathbf{h} \mid \mathbf{v})$ and $P(\mathbf{v} \mid \mathbf{h})$ factorize into products of independent Bernoulli distributions. This allows efficient Gibbs sampling and enables the contrastive divergence algorithm.
 
-1. **Score Matching and Noise Contrastive Estimation** These are alternative training criteria that circumvent the partition function entirely. **Score matching** minimizes the Fisher divergence between the model and data distributions by matching the gradients of their log-densities, which does not require $Z_\theta$. **Noise contrastive estimation (NCE)** transforms the unsupervised learning problem into a supervised logistic regression task of distinguishing data samples from noise samples, where the partition function becomes a learnable parameter.
+4. **Score Matching and Noise Contrastive Estimation** 
+These are alternative training criteria that circumvent the partition function entirely. **Score matching** minimizes the Fisher divergence between the model and data distributions by matching the gradients of their log-densities, which does not require $Z_\theta$. **Noise contrastive estimation (NCE)** transforms the unsupervised learning problem into a supervised logistic regression task of distinguishing data samples from noise samples, where the partition function becomes a learnable parameter.
 
-1. **Annealed Importance Sampling** For model evaluation (rather than training), **annealed importance sampling (AIS)** provides an unbiased estimate of $Z_\theta$. It works by gradually transforming a simple base distribution (e.g., uniform) into the model distribution through a sequence of intermediate distributions, using importance weights to correct for the sampling bias. While computationally expensive, AIS is a gold standard for evaluating generative models when exact likelihoods are required.
+5. **Annealed Importance Sampling** 
+For model evaluation (rather than training), **annealed importance sampling (AIS)** provides an unbiased estimate of $Z_\theta$. It works by gradually transforming a simple base distribution (e.g., uniform) into the model distribution through a sequence of intermediate distributions, using importance weights to correct for the sampling bias. While computationally expensive, AIS is a gold standard for evaluating generative models when exact likelihoods are required.
 
 ## The Partition Function in the Era of Deep Learning
 It is worth noting that the intractability of the partition function is not unique to Boltzmann machines. Many modern deep generative models face analogous challenges:

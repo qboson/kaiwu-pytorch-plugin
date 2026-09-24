@@ -14,7 +14,7 @@ hide_child: false
 ## The Ising Model of Magnetism
 In condensed matter physics, the Ising model describes a system of interacting magnetic spins. Each spin $s_i$ resides on a lattice site and can point either "up" $(s_i = +1 )$ or "down" $( s_i = -1)$. The energy of a particular spin configuration $\mathbf{s} = (s_1, s_2, \ldots, s_N)$is given by the Hamiltonian:
 
-$$E(\mathbf{s}) = -\sum_{i<j} J_{ij} s_i s_j - \sum_i h_i s_i$$
+$$E(\mathbf{s}) = -\sum_{i<j} J_{ij} s_i s_j - \sum_i h_i s_i$$ (eq-ising-hamiltonian)
 
 Here, $J_{ij}$ represents the interaction strength (coupling) between spins $i$and $j$. If $J_{ij} > 0$, the interaction is **ferromagnetic**: the spins prefer to align in the same direction to lower the energy. If $J_{ij} < 0$, the interaction is **antiferromagnetic**: the spins prefer opposite alignment. The term $h_i$ represents an external magnetic field biasing individual spins.
 
@@ -63,20 +63,20 @@ A **spin glass** is a magnetic system in which the coupling strengths $J_{ij}$ a
 
 This is precisely the scenario we encounter in neural networks designed for associative memory. When we store multiple patterns using a Hebbian learning rule:
 
-$$w_{ij} = \frac{1}{N} \sum_{\mu=1}^P \xi_i^\mu \xi_j^\mu$$
+$$w_{ij} = \frac{1}{N} \sum_{\mu=1}^P \xi_i^\mu \xi_j^\mu$$ (eq-hebbian)
 
 we are effectively engineering a spin glass whose low-energy configurations correspond to the stored memories $ \{\boldsymbol{\xi}^\mu\}$. However, because the weight matrix mixes contributions from different memories, the energy landscape inevitably develops **spurious minima**—states that are not stored patterns but nevertheless trap the network dynamics.
 
 ## From Deterministic Dynamics to Stochastic Search
 Hopfield's original network employed deterministic, asynchronous updates:
 
-$$x_i \leftarrow \text{sign}\left( \sum_{j} w_{ij} x_j + b_i \right)$$
+$$x_i \leftarrow \text{sign}\left( \sum_{j} w_{ij} x_j + b_i \right)$$ (eq-sign-update)
 
 This dynamics is equivalent to moving strictly downhill in the energy landscape. The network will converge to the nearest local minimum, but it may get stuck in a spurious state rather than the intended memory.
 
 The **Boltzmann Machine** introduces a crucial modification: updates become **stochastic**. At a finite temperature $T$, a neuron $i$ is set to state $1$ with probability:
 
-$$P(x_i = 1) = \sigma\left( \frac{\sum_j w_{ij} x_j + b_i}{T} \right)$$
+$$P(x_i = 1) = \sigma\left( \frac{\sum_j w_{ij} x_j + b_i}{T} \right)$$ (eq-stoch-update)
 
 where $ \sigma(z) = 1/(1 + \exp(-z))$ is the sigmoid function. Thermal noise occasionally pushes the system *uphill*, allowing it to escape shallow local minima and explore the energy landscape more thoroughly. As the temperature is gradually reduced (**simulated annealing**), the system is more likely to settle into a deep, low-energy state corresponding to a true memory.
 

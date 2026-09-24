@@ -1,0 +1,47 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: KPP docs\n"
+"Language: en\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:1
+msgid "Q-VAE for Single-Cell Transcriptomics"
+msgstr "Q-VAE for Single-Cell Transcriptomics"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:3
+msgid ""
+"**Status**: Coming soon — placeholder page; will be expanded into a full "
+"tutorial."
+msgstr ""
+"**Status**: Coming soon — placeholder page; will be expanded into a full "
+"tutorial."
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:5
+msgid ""
+"Single-cell representation learning with a quantum variational autoencoder "
+"(QVAE): read a single-cell expression matrix, train a QVAE, extract low-"
+"dimensional representations, compute UMAP, analyze the energy distribution, "
+"and evaluate clustering quality against cell-type labels."
+msgstr ""
+"Single-cell representation learning with a quantum variational autoencoder "
+"(QVAE): read a single-cell expression matrix, train a QVAE, extract low-"
+"dimensional representations, compute UMAP, analyze the energy distribution, "
+"and evaluate clustering quality against cell-type labels."
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:7
+msgid ""
+"**Example**: `example/qvae_cell/train_qvae_cell.ipynb` · "
+"`example/qvae_cell/evaluate_benchmark.py`"
+msgstr ""
+"**Example**: `example/qvae_cell/train_qvae_cell.ipynb` · "
+"`example/qvae_cell/evaluate_benchmark.py`"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:9
+msgid ""
+"**Data**: [Kaggle immune-"
+"data](https://www.kaggle.com/datasets/redwoodz/immune-data)"
+msgstr ""
+"**Data**: [Kaggle immune-"
+"data](https://www.kaggle.com/datasets/redwoodz/immune-data)"

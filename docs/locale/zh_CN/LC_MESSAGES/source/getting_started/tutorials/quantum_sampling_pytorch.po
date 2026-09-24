@@ -1,162 +1,288 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
-# This file is distributed under the same license as the
-# Kaiwu-PyTorch-Plugin package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-28 10:48+0800\n"
+"POT-Creation-Date: 2026-09-10 10:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh_CN\n"
 "Language-Team: zh_CN <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:1
-msgid "将量子采样器集成到 PyTorch"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:1
+msgid "Integrating Quantum Samplers into PyTorch"
+msgstr "将量子采样器集成到 PyTorch"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:3
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:3
 msgid ""
-"README 中的基础示例表明，KPP 将 PyTorch 模型、优化器和 Kaiwu SDK "
-"采样器组合在同一个训练循环中。本章说明如何将本地模拟退火替换为相干伊辛机（CIM）采样器，以及当前 KPP API 中各调用的含义。"
+"The previous two chapters motivated quantum sampling ([Why "
+"Quantum?](quantum_sampling_bottleneck.md)) and introduced SA as the "
+"classical baseline ([Simulated Annealing for Ising "
+"Models](simulated_annealing.md)). This chapter bridges physics and code: it "
+"introduces the **Kaiwu-PyTorch-Plugin (KPP)**, the software layer that plugs"
+" samplers, classical and quantum, into the PyTorch deep learning ecosystem. "
+"The [Quick Start](../quickstart.md) showed the basic training loop; here we "
+"explain the core interfaces, how to create and configure a CIM sampler, and "
+"what happens behind the scenes when you replace the local SA sampler with a "
+"quantum one."
 msgstr ""
+"前两章阐明了量子采样的动机（[为什么需要量子采样](quantum_sampling_bottleneck.md)），并介绍了作为经典基线的 "
+"SA（[用于 Ising 模型的模拟退火](simulated_annealing.md)）。本章连接物理与代码：介绍 **Kaiwu-PyTorch-"
+"Plugin（KPP）**——把经典与量子采样器接入 PyTorch "
+"深度学习生态的软件层。[快速开始](../quickstart.md)展示了基本训练循环；此处我们讲解核心接口、如何创建与配置 CIM "
+"采样器，以及用量子采样器替换本地 SA 采样器时背后发生的过程。"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:5
-msgid "核心接口"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:5
+msgid "Core Interfaces"
+msgstr "核心接口"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:7
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid ""
-"`RestrictedBoltzmannMachine` 和 `BoltzmannMachine` 均继承自 "
-"`AbstractBoltzmannMachine`。训练中最常用的接口是："
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
+"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}."
 msgstr ""
+"E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{b}^\\top \\mathbf{v} - "
+"\\mathbf{c}^\\top \\mathbf{h} - \\mathbf{v}^\\top \\mathbf{W} \\mathbf{h}."
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:9
-msgid "`get_hidden(s_visible, ...)`：为 RBM 构造包含可见与隐藏状态的正相状态。"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:14
+msgid "The interfaces most used in training are:"
+msgstr "训练中最常用的接口是："
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:10
-msgid "`sample(sampler)`：根据当前模型参数构造 Ising 矩阵，调用 `sampler.solve()`，并返回负相状态张量。"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:11
-msgid "`objective(s_positive, s_negative)`：计算其梯度等价于负对数似然梯度的目标。"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:13
-msgid "因此，`sample()` 不接收数据状态，也不返回可见层和隐藏层两个张量；`objective()` 只接收正相与负相两个状态张量。"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:15
-msgid "创建 CIM 采样器"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:17
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:16
 msgid ""
-"真实量子采样需要已配置的 Kaiwu SDK 授权信息和真机访问权限。`PrecisionReducer` 可用于将 Ising "
-"参数适配到硬件精度约束。"
-msgstr ""
+"`get_hidden(s_visible, ...)`: builds the positive-phase state containing "
+"both visible and hidden states for an RBM."
+msgstr "`get_hidden(s_visible, ...)`：为 RBM 构造包含可见与隐藏状态的正相状态。"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:32
-msgid "最小训练迭代"
-msgstr ""
-
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:34
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:17
 msgid ""
-"下面的代码遵循 README 的 RBM 示例：正相状态来自数据，负相状态来自当前模型的采样结果。将 `sampler` 换为 "
+"`sample(sampler)`: constructs the Ising matrix from the current model "
+"parameters, calls `sampler.solve()`, and returns the negative-phase state "
+"tensor."
+msgstr "`sample(sampler)`：根据当前模型参数构造 Ising 矩阵，调用 `sampler.solve()`，并返回负相状态张量。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:18
+msgid ""
+"`objective(s_positive, s_negative)`: computes a surrogate objective whose "
+"gradient is equivalent to the negative log-likelihood gradient."
+msgstr "`objective(s_positive, s_negative)`：计算其梯度等价于负对数似然梯度的目标。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:20
+msgid ""
+"Note that `sample()` does **not** take a data state as input, nor does it "
+"return separate visible and hidden tensors; `objective()` takes exactly the "
+"two phase tensors."
+msgstr "注意 `sample()` **不**接收数据状态，也不返回分离的可见层与隐藏层张量；`objective()` 只接收两个相状态张量。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:22
+msgid "Creating a CIM Sampler"
+msgstr "创建 CIM 采样器"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:24
+msgid ""
+"Real hardware quantum sampling requires configured Kaiwu SDK credentials and"
+" real-machine access. `PrecisionReducer` adapts the Ising parameters to "
+"hardware precision constraints:"
+msgstr ""
+"真实量子采样需要已配置的 Kaiwu SDK 凭据与真机访问权限。`PrecisionReducer` 将 Ising 参数适配到硬件精度约束："
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:39
+msgid "A Minimal Training Iteration"
+msgstr "最小训练迭代"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:41
+msgid ""
+"The loop mirrors the [Quick Start](../quickstart.md) example: positive phase"
+" from data, negative phase from `sample(sampler)`. Swap in "
+"`SimulatedAnnealingOptimizer()` to run the same loop locally."
+msgstr ""
+"该循环与[快速开始](../quickstart.md)示例一致：正相来自数据，负相来自 `sample(sampler)`。将采样器换为 "
 "`SimulatedAnnealingOptimizer()` 即可在本地运行同一流程。"
-msgstr ""
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:55
-msgid "选择采样器"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:62
+msgid "What Happens During `rbm.sample(sampler)`"
+msgstr "`rbm.sample(sampler)` 期间发生了什么"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "考虑因素"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:64
+msgid ""
+"From the PyTorch perspective, `sample()` behaves like any other tensor-"
+"producing function."
+msgstr "从 PyTorch 的角度看，`sample()` 与其他生成张量的函数行为无异。"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:66
+msgid ""
+"**Hamiltonian Construction**: weights and biases are converted into the "
+"Ising parameters $\\{h_i, J_{ij}\\}$ via the mapping described in the "
+"previous chapters."
+msgstr "**哈密顿量构造**：权重与偏置通过前几章所述映射转换为 Ising 参数 $\\{h_i, J_{ij}\\}$。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:67
+msgid ""
+"**Precision Scaling**: `PrecisionReducer` discretizes the parameters to the "
+"hardware's bit precision."
+msgstr "**精度缩放**：`PrecisionReducer` 将参数离散化以匹配硬件位精度。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:68
+msgid ""
+"**Cloud Submission**: the Hamiltonian is sent via the Kaiwu SDK; the job "
+"queues for the next available CIM unit."
+msgstr "**云端提交**：哈密顿量经 Kaiwu SDK 发送至 CIM 服务；任务进入队列，等待分配给下一个可用单元。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:69
+msgid ""
+"**Physical Sampling**: the CIM evolves optically, producing spin "
+"configurations drawn from the approximate Boltzmann distribution at the "
+"hardware's effective temperature."
+msgstr "**物理采样**：CIM 以光学方式演化，产生近似硬件有效温度下玻尔兹曼分布的自旋构型。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:70
+msgid ""
+"**Result Retrieval**: measured configurations return as PyTorch tensors."
+msgstr "**结果取回**：测量得到的构型以 PyTorch 张量返回。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:72
+msgid "Choosing a Sampler"
+msgstr "选择采样器"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:74
+msgid ""
+"The table below consolidates the SA-vs-CIM comparison introduced in the "
+"[previous chapter](simulated_annealing.md):"
+msgstr "下表汇总了[上一章](simulated_annealing.md)引入的 SA 与 CIM 对比："
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Consideration"
+msgstr "考虑因素"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "`SimulatedAnnealingOptimizer`"
-msgstr ""
+msgstr "`SimulatedAnnealingOptimizer`"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
 msgid "`CIMOptimizer`"
-msgstr ""
+msgstr "`CIMOptimizer`"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "运行位置"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Run location"
+msgstr "运行位置"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "本地 CPU"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Local CPU"
+msgstr "本地 CPU"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "Kaiwu 真机服务"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Kaiwu real-machine service (cloud processor)"
+msgstr "Kaiwu 真机服务（云处理器）"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "前提"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Prerequisite"
+msgstr "前提"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "无需真机凭据"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "None"
+msgstr "无需真机凭据"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "SDK 授权、访问权限与配额"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "SDK credentials, access rights, quota"
+msgstr "SDK 授权、访问权限与配额"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "适用阶段"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Escape from local minima"
+msgstr "逃离局部极小"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "调试、基线与小规模实验"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Thermal activation (barrier crossing $\\propto \\exp(-\\Delta E / T)$)"
+msgstr "热激活（势垒穿越 $\\propto \\exp(-\\Delta E / T)$）"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "具备真机资源后的比较实验"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Quantum tunneling"
+msgstr "量子隧穿"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "端到端耗时"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Suitable phase"
+msgstr "适用阶段"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "由本地问题规模与设置决定"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Debugging, baselines, small experiments"
+msgstr "调试、基线与小规模实验"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md
-msgid "还包含任务提交与排队时间"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Comparative experiments with real-machine access"
+msgstr "具备真机资源后的比较实验"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:64
-msgid "先用经典采样器验证数据处理、模型和训练循环，再在相同实验设置下替换为 CIM 采样器，是更容易定位问题的工作方式。"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "End-to-end latency"
+msgstr "端到端耗时"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:66
-msgid "小结"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "Determined by local problem size and settings"
+msgstr "由本地问题规模与设置决定"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:68
-msgid "KPP 通过 `sample(sampler)` 将采样器接入 PyTorch 训练循环。"
-msgstr ""
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:9
+msgid "High — job submission, queuing, and physical evolution"
+msgstr "高——包含任务提交、排队与物理演化"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:69
-msgid "负相状态由 `sample()` 返回，训练目标由 `objective(s_positive, s_negative)` 计算。"
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:84
+msgid ""
+"A common workflow is to **develop and debug locally with SA**, verifying "
+"data handling, the model, and the training loop, then **switch to the CIM "
+"sampler in the same experimental setup** by changing only the sampler "
+"instantiation. This makes it far easier to isolate problems."
 msgstr ""
+"常见的做法是先用 SA **在本地开发与调试**，验证数据处理、模型与训练循环，再在相同的实验设置下**切换到 CIM "
+"采样器**——只需更改采样器的实例化。这大大简化了问题定位。"
 
-#: ../../source/getting_started/tutorials/quantum_sampling_pytorch.md:70
-msgid "CIM 采样应与经典基线在相同任务和评价指标下比较。"
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:86
+msgid "Summary"
+msgstr "小结"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:88
+msgid ""
+"KPP plugs samplers into the PyTorch training loop through `sample(sampler)`."
+msgstr "KPP 通过 `sample(sampler)` 将采样器接入 PyTorch 训练循环。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:89
+msgid ""
+"The negative phase comes from `sample()`, and the training objective is "
+"computed by `objective(s_positive, s_negative)`."
+msgstr "负相状态由 `sample()` 返回，训练目标由 `objective(s_positive, s_negative)` 计算。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:90
+msgid ""
+"Quantum sampling follows a five-step pipeline: construction, scaling, "
+"submission, evolution, retrieval. All handled automatically."
+msgstr "量子采样遵循五步流水线：构造、缩放、提交、演化、取回，全部自动完成。"
+
+#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_pytorch.md:91
+msgid ""
+"CIM samples should always be compared against a classical baseline on the "
+"same task and metrics."
+msgstr "CIM 样本应始终与同一任务、同一指标下的经典基线进行比较。"
+
+msgid ""
+"`RestrictedBoltzmannMachine` and `BoltzmannMachine` inherit from "
+"`AbstractBoltzmannMachine` (a `torch.nn.Module`). The RBM energy follows "
+"from [Section 4.2, Restricted Boltzmann Machine](../../theoretical-"
+"foundations/kpp-theoretical-foundations-bm-restricted.md) (Eq. {eq}`eq-rbm-"
+"energy-tf`):"
 msgstr ""
+"`RestrictedBoltzmannMachine` 与 `BoltzmannMachine` 均继承自 "
+"`AbstractBoltzmannMachine`（一个 `torch.nn.Module`）。RBM 能量遵循 [第 4.2 "
+"节：受限玻尔兹曼机](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
+"restricted.md) (Eq. {eq}`eq-rbm-energy-tf`)："
 
+#~ msgid ""
+#~ "`RestrictedBoltzmannMachine` and `BoltzmannMachine` inherit from "
+#~ "`AbstractBoltzmannMachine` (a `torch.nn.Module`). The RBM energy follows "
+#~ "from [Section 4.2, Restricted Boltzmann Machine](../../theoretical-"
+#~ "foundations/kpp-theoretical-foundations-bm-restricted.md):"
+#~ msgstr ""
+#~ "`RestrictedBoltzmannMachine` 与 `BoltzmannMachine` 均继承自 "
+#~ "`AbstractBoltzmannMachine`（一个 `torch.nn.Module`）。RBM 能量来自[第 4.2 "
+#~ "节：受限玻尔兹曼机](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
+#~ "restricted.md)："

@@ -8,18 +8,212 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 19:30+0800\n"
+"POT-Creation-Date: 2026-09-08 15:02+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../source/theoretical-foundations/index.md:1
-msgid "理论基础"
+#: ../../source/theoretical-foundations/index.md:23
+msgid "Theoretical Foundations"
 msgstr "理论基础"
 
+#: ../../source/theoretical-foundations/index.md:25
+msgid ""
+"This guide lays the theoretical groundwork for **KPP (Kaiwu-PyTorch-"
+"Plugin)**, covering statistical physics, neural networks, and energy‑based "
+"models."
+msgstr "本指南为 **KPP（Kaiwu-PyTorch-Plugin）** 奠定理论基础，涵盖统计物理、神经网络与基于能量的模型。"
+
+#: ../../source/theoretical-foundations/index.md:27
+msgid ""
+"It traces the chain from spin‑glass models to Boltzmann machines, "
+"establishing the conceptual basis for the quantum‑enhanced techniques "
+"covered in the subsequent tutorials."
+msgstr "它沿着从自旋玻璃模型到玻尔兹曼机的脉络展开，为后续教程中涉及的量子增强技术奠定概念基础。"
+
+#: ../../source/theoretical-foundations/index.md:29
+msgid ""
+"For a step‑by‑step introduction to KPP, see the [Getting "
+"Started](../getting_started/index.md) guide."
+msgstr "如需 KPP 的分步入门介绍，请参阅[入门指南](../getting_started/index.md)。"
+
+#: ../../source/theoretical-foundations/index.md:31
+msgid "Statistical Physics of Memory and Computation"
+msgstr "记忆与计算的统计物理"
+
+#: ../../source/theoretical-foundations/index.md:43
+msgid ""
+"[Spin-Glass Analogy](kpp-theoretical-foundations-stat-spinglass.md): Mapping"
+" Ising models to neural states, bridging physics and computation."
+msgstr ""
+"[自旋玻璃类比](kpp-theoretical-foundations-stat-"
+"spinglass.md)：将伊辛模型映射到神经状态，连接物理与计算。"
+
+#: ../../source/theoretical-foundations/index.md:44
+msgid ""
+"[Boltzmann Distribution and Equilibrium](kpp-theoretical-foundations-stat-"
+"boltzmann.md): Defining state probability via energy and the partition "
+"function."
+msgstr ""
+"[玻尔兹曼分布与平衡](kpp-theoretical-foundations-stat-boltzmann.md)：通过能量与配分函数定义状态概率。"
+
+#: ../../source/theoretical-foundations/index.md:45
+msgid ""
+"[The Need for Noise](kpp-theoretical-foundations-stat-noise.md): From "
+"deterministic Hopfield traps to stochastic search, how noise helps escape "
+"local minima."
+msgstr ""
+"[噪声的必要性](kpp-theoretical-foundations-stat-noise.md)：从确定性 Hopfield "
+"陷阱到随机搜索，噪声如何帮助逃离局部极小值。"
+
+#: ../../source/theoretical-foundations/index.md:46
+msgid ""
+"[Renormalization Group](kpp-theoretical-foundations-stat-"
+"renormalization.md): From microscopic spins to macroscopic features via "
+"coarse-graining, analogous to hierarchical feature learning."
+msgstr ""
+"[重整化群](kpp-theoretical-foundations-stat-"
+"renormalization.md)：通过粗粒化从微观自旋到宏观特征，类似于层次化特征学习。"
+
+#: ../../source/theoretical-foundations/index.md:48
+msgid "Neural Network Fundamentals"
+msgstr "神经网络基础"
+
+#: ../../source/theoretical-foundations/index.md:59
+msgid ""
+"[Linear Neurons Recap](kpp-theoretical-foundations-nn-recap.md): "
+"Perceptrons, the XOR problem, and the motivation for depth."
+msgstr ""
+"[线性神经元回顾](kpp-theoretical-foundations-nn-recap.md)：感知机、XOR 问题与深度学习的动机。"
+
+#: ../../source/theoretical-foundations/index.md:60
+msgid ""
+"[Recurrent Networks and Content-Addressable Memory](kpp-theoretical-"
+"foundations-nn-recurrent.md): Dynamics versus feed-forward computation."
+msgstr ""
+"[循环网络与内容可寻址记忆](kpp-theoretical-foundations-nn-recurrent.md)：动力学与前馈计算的对比。"
+
+#: ../../source/theoretical-foundations/index.md:61
+msgid ""
+"[Hebbian Learning as Sculpting Energy](kpp-theoretical-foundations-nn-"
+"learning.md): How local synaptic rules shape the global energy landscape."
+msgstr ""
+"[Hebbian 学习即能量塑造](kpp-theoretical-foundations-nn-"
+"learning.md)：局部突触规则如何塑造全局能量景观。"
+
+#: ../../source/theoretical-foundations/index.md:63
+msgid "Energy-Based Models (EBMs)"
+msgstr "基于能量的模型（EBMs）"
+
+#: ../../source/theoretical-foundations/index.md:74
+msgid ""
+"[Defining the Objective: Low Energy for Real Data](kpp-theoretical-"
+"foundations-ebms-def.md): Shaping the energy landscape to fit observations."
+msgstr ""
+"[定义目标：真实数据低能量](kpp-theoretical-foundations-ebms-def.md)：塑造能量景观以拟合观测数据。"
+
+#: ../../source/theoretical-foundations/index.md:75
+msgid ""
+"[The Intractable Partition Function Problem](kpp-theoretical-foundations-"
+"ebms-partition.md): The computational barrier to exact inference."
+msgstr ""
+"[难以处理的配分函数问题](kpp-theoretical-foundations-ebms-partition.md)：精确推断面临的计算障碍。"
+
+#: ../../source/theoretical-foundations/index.md:76
+msgid ""
+"[Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md): A "
+"practical shortcut, approximating gradients without equilibrium."
+msgstr "[对比散度](kpp-theoretical-foundations-ebms-cd.md)：一种实用的捷径，无需达到平衡即可近似梯度。"
+
+#: ../../source/theoretical-foundations/index.md:78
+msgid "Boltzmann Machine Architecture: The Full Spectrum"
+msgstr "玻尔兹曼机架构：完整谱系"
+
+#: ../../source/theoretical-foundations/index.md:89
+msgid ""
+"[Classical Boltzmann Machine](kpp-theoretical-foundations-bm-overall.md): "
+"Symmetric connections between visible and hidden units, and the wake-sleep "
+"algorithm."
+msgstr ""
+"[经典玻尔兹曼机](kpp-theoretical-foundations-bm-overall.md)：可见单元与隐单元之间的对称连接，以及 "
+"wake-sleep 算法。"
+
+#: ../../source/theoretical-foundations/index.md:90
+msgid ""
+"[Restricted Boltzmann Machine (RBM)](kpp-theoretical-foundations-bm-"
+"restricted.md): The bipartite breakthrough enabling efficient layer-wise "
+"sampling."
+msgstr ""
+"[受限玻尔兹曼机（RBM）](kpp-theoretical-foundations-bm-"
+"restricted.md)：二部图结构的突破，实现了高效的分层采样。"
+
+#: ../../source/theoretical-foundations/index.md:91
+msgid ""
+"[Beyond Single Layers: Stacking for Deep Learning](kpp-theoretical-"
+"foundations-bm-deep.md): Building Deep Belief Networks (DBNs) and the "
+"connection to modern pre-training."
+msgstr ""
+"[超越单层：堆叠实现深度学习](kpp-theoretical-foundations-bm-"
+"deep.md)：构建深度信念网络（DBNs）及其与现代预训练的联系。"
+
+#: ../../source/theoretical-foundations/index.md:93
+msgid "Recap: From Statistical Physics to Sampling Bottlenecks"
+msgstr "回顾：从统计物理到采样瓶颈"
+
+#: ../../source/theoretical-foundations/index.md:102
+msgid ""
+"[Read the Recap](kpp-theoretical-foundations-recap.md) for the key "
+"takeaways:"
+msgstr "阅读[回顾](kpp-theoretical-foundations-recap.md)以获取要点："
+
+#: ../../source/theoretical-foundations/index.md:104
+msgid ""
+"Statistical physics provides the probabilistic lens (Boltzmann distribution)"
+" and the metaphor of the energy landscape."
+msgstr "统计物理提供了概率视角（玻尔兹曼分布）与能量景观的隐喻。"
+
+#: ../../source/theoretical-foundations/index.md:105
+msgid ""
+"Neural network fundamentals provide the structural components (units, "
+"biases, weights) and the biological inspiration (Hebbian learning)."
+msgstr "神经网络基础提供了结构组件（单元、偏置、权重）与生物学灵感（Hebbian 学习）。"
+
+#: ../../source/theoretical-foundations/index.md:106
+msgid ""
+"Energy-based models frame the learning objective as minimizing energy for "
+"real data; the intractability of exact gradients motivates approximations "
+"like Contrastive Divergence, which provides a practical solution to the "
+"intractable partition function."
+msgstr "基于能量的模型将学习目标表述为降低真实数据的能量；精确梯度的难解性催生了对比散度等近似方法，为难以处理的配分函数提供了实用解决方案。"
+
+#: ../../source/theoretical-foundations/index.md:107
+msgid ""
+"Boltzmann Machine Architecture transitions from the computationally "
+"prohibitive full Boltzmann Machine to the Restricted Boltzmann Machine "
+"(RBM), which serves as the critical building block for stacking deep "
+"generative architectures."
+msgstr "玻尔兹曼机架构从计算上不可行的全连接玻尔兹曼机过渡到受限玻尔兹曼机（RBM），后者是堆叠深度生成架构的关键构件。"
+
+#: ../../source/theoretical-foundations/index.md:109
+msgid ""
+"These foundations expose a fundamental tension: **the expressiveness of "
+"energy-based models is bottlenecked by the difficulty of sampling from "
+"complex, high-dimensional Boltzmann distributions.** Classical Markov chain "
+"methods suffer from slow mixing and bias; quantum sampling offers a "
+"principled alternative by physically evolving a system toward equilibrium."
+msgstr ""
+"这些基础揭示了一个根本性矛盾：**基于能量的模型的表达能力受制于从复杂高维玻尔兹曼分布中采样的难度。** "
+"经典马尔可夫链方法存在混合缓慢与偏差问题；量子采样通过物理演化使系统趋向平衡，提供了一种有理论依据的替代方案。"
+
+#: ../../source/theoretical-foundations/index.md:113
+msgid "References and Further Reading"
+msgstr "参考文献与延伸阅读"
+
+#~ msgid "理论基础"
+#~ msgstr "理论基础"

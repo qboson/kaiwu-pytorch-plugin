@@ -74,7 +74,7 @@ $$\nabla \log Z_\theta = \frac{1}{Z_\theta} \sum_{\tilde{\mathbf{x}}} \exp(-E_\t
 
 Thus, the gradient of the log-likelihood becomes:
 
-$$\nabla f(\theta) = -\mathbb{E}_{\text{data}}[\nabla E_\theta(\mathbf{X})] + \mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$
+$$\nabla f(\theta) = -\mathbb{E}_{\text{data}}[\nabla E_\theta(\mathbf{X})] + \mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$ (eq-nll-gradient-tf)
 
 This contrastive form, i.e. the difference between an expectation under the **data distribution** and an expectation under the **model distribution,** is the mathematical heart of all Boltzmann machine learning algorithms. The first term lowers the energy of observed data configurations; the second term raises the energy of configurations that the model currently deems probable.
 

@@ -32,11 +32,11 @@ $$E(\mathbf{v}, \mathbf{h}) = -\sum_{i \in \text{vis}} b_i v_i - \sum_{j \in \te
 
 where $\mathbf{x} = (\mathbf{v}, \mathbf{h})$ denotes the full state vector, $b_i$ are visible biases, and $c_j$ are hidden biases. The summation over $i<j$ runs over all distinct pairs of units, both visible-visible, visible-hidden, and hidden-hidden.
 
-This energy function defines a joint probability distribution over all $2^{N}$ possible states via the Boltzmann distribution:
+This energy function defines a joint probability distribution over all $2^{N}$ possible states via the Boltzmann distribution (Eq. {eq}`eq-boltzmann-dist`, Section 1.2):
 
 $$P(\mathbf{v}, \mathbf{h}) = \frac{1}{Z} \exp\left(-E(\mathbf{v}, \mathbf{h})\right)$$
 
-where the partition function $Z$ sums over all joint configurations:
+where the partition function $Z$ (cf. Eq. {eq}`eq-partition`, Section 3.2) sums over all joint configurations:
 
 $$Z = \sum_{\tilde{\mathbf{v}}, \tilde{\mathbf{h}}} \exp\left(-E(\tilde{\mathbf{v}}, \tilde{\mathbf{h}})\right)$$
 
@@ -58,7 +58,7 @@ Consequently, if the network is allowed to run for a sufficiently long time (i.e
 Consequently, repeated application drives the network toward equilibrium, where configurations are sampled according to $P(\mathbf{v}, \mathbf{h})$.
 
 ## Learning Objective: Maximum Likelihood with Hidden Variables
-The goal of learning is to adjust the weights and biases so that the marginal distribution over visible units, $P(\mathbf{v})$, approximates the empirical distribution of the training data. As derived in Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md), the gradient of the negative log-likelihood for a single training example $\mathbf{v}$ with respect to a weight $w_{ij}$ is:
+The goal of learning is to adjust the weights and biases so that the marginal distribution over visible units, $P(\mathbf{v})$, approximates the empirical distribution of the training data. As derived in Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) (Eq. {eq}`eq-nll-gradient-tf`), the gradient of the negative log-likelihood for a single training example $\mathbf{v}$ with respect to a weight $w_{ij}$ is:
 
 $$\frac{\partial \left( -\log P(\mathbf{v}) \right)}{\partial w_{ij}} = \mathbb{E}_{\mathbf{h} \mid \mathbf{v}} \left[ x_i x_j \right] - \mathbb{E}_{P(\mathbf{v}, \mathbf{h})} \left[ x_i x_j \right]$$
 

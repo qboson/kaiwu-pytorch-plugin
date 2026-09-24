@@ -14,7 +14,7 @@ hide_child: false
 ## The Core Insight: Truncated Markov Chains
 The key observation behind contrastive divergence, introduced by Geoffrey Hinton in 2002, is that we need not run the Markov chain all the way to equilibrium. Instead, we can initialize the chain at a **data point** and run it for only a small number of steps, often just **one,** and then treat the resulting state as an approximate sample from the model distribution.
 
-Why should this work? Consider the gradient of the negative log-likelihood:
+Why should this work? Consider the gradient of the negative log-likelihood (Eq. {eq}`eq-nll-gradient-tf`, Section 3.1):
 
 $$\nabla f(\theta) = -\mathbb{E}_{\text{data}} \left[ \frac{\partial E_\theta}{\partial \theta} \right] + \mathbb{E}_{\text{model}} \left[ \frac{\partial E_\theta}{\partial \theta} \right]$$
 
@@ -46,7 +46,7 @@ The CD-k algorithm for training a Restricted Boltzmann Machine (RBM) or a genera
 
 Update each weight $w_{ij}$ using the difference between positive and negative statistics:
 
-$$\Delta w_{ij} = \eta \left( \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{recon}} \right)$$
+$$\Delta w_{ij} = \eta \left( \langle v_i h_j \rangle_{\text{data}} - \langle v_i h_j \rangle_{\text{recon}} \right)$$ (eq-cd-update)
 
 where $\eta$ is the learning rate. Biases are updated similarly using unit activations.
 
@@ -71,7 +71,7 @@ $$\text{CD}_k = \text{KL}(P_{\text{data}} \| P_\theta) - \text{KL}(P_\theta^{(k)
 
 where $P_\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting from the data. Minimizing this **contrastive divergence** encourages the model distribution to be close to the data distribution while simultaneously being far from the $k$ step distribution. This formulation justifies the name and provides a more principled foundation than a mere heuristic.
 
-1. **Persistent Contrastive Divergence (PCD)**: An important variant, **persistent contrastive divergence**, maintains a persistent set of Markov chains whose states are retained across weight updates. Instead of reinitializing from data each time, the chains continue to evolve. PCD yields samples that are closer to the true model distribution and can improve the quality of the learned model, especially for deeper architectures.
+- **Persistent Contrastive Divergence (PCD)**: An important variant, **persistent contrastive divergence**, maintains a persistent set of Markov chains whose states are retained across weight updates. Instead of reinitializing from data each time, the chains continue to evolve. PCD yields samples that are closer to the true model distribution and can improve the quality of the learned model, especially for deeper architectures.
 
 ## Limitations and Caveats
 Contrastive divergence is a pragmatic approximation, not an exact algorithm. It has several known limitations:

@@ -42,7 +42,7 @@ In a DBN, each new hidden layer can be seen as a **coarse-graining operation** o
 
 Just as the RG reveals that all critical points belong to a finite number of universality classes, deep learning shows that a well-trained network automatically discovers the universal structure of the data – the features that generalise across examples.
 
-## Statistical Physics Foundations: Extensive and Intensive Variables
+## Extensive and Intensive Variables
 To fully appreciate the RG analogy, we must distinguish between **extensive** and **intensive** variables in thermodynamics:
 
 - **Extensive variables** (e.g., volume $V$, energy $E$, entropy $S$, number of particles $N$) scale with the size of the system.

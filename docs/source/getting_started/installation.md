@@ -1,221 +1,322 @@
-# 安装指南
+<!-- ```YAML
+title: Installation Guide
+slug: kpp-getting-started-installation
+sidebar_position: 2
+hide: false
+``` -->
 
-本章介绍如何安装 Kaiwu-PyTorch-Plugin 及其依赖项。
 
-## 1. 环境要求
+# Installation Guide
 
-在安装之前，请确保您的系统满足以下要求：
+> This chapter describes how to install Kaiwu-PyTorch-Plugin and its dependencies.
 
-```{list-table}
-:widths: 30 70
-:header-rows: 1
+## System Requirements
 
-* - 依赖项
-  - 版本要求
-* - Python
-  - 3.10
-* - PyTorch
-  - 2.7.0
-* - NumPy
-  - 2.2.6
-* - Kaiwu SDK
-  - 1.3.1
+Before installation, ensure your system meets the following requirements:
 
-```
-检查 Python 版本：
+| Dependency | Required Version | Role |
+|------------|-----------------|------|
+| Python | 3.10 | Base runtime (tested against 3.10 specifically) |
+| PyTorch | 2.7 | Tensor operations & automatic differentiation |
+| NumPy | 2.2.6 | Linear algebra & SDK interfacing |
+| Kaiwu SDK | v1.3.1+ | Ising optimization backend (classical SA + quantum CIM) |
 
-```{code-block} bash
+> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK v1.3.1 is the current recommended release.
 
- python --version
- # or
- python3 --version
-
-```
-如果需要安装 Python 3.10，请访问 [Python 3.10 下载页面](https://www.python.org/downloads/release/python-31011/)。
-
-## 2. 安装 Kaiwu-PyTorch-Plugin
-
-### 2.1 创建并激活环境
-
-推荐使用 conda 创建独立的 Python 环境：
-
-```{code-block} bash
-
- # Create a new environment
- conda create -n quantum_env python=3.10
-
- # Activate the environment
- conda activate quantum_env
-
-```
-### 2.2 克隆仓库
-
-从 GitHub 克隆项目到本地：
-
-```{code-block} bash
-
- git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
- cd kaiwu-pytorch-plugin
-
-```
-### 2.3 安装依赖
-
-安装项目依赖：
-
-```{code-block} bash
-
- pip install -r requirements/requirements.txt
-
-```
-### 2.4 安装插件
-
-```{code-block} bash
-
- pip install .
-
-```
-### 2.5 使用 Docker（可选）
-
-README 提供了基于 Jupyter Notebook 的 Docker 配置，用于获得隔离、可复现的环境。进入 `requirements/` 目录后构建并启动服务：
-
-```{code-block} bash
-
- cd requirements
- docker compose build
- docker compose up
-
+Check the Python version:
+```bash
+python --version
+# or
+python3 --version
 ```
 
-服务启动后可通过 `http://localhost:8888` 访问。停止服务时按下 `Ctrl+C`，再执行 `docker compose down`。
+If you need to install Python 3.10, please visit the <u>Python 3.10 download page</u>.
 
-## 3. 安装 Kaiwu SDK（必需）
+## Install Kaiwu-PyTorch-Plugin
 
-Kaiwu-PyTorch-Plugin 依赖 Kaiwu SDK 提供量子计算能力。
+> You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
+### Option 1: Local Setup (conda/pip)
 
-现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装，其他版本的Kaiwu SDK 的下载和安装步骤如下：
+#### Step-by-Step Guide
 
-### 3.1 获取 SDK
+1. **Create and Activate Environment**
+It is recommended to use conda to create an isolated Python environment:
+```bash
+# Create a new environment
+conda create -n quantum_env python=3.10
 
-1. 访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)
-2. 下载适合您系统的 SDK 安装包
-3. 参考 [Kaiwu SDK 安装说明](https://kaiwu-sdk-docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html) 以完成安装
-
-### 3.2 配置授权信息
-
-安装完成后，您需要配置 SDK 授权信息：
-
+# Activate the environment
+conda activate quantum_env
 ```
 
- User ID: <your-user-id>
- SDK Token: <your-sdk-token>
-
+2. **Clone the Repository**
+Clone the project from GitHub to your local machine:
+```bash
+git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+cd kaiwu-pytorch-plugin
 ```
-```{note}
 
- 请将上述信息替换为您的实际授权信息。授权信息可在 QBoson 平台的 [Kaiwu SDK 页面](https://platform.qboson.com/) 获取。
-
+3. **Install Dependencies**
+Install the project dependencies:
+```bash
+pip install -r requirements/requirements.txt
 ```
-## 4. 验证安装
 
-安装完成后，运行以下代码验证安装是否成功：
-
-```{code-block} python
-
- # 验证 PyTorch
- import torch
- print(f"PyTorch version: {torch.__version__}")
-
-
-
- # 验证 Kaiwu SDK
- import kaiwu
- import numpy as np
- from kaiwu.classical import SimulatedAnnealingOptimizer
- opt = SimulatedAnnealingOptimizer()
- mat = np.array([[1, -1], [-1, 1]])
- result = opt.solve(mat)
- print(f"Kaiwu SDK version: {kaiwu.__version__}")
- print(result)
-
- # 验证 Kaiwu-PyTorch-Plugin
- from kaiwu.torch_plugin import RestrictedBoltzmannMachine
- print("Kaiwu-PyTorch-Plugin imported successfully!")
- # 简单测试
- rbm = RestrictedBoltzmannMachine(num_visible=10, num_hidden=5)
- print(f"RBM created with {rbm.num_visible} visible and {rbm.num_hidden} hidden units")
-
+4. **Install the Plugin**
+```bash
+pip install .
 ```
-如果没有报错，至此您已经安装成功。后续您可以根据需求进行模型的构建，并使用经典计算器进行模型验证，验证通过后再根据如下步骤切换到量子计算器以利用量子计算资源。
 
-## 5. 获取量子计算机访问
+#### Checkpoint
 
-要体验真正的量子计算能力，您需要获取量子计算机的访问权限：
-
-1. 在 [QBoson 平台](https://platform.qboson.com/) 注册账号
-2. 通过平台联系官方工作人员获取真机配额
-
-```{note}
-
- 在获取真机访问权限之前，您可以使用模拟器进行开发和测试验证。Kaiwu SDK 提供了多种经典优化器（如模拟退火优化器）作为量子采样器的经典替代方案。
-
+Run 
+```bash
+python -c "import torch; print(torch.__version__)"
 ```
-## 6. 开发环境设置（可选）
+to confirm PyTorch is installed.
 
-如果您计划参与插件的开发，可以安装开发依赖：
+### Option 2: Docker Setup (no local environment required)
 
-```{code-block} bash
+The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
 
- pip install -r requirements/devel.txt
+#### Required Project Structure
 
+```bash
+requirements/
+├── docker-compose.yml
+├── requirements.txt               # Kaiwu SDK included
+├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
+└── docker/
+    └── Dockerfile
 ```
-运行测试：
 
-```{code-block} bash
+#### Docker Commands
 
- # Run all tests
- pytest tests/
+1. **Clone the repository**
+Clone the project from GitHub to your local machine:
+   ```bash
+   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   cd kaiwu-pytorch-plugin/requirements
+   ```
 
- # Run specific tests
- pytest tests/test_rbm.py
+2. **Build the Docker image**
+   ```bash
+   docker compose build
+   ```
 
+3. **Start the Jupyter notebook server**
+   ```bash
+   docker compose up
+   ```
+
+#### Access
+
+- Open `http://localhost:8888` (no token required)
+- Project root mounted at `/home/jovyan/work`
+- Use JupyterLab Terminal for command-line work
+
+```bash
+/home/jovyan/work
+# All project files are already here; edit, run, and version them directly.
 ```
-代码风格检查：
+This mounts your local repository into the container, so any changes you make locally will be reflected immediately inside Jupyter.
 
-```{code-block} bash
+#### Stop the Server
 
- pylint src/kaiwu/
-
+Press `Ctrl+C`, then run:
+```bash
+docker compose down
 ```
-## 7. 常见问题
 
-### Q: 安装时提示 Python 版本不兼容？
+## Project Structure & Package Layout
 
-A: Kaiwu-PyTorch-Plugin 目前基于 Python 3.10。请使用 conda 创建 Python 3.10 环境：
-
-```{code-block} bash
-
- conda create -n quantum_env python=3.10
- conda activate quantum_env
-
+```bash
+Kaiwu-pytorch-plugin/
+├── src/kaiwu/torch_plugin/   # Core library
+│   ├── __init__.py
+│   ├── abstract_boltzmann_machine.py
+│   ├── restricted_boltzmann_machine.py
+│   ├── full_boltzmann_machine.py
+│   ├── gbrbm.py
+│   ├── dbn.py
+│   ├── qvae.py
+│   └── qdiffusion.py
+├── example/                   # Application examples
+│   ├── rbm_digits
+│   ├── dbn_digits
+│   ├── bm_generation/
+│   ├── qvae_mnist/
+│   ├── qvae_cell/
+│   └── qdiffusion/
+├── tests/                      # Test suite
+│   └── test_rbm.py
+├── requirements/               # Dependencies & Docker
+├── docs/                       # Documentation
+└── README.md
 ```
-### Q: 无法导入 kaiwu.torch_plugin？
 
-A: 请确保：
+### Key Code Entities
 
-1. 当前环境已激活（`conda activate quantum_env`）
-2. Kaiwu SDK 已正确安装
-3. 已正确安装 Kaiwu-PyTorch-Plugin（`pip install .`），检查是否已经安装可以使用
-    `pip list` 或者 `pip show kaiwu-torch-plugin`
+| Entity                           | Description                                                                                                                        |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **`AbstractBoltzmannMachine`**   | Base class defining the interface for all models                                                                                   |
+| **`BoltzmannMachine`**           | Fully connected; uses `condition_sample()` for positive phase                                                                      |
+| **`RestrictedBoltzmannMachine`** | Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy definition                                               |
+| **`GaussianBernoulliRBM`**       | RBM variant with real-valued visible units (Gaussian distribution) and binary hidden units (Bernoulli distribution), or vice versa |
 
+## Kaiwu SDK Configuration & License
 
-### Q: 如何更新到最新版本？
+Kaiwu-PyTorch-Plugin depends on the **Kaiwu SDK** to provide quantum computing capabilities. The Kaiwu SDK is a proprietary backend that provides both classical simulation (SA) and quantum execution (CIM), and must be installed separately.
 
-A: 进入项目目录并拉取最新代码：
+### Step 1: Obtain & Install SDK
+#### Option A: Install from PyPI (Recommended)
 
-```{code-block} bash
+The Kaiwu SDK is available on PyPI. You can install it directly:
 
- cd kaiwu-pytorch-plugin
- git pull origin main
- pip install .
+```bash
+pip install kaiwu==1.3.1
+```
 
+Alternatively, add the following line to your `requirements.txt`:
+
+```text
+kaiwu==1.3.1
+```
+
+#### Option B: Install from Official Wheel
+
+If you need a specific version or have network restrictions, download the SDK wheel from the QBoson platform:
+
+> 1. Visit the <u>Kaiwu SDK download page</u> on the QBoson platform
+> 2. Download the wheel package suitable for your system (e.g., `kaiwu-1.3.1-py3-none-any.whl`)
+> 3. Install the wheel:
+
+```bash
+pip install kaiwu-1.3.1-py3-none-any.whl
+```
+
+### Step 2: Set Environment Variables
+
+After installation, you need to configure the SDK authorization credentials. Set the following environment variables:
+
+```bash
+export USER_ID="<your-user-id>"
+export SDK_CODE="<your-sdk-code>"
+```
+
+> **Important:** The environment variable name is `SDK_CODE`, **not** `SDK_TOKEN`. Using the wrong variable name will cause authentication to fail.
+
+### Step 3: Initialize License in Code
+
+Then initialize the license in your code:
+
+```python
+import os
+import kaiwu as kw
+
+kw.license.init(
+    os.getenv("USER_ID"),
+    os.getenv("SDK_CODE")
+)
+```
+
+> **Note:** Always keep credentials in environment variables, never hardcode them in source code, as they could be accidentally committed to version control. The credentials can be obtained from the <u>Kaiwu SDK page</u> on the QBoson platform.
+
+## Obtain Quantum Computer Access
+### How to Get QPU Access
+To experience true quantum computing capabilities, you need to obtain access to a quantum computer:
+
+> 1. Register an account on the <u>QBoson platform</u>
+> 2. Contact the official staff through the platform to request a quota for the real quantum device
+
+> **Note:** Before obtaining access to the real quantum device, you can use simulators for development and testing. The Kaiwu SDK provides various classical optimizers (such as the simulated annealing optimizer) as classical alternatives to the quantum sampler.
+
+### Development Workflow Recommendation:
+
+```{mermaid}
+graph LR
+    A["Develop & Debug<br>(SA Simulator)"]
+    B["Validate Model<br>(SA Simulator)"]
+    C["Scale to QPU<br>(CIM Quantum)"]
+    
+    A --> B
+    B --> C
+    classDef dev fill:#e3f2fd,stroke:#1e88e5,stroke-width:1px;
+    classDef val fill:#fff3e0,stroke:#fb8c00,stroke-width:1px;
+    classDef qpu fill:#e8f5e9,stroke:#43a047,stroke-width:1px;
+    
+    class A dev;
+    class B val;
+    class C qpu;
+```
+
+> **Note:** Always validate your model with the classical simulator before consuming QPU quota.
+## Verify Installation
+
+After installation, run the following code to verify that the installation was successful:
+
+### Three Verification Steps
+
+1. **Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded
+2. **Test SDK backend:** Verify the classical SA solver works
+3. **Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and initializes
+
+### Smoke-Test Code
+
+```python
+# Verify PyTorch
+import torch
+print(f"PyTorch version: {torch.__version__}")
+
+# Verify Kaiwu SDK
+import kaiwu
+import numpy as np
+from kaiwu.classical import SimulatedAnnealingOptimizer
+opt = SimulatedAnnealingOptimizer()
+mat = np.array([[1, -1], [-1, 1]])
+result = opt.solve(mat)
+print(f"Kaiwu SDK version: {kaiwu.__version__}")
+print(result)
+
+# Verify Kaiwu-PyTorch-Plugin
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+print("Kaiwu-PyTorch-Plugin imported successfully!")
+# Simple test
+rbm = RestrictedBoltzmannMachine(num_visible=10, num_hidden=5)
+print(f"RBM created with {rbm.num_visible} visible and {rbm.num_hidden} hidden units")
+```
+
+### Expected Output
+
+```bash
+PyTorch version: 2.7.0
+Kaiwu SDK version: 1.3.1
+Solver result: [array([1, -1]), array([-1, 1])]
+Kaiwu-PyTorch-Plugin imported successfully!
+RBM created with 10 visible and 5 hidden units
+```
+If no error occurs, your environment is ready. You can now build models and validate with classical samplers, then switch to the quantum sampler.
+
+## Development Environment Setup (Optional)
+
+If you plan to participate in the development of the plugin, you can install the development dependencies:
+
+```bash
+pip install -r requirements/devel.txt
+```
+
+### Run tests:
+
+```bash
+# Run all tests
+pytest tests/
+
+# Run specific tests
+pytest tests/test_rbm.py
+```
+
+### Lint code style:
+
+```bash
+pylint src/kaiwu/
 ```

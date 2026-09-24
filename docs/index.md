@@ -15,6 +15,12 @@ source/theoretical-foundations/index
 ```{toctree}
 :maxdepth: 2
 
+source/getting_started/tutorials/index
+
+```
+```{toctree}
+:maxdepth: 2
+
 source/modules/kaiwu.torch_plugin
 
 ```

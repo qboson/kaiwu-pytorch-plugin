@@ -12,127 +12,179 @@ msgstr ""
 "POT-Creation-Date: 2026-09-23 20:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: ../../source/about/release_notes.md:1
 msgid "发行说明"
-msgstr ""
+msgstr "发行说明"
 
 #: ../../source/about/release_notes.md:3
 msgid "本页记录 Kaiwu-PyTorch-Plugin 各版本的更新内容。"
-msgstr ""
+msgstr "本页记录 Kaiwu-PyTorch-Plugin 各版本的更新内容。"
 
 #: ../../source/about/release_notes.md:5
-msgid "版本 0.3.0（2026-09-23）"
-msgstr ""
+msgid "版本 0.1.0（2025-12-24）"
+msgstr "版本 0.1.0（2025-12-24）"
 
 #: ../../source/about/release_notes.md:7
-msgid "新增"
-msgstr ""
+#: ../../source/about/release_notes.md:21
+msgid "**新功能**"
+msgstr "**新功能**"
 
 #: ../../source/about/release_notes.md:9
-msgid "GBRBM 高斯-伯努利受限玻尔兹曼机；"
-msgstr ""
+msgid "依赖许可证检查"
+msgstr "依赖许可证检查"
 
 #: ../../source/about/release_notes.md:10
-msgid "MAIFS 模型无关特征选择（`FeatureSelectionWrapper`）；"
-msgstr ""
+msgid "PyPI 发布流水线"
+msgstr "PyPI 发布流水线"
 
-#: ../../source/about/release_notes.md:11
-msgid "新增 Docker 开发环境。"
-msgstr ""
+#: ../../source/about/release_notes.md:13
+#: ../../source/about/release_notes.md:27
+msgid "**改进**"
+msgstr "**改进**"
 
-#: ../../source/about/release_notes.md:12
-msgid "用量统计；"
-msgstr ""
-
-#: ../../source/about/release_notes.md:14
-msgid "改造"
-msgstr ""
+#: ../../source/about/release_notes.md:15
+msgid "文档与说明更新"
+msgstr "文档与说明更新"
 
 #: ../../source/about/release_notes.md:16
-msgid "QVAE 重构为 `AutoEncoderBase` + config 驱动的工厂式构造；"
-msgstr ""
+msgid "调整BM接口和矩阵转换逻辑"
+msgstr "调整BM接口和矩阵转换逻辑"
 
-#: ../../source/about/release_notes.md:17
-msgid "QDiffusion 进行了接口调整，移除 `EnergyBackboneAdapter` Protocol；"
-msgstr ""
+#: ../../source/about/release_notes.md:19
+msgid "版本 0.0.2（2025-11-06）"
+msgstr "版本 0.0.2（2025-11-06）"
 
-#: ../../source/about/release_notes.md:18
-msgid "dplm/qvae_mnist 示例由单体脚本拆分为 models/utils/workflows 分层结构。"
-msgstr ""
-
-#: ../../source/about/release_notes.md:20
-msgid "文档"
-msgstr ""
-
-#: ../../source/about/release_notes.md:22
-msgid "全量 rst 转 MyST Markdown，新增 10 篇理论基础、3 篇教程、贡献指南，数学渲染换 KaTeX。"
-msgstr ""
+#: ../../source/about/release_notes.md:23
+msgid "新增文档框架，支持 Sphinx 构建"
+msgstr "新增文档框架，支持 Sphinx 构建"
 
 #: ../../source/about/release_notes.md:24
-msgid "版本 0.2.0（2026-07-07）"
-msgstr ""
+msgid "新增 DBN（深度信念网络）模块，支持多层 RBM 堆叠"
+msgstr "新增 DBN（深度信念网络）模块，支持多层 RBM 堆叠"
 
-#: ../../source/about/release_notes.md:26
-msgid "更新"
-msgstr ""
+#: ../../source/about/release_notes.md:25
+msgid "新增 Q-VAE 示例，支持量子变分自编码器训练"
+msgstr "新增 Q-VAE 示例，支持量子变分自编码器训练"
 
-#: ../../source/about/release_notes.md:28
-msgid ""
-"**新增 `QDiffusion`** 在顶层插件接口中新增 `QDiffusion` 与 "
-"`QDiffusionConfig`，使用基于玻尔兹曼机作为能量模型优化扩散过程。"
-msgstr ""
+#: ../../source/about/release_notes.md:29
+msgid "恢复并优化 RBM 模块实现"
+msgstr "恢复并优化 RBM 模块实现"
+
+#: ../../source/about/release_notes.md:30
+msgid "更新示例代码 README 文档"
+msgstr "更新示例代码 README 文档"
 
 #: ../../source/about/release_notes.md:31
-msgid "**新增 `QDiffusion` 蛋白质生成示例** 新增 `example/qdiffusion/` 示例目录，包括："
-msgstr ""
+msgid "改进代码注释，提升可读性"
+msgstr "改进代码注释，提升可读性"
 
 #: ../../source/about/release_notes.md:33
-msgid "`simple/`：用于快速理解 `QDiffusion` API 的最小训练与生成示例"
-msgstr ""
+msgid "**文档**"
+msgstr "**文档**"
 
-#: ../../source/about/release_notes.md:34
-msgid "`dplm/`：基于 DPLM 的完整蛋白质序列生成工作流，涵盖模型构建、训练、引导生成、checkpoint 复现与评估"
-msgstr ""
+#: ../../source/about/release_notes.md:35
+msgid "更新中英文 README 文档"
+msgstr "更新中英文 README 文档"
 
 #: ../../source/about/release_notes.md:36
-msgid ""
-"**新增 Q-VAE 单细胞表征学习示例** 新增 `example/qvae_cell/` "
-"示例，提供单细胞表征学习完整流程，包括数据读取、Q-VAE 训练、潜在表示提取、可视化、能量分析以及下游 benchmark 评估。"
-msgstr ""
+msgid "添加更详细的安装说明"
+msgstr "添加更详细的安装说明"
+
+#: ../../source/about/release_notes.md:37
+msgid "补充示例代码说明"
+msgstr "补充示例代码说明"
 
 #: ../../source/about/release_notes.md:39
-msgid ""
-"**新增 RISC-V 64 平台预编译 wheel** 提供 kaiwu 1.3.1 / kpp 0.2.0 在 RISC-V 64 "
-"平台的预编译 wheel，安装方式见下文。"
-msgstr ""
+msgid "**修复**"
+msgstr "**修复**"
+
+#: ../../source/about/release_notes.md:41
+msgid "修复 DBN 模块中的已知问题"
+msgstr "修复 DBN 模块中的已知问题"
 
 #: ../../source/about/release_notes.md:42
-msgid "RISC-V 64 安装"
-msgstr ""
+msgid "修复 pylint 检查发现的代码问题"
+msgstr "修复 pylint 检查发现的代码问题"
 
 #: ../../source/about/release_notes.md:44
-msgid "要求：RISC-V 64 + Python 3.10 + glibc ≥ 2.31。"
-msgstr ""
+msgid "版本 0.0.1（2025-10-15）"
+msgstr "版本 0.0.1（2025-10-15）"
+
+#: ../../source/about/release_notes.md:46
+msgid "**初始版本**"
+msgstr "**初始版本**"
+
+#: ../../source/about/release_notes.md:48
+msgid "Kaiwu-PyTorch-Plugin 的首个正式发布版本，提供以下核心功能："
+msgstr "Kaiwu-PyTorch-Plugin 的首个正式发布版本，提供以下核心功能："
+
+#: ../../source/about/release_notes.md:50
+msgid "**核心模块**"
+msgstr "**核心模块**"
+
+#: ../../source/about/release_notes.md:52
+msgid "`RestrictedBoltzmannMachine`：受限玻尔兹曼机实现"
+msgstr "`RestrictedBoltzmannMachine`：受限玻尔兹曼机实现"
+
+#: ../../source/about/release_notes.md:53
+msgid "`BoltzmannMachine`：全连接玻尔兹曼机实现"
+msgstr "`BoltzmannMachine`：全连接玻尔兹曼机实现"
+
+#: ../../source/about/release_notes.md:54
+msgid "`AbstractBoltzmannMachine`：抽象基类，支持自定义扩展"
+msgstr "`AbstractBoltzmannMachine`：抽象基类，支持自定义扩展"
+
+#: ../../source/about/release_notes.md:56
+msgid "**主要特性**"
+msgstr "**主要特性**"
+
+#: ../../source/about/release_notes.md:58
+msgid "支持 PyTorch 原生接口，可使用标准优化器（SGD、Adam 等）"
+msgstr "支持 PyTorch 原生接口，可使用标准优化器（SGD、Adam 等）"
 
 #: ../../source/about/release_notes.md:59
-msgid "验证："
-msgstr ""
+msgid "支持 Kaiwu SDK 采样器，包括模拟退火和量子采样"
+msgstr "支持 Kaiwu SDK 采样器，包括模拟退火和量子采样"
 
-#: ../../source/about/release_notes.md:68
-msgid "注：kaiwu / kpp 因 PyPI 上 riscv64 依赖不全，需 `--no-deps`；numpy 须先于 pandas。"
-msgstr ""
+#: ../../source/about/release_notes.md:60
+msgid "支持 GPU 加速训练"
+msgstr "支持 GPU 加速训练"
 
-#: ../../source/about/release_notes.md:70
-msgid "版本 0.1.1（2026-04-01）"
-msgstr ""
+#: ../../source/about/release_notes.md:61
+msgid "提供完整的示例代码"
+msgstr "提供完整的示例代码"
+
+#: ../../source/about/release_notes.md:63
+msgid "**示例**"
+msgstr "**示例**"
+
+#: ../../source/about/release_notes.md:65
+msgid "`rbm_digits`：手写数字识别示例"
+msgstr "`rbm_digits`：手写数字识别示例"
+
+#: ../../source/about/release_notes.md:66
+msgid "`qvae_mnist`：Q-VAE MNIST 生成示例"
+msgstr "`qvae_mnist`：Q-VAE MNIST 生成示例"
+
+#: ../../source/about/release_notes.md:67
+msgid "`bm_generation`：玻尔兹曼机数据生成示例"
+msgstr "`bm_generation`：玻尔兹曼机数据生成示例"
+
+#: ../../source/about/release_notes.md:69
+msgid "**环境要求**"
+msgstr "**环境要求**"
+
+#: ../../source/about/release_notes.md:71
+msgid "Python 3.10"
+msgstr "Python 3.10"
 
 #: ../../source/about/release_notes.md:72
 msgid "主要新增功能"
@@ -302,11 +354,11 @@ msgstr ""
 
 #: ../../source/about/release_notes.md:146
 msgid "PyTorch 2.7.0"
-msgstr ""
+msgstr "PyTorch 2.7.0"
 
 #: ../../source/about/release_notes.md:147
 msgid "Kaiwu SDK v1.2.0+"
-msgstr ""
+msgstr "Kaiwu SDK v1.2.0+"
 
 #~ msgid "``RestrictedBoltzmannMachine``：受限玻尔兹曼机实现"
 #~ msgstr ""
@@ -325,16 +377,3 @@ msgstr ""
 
 #~ msgid "``bm_generation``：玻尔兹曼机数据生成示例"
 #~ msgstr ""
-
-#~ msgid "MAIFS 模型无关特征选择（`FeatureSelectionWrapper` + QUBO/CIM 求解器）；"
-#~ msgstr ""
-
-#~ msgid "新增 Docker 开发环境；"
-#~ msgstr ""
-
-#~ msgid "用量统计（`KPP_STATS_ENABLED` 可控）。"
-#~ msgstr ""
-
-#~ msgid "QVAE 重构为 `AutoEncoderBase` + config 驱动的工厂式构造，旧签名不兼容；"
-#~ msgstr ""
-
