@@ -127,7 +127,6 @@ def plot_feature_importance(importances, out_png,
                             feature_names=None, top_k=20,
                             title="Feature importance (F1 drop under permutation)"):
     """Bar plot of feature importances (higher = more important)."""
-    import numpy as np
     imp = np.asarray(importances)
     order = np.argsort(imp)[::-1][:top_k]
     names = feature_names or [f"f{i}" for i in range(len(imp))]

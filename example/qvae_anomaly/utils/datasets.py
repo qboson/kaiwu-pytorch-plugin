@@ -147,10 +147,10 @@ def load_kddcup99():
         "dst_host_rerror_rate","dst_host_srv_rerror_rate",
     ]
 
-    train = pd.read_csv(PUBLIC_ROOT / "kdd_99/kddcup.data_10_percent_corrected.gz",
+    train = pd.read_csv(DATA_ROOT / "kdd_99/kddcup.data_10_percent_corrected.gz",
                         header=None, names=NAMES, compression=None, encoding="latin-1",
                         engine="python", on_bad_lines="skip")
-    test = pd.read_csv(PUBLIC_ROOT / "kdd_99/corrected_dir/corrected",
+    test = pd.read_csv(DATA_ROOT / "kdd_99/corrected_dir/corrected",
                        header=None, names=NAMES, compression=None, encoding="latin-1")
 
     # numeric coercion

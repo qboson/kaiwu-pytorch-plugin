@@ -6,7 +6,8 @@ Usage:
     python train_public_ad.py --dataset creditcard --epochs 20
 """
 from __future__ import annotations
-import argparse, sys
+import argparse
+import sys
 from pathlib import Path
 import numpy as np
 import torch

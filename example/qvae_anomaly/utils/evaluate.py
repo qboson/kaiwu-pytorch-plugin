@@ -1,6 +1,10 @@
-from .logging import get_logger
-logger = get_logger("evaluate")
+# -*- coding: utf-8 -*-
+"""Evaluation helpers: threshold optimization and metric computation.
 
+The grid search over candidate thresholds logs one line per candidate at INFO
+level, so the search direction and F1 trajectory are visible in run logs.
+"""
+import time
 import numpy as np
 import torch
 from sklearn.metrics import (
@@ -13,10 +17,14 @@ from sklearn.metrics import (
     average_precision_score,
 )
 
+from .logging import get_logger
+
+logger = get_logger("evaluate")
+
 def compute_threshold(
     free_energy_func,  # 改为可调用对象
-    X_val_tensor: torch.Tensor, 
-    percentile: float = 95, 
+    X_val_tensor: torch.Tensor,
+    percentile: float = 95,
     device=None
 ) -> float:
     """
@@ -104,8 +112,8 @@ def compute_anomaly_scores(free_energy_func, data_loader, device):
     return scores, labels
 
 def optimize_threshold_rbm(
-    free_energy_func, val_loader, device, 
-    initial_threshold=None, step=0.001, decay=0.5, 
+    free_energy_func, val_loader, device,
+    initial_threshold=None, step=0.001, decay=0.5,
     num_decay=30, occ=10, metric='f1',
     search_mode='grid', n_candidates=200,
     direction='higher_is_anomaly'
@@ -122,10 +130,9 @@ def optimize_threshold_rbm(
         raise ValueError("direction must be 'higher_is_anomaly' or 'lower_is_anomaly'")
     # 预先计算所有验证样本的分数和标签
     scores, labels = compute_anomaly_scores(free_energy_func, val_loader, device)
-    
+
     if search_mode == 'grid':
         # 自动网格搜索（推荐用于调优）
-        import time
         t0 = time.time()
         q5, q95 = np.percentile(scores, [5, 95])
         # 如果分数范围太小，适当扩展
@@ -204,7 +211,8 @@ def optimize_threshold_rbm(
                 cur_threshold += step
 
             if decay_step == num_decay - 1:
-                logger.info("Optimization finished. Best threshold: %.6f | Best %s: %.4f", best_threshold, metric.upper(), best_metric)
+                logger.info("Optimization finished. Best threshold: %.6f | Best %s: %.4f",
+                            best_threshold, metric.upper(), best_metric)
                 return best_threshold
 
         return best_threshold

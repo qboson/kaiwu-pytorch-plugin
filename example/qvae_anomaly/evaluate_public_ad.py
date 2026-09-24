@@ -6,7 +6,9 @@ Usage:
     python evaluate_public_ad.py --dataset creditcard
 """
 from __future__ import annotations
-import argparse, json, sys
+import argparse
+import json
+import sys
 from pathlib import Path
 import numpy as np
 import torch
