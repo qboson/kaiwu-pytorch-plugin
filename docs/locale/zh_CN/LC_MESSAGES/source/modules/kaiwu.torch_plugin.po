@@ -649,6 +649,16 @@ msgstr ""
 "     - posterior：后验分布对象（MixtureGeneric）     - q：编码器输出的逻辑值（batch_size, "
 "latent_dim）     - zeta：重参数化的潜变量样本（batch_size, latent_dim）"
 
+#: kaiwu.torch_plugin.qvae.QVAE.forward:8 of
+#, fuzzy
+msgid "Reconstructed logits, posterior distribution, encoder logits,"
+msgstr "重建 logits、后验分布、编码器 logits 和重参数化的潜变量样本。"
+
+#: kaiwu.torch_plugin.qvae.QVAE.forward:9 of
+#, fuzzy
+msgid "and reparameterized latent sample."
+msgstr "后验分布和重参数化的潜变量样本。"
+
 #: kaiwu.torch_plugin.qvae.QVAE.loss:1 of
 msgid "Compute total loss (reconstruction + KL + weight decay)."
 msgstr "计算总损失（重建损失 + KL 损失 + 权重衰减）。"

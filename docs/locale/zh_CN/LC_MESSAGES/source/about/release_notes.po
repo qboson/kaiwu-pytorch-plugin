@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 10:35+0800\n"
+"POT-Creation-Date: 2026-09-23 20:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -187,10 +187,176 @@ msgid "Python 3.10"
 msgstr "Python 3.10"
 
 #: ../../source/about/release_notes.md:72
+msgid "主要新增功能"
+msgstr ""
+
+#: ../../source/about/release_notes.md:74
+#: ../../source/about/release_notes.md:83
+msgid "依赖许可证检查"
+msgstr ""
+
+#: ../../source/about/release_notes.md:75
+#: ../../source/about/release_notes.md:84
+msgid "PyPI 发布流水线"
+msgstr ""
+
+#: ../../source/about/release_notes.md:76
+#: ../../source/about/release_notes.md:89
+msgid "文档与说明更新"
+msgstr ""
+
+#: ../../source/about/release_notes.md:77
+#: ../../source/about/release_notes.md:90
+msgid "调整BM接口和矩阵转换逻辑"
+msgstr ""
+
+#: ../../source/about/release_notes.md:79
+msgid "版本 0.1.0（2025-12-24）"
+msgstr ""
+
+#: ../../source/about/release_notes.md:81
+#: ../../source/about/release_notes.md:95
+msgid "**新功能**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:87
+#: ../../source/about/release_notes.md:101
+msgid "**改进**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:93
+msgid "版本 0.0.2（2025-11-06）"
+msgstr ""
+
+#: ../../source/about/release_notes.md:97
+msgid "新增文档框架，支持 Sphinx 构建"
+msgstr ""
+
+#: ../../source/about/release_notes.md:98
+msgid "新增 DBN（深度信念网络）模块，支持多层 RBM 堆叠"
+msgstr ""
+
+#: ../../source/about/release_notes.md:99
+msgid "新增 Q-VAE 示例，支持量子变分自编码器训练"
+msgstr ""
+
+#: ../../source/about/release_notes.md:103
+msgid "恢复并优化 RBM 模块实现"
+msgstr ""
+
+#: ../../source/about/release_notes.md:104
+msgid "更新示例代码 README 文档"
+msgstr ""
+
+#: ../../source/about/release_notes.md:105
+msgid "改进代码注释，提升可读性"
+msgstr ""
+
+#: ../../source/about/release_notes.md:107
+msgid "**文档**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:109
+msgid "更新中英文 README 文档"
+msgstr ""
+
+#: ../../source/about/release_notes.md:110
+msgid "添加更详细的安装说明"
+msgstr ""
+
+#: ../../source/about/release_notes.md:111
+msgid "补充示例代码说明"
+msgstr ""
+
+#: ../../source/about/release_notes.md:113
+msgid "**修复**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:115
+msgid "修复 DBN 模块中的已知问题"
+msgstr ""
+
+#: ../../source/about/release_notes.md:116
+msgid "修复 pylint 检查发现的代码问题"
+msgstr ""
+
+#: ../../source/about/release_notes.md:118
+msgid "版本 0.0.1（2025-10-15）"
+msgstr ""
+
+#: ../../source/about/release_notes.md:120
+msgid "**初始版本**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:122
+msgid "Kaiwu-PyTorch-Plugin 的首个正式发布版本，提供以下核心功能："
+msgstr ""
+
+#: ../../source/about/release_notes.md:124
+msgid "**核心模块**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:126
+msgid "`RestrictedBoltzmannMachine`：受限玻尔兹曼机实现"
+msgstr ""
+
+#: ../../source/about/release_notes.md:127
+msgid "`BoltzmannMachine`：全连接玻尔兹曼机实现"
+msgstr ""
+
+#: ../../source/about/release_notes.md:128
+msgid "`AbstractBoltzmannMachine`：抽象基类，支持自定义扩展"
+msgstr ""
+
+#: ../../source/about/release_notes.md:130
+msgid "**主要特性**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:132
+msgid "支持 PyTorch 原生接口，可使用标准优化器（SGD、Adam 等）"
+msgstr ""
+
+#: ../../source/about/release_notes.md:133
+msgid "支持 Kaiwu SDK 采样器，包括模拟退火和量子采样"
+msgstr ""
+
+#: ../../source/about/release_notes.md:134
+msgid "支持 GPU 加速训练"
+msgstr ""
+
+#: ../../source/about/release_notes.md:135
+msgid "提供完整的示例代码"
+msgstr ""
+
+#: ../../source/about/release_notes.md:137
+msgid "**示例**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:139
+msgid "`rbm_digits`：手写数字识别示例"
+msgstr ""
+
+#: ../../source/about/release_notes.md:140
+msgid "`qvae_mnist`：Q-VAE MNIST 生成示例"
+msgstr ""
+
+#: ../../source/about/release_notes.md:141
+msgid "`bm_generation`：玻尔兹曼机数据生成示例"
+msgstr ""
+
+#: ../../source/about/release_notes.md:143
+msgid "**环境要求**"
+msgstr ""
+
+#: ../../source/about/release_notes.md:145
+msgid "Python 3.10"
+msgstr ""
+
+#: ../../source/about/release_notes.md:146
 msgid "PyTorch 2.7.0"
 msgstr "PyTorch 2.7.0"
 
-#: ../../source/about/release_notes.md:73
+#: ../../source/about/release_notes.md:147
 msgid "Kaiwu SDK v1.2.0+"
 msgstr "Kaiwu SDK v1.2.0+"
 

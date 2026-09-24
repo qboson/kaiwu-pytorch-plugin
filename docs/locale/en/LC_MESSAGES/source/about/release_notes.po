@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 10:35+0800\n"
+"POT-Creation-Date: 2026-09-23 20:56+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -28,177 +28,325 @@ msgid "本页记录 Kaiwu-PyTorch-Plugin 各版本的更新内容。"
 msgstr "This page documents the updates for each version of Kaiwu-PyTorch-Plugin."
 
 #: ../../source/about/release_notes.md:5
+msgid "版本 0.3.0（2026-09-23）"
+msgstr "Version 0.3.0 (2026-09-23)"
+
+#: ../../source/about/release_notes.md:7
+msgid "新增"
+msgstr "New Features"
+
+#: ../../source/about/release_notes.md:9
+msgid "GBRBM 高斯-伯努利受限玻尔兹曼机；"
+msgstr "Added GBRBM (Gaussian-Bernoulli Restricted Boltzmann Machine)."
+
+#: ../../source/about/release_notes.md:10
+msgid "MAIFS 模型无关特征选择（`FeatureSelectionWrapper`）；"
+msgstr "Added MAIFS (Model-Agnostic Feature Selection)."
+
+#: ../../source/about/release_notes.md:11
+msgid "新增 Docker 开发环境。"
+msgstr "Added a new Docker development environment."
+
+#: ../../source/about/release_notes.md:12
+msgid "用量统计；"
+msgstr "Added usage statistics tracking."
+
+#: ../../source/about/release_notes.md:14
+msgid "改造"
+msgstr "Refactoring"
+
+#: ../../source/about/release_notes.md:16
+msgid "QVAE 重构为 `AutoEncoderBase` + config 驱动的工厂式构造；"
+msgstr ""
+"Refactored QVAE into an ``AutoEncoderBase`` + configuration-driven factory "
+"architecture."
+
+#: ../../source/about/release_notes.md:17
+msgid "QDiffusion 进行了接口调整，移除 `EnergyBackboneAdapter` Protocol；"
+msgstr ""
+"Updated the QDiffusion interface and removed the "
+"``EnergyBackboneAdapter`` Protocol."
+
+#: ../../source/about/release_notes.md:18
+msgid "dplm/qvae_mnist 示例由单体脚本拆分为 models/utils/workflows 分层结构。"
+msgstr ""
+"Refactored the dplm/qvae_mnist example from a monolithic script into a "
+"layered structure with separate models, utils, and workflows modules."
+
+#: ../../source/about/release_notes.md:20
+msgid "文档"
+msgstr "Documentation"
+
+#: ../../source/about/release_notes.md:22
+msgid "全量 rst 转 MyST Markdown，新增 10 篇理论基础、3 篇教程、贡献指南，数学渲染换 KaTeX。"
+msgstr ""
+"Migrated all documentation from reStructuredText (rst) to MyST Markdown. "
+"Added 10 theoretical foundation documents, 3 tutorials, and a contribution "
+"guide. Updated mathematical rendering to use KaTeX."
+
+#: ../../source/about/release_notes.md:24
+msgid "版本 0.2.0（2026-07-07）"
+msgstr "Version 0.2.0 (2026-07-07)"
+
+#: ../../source/about/release_notes.md:26
+msgid "更新"
+msgstr "Update"
+
+#: ../../source/about/release_notes.md:28
+msgid ""
+"**新增 `QDiffusion`** 在顶层插件接口中新增 `QDiffusion` 与 "
+"`QDiffusionConfig`，使用基于玻尔兹曼机作为能量模型优化扩散过程。"
+msgstr ""
+"**``QDiffusion``** Added ``QDiffusion`` and ``QDiffusionConfig`` to the "
+"top-level plugin API, using a Boltzmann machine as the energy model to "
+"optimize the diffusion process."
+
+#: ../../source/about/release_notes.md:31
+msgid "**新增 `QDiffusion` 蛋白质生成示例** 新增 `example/qdiffusion/` 示例目录，包括："
+msgstr ""
+"**``QDiffusion`` protein generation examples** Added a new "
+"``example/qdiffusion/`` suite with:"
+
+#: ../../source/about/release_notes.md:33
+msgid "`simple/`：用于快速理解 `QDiffusion` API 的最小训练与生成示例"
+msgstr ""
+"``simple/``: minimal training and generation scripts for learning the "
+"``QDiffusion`` API"
+
+#: ../../source/about/release_notes.md:34
+msgid "`dplm/`：基于 DPLM 的完整蛋白质序列生成工作流，涵盖模型构建、训练、引导生成、checkpoint 复现与评估"
+msgstr ""
+"``dplm/``: a full DPLM-based workflow for protein sequence generation, "
+"including model construction, training, guided generation, checkpoint "
+"rerun, and evaluation"
+
+#: ../../source/about/release_notes.md:36
+msgid ""
+"**新增 Q-VAE 单细胞表征学习示例** 新增 `example/qvae_cell/` "
+"示例，提供单细胞表征学习完整流程，包括数据读取、Q-VAE 训练、潜在表示提取、可视化、能量分析以及下游 benchmark 评估。"
+msgstr ""
+"**Q-VAE single-cell representation learning example** Added a new "
+"``example/qvae_cell/`` workflow for single-cell representation learning, "
+"including data loading, Q-VAE training, latent embedding extraction, "
+"visualization, energy analysis, and downstream benchmarking."
+
+#: ../../source/about/release_notes.md:39
+msgid ""
+"**新增 RISC-V 64 平台预编译 wheel** 提供 kaiwu 1.3.1 / kpp 0.2.0 在 RISC-V 64 "
+"平台的预编译 wheel，安装方式见下文。"
+msgstr ""
+"**RISC-V 64 prebuilt wheels** Added prebuilt wheels for kaiwu 1.3.1 / kpp"
+" 0.2.0 on RISC-V 64. See installation below."
+
+#: ../../source/about/release_notes.md:42
+msgid "RISC-V 64 安装"
+msgstr "RISC-V 64 Installation"
+
+#: ../../source/about/release_notes.md:44
+msgid "要求：RISC-V 64 + Python 3.10 + glibc ≥ 2.31。"
+msgstr "Requirements: RISC-V 64 + Python 3.10 + glibc ≥ 2.31."
+
+#: ../../source/about/release_notes.md:59
+msgid "验证："
+msgstr "Verification:"
+
+#: ../../source/about/release_notes.md:68
+msgid "注：kaiwu / kpp 因 PyPI 上 riscv64 依赖不全，需 `--no-deps`；numpy 须先于 pandas。"
+msgstr ""
+"Note: kaiwu / kpp must be installed with ``--no-deps`` because the "
+"riscv64 dependencies on PyPI are incomplete; numpy must be installed "
+"before pandas."
+
+#: ../../source/about/release_notes.md:70
+msgid "版本 0.1.1（2026-04-01）"
+msgstr "Version 0.1.1 (2026-04-01)"
+
+#: ../../source/about/release_notes.md:72
+msgid "主要新增功能"
+msgstr "Main New Features"
+
+#: ../../source/about/release_notes.md:74
+#: ../../source/about/release_notes.md:83
+msgid "依赖许可证检查"
+msgstr "Dependency license checking"
+
+#: ../../source/about/release_notes.md:75
+#: ../../source/about/release_notes.md:84
+msgid "PyPI 发布流水线"
+msgstr "PyPI publishing pipeline"
+
+#: ../../source/about/release_notes.md:76
+#: ../../source/about/release_notes.md:89
+msgid "文档与说明更新"
+msgstr "Documentation and README updates"
+
+#: ../../source/about/release_notes.md:77
+#: ../../source/about/release_notes.md:90
+msgid "调整BM接口和矩阵转换逻辑"
+msgstr "Adjustments to the BM interface and matrix conversion logic"
+
+#: ../../source/about/release_notes.md:79
 msgid "版本 0.1.0（2025-12-24）"
 msgstr "Version 0.1.0 (2025-12-24)"
 
-#: ../../source/about/release_notes.md:7 ../../source/about/release_notes.md:21
+#: ../../source/about/release_notes.md:81
+#: ../../source/about/release_notes.md:95
 msgid "**新功能**"
 msgstr "**New Features**"
 
-#: ../../source/about/release_notes.md:9
-msgid "依赖许可证检查"
-msgstr "Dependency license check"
-
-#: ../../source/about/release_notes.md:10
-msgid "PyPI 发布流水线"
-msgstr "PyPI release pipeline"
-
-#: ../../source/about/release_notes.md:13
-#: ../../source/about/release_notes.md:27
+#: ../../source/about/release_notes.md:87
+#: ../../source/about/release_notes.md:101
 msgid "**改进**"
 msgstr "**Improvements**"
 
-#: ../../source/about/release_notes.md:15
-msgid "文档与说明更新"
-msgstr "Documentation and instructions updated"
-
-#: ../../source/about/release_notes.md:16
-msgid "调整BM接口和矩阵转换逻辑"
-msgstr "Adjusted BM interface and matrix conversion logic"
-
-#: ../../source/about/release_notes.md:19
+#: ../../source/about/release_notes.md:93
 msgid "版本 0.0.2（2025-11-06）"
 msgstr "Version 0.0.2 (2025-11-06)"
 
-#: ../../source/about/release_notes.md:23
+#: ../../source/about/release_notes.md:97
 msgid "新增文档框架，支持 Sphinx 构建"
 msgstr "Added documentation framework with Sphinx support"
 
-#: ../../source/about/release_notes.md:24
+#: ../../source/about/release_notes.md:98
 msgid "新增 DBN（深度信念网络）模块，支持多层 RBM 堆叠"
 msgstr "Added DBN (Deep Belief Network) module supporting multi-layer RBM stacking"
 
-#: ../../source/about/release_notes.md:25
+#: ../../source/about/release_notes.md:99
 msgid "新增 Q-VAE 示例，支持量子变分自编码器训练"
 msgstr "Added Q-VAE example supporting quantum variational autoencoder training"
 
-#: ../../source/about/release_notes.md:29
+#: ../../source/about/release_notes.md:103
 msgid "恢复并优化 RBM 模块实现"
 msgstr "Restored and optimized RBM module implementation"
 
-#: ../../source/about/release_notes.md:30
+#: ../../source/about/release_notes.md:104
 msgid "更新示例代码 README 文档"
 msgstr "Updated example code README"
 
-#: ../../source/about/release_notes.md:31
+#: ../../source/about/release_notes.md:105
 msgid "改进代码注释，提升可读性"
 msgstr "Improved code comments for better readability"
 
-#: ../../source/about/release_notes.md:33
+#: ../../source/about/release_notes.md:107
 msgid "**文档**"
 msgstr "**Documentation**"
 
-#: ../../source/about/release_notes.md:35
+#: ../../source/about/release_notes.md:109
 msgid "更新中英文 README 文档"
 msgstr "Updated Chinese and English README files"
 
-#: ../../source/about/release_notes.md:36
+#: ../../source/about/release_notes.md:110
 msgid "添加更详细的安装说明"
 msgstr "Added more detailed installation instructions"
 
-#: ../../source/about/release_notes.md:37
+#: ../../source/about/release_notes.md:111
 msgid "补充示例代码说明"
 msgstr "Supplemented example code descriptions"
 
-#: ../../source/about/release_notes.md:39
+#: ../../source/about/release_notes.md:113
 msgid "**修复**"
 msgstr "**Bug Fixes**"
 
-#: ../../source/about/release_notes.md:41
+#: ../../source/about/release_notes.md:115
 msgid "修复 DBN 模块中的已知问题"
 msgstr "Fixed known issues in the DBN module"
 
-#: ../../source/about/release_notes.md:42
+#: ../../source/about/release_notes.md:116
 msgid "修复 pylint 检查发现的代码问题"
 msgstr "Fixed code issues detected by pylint"
 
-#: ../../source/about/release_notes.md:44
+#: ../../source/about/release_notes.md:118
 msgid "版本 0.0.1（2025-10-15）"
 msgstr "Version 0.0.1 (2025-10-15)"
 
-#: ../../source/about/release_notes.md:46
+#: ../../source/about/release_notes.md:120
 msgid "**初始版本**"
 msgstr "**Initial Release**"
 
-#: ../../source/about/release_notes.md:48
+#: ../../source/about/release_notes.md:122
 msgid "Kaiwu-PyTorch-Plugin 的首个正式发布版本，提供以下核心功能："
 msgstr ""
 "The first official release of Kaiwu-PyTorch-Plugin, providing the "
 "following core features:"
 
-#: ../../source/about/release_notes.md:50
+#: ../../source/about/release_notes.md:124
 msgid "**核心模块**"
 msgstr "**Core Modules**"
 
-#: ../../source/about/release_notes.md:52
+#: ../../source/about/release_notes.md:126
 msgid "`RestrictedBoltzmannMachine`：受限玻尔兹曼机实现"
 msgstr ""
 "``RestrictedBoltzmannMachine``: Implementation of Restricted Boltzmann "
 "Machine"
 
-#: ../../source/about/release_notes.md:53
+#: ../../source/about/release_notes.md:127
 msgid "`BoltzmannMachine`：全连接玻尔兹曼机实现"
 msgstr "``BoltzmannMachine``: Implementation of fully-connected Boltzmann Machine"
 
-#: ../../source/about/release_notes.md:54
+#: ../../source/about/release_notes.md:128
 msgid "`AbstractBoltzmannMachine`：抽象基类，支持自定义扩展"
 msgstr ""
 "``AbstractBoltzmannMachine``: Abstract base class supporting custom "
 "extensions"
 
-#: ../../source/about/release_notes.md:56
+#: ../../source/about/release_notes.md:130
 msgid "**主要特性**"
 msgstr "**Key Features**"
 
-#: ../../source/about/release_notes.md:58
+#: ../../source/about/release_notes.md:132
 msgid "支持 PyTorch 原生接口，可使用标准优化器（SGD、Adam 等）"
 msgstr ""
 "Supports native PyTorch interface, compatible with standard optimizers "
 "(SGD, Adam, etc.)"
 
-#: ../../source/about/release_notes.md:59
+#: ../../source/about/release_notes.md:133
 msgid "支持 Kaiwu SDK 采样器，包括模拟退火和量子采样"
 msgstr ""
 "Supports Kaiwu SDK samplers, including simulated annealing and quantum "
 "sampling"
 
-#: ../../source/about/release_notes.md:60
+#: ../../source/about/release_notes.md:134
 msgid "支持 GPU 加速训练"
 msgstr "Supports GPU-accelerated training"
 
-#: ../../source/about/release_notes.md:61
+#: ../../source/about/release_notes.md:135
 msgid "提供完整的示例代码"
 msgstr "Provides complete example code"
 
-#: ../../source/about/release_notes.md:63
+#: ../../source/about/release_notes.md:137
 msgid "**示例**"
 msgstr "**Examples**"
 
-#: ../../source/about/release_notes.md:65
+#: ../../source/about/release_notes.md:139
 msgid "`rbm_digits`：手写数字识别示例"
 msgstr "``rbm_digits``: Handwritten digit recognition example"
 
-#: ../../source/about/release_notes.md:66
+#: ../../source/about/release_notes.md:140
 msgid "`qvae_mnist`：Q-VAE MNIST 生成示例"
 msgstr "``qvae_mnist``: Q-VAE MNIST generation example"
 
-#: ../../source/about/release_notes.md:67
+#: ../../source/about/release_notes.md:141
 msgid "`bm_generation`：玻尔兹曼机数据生成示例"
 msgstr "``bm_generation``: Boltzmann Machine data generation example"
 
-#: ../../source/about/release_notes.md:69
+#: ../../source/about/release_notes.md:143
 msgid "**环境要求**"
 msgstr "**Requirements**"
 
-#: ../../source/about/release_notes.md:71
+#: ../../source/about/release_notes.md:145
 msgid "Python 3.10"
 msgstr "Python 3.10"
 
-#: ../../source/about/release_notes.md:72
+#: ../../source/about/release_notes.md:146
 msgid "PyTorch 2.7.0"
 msgstr "PyTorch 2.7.0"
 
-#: ../../source/about/release_notes.md:73
+#: ../../source/about/release_notes.md:147
 msgid "Kaiwu SDK v1.2.0+"
 msgstr "Kaiwu SDK v1.2.0+"
+
+#~ msgid "用量统计（`KPP_STATS_ENABLED` 可控）。"
+#~ msgstr ""
+#~ "Added usage statistics tracking, controllable"
+#~ " via ``KPP_STATS_ENABLED``."
 
