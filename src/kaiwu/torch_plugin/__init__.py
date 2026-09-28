@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Kaiwu-PyTorch-Plugin public API."""
-
+from .quantization import quantization
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine
 from .maifs import FeatureSelectionWrapper, QuadraticLinearSolver
@@ -27,6 +27,7 @@ __all__ = [
     "FeatureSelectionWrapper",
     "QuadraticLinearSolver",
     "enable_usage_stats",
+    "quantization",
     "disable_usage_stats",
     "is_usage_stats_enabled",
 ]
