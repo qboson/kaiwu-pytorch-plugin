@@ -379,3 +379,177 @@ class QVAE(AutoEncoderBase):
         if hasattr(self.bm, "linear_bias"):
             wd += self.weight_decay * 0.5 * torch.sum(self.bm.linear_bias**2)
         return wd
+
+
+class Q_SVI:
+    """
+    Quantum Stochastic Variational Inference (Q-SVI) training engine.
+
+    Aligns with the pyro.infer.SVI interface (model, guide, loss, step(x))
+    while maintaining the two-stage alternating optimization sequence for
+    Quantum Variational Autoencoders (QVAE).
+
+    Args:
+        model (AutoEncoderBase or nn.Module): The QVAE model instance.
+        guide (callable, optional): Variational guide. If None, uses the model's
+            internal encoder and posterior distribution.
+        optim (torch.optim.Optimizer or tuple or dict, optional): Primary optimizer
+            for the encoder/decoder, or a container of (vae_optim, bm_optim).
+        loss (callable, optional): Objective loss function taking (model, guide, x)
+            or (x, recon_x, posterior). Defaults to model.loss.
+        bm_optim (torch.optim.Optimizer, optional): Optimizer for the Boltzmann
+            Machine parameters. If provided, two-stage alternating optimization
+            is enabled.
+        bm_weight_decay (float, optional): Weight decay coefficient for BM loss.
+            Defaults to 0.0.
+    """
+
+    def __init__(
+        self,
+        model,
+        guide=None,
+        optim=None,
+        loss=None,
+        bm_optim=None,
+        bm_weight_decay=0.0,
+    ):
+        self.model = model
+        self.guide = guide
+        self.loss_fn = loss
+        self.bm_weight_decay = float(bm_weight_decay)
+
+        self.vae_optim = None
+        self.bm_optim = None
+        self.use_two_optimisers = False
+
+        self._configure_optimizers(optim, bm_optim)
+
+        self.last_loss = 0.0
+        self.last_vae_loss = 0.0
+        self.last_bm_loss = 0.0
+
+    def _configure_optimizers(self, optim, bm_optim=None):
+        """Configure VAE and BM optimizers from flexible input types."""
+        if isinstance(optim, (tuple, list)):
+            self.vae_optim = optim[0]
+            self.bm_optim = optim[1] if len(optim) > 1 else bm_optim
+        elif isinstance(optim, dict):
+            self.vae_optim = optim.get("vae") or optim.get("optim")
+            self.bm_optim = optim.get("bm") or bm_optim
+        else:
+            self.vae_optim = optim
+            self.bm_optim = bm_optim
+
+        self.use_two_optimisers = self.bm_optim is not None
+
+    def set_optimizers(self, vae_optim=None, bm_optim=None):
+        """Update or register optimizers on the SVI engine.
+
+        Args:
+            vae_optim (torch.optim.Optimizer, optional): VAE optimizer.
+            bm_optim (torch.optim.Optimizer, optional): BM optimizer.
+        """
+        if vae_optim is not None:
+            self.vae_optim = vae_optim
+        if bm_optim is not None:
+            self.bm_optim = bm_optim
+        self.use_two_optimisers = self.bm_optim is not None
+
+    def _compute_forward_and_loss(self, x, *args, **kwargs):
+        """Internal helper to compute forward pass and loss consistently."""
+        if self.guide is not None:
+            posterior, q, zeta = self.guide(x, *args, **kwargs)
+            recon_x = self.model.decoder(zeta)
+            if getattr(self.model, "config", None) and getattr(self.model.config, "loss_type", None) == "bernoulli":
+                if hasattr(self.model, "_train_bias"):
+                    recon_x = recon_x + self.model._train_bias
+        else:
+            output = self.model(x, *args, **kwargs)
+            recon_x, posterior, q, _ = output
+
+        if self.loss_fn is not None:
+            try:
+                vae_loss = self.loss_fn(x, recon_x, posterior)
+            except TypeError:
+                vae_loss = self.loss_fn(self.model, self.guide, x, *args, **kwargs)
+        else:
+            vae_loss = self.model.loss(x, recon_x, posterior)
+
+        return vae_loss, q
+
+    def step(self, x, *args, **kwargs):
+        """Take a single optimization step on batch x.
+
+        Maintains the two-stage alternating optimization sequence:
+        1. Zero grad on VAE optimizer, forward pass through model, compute loss,
+           backward pass, step VAE optimizer.
+        2. If BM optimizer is present, zero grad on BM optimizer, compute
+           bm_loss on q.detach(), backward pass, step BM optimizer.
+
+        Args:
+            x (torch.Tensor): Input batch tensor.
+            *args: Additional positional arguments for model forward.
+            **kwargs: Additional keyword arguments for model forward.
+
+        Returns:
+            float: Total scalar step loss (VAE loss + BM loss if two-stage).
+        """
+        if self.vae_optim is not None:
+            self.vae_optim.zero_grad()
+
+        vae_loss, q = self._compute_forward_and_loss(x, *args, **kwargs)
+        vae_loss.backward()
+
+        if self.vae_optim is not None:
+            self.vae_optim.step()
+
+        self.last_vae_loss = vae_loss.item()
+        total_loss = self.last_vae_loss
+
+        if self.use_two_optimisers and hasattr(self.model, "bm_loss"):
+            self.bm_optim.zero_grad()
+            bm_loss = self.model.bm_loss(q.detach(), self.bm_weight_decay)
+            bm_loss.backward()
+            self.bm_optim.step()
+
+            self.last_bm_loss = bm_loss.item()
+            total_loss += self.last_bm_loss
+        else:
+            self.last_bm_loss = 0.0
+
+        self.last_loss = total_loss
+        return float(total_loss)
+
+    def evaluate_loss(self, x, *args, **kwargs):
+        """Evaluate loss on batch x without parameter updates.
+
+        Args:
+            x (torch.Tensor): Input batch tensor.
+            *args: Additional positional arguments for model forward.
+            **kwargs: Additional keyword arguments for model forward.
+
+        Returns:
+            float: Total evaluated scalar loss.
+        """
+        with torch.no_grad():
+            vae_loss, q = self._compute_forward_and_loss(x, *args, **kwargs)
+            total_loss = vae_loss.item()
+            if self.use_two_optimisers and hasattr(self.model, "bm_loss"):
+                bm_loss = self.model.bm_loss(q.detach(), self.bm_weight_decay)
+                total_loss += bm_loss.item()
+            return float(total_loss)
+
+    evaluate = evaluate_loss
+
+    def get_last_loss_dict(self):
+        """Return the dictionary of loss components from the last step."""
+        return {
+            "total_loss": self.last_loss,
+            "vae_loss": self.last_vae_loss,
+            "bm_loss": self.last_bm_loss,
+        }
+
+
+# Public alias for naming consistency
+QSVI = Q_SVI
+
