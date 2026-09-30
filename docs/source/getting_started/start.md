@@ -170,7 +170,7 @@ Below is a simple example of calling RBM. This example demonstrates how to use t
      # Compute the objective---this objective yields the same gradient as the negative
      # log likelihood of the model
      objective = rbm.objective(x, s)
-     # Backpropgate gradients
+     # Backpropagate gradients
      objective.backward()
      # Update model weights with a step of stochastic gradient descent
      opt_rbm.step()
