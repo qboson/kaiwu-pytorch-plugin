@@ -13,50 +13,82 @@ For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://
 A Restricted Boltzmann Machine is an energy-based unsupervised learning model consisting of a visible layer and a hidden layer, with full connections between layers but no connections within a layer. Its core idea is to model the probability distribution of data through an energy function and train weights using algorithms such as Contrastive Divergence (CD), allowing the model to learn hidden features of input data. RBMs are commonly used for feature extraction, dimensionality reduction, or collaborative filtering, and are also the foundation for building more complex models. A Boltzmann Machine is a fully connected stochastic neural network where all neurons can be interconnected (including within the visible and hidden layers). Traditional sampling methods for BMs are inefficient, and quantum computing provides a new approach.
 
 ```mermaid
-flowchart TD
-    torch[PyTorch tensors, modules, autograd]
-    kaiwu[Kaiwu SDK samplers<br/>SA / CIM backend]
+graph TD
+    %% 定义子图样式（可选）
+    classDef subGraph fill:#f8f9fa,stroke:#ddd,stroke-width:1px,rx:5,ry:5;
 
-    subgraph plugin["src/kaiwu/torch_plugin"]
-        abm["abstract_boltzmann_machine.py<br/>AbstractBoltzmannMachine"]
-        bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
-        rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
-        qvae["qvae.py<br/>QVAE"]
-        qdiff["qdiffusion.py<br/>QDiffusion"]
-        dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
-        dbn["dbn.py<br/>UnsupervisedDBN"]
+    subgraph Classical_Framework ["Classical Framework"]
+        PyTorch["PyTorch<br>(Autograd/Tensors)"]:::node
     end
 
-    torch --> abm
-    kaiwu --> abm
-    abm --> bm
-    abm --> rbm
-    abm --> qvae
-    abm --> qdiff
-    dist --> qvae
-    rbm --> dbn
-
-    subgraph examples["example"]
-        rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
-        dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
-        bm_generation["bm_generation<br/>BM distribution learning and sampling"]
-        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
-        qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
-        qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
+    %% 1. 右上模块名字只需要保留 Kaiwu SDK
+    subgraph Kaiwu_SDK ["Kaiwu SDK"]
+        SA["SimulatedAnnealingOptimizer"]:::node
+        CIM["CIMOptimizer"]:::node
     end
 
-    rbm --> rbm_digits
-    dbn --> dbn_digits
-    bm --> bm_generation
-    qdiff --> qdiffusion
-    qvae --> qvae_mnist
-    qvae --> qvae_cell
-    bm --> qvae_cell
+    %% 2. 中间模块名字显示完整：Kaiwu Torch Plugin
+    subgraph Torch_Plugin ["Kaiwu Torch Plugin"]
+        Abstract["abstract_boltzmann_machine.py"]:::node
+        RBM["restricted_boltzmann_machine.py"]:::node
+        GBRBM["gbrbm.py<br>GaussianBernoulliRestricte"]:::node
+        FullBM["full_boltzmann_machine.py<br>BoltzmannMachine"]:::node
+        QDiff["qdiffusion.py<br>QDDiffusion"]:::node
+        QVAE["qvae.py<br>QVAE"]:::node
+        
+        %% 3. dbn.py 作为 RBM 的下链，且保持在 Kaiwu Torch Plugin 层中
+        DBN["dbn.py<br>UnsupervisedDBN"]:::node
+    end
+
+    %% 4. 最下面模块名字为 Examples，不需要 "[]"
+    subgraph Examples
+        rbm_digits["rbm_digits"]:::node
+        dbn_digits["dbn_digits"]:::node
+        bm_generation["bm_generation"]:::node
+        qdiffusion["qdiffusion"]:::node
+        qvae_mnist["qvae_mnist"]:::node
+        qvae_cell["qvae_cell"]:::node
+    end
+
+    %% -------- 连线逻辑 --------
+    %% 上层框架指向插件
+    PyTorch --> Abstract
+    SA -.-> Abstract
+    CIM -.-> Abstract
+
+    %% 插件层内部的继承/实现关系
+    Abstract --> RBM
+    Abstract --> GBRBM
+    Abstract --> FullBM
+    Abstract --> QDiff
+    Abstract --> QVAE
+
+    RBM --> DBN
+
+    %% 插件层指向示例层
+    RBM --> rbm_digits
+    DBN --> dbn_digits
+    FullBM --> bm_generation
+    QDiff --> qdiffusion
+    QVAE --> qvae_mnist
+    QVAE --> qvae_cell
+
+    %% 应用子图背景样式
+    class Classical_Framework,Kaiwu_SDK,Torch_Plugin,Examples subGraph;
 ```
-The above image shows the project file structure:
-- The Kaiwu-torch-plugin section of the code includes base class, Restricted Boltzmann Machine, and Boltzmann Machine.
-- The example section of the code includes examples: qvae for generating digits, digits for digit recognition etc.
-- The test section contains unit tests.
+
+The diagram above shows the main code structure of the project:
+
+- The `kaiwu-torch-plugin` package (`src/kaiwu/torch_plugin`) provides the core
+  modules: the abstract base class `AbstractBoltzmannMachine`,
+  `RestrictedBoltzmannMachine` / `BoltzmannMachine`, `QVAE` (with Bernoulli /
+  mixture utilities), `QDiffusion`, and `UnsupervisedDBN`. All modules are
+  built on PyTorch and sample via the Kaiwu SDK samplers (SA / CIM backends).
+- The `example` directory contains runnable examples: digit recognition
+  (RBM / DBN), image generation and latent classification (QVAE on MNIST),
+  protein sequence generation (Q-Diffusion), and single-cell representation
+  learning (QVAE on cell data).
+- The `tests` directory contains the corresponding basic tests.
 
 ### Main Features
 - Quantum Support: Inherits from Kaiwu SDK, supports calling photonic quantum computers
@@ -223,7 +255,7 @@ if __name__ == "__main__":
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
     objective = rbm.objective(x, s)
-    # Backpropgate gradients
+    # Backpropagate gradients
     objective.backward()
     # Update model weights with a step of stochastic gradient descent
     opt_rbm.step()
@@ -384,7 +416,7 @@ In single-cell transcriptomics analysis (a technique revealing cellular heteroge
 Based on this representation, we successfully integrated millions of single-cell transcriptomic data points and achieved superior performance in downstream tasks (e.g., cell clustering, classification, trajectory inference) compared to existing methods, validating the excellence of this latent representation.  
 
 If you are interested in this work, please check out our paper:  
-[**Quantum-Boosted High-Fidelity Deep Learning**](ttps://arxiv.org/pdf/2508.11190)
+[**Quantum-Boosted High-Fidelity Deep Learning**](https://arxiv.org/pdf/2508.11190)
 
 <img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
 
