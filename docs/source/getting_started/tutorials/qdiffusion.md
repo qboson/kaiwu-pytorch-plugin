@@ -7,3 +7,11 @@ Discrete diffusion generation for proteins with the generic `Q-Diffusion` core (
 **Examples**: `example/qdiffusion/simple/simple_train_example.py` · `example/qdiffusion/simple/simple_generate_example.py`
 
 **DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome UP000005640
+
+## Decoding score precision
+
+Q-Diffusion initializes float32 decoding scores. Both initial candidate
+sampling and repetition resampling convert proposal logits to that score
+precision before sampling. Proposal and energy model parameters retain their
+chosen precision during generation, including float16, bfloat16, and float64
+backbones.
