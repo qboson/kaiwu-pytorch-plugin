@@ -144,6 +144,18 @@ Q-VAE 学到的表征可用于下游分类任务：
 它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。
 在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。
 
+`get_full_pipeline(config)` 返回支持 `get_params`、`set_params`、`clone` 和
+`GridSearchCV` 的 scikit-learn `Pipeline`。例如，`classifier__lr_mlp` 可以调整
+MLP 学习率，`qvae__config` 可以替换整个 QVAE 配置对象；配置对象自身不展开为嵌套参数。
+`clone` 保留构造配置，创建尚未训练的 QVAE transformer 和 MLP，不复制模型、优化器或训练历史。
+
+MLP 的 `input_dim=None` 和 `device=None` 保留为构造参数；实际输入维数与计算设备在
+每次 `fit` 中写入 `input_dim_` 和 `device_`，因此重新训练时可以自动适配新的特征维数。
+`lr`、`batch_size`、`epochs` 仍作为 `lr_mlp`、`batch_size_mlp`、`epochs_mlp` 的兼容别名。
+MLP 每次 `fit` 使用当前 `random_state` 初始化网络，并控制其批次打乱和 dropout；
+构造与 `clone` 不重置 Torch 的全局随机状态。这不为前面的 QVAE 训练配置随机种子。
+训练数据仍需满足示例原有的标签范围与 `output_dim` 要求。
+
 ```{literalinclude} ../../../../example/qvae_mnist/downstream/classifier.py
 :pyobject: MLPClassifier.fit
 ```

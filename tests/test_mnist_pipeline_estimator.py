@@ -277,3 +277,51 @@ def test_normal_classifier_subclass_clones_and_fits(example, tmp_path):
     copied.fit(*data(width=3))
     assert copied.input_dim_ == 3
     assert copied.predict(data(width=3)[0]).shape == (25,)
+
+
+def test_constructor_does_not_reset_global_torch_random_state(example, tmp_path):
+    _, classifier_class, _ = example
+    with torch.random.fork_rng(devices=[]):
+        torch.manual_seed(991)
+        before = torch.get_rng_state().clone()
+        classifier_class(**classifier_parameters(tmp_path))
+        assert torch.equal(torch.get_rng_state(), before)
+
+
+@pytest.mark.parametrize('fitted', [False, True])
+def test_clone_does_not_reset_global_torch_random_state(example, tmp_path, fitted):
+    _, classifier_class, _ = example
+    with torch.random.fork_rng(devices=[]):
+        model = classifier_class(**classifier_parameters(tmp_path))
+        if fitted:
+            model.fit(*data(width=2))
+        torch.manual_seed(991)
+        before = torch.get_rng_state().clone()
+        copied = clone(model)
+        assert copied.model is None
+        assert torch.equal(torch.get_rng_state(), before)
+
+
+@pytest.mark.parametrize('current_seed', [5, 13])
+def test_actual_refit_uses_current_seed_like_a_fresh_classifier(example, tmp_path, current_seed):
+    _, classifier_class, _ = example
+    parameters = classifier_parameters(tmp_path, device='cpu')
+    parameters.update(input_dim=3, hidden_dims=[4], batch_size_mlp=5, epochs_mlp=3,
+                      random_state=5)
+    features, labels = data(width=3)
+    with torch.random.fork_rng(devices=[]):
+        model = classifier_class(**parameters).fit(features, labels)
+        model.set_params(random_state=current_seed)
+        torch.rand(17)
+        model.fit(features, labels)
+        actual_state = {name: tensor.clone() for name, tensor in model.model.state_dict().items()}
+        actual_random_state = torch.get_rng_state().clone()
+        actual_probabilities = model.predict_proba(features)
+        assert any(isinstance(layer, torch.nn.Dropout) for layer in model.model)
+
+        parameters['random_state'] = current_seed
+        fresh = classifier_class(**parameters).fit(features, labels)
+        assert torch.equal(torch.get_rng_state(), actual_random_state)
+        for name, tensor in fresh.model.state_dict().items():
+            assert torch.equal(tensor, actual_state[name]), name
+        np.testing.assert_array_equal(fresh.predict_proba(features), actual_probabilities)

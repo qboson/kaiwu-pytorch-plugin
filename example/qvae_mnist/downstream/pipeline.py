@@ -10,6 +10,7 @@ from datetime import datetime
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -42,7 +43,7 @@ def get_full_pipeline(config):
     clf = MLPClassifier(save_path=config.output_dir, **classifier_kwargs)
     return Pipeline([('qvae', qvae_transformer), ('classifier', clf)])
 
-class PipelineTransformer:
+class PipelineTransformer(TransformerMixin, BaseEstimator):
     """
     A transformer that trains a QVAE and extracts features using the trained model.
 
