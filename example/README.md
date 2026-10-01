@@ -7,6 +7,10 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+### Quantum Feature Selection
+
+`example/feature_selection/` demonstrates `FeatureSelectionWrapper`: training a model while a QUBO-based feature mask selects the informative input features, with the selection subproblem solved by `local_search`, `sa`, or the Kaiwu CIM solver. A linear-regression entry compares the local, SA, and CIM solvers (only `local_search` runs without a license), and a neural-network entry runs the CIM path on TinyCNN / SimpleRNN / SimpleLSTM backbones over synthetic datasets with known signal features. See `example/feature_selection/README.md`.
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:
