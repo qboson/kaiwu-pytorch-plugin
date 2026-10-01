@@ -24,12 +24,18 @@ from feature_selection_datasets import (
 )
 from feature_selection_models import SimpleLSTM, SimpleRNN, TinyCNN
 from kaiwu.torch_plugin import FeatureSelectionWrapper
-from kaiwu_license import _init_kaiwu_license_from_env
+from kaiwu_license import _init_kaiwu_license_from_env, has_license_env
 
 KAIWU_PROJECT_NO = "Your PROJECT NO"
 
 
 def main() -> None:
+    if not has_license_env():
+        raise SystemExit(
+            "This example uses the kaiwu_cim solver, which routes through"
+            " the Kaiwu SDK and needs a license. Set LICENSE_USER_ID and"
+            " LICENSE_SDK_CODE (see this directory README) first."
+        )
     _init_kaiwu_license_from_env()
     cnn_dataset = build_cnn_dataset()
     sequence_dataset = build_sequence_dataset()
