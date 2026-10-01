@@ -3,8 +3,28 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
+from numbers import Integral
+
 import torch
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+
+
+def _gibbs_count(name, value, minimum=0):
+    """Validate Gibbs counts without truncating fractions or accepting booleans."""
+    if isinstance(value, bool) or not isinstance(value, Integral) or value < minimum:
+        raise ValueError(f"{name} must be an integer >= {minimum}")
+    return int(value)
+
+
+def _gibbs_initial_state(name, state, width, parameter):
+    """Validate binary chain initializers before converting to the model's precision."""
+    if not isinstance(state, torch.Tensor):
+        raise TypeError(f"{name} must be a torch.Tensor")
+    if state.ndim != 2 or state.shape[0] == 0 or state.shape[1] != width:
+        raise ValueError(f"{name} must have nonempty shape (B, {width})")
+    if not torch.all((state == 0) | (state == 1)):
+        raise ValueError(f"{name} must contain binary states exactly equal to 0 or 1")
+    return state.to(parameter)
 
 
 class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -114,6 +134,104 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             else:
                 s_all[:, : self.num_visible] = prob
             return s_all
+
+    @torch.no_grad()
+    def gibbs_sample(
+        self,
+        n_step: int,
+        n_burnin: int = 0,
+        s_visible: torch.Tensor = None,
+        s_hidden: torch.Tensor = None,
+        n_sample: int = None,
+        generator: torch.Generator = None,
+    ) -> torch.Tensor:
+        """Generate binary joint states with local PyTorch block Gibbs sampling.
+
+        Each batch row starts a separate chain. A visible initializer updates
+        hidden then visible units; a hidden initializer updates visible then
+        hidden units. Both layers are resampled on every complete transition;
+        initial states are never clamped. This finite-length MCMC approximation
+        does not guarantee mixing or independent draws from the model.
+
+        Args:
+            n_step: Total complete transitions per chain, a nonnegative integer.
+            n_burnin: Initial transitions to discard, a nonnegative integer.
+                Discarding does not change transitions or random-number consumption.
+            s_visible: Optional nonempty binary tensor of shape ``(B, num_visible)``.
+            s_hidden: Optional nonempty binary tensor of shape ``(B, num_hidden)``.
+                Provide at most one initializer. Inputs are converted to the current
+                parameter dtype/device without modifying the caller's tensor.
+            n_sample: Positive number of chains when no initializer is supplied;
+                visible units then start from Bernoulli(0.5). If also supplied with
+                an initializer, it must equal its batch size.
+            generator: Optional PyTorch generator on the parameter device, used
+                for initialization and every draw. None uses the default Torch RNG.
+
+        Returns:
+            torch.Tensor: Detached 0/1 states in the current parameter dtype/device,
+                with visible columns followed by hidden columns. Rows are grouped
+                by retained transition, with shape
+                ``(max(n_step - n_burnin, 0) * B, num_nodes)``. Zero steps or fully
+                discarded chains return an empty batch after the requested work.
+
+        Raises:
+            ValueError: If counts or binary initial states violate this contract.
+            TypeError: If initial states or the generator have the wrong type.
+        """
+        n_step = _gibbs_count("n_step", n_step)
+        n_burnin = _gibbs_count("n_burnin", n_burnin)
+        if n_sample is not None:
+            n_sample = _gibbs_count("n_sample", n_sample, minimum=1)
+        if generator is not None and not isinstance(generator, torch.Generator):
+            raise TypeError("generator must be a torch.Generator")
+        if s_visible is not None and s_hidden is not None:
+            raise ValueError("Provide at most one of s_visible and s_hidden")
+
+        visible_first = s_hidden is None
+        if s_visible is None and s_hidden is None:
+            if n_sample is None:
+                raise ValueError("n_sample is required without an initial state")
+            states = torch.bernoulli(
+                self.quadratic_coef.new_full((n_sample, self.num_visible), 0.5),
+                generator=generator,
+            )
+        else:
+            states = _gibbs_initial_state(
+                "s_visible" if visible_first else "s_hidden",
+                s_visible if visible_first else s_hidden,
+                self.num_visible if visible_first else self.num_hidden,
+                self.quadratic_coef,
+            )
+            if n_sample is not None and n_sample != states.shape[0]:
+                raise ValueError("n_sample must equal the initial state's batch size")
+
+        samples = []
+        for step in range(n_step):
+            if visible_first:
+                hidden = torch.bernoulli(
+                    torch.sigmoid(states @ self.quadratic_coef + self.hidden_bias),
+                    generator=generator,
+                )
+                visible = torch.bernoulli(
+                    torch.sigmoid(hidden @ self.quadratic_coef.t() + self.visible_bias),
+                    generator=generator,
+                )
+                states = visible
+            else:
+                visible = torch.bernoulli(
+                    torch.sigmoid(states @ self.quadratic_coef.t() + self.visible_bias),
+                    generator=generator,
+                )
+                hidden = torch.bernoulli(
+                    torch.sigmoid(visible @ self.quadratic_coef + self.hidden_bias),
+                    generator=generator,
+                )
+                states = hidden
+            if step >= n_burnin:
+                samples.append(torch.cat((visible, hidden), dim=1))
+        if not samples:
+            return self.quadratic_coef.new_empty((0, self.num_nodes))
+        return torch.cat(samples, dim=0)
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
