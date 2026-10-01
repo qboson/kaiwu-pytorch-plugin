@@ -69,3 +69,12 @@ jobs:
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
+
+      - name: Smoke-test the built wheel
+        run: |
+          python -m pip install --quiet build
+          python -m build --wheel
+          python -m pip uninstall --yes kaiwu-torch-plugin
+          python -m pip install --quiet --no-deps dist/*.whl
+          cd ..
+          python -c "import kaiwu.torch_plugin as kpp; from kaiwu.torch_plugin import QDiffusion, FeatureSelectionWrapper, QuadraticLinearSolver; assert 'site-packages' in kpp.__file__ and '/src/' not in kpp.__file__, kpp.__file__; print('wheel import OK:', kpp.__file__)"
