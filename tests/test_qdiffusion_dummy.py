@@ -99,6 +99,29 @@ class TestQDiffusionDummy(unittest.TestCase):
             dtype=torch.long,
         )
 
+    def test_train_keeps_frozen_proposal_in_eval_mode(self):
+        proposal_model = DummyProposalModel(vocab_size=8, hidden_size=12)
+        proposal_model.drop = nn.Dropout(0.5)
+        frozen_model = QDiffusion(
+            proposal_model=proposal_model,
+            energy_model=self.energy_model,
+            token_spec=self.token_spec,
+            config=self.config,
+            freeze_proposal=True,
+        )
+
+        frozen_model.train()
+
+        self.assertTrue(frozen_model.training)
+        self.assertFalse(frozen_model.proposal_model.training)
+        self.assertFalse(frozen_model.proposal_model.drop.training)
+
+    def test_train_propagates_into_unfrozen_proposal(self):
+        self.model.train()
+
+        self.assertTrue(self.model.training)
+        self.assertTrue(self.model.proposal_model.training)
+
     def test_forward_shape(self):
         logits = self.model.forward(self.targets)
         self.assertEqual(logits.shape, (2, 5, 8))
@@ -144,12 +167,27 @@ class TestQDiffusionDummy(unittest.TestCase):
         self.assertEqual(outputs["logits"].shape, (2, 5, 8))
         self.assertEqual(outputs["targets"].shape[1], 5)
         self.assertEqual(outputs["loss_mask"].dtype, torch.bool)
-        self.assertEqual(outputs["weight"].shape, (2, 1))
         self.assertEqual(outputs["energy_objective"].shape, (2, 1))
+
+    def test_coupled_objective_fields(self):
+        self.model.config.use_coupled_sampling = True
+
+        outputs = self.model.objective({"targets": self.targets})
+
+        self.assertEqual(outputs["logits"].shape, (4, 5, 8))
+        self.assertEqual(outputs["targets"].shape, (4, 5))
+        self.assertEqual(outputs["loss_mask"].shape, (4, 5))
+        self.assertEqual(outputs["energy_objective"].shape, (4, 1))
 
     def test_generate_one_step(self):
         generated = self.model.generate(self.targets, max_steps=1)
         self.assertEqual(generated.shape, self.targets.shape)
+
+    def test_to_refreshes_cached_metadata(self):
+        self.model.to(dtype=torch.float64)
+
+        self.assertEqual(self.model.device, torch.device("cpu"))
+        self.assertEqual(self.model.dtype, torch.float64)
 
     def test_removed_dplm_entrypoints(self):
         self.assertFalse(hasattr(QDiffusion, "from_pretrained"))

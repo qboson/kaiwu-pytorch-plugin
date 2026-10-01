@@ -9,3 +9,5 @@ torch>=2.0
 omegaconf>=2.3,<3
 tqdm>=4.66,<5
 transformers==4.39.2
+# Required only by example/qdiffusion/dplm/workflows/esm2_eval*.py (ESM2 embeddings).
+fair-esm>=2.0

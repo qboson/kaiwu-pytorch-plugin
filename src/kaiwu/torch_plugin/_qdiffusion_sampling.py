@@ -1,4 +1,5 @@
-# Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 """Private sampling helpers shared by the public QDiffusion model."""

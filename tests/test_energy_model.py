@@ -18,6 +18,19 @@ class DummySampler:
         return np.ones((self.num_solutions, ising_mat.shape[0]), dtype=np.float32)
 
 
+class DiverseSampler:
+    """Return two distinct hidden-state samples for reduction tests."""
+
+    def solve(self, ising_mat):
+        """Return all-on and all-off hidden states."""
+
+        del ising_mat
+        return np.array(
+            [[1.0, 1.0, 1.0], [-1.0, -1.0, 1.0]],
+            dtype=np.float32,
+        )
+
+
 class TestEnergyModel(unittest.TestCase):
     def test_score_visible_logits_shape_and_stats(self):
         model = EnergyModel(
@@ -54,6 +67,32 @@ class TestEnergyModel(unittest.TestCase):
         )
 
         self.assertTrue(torch.equal(energy, expected))
+
+    def test_score_visible_logits_can_average_lowest_samples(self):
+        """Lowest-sample aggregation retains the requested BM solutions."""
+
+        model = EnergyModel(
+            bm_num_visible=2,
+            bm_num_hidden=2,
+            sampler=DiverseSampler(),
+        )
+        with torch.no_grad():
+            model.energy_bm.linear_bias.copy_(torch.tensor([0.0, 0.0, 1.0, 2.0]))
+        visible_logits = torch.tensor([[2.0, -2.0]])
+
+        energy = model.score_visible_logits(visible_logits, num_lowest=1)
+        visible_state = model.discretize_visible_state(visible_logits)
+        full_states, split_sizes = model.sample_hidden_state(visible_state)
+        flat_energy = model.energy_bm(full_states).unsqueeze(-1)
+        expected = torch.stack(
+            [
+                part.topk(1, dim=0, largest=False).values.mean(dim=0)
+                for part in torch.split(flat_energy, split_sizes.tolist())
+            ],
+            dim=0,
+        )
+
+        torch.testing.assert_close(energy, expected)
 
     def test_discretize_visible_state_returns_sigmoid_probabilities(self):
         model = EnergyModel(

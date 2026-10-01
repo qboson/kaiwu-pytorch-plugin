@@ -4,22 +4,32 @@
 
 Examples and workflow scripts for the public `Q-Diffusion` module.
 
+For discrete text generation, see [`nemotron/`](nemotron/README.md), which
+combines a frozen Nemotron proposal, contextual energy model, public KPP BM,
+and the PyPI Kaiwu simulated-annealing optimizer.
+
 ## Data
 [data used for example/qdiffusion](https://www.uniprot.org/proteomes/UP000005640)
 
 
 ## Quick Start
 
+The example scripts import `kaiwu.torch_plugin` from the repository's `src/`
+tree, so an editable install is **required** before running them:
+
 ```bash
+pip install -e .
 pip install -r example/qdiffusion/requirements.txt
-python example/qdiffusion/simple/simple_train_example.py
-python example/qdiffusion/simple/simple_generate_example.py
 ```
 
-These commands work in both common local modes:
+Then run the entry scripts as modules from the repository root:
 
-- development checkout: run directly from the repo root
-- installed package: `pip install -e .` and then run the same commands
+```bash
+python -m example.qdiffusion.simple.simple_train_example
+python -m example.qdiffusion.simple.simple_generate_example
+python -m example.qdiffusion.dplm.workflows.train
+python -m example.qdiffusion.dplm.workflows.esm2_eval
+```
 
 ## How It Fits Together
 
@@ -57,9 +67,9 @@ the larger experiment workflow.
 - `dplm/utils/dplm_builder.py`: protein-case `Q-Diffusion` assembly helper
 - `dplm/models/`: model-side code, split into backbone loading, energy rerankers, and private ESM patching
 - `dplm/utils/`: workflow-side utilities for FASTA I/O, checkpoints, and evaluation metrics
-- `dplm/workflows/`: the actual train and ESM2 evaluation implementations
-- `dplm/train_workflow.py`: compatibility entrypoint for the full train/eval workflow
-- `dplm/eval_esm2_distances.py`: compatibility entrypoint for ESM2 distance evaluation
+- `dplm/workflows/`: the train and ESM2 evaluation implementations
+- `dplm/workflows/train.py`: entrypoint for the full train/eval workflow
+- `dplm/workflows/esm2_eval.py`: entrypoint for ESM2 distance evaluation
 
 If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
 
@@ -77,7 +87,7 @@ Its end-to-end flow is:
 
 ## Sample ESM2 Distance Result
 
-The DPLM-guided workflow includes `dplm/eval_esm2_distances.py` for embedding-level
+The DPLM-guided workflow includes `dplm/workflows/esm2_eval.py` for embedding-level
 comparison between generated sequences and the reference proteome. One example
 report from the current setup used:
 

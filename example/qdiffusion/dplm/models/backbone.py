@@ -13,7 +13,7 @@ import torch
 from torch import nn
 from transformers import AutoConfig, AutoModelForMaskedLM
 
-from kaiwu.torch_plugin.qdiffusion import SequenceTokenSpec
+from kaiwu.torch_plugin import SequenceTokenSpec
 
 from .esm_patch import _EsmForDPLM
 
