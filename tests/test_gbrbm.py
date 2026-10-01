@@ -1,3 +1,4 @@
+import itertools
 import os
 import sys
 import unittest
@@ -200,6 +201,125 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertEqual(bm.mu.shape, (2,))
         self.assertEqual(bm.quadratic_coef.shape, (2, 3))
         self.assertEqual(bm.linear_bias.shape, (3,))
+
+
+class TestGBRBMConstructorDtype(unittest.TestCase):
+    """Exercise fresh models without replacing their parameter storage."""
+
+    @staticmethod
+    def make_model(is_visible_gaussian):
+        """Create an unequal-size, double-precision model on CPU."""
+        return GaussianBernoulliRestrictedBoltzmannMachine(
+            num_visible=3,
+            num_hidden=2,
+            is_visible_gaussian=is_visible_gaussian,
+            dtype=torch.float64,
+            device=torch.device("cpu"),
+        )
+
+    def test_default_parameters_follow_constructor_dtype(self):
+        """Explicit dtype should override the global default for all parameters."""
+        original_dtype = torch.get_default_dtype()
+        try:
+            for dtype, global_dtype in (
+                (torch.float64, torch.float32),
+                (torch.float32, torch.float64),
+            ):
+                torch.set_default_dtype(global_dtype)
+                for visible_gaussian in (True, False):
+                    with self.subTest(dtype=dtype, visible_gaussian=visible_gaussian):
+                        bm = GaussianBernoulliRestrictedBoltzmannMachine(
+                            3, 2, is_visible_gaussian=visible_gaussian,
+                            dtype=dtype, device=torch.device("cpu"),
+                        )
+                        for name, parameter in bm.named_parameters():
+                            self.assertEqual(parameter.dtype, dtype, name)
+                            self.assertEqual(parameter.device, torch.device("cpu"), name)
+        finally:
+            torch.set_default_dtype(original_dtype)
+
+    def test_double_precision_energy_and_gradients(self):
+        """A newly constructed float64 model should support energy and training."""
+        for visible_gaussian in (True, False):
+            with self.subTest(visible_gaussian=visible_gaussian):
+                bm = self.make_model(visible_gaussian)
+                states = torch.arange(2 * bm.num_nodes, dtype=torch.float64).reshape(
+                    2, bm.num_nodes
+                ) / 10
+                states[:, bm.num_gaussian:] = 1
+                energy = bm(states)
+                self.assertEqual(energy.dtype, torch.float64)
+                torch.testing.assert_close(bm.energy(states), energy.detach())
+                energy.sum().backward()
+                for parameter in bm.parameters():
+                    self.assertEqual(parameter.grad.dtype, torch.float64)
+                    self.assertTrue(torch.isfinite(parameter.grad).all())
+                gaussian = states[:, :bm.num_gaussian]
+                for result in (
+                    bm.marginal_energy(gaussian),
+                    bm.positive_phase_energy_expectation(gaussian),
+                ):
+                    self.assertEqual(result.dtype, torch.float64)
+                    self.assertTrue(torch.isfinite(result).all())
+
+    def test_double_precision_conditional_inference(self):
+        """Both conditionals should accept float64 states immediately after init."""
+        for visible_gaussian in (True, False):
+            with self.subTest(visible_gaussian=visible_gaussian):
+                bm = self.make_model(visible_gaussian)
+                gaussian = torch.ones(2, bm.num_gaussian, dtype=torch.float64)
+                bernoulli = torch.ones(2, bm.num_bernoulli, dtype=torch.float64)
+                inferred = bm.infer_from_gaussian(gaussian, binarize=False)
+                expected_prob = torch.sigmoid(
+                    (gaussian / bm.var) @ bm.quadratic_coef + bm.linear_bias
+                )
+                torch.testing.assert_close(inferred[:, :bm.num_gaussian], gaussian)
+                torch.testing.assert_close(inferred[:, bm.num_gaussian:], expected_prob)
+                inferred = bm.infer_from_bernoulli(bernoulli, no_random=True)
+                expected_mean = bernoulli @ bm.quadratic_coef.t() + bm.mu
+                torch.testing.assert_close(inferred[:, :bm.num_gaussian], expected_mean)
+                torch.testing.assert_close(inferred[:, bm.num_gaussian:], bernoulli)
+                for kwargs in ({"no_random": True}, {}):
+                    sampled = bm.infer_from_gaussian(gaussian, **kwargs)
+                    self.assertEqual(sampled.dtype, torch.float64)
+                    bits = sampled[:, bm.num_gaussian:]
+                    self.assertTrue(((bits == 0) | (bits == 1)).all())
+
+    def test_double_precision_ising_conversion(self):
+        """The float64 Ising model should preserve all Bernoulli energy differences."""
+        for visible_gaussian in (True, False):
+            with self.subTest(visible_gaussian=visible_gaussian):
+                bm = self.make_model(visible_gaussian)
+                matrix = bm.get_ising_matrix()
+                bernoulli = torch.tensor(
+                    list(itertools.product((0, 1), repeat=bm.num_bernoulli)),
+                    dtype=torch.float64,
+                )
+                states = bm.infer_from_bernoulli(bernoulli, no_random=True)
+                energy = bm.energy(states).numpy()
+                spins = np.column_stack((2 * bernoulli.numpy() - 1, np.ones(len(states))))
+                ising_energy = -np.einsum("bi,ij,bj->b", spins, matrix, spins)
+                self.assertEqual(matrix.dtype, np.float64)
+                np.testing.assert_allclose(
+                    energy - energy[0], ising_energy - ising_energy[0],
+                    rtol=1e-12, atol=1e-12,
+                )
+
+    def test_double_precision_gibbs_sampling(self):
+        """Random and both conditioned Gibbs starts should work in float64."""
+        for visible_gaussian in (True, False):
+            bm = self.make_model(visible_gaussian)
+            starts = (
+                {"n_sample": 2},
+                {"s_gaussian": torch.zeros(2, bm.num_gaussian, dtype=torch.float64)},
+                {"s_bernoulli": torch.ones(2, bm.num_bernoulli, dtype=torch.float64)},
+            )
+            for start in starts:
+                with self.subTest(visible_gaussian=visible_gaussian, start=list(start)):
+                    samples = bm.gibbs_sample(n_step=2, **start)
+                    self.assertEqual(samples.shape, (4, bm.num_nodes))
+                    self.assertEqual(samples.dtype, torch.float64)
+                    self.assertTrue(torch.isfinite(samples).all())
 
 
 if __name__ == "__main__":
