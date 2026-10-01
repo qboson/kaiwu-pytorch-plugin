@@ -58,19 +58,25 @@ Consequently, if the network is allowed to run for a sufficiently long time (i.e
 Consequently, repeated application drives the network toward equilibrium, where configurations are sampled according to $P(\mathbf{v}, \mathbf{h})$.
 
 ## Learning Objective: Maximum Likelihood with Hidden Variables
-The goal of learning is to adjust the weights and biases so that the marginal distribution over visible units, $P(\mathbf{v})$, approximates the empirical distribution of the training data. As derived in Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) (Eq. {eq}`eq-nll-gradient-tf`), the gradient of the negative log-likelihood for a single training example $\mathbf{v}$ with respect to a weight $w_{ij}$ is:
+The goal of learning is to adjust the weights and biases so that the marginal distribution over visible units, $P(\mathbf{v})$, approximates the empirical distribution of the training data. Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) (Eq. {eq}`eq-nll-gradient-tf`) derives the log-likelihood gradient. Its sign reverses for the negative log-likelihood $\mathcal{L}(\mathbf{v}) = -\log P(\mathbf{v})$, which is minimized by gradient descent. For a weight $w_{ij}$ and a single training example $\mathbf{v}$:
 
-$$\frac{\partial \left( -\log P(\mathbf{v}) \right)}{\partial w_{ij}} = \mathbb{E}_{\mathbf{h} \mid \mathbf{v}} \left[ x_i x_j \right] - \mathbb{E}_{P(\mathbf{v}, \mathbf{h})} \left[ x_i x_j \right]$$
+$$\frac{\partial \mathcal{L}(\mathbf{v})}{\partial w_{ij}} = \mathbb{E}_{P(\mathbf{v}, \mathbf{h})} \left[ x_i x_j \right] - \mathbb{E}_{\mathbf{h} \mid \mathbf{v}} \left[ x_i x_j \right]$$
 
-Here, $ x_i$ and $x_j$ denote the states of the two connected units. The first term is the expected product of their activities when the visible units are **clamped** to the training example $\mathbf{v}$ and the hidden units are allowed to fluctuate according to their conditional distribution. This is the **positive phase** or **wake phase** statistic.
+Here, $ x_i$ and $x_j$ denote the states of the two connected units. The conditional expectation is the expected product of their activities when the visible units are **clamped** to the training example $\mathbf{v}$ and the hidden units are allowed to fluctuate according to their conditional distribution. This is the **positive phase** or **wake phase** statistic.
 
-The second term is the expected product when the network runs **freely** without any external input, sampling from its equilibrium distribution. This is the **negative phase** or **sleep phase** statistic.
+The model expectation is the expected product when the network runs **freely** without any external input, sampling from its equilibrium distribution. This is the **negative phase** or **sleep phase** statistic.
 
-The learning rule is thus:
+Gradient descent subtracts the NLL gradient, so the learning rule is:
 
 $$\Delta w_{ij} = \eta \left( \langle x_i x_j \rangle_{\text{clamped}} - \langle x_i x_j \rangle_{\text{free}} \right)$$
 
 where $\eta$ is the learning rate. Biases are updated similarly by treating them as weights from an always-on unit with state 1.
+
+The [CPU exact-likelihood example](https://github.com/qboson/kaiwu-pytorch-plugin/blob/main/example/run_exact_likelihood.py)
+checks this direction against the existing KPP `objective` using all four states
+of a two-node BM. At zero weights and biases, observing $(1, 1)$ gives an NLL
+edge-weight gradient of $0.25 - 1 = -0.75$. Subtracting that gradient increases
+the weight and raises the observed state's probability.
 
 ## The Wake-Sleep Algorithm: A Biological Metaphor
 The two-phase nature of the learning rule suggests a compelling biological metaphor. In the **wake phase**, the network is driven by sensory input (the visible units are clamped to data). The hidden units respond to this input, and the correlations $\langle x_i x_j \rangle_{\text{clamped}}$ are recorded. These correlations strengthen connections between units that tend to be co-active in response to real-world stimuli—a Hebbian process.
