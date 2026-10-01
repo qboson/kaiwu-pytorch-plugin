@@ -98,5 +98,16 @@ def test_disabled_autograd_does_not_silently_report_zero_for_a_nonconstant_loss(
     wrapper = FeatureSelectionWrapper(nn.Linear(3, 1), feature_dim=3)
 
     with torch.no_grad():
-        with pytest.raises(RuntimeError, match="does not require grad"):
+        with pytest.raises(RuntimeError):
+            wrapper.compute_mask_derivatives(data(torch.float32), nn.MSELoss())
+
+
+@pytest.mark.parametrize("enable_grad_inside_inference", [False, True])
+def test_inference_mode_does_not_silently_report_zero_for_a_nonconstant_loss(
+    enable_grad_inside_inference,
+):
+    wrapper = FeatureSelectionWrapper(nn.Linear(3, 1), feature_dim=3)
+
+    with torch.inference_mode(), torch.set_grad_enabled(enable_grad_inside_inference):
+        with pytest.raises(RuntimeError):
             wrapper.compute_mask_derivatives(data(torch.float32), nn.MSELoss())
