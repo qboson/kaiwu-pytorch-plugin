@@ -12,13 +12,14 @@
 运行方式：
 
 ```bash
-# 无 license 路径（仅 local_search / sa）
+# 运行 local_search 求解器；未配置 license 时自动跳过 sa 与 kaiwu_cim
 python example/feature_selection/linear_regression_solvers.py
 
-# 量子路径（kaiwu_cim）——需要 Kaiwu license
+# sa / kaiwu_cim 路径——两者都经由 Kaiwu SDK，需要 license
 export LICENSE_USER_ID="<your-user-id>"
 export LICENSE_SDK_CODE="<your-sdk-code>"
 export KAIWU_PROJECT_NO="<your-project-no>"   # 或直接编辑脚本中的 KAIWU_PROJECT_NO
+python example/feature_selection/linear_regression_solvers.py
 python example/feature_selection/neural_network_kaiwu_cim.py
 ```
 
@@ -34,4 +35,4 @@ python example/feature_selection/neural_network_kaiwu_cim.py
 | `neural_network_kaiwu_cim.py` | CNN / RNN / LSTM 上的特征选择（`kaiwu_cim`） |
 | `kaiwu_license.py` | 从 `LICENSE_USER_ID` / `LICENSE_SDK_CODE` 初始化 Kaiwu license |
 
-**依赖项**：除包自身要求外无额外依赖。`kaiwu_cim` 求解器需要 Kaiwu license（见[安装指南](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/source/getting_started/installation.html) "Kaiwu SDK Configuration & License" 一节）；`linear_regression_solvers.py` 中的 `local_search` 与 `sa` 求解器无需 license 即可运行。
+**依赖项**：除包自身要求外无额外依赖。`sa` 与 `kaiwu_cim` 求解器都经由 Kaiwu SDK，需要 Kaiwu license（见[安装指南](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/source/getting_started/installation.html) "Kaiwu SDK Configuration & License" 一节）；`linear_regression_solvers.py` 中的 `local_search` 与 `sa` 求解器无需 license 即可运行。

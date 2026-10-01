@@ -9,7 +9,7 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 ### Quantum Feature Selection
 
-`example/feature_selection/` demonstrates `FeatureSelectionWrapper`: training a model while a QUBO-based feature mask selects the informative input features, with the selection subproblem solved by `local_search`, `sa`, or the Kaiwu CIM solver. A linear-regression entry compares all three solvers without any license requirement, and a neural-network entry runs the CIM path on TinyCNN / SimpleRNN / SimpleLSTM backbones over synthetic datasets with known signal features. See `example/feature_selection/README.md`.
+`example/feature_selection/` demonstrates `FeatureSelectionWrapper`: training a model while a QUBO-based feature mask selects the informative input features, with the selection subproblem solved by `local_search`, `sa`, or the Kaiwu CIM solver. A linear-regression entry compares the local, SA, and CIM solvers (only `local_search` runs without a license), and a neural-network entry runs the CIM path on TinyCNN / SimpleRNN / SimpleLSTM backbones over synthetic datasets with known signal features. See `example/feature_selection/README.md`.
 
 ### Q-Diffusion
 

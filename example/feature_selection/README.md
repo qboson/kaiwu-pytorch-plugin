@@ -12,13 +12,15 @@ Two entry scripts:
 Run:
 
 ```bash
-# license-free path (local_search / sa only)
+# runs the local_search solver; the sa and kaiwu_cim solvers are
+# skipped automatically when no license is configured
 python example/feature_selection/linear_regression_solvers.py
 
-# quantum path (kaiwu_cim) — requires a Kaiwu license
+# sa / kaiwu_cim paths — both go through the Kaiwu SDK and need a license
 export LICENSE_USER_ID="<your-user-id>"
 export LICENSE_SDK_CODE="<your-sdk-code>"
 export KAIWU_PROJECT_NO="<your-project-no>"   # edit KAIWU_PROJECT_NO in the scripts, or leave the default
+python example/feature_selection/linear_regression_solvers.py
 python example/feature_selection/neural_network_kaiwu_cim.py
 ```
 
@@ -34,4 +36,4 @@ Each run prints, per model: the final loss, the accuracy (classification) or los
 | `neural_network_kaiwu_cim.py` | Feature selection on CNN / RNN / LSTM with `kaiwu_cim` |
 | `kaiwu_license.py` | Initializes the Kaiwu license from `LICENSE_USER_ID` / `LICENSE_SDK_CODE` |
 
-**Dependencies**: none beyond the package requirements. The `kaiwu_cim` solver requires a Kaiwu license ([installation guide](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/source/getting_started/installation.html), "Kaiwu SDK Configuration & License"); the `local_search` and `sa` solvers in `linear_regression_solvers.py` run without one.
+**Dependencies**: none beyond the package requirements. The `sa` and `kaiwu_cim` solvers both go through the Kaiwu SDK and require a Kaiwu license ([installation guide](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/source/getting_started/installation.html), "Kaiwu SDK Configuration & License"); the `local_search` and `sa` solvers in `linear_regression_solvers.py` run without one.
