@@ -152,6 +152,42 @@ class TestQVAE(unittest.TestCase):
                 torch.testing.assert_close(self.encoder.inputs[-1], x.reshape(2, -1))
                 torch.testing.assert_close(energy, expected_energy)
 
+    def test_bernoulli_energy_with_real_encoder_and_bm_gradients(self):
+        """Uncentered energy scores distinct states and trains only the BM."""
+        encoder = torch.nn.Linear(self.input_dim, self.latent_dim)
+        with torch.no_grad():
+            encoder.weight.zero_()
+            encoder.weight[:, : self.latent_dim].copy_(torch.eye(self.latent_dim))
+            encoder.bias.copy_(torch.tensor([-0.5, 0.25, -1.0, 0.0]))
+        bm = RestrictedBoltzmannMachine(
+            2,
+            2,
+            quadratic_coef=torch.tensor([[0.5, -1.0], [2.0, 0.25]]),
+            linear_bias=torch.tensor([0.1, -0.2, 0.3, 0.4]),
+            device="cpu",
+        )
+        self.qvae.encoder = encoder
+        self.qvae.bm = bm
+        x = torch.tensor(
+            [
+                [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+            ]
+        )
+
+        # Thresholded encoder states are [0, 1, 0, 0] and [1, 1, 0, 1].
+        energy = self.qvae.energy(x)
+        torch.testing.assert_close(energy, torch.tensor([0.2, 0.45]))
+        energy.sum().backward()
+        torch.testing.assert_close(
+            bm.linear_bias.grad, torch.tensor([-1.0, -2.0, 0.0, -1.0])
+        )
+        torch.testing.assert_close(
+            bm.quadratic_coef.grad, torch.tensor([[0.0, -1.0], [0.0, -1.0]])
+        )
+        self.assertIsNone(encoder.weight.grad)
+        self.assertIsNone(encoder.bias.grad)
+
     def test_mse_forward_and_loss(self):
         """The MSE configuration bypasses Bernoulli centering and bias."""
         self.config.loss_type = "mse"
