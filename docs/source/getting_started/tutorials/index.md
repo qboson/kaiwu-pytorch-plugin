@@ -49,10 +49,12 @@ bm_generation
 
 rbm_classification
 dbn_classification
+gbrbm
 ```
 
 - [RBM Classification: Handwritten Digit Recognition](rbm_classification.md): Feature learning and classification with a single RBM. Example: `example/rbm_digits/rbm_digits.ipynb`.
 - [DBN Classification: Deep Belief Networks](dbn_classification.md): Stacking RBMs into a Deep Belief Network for hierarchical features. Example: `example/dbn_digits/supervised_dbn_digits.ipynb`.
+- [GBRBM: Modeling Continuous Data](gbrbm.md): Training, generating, and scoring with a Gaussian-Bernoulli RBM on real-valued inputs. Example: `example/gbrbm/run_gbrbm.py`.
 
 ## Tutorial 3: Quantum Variational Autoencoder (Q-VAE)
 
