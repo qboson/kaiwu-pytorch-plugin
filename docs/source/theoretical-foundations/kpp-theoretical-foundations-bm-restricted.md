@@ -205,6 +205,34 @@ The conditional $P(v_i \mid \mathbf{h})$ is Gaussian with mean $b_i + \sigma_i \
 
 These variants preserve the bipartite structure and conditional independence properties, allowing the same efficient block Gibbs sampling and contrastive divergence training.
 
+### Gaussian-Bernoulli Gibbs Sampling and Burn-In
+
+`GaussianBernoulliRestrictedBoltzmannMachine.gibbs_sample` performs `n_step`
+complete block Gibbs transitions. Its `n_burnin` argument discards that many
+initial transitions from each chain. Returned rows are grouped by retained
+transition: the first batch contains transition `n_burnin + 1`, followed by
+the batches from later transitions. The initial state is not a returned sample.
+
+```python
+import torch
+from kaiwu.torch_plugin.gbrbm import GaussianBernoulliRestrictedBoltzmannMachine
+
+model = GaussianBernoulliRestrictedBoltzmannMachine(2, 3, device="cpu")
+initial_gaussian = torch.zeros(4, 2)
+samples = model.gibbs_sample(
+    n_step=5, n_burnin=2, s_gaussian=initial_gaussian
+)
+assert samples.shape == (12, 5)  # Four chains, retained transitions 3, 4, 5.
+```
+
+With the default `n_burnin=0`, every transition is retained. When
+`n_burnin >= n_step`, or `n_step=0`, the result has shape `(0, num_nodes)`.
+Initialization and the requested transitions still run, so discarding samples
+does not change the chain or its random-number consumption. This behavior
+applies to Gaussian, Bernoulli, external-sampler, and random initialization,
+and to both visible-partition layouts. Full states always use the internal
+Gaussian-first node order.
+
 ## Limitations of the RBM
 Despite its success, the RBM has limitations:
 

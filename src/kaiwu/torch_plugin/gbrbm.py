@@ -285,17 +285,21 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         Args:
             n_step (int): Number of Gibbs sampling steps to perform.
-            n_burnin (int, optional): Number of initial steps to discard.
-                Defaults to 0.
+            n_burnin (int, optional): Number of initial complete Gibbs steps
+                to discard. Defaults to 0.
             s_gaussian (torch.tensor, optional): Initial Gaussian states.
             s_bernoulli (torch.tensor, optional): Initial Bernoulli states.
             sampler (optional): External sampler used to initialize Bernoulli states.
             n_sample (int, optional): Number of randomly initialized samples.
 
         Returns:
-            torch.tensor: Samples generated through Gibbs sampling.
+            torch.tensor: Retained samples, grouped by Gibbs step, with shape
+                ``(max(n_step - n_burnin, 0) * n_sample, num_nodes)`` for
+                nonnegative step counts. If all steps are discarded or
+                ``n_step`` is zero, returns an empty batch with ``num_nodes``
+                columns. Initialization and all ``n_step`` transitions are
+                performed before returning, including for an empty batch.
         """
-        n_burnin_ = n_burnin - 1
         with torch.no_grad():
             if s_gaussian is not None:
                 n_sample = s_gaussian.shape[0]
@@ -343,8 +347,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                     s_all = self.infer_from_bernoulli(s_bernoulli)
                     s_gaussian = s_all[:, : self.num_gaussian]
                     s_all = self.infer_from_gaussian(s_gaussian)
-                if no_step >= n_burnin_:
+                if no_step >= n_burnin:
                     samples.append(s_all)
+            if not samples:
+                return s_all.new_empty((0, self.num_nodes))
             return torch.concat(samples)
 
     def sample(self, sampler) -> torch.Tensor:
