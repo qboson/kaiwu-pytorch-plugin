@@ -205,6 +205,67 @@ The conditional $P(v_i \mid \mathbf{h})$ is Gaussian with mean $b_i + \sigma_i \
 
 These variants preserve the bipartite structure and conditional independence properties, allowing the same efficient block Gibbs sampling and contrastive divergence training.
 
+## Visible-state scoring with the plugin GBRBM
+
+`GaussianBernoulliRestrictedBoltzmannMachine.visible_marginal_energy(s_visible, enable_grad=False)`
+scores observed visible states without generating joint latent states. It accepts a
+tensor of shape `(B, num_visible)` in the model parameters' dtype and device, and
+returns one unnormalized free energy per observation. Lower energy means higher
+probability mass or density within the same fixed model. Relative-likelihood
+comparisons use the standard free-energy definition in
+[Hinton's practical guide, section 16.1](https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf).
+Absolute negative log-likelihood still requires adding the model's log partition
+function; free energies from different models cannot directly substitute for it.
+
+The formulas below follow the plugin's actual `energy` convention, whose coupling
+uses inverse **variance**, rather than the inverse standard deviation in the
+generic Gaussian example above. Let $q_i$ be the clipped variance returned by
+`var`, $\mathbf{g}$ the Gaussian partition, $\mathbf{b}$ the Bernoulli partition,
+and $\mathbf{c}$ its bias. Joint states always store Gaussian units first:
+
+$$E(\mathbf{g},\mathbf{b})=
+\frac12\sum_i\frac{(g_i-\mu_i)^2}{q_i}
+-\sum_{i,j}\frac{g_i}{q_i}W_{ij}b_j-\mathbf{c}^\top\mathbf{b}.$$
+
+When `is_visible_gaussian=True`, the method sums over binary hidden states:
+
+$$F_G(\mathbf{g})=
+\frac12\sum_i\frac{(g_i-\mu_i)^2}{q_i}
+-\sum_j\operatorname{softplus}\left(c_j+\sum_i\frac{g_i}{q_i}W_{ij}\right).$$
+
+When `is_visible_gaussian=False`, visible observations are Bernoulli states and
+Gaussian hidden states are integrated over ordinary Lebesgue measure. With
+$\mathbf{a}=\mathbf{W}\mathbf{b}$, completing the Gaussian square gives:
+
+$$F_B(\mathbf{b})=-\mathbf{c}^\top\mathbf{b}
+-\sum_i\frac{\mu_i a_i+a_i^2/2}{q_i}
+-\frac12\sum_i\log(2\pi q_i).$$
+
+The last term depends on model variance and is retained for correct values and
+parameter gradients. The implementation uses stable softplus and adds the log
+normalization terms without first multiplying a large variance by $2\pi$.
+The legacy `marginal_energy(s_gaussian)` continues to score the Gaussian partition
+in either orientation and continues to disable gradients.
+
+```python
+import torch
+from kaiwu.torch_plugin.gbrbm import GaussianBernoulliRestrictedBoltzmannMachine
+
+rbm = GaussianBernoulliRestrictedBoltzmannMachine(
+    num_visible=3, num_hidden=2, is_visible_gaussian=False,
+    device=torch.device("cpu"),
+)
+visible = torch.tensor([[1.0, 0.0, 1.0], [0.0, 1.0, 0.0]])
+free_energy = rbm.visible_marginal_energy(visible)
+log_probability_ratio = free_energy[1] - free_energy[0]
+differentiable_scores = rbm.visible_marginal_energy(visible, enable_grad=True)
+```
+
+Evaluation disables gradients by default. `enable_grad=True` records derivatives
+for observations and all parameters, including inside ordinary `torch.no_grad()`;
+`torch.inference_mode()` still prevents recording. This supports differentiable
+scoring objectives, density comparisons and anomaly ranking without a sampler.
+
 ## Limitations of the RBM
 Despite its success, the RBM has limitations:
 
