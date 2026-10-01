@@ -5,7 +5,10 @@ import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validated_states,
+)
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -84,7 +87,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
+
+        Raises:
+            ValueError: If ``s_all`` does not have shape (B, N) with
+                ``N == num_nodes``.
         """
+        _validated_states("s_all", s_all, self.num_nodes)
         return -s_all @ self.linear_bias - 0.5 * torch.sum(
             s_all.matmul(self.symmetrized_quadratic_coef()) * s_all, dim=-1
         )
@@ -162,6 +170,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
             if s_visible is not None:
+                if s_visible.ndim != 2 or s_visible.shape[1] > self.num_nodes:
+                    raise ValueError(
+                        "s_visible must have shape (batch, num_clamped_nodes) "
+                        f"with at most {self.num_nodes} columns, "
+                        f"got {tuple(s_visible.shape)}"
+                    )
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
@@ -207,7 +221,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
+
+        Raises:
+            ValueError: If ``s_visible`` has more columns than ``num_nodes``.
         """
+        if s_visible.ndim != 2 or s_visible.shape[1] > self.num_nodes:
+            raise ValueError(
+                "s_visible must have shape (batch, num_visible_nodes) "
+                f"with at most {self.num_nodes} columns, "
+                f"got {tuple(s_visible.shape)}"
+            )
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
