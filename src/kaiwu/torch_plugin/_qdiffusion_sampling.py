@@ -78,11 +78,14 @@ def stochastic_sample_from_categorical(
         temperature: Sampling temperature forwarded to
             :func:`sample_from_categorical`.
         noise_scale: Multiplicative scale for the sampled Gumbel noise.
+            Zero disables perturbation and skips drawing Gumbel noise.
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
         sampled from the perturbed categorical distribution.
     """
+    if noise_scale == 0.0:
+        return sample_from_categorical(logits, temperature)
     gumbel_noise = -torch.log(-torch.log(torch.rand_like(logits) + 1e-8) + 1e-8)
     noisy_logits = logits + noise_scale * gumbel_noise
     return sample_from_categorical(noisy_logits, temperature)
@@ -102,6 +105,7 @@ def stochastic_sample_from_categorical_n(
         temperature: Sampling temperature forwarded to
             :func:`sample_from_categorical`.
         noise_scale: Multiplicative scale for the sampled Gumbel noise.
+            Zero disables perturbation and skips drawing Gumbel noise.
         n: Number of independent noisy candidate sets to draw.
 
     Returns:
@@ -109,6 +113,8 @@ def stochastic_sample_from_categorical_n(
         whose leading dimension indexes the sampled candidate set.
     """
     expanded_logits = logits.unsqueeze(0).expand(n, *logits.shape)
+    if noise_scale == 0.0:
+        return sample_from_categorical(expanded_logits, temperature)
     gumbel_noise = -torch.log(
         -torch.log(torch.rand_like(expanded_logits) + 1e-8) + 1e-8
     )
