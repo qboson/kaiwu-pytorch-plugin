@@ -5,9 +5,37 @@
 
 
 """Abstract base class for Boltzmann Machines."""
+import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
+
+
+def _validate_ising_solutions(solution, num_spins):
+    """Validate the complete solver batch before gauge decoding."""
+    if solution is None:
+        raise RuntimeError(
+            "sampler.solve returned None; no Ising solutions are available. "
+            "For an asynchronous sampler, complete the task before sampling."
+        )
+    try:
+        solution = np.asarray(solution)
+    except (TypeError, ValueError, RuntimeError) as error:
+        raise RuntimeError("sampler.solve returned an invalid Ising batch") from error
+
+    if solution.ndim != 2 or solution.shape[0] == 0 or solution.shape[1] != num_spins:
+        raise RuntimeError(
+            "sampler.solve must return a nonempty 2D Ising batch with "
+            f"{num_spins} columns (including the gauge spin); got {solution.shape}"
+        )
+    if solution.dtype.kind not in "biuf" or not np.all(
+        (solution == -1) | (solution == 1)
+    ):
+        raise RuntimeError(
+            "sampler.solve must return real Ising spins exactly equal to -1 or +1 "
+            "in every row, including the gauge spin"
+        )
+    return solution
 
 
 class AbstractBoltzmannMachine(torch.nn.Module):
@@ -91,10 +119,16 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
         Args:
             sampler (kaiwu.core.OptimizerBase): Optimizer used for sampling from the model.
-                The sampler can be kaiwuSDK's CIM or other solvers.
+                The sampler can be kaiwuSDK's CIM or other solvers. Its ``solve``
+                result must be a nonempty 2D batch of exact -1/+1 spins, with
+                one column per Ising matrix row, including the last gauge spin.
 
         Returns:
             torch.Tensor: Spins sampled from the model.
+
+        Raises:
+            RuntimeError: If the sampler has no available results or returns
+                an invalid Ising batch.
         """
         ising_mat = self.get_ising_matrix()
 
@@ -104,6 +138,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         with kpp_caller_context():
             solution = sampler.solve(ising_mat)
 
+        solution = _validate_ising_solutions(solution, ising_mat.shape[0])
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
         solution = torch.FloatTensor(solution)
         solution = solution.to(self.device)
