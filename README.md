@@ -204,7 +204,7 @@ if __name__ == "__main__":
         sampler = SimulatedAnnealingOptimizer()
     num_nodes = 50
     num_visible = 20
-    x = 1 - 2.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
+    x = 1.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
 
     # Instantiate the model
     rbm = RestrictedBoltzmannMachine(
@@ -216,14 +216,14 @@ if __name__ == "__main__":
 
     # Example of one iteration in a training loop
     # Generate a sample set from the model
-    x = rbm.get_hidden(x)
+    x = rbm.get_hidden(x, bernoulli=True)
     s = rbm.sample(sampler)
 
     opt_rbm.zero_grad()
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
     objective = rbm.objective(x, s)
-    # Backpropgate gradients
+    # Backpropagate gradients
     objective.backward()
     # Update model weights with a step of stochastic gradient descent
     opt_rbm.step()
@@ -249,7 +249,6 @@ model = QDiffusion(
         eos_id=2,
         mask_id=3,
     ),
-    energy_adapter=energy_adapter,
     config=QDiffusionConfig(num_candidates=4),
 )
 ```
