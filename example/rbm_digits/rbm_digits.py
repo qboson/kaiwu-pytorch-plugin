@@ -40,7 +40,8 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         batch_size (int): 批处理大小。
         n_iter (int): 迭代次数。
         verbose (int): 是否打印训练过程中的信息。
-        random_state (int, optional): 随机种子，用于结果的可重复性。
+        random_state (int, optional): 每次 fit 的 Torch 随机种子及 SA 的 rand_seed。
+        use_cim (bool): 是否在下一次 fit 时使用 CIM 采样器。
     """
 
     def __init__(
@@ -62,11 +63,17 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         self.verbose = verbose
         self.plot_img = plot_img
         self.random_state = random_state
+        self.use_cim = use_cim
+        self.sampler = None
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.rbm = None  # 用于存储训练好的RBM模型
 
-        if use_cim:
+    def _create_sampler(self):
+        """Create a fresh backend using the current estimator parameters."""
+        if self.use_cim:
             kw.common.CheckpointManager.save_dir = './tmp'
             sampler = CIMOptimizer(task_name="test_kpp", wait=True)
-            self.sampler = PrecisionReducer(
+            sampler = PrecisionReducer(
                 sampler,
                 precision=8,
                 truncated_precision=10,
@@ -75,10 +82,10 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             )
             print("Using CIM optimizer")
         else:
-            self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
+            options = {} if self.random_state is None else {"rand_seed": self.random_state}
+            sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100, **options)
             print("Using Simulated Annealing optimizer")
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.rbm = None  # 用于存储训练好的RBM模型
+        return sampler
 
     def gen_digits_image(self, X, size=8):
         """
@@ -103,6 +110,9 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             X: 训练数据，形状为 (n_samples, n_features)
             y: 忽略，为兼容scikit-learn接口
         """
+        if self.random_state is not None:
+            torch.manual_seed(self.random_state)
+        self.sampler = self._create_sampler()
         # 初始化受限玻尔兹曼机（RBM）模型
         rbm = RestrictedBoltzmannMachine(
             X.shape[1],  # 可见层单元数（特征维度）
