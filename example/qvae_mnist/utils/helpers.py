@@ -4,6 +4,9 @@ Unsorted helper functions
 """
 import os
 import datetime
+import logging
+from numbers import Integral
+from typing import Union, Optional
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -14,13 +17,11 @@ import gif
 import imageio
 from PIL import Image
 import torch
-from torch.distributions import Exponential
 from sklearn.manifold import TSNE
 from torchvision import transforms
 from torchmetrics.image.fid import FrechetInceptionDistance
-from typing import Union, Optional
+from kaiwu.torch_plugin.qvae_dist_util import Exponential
 
-import logging
 logger = logging.getLogger(__name__)
 
 def save_list_to_txt(filename, data):
@@ -245,7 +246,7 @@ def plot_flattened_images_grid(
 
     features_numpy = features[:num_images].detach().cpu().numpy()
 
-    fig, axes = plt.subplots(grid_size, grid_size, figsize=(5, 5))
+    fig, axes = plt.subplots(grid_size, grid_size, figsize=(5, 5), squeeze=False)
     for i in range(grid_size):
         for j in range(grid_size):
             idx = i * grid_size + j
@@ -297,16 +298,16 @@ def _apply_train_bias(model, generated_x: torch.Tensor) -> torch.Tensor:
     return generated_x
 
 
+def _require_positive_integer(value, name):
+    """Reject invalid counts before constructing a sampler or decoding images."""
+    if isinstance(value, bool) or not isinstance(value, Integral) or value <= 0:
+        raise ValueError(f"{name} must be a positive integer")
+
+
 def generate_qvae_images(model, save_path, grid_size=8):
-    model.eval()
-    sampler = init_qvae_sampler(model)
-    z = model.bm.sample(sampler)
-    zeta = torch.distributions.Exponential(model.dist_beta).sample(z.shape).to(z.device)
-    zeta = torch.where(z == 0.0, zeta, 1 - zeta)
-    with torch.no_grad():
-        generated_x = model.decoder(zeta)
-        generated_x = _apply_train_bias(model, generated_x)
-        generated_x = torch.sigmoid(generated_x)
+    """Generate and save exactly grid_size squared images using bounded latents."""
+    _require_positive_integer(grid_size, "grid_size")
+    generated_x = generate_qvae_samples(model, model.dist_beta, n_images=grid_size ** 2)
 
     generated_save_path = os.path.join(save_path, "generated_x.png")
     print(f"Visualizing generated images, saving to: {generated_save_path}")
@@ -326,27 +327,37 @@ def get_real_images(dataloader, n_images=10000):
 
 
 def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
+    """Decode exactly n_images prior samples with the training smoothing law.
+
+    The decoder processes at most batch_size rows at once, independently of
+    the number of solutions returned by each BM sampling call.
+    """
+    _require_positive_integer(n_images, "n_images")
+    _require_positive_integer(batch_size, "batch_size")
+    beta = torch.as_tensor(dist_beta, dtype=torch.float32)
+    if beta.numel() == 0 or not torch.isfinite(beta).all() or (beta <= 0).any():
+        raise ValueError("dist_beta must be finite and positive")
+
     model.eval()
     imgs = []
     sampler = init_qvae_sampler(model)
-    with torch.no_grad():
-        for _ in tqdm(range(n_images // batch_size)):
+    smoothing_dist = Exponential(dist_beta)
+    generated_count = 0
+    with torch.no_grad(), tqdm(total=n_images) as progress:
+        while generated_count < n_images:
             z = model.bm.sample(sampler)
-            shape = z.shape
-            smoothing_dist = Exponential(dist_beta)
-            # 从平滑分布采样
-            zeta = smoothing_dist.sample(shape)
-            zeta = zeta.to(z.device)
-            zeta = torch.where(z == 0.0, zeta, 0)
-            # zeta = torch.randn(256, 256).to(device)
-            generated_x = model.decoder(zeta)
-
-            generated_x = generated_x + model._train_bias
-
-            generated_x = torch.sigmoid(generated_x)
-
-            imgs.append(generated_x)
-    return torch.cat(imgs, dim=0)[:n_images]
+            if z.shape[0] == 0:
+                raise ValueError("BM sampler returned an empty batch")
+            z = z[:n_images - generated_count]
+            for latent_batch in z.split(batch_size):
+                noise = smoothing_dist.sample(latent_batch.shape).to(latent_batch)
+                zeta = torch.where(latent_batch == 0.0, noise, 1.0 - noise)
+                generated_x = model.decoder(zeta)
+                generated_x = _apply_train_bias(model, generated_x)
+                imgs.append(torch.sigmoid(generated_x))
+                generated_count += latent_batch.shape[0]
+                progress.update(latent_batch.shape[0])
+    return torch.cat(imgs, dim=0)
 
 class FIDImagePreprocessor:
     """预处理图像以适配 InceptionV3（FID 模型）输入要求"""
