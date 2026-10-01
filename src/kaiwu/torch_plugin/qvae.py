@@ -178,7 +178,8 @@ class QVAE(AutoEncoderBase):
         """Compute the Boltzmann-machine energy for each input sample.
 
         Bernoulli inputs are centered only when a dataset mean has been set,
-        matching the preprocessing used by :meth:`forward`.
+        matching the preprocessing used by :meth:`forward`. Binary states use
+        the Boltzmann machine's parameter dtype and device when available.
 
         Args:
             x (torch.Tensor): Input samples with the input feature dimension.
@@ -202,7 +203,9 @@ class QVAE(AutoEncoderBase):
             raise ValueError(f"Unsupported loss type: {configured_loss_type}")
 
         q = self.encoder(x)
-        return self.bm((q > 0).float())
+        bm_parameter = next(self.bm.parameters(), None)
+        binary_states = (q > 0).to(q if bm_parameter is None else bm_parameter)
+        return self.bm(binary_states)
 
     @abc.abstractmethod
     def _create_sampler(self, sampler_type):

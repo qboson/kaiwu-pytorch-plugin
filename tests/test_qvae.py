@@ -188,6 +188,28 @@ class TestQVAE(unittest.TestCase):
         self.assertIsNone(encoder.weight.grad)
         self.assertIsNone(encoder.bias.grad)
 
+        # Explicit encoder/BM components can use different precisions, and a
+        # converted double model must score its generated binary states too.
+        for encoder_dtype, bm_dtype in (
+            (torch.float32, torch.float64),
+            (torch.float64, torch.float64),
+            (torch.float16, torch.float32),
+        ):
+            with self.subTest(encoder_dtype=encoder_dtype, bm_dtype=bm_dtype):
+                encoder.to(dtype=encoder_dtype)
+                bm.double() if bm_dtype == torch.float64 else bm.float()
+                bm.zero_grad()
+                typed_energy = self.qvae.energy(x.to(dtype=encoder_dtype))
+                torch.testing.assert_close(
+                    typed_energy, torch.tensor([0.2, 0.45], dtype=bm_dtype)
+                )
+                typed_energy.sum().backward()
+                torch.testing.assert_close(
+                    bm.linear_bias.grad,
+                    torch.tensor([-1.0, -2.0, 0.0, -1.0], dtype=bm_dtype),
+                )
+                self.assertIsNone(encoder.weight.grad)
+
     def test_mse_forward_and_loss(self):
         """The MSE configuration bypasses Bernoulli centering and bias."""
         self.config.loss_type = "mse"
