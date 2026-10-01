@@ -56,6 +56,29 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """
         return self._to_ising_matrix()
 
+    @staticmethod
+    def _validate_clip_range(name, clip_range):
+        """Validate a clipping range for ``clip_parameters``.
+
+        Args:
+            name (str): Argument name used in the error message.
+            clip_range (tuple[float, float]): Lower and upper clip bounds.
+
+        Raises:
+            ValueError: If the range is not a ``(low, high)`` pair with
+                ``low <= high``.
+        """
+        try:
+            low, high = clip_range
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                f"{name} must be a (low, high) pair, got {clip_range!r}"
+            ) from exc
+        if low > high:
+            raise ValueError(
+                f"{name} must satisfy low <= high, got ({low}, {high})"
+            )
+
     def _to_ising_matrix(self):
         """Converts the model to Ising format.
 
