@@ -126,6 +126,8 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
 
+        Gradient computation follows the surrounding PyTorch gradient context.
+
         Args:
             s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,
                 and N is the number of variables in the model.
@@ -133,7 +135,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
         """
-        return self.energy(s_all, enable_grad=True)
+        return self.energy(s_all, enable_grad=torch.is_grad_enabled())
 
     def energy(self, s_all: torch.Tensor, enable_grad: bool = False) -> torch.Tensor:
         """Compute the Hamiltonian.
@@ -142,7 +144,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,
                 and N is the number of variables in the model.
             enable_grad (bool, optional): Whether to enable gradient computation.
-                Defaults to False.
+                Defaults to False. Explicitly overrides ordinary gradient mode,
+                including ``torch.no_grad()``; ``torch.inference_mode()`` still
+                prevents autograd recording. Use ``model(s_all)`` to follow the
+                caller's gradient context instead.
 
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
