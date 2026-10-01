@@ -149,6 +149,9 @@ class DistUtil:
 def sigmoid_cross_entropy_with_logits(logits, labels):
     """Compute sigmoid cross-entropy loss.
 
+    Compute each outcome's negative log probability directly to avoid
+    cancellation and retain small losses and gradients for finite logits.
+
     Args:
         logits (torch.Tensor): Logits.
         labels (torch.Tensor): Labels.
@@ -156,7 +159,9 @@ def sigmoid_cross_entropy_with_logits(logits, labels):
     Returns:
         torch.Tensor: Sigmoid cross-entropy loss.
     """
-    return logits - logits * labels + F.softplus(-logits)
+    if labels.dtype == torch.bool:
+        labels = labels.to(logits.dtype)
+    return (1.0 - labels) * F.softplus(logits) + labels * F.softplus(-logits)
 
 
 class FactorialBernoulliUtil(DistUtil):
@@ -202,12 +207,17 @@ class FactorialBernoulliUtil(DistUtil):
     def entropy(self):
         """Compute entropy of Bernoulli distribution.
 
+        Evaluate both outcome probabilities directly, including the small
+        probability when a finite logit makes its complement round to one.
+
         Returns:
             torch.Tensor: Entropy value.
         """
-        mu = torch.sigmoid(self.logit_mu)
-        ent = sigmoid_cross_entropy_with_logits(logits=self.logit_mu, labels=mu)
-        return ent
+        logits = self.logit_mu
+        return (
+            torch.sigmoid(-logits) * F.softplus(logits)
+            + torch.sigmoid(logits) * F.softplus(-logits)
+        )
 
     def log_prob_per_var(self, samples):
         """Compute log probability of samples under the distribution.
