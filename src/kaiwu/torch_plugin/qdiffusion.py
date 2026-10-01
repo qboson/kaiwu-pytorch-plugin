@@ -69,7 +69,8 @@ class QDiffusionConfig:
 
         disable_resample: Whether to disable repetition-collapse resampling.
 
-        resample_ratio: Frequency threshold that triggers resampling.
+        resample_ratio: Editable-content frequency ratio that triggers resampling
+            for tokens occurring at least twice; the comparison is strict.
 
         resample_top_p: Top-p cutoff used during resampling.
 
@@ -211,17 +212,11 @@ class QDiffusion(nn.Module):
 
     Args:
         proposal_model: Backbone used to predict proposal logits.
-
         energy_model: Energy-side model used to encode and score candidates.
-
         token_spec: Special-token metadata required by the generator.
-
         config: Optional generation/training configuration.
-
         dtype: Floating point dtype tracked by the wrapper.
-
         device: Optional target device. When omitted, infer from parameters.
-
         freeze_proposal: Whether to freeze proposal model parameters.
     """
 
@@ -819,22 +814,26 @@ class QDiffusion(nn.Module):
         resample_scores = []
 
         for batch_index, sequence in enumerate(tokens):
+            editable = editable_token_mask[batch_index]
+            threshold = int(editable.sum()) * self.config.resample_ratio
             token_positions = {}
             max_frequency = -1
             for position, token in enumerate(sequence):
+                if not editable[position]:
+                    continue
                 token = int(token)
                 token_positions.setdefault(token, []).append(position)
                 max_frequency = max(max_frequency, len(token_positions[token]))
 
-            if max_frequency <= len(sequence) * self.config.resample_ratio:
+            if max_frequency < 2 or max_frequency <= threshold:
                 continue
 
             mask = torch.zeros_like(sequence).bool()
             for token, positions in token_positions.items():
-                if len(positions) > len(sequence) * self.config.resample_ratio:
+                if len(positions) >= 2 and len(positions) > threshold:
                     mask |= sequence.eq(token)
 
-            mask &= editable_token_mask[batch_index]
+            mask &= editable
             if not mask.any():
                 continue
 

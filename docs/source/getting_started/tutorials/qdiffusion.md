@@ -19,3 +19,10 @@ Proposal sampling excludes special token ids from editable positions. The
 training objective still returns the original, unfiltered proposal `logits`.
 Repetition resampling only masks editable positions and keeps the fixed context
 intact when calling the proposal model again.
+
+Repetition frequencies and the `resample_ratio` denominator count only editable
+content. Adding padding or fixed context cannot change that content's repetition
+decision. A token must occur at least twice, and its editable frequency must be
+strictly greater than `resample_ratio * editable_length`; equality does not
+trigger resampling. Empty editable regions, a single editable token, and other
+nonrepeated content do not trigger an extra proposal call.
