@@ -126,6 +126,14 @@ python run_pipeline.py --epochs 50 --run-tsne
 二是利用 `t_SNE` 对 QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。
 两者均支持自动保存高分辨率图像，并可灵活控制是否实时显示，便于实验分析、结果记录。
 
+以下 MNIST PNG 绘图函数会在保存前自动建立目标文件的父目录。
+`plot_training_curves` 和 `t_SNE` 默认将带时间戳的图像保存到 `results/`；
+`plot_MNIST_output` 和 `plot_generative_output` 默认使用 `output/testVAE.png`。
+这些函数以及 `plot_flattened_images_grid` 支持字符串或 `Path` 文件路径，
+包括尚不存在的多层目录和当前目录中的裸文件名（如 `curves.png`）。
+`plot_flattened_images_grid` 未提供保存路径时仍仅显示图像。
+因此，`MLPClassifier` 的默认训练曲线输出无需提前创建 `results/` 目录。
+
 ### 5.1 训练过程可视化
 
 ```{literalinclude} ../../../../example/qvae_mnist/utils/helpers.py
