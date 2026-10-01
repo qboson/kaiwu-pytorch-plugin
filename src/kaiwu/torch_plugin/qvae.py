@@ -260,6 +260,10 @@ class QVAE(AutoEncoderBase):
     def loss(self, x, recon_x, posterior):
         """Compute total loss (reconstruction + KL + weight decay).
 
+        Store the current batch's unweighted reconstruction and KL terms in
+        ``last_recon_loss`` and ``last_kl_loss`` as detached scalar tensors for
+        logging. The returned total loss remains differentiable.
+
         Args:
             x (torch.Tensor): Input tensor (batch_size, input_dim).
             recon_x (torch.Tensor): Reconstructed logits (batch_size, input_dim).
@@ -296,6 +300,8 @@ class QVAE(AutoEncoderBase):
 
         # Total loss
         total_loss = recon_loss + self.kl_beta * kl_loss + wd_loss
+        self.last_recon_loss = recon_loss.detach()
+        self.last_kl_loss = kl_loss.detach()
         return total_loss
 
     def bm_loss(self, q, bm_weight_decay=0.0):
