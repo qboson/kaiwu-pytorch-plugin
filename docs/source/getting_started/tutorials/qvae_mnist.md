@@ -120,6 +120,15 @@ python run_pipeline.py --epochs 50 --run-tsne
 ```{literalinclude} ../../../../example/qvae_mnist/trainer/trainer.py
 :pyobject: Trainer.train
 ```
+
+通过 `set_dataset_mean()` 设置的训练数据均值会随 `state_dict()` 一起保存，
+`load_state_dict()` 会恢复编码器的中心化状态和已有的重建偏置。
+因此，将 checkpoint 加载到新建模型后，无需重新计算训练均值。
+
+旧版 checkpoint 没有保存中心化均值。加载这类文件时，模型会保留当前已设置的均值，
+也支持原有的严格加载方式；请先用原训练数据的均值调用 `set_dataset_mean()`，
+再加载旧 checkpoint，以保持推断结果一致。重建偏置与中心化均值是独立的状态。
+
 ## 5. 可视化与评估
 本节提供两类关键可视化工具：
 一是通过 `plot_training_curves` 绘制训练/验证损失与准确率曲线，用于监控模型收敛情况；
