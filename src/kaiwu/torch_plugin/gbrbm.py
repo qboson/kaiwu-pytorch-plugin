@@ -22,6 +22,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     and one Bernoulli partition. ``is_visible_gaussian`` indicates whether the
     visible nodes correspond to the Gaussian side.
 
+    Supplied coupling weights and biases retain their values during construction.
+    Missing parameters are randomly initialized. Call ``init_parameter()`` to
+    explicitly reinitialize all parameters, including supplied weights and biases.
+
     Args:
         num_visible (int): Number of visible nodes in the model.
         num_hidden (int): Number of hidden nodes in the model.
@@ -82,7 +86,12 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             else torch.zeros(self.num_bernoulli).to(self.device)
         )
 
-        self.init_parameter(std=0.01, init_var=1)
+        self._init_normal_parameter(self.mu)
+        init.constant_(self.log_var, 0)
+        if quadratic_coef is None:
+            self._init_normal_parameter(self.quadratic_coef)
+        if linear_bias is None:
+            self._init_normal_parameter(self.linear_bias)
 
         self.eps = eps
 
@@ -104,7 +113,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def init_parameter(
         self, init_var: float = 1, std: float = 0.01, max_fold: float = 16
     ):
-        """Initialize model parameters with normal distribution.
+        """Reinitialize all model parameters, including supplied weights and biases.
 
         Args:
             init_var (float, optional): Initial variance for Gaussian units.
@@ -114,14 +123,18 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             max_fold (float, optional): Maximum factor for clipping parameters.
                 Defaults to 16.
         """
-        bound = max_fold * std
-        init.normal_(self.mu, 0, std)
-        self.get_parameter("mu").data.clip_(-bound, bound)
+        self._init_normal_parameter(self.mu, std, max_fold)
         init.constant_(self.log_var, np.log(init_var))
-        init.normal_(self.quadratic_coef, 0, std)
-        self.quadratic_coef.data.clip_(-bound, bound)
-        init.normal_(self.linear_bias, 0, std)
-        self.linear_bias.data.clip_(-bound, bound)
+        self._init_normal_parameter(self.quadratic_coef, std, max_fold)
+        self._init_normal_parameter(self.linear_bias, std, max_fold)
+
+    @staticmethod
+    def _init_normal_parameter(parameter, std=0.01, max_fold=16):
+        """Initialize one parameter with a bounded normal distribution."""
+        bound = max_fold * std
+        with torch.no_grad():
+            init.normal_(parameter, 0, std)
+            parameter.clip_(-bound, bound)
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
