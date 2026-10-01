@@ -9,5 +9,5 @@ pylint:
 	pylint src/
 
 pytest:
-	coverage run --source=$(CHECK_DIRS) -m pytest tests --ignore=tests/
+	coverage run --source=$(CHECK_DIRS) -m pytest tests
 	coverage report
