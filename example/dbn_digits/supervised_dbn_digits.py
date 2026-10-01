@@ -425,7 +425,8 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
 
 
 # =================== 具体的分类DBN实现 =====================
-class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMixin):
+# Place the mixin before BaseEstimator's inheritance chain for classifier tags.
+class SupervisedDBNClassification(ClassifierMixin, AbstractSupervisedDBNClassifier):
     """
     PyTorch实现的监督DBN分类器
     """
