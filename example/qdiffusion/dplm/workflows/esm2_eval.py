@@ -545,6 +545,7 @@ def main() -> None:
     print("Starting ESM2 evaluation stage...")
     model, alphabet = load_esm2_model(config.esm2_model, device)
 
+    key_mode = "position" if config.pair_mode == "order" else "header"
     reference_embeddings = embed_sequences(
         reference_records,
         model=model,
@@ -552,6 +553,7 @@ def main() -> None:
         device=device,
         batch_size=config.batch_size,
         pooling=config.pooling,
+        key_mode=key_mode,
     )
 
     summaries: list[DistanceSummary] = []
@@ -562,6 +564,7 @@ def main() -> None:
         device=device,
         batch_size=config.batch_size,
         pooling=config.pooling,
+        key_mode=key_mode,
     )
     baseline_rows, baseline_summary = evaluate_candidate_set(
         label="baseline",
@@ -570,6 +573,7 @@ def main() -> None:
         reference_embeddings=reference_embeddings,
         candidate_embeddings=baseline_embeddings,
         pair_mode=config.pair_mode,
+        key_mode=key_mode,
     )
     write_rows_csv(output_dir / "baseline_pair_distances.csv", baseline_rows)
     write_summary_json(output_dir / "baseline_summary.json", baseline_summary)
@@ -582,6 +586,7 @@ def main() -> None:
         device=device,
         batch_size=config.batch_size,
         pooling=config.pooling,
+        key_mode=key_mode,
     )
     guided_rows, guided_summary = evaluate_candidate_set(
         label="guided",
@@ -590,6 +595,7 @@ def main() -> None:
         reference_embeddings=reference_embeddings,
         candidate_embeddings=guided_embeddings,
         pair_mode=config.pair_mode,
+        key_mode=key_mode,
     )
     write_rows_csv(output_dir / "guided_pair_distances.csv", guided_rows)
     write_summary_json(output_dir / "guided_summary.json", guided_summary)

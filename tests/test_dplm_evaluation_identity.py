@@ -3,6 +3,7 @@ from dataclasses import replace
 import importlib.util
 import json
 from pathlib import Path
+import runpy
 import sys
 import types
 
@@ -149,6 +150,30 @@ def test_default_mapping_and_header_pairing_preserve_unique_header_consumers(eva
     assert [row.cosine_distance for row in rows] == [0., 0.]
 
 
+def test_default_header_mapping_still_supports_order_pairing(evaluation_modules):
+    helper, _ = evaluation_modules
+    reference = [("reference-first", "AAA"), ("reference-second", "CCC")]
+    candidates = [("candidate-first", "AAA"), ("candidate-second", "CCC")]
+    rows, _ = helper.evaluate_candidate_set(
+        label="legacy-order", reference_records=reference, candidate_records=candidates,
+        reference_embeddings=embed(helper, reference), candidate_embeddings=embed(helper, candidates),
+        pair_mode="order",
+    )
+    assert [row.cosine_distance for row in rows] == [0., 0.]
+
+
+def test_position_mapping_cannot_be_used_for_header_pairing(evaluation_modules):
+    helper, _ = evaluation_modules
+    records = [("first", "AAA"), ("second", "CCC")]
+    embeddings = embed(helper, records, key_mode="position")
+    with pytest.raises(ValueError, match="require.*order"):
+        helper.evaluate_candidate_set(
+            label="incompatible", reference_records=records, candidate_records=records,
+            reference_embeddings=embeddings, candidate_embeddings=embeddings,
+            pair_mode="header", key_mode="position",
+        )
+
+
 @pytest.mark.parametrize("same_sequence", [True, False])
 def test_header_mapping_rejects_ambiguous_duplicate_headers(evaluation_modules, same_sequence):
     helper, _ = evaluation_modules
@@ -170,8 +195,9 @@ def test_legacy_header_mapping_cannot_silently_misuse_duplicate_headers(evaluati
 
 
 @pytest.mark.parametrize("pair_mode", ["order", "header"])
+@pytest.mark.parametrize("entrypoint", [False, True])
 def test_actual_main_uses_consistent_embedding_identity_and_writes_correct_reports(
-    evaluation_modules, monkeypatch, tmp_path, pair_mode
+    evaluation_modules, monkeypatch, tmp_path, pair_mode, entrypoint
 ):
     _, workflow = evaluation_modules
     reference = [("same" if pair_mode == "order" else "first", "AAA"),
@@ -189,7 +215,15 @@ def test_actual_main_uses_consistent_embedding_identity_and_writes_correct_repor
     monkeypatch.setattr(workflow, "build_sa_eval_config", offline_config)
     monkeypatch.setattr(workflow, "generate_candidate_fastas", lambda **kwargs: tuple(paths[1:]))
     monkeypatch.setattr(workflow, "load_esm2_model", lambda *args: (TinySequenceModel().eval(), TinyAlphabet()))
-    workflow.main()
+    if entrypoint:
+        package = types.ModuleType("workflows")
+        package.__path__ = [str(Path(workflow.__file__).parent)]
+        monkeypatch.setitem(sys.modules, "workflows", package)
+        monkeypatch.setitem(sys.modules, "workflows.esm2_eval", workflow)
+        path = Path(workflow.__file__).parents[1] / "eval_esm2_distances.py"
+        runpy.run_path(str(path), run_name="__main__")
+    else:
+        workflow.main()
     for label in ("baseline", "guided"):
         payload = json.loads((tmp_path / "reports" / f"{label}_summary.json").read_text())
         assert payload["paired_count"] == 2
