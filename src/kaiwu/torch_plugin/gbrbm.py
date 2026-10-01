@@ -6,6 +6,8 @@ This module implements a restricted Boltzmann machine with one Gaussian
 partition and one Bernoulli partition.
 """
 
+import math
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -172,13 +174,57 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Free Hamiltonian of Gaussian nodes.
         """
         with torch.no_grad():
-            return 0.5 * torch.sum(
-                (s_gaussian - self.mu).square() / self.var, dim=-1
-            ) - torch.sum(
-                F.softplus(
-                    (s_gaussian / self.var) @ self.quadratic_coef + self.linear_bias
-                ),
-                dim=-1,
+            return self._gaussian_marginal_energy(s_gaussian)
+
+    def _gaussian_marginal_energy(self, s_gaussian: torch.Tensor) -> torch.Tensor:
+        """Compute Gaussian-partition free energy in the caller's gradient context."""
+        return 0.5 * torch.sum(
+            (s_gaussian - self.mu).square() / self.var, dim=-1
+        ) - torch.sum(
+            F.softplus(
+                (s_gaussian / self.var) @ self.quadratic_coef + self.linear_bias
+            ),
+            dim=-1,
+        )
+
+    def visible_marginal_energy(
+        self,
+        s_visible: torch.Tensor,
+        enable_grad: bool = False,
+    ) -> torch.Tensor:
+        """Score visible states after analytically marginalizing the hidden layer.
+
+        Gaussian visible states sum out binary hidden units. Bernoulli visible
+        states integrate Gaussian hidden units, retaining the variance-dependent
+        Gaussian normalization constant. Lower scores mean higher probability
+        mass or density within the same model; absolute negative log-likelihood
+        also requires the model's log partition function.
+
+        Args:
+            s_visible: Visible observations of shape ``(B, num_visible)``, matching
+                the model parameter dtype and device. These are Gaussian states
+                or floating-point 0/1 Bernoulli states according to the orientation.
+            enable_grad: Whether to record gradients for inputs and parameters.
+                Defaults to False. Explicitly overrides ordinary ``no_grad``;
+                ``inference_mode`` still prevents autograd recording.
+
+        Returns:
+            torch.Tensor: Unnormalized visible-state free energies of shape ``(B,)``.
+
+        Raises:
+            ValueError: If observations do not have shape ``(B, num_visible)``.
+        """
+        if s_visible.ndim != 2 or s_visible.shape[1] != self.num_visible:
+            raise ValueError("s_visible must have shape (B, num_visible)")
+        with torch.set_grad_enabled(enable_grad):
+            if self.is_visible_gaussian:
+                return self._gaussian_marginal_energy(s_visible)
+            variance = self.var
+            mean_shift = s_visible @ self.quadratic_coef.t()
+            return (
+                -s_visible @ self.linear_bias
+                - torch.sum(mean_shift * (self.mu + 0.5 * mean_shift) / variance, dim=-1)
+                - 0.5 * torch.sum(variance.log() + math.log(2 * math.pi))
             )
 
     def _to_ising_matrix(self):
