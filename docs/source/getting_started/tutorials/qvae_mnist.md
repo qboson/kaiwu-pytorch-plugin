@@ -90,6 +90,10 @@ $$
 
 参考模块手册中的QVAE类。
 
+`model.energy(x)` 返回每个输入样本的潜在玻尔兹曼机能量。配置 `loss_type='bernoulli'` 时，
+数据均值是可选的：只有调用 `model.set_dataset_mean(mean)` 后，`forward()` 和 `energy()`
+才会在编码前减去该均值；未设置均值时，两者都使用原始输入。配置 `loss_type='mse'` 时不减去均值。
+
 ## 3. 数据准备
 
 `loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST 的加载与预处理流程，返回训练和测试用的 `DataLoader`。

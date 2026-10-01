@@ -177,6 +177,9 @@ class QVAE(AutoEncoderBase):
     def energy(self, x, loss_type=None):
         """Compute the Boltzmann-machine energy for each input sample.
 
+        Bernoulli inputs are centered only when a dataset mean has been set,
+        matching the preprocessing used by :meth:`forward`.
+
         Args:
             x (torch.Tensor): Input samples with the input feature dimension.
             loss_type (str, optional): Loss type to validate against the model
@@ -190,8 +193,11 @@ class QVAE(AutoEncoderBase):
             raise ValueError("loss_type must match model.config.loss_type")
 
         x = x.view(-1, self._input_dimension)
-        if configured_loss_type == "bernoulli" and self._dataset_mean is not None:
-            x = x - torch.as_tensor(self._dataset_mean, dtype=x.dtype, device=x.device)
+        if configured_loss_type == "bernoulli":
+            if self._dataset_mean is not None:
+                x = x - torch.as_tensor(
+                    self._dataset_mean, dtype=x.dtype, device=x.device
+                )
         elif configured_loss_type != "mse":
             raise ValueError(f"Unsupported loss type: {configured_loss_type}")
 

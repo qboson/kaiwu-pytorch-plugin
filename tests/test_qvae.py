@@ -138,6 +138,20 @@ class TestQVAE(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.qvae.energy(x, loss_type="mse")
 
+    def test_energy_accepts_bernoulli_without_dataset_mean(self):
+        """Bernoulli energy uses raw inputs when no dataset mean is supplied."""
+        self.qvae.eval()
+        x = torch.arange(16, dtype=torch.float32).reshape(2, 2, 4) / 16
+        _, _, q, _ = self.qvae(x)
+        expected_energy = self.rbm((q > 0).float())
+
+        for loss_type in (None, "bernoulli"):
+            with self.subTest(loss_type=loss_type):
+                energy = self.qvae.energy(x, loss_type=loss_type)
+                self.assertEqual(energy.shape, (x.size(0),))
+                torch.testing.assert_close(self.encoder.inputs[-1], x.reshape(2, -1))
+                torch.testing.assert_close(energy, expected_energy)
+
     def test_mse_forward_and_loss(self):
         """The MSE configuration bypasses Bernoulli centering and bias."""
         self.config.loss_type = "mse"
@@ -149,6 +163,10 @@ class TestQVAE(unittest.TestCase):
         self.assertTrue(torch.equal(recon_x, torch.zeros_like(recon_x)))
         torch.testing.assert_close(self.encoder.inputs[-1], x)
         self.assertGreater(self.qvae.loss(x, recon_x, posterior).item(), 0.0)
+
+        energy = self.qvae.energy(x)
+        torch.testing.assert_close(self.encoder.inputs[-1], x)
+        torch.testing.assert_close(energy, self.rbm(torch.ones(2, self.latent_dim)))
 
     def test_unsupported_loss_type_is_rejected(self):
         """Unsupported loss types fail at the public computation boundary."""
