@@ -160,8 +160,11 @@ class TestBoltzmannMachine(unittest.TestCase):
                 self.bm(s) - self.bm(s2),
                 -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
             )
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
-                -x2 @ ising_mat @ x2.T
+            # Kaiwu solvers minimize s^T M s and the official kw.conversion emits
+            # matrices whose s^T M s equals the binary objective, so the machine
+            # energy matches +x^T M x (see tests/test_ising_ground_state.py).
+            assert self.bm(s) - self.bm(s2) == x @ ising_mat @ x.T - (
+                x2 @ ising_mat @ x2.T
             )
 
     def test_hidden_to_ising(self):
@@ -194,8 +197,11 @@ class TestBoltzmannMachine(unittest.TestCase):
                 self.bm(s) - self.bm(s2),
                 -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
             )
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
-                -x2 @ ising_mat @ x2.T
+            # Kaiwu solvers minimize s^T M s and the official kw.conversion emits
+            # matrices whose s^T M s equals the binary objective, so the machine
+            # energy matches +x^T M x (see tests/test_ising_ground_state.py).
+            assert self.bm(s) - self.bm(s2) == x @ ising_mat @ x.T - (
+                x2 @ ising_mat @ x2.T
             )
 
 

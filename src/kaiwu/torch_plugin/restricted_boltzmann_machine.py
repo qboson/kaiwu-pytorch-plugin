@@ -135,14 +135,24 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
             ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
-            # Restricted Boltzmann Machine: only connections between visible and hidden layers
+            # Restricted Boltzmann Machine: only connections between visible and hidden layers.
+            # Kaiwu solvers minimize the plain quadratic form s^T M s, so the binary energy
+            # (low energy = high probability) enters negated: minimizing the matrix then finds
+            # the machine's ground states. The magnitudes follow the official
+            # kw.conversion.qubo_matrix_to_ising_matrix convention, where s^T M s equals the
+            # QUBO objective exactly (each symmetric entry carries 1/8 of the pair coefficient).
             ising_mat[: self.num_visible, self.num_visible : -1] = (
-                self.quadratic_coef / 8
+                -self.quadratic_coef / 8
             )
             ising_mat[self.num_visible : -1, : self.num_visible] = (
-                self.quadratic_coef.t() / 8
+                -self.quadratic_coef.t() / 8
             )
-            ising_bias = self.linear_bias / 4 + ising_mat.sum(dim=0)[:-1]
+            # Per-unit coupling magnitudes: visible units see their W row sums,
+            # hidden units their W column sums.
+            coupling_sums = torch.zeros(num_nodes, device=self.device)
+            coupling_sums[: self.num_visible] = self.quadratic_coef.sum(dim=1)
+            coupling_sums[self.num_visible :] = self.quadratic_coef.sum(dim=0)
+            ising_bias = -(self.linear_bias / 4 + coupling_sums / 8)
             ising_mat[:num_nodes, -1] = ising_bias
             ising_mat[-1, :num_nodes] = ising_bias
             return ising_mat.detach().cpu().numpy()

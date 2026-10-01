@@ -102,10 +102,14 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 device=self.device,
                 dtype=linear_bias.dtype,
             )
-            # Fill quadratic part
-            ising_mat[:-1, :-1] = quadratic_coef / 8
+            # Fill quadratic part. Kaiwu solvers minimize the plain quadratic form
+            # s^T M s, so the machine's binary energy (low energy = high probability)
+            # enters negated: minimizing the matrix then finds the machine's ground
+            # states. Magnitudes follow the official kw.conversion convention, where
+            # s^T M s equals the QUBO objective exactly.
+            ising_mat[:-1, :-1] = -quadratic_coef / 8
             # Calculate ising_bias
-            ising_bias = linear_bias / 4 + column_sums / 8
+            ising_bias = -(linear_bias / 4 + column_sums / 8)
             # Fill bias part
             ising_mat[:num_nodes, -1] = ising_bias
             ising_mat[-1, :num_nodes] = ising_bias
@@ -136,8 +140,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 device=self.device,
                 dtype=sub_linear.dtype,
             )
-            ising_mat[:-1, :-1] = sub_quadratic / 8
-            ising_bias = sub_linear / 4 + sub_column_sums / 8
+            ising_mat[:-1, :-1] = -sub_quadratic / 8
+            ising_bias = -(sub_linear / 4 + sub_column_sums / 8)
             ising_mat[:-1, -1] = ising_bias
             ising_mat[-1, :-1] = ising_bias
             return ising_mat.cpu().numpy()

@@ -199,8 +199,11 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         ising_mat = torch.zeros(
             (num_nodes + 1, num_nodes + 1), device=self.device, dtype=self.dtype
         )
-        ising_mat[:-1, :-1] = quadratic_term * 0.125
-        ising_linear = linear_term * 0.25 + column_sums * 0.125
+        # Kaiwu solvers minimize the plain quadratic form s^T M s, so the Bernoulli
+        # energy (low energy = high probability) enters negated; magnitudes follow
+        # the official kw.conversion convention (s^T M s equals the QUBO objective).
+        ising_mat[:-1, :-1] = -quadratic_term * 0.125
+        ising_linear = -(linear_term * 0.25 + column_sums * 0.125)
         ising_mat[:num_nodes, -1] = ising_linear
         ising_mat[-1, :num_nodes] = ising_linear
         return ising_mat.detach().cpu().numpy()
