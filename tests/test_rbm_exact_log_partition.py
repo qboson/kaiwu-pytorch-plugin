@@ -188,6 +188,37 @@ def test_extreme_finite_coefficients_are_stable(shape, dtype):
         assert torch.isfinite(gradient).all()
 
 
+@pytest.mark.parametrize("shape", [(1, 1), (1, 2), (2, 1)])
+@pytest.mark.parametrize("bias", [19.99, 20., 20.01, 21., 30., -20.01, 1000., -1000.])
+def test_threshold_and_extreme_log_partition_derivatives_match_joint_energy(shape, bias):
+    """A reference must preserve FP64 curvature above softplus's linear threshold."""
+    linear_bias = torch.zeros(sum(shape), dtype=torch.float64)
+    # Put the large bias in the analytically marginalized layer for either direction.
+    marginalized_index = shape[0] if shape[0] <= shape[1] else 0
+    linear_bias[marginalized_index] = bias
+    model = RBM(*shape, quadratic_coef=torch.zeros(shape, dtype=torch.float64),
+                linear_bias=linear_bias)
+    parameters = (model.linear_bias, model.quadratic_coef)
+
+    def derivatives(log_partition):
+        gradients = torch.autograd.grad(log_partition, parameters, create_graph=True)
+        vector = torch.cat([gradient.reshape(-1) for gradient in gradients])
+        rows = []
+        for component in vector:
+            row = torch.autograd.grad(component, parameters, retain_graph=True)
+            rows.append(torch.cat([derivative.reshape(-1) for derivative in row]))
+        return vector, torch.stack(rows)
+
+    expected = torch.logsumexp(-model(_states(sum(shape))), dim=0)
+    expected_gradient, expected_hessian = derivatives(expected)
+    actual = model.exact_log_partition(enable_grad=True)
+    actual_gradient, actual_hessian = derivatives(actual)
+    torch.testing.assert_close(actual, expected, atol=1e-13, rtol=1e-15)
+    torch.testing.assert_close(actual_gradient, expected_gradient, atol=1e-13, rtol=1e-13)
+    torch.testing.assert_close(actual_hessian, expected_hessian, atol=1e-13, rtol=1e-13)
+    assert torch.isfinite(actual_gradient).all() and torch.isfinite(actual_hessian).all()
+
+
 def test_gradient_context_is_explicit_and_restored():
     model = _model(2, 1)
     with torch.enable_grad():
