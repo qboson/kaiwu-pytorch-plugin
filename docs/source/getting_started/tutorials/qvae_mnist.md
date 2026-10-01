@@ -136,6 +136,24 @@ python run_pipeline.py --epochs 50 --run-tsne
 ```{literalinclude} ../../../../example/qvae_mnist/utils/helpers.py
 :pyobject: t_SNE
 ```
+
+### 5.3 从先验生成图像
+
+`generate_qvae_samples(model, dist_beta, n_images, batch_size)` 从模型的 BM 先验获取二值潜变量，
+再使用与训练时相同的归一化截断指数分布在 `[0, 1]` 内采样平滑噪声。
+对于二值状态 `z=0` 使用噪声本身，对于 `z=1` 使用反射值 `1-noise`。
+解码结果添加训练偏置后经过 sigmoid，返回 `[n_images, 784]` 的图像张量。
+
+生成数量以 BM 实际返回的样本数累计，因此请求不足一个批次、存在余数或每次采样数量变化时，
+仍会恰好返回 `n_images` 张图像。`batch_size` 限制单次解码的图像数，不要求 BM 返回相同数量。
+两者必须为正整数，`dist_beta` 必须为有限正数；BM 返回空批次时会立即报错。
+极小 `dist_beta` 的数值精度由核心 `Exponential` 实现决定，本例直接复用其采样结果；
+相关的数值稳定性改进见 [#180](https://github.com/qboson/kaiwu-pytorch-plugin/pull/180)。
+
+`generate_qvae_images(model, save_path, grid_size)` 复用同一采样过程，生成恰好
+`grid_size ** 2` 张图像并保存为 `generated_x.png`。`grid_size` 必须为正整数，也支持单张图像的
+`grid_size=1`。生成函数会将模型置于评估模式，并在关闭 autograd 的情况下调用解码器。
+
 ## 6. 表征学习与分类
 
 Q-VAE 学到的表征可用于下游分类任务：

@@ -11,7 +11,7 @@ import torch
 
 for dependency in ("sklearn", "matplotlib", "seaborn", "gif", "imageio",
                    "tqdm", "torchvision", "torchmetrics"):
-    pytest.importorskip(dependency)
+    importlib.import_module(dependency)
 import matplotlib
 matplotlib.use("Agg")
 from PIL import Image
@@ -99,10 +99,15 @@ def test_exact_count_uses_actual_sampler_rows_and_limits_decoder_batches(
     assert ((images >= 0) & (images <= 1)).all()
 
 
-@pytest.mark.parametrize("beta", [.5, 2.])
+@pytest.mark.parametrize("beta", [.5, 2., 10.])
 def test_both_binary_states_follow_independent_truncated_exponential_cdf(
         actual_example, monkeypatch, beta):
     helpers, model = actual_example
+    settings = dict(encoder_hidden_nodes=[3], decoder_hidden_nodes=[3], num_latent_units=2)
+    if beta != 10:
+        settings["dist_beta"] = beta
+    model = type(model)(784, torch.nn.ReLU(), type(model.config)(**settings))
+    assert model.dist_beta == beta
     monkeypatch.setattr(helpers, "init_qvae_sampler", lambda unused: SpinSampler((65,)))
     latent, _, _ = capture_decoder(model)
     torch.manual_seed(42)
