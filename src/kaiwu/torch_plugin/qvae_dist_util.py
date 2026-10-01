@@ -207,17 +207,30 @@ class FactorialBernoulliUtil(DistUtil):
     def entropy(self):
         """Compute entropy of Bernoulli distribution.
 
-        Evaluate both outcome probabilities directly, including the small
-        probability when a finite logit makes its complement round to one.
+        Evaluate confident logits' probability-weighted tail in log space,
+        before a raw probability underflows. Half and bfloat16 intermediates
+        use float32, with the result rounded back to the input dtype. Near
+        zero, keep the signed expression so second derivatives remain smooth.
+        Input dtype and kernel arithmetic still limit very small values and
+        higher derivatives.
 
         Returns:
             torch.Tensor: Entropy value.
         """
         logits = self.logit_mu
-        return (
+        if logits.dtype in (torch.float16, torch.bfloat16):
+            logits = logits.float()
+        ordinary_entropy = (
             torch.sigmoid(-logits) * F.softplus(logits)
             + torch.sigmoid(logits) * F.softplus(-logits)
         )
+        magnitude = logits.abs()
+        tail_softplus = F.softplus(-magnitude)
+        # softplus(a) = a + softplus(-a), without its positive-input approximation.
+        tail_entropy = tail_softplus + torch.exp(
+            torch.log(magnitude.clamp_min(1)) - magnitude - tail_softplus
+        )
+        return torch.where(magnitude >= 1, tail_entropy, ordinary_entropy).to(self.logit_mu.dtype)
 
     def log_prob_per_var(self, samples):
         """Compute log probability of samples under the distribution.
