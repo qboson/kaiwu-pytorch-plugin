@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import AbstractBoltzmannMachine, _ising_matrix_to_numpy
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -109,7 +109,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Fill bias part
             ising_mat[:num_nodes, -1] = ising_bias
             ising_mat[-1, :num_nodes] = ising_bias
-            return ising_mat.cpu().numpy()
+            return _ising_matrix_to_numpy(ising_mat)
 
     def _hidden_to_ising_matrix(self, s_visible: torch.Tensor) -> np.ndarray:
         """Given visible nodes, convert the model to a submatrix in Ising format.
@@ -140,7 +140,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_bias = sub_linear / 4 + sub_column_sums / 4
             ising_mat[:-1, -1] = ising_bias
             ising_mat[-1, :-1] = ising_bias
-            return ising_mat.cpu().numpy()
+            return _ising_matrix_to_numpy(ising_mat)
 
     def gibbs_sample(
         self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import AbstractBoltzmannMachine, _ising_matrix_to_numpy
 
 
 class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -145,7 +145,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         )
 
     def _to_ising_matrix(self):
-        """Convert to an Ising matrix while retaining the model parameter dtype."""
+        """Convert to Ising format, retaining dtype except for NumPy's BF16 fallback."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
             ising_mat = torch.zeros(
@@ -162,4 +162,4 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             ising_bias = self.linear_bias / 4 + ising_mat.sum(dim=0)[:-1]
             ising_mat[:num_nodes, -1] = ising_bias
             ising_mat[-1, :num_nodes] = ising_bias
-            return ising_mat.detach().cpu().numpy()
+            return _ising_matrix_to_numpy(ising_mat)

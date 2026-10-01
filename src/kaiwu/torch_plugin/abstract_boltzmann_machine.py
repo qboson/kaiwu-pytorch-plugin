@@ -10,6 +10,14 @@ import torch
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
 
 
+def _ising_matrix_to_numpy(ising_matrix: torch.Tensor):
+    """Export coefficients, promoting BF16 only at the unsupported NumPy boundary."""
+    matrix = ising_matrix.detach().cpu()
+    if matrix.dtype == torch.bfloat16:
+        matrix = matrix.float()
+    return matrix.numpy()
+
+
 class AbstractBoltzmannMachine(torch.nn.Module):
     """Abstract base class for Boltzmann Machines.
 
@@ -52,7 +60,9 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Converts the model to Ising format.
 
         Returns:
-            torch.Tensor: Ising matrix.
+            numpy.ndarray: Ising matrix, retaining NumPy-supported parameter dtypes.
+                BF16 coefficients are exported as float32 because NumPy cannot
+                represent BF16. This does not change the model parameter dtype.
         """
         return self._to_ising_matrix()
 
@@ -60,7 +70,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Converts the model to Ising format.
 
         Returns:
-            torch.Tensor: Ising matrix.
+            numpy.ndarray: Ising matrix, with BF16 coefficients exported as float32.
 
         Raises:
             NotImplementedError: If not implemented in subclass.

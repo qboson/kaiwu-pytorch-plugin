@@ -12,7 +12,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn import init
 
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import AbstractBoltzmannMachine, _ising_matrix_to_numpy
 
 
 class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -206,7 +206,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         ising_linear = linear_term * 0.25 + column_sums * 0.125
         ising_mat[:num_nodes, -1] = ising_linear
         ising_mat[-1, :num_nodes] = ising_linear
-        return ising_mat.detach().cpu().numpy()
+        return _ising_matrix_to_numpy(ising_mat)
 
     def infer_from_gaussian(
         self,
