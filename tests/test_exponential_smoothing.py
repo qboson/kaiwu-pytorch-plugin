@@ -114,21 +114,24 @@ def test_mixture_smoothing_remains_finite_with_small_positive_rate(beta):
         assert torch.isfinite(value).all()
 
 
-def test_zero_rate_keeps_existing_undefined_results():
-    """This stability fix does not introduce a new beta=0 distribution contract."""
-    distribution = Exponential(0.0)
-    inputs = torch.tensor([0.0, 0.5, 1.0])
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+def test_cdf_retains_representable_upper_tail_gradient(dtype):
+    """CDF saturation must not erase a still-representable positive density."""
+    distribution = Exponential(200.0)
+    inputs = torch.tensor([0.1, 0.2, 0.3], dtype=dtype, requires_grad=True)
+    cdf = distribution.cdf(inputs)
+    gradient = torch.autograd.grad(cdf.sum(), inputs)[0]
+    rate = distribution.beta.item()
+    expected = torch.tensor(
+        [
+            rate * math.exp(-rate * value) / -math.expm1(-rate)
+            for value in inputs.detach().tolist()
+        ],
+        dtype=dtype,
+    )
 
-    for value in (
-        distribution.pdf(inputs),
-        distribution.cdf(inputs),
-        distribution.log_pdf(inputs),
-        distribution.sample((3,)),
-    ):
-        assert torch.isnan(value).all()
-
-
-def test_negative_rate_keeps_existing_log_density_behavior():
-    """Negative rates retain the existing log-density behavior without new validation."""
-    distribution = Exponential(-1.0)
-    assert torch.isnan(distribution.log_pdf(torch.tensor([0.0, 0.5, 1.0]))).all()
+    assert cdf[-1].item() == 1.0
+    assert torch.all(gradient > 0.0)
+    torch.testing.assert_close(
+        gradient, expected, rtol=2e-5 if dtype == torch.float32 else 1e-12, atol=0.0
+    )
