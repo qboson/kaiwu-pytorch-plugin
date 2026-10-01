@@ -2,20 +2,11 @@
 
 from itertools import product
 from pathlib import Path
+import sys
 
 import numpy as np
 import pytest
 import torch
-
-pytest.importorskip('sklearn')
-pytest.importorskip('matplotlib')
-pytest.importorskip('seaborn')
-pytest.importorskip('pandas')
-pytest.importorskip('tqdm')
-pytest.importorskip('gif')
-pytest.importorskip('imageio')
-pytest.importorskip('torchvision')
-pytest.importorskip('torchmetrics')
 
 import matplotlib
 matplotlib.use('Agg')
@@ -40,20 +31,31 @@ class OfflineSampler:
 def example(monkeypatch):
     folder = Path(__file__).resolve().parents[1] / 'example/qvae_mnist'
     monkeypatch.syspath_prepend(str(folder))
-    import model.model as mnist_module
-    import trainer.trainer as trainer_module
-    import trainer.model_tuner as tuner_module
-    import kaiwu.torch_plugin.qvae as qvae_module
+    roots = {'model', 'trainer', 'utils', 'downstream'}
+    saved_modules = {name: module for name, module in sys.modules.items()
+                     if name.split('.')[0] in roots}
+    for name in saved_modules:
+        del sys.modules[name]
+    try:
+        import model.model as mnist_module
+        import trainer.trainer as trainer_module
+        import trainer.model_tuner as tuner_module
+        import kaiwu.torch_plugin.qvae as qvae_module
 
-    assert Path(mnist_module.__file__).resolve() == folder / 'model/model.py'
-    assert Path(trainer_module.__file__).resolve() == folder / 'trainer/trainer.py'
-    assert Path(tuner_module.__file__).resolve() == folder / 'trainer/model_tuner.py'
-    source = folder.parents[1] / 'src'
-    assert Path(qvae_module.__file__).resolve().is_relative_to(source)
-    monkeypatch.setattr(mnist_module, 'SimulatedAnnealingOptimizer', OfflineSampler)
-    monkeypatch.setattr(plt, 'show', lambda: None)
-    yield mnist_module, trainer_module, tuner_module
-    plt.close('all')
+        assert Path(mnist_module.__file__).resolve() == folder / 'model/model.py'
+        assert Path(trainer_module.__file__).resolve() == folder / 'trainer/trainer.py'
+        assert Path(tuner_module.__file__).resolve() == folder / 'trainer/model_tuner.py'
+        source = folder.parents[1] / 'src'
+        assert Path(qvae_module.__file__).resolve().is_relative_to(source)
+        monkeypatch.setattr(mnist_module, 'SimulatedAnnealingOptimizer', OfflineSampler)
+        monkeypatch.setattr(plt, 'show', lambda: None)
+        yield mnist_module, trainer_module, tuner_module
+    finally:
+        for name in list(sys.modules):
+            if name.split('.')[0] in roots:
+                del sys.modules[name]
+        sys.modules.update(saved_modules)
+        plt.close('all')
 
 
 @pytest.mark.parametrize('epochs', [*range(1, 10), 10, 21, 50])

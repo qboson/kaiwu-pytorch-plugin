@@ -117,6 +117,11 @@ python run_pipeline.py --epochs 50 --run-tsne
 
 完整参数可运行 `python run_pipeline.py --help` 查看；首次运行需要根据数据集配置下载或准备数据。
 
+`num_epochs` 可以设为 1 到 9，进行短训练验证。训练器按
+`max(1, num_epochs // 10)` 的间隔保存重建图，因此短训练会在每轮保存；
+10 轮及以上仍使用原来的间隔，最后一轮始终保存重建图。
+完整训练结束后还会写出 `model_final_QVAE.pt` 和训练曲线。
+
 ```{literalinclude} ../../../../example/qvae_mnist/trainer/trainer.py
 :pyobject: Trainer.train
 ```
