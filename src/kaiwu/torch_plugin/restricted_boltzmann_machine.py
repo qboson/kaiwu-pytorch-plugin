@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
+import torch.nn.functional as F
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
@@ -129,6 +130,31 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         return -s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
         )
+
+    def marginal_energy(
+        self,
+        s_visible: torch.Tensor,
+        enable_grad: bool = False,
+    ) -> torch.Tensor:
+        """Compute visible-state free energy by summing out the binary hidden layer.
+
+        Returns ``-log(sum_h(exp(-E(s_visible, h))))`` in closed form. Differences
+        between these energies give visible-state log probability ratios without
+        estimating the partition function. Absolute negative log-likelihood also
+        requires the log partition function.
+
+        Args:
+            s_visible: Visible states of shape ``(B, num_visible)``, using the same
+                dtype and device as the model parameters.
+            enable_grad: Whether to enable gradients for inputs and parameters.
+                Defaults to False, matching the energy evaluation convention.
+
+        Returns:
+            torch.Tensor: Free energy of shape ``(B,)``.
+        """
+        with torch.set_grad_enabled(enable_grad):
+            hidden_logits = s_visible @ self.quadratic_coef + self.hidden_bias
+            return -s_visible @ self.visible_bias - F.softplus(hidden_logits).sum(dim=-1)
 
     def _to_ising_matrix(self):
         """Convert the Restricted Boltzmann Machine to Ising format."""
