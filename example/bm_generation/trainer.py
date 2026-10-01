@@ -59,9 +59,12 @@ def process_solve_graph_worker(params):
         # 正相位采样 (Condition Sample)
         state_v_chunk = bm_shared.condition_sample(sampler, s_visible_chunk).detach()
         # 输入条件采样
-        state_vi_chunk = bm_shared.condition_sample(
-            sampler, s_visible_chunk[:, :-num_output]
-        ).detach()
+        if num_output:
+            state_vi_chunk = bm_shared.condition_sample(
+                sampler, s_visible_chunk[:, :-num_output]
+            ).detach()
+        else:
+            state_vi_chunk = state_v_chunk
 
     return state_v_chunk, state_vi_chunk
 
@@ -231,13 +234,10 @@ class Trainer:
                 # 计算 KL 散度项
                 kl_divergence = self.bm_net.objective(combined_v, state_all)
 
-                # 计算 NCL (Non-Contrastive Loss) 类似项
-                # 保持原逻辑：将输出部分置零后计算 objective
-                v_ncl = combined_v.clone()
-                vi_ncl = combined_vi.clone()
-                v_ncl[:, -self.num_output :] = 0.0
-                vi_ncl[:, -self.num_output :] = 0.0
-                ncl = self.bm_net.objective(v_ncl, vi_ncl)
+                # NCL 的能量差保留完整状态；固定输入项自然相消。
+                # 没有输出单元时条件似然为 1，NCL 及其梯度为零。
+                if self.num_output:
+                    ncl = self.bm_net.objective(combined_v, combined_vi)
 
                 # 组合目标函数
                 obj = (
