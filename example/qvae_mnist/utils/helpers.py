@@ -80,7 +80,6 @@ def plot_training_curves(
 
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     print(f"Training curves saved to: {save_path}")
-    plt.show()
 
     if show:
         plt.show()
