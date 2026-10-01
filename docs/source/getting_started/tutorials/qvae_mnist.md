@@ -120,6 +120,8 @@ python run_pipeline.py --epochs 50 --run-tsne
 `num_epochs` 可以设为 1 到 9，进行短训练验证。训练器按
 `max(1, num_epochs // 10)` 的间隔保存重建图，因此短训练会在每轮保存；
 10 轮及以上仍使用原来的间隔，最后一轮始终保存重建图。
+重建图使用测试加载器的最后一个批次，每次最多显示 5 对原图和重建图；
+如果最后一个批次只有 1 到 4 个样本，就显示实际可用的数量。
 完整训练结束后还会写出 `model_final_QVAE.pt` 和训练曲线。
 
 ```{literalinclude} ../../../../example/qvae_mnist/trainer/trainer.py

@@ -231,6 +231,7 @@ class Trainer:
 
         plot_MNIST_output(
             x_true, x_recon,
+            n_samples=min(5, len(x_true), len(x_recon)),
             output=os.path.join(self.output_dir, f"reconstruction_epoch_{epoch}.png")
         )
 
