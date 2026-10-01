@@ -112,10 +112,19 @@ class AutoEncoderBase(nn.Module):
         self, state_dict, prefix, local_metadata, strict,
         missing_keys, unexpected_keys, error_msgs,
     ):
-        """Keep configured means when strictly loading legacy checkpoints."""
+        """Load centering state with legacy compatibility and parameter properties."""
         extra_key = prefix + "_extra_state"
         if extra_key not in state_dict:
             state_dict[extra_key] = self.get_extra_state()
+        mean_state = state_dict[extra_key]
+        if (
+            not local_metadata.get("assign_to_params_buffers", False)
+            and isinstance(mean_state, torch.Tensor)
+            and mean_state.numel() > 0
+        ):
+            parameter = next(self.parameters(), None)
+            if parameter is not None:
+                state_dict[extra_key] = mean_state.to(parameter)
         super()._load_from_state_dict(
             state_dict, prefix, local_metadata, strict,
             missing_keys, unexpected_keys, error_msgs,

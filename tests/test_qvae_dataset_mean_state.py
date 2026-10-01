@@ -185,3 +185,34 @@ def test_checkpoint_mean_is_an_independent_snapshot():
     assert_same_forward(expected, restored)
     checkpoint["_extra_state"].fill_(0.0)
     assert_same_forward(expected, restored)
+
+
+@pytest.mark.parametrize("initial_mean", [None, torch.tensor([0.1, 0.2])])
+@pytest.mark.parametrize("nested", [False, True])
+@pytest.mark.parametrize("assign", [False, True])
+def test_loading_checkpoint_mean_follows_receiving_precision(initial_mean, nested, assign):
+    """The mean follows parameter properties in both supported load modes."""
+    source = make_model(torch.tensor([0.8, 0.8], dtype=torch.float32))
+    receiving = make_model(initial_mean).double()
+    source_container = nn.Sequential(source) if nested else source
+    target_container = nn.Sequential(receiving) if nested else receiving
+    checkpoint = serialize_state(source_container)
+
+    target_container.load_state_dict(checkpoint, strict=True, assign=assign)
+    expected_dtype = torch.float32 if assign else torch.float64
+    inputs = INPUTS.to(expected_dtype)
+    with torch.random.fork_rng(devices=[]):
+        torch.manual_seed(0)
+        reconstruction, posterior, logits, latent = receiving(inputs)
+
+    mean_key = "0._extra_state" if nested else "_extra_state"
+    expected_mean = checkpoint[mean_key].to(expected_dtype)
+    torch.testing.assert_close(logits, 10.0 * (inputs - expected_mean))
+    for output in [reconstruction, posterior.logit_mu, logits, latent]:
+        assert output.dtype == expected_dtype
+        assert torch.isfinite(output).all()
+    assert receiving.encoder.weight.dtype == expected_dtype
+    assert receiving._train_bias.dtype == expected_dtype
+    assert receiving._dataset_mean.dtype == expected_dtype
+    assert receiving._dataset_mean.device == receiving.encoder.weight.device
+    torch.testing.assert_close(receiving._dataset_mean, expected_mean, rtol=0.0, atol=0.0)

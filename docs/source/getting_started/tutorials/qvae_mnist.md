@@ -124,6 +124,8 @@ python run_pipeline.py --epochs 50 --run-tsne
 通过 `set_dataset_mean()` 设置的训练数据均值会随 `state_dict()` 一起保存，
 `load_state_dict()` 会恢复编码器的中心化状态和已有的重建偏置。
 因此，将 checkpoint 加载到新建模型后，无需重新计算训练均值。
+默认加载时，均值会采用接收模型参数的 dtype 和 device；使用 `assign=True` 时，
+均值与其他模型状态一样保留 checkpoint 中的 Tensor 属性。
 
 旧版 checkpoint 没有保存中心化均值。加载这类文件时，模型会保留当前已设置的均值，
 也支持原有的严格加载方式；请先用原训练数据的均值调用 `set_dataset_mean()`，
