@@ -187,7 +187,7 @@ class Trainer:
 
             epoch_pbar.set_description(f"Epoch {epoch}/{self.config.num_epochs} - Train Loss: {train_loss:.2f}, Test Loss: {test_loss:.2f}")
 
-            if epoch % (self.config.num_epochs // 10) == 0 or epoch == self.config.num_epochs:
+            if epoch % max(1, self.config.num_epochs // 10) == 0 or epoch == self.config.num_epochs:
                 self._save_reconstruction(epoch, input_data, output_data)
                 logger.info(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Test Loss={test_loss:.4f}")
 
@@ -231,6 +231,7 @@ class Trainer:
 
         plot_MNIST_output(
             x_true, x_recon,
+            n_samples=min(5, len(x_true), len(x_recon)),
             output=os.path.join(self.output_dir, f"reconstruction_epoch_{epoch}.png")
         )
 

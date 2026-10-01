@@ -2,6 +2,17 @@
 
 pytest==8.3.5
 pytest-cov==6.1.1
+# DBN example regressions use these existing optional example dependencies.
+scikit-learn>=1.5,<1.8
+scipy
+matplotlib
+seaborn
+# Full MNIST generation helper imports used by regression tests.
+gif==23.3.0
+imageio==2.38.0
+tqdm
+torchvision==0.22.0
+torchmetrics==1.9.0
 isort>=5.10.0
 pip-licenses==5.5.0
 pylint==3.3.7
