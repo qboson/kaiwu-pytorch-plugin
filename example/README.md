@@ -7,11 +7,15 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:
 - `simple/`: minimal train and generate scripts
 - `dplm/`: protein-case workflow utilities and adapter code
+
+For details, see `example/qdiffusion/README.md`。
 
 ---
 
@@ -30,6 +34,8 @@ This example demonstrates how to use a Restricted Boltzmann Machine (RBM) for fe
 
 Run the example via `example/rbm_digits/rbm_digits.ipynb`.
 
+For details, see `example/rbm_digits/README.md`.
+
 #### DBN-Based Classification
 
 Building upon the RBM approach, this example demonstrates a complete Deep Belief Network (DBN) implementation with multiple RBM layers, offering more sophisticated feature learning and flexible training strategies. This implementation can be seen as a direct evolution of the RBM approach, demonstrating how stacking multiple RBMs enables learning increasingly abstract representations of the input data. The main contents include:
@@ -42,6 +48,8 @@ Building upon the RBM approach, this example demonstrates a complete Deep Belief
 * **Advanced Architecture**: PyTorch-based implementation with scikit-learn compatibility through `AbstractSupervisedDBN` base classes.
 
 Run the example via `example/dbn_digits/supervised_dbn_digits.ipynb`.
+
+For details, see `example/dbn_digits/README.md`.
 
 **Dependencies**
 
@@ -88,6 +96,8 @@ This example demonstrates how to train and evaluate a Quantum Variational Autoen
 
 Run the example via `example/qvae_mnist/train_qvae.ipynb`.
 
+For details, see `example/qvae_mnist/README.md`.
+
 **Dependencies**
 
 ```
@@ -104,11 +114,32 @@ This extended example demonstrates how pre-trained Q-VAE representations can be 
 * **Unsupervised Feature Learning**: Q-VAE encoder learns meaningful features without label supervision;
 * **Transfer Learning**: Pre-trained representations enable efficient downstream task adaptation;
 * **Multi-task Capability**: Same representations support both generation and classification;
-* **Model Interpretability**: t-SNE visualization renables qualitative assessment of latent space structure, provides insights into class separation and cluster formation during training.
+* **Model Interpretability**: t-SNE visualization enables qualitative assessment of latent space structure, provides insights into class separation and cluster formation during training.
 
 Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
+
+For details, see `example/qvae_mnist/README.md`.
 
 **Dependencies**
 ```
 torchvision==0.22.0
+```
+
+---
+
+### Representation Learning: Q-VAE for Single-Cell Data
+
+This example demonstrates QVAE-based single-cell representation learning. The workflow reads a single-cell expression matrix, trains a Q-VAE, extracts low-dimensional representations, computes UMAP, analyzes the energy distribution, and evaluates clustering quality against cell-type labels. Multiple downstream evaluations are supported (Leiden clustering, classification, scIB, scGraph, DPT).
+
+Run the training via `example/qvae_cell/scripts/train.sh` (or `train_qvae_cell.py` with CLI options), and evaluation via `example/qvae_cell/evaluate_benchmark.py --metrics clustering,classification,scib,scgraph`.
+
+For details, see `example/qvae_cell/README.md`.
+
+**Dependencies**
+```
+anndata
+scanpy
+leidenalg
+scib_metrics
+scgraph
 ```

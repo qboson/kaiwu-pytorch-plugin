@@ -9,6 +9,16 @@
 
 ---
 
+### Q-Diffusion
+
+`example/qdiffusion/` 现在分为：
+- `simple/`：最小化的训练与生成脚本
+- `dplm/`：蛋白质案例工作流工具与适配代码
+
+详细说明请参见 `example/qdiffusion/README_ZH.md`。
+
+---
+
 ### 分类任务：手写数字识别
 
 本节提供了两种互补的方法，分别基于不同的神经网络架构实现手写数字识别，均展示了无监督特征学习在分类任务中的作用。
@@ -24,6 +34,8 @@
 
 请通过 `example/rbm_digits/rbm_digits.ipynb` 运行该示例。
 
+详细说明请参见 `example/rbm_digits/README.md`。
+
 #### 基于 DBN 的分类方法
 
 该示例在 RBM 方法的基础上，进一步构建了一个完整的深度信念网络（Deep Belief Network, DBN），包含多层 RBM，提供更复杂的特征学习能力和灵活的训练策略。该实现可视作 RBM 方法的直接演进，展示了如何通过堆叠多个 RBM 来学习输入数据中越来越抽象的表示。主要内容包括：
@@ -36,6 +48,8 @@
 * **高级架构设计**：基于 PyTorch 实现，并通过 `AbstractSupervisedDBN` 基类提供与 scikit-learn 的兼容性。
 
 请通过 `example/dbn_digits/supervised_dbn_digits.ipynb` 运行该示例。
+
+详细说明请参见 `example/dbn_digits/README.md`。
 
 **依赖项**
 
@@ -73,6 +87,8 @@ matplotlib
 
 请通过 `example/qvae_mnist/train_qvae.ipynb` 运行该示例。
 
+详细说明请参见 `example/qvae_mnist/README.md`。
+
 **依赖项**
 
 ```
@@ -93,8 +109,28 @@ torchmetrics[image]
 
 请通过 `example/qvae_mnist/train_qvae_classifier.ipynb` 运行该示例。
 
+详细说明请参见 `example/qvae_mnist/README.md`。
+
 **依赖项**
 
 ```
 torchvision==0.22.0
+```
+---
+
+### 表征学习：基于 QVAE 的单细胞数据
+
+该示例演示了基于 QVAE 的单细胞表征学习。流程包括读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 UMAP、分析能量分布，并使用细胞类型标签评估聚类质量。支持多种下游评估（Leiden 聚类、分类、scIB、scGraph、DPT）。
+
+通过 `example/qvae_cell/scripts/train.sh`（或带 CLI 参数的 `train_qvae_cell.py`）运行训练，通过 `example/qvae_cell/evaluate_benchmark.py --metrics clustering,classification,scib,scgraph` 运行评估。
+
+详细说明请参见 `example/qvae_cell/README.md`。
+
+**依赖项**
+```
+anndata
+scanpy
+leidenalg
+scib_metrics
+scgraph
 ```

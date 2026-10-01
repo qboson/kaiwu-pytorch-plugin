@@ -29,7 +29,6 @@ kpp_qvae/
 ├── trainer.py                 # Data preparation, model construction, training loop, representation and energy extraction
 ├── visualization.py           # Training curves, UMAP, and energy plots
 ├── train_qvae_cell.py         # Command-line entry point
-├── evaluate_clustering.py     # Legacy Leiden clustering evaluation entry point
 ├── evaluate_benchmark.py      # Unified evaluation entry point
 ├── scripts/
 │   ├── train.sh               # Current training command
