@@ -85,6 +85,22 @@ def test_pretrainer_exposes_all_constructor_parameters(examples):
     assert model.hidden_layers_structure is parameters["hidden_layers_structure"]
 
 
+def test_pretrainer_parent_initialization_supports_subclass_parameters(examples, data):
+    pretrainer_class, _ = examples
+    features, _ = data
+
+    class NamedPretrainer(pretrainer_class):
+        def __init__(self, name="default"):
+            super().__init__(hidden_layers_structure=[2], n_epochs_rbm=1, verbose=False)
+            self.name = name
+
+    model = NamedPretrainer(name="custom")
+    model.fit(features)
+    copied = clone(model)
+    assert copied.name == "custom"
+    assert copied._dbn.rbm_layers is None
+
+
 @pytest.mark.parametrize("fine_tuning", [False, True])
 def test_supervised_exposes_all_constructor_parameters(examples, fine_tuning):
     _, supervised_class = examples

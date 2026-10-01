@@ -115,6 +115,7 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         self.verbose = verbose
         self.plot_img = plot_img
         self.random_state = random_state
+        self.use_cim = use_cim
 
         # 监督微调配置
         self.fine_tuning = fine_tuning
@@ -128,18 +129,17 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         self.fine_tune_network = None
         self.classifier = None
         self.label_encoder = LabelEncoder()
-        self.unsupervised_dbn = DBNPretrainer(
-            hidden_layers_structure=self.hidden_layers_structure,
-            learning_rate_rbm=self.learning_rate_rbm,
-            n_epochs_rbm=self.n_epochs_rbm,
-            verbose=self.verbose,
-            plot_img=self.plot_img,
-            random_state=self.random_state,
-            use_cim=use_cim,
-        )
+        self.unsupervised_dbn = DBNPretrainer(**self._pretrainer_parameters())
+
+    def _pretrainer_parameters(self):
+        """Share current pretraining configuration, including batch size."""
+        names = ("hidden_layers_structure", "learning_rate_rbm", "n_epochs_rbm",
+                 "batch_size", "verbose", "plot_img", "random_state", "use_cim")
+        return {name: getattr(self, name) for name in names}
 
     def pre_train(self, X):
         """预训练无监督网络"""
+        self.unsupervised_dbn.set_params(**self._pretrainer_parameters())
         self.unsupervised_dbn.fit(X)
         return self
 
@@ -281,12 +281,44 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
     抽象监督DBN，提供下游分类器训练和fine-tuning相关的通用工具
     """
 
-    def __init__(self, classifier_type="logistic", clf_C=1.0, clf_iter=100, **kwargs):
-        # 确保fine_tuning参数有默认值
-        if "fine_tuning" not in kwargs:
-            kwargs["fine_tuning"] = True
-
-        super().__init__(**kwargs)
+    # Explicit parameters are required by scikit-learn's cloning contract.
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        classifier_type="logistic",
+        clf_C=1.0,
+        clf_iter=100,
+        *,
+        hidden_layers_structure=(100, 100),
+        learning_rate_rbm=0.1,
+        n_epochs_rbm=10,
+        batch_size=32,
+        verbose=True,
+        plot_img=False,
+        random_state=None,
+        fine_tuning=True,
+        learning_rate=0.1,
+        n_iter_backprop=100,
+        l2_regularization=1e-4,
+        activation_function="sigmoid",
+        dropout_p=0.0,
+        use_cim=False,
+    ):
+        super().__init__(
+            hidden_layers_structure=hidden_layers_structure,
+            learning_rate_rbm=learning_rate_rbm,
+            n_epochs_rbm=n_epochs_rbm,
+            batch_size=batch_size,
+            verbose=verbose,
+            plot_img=plot_img,
+            random_state=random_state,
+            fine_tuning=fine_tuning,
+            learning_rate=learning_rate,
+            n_iter_backprop=n_iter_backprop,
+            l2_regularization=l2_regularization,
+            activation_function=activation_function,
+            dropout_p=dropout_p,
+            use_cim=use_cim,
+        )
         self.classifier_type = classifier_type
         self.clf_C = clf_C
         self.clf_iter = clf_iter
@@ -429,9 +461,6 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
     """
     PyTorch实现的监督DBN分类器
     """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     def _fine_tuning(self, X, y):
         """微调实现"""
