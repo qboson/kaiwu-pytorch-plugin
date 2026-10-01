@@ -32,6 +32,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
     ):
         super().__init__(device=device)
         self.num_nodes = num_nodes
+        if quadratic_coef is not None:
+            self._validate_quadratic_coef(quadratic_coef)
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef
             if quadratic_coef is not None
@@ -42,6 +44,38 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             if linear_bias is not None
             else torch.zeros(self.num_nodes).to(self.device)
         )
+
+    @staticmethod
+    def _validate_quadratic_coef(quadratic_coef: torch.FloatTensor) -> None:
+        """Validate a user-supplied coupling matrix.
+
+        The machine's energy only reads the strict upper triangle
+        (:meth:`symmetrized_quadratic_coef`), so a nonzero diagonal would be
+        dropped silently even though, for the binary states the machine
+        samples, ``x_i * x_i == x_i`` makes every diagonal entry equivalent
+        to a linear bias. Reject the matrix instead of quietly modeling a
+        different energy than the caller supplied.
+
+        Raises:
+            ValueError: If the matrix is not square or its diagonal is nonzero.
+        """
+        if quadratic_coef.ndim != 2 or (
+            quadratic_coef.shape[0] != quadratic_coef.shape[1]
+        ):
+            raise ValueError(
+                "quadratic_coef must be a square matrix of shape "
+                f"[num_nodes, num_nodes], got {tuple(quadratic_coef.shape)}"
+            )
+        diagonal = quadratic_coef.diagonal()
+        if bool(torch.any(diagonal != 0)):
+            raise ValueError(
+                "quadratic_coef must have a zero diagonal: the pairwise "
+                "coupling drops it, and for the binary states the machine "
+                "samples a diagonal entry is equivalent to a linear bias "
+                "(x_i * x_i == x_i). Fold it into linear_bias instead: "
+                "linear_bias + 0.5 * diagonal under the "
+                "-0.5 * x^T J x energy convention."
+            )
 
     def symmetrized_quadratic_coef(self):
         """Quadratic coefficient"""
