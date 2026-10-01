@@ -244,6 +244,7 @@ class QDiffusion(nn.Module):
         self.token_spec = token_spec
         self.config = config or QDiffusionConfig()
         self.dtype = dtype
+        self.freeze_proposal = freeze_proposal
 
         if freeze_proposal:
             self.proposal_model.eval()
@@ -284,6 +285,17 @@ class QDiffusion(nn.Module):
         except StopIteration:
             self.device = torch.device("cpu")
         return module
+
+    def train(self, mode: bool = True) -> "QDiffusion":
+        """Set the wrapper's training mode; a frozen proposal stays in eval.
+
+        ``nn.Module.train`` recurses into submodules and would reactivate
+        dropout / batchnorm in a frozen proposal, so eval is re-applied.
+        """
+        super().train(mode)
+        if self.freeze_proposal:
+            self.proposal_model.eval()
+        return self
 
     def forward(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
         """Runs the proposal model on the current noisy state.
