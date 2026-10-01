@@ -21,6 +21,10 @@ scib_metrics
 scgraph
 ```
 
+Kaiwu 1.3.1 exposes the hardware precision wrapper as
+`kaiwu.cim.PrecisionReducer`. Selecting `--sampler-type sa` only creates the
+local simulated annealing optimizer.
+
 ## File Structure
 
 ```text
