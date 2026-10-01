@@ -2,6 +2,16 @@
 
 pytest==8.3.5
 pytest-cov==6.1.1
+# MNIST Trainer regressions import the example's existing optional helpers.
+scikit-learn>=1.5,<1.8
+scipy
+matplotlib
+seaborn
+gif==23.3.0
+imageio==2.38.0
+tqdm
+torchvision==0.22.0
+torchmetrics==1.9.0
 isort>=5.10.0
 pip-licenses==5.5.0
 pylint==3.3.7

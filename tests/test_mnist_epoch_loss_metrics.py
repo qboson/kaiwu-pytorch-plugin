@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 import torch
 from torch import nn
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Sampler, SubsetRandomSampler, TensorDataset
 
 from kaiwu.torch_plugin import QVAE, RestrictedBoltzmannMachine
 
@@ -161,6 +161,60 @@ def test_two_stage_training_weights_real_bm_objective_separately(example, batch_
     assert testing == pytest.approx(vae, rel=1e-6)
     assert all(torch.equal(value, initial[key]) for key, value in model.state_dict().items())
     assert torch.isfinite(model.bm.linear_bias.grad).all()
+
+
+class FixedIndicesSampler(Sampler):
+    """An ordinary Torch sampler yielding repeated observation indices."""
+
+    def __init__(self, indices):
+        self.indices = indices
+
+    def __iter__(self):
+        return iter(self.indices)
+
+    def __len__(self):
+        return len(self.indices)
+
+
+def _sampled_loader(dataset, sampling):
+    if sampling == "drop_last":
+        return DataLoader(dataset, batch_size=3, drop_last=True), [0, 1, 2, 3, 4, 5]
+    indices = [0, 2, 5] if sampling == "subset" else [1, 1, 4, 0, 4, 1]
+    sampler = SubsetRandomSampler(indices) if sampling == "subset" else FixedIndicesSampler(indices)
+    return DataLoader(dataset, batch_size=2, sampler=sampler), indices
+
+
+@pytest.mark.parametrize("sampling", ["drop_last", "subset", "repeated"])
+@pytest.mark.parametrize("two_stage", [False, True])
+def test_registered_loaders_normalize_over_processed_observations(example, sampling, two_stage):
+    rows = _rows(7)
+    tuner, model = _tuner(example, rows, 2, two_stage)
+    loader, indices = _sampled_loader(tuner.train_loader.dataset, sampling)
+    tuner.register_dataLoaders(loader, loader)
+    expected = _analytic_mean(rows[indices], [.7, -.4, .1])
+
+    training = tuner.train(1)
+    testing = tuner.test()[0].item()
+
+    assert training == pytest.approx(expected, rel=1e-6)
+    assert testing == pytest.approx(expected, rel=1e-6)
+    assert model.sampler.calls == len(loader) * (3 if two_stage else 2)
+
+
+def test_repeated_observations_normalize_both_dual_optimizer_terms(example):
+    rows = _rows(7)
+    tuner, _ = _tuner(example, rows, 2, True, nonzero_bm=True)
+    loader, indices = _sampled_loader(tuner.train_loader.dataset, "repeated")
+    tuner.register_dataLoaders(loader, loader)
+    penalty = .2 * .5 * (.2**2 + .3**2)
+    vae = _analytic_mean(rows[indices], [.7, -.4, .1]) + penalty
+    bm = -.2 - .05 + penalty
+
+    training = tuner.train(1)
+    testing = tuner.test()[0].item()
+
+    assert training == pytest.approx(vae + bm, rel=1e-6)
+    assert testing == pytest.approx(vae, rel=1e-6)
 
 
 @pytest.mark.parametrize("batch_size", [8, 32])
