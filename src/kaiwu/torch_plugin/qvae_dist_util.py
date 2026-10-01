@@ -61,10 +61,7 @@ class SmoothingDist:
 class Exponential(SmoothingDist):
     """Exponential smoothing distribution class.
 
-    Implements PDF, CDF, sampling, and log PDF on the interval [0, 1].
-    For positive beta approaching zero, this distribution approaches the uniform
-    distribution. Normalization and inverse-CDF sampling avoid cancellation in
-    this limit and in the upper tail.
+    Implements PDF, CDF, sampling, and log PDF for exponential smoothing distribution.
     """
 
     def __init__(self, beta):
@@ -84,7 +81,7 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Probability density value.
         """
-        return self.beta * torch.exp(-self.beta * zeta) / -torch.expm1(-self.beta)
+        return self.beta * torch.exp(-self.beta * zeta) / (1 - torch.exp(-self.beta))
 
     def cdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Cumulative distribution function.
@@ -95,18 +92,13 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Cumulative distribution value.
         """
-        scaled = self.beta * zeta
-        # expm1's backward uses its rounded output + 1. Use exp in the tail to
-        # retain the CDF gradient after expm1(-scaled) rounds to -1.
-        numerator = torch.where(
-            scaled < 1.0,
-            -torch.expm1(-scaled),
-            1.0 - torch.exp(-scaled),
-        )
-        return numerator / -torch.expm1(-self.beta)
+        return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
 
     def sample(self, shape: tuple) -> torch.Tensor:
         """Sampling.
+
+        For beta >= 1, the inverse CDF retains the exp(-beta) survival component
+        to keep upper-tail quantiles accurate when uniform draws approach one.
 
         Args:
             shape (tuple): Sample shape.
@@ -115,15 +107,13 @@ class Exponential(SmoothingDist):
             torch.Tensor: Sample result.
         """
         rho = torch.rand(shape)
-        # log1p preserves small rates; the log-sum form preserves the upper tail
-        # when 1 - exp(-beta) rounds to one.
-        log_survival = torch.where(
-            self.beta < 1.0,
-            torch.log1p(torch.expm1(-self.beta) * rho),
-            torch.logaddexp(torch.log1p(-rho), torch.log(rho) - self.beta),
+        zeta = -torch.log(1.0 - (1.0 - torch.exp(-self.beta)) * rho) / self.beta
+        # Keep the two survival components separate: normalizing first can round
+        # away exp(-beta), even with expm1, and distort upper-tail quantiles.
+        log_tail_survival = torch.logaddexp(
+            torch.log1p(-rho), torch.log(rho) - self.beta
         )
-        zeta = -log_survival / self.beta
-        return zeta
+        return torch.where(self.beta >= 1.0, -log_tail_survival / self.beta, zeta)
 
     def log_pdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Log probability density.
@@ -137,7 +127,7 @@ class Exponential(SmoothingDist):
         return (
             torch.log(self.beta)
             - self.beta * zeta
-            - torch.log(-torch.expm1(-self.beta))
+            - torch.log(1 - torch.exp(-self.beta))
         )
 
 
