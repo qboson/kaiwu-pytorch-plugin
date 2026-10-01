@@ -205,10 +205,14 @@ class PrecisionSplitExplorer:
 
         Returns:
             A tuple containing the adjusted matrix and Kaiwu precision metadata.
+            An all-zero matrix is returned as a new integer matrix with one-bit
+            precision and unit scaling: encoding zero requires no quantization.
 
         Raises:
             ImportError: If the Kaiwu precision helpers are unavailable.
         """
+        if not np.any(ising_matrix):
+            return np.zeros_like(ising_matrix, dtype=int), {"precision": 1, "multiplier": 1.0}
         adjust_ising_matrix_precision, calculate_ising_matrix_bit_width = (
             _get_kaiwu_precision_helpers()
         )
