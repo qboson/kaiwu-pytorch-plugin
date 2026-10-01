@@ -62,6 +62,12 @@ class Exponential(SmoothingDist):
     """Exponential smoothing distribution class.
 
     Implements PDF, CDF, sampling, and log PDF for exponential smoothing distribution.
+
+    The density is parametrized on the unit interval, so every formula involves
+    terms of the form ``1 - exp(-t)``. These are computed with ``expm1``/``log1p``
+    to avoid the catastrophic cancellation of ``1 - exp(-t)`` in float32 when
+    ``beta`` is small (e.g. ``beta <= 1e-4`` loses accuracy and ``beta <= 1e-8``
+    yields exact zeros, hence inf/NaN densities).
     """
 
     def __init__(self, beta):
@@ -81,7 +87,7 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Probability density value.
         """
-        return self.beta * torch.exp(-self.beta * zeta) / (1 - torch.exp(-self.beta))
+        return self.beta * torch.exp(-self.beta * zeta) / (-torch.expm1(-self.beta))
 
     def cdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Cumulative distribution function.
@@ -92,7 +98,7 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Cumulative distribution value.
         """
-        return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
+        return (-torch.expm1(-self.beta * zeta)) / (-torch.expm1(-self.beta))
 
     def sample(self, shape: tuple) -> torch.Tensor:
         """Sampling.
@@ -104,7 +110,7 @@ class Exponential(SmoothingDist):
             torch.Tensor: Sample result.
         """
         rho = torch.rand(shape)
-        zeta = -torch.log(1.0 - (1.0 - torch.exp(-self.beta)) * rho) / self.beta
+        zeta = -torch.log1p(torch.expm1(-self.beta) * rho) / self.beta
         return zeta
 
     def log_pdf(self, zeta: torch.Tensor) -> torch.Tensor:
@@ -119,7 +125,7 @@ class Exponential(SmoothingDist):
         return (
             torch.log(self.beta)
             - self.beta * zeta
-            - torch.log(1 - torch.exp(-self.beta))
+            - torch.log(-torch.expm1(-self.beta))
         )
 
 
