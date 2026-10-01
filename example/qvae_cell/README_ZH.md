@@ -91,6 +91,8 @@ qvae_energy_umap.png              # energy UMAP
 qvae_energy_by_celltype.png       # cell type energy 分布
 ```
 
+重构和 KL 曲线记录未经 KL 权重或权重衰减处理的原始 batch 损失项。每次 `QVAE.loss` 调用均将 `last_recon_loss` 和 `last_kl_loss` 更新为脱离计算图的标量张量，供日志使用；用于优化的总损失仍包含 `kl_beta` 和权重衰减。
+
 ## 评估
 
 统一评估入口为 `evaluate_benchmark.py`，通过 `--metrics` 选择要运行的评估项：
