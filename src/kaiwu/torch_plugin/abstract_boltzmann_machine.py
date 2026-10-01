@@ -94,7 +94,8 @@ class AbstractBoltzmannMachine(torch.nn.Module):
                 The sampler can be kaiwuSDK's CIM or other solvers.
 
         Returns:
-            torch.Tensor: Spins sampled from the model.
+            torch.Tensor: Spins sampled from the model, using its parameter dtype.
+                Parameterless subclasses retain the float32 sampling default.
         """
         ising_mat = self.get_ising_matrix()
 
@@ -105,7 +106,8 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             solution = sampler.solve(ising_mat)
 
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
-        solution = torch.FloatTensor(solution)
-        solution = solution.to(self.device)
+        parameter = next(self.parameters(), None)
+        dtype = torch.float32 if parameter is None else parameter.dtype
+        solution = torch.as_tensor(solution, dtype=dtype, device=self.device)
 
         return solution

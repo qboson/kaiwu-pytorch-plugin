@@ -77,6 +77,10 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Args:
             s_visible: Visible layer tensor.
             requires_grad: Whether to allow gradient backpropagation.
+            bernoulli: Whether to draw binary states instead of returning probabilities.
+
+        Returns:
+            torch.Tensor: Complete states with the model parameter dtype.
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
@@ -84,6 +88,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
                 device=self.device,
+                dtype=self.quadratic_coef.dtype,
             )
             s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
@@ -98,11 +103,20 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def get_visible(
         self, s_hidden: torch.Tensor, bernoulli: bool = False
     ) -> torch.Tensor:
-        """Propagate hidden spins to the visible layer."""
+        """Propagate hidden spins to the visible layer.
+
+        Args:
+            s_hidden: Hidden layer tensor.
+            bernoulli: Whether to draw binary states instead of returning probabilities.
+
+        Returns:
+            torch.Tensor: Complete states with the model parameter dtype.
+        """
         with torch.no_grad():
             s_all = torch.zeros(
-                s_hidden.size(0), self.num_hidden + self.num_visible
-            ).to(self.device)
+                s_hidden.size(0), self.num_hidden + self.num_visible,
+                device=self.device, dtype=self.quadratic_coef.dtype,
+            )
             s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
                 s_hidden @ self.quadratic_coef.t()
@@ -131,10 +145,13 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         )
 
     def _to_ising_matrix(self):
-        """Convert the Restricted Boltzmann Machine to Ising format."""
+        """Convert to an Ising matrix while retaining the model parameter dtype."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
-            ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+            ising_mat = torch.zeros(
+                (num_nodes + 1, num_nodes + 1),
+                device=self.device, dtype=self.linear_bias.dtype,
+            )
             # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
                 self.quadratic_coef / 8

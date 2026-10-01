@@ -155,6 +155,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             num_sample (int, optional): Number of samples.
                 If ``None``, uses batch size of s_visible.
+
+        Returns:
+            torch.Tensor: Binary states with the model parameter dtype.
         """
         with torch.no_grad():
             # Initialization: If neither visible unit state nor sample number is provided,
@@ -165,7 +168,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
-                        (s_visible.size(0), self.num_nodes), 0.5, device=self.device
+                        (s_visible.size(0), self.num_nodes), 0.5,
+                        device=self.device, dtype=self.linear_bias.dtype,
                     )
                 )
                 # Replace visible part with given visible unit state
@@ -173,7 +177,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             else:
                 # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
-                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
+                    torch.full(
+                        (num_sample, self.num_nodes), 0.5,
+                        device=self.device, dtype=self.linear_bias.dtype,
+                    )
                 )
 
             # Number of visible units
