@@ -7,6 +7,10 @@
 
 这两个脚本均完整展示了模型初始化、采样、目标函数计算、梯度下降和参数更新的全过程，可作为快速上手玻尔兹曼机相关模型的参考示例。
 
+### 量子特征选择
+
+`example/feature_selection/` 演示 `FeatureSelectionWrapper`：在训练模型的同时，用基于 QUBO 的特征掩码筛选输入中的有效特征，筛选子问题可由 `local_search`、`sa` 或 Kaiwu CIM 求解器求解。线性回归入口无需 license 即可对比三种求解器，神经网络入口在 TinyCNN / SimpleRNN / SimpleLSTM 骨干网络上运行 CIM 路径，数据为已知信号特征的合成数据集。详见 `example/feature_selection/README_ZH.md`。
+
 ---
 
 ### 分类任务：手写数字识别
