@@ -126,6 +126,35 @@ def exponential_cdf(sample):
     return -math.expm1(-2. * sample) / -math.expm1(-2.)
 
 
+@pytest.mark.parametrize("dtype", [torch.bool, torch.int32, torch.int64])
+def test_integral_logits_keep_floating_probability_sampling(core, dtype):
+    _, distributions, _ = core
+    logits = torch.tensor([[0, 1, 0, 1]], dtype=dtype)
+    probability = torch.sigmoid(logits)
+    torch.manual_seed(31)
+    bits = torch.rand_like(probability) < probability
+    expected_next_draw = torch.rand(5)
+    torch.manual_seed(31)
+    sampled_bits = distributions.FactorialBernoulliUtil(logits).reparameterize(False)
+    assert sampled_bits.dtype == probability.dtype == torch.float32
+    torch.testing.assert_close(sampled_bits.bool(), bits)
+    torch.testing.assert_close(torch.rand(5), expected_next_draw)
+    for training in (True, False):
+        torch.manual_seed(31)
+        bits = torch.rand_like(probability) < probability
+        smoothing_uniforms = torch.rand(logits.shape)
+        expected_next_draw = torch.rand(5)
+        torch.manual_seed(31)
+        samples = distributions.MixtureGeneric(logits, 2.).reparameterize(training)
+        assert samples.dtype == probability.dtype
+        assert torch.all((samples > 0) & (samples < 1))
+        torch.testing.assert_close(torch.rand(5), expected_next_draw)
+        for sample, bit, uniform in zip(samples.flatten().tolist(),
+                                        bits.flatten().tolist(), smoothing_uniforms.flatten().tolist()):
+            component_value = 1. - sample if bit else sample
+            assert math.isclose(exponential_cdf(component_value), uniform, abs_tol=2e-7)
+
+
 @pytest.mark.parametrize("dtype", DTYPES)
 @pytest.mark.parametrize("training", [True, False])
 def test_mixture_samples_match_component_cdf_and_rng(core, dtype, training):
