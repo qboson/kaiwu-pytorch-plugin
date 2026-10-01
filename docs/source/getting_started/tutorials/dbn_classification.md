@@ -168,6 +168,21 @@ $$
   - SGD 优化器 + L2 正则化
   - 支持 Dropout 防止过拟合
 
+- **分类评估**：两种监督训练模式均提供分类器身份，可使用 scikit-learn 的概率评分器。
+  `predict` 返回原始类别标签，`predict_proba` 的列顺序与 `classes_` 一致，支持字符串和非连续整数标签。
+  对已调用 `fit(X_train, y_train)` 的 `SupervisedDBNClassification` 实例 `model`，可以计算：
+
+  ```python
+  from sklearn.base import is_classifier
+  from sklearn.metrics import get_scorer
+
+  assert is_classifier(model)
+  accuracy = model.score(X_test, y_test)
+  negative_log_loss = get_scorer("neg_log_loss")(model, X_test, y_test)
+  ```
+
+  `score` 返回分类准确率；`neg_log_loss` 返回负的平均对数损失，数值越大表示概率预测越好。
+
 ### 5. 其他内容
 
 - **数据加载（`load_data` 方法）**
