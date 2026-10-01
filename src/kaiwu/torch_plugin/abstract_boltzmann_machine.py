@@ -24,19 +24,28 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         else:
             self.device = device
 
-    def to(self, device=..., dtype=..., non_blocking=...):
-        """Moves the model to the specified device.
+    def _apply(self, fn, recurse=True):
+        """Applies ``fn`` to parameters and keeps ``self.device`` in sync.
+
+        ``nn.Module`` moves child modules through ``_apply`` without calling a
+        child's ``.to()`` override, so a Boltzmann machine nested inside
+        another module would otherwise keep a stale plain-attribute device
+        after its parameters were moved. Syncing here covers every move path:
+        direct ``.to()``/``.cpu()`` calls and moves initiated by parent
+        modules.
 
         Args:
-            device: Target device.
-            dtype: Target data type.
-            non_blocking: Whether the operation should be non-blocking.
+            fn: Function applied to each parameter and buffer.
+            recurse: Whether to recurse into child modules.
 
         Returns:
-            AbstractBoltzmannMachine: The model on the target device.
+            AbstractBoltzmannMachine: The moved module.
         """
-        self.device = device
-        return super().to(device)
+        module = super()._apply(fn, recurse)
+        parameter = next(self.parameters(), None)
+        if parameter is not None:
+            self.device = parameter.device
+        return module
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
