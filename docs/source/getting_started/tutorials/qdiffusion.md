@@ -7,3 +7,11 @@ Discrete diffusion generation for proteins with the generic `Q-Diffusion` core (
 **Examples**: `example/qdiffusion/simple/simple_train_example.py` · `example/qdiffusion/simple/simple_generate_example.py`
 
 **DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome UP000005640
+
+## Remasking schedule
+
+With the default unconditional decoding strategy, skeptical remasking retains
+the number of editable positions prescribed by the linear or cosine schedule. Equal proposal
+confidence scores keep that count intact; deterministic ties follow position
+order. Fixed positions and `BOS`, `EOS`, and `PAD` tokens remain unchanged.
+The final step leaves no diffusion masks in editable positions.
