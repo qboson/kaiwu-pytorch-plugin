@@ -193,16 +193,20 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             raise ValueError("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
 
     def load_data(self, plot_img=False):
-        "载入图片数据"
+        """先划分原始图像，再仅增强训练集，避免平移图像泄漏到测试集。"""
         digits = load_digits()
         images = digits.images  # 8x8 的图像矩阵
         labels = digits.target  # 对应的标签
 
-        # 获取图像数据和标签
-        # 扩展数据集
+        # 同一原始图像及其平移版本必须留在同一训练/测试划分中。
+        train_images, test_images, train_labels, y_test = train_test_split(
+            images, labels, test_size=0.2, random_state=42
+        )
+
+        # 仅增强训练集，测试集保留未见过的原始图像。
         expanded_images = []
         expanded_labels = []
-        for image, label in zip(images, labels):
+        for image, label in zip(train_images, train_labels):
             # 原始图像
             expanded_images.append(image)
             expanded_labels.append(label)
@@ -224,15 +228,11 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 plt.title("Training: %i\n" % expanded_labels[index], fontsize=18)
 
         # 将图像数据展平为二维数组 (n_samples, 64)
-        n_samples = expanded_images.shape[0]
-        data = expanded_images.reshape((n_samples, -1))
+        X_train = expanded_images.reshape((len(expanded_images), -1))
+        X_test = test_images.reshape((len(test_images), -1))
+        y_train = expanded_labels
 
-        # 划分训练集和测试集
-        X_train, X_test, y_train, y_test = train_test_split(
-            data, expanded_labels, test_size=0.2, random_state=42
-        )
-
-        # 使用sklearn的MinMaxScaler进行归一化
+        # 仅用增强后的训练集拟合归一化参数，再变换原始测试图像。
         scaler = MinMaxScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
