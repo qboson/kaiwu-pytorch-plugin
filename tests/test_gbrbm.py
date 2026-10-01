@@ -321,6 +321,34 @@ class TestGBRBMConstructorDtype(unittest.TestCase):
                     self.assertEqual(samples.dtype, torch.float64)
                     self.assertTrue(torch.isfinite(samples).all())
 
+    def test_supplied_double_precision_parameters(self):
+        """Supplied parameters should work alongside defaults of matching dtype."""
+        for visible_gaussian in (True, False):
+            num_gaussian, num_bernoulli = (3, 2) if visible_gaussian else (2, 3)
+            for supplied_names in (
+                ("quadratic_coef",), ("linear_bias",),
+                ("quadratic_coef", "linear_bias"),
+            ):
+                with self.subTest(
+                    visible_gaussian=visible_gaussian, supplied_names=supplied_names
+                ):
+                    tensors = {
+                        "quadratic_coef": torch.zeros(
+                            num_gaussian, num_bernoulli, dtype=torch.float64
+                        ),
+                        "linear_bias": torch.zeros(num_bernoulli, dtype=torch.float64),
+                    }
+                    bm = GaussianBernoulliRestrictedBoltzmannMachine(
+                        3, 2, is_visible_gaussian=visible_gaussian,
+                        dtype=torch.float64, device=torch.device("cpu"),
+                        **{name: tensors[name] for name in supplied_names},
+                    )
+                    states = bm.infer_from_bernoulli(
+                        torch.ones(2, num_bernoulli, dtype=torch.float64),
+                        no_random=True,
+                    )
+                    self.assertEqual(bm.energy(states).dtype, torch.float64)
+
 
 if __name__ == "__main__":
     unittest.main()
