@@ -1,6 +1,8 @@
 """Numerical accuracy tests for the distributions used by QVAE."""
 
 import math
+from decimal import Decimal, localcontext
+from pathlib import Path
 
 import pytest
 import torch
@@ -18,6 +20,108 @@ TAIL_CASES = [
     (torch.float32, 20.0, 1e-6),
     (torch.float64, 40.0, 1e-12),
 ]
+
+
+@pytest.fixture(scope="module", autouse=True)
+def actual_distribution_source():
+    source = Path(__file__).resolve().parents[1] / "src/kaiwu/torch_plugin/qvae_dist_util.py"
+    assert Path(FactorialBernoulliUtil.entropy.__code__.co_filename).resolve() == source
+
+
+def decimal_entropy_reference(value):
+    """Use high-precision outcome probabilities rather than the implemented tail formula."""
+    with localcontext() as context:
+        context.prec = 900
+        logit = Decimal(str(value))
+        probability = 1 / (1 + (-logit).exp())
+        complement = 1 - probability
+        entropy = -probability * probability.ln() - complement * complement.ln()
+        variance = probability * complement
+        gradient = -logit * variance
+        hessian = -variance - logit * variance * (1 - 2 * probability)
+        return entropy, gradient, hessian
+
+
+SUBNORMAL_CASES = [
+    (torch.float16, 18.),
+    (torch.bfloat16, 94.),
+    (torch.float32, 100.),
+    (torch.float64, 750.),
+]
+
+
+@pytest.mark.parametrize("dtype,magnitude", SUBNORMAL_CASES)
+def test_entropy_retains_weighted_tails_when_raw_probability_underflows(dtype, magnitude):
+    logits = torch.tensor([-magnitude, magnitude], dtype=dtype)
+
+    actual = FactorialBernoulliUtil(logits).entropy()
+
+    expected = torch.tensor([float(decimal_entropy_reference(value)[0])
+                             for value in logits.tolist()], dtype=dtype)
+    quantum = torch.finfo(dtype).tiny * torch.finfo(dtype).eps
+    assert actual.dtype == dtype
+    assert torch.isfinite(actual).all()
+    assert (actual > 0).all()
+    # Permit one final native rounding unit, not an absolute tolerance that hides zero.
+    torch.testing.assert_close(actual, expected, rtol=0, atol=quantum)
+    assert actual[0] == actual[1]
+
+
+@pytest.mark.parametrize("dtype,magnitude", SUBNORMAL_CASES)
+def test_entropy_retains_subnormal_analytic_gradient_in_both_tails(dtype, magnitude):
+    logits = torch.tensor([-magnitude, magnitude], dtype=dtype, requires_grad=True)
+
+    entropy = FactorialBernoulliUtil(logits).entropy()
+    actual = torch.autograd.grad(entropy.sum(), logits)[0]
+
+    expected = torch.tensor([float(decimal_entropy_reference(value)[1])
+                             for value in logits.tolist()], dtype=dtype)
+    quantum = torch.finfo(dtype).tiny * torch.finfo(dtype).eps
+    assert actual.dtype == dtype
+    assert torch.isfinite(actual).all()
+    assert (actual.abs() > 0).all()
+    torch.testing.assert_close(actual, expected, rtol=0, atol=quantum)
+
+
+@pytest.mark.parametrize("dtype,rtol", [
+    (torch.float16, 5e-3), (torch.bfloat16, 2e-2),
+    (torch.float32, 2e-6), (torch.float64, 2e-14),
+])
+def test_entropy_gradients_and_hessians_match_decimal_near_zero_and_unit_boundary(dtype, rtol):
+    one = torch.tensor(1., dtype=dtype)
+    below = torch.nextafter(one, torch.tensor(0., dtype=dtype)).item()
+    above = torch.nextafter(one, torch.tensor(float("inf"), dtype=dtype)).item()
+    logits = torch.tensor([-above, -1., -below, -.1, 0., .1, below, 1., above],
+                          dtype=dtype, requires_grad=True)
+
+    entropy = FactorialBernoulliUtil(logits).entropy()
+    gradient = torch.autograd.grad(entropy.sum(), logits, create_graph=True)[0]
+    hessian = torch.autograd.grad(gradient.sum(), logits)[0]
+
+    references = [decimal_entropy_reference(value) for value in logits.tolist()]
+    for column, actual in enumerate((entropy, gradient, hessian)):
+        expected = torch.tensor([float(row[column]) for row in references], dtype=dtype)
+        assert actual.dtype == dtype
+        assert torch.isfinite(actual).all()
+        torch.testing.assert_close(actual, expected, rtol=rtol, atol=0)
+    assert gradient[4] == 0
+    assert hessian[4] == -.25
+
+
+@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32, torch.float64])
+def test_entropy_inactive_branch_stays_finite_at_zero_and_extreme_finite_logits(dtype):
+    magnitude = torch.finfo(dtype).max
+    logits = torch.tensor([-magnitude, 0., magnitude], dtype=dtype, requires_grad=True)
+
+    entropy = FactorialBernoulliUtil(logits).entropy()
+    gradient = torch.autograd.grad(entropy.sum(), logits, create_graph=True)[0]
+    hessian = torch.autograd.grad(gradient.sum(), logits)[0]
+
+    assert all(torch.isfinite(value).all() for value in (entropy, gradient, hessian))
+    assert entropy[0] == entropy[2] == 0
+    assert (gradient == 0).all()
+    assert hessian[0] == hessian[2] == 0
+    assert hessian[1] == -.25
 
 
 @pytest.mark.parametrize("dtype,magnitude,rtol", TAIL_CASES)
