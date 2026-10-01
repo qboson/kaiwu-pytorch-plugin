@@ -2,6 +2,9 @@
 
 pytest==8.3.5
 pytest-cov==6.1.1
+# DPLM pooling tests import the example's real backbone without downloading models.
+transformers==4.39.2
+omegaconf>=2.3,<3
 isort>=5.10.0
 pip-licenses==5.5.0
 pylint==3.3.7
