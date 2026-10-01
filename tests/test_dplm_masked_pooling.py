@@ -87,6 +87,15 @@ def test_numeric_weights_and_existing_clamped_denominator_are_preserved(dtype):
     torch.testing.assert_close(_pool(hidden, mask), expected, atol=0, rtol=0)
 
 
+def test_finite_numeric_mask_gradients_at_zero_weight_retain_existing_formula():
+    hidden = torch.tensor([[[2.], [6.]]], dtype=torch.float64, requires_grad=True)
+    mask = torch.tensor([[1., 0.]], dtype=torch.float64, requires_grad=True)
+    result = _pool(hidden, mask)
+    result.sum().backward()
+    torch.testing.assert_close(hidden.grad, torch.tensor([[[1.], [0.]]], dtype=torch.float64))
+    torch.testing.assert_close(mask.grad, torch.tensor([[0., 4.]], dtype=torch.float64))
+
+
 class _TinyTokenNet(nn.Module):
     """A real trainable network injected through the existing backbone API."""
     mask_id, pad_id, bos_id, eos_id, x_id = 0, 1, 2, 3, 4

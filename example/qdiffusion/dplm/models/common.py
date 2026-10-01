@@ -56,9 +56,17 @@ def masked_mean_pool(
     hidden_states: torch.Tensor,
     attention_mask: torch.Tensor,
 ) -> torch.Tensor:
-    """Pools token states with one padding-aware mean."""
+    """Pool valid tokens, accumulating low-precision states in float32.
+
+    Zero-weight padding is excluded even if its hidden state is nonfinite.
+    Active nonfinite states still propagate, and the result keeps the input dtype.
+    """
     # All downstream rerankers expect one fixed-size sequence feature, so we
     # collapse token states here while ignoring padding positions.
-    mask = attention_mask.to(hidden_states.dtype).unsqueeze(-1)
+    accumulation_dtype = (torch.float32 if hidden_states.dtype in
+                          (torch.float16, torch.bfloat16) else hidden_states.dtype)
+    mask = attention_mask.to(accumulation_dtype).unsqueeze(-1)
+    states = hidden_states.to(accumulation_dtype)
+    states = states.masked_fill((mask == 0) & ~torch.isfinite(states), 0)
     denominator = mask.sum(dim=1).clamp_min(1.0)
-    return (hidden_states * mask).sum(dim=1) / denominator
+    return ((states * mask).sum(dim=1) / denominator).to(hidden_states.dtype)
