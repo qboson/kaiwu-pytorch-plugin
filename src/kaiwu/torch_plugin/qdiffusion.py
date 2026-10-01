@@ -840,7 +840,7 @@ class QDiffusion(nn.Module):
         resample_input = torch.stack(resample_input, dim=0).type_as(tokens)
         resample_scores = torch.stack(resample_scores, dim=0).type_as(scores)
         resample_masks = torch.stack(resample_masks, dim=0).bool()
-        logits = self._mask_logits(self.forward(resample_input))
+        logits = self._mask_logits(self.forward(resample_input)).type_as(resample_scores)
         logits = top_k_top_p_filtering(logits, top_p=self.config.resample_top_p)
         new_tokens, new_scores = stochastic_sample_from_categorical(
             logits, temperature=0.0
