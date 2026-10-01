@@ -19,6 +19,7 @@ from kaiwu.torch_plugin.maifs import qubo
 assert Path(qubo.__file__).resolve() == (
     SOURCE / "kaiwu" / "torch_plugin" / "maifs" / "qubo.py"
 ).resolve()
+REAL_PRECISION_EXPLORER = qubo.PrecisionSplitExplorer
 
 
 @pytest.fixture
@@ -76,6 +77,8 @@ def offline_cim(monkeypatch, tmp_path):
                 return None
             if state["failure"] == "empty":
                 return np.empty((0, 3))
+            if "invalid_spin" in state:
+                return np.array([[state["invalid_spin"], -1.0, 1.0]])
             if state["one_dimensional"]:
                 return np.array([-1, 1, -1])  # Negative gauge decodes to [1, 0].
             return np.array([[1, -1, 1], [-1, 1, 1]])
@@ -181,6 +184,38 @@ def test_failed_jobs_restore_sdk_setting_and_keep_diagnostic_records(
     options["cleanup_records"] = cleanup
     offline_cim["failure"] = failure
     with pytest.raises(RuntimeError):
+        public_solve(options)
+
+    assert kaiwu.common.CheckpointManager.save_dir == previous
+    assert user_file.read_bytes() == b"Unrelated user notes"
+    assert prior_record.read_bytes() == b"Unrelated earlier job"
+    job = offline_cim["jobs"][0]
+    assert job["directory"].parent == checkpoint_base.resolve()
+    assert job["record"].read_bytes() == b"current CIM result"
+
+
+@pytest.mark.parametrize("cleanup", [True, False])
+@pytest.mark.parametrize("invalid_spin", [0.0, np.nan], ids=["zero", "nan"])
+def test_invalid_restored_spins_keep_diagnostic_records(
+    tmp_path, monkeypatch, offline_cim, cleanup, invalid_spin
+):
+    """SDK restoration can retain invalid spins; public rejection must preserve records."""
+    checkpoint_base, previous, user_file, prior_record, options = prepare_directories(
+        tmp_path, monkeypatch, "explicit"
+    )
+    options["cleanup_records"] = cleanup
+    offline_cim["invalid_spin"] = invalid_spin
+
+    def identity_search(self, matrix):
+        # Keep actual SDK restoration while avoiding hardware and precision search.
+        self.plan = SimpleNamespace(
+            split_matrix=matrix, last_var_idx=np.arange(matrix.shape[0])
+        )
+        return self.plan
+
+    monkeypatch.setattr(qubo, "PrecisionSplitExplorer", REAL_PRECISION_EXPLORER)
+    monkeypatch.setattr(REAL_PRECISION_EXPLORER, "search", identity_search)
+    with pytest.raises(RuntimeError, match="spin solution must contain only -1/1 values"):
         public_solve(options)
 
     assert kaiwu.common.CheckpointManager.save_dir == previous
