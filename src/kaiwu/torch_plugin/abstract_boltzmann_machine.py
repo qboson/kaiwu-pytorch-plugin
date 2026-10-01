@@ -24,19 +24,30 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         else:
             self.device = device
 
-    def to(self, device=..., dtype=..., non_blocking=...):
-        """Moves the model to the specified device.
+    def to(self, *args, **kwargs):
+        """Moves and/or casts the parameters and buffers.
+
+        Delegates to ``torch.nn.Module.to`` for conversion semantics and
+        synchronizes KPP's ``self.device`` from the resulting module state.
 
         Args:
-            device: Target device.
-            dtype: Target data type.
-            non_blocking: Whether the operation should be non-blocking.
+            ``*args``: Positional arguments forwarded to ``torch.nn.Module.to``.
+            ``**kwargs``: Keyword arguments forwarded to ``torch.nn.Module.to``.
 
         Returns:
-            AbstractBoltzmannMachine: The model on the target device.
+            AbstractBoltzmannMachine: self.
         """
-        self.device = device
-        return super().to(device)
+        result = super().to(*args, **kwargs)
+
+        parameter = next(self.parameters(), None)
+        if parameter is not None:
+            self.device = parameter.device
+        else:
+            buffer = next(self.buffers(), None)
+            if buffer is not None:
+                self.device = buffer.device
+
+        return result
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
