@@ -19,6 +19,21 @@ The interfaces most used in training are:
 
 Note that `sample()` does **not** take a data state as input, nor does it return separate visible and hidden tensors; `objective()` takes exactly the two phase tensors.
 
+The sampler's `solve(ising_matrix)` result must contain a nonempty 2D batch of
+real spins exactly equal to `-1` or `+1`. Its width must match the submitted Ising
+matrix, including the final gauge spin. KPP validates every row before decoding;
+it preserves all valid rows and both global gauge choices. A `None` result, empty
+batch, incorrect width, or invalid spin raises `RuntimeError` before it can become
+a negative-phase state. `BoltzmannMachine.condition_sample()` applies the same
+contract separately to each observed condition and raises if any batch is
+invalid, rather than returning an incomplete set of conditions. For a GBRBM,
+the submitted matrix covers the Bernoulli units plus the gauge, not the Gaussian
+units.
+
+Asynchronous CIM samplers may return `None` while a task is still running.
+Complete the task before calling the model's sampling method, or configure the
+sampler to wait for results. The model does not poll or retry pending tasks.
+
 ## Creating a CIM Sampler
 
 Real hardware quantum sampling requires configured Kaiwu SDK credentials and real-machine access. `PrecisionReducer` adapts the Ising parameters to hardware precision constraints:
