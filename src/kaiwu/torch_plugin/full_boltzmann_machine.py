@@ -137,7 +137,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 dtype=sub_linear.dtype,
             )
             ising_mat[:-1, :-1] = sub_quadratic / 8
-            ising_bias = sub_linear / 4 + sub_column_sums / 4
+            ising_bias = sub_linear / 4 + sub_column_sums / 8
             ising_mat[:-1, -1] = ising_bias
             ising_mat[-1, :-1] = ising_bias
             return ising_mat.cpu().numpy()
