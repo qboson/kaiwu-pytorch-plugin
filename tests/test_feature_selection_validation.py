@@ -105,6 +105,7 @@ def test_constructor_preserves_integer_like_inputs_and_supported_solvers(solver,
         (100, {"cardinality_k": 1}, 1, 100),
         (10, {"cardinality_k": 0, "min_selected_features": 0}, 0, 10),
         (10, {"cardinality_k": 10}, 2, 10),
+        (10, {"cardinality_k": 2, "min_selected_features": 2, "max_selected_features": 2}, 2, 2),
     ],
 )
 def test_default_bounds_respect_feasible_cardinality_targets(
