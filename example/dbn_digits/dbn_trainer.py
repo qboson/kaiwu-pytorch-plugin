@@ -508,6 +508,11 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
         return self._dbn.num_layers
 
     @property
+    def input_dim(self):
+        """返回输入维度 - 使用底层模型的属性"""
+        return self._dbn.input_dim
+
+    @property
     def _output_dim(self):
         """返回输出维度 - 使用底层模型的属性"""
         return self._dbn.output_dim
