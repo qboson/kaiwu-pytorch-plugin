@@ -34,7 +34,11 @@ class _ModifiedEsmSelfAttention(EsmSelfAttention):
         past_key_value: Optional[Tuple[Tuple[torch.FloatTensor, ...], ...]] = None,
         output_attentions: Optional[bool] = False,
     ) -> Tuple[torch.Tensor, ...]:
-        del output_attentions
+        if output_attentions:
+            # 与 head_mask 一样，明确声明不支持，避免上层按标准接口取 attention 时报 IndexError
+            raise NotImplementedError(
+                "output_attentions is not supported by the patched attention"
+            )
         mixed_query_layer = self.query(hidden_states)
         is_cross_attention = encoder_hidden_states is not None
 
