@@ -158,6 +158,11 @@ class QVAE(AutoEncoderBase):
             self.bm = self._create_bm()
         if self.sampler is None:
             self.sampler = self._create_sampler(self.sampler_type)
+        if self.bm.num_nodes != self._latent_dimensions:
+            raise ValueError(
+                f"The number of variables in the Boltzmann machine {self.bm.num_nodes}"
+                f" does not match the number of latent units {self._latent_dimensions}."
+            )
         if self._dataset_mean is not None:
             self.set_train_bias(self._dataset_mean)
 
