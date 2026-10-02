@@ -573,7 +573,7 @@ class RBMVisualizer:
     def plot_weights(
         self,
         rbm,
-        n_visible=64,
+        n_visible=None,
         grid_shape=(8, 16),
         figsize=(16, 7),
         title_suffix="RBM Weights",
@@ -584,7 +584,7 @@ class RBMVisualizer:
 
         Args:
             rbm: RBM模型
-            n_visible (int): 可见单元数量
+            n_visible (int): 可见单元数量。为 None 时使用模型的可见单元数
             grid_shape (tuple): 网格形状 (rows, cols)
             figsize (tuple): 图形大小
             title_suffix (str): 标题后缀
@@ -592,6 +592,9 @@ class RBMVisualizer:
             save_pdf (bool): 是否保存为PDF
         """
         weights = rbm.quadratic_coef.detach().cpu().numpy()
+        if n_visible is None:
+            # 从权重矩阵推断可见单元数，避免把 8x8 的布局硬编码到其他数据集上
+            n_visible = weights.shape[0]
 
         fig, axes = plt.subplots(
             grid_shape[0],
