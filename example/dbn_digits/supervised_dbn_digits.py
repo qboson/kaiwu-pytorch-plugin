@@ -483,6 +483,12 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
 
     def _train_fine_tune_network(self, X_tensor, y_tensor):
         """训练微调网络"""
+        if self.n_iter_backprop < 1:
+            # 0 次迭代会让网络保持随机初始化，verbose 统计也会引用未赋值变量
+            raise ValueError(
+                "n_iter_backprop must be at least 1: the fine-tuning network "
+                "would otherwise stay randomly initialised."
+            )
         criterion = nn.CrossEntropyLoss()
         optimizer = self._create_optimizer(self.fine_tune_network.parameters())
         loader = self._create_data_loader(X_tensor, y_tensor, shuffle=True)
