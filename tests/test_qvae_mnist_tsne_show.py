@@ -14,13 +14,30 @@ import numpy as np
 import pytest
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, os.path.join(REPO_ROOT, "example", "qvae_mnist"))
+HELPERS_DIR = os.path.join(REPO_ROOT, "example", "qvae_mnist")
 sys.path.insert(0, os.path.abspath(os.path.join(REPO_ROOT, "src")))
+
+import importlib.util  # noqa: E402
 
 import torch  # noqa: E402
 from torch.utils.data import DataLoader, TensorDataset  # noqa: E402
 
-import utils.helpers as helpers  # noqa: E402
+
+def _load_helpers():
+    """Load the example helpers by path.
+
+    ``example/qvae_mnist/utils`` is a namespace package, so another example's
+    regular ``utils`` package (``example/qdiffusion/dplm/utils``) shadows it
+    when both example directories are on ``sys.path``.
+    """
+    path = os.path.join(HELPERS_DIR, "utils", "helpers.py")
+    spec = importlib.util.spec_from_file_location("qvae_mnist_helpers", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+helpers = _load_helpers()
 
 
 @pytest.fixture(autouse=True)
