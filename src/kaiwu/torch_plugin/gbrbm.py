@@ -6,6 +6,8 @@ This module implements a restricted Boltzmann machine with one Gaussian
 partition and one Bernoulli partition.
 """
 
+import math
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -88,8 +90,17 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
     @property
     def var(self):
-        """torch.tensor: Variance of Gaussian units, clipped to avoid numerical issues."""
-        return self.log_var.exp().clip(min=self.eps)
+        """torch.tensor: Variance of Gaussian units, clipped to ``[eps, 1/eps]``
+        to avoid numerical issues.
+
+        The guard is applied to ``log_var`` before exponentiation: clamping
+        the exponent keeps the variance finite when ``log_var`` overflows the
+        float32 range, which would otherwise make the energy independent of
+        the Gaussian state and produce ``NaN`` gradients (``0 * inf`` in the
+        backward of ``exp``).
+        """
+        log_eps = math.log(self.eps) if self.eps > 0 else -float("inf")
+        return torch.exp(self.log_var.clamp(min=log_eps, max=-log_eps))
 
     @property
     def std(self):
