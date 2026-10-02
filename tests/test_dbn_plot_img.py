@@ -3,14 +3,17 @@
 import os
 import sys
 
-import matplotlib
+import pytest
+
+pytest.importorskip("matplotlib")
+pytest.importorskip("sklearn")
+pytest.importorskip("kaiwu")
+
+import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
 
 import numpy as np  # noqa: E402
-import pytest  # noqa: E402
-
-pytest.importorskip("kaiwu")
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../example/dbn_digits"))
