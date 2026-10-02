@@ -50,6 +50,13 @@ def main():
     parser.add_argument("--lr", type=float, default=8e-4)
     parser.add_argument("--bm-lr", type=float, default=8e-4)
     parser.add_argument("--use-cuda", action="store_true")
+    parser.add_argument(
+        "--backend",
+        type=str,
+        default="svi",
+        choices=["svi", "legacy"],
+        help="QVAE trainer backend: 'svi' (Q_SVI kernel, pilot default) or 'legacy' (ModelTuner loop)",
+    )
     parser.add_argument("--feature-type", type=str, default="q", choices=["q", "zeta"])
     parser.add_argument("--run-tsne", action="store_true")
     parser.add_argument("--compute_energy", action="store_true")
@@ -100,6 +107,7 @@ def main():
     config.loss_type = args.loss_type
     config.weight_decay = args.weight_decay
     config.num_latent_units = args.num_latent_units
+    config.backend = args.backend
 
     # Load data (flattened)
     train_loader, test_loader = loadMNIST(

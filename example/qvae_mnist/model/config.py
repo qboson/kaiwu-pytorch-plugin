@@ -40,6 +40,7 @@ class Config:
         self.lr = kwargs.get('lr', 8e-4)
         self.bm_lr = kwargs.get('bm_lr', 8e-4)
         self.use_cuda = kwargs.get('use_cuda', False)
+        self.backend = kwargs.get('backend', 'legacy')  # 'legacy'(ModelTuner) 或 'svi'(Q_SVI)
         self.feature_type = kwargs.get('feature_type', 'q')
         self.run_tsne = kwargs.get('run_tsne', False)
         self.compute_energy = kwargs.get('compute_energy', False)

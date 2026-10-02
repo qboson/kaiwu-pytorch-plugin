@@ -2,6 +2,8 @@ import os
 import torch
 import numpy as np
 
+from kaiwu.torch_plugin import Q_SVI
+
 from utils.logging import get_logger
 from utils.exception import ValueError, TypeError
 
@@ -9,19 +11,38 @@ logger = get_logger(__name__)
 logger.setLevel('WARNING')
 
 class ModelTuner(object):
-	def __init__(self, config=None):
+	def __init__(self, config=None, backend='legacy'):
 		self._config=config
+		self._backend=backend
+		if backend not in ('legacy', 'svi'):
+			raise ValueError(f"Unsupported backend: {backend} (expected 'legacy' or 'svi')")
 		self._model=None
 		self._optimiser = None          # 主优化器（单阶段模式）
 		self._vae_optimiser = None      # VAE 部分优化器（两阶段）
 		self._bm_optimiser = None       # BM 部分优化器（两阶段）
 		self._use_two_optimisers = False
+		self._q_svi = None              # backend='svi' 时持有的 Q_SVI 内核
 
 		self.train_loader=None
 		self.test_loader=None
 
 		self.outpath=""
 		self.infile=""
+
+	def _init_q_svi(self):
+		"""按已注册的优化器构建 Q_SVI 内核（batch 循环委托给它执行）。"""
+		vae_optimiser = self._vae_optimiser if self._use_two_optimisers else self._optimiser
+		# 与 legacy 循环一致：仅 QVAE/CellQVAE 在两阶段模式下更新 BM。
+		bm_optimiser = None
+		if self._use_two_optimisers and self._config.type in ['QVAE', 'CellQVAE']:
+			bm_optimiser = self._bm_optimiser
+		self._q_svi = Q_SVI(
+			model=self._model,
+			optim=vae_optimiser,
+			bm_optim=bm_optimiser,
+			bm_weight_decay=getattr(self._config, 'weight_decay', 0.0),
+		)
+		logger.debug("Q_SVI backend initialised")
 
 	def save_model(self,config_string='test'):
 		logger.info("Saving Model")
@@ -99,8 +120,22 @@ class ModelTuner(object):
 		#set pytorch train mode
 		self._model.train()
 
+		if self._backend == 'svi' and self._q_svi is None:
+			self._init_q_svi()
+
 		total_train_loss = 0
 		for batch_idx, (inputData, label) in enumerate(self.train_loader):
+			# SVI 后端：batch 循环委托给 Q_SVI.step(x)，更新顺序与 legacy 逐行对齐。
+			if self._q_svi is not None:
+				total_train_loss += self._q_svi.step(inputData)
+
+				# Output logging（与 legacy 分支保持一致）
+				if batch_idx % 100 == 0:
+					logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+						epoch, batch_idx*len(inputData), len(self.train_loader.dataset),
+						100.*batch_idx/len(self.train_loader), self._q_svi.last_loss/len(inputData)))
+				continue
+
 			#set gradients to zero before backprop. Needed in pytorch
 			# self._optimiser.zero_grad()
 
