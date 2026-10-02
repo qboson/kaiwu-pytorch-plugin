@@ -205,10 +205,16 @@ class FeatureSelectionWrapper(nn.Module):
             Mean loss over all processed batches.
 
         Raises:
-            ValueError: If ``data_loader`` yields no batches or ``loss_fn`` does
-                not return a scalar tensor.
+            ValueError: If ``train_epochs`` is not positive, ``data_loader``
+                yields no batches, or ``loss_fn`` does not return a scalar
+                tensor.
         """
         train_epochs = int(train_epochs)
+        if train_epochs < 1:
+            raise ValueError(
+                "train_epochs must be at least 1; a zero-epoch call would "
+                "never process the data_loader."
+            )
         self.train()
         total_loss = 0.0
         batch_count = 0
