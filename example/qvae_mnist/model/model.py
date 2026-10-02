@@ -57,6 +57,7 @@ class MnistQVAE(QVAE):
         return BasicEncoder(
             node_sequence=node_pairs,
             activation_fct=self._activation_fct,
+            output_activation_fct=nn.Identity(),  # 输出潜变量 logits
             weight_decay=self.weight_decay   # 传递衰减系数
         )
 
