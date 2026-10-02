@@ -294,6 +294,11 @@ class QVAE(AutoEncoderBase):
         # Weight decay
         wd_loss = self._weight_decay_loss()
 
+        # Expose the components for logging/metric aggregation; detached so
+        # callers can ``.item()`` them without holding the autograd graph.
+        self.last_recon_loss = recon_loss.detach()
+        self.last_kl_loss = kl_loss.detach()
+
         # Total loss
         total_loss = recon_loss + self.kl_beta * kl_loss + wd_loss
         return total_loss
@@ -379,3 +384,99 @@ class QVAE(AutoEncoderBase):
         if hasattr(self.bm, "linear_bias"):
             wd += self.weight_decay * 0.5 * torch.sum(self.bm.linear_bias**2)
         return wd
+
+
+class Q_SVI:  # pylint: disable=invalid-name,too-few-public-methods
+    """Lightweight SVI-style training kernel for QVAE models.
+
+    The external interface mirrors ``pyro.infer.SVI`` (``model`` / ``guide`` /
+    ``loss`` / ``step``) without requiring pyro. In this kernel the encoder
+    plays the guide (variational posterior over the latent spins) and the
+    decoder together with the BM prior plays the generative model, as in
+    Pyro's VAE example. By default both roles are served by the composed
+    ``QVAE.forward`` so that RNG consumption and the backward order stay
+    line-aligned with the legacy ``ModelTuner`` loop.
+
+    Each ``step(x)`` runs the two-phase alternating update:
+
+    1. zero the VAE optimiser, run the guide, compute the loss and step the
+       encoder/decoder optimiser;
+    2. zero the BM optimiser, compute ``bm_loss`` on the detached posterior
+       logits ``q`` and step the BM optimiser.
+
+    Args:
+        model (QVAE): Model exposing ``loss`` and ``bm_loss`` (any
+            ``AutoEncoderBase`` subclass qualifies).
+        guide (callable, optional): Inference callable
+            ``guide(x, **kwargs) -> (recon_x, posterior, q, zeta)``; defaults
+            to ``model`` itself (i.e. ``model.forward``).
+        optim (torch.optim.Optimizer): Optimiser over the encoder/decoder
+            parameters (phase 1).
+        loss (callable, optional): Loss callable
+            ``(x, recon_x, posterior) -> torch.Tensor``; defaults to
+            ``model.loss``. Unlike pyro this is a plain callable, not an ELBO
+            object.
+        bm_optim (torch.optim.Optimizer, optional): Optimiser over the BM
+            parameters (phase 2). When omitted, ``step`` performs only the
+            single-stage VAE update.
+        bm_weight_decay (float, optional): Weight decay forwarded to
+            ``model.bm_loss``. Defaults to ``0.0``.
+    """
+
+    def __init__(
+        self,
+        model,
+        guide=None,
+        optim=None,
+        loss=None,
+        bm_optim=None,
+        bm_weight_decay=0.0,
+    ):
+        if model is None:
+            raise ValueError("Q_SVI requires a model exposing loss/bm_loss.")
+        if optim is None:
+            raise ValueError("Q_SVI requires a VAE optimiser (optim).")
+        self.model = model
+        self.guide = guide
+        self.optim = optim
+        self.loss_fn = loss
+        self.bm_optim = bm_optim
+        self.bm_weight_decay = bm_weight_decay
+        self.last_loss = None
+        self.last_bm_loss = None
+
+    def step(self, x, **kwargs):
+        """Run one two-phase SVI update on a single batch.
+
+        Args:
+            x (torch.Tensor): Input tensor (batch_size, input_dim).
+            ``**kwargs``: Additional keyword arguments forwarded to the guide
+                (e.g. ``batch_idx`` for batch-conditioned decoders).
+
+        Returns:
+            float: Sum of the phase-1 loss and the phase-2 BM loss (the BM
+            term is ``0.0`` in single-stage mode), matching the loss the
+            legacy ``ModelTuner`` accumulates per batch.
+        """
+        # Phase 1: update encoder/decoder through the guide + generative loss.
+        self.optim.zero_grad()
+        guide = self.guide if self.guide is not None else self.model
+        recon_x, posterior, q, _ = guide(x, **kwargs)
+        loss_fn = self.loss_fn if self.loss_fn is not None else self.model.loss
+        loss = loss_fn(x, recon_x, posterior)
+        loss.backward()
+        self.optim.step()
+
+        # Phase 2: update the BM prior on the detached posterior logits.
+        bm_loss_value = 0.0
+        self.last_bm_loss = None
+        if self.bm_optim is not None:
+            self.bm_optim.zero_grad()
+            bm_loss = self.model.bm_loss(q.detach(), self.bm_weight_decay)
+            bm_loss.backward()
+            self.bm_optim.step()
+            bm_loss_value = bm_loss.item()
+            self.last_bm_loss = bm_loss_value
+
+        self.last_loss = loss.item()
+        return self.last_loss + bm_loss_value
