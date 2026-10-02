@@ -8,6 +8,8 @@ import pytest
 import torch
 
 pytest.importorskip("kaiwu")
+for _module in ("sklearn", "tqdm"):
+    pytest.importorskip(_module)
 kaiwu_preprocess = pytest.importorskip("kaiwu.preprocess")
 
 if not hasattr(kaiwu_preprocess, "PrecisionReducer"):
