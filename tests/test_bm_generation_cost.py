@@ -5,7 +5,10 @@ import sys
 import tempfile
 
 import numpy as np
+import pytest
 import torch
+
+pytest.importorskip("matplotlib")
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../example/bm_generation"))
