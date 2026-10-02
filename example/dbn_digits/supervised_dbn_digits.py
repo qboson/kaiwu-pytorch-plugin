@@ -696,6 +696,12 @@ class RBMVisualizer:
             img_size = int(np.sqrt(n_features))
             if img_size * img_size == n_features:
                 img_shape = (img_size, img_size)
+            else:
+                # 非完全平方数时退化为矩形布局，保证 rows * cols == n_features
+                for rows in range(img_size, 0, -1):
+                    if n_features % rows == 0:
+                        img_shape = (rows, n_features // rows)
+                        break
 
         # 创建图形
         fig, axes = plt.subplots(2, n_images, figsize=(2 * n_images, 4))
