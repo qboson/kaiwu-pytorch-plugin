@@ -139,7 +139,18 @@ def t_SNE(
 
     # 执行t-SNE
     logger.info("Running t-SNE...")
-    tsne = TSNE(n_components=2, verbose=1, perplexity=30, max_iter=500, random_state=42)
+    num_samples = len(features)
+    if num_samples < 2:
+        raise ValueError("t-SNE requires at least 2 samples.")
+    # sklearn 要求 perplexity < 样本数，小规模快速验证时按样本数收敛
+    perplexity = min(30, max(1, num_samples - 1))
+    tsne = TSNE(
+        n_components=2,
+        verbose=1,
+        perplexity=perplexity,
+        max_iter=500,
+        random_state=42,
+    )
     tsne_results = tsne.fit_transform(df[feat_cols].values)
 
     df_tsne = df.copy()
