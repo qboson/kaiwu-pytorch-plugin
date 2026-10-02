@@ -242,7 +242,7 @@ class Trainer:
                 # 组合目标函数
                 obj = (
                     self.cost_param["alpha"] * kl_divergence
-                    + (1 - self.cost_param["alpha"]) * ncl
+                    + self.cost_param["beta"] * ncl
                 )
 
                 # 4. 反向传播与优化
