@@ -178,7 +178,6 @@ def t_SNE(
 
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     logger.info(f"t-SNE plot saved to: {save_path}")
-    plt.show()
 
     if show:
         plt.show()
