@@ -581,8 +581,8 @@ def _solve_ising_sa(
     Args:
         ising_matrix: Square Ising matrix with an auxiliary spin.
         initial_binary: Optional initial binary state for the original QUBO
-            variables. Kaiwu SA does not consume this state directly, but it is
-            validated to keep the solver contract consistent.
+            variables. It is encoded as an Ising spin vector (with the
+            auxiliary spin fixed to ``+1``) and used as the SA warm start.
         max_iter: Backward-compatible positive iteration hint from the previous
             local SA solver. Kaiwu-specific schedule options should be passed
             through ``optimizer_kwargs``.
@@ -605,19 +605,21 @@ def _solve_ising_sa(
     if not np.all(np.isfinite(matrix)):
         raise ValueError("ising_matrix must contain only finite values")
 
+    init_solution = None
     if initial_binary is not None:
         binary = np.asarray(initial_binary, dtype=int)
         if binary.ndim != 1 or binary.shape[0] != matrix.shape[0] - 1:
             raise ValueError("initial_binary must match the QUBO variable size")
         if not np.all((binary == 0) | (binary == 1)):
             raise ValueError("initial_binary must contain only 0/1 values")
+        init_solution = np.concatenate([2 * binary - 1, [1]])
 
     resolved_kwargs = {"size_limit": 1}
     resolved_kwargs.update(optimizer_kwargs)
     optimizer = kw.classical.SimulatedAnnealingOptimizer(**resolved_kwargs)
 
     np.random.seed(int(random_state))
-    result = optimizer.solve(matrix)
+    result = optimizer.solve(matrix, init_solution=init_solution)
 
     if result is None:
         raise RuntimeError("SimulatedAnnealingOptimizer did not return a solution.")
