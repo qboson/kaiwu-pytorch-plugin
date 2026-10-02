@@ -21,6 +21,7 @@ import torch.nn as nn
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
 from dbn_trainer import DBNPretrainer
+from kaiwu.torch_plugin.dbn import UnsupervisedDBN
 
 
 def translate_image(image, direction):
@@ -687,8 +688,14 @@ class RBMVisualizer:
         X_sample = X[:n_images]
         y_sample = y[:n_images]
 
-        # 重构图像
-        X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
+        # 重构图像。单层 RBM 没有 reconstruct 方法（那是 UnsupervisedDBN 的
+        # 接口），因此这里使用库内按 RBM 重构的静态方法，使该类对两种模型都可用。
+        if hasattr(rbm, "reconstruct"):
+            X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
+        else:
+            X_recon, recon_errors = UnsupervisedDBN.reconstruct_with_rbm(
+                rbm, X_sample
+            )
 
         # 推断图像形状
         if img_shape is None:
