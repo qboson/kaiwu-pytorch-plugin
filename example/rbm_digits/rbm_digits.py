@@ -84,16 +84,16 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         """
         生成图片
         Args:
-            X: 形状为 (20, size * size) 的数组
+            X: 形状为 (n, size * size) 的数组，n 为实际采样个数
         Returns：
-            拼接后的大图像，形状为 (8, 20 * size)
+            拼接后的大图像，形状为 (size, n * size)
         """
 
         plt.rcParams["image.cmap"] = "gray"
-        # 先将每个数字的特征向量还原为8x8图像
-        digits = X.reshape(20, size, size)  # 形状：(20, 8, 8)
-        # 将20个8x8的图片横向拼接
-        image = np.hstack(digits)  # 形状：(8, 160)
+        # 先将每个数字的特征向量还原为size x size图像
+        digits = X.reshape(X.shape[0], size, size)  # 形状：(n, 8, 8)
+        # 将n个8x8的图片横向拼接
+        image = np.hstack(digits)  # 形状：(8, n * 8)
         return image
 
     def fit(self, X, y=None):  # 修改接口以符合scikit-learn约定
