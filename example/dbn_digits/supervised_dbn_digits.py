@@ -373,9 +373,16 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         return DataLoader(dataset, batch_size=self.batch_size, shuffle=shuffle)
 
     def get_feature_importance(self):
-        """获取特征重要性（适用于分类器模式）"""
+        """获取特征重要性（适用于分类器模式）
+
+        二分类时 ``coef_`` 只有一行；多分类时每个类别一行，此处对各类别的
+        系数取绝对值后求平均，避免只返回第一个类别的系数。
+        """
         if not self.fine_tuning and hasattr(self.classifier, "coef_"):
-            return np.abs(self.classifier.coef_[0])
+            coef = np.abs(np.asarray(self.classifier.coef_))
+            if coef.ndim == 2 and coef.shape[0] > 1:
+                return coef.mean(axis=0)
+            return coef.reshape(-1)
         else:
             print("Feature importance is only available in classifier mode")
             return None
