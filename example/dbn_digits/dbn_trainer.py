@@ -168,6 +168,14 @@ class DBNTrainer:
             drop_last=self.drop_last,
         )
 
+        # 空 loader（例如 drop_last=True 且 batch_size 大于样本数）不会执行
+        # 训练循环，随后读取 avg_loss 会抛 UnboundLocalError，这里提前给出明确错误。
+        if self.n_epochs_rbm > 0 and len(loader) == 0:
+            raise ValueError(
+                "Training produced no batches: check batch_size and drop_last "
+                f"against the {len(dataset)} samples in this layer's input."
+            )
+
         if self.verbose:
             print("[DBN] Pre-training start:")
 
