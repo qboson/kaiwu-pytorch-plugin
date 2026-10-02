@@ -250,11 +250,11 @@ sampler = SimulatedAnnealingOptimizer()
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
 sampler = CIMOptimizer(task_name="test_rbm", wait=True)
 sampler = PrecisionReducer(
-    sampler,
-    precision=8,
-    truncated_precision=10,
-    target_bits=550,
-    only_feasible_solution=False,
+    sampler,
+    precision=8,
+    truncated_precision=10,
+    target_bits=550,
+    only_feasible_solution=False,
 )
 ```
 - **Extension mechanisms:** Decoupled energy function, swappable samplers, custom energy terms.
