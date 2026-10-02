@@ -29,7 +29,7 @@ def _agg_backend(monkeypatch):
     matplotlib.use("Agg")
 
 
-def test_progress_log_reports_the_total_epochs(caplog, monkeypatch):
+def test_progress_log_reports_the_total_epochs(caplog, monkeypatch, tmp_path):
     monkeypatch.setattr(
         classifier_module.MLPClassifier,
         "_train_mlp_epoch",
@@ -52,7 +52,7 @@ def test_progress_log_reports_the_total_epochs(caplog, monkeypatch):
         epochs_mlp=20,
         batch_size_mlp=8,
         device=torch.device("cpu"),
-        save_path=None,
+        save_path=str(tmp_path),  # curve output dir must exist (see #239)
     )
     with caplog.at_level(logging.INFO):
         classifier.fit(x, y)
