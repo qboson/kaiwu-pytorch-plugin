@@ -7,6 +7,7 @@ import importlib
 import shutil
 import tempfile
 from dataclasses import dataclass
+from math import fsum
 from numbers import Integral
 from pathlib import Path
 from time import time_ns
@@ -498,12 +499,47 @@ class QuadraticLinearSolver:
         return self.qubo_matrix_to_ising_matrix(qubo_matrix)
 
 
+def _best_local_search_flip(
+    couplings: np.ndarray,
+    spins: np.ndarray,
+    fields: np.ndarray,
+    error_bound: np.ndarray,
+) -> int:
+    """Choose a strictly improving flip, accurately resolving close gains.
+
+    Incremental fields provide candidate bounds. Accurately sum the rows that
+    could win, including numerical ties, so rounding drift cannot cause a
+    spurious improving move or hide an improvement near zero.
+    """
+    deltas = -2 * spins * fields
+    best_upper_bound = min(0.0, float(np.min(deltas + error_bound)))
+    candidates = np.flatnonzero(deltas - error_bound <= best_upper_bound)
+    best_delta, best_index = 0.0, -1
+    for index in candidates:
+        field = fsum(float(weight) * int(spin)
+                     for weight, spin in zip(couplings[index], spins))
+        delta = -2 * int(spins[index]) * field
+        if delta < best_delta:
+            best_delta, best_index = delta, int(index)
+    return best_index
+
+
 def _solve_ising_local_search(
     ising_matrix: np.ndarray,
     initial_binary: np.ndarray | None = None,
     max_iter: int = 2000,
 ) -> np.ndarray:
-    """Solve an Ising matrix with local greedy spin flips.
+    """Solve an Ising matrix with incremental local greedy spin flips.
+
+    Only the upper triangle contributes to the objective. Diagonal entries
+    are constant for spins and are excluded from flip gains. Candidate fields
+    are updated incrementally; close gains are recomputed with accurate sums,
+    choosing the lowest index on exact ties. Floating-point energy subtraction
+    in a full scan can lose small gains, so numerically ambiguous trajectories
+    need not match that subtraction-based implementation.
+
+    Off-diagonal absolute row sums must not exceed one quarter of the float64
+    maximum, leaving headroom for doubled gains and field updates.
 
     Args:
         ising_matrix: Square Ising matrix with an auxiliary spin.
@@ -522,6 +558,8 @@ def _solve_ising_local_search(
     matrix = np.asarray(ising_matrix, dtype=float)
     if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
         raise ValueError("ising_matrix must be a square matrix")
+    if not np.all(np.isfinite(matrix)):
+        raise ValueError("ising_matrix must contain finite values")
 
     if initial_binary is None:
         spins = np.ones(matrix.shape[0], dtype=int)
@@ -533,38 +571,27 @@ def _solve_ising_local_search(
             raise ValueError("initial_binary must contain only 0/1 values")
         spins = np.r_[2 * binary - 1, 1].astype(int)
 
-    weights = np.triu(matrix)
-
-    def objective(candidate: np.ndarray) -> float:
-        """Evaluate the Ising objective for a candidate spin vector.
-
-        Args:
-            candidate: Candidate spin vector encoded with ``-1`` and ``1``.
-
-        Returns:
-            Ising objective value for ``candidate``.
-        """
-        return float(np.sum(weights * np.outer(candidate, candidate)))
-
-    current_value = objective(spins)
-
-    for _ in range(int(max_iter)):
-        best_delta = 0.0
-        best_index = -1
-        best_value = current_value
-        for index in range(spins.size):
-            candidate = spins.copy()
-            candidate[index] *= -1
-            candidate_value = objective(candidate)
-            delta = candidate_value - current_value
-            if delta < best_delta:
-                best_delta = float(delta)
-                best_index = int(index)
-                best_value = float(candidate_value)
+    if spins.size == 0:
+        return spins.reshape(1, -1)
+    upper = np.triu(matrix, 1)
+    couplings = upper + upper.T
+    # Keep fields, doubled gains, and intermediate field updates representable.
+    with np.errstate(over="ignore"):
+        row_scale = np.sum(np.abs(couplings), axis=1)
+    if np.any(row_scale > np.finfo(float).max / 4):
+        raise ValueError("ising_matrix coupling row sums exceed the safe float64 range")
+    fields = np.sum(couplings * spins[None, :], axis=1)
+    for iteration in range(int(max_iter)):
+        # Bound initial row summation and accumulated field-update roundoff.
+        error_bound = (
+            16 * np.finfo(float).eps * (spins.size + 2 * iteration + 2) * row_scale
+        )
+        best_index = _best_local_search_flip(couplings, spins, fields, error_bound)
         if best_index < 0:
             break
+        previous_spin = spins[best_index]
         spins[best_index] *= -1
-        current_value = best_value
+        fields -= 2 * previous_spin * couplings[:, best_index]
 
     return spins.reshape(1, -1).astype(int)
 
