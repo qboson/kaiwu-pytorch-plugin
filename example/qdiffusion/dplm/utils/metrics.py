@@ -54,8 +54,12 @@ def jsd_from_counts(
 
     reference_total = sum(reference_counts.values())
     candidate_total = sum(candidate_counts.values())
-    if reference_total == 0 or candidate_total == 0:
+    if reference_total == 0 and candidate_total == 0:
         return 0.0
+    if reference_total == 0 or candidate_total == 0:
+        # One side is empty: the distributions have disjoint support, which is
+        # maximal divergence (ln 2), not a perfect match.
+        return math.log(2.0)
 
     reference_probs = [
         reference_counts.get(token, 0) / reference_total for token in vocabulary
