@@ -6,7 +6,8 @@ import sys
 import numpy as np
 import pytest
 
-pytest.importorskip("sklearn")
+for _module in ("matplotlib", "scipy", "seaborn", "sklearn"):
+    pytest.importorskip(_module)
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../example/rbm_digits"))
