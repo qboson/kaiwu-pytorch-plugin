@@ -69,12 +69,21 @@ class PipelineTransformer:
         """
         if y is None:
             y = np.zeros(X.shape[0], dtype=int)
-    
+
+        # 小样本快速运行时随机子集里可能出现只有 1 个样本的类别，无法分层切分
+        _, class_counts = np.unique(y, return_counts=True)
+        stratify = y if class_counts.min() >= 2 else None
+        if stratify is None:
+            print(
+                "Warning: at least one class has fewer than 2 samples; "
+                "falling back to a random train/validation split."
+            )
+
         X_train, X_val, y_train, y_val = train_test_split(
-            X, y, 
-            test_size=0.2, 
-            random_state=42, 
-            stratify=y
+            X, y,
+            test_size=0.2,
+            random_state=42,
+            stratify=stratify
         )
 
         # X_train, X_val = train_test_split(X, test_size=0.2, random_state=42)
