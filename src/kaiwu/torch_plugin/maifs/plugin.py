@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from math import ceil
 
 import numpy as np
@@ -195,6 +195,11 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> float:
         """Train wrapped-model weights and optionally refresh the feature mask.
 
+        Multiple epochs and scheduled mask updates require a re-iterable data
+        source such as a DataLoader or list. A one-shot iterator is supported
+        only for one epoch without a mask update. Data is not cached; custom
+        iterable sources must supply a fresh traversal on each iteration.
+
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
             loss_fn: Loss function returning a scalar tensor.
@@ -206,9 +211,20 @@ class FeatureSelectionWrapper(nn.Module):
 
         Raises:
             ValueError: If ``data_loader`` yields no batches or ``loss_fn`` does
-                not return a scalar tensor.
+                not return a scalar tensor, or a one-shot iterator would need
+                to be traversed again.
         """
         train_epochs = int(train_epochs)
+        interval = self.mask_update_epochs
+        mask_update_due = (
+            interval is not None and min(train_epochs, interval) > 0
+            and self._trained_epochs % interval + train_epochs >= interval
+        )
+        if isinstance(data_loader, Iterator) and (train_epochs > 1 or mask_update_due):
+            raise ValueError(
+                "data_loader must be re-iterable for multiple epochs or mask updates; "
+                "use a DataLoader or a list instead of a one-shot iterator"
+            )
         self.train()
         total_loss = 0.0
         batch_count = 0
