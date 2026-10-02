@@ -116,3 +116,18 @@ def test_empty_matrix_preserves_empty_solution():
 def test_nonfinite_coefficients_are_rejected(value):
     with pytest.raises(ValueError, match="finite"):
         _solve_ising_local_search(np.array([[0., value], [0., 0.]]))
+
+
+@pytest.mark.parametrize("size", [2, 4])
+def test_finite_coefficients_with_unsafe_row_sums_are_rejected(size):
+    """Finite inputs can still overflow gain updates or the absolute row sum."""
+    matrix = np.triu(np.full((size, size), 1e308), 1)
+    with np.errstate(all="raise"), pytest.raises(ValueError, match="safe float64 range"):
+        _solve_ising_local_search(matrix)
+
+
+def test_large_representable_couplings_still_search_without_overflow():
+    matrix = np.array([[0., 1e307], [0., 0.]])
+    with np.errstate(all="raise"):
+        result = _solve_ising_local_search(matrix)
+    np.testing.assert_array_equal(result, [[-1, 1]])

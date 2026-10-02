@@ -538,6 +538,9 @@ def _solve_ising_local_search(
     in a full scan can lose small gains, so numerically ambiguous trajectories
     need not match that subtraction-based implementation.
 
+    Off-diagonal absolute row sums must not exceed one quarter of the float64
+    maximum, leaving headroom for doubled gains and field updates.
+
     Args:
         ising_matrix: Square Ising matrix with an auxiliary spin.
         initial_binary: Optional initial binary state for the original QUBO
@@ -572,8 +575,12 @@ def _solve_ising_local_search(
         return spins.reshape(1, -1)
     upper = np.triu(matrix, 1)
     couplings = upper + upper.T
+    # Keep fields, doubled gains, and intermediate field updates representable.
+    with np.errstate(over="ignore"):
+        row_scale = np.sum(np.abs(couplings), axis=1)
+    if np.any(row_scale > np.finfo(float).max / 4):
+        raise ValueError("ising_matrix coupling row sums exceed the safe float64 range")
     fields = np.sum(couplings * spins[None, :], axis=1)
-    row_scale = np.sum(np.abs(couplings), axis=1)
     for iteration in range(int(max_iter)):
         # Bound initial row summation and accumulated field-update roundoff.
         error_bound = (
