@@ -77,6 +77,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Args:
             s_visible: Visible layer tensor.
             requires_grad: Whether to allow gradient backpropagation.
+            bernoulli: Whether to draw binary states instead of probabilities.
+
+        Returns:
+            torch.Tensor: Full state tensor whose dtype matches the model
+            parameters.
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
@@ -84,13 +89,16 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
                 device=self.device,
+                dtype=self.quadratic_coef.dtype,
             )
             s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
                 s_visible @ self.quadratic_coef + self.linear_bias[self.num_visible :]
             )
             if bernoulli:
-                s_all[:, self.num_visible :] = (prob > torch.rand_like(prob)).float()
+                s_all[:, self.num_visible :] = (prob > torch.rand_like(prob)).to(
+                    dtype=s_all.dtype
+                )
             else:
                 s_all[:, self.num_visible :] = prob
             return s_all
@@ -98,11 +106,23 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def get_visible(
         self, s_hidden: torch.Tensor, bernoulli: bool = False
     ) -> torch.Tensor:
-        """Propagate hidden spins to the visible layer."""
+        """Propagate hidden spins to the visible layer.
+
+        Args:
+            s_hidden: Hidden layer tensor.
+            bernoulli: Whether to draw binary states instead of probabilities.
+
+        Returns:
+            torch.Tensor: Full state tensor whose dtype matches the model
+            parameters.
+        """
         with torch.no_grad():
             s_all = torch.zeros(
-                s_hidden.size(0), self.num_hidden + self.num_visible
-            ).to(self.device)
+                s_hidden.size(0),
+                self.num_hidden + self.num_visible,
+                device=self.device,
+                dtype=self.quadratic_coef.dtype,
+            )
             s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
                 s_hidden @ self.quadratic_coef.t()
@@ -110,7 +130,9 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             )
 
             if bernoulli:
-                s_all[:, : self.num_visible] = (prob > torch.rand_like(prob)).float()
+                s_all[:, : self.num_visible] = (prob > torch.rand_like(prob)).to(
+                    dtype=s_all.dtype
+                )
             else:
                 s_all[:, : self.num_visible] = prob
             return s_all
