@@ -86,3 +86,19 @@ def test_reiterable_sources_support_epochs_and_mask_updates(training_setup, load
     assert isinstance(loss, float)
     assert wrapper._trained_epochs == 3
     assert wrapper.mask.shape == (2,)
+
+
+def test_custom_reiterable_with_next_method_is_supported(training_setup):
+    wrapper, optimizer, batches = training_setup
+
+    class Reiterable:
+        def __init__(self):
+            self.cursor = iter(batches)
+        def __iter__(self):
+            return iter(batches)
+        def __next__(self):
+            return next(self.cursor)
+
+    loss = wrapper.fit_weights(Reiterable(), nn.MSELoss(), optimizer, 2)
+    assert isinstance(loss, float)
+    assert wrapper._trained_epochs == 2

@@ -220,7 +220,8 @@ class FeatureSelectionWrapper(nn.Module):
             interval is not None and min(train_epochs, interval) > 0
             and self._trained_epochs % interval + train_epochs >= interval
         )
-        if isinstance(data_loader, Iterator) and (train_epochs > 1 or mask_update_due):
+        if (train_epochs > 1 or mask_update_due) and isinstance(data_loader, Iterator) \
+                and iter(data_loader) is data_loader:
             raise ValueError(
                 "data_loader must be re-iterable for multiple epochs or mask updates; "
                 "use a DataLoader or a list instead of a one-shot iterator"
