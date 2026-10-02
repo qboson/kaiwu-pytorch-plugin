@@ -62,8 +62,8 @@ def write_fasta_records(path: Path, records: list[tuple[str, str]]) -> None:
     """Writes FASTA records to disk."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
-        for index, (header, sequence) in enumerate(records, start=1):
-            handle.write(f">seq_{index} {header}\n")
+        for header, sequence in records:
+            handle.write(f">{header}\n")
             handle.write(sequence + "\n")
 
 
