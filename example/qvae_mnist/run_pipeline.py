@@ -11,9 +11,38 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
+import kaiwu as kw
+
 from model import Config
 from downstream import get_full_pipeline
 from utils.loadMNIST import loadMNIST
+
+
+def _ensure_license():
+    """Initialize the Kaiwu SDK license from the environment or exit.
+
+    The default ``--sampler-type sa`` (and ``cim``) sampler requires a Kaiwu
+    license; without credentials the SDK drops into an interactive prompt that
+    crashes non-interactive runs with ``ValueError: EOF when reading a line``.
+
+    Raises:
+        SystemExit: When ``USER_ID`` or ``SDK_CODE`` is not set, with setup
+            instructions.
+    """
+    user_id = os.getenv("USER_ID")
+    sdk_code = os.getenv("SDK_CODE")
+    if user_id and sdk_code:
+        kw.license.init(user_id, sdk_code)
+        return
+    raise SystemExit(
+        "This example needs a Kaiwu SDK license to run.\n"
+        "1. Register on https://platform.qboson.com and get your credentials\n"
+        "   (see docs/source/getting_started/installation.md, section\n"
+        "   'Kaiwu SDK Configuration & License').\n"
+        "2. Export them before running the example:\n"
+        '   export USER_ID="<your-user-id>"\n'
+        '   export SDK_CODE="<your-sdk-code>"'
+    )
 
 
 def flatten_dataloader(dataloader):
@@ -28,6 +57,8 @@ def flatten_dataloader(dataloader):
 
 
 def main():
+    _ensure_license()
+
     parser = argparse.ArgumentParser(description="Train QVAE + MLP pipeline")
     # Model hyperparameters
     parser.add_argument("--model-type", type=str, default="QVAE", choices=["QVAE", "CellQVAE"])
