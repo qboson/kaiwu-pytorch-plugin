@@ -181,6 +181,15 @@ class Trainer:
 
         t_start = time.time()
         step = 0
+
+        # 空的 data（例如 drop_last=True 且 batch_size 大于数据集）会让下面的
+        # while 循环无法推进 step，从而无限空转，因此提前报错。
+        if max_steps > 0 and len(self.data) == 0:
+            raise ValueError(
+                "train() requires at least one data batch, but the data source "
+                "yielded no batches."
+            )
+
         self.saver.save_info(self.bm_net, save_path, 0, 0.0)
 
         # 预先分配 Pool 以减少重复创建开销
