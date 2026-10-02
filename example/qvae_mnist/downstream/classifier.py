@@ -195,7 +195,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             if epoch % 10 == 0:
                 # print(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.2f}%")
                 logger.info(
-                    f"Epoch {epoch}/{epoch}: "
+                    f"Epoch {epoch}/{self.epochs}: "
                     f"Train Loss={avg_train_loss:.4f}, Train Acc={train_acc:.2f}% | "
                     f"Val Loss={avg_val_loss:.4f}, Val Acc={val_acc:.2f}%"
                 )
