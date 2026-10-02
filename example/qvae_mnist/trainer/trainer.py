@@ -102,15 +102,6 @@ class Trainer:
                 activation_fct=self.config.activation_fct,
                 config=self.config
             )
-        elif self.config.type == 'CellQVAE':
-            model = CellQVAE(
-                input_dimension=input_dim,
-                activation_fct=self.config.activation_fct,
-                bm_type=self.config.bm_type,
-                sampler_type=self.config.sampler_type,
-                config=self.config,
-                n_batches=self.n_batches,
-            )
         else:
             raise ValueError(f"Unsupported model type: {self.config.type}")
 
