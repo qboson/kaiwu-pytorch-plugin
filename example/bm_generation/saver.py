@@ -24,6 +24,7 @@ class Saver:
             t_run (float): 计算运行时间
         """
         save_path = os.path.join(save_path, f"rbm_model{output_i}.pth")
+        os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
         print(f"time: {time}, save_path: {save_path}")
         torch.save(model, save_path)
 
