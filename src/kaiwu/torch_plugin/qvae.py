@@ -189,7 +189,7 @@ class QVAE(AutoEncoderBase):
         if loss_type is not None and loss_type != configured_loss_type:
             raise ValueError("loss_type must match model.config.loss_type")
 
-        x = x.view(-1, self._input_dimension)
+        x = x.reshape(-1, self._input_dimension)
         if configured_loss_type == "bernoulli" and self._dataset_mean is not None:
             x = x - torch.as_tensor(self._dataset_mean, dtype=x.dtype, device=x.device)
         elif configured_loss_type != "mse":
@@ -230,7 +230,7 @@ class QVAE(AutoEncoderBase):
             tuple: Reconstructed logits, posterior distribution, encoder logits,
                 and reparameterized latent sample.
         """
-        x = x.view(-1, self._input_dimension)
+        x = x.reshape(-1, self._input_dimension)
 
         # For Bernoulli data, we optionally subtract dataset mean
         if self.config.loss_type == "bernoulli":
@@ -275,7 +275,7 @@ class QVAE(AutoEncoderBase):
         """
         if self.config.loss_type == "mse":
             recon_loss = F.mse_loss(
-                recon_x, x.view(-1, self._input_dimension), reduction="sum"
+                recon_x, x.reshape(-1, self._input_dimension), reduction="sum"
             ) / x.size(0)
         elif self.config.loss_type == "bernoulli":  # bernoulli
             # recon_loss = F.binary_cross_entropy_with_logits(
