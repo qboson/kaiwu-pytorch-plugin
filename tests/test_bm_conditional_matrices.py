@@ -190,3 +190,27 @@ def test_empty_batch_does_not_prepare_terms(monkeypatch):
     monkeypatch.setattr(model, 'symmetrized_quadratic_coef', unexpected)
     with pytest.raises((RuntimeError, ValueError)):
         model.condition_sample(RecordingSampler(), torch.empty(0, 3))
+
+
+@pytest.mark.parametrize('autocast_dtype', [torch.float16, torch.bfloat16])
+def test_autocast_preserves_legacy_matrix_with_float32_bias(autocast_dtype):
+    model = machine(6, torch.float32, 7)
+    visible = torch.rand(4, 3)
+    sampler = RecordingSampler()
+    with torch.autocast('cpu', dtype=autocast_dtype):
+        model.condition_sample(sampler, visible)
+        for row, matrix in zip(visible, sampler.matrices):
+            np.testing.assert_array_equal(matrix, legacy_matrix(model, row))
+
+
+def test_autocast_preserves_promoted_field_dtype():
+    model = machine(6, torch.float32, 7)
+    model.linear_bias = torch.nn.Parameter(model.linear_bias.detach().half())
+    visible = torch.rand(4, 3)
+    sampler = RecordingSampler()
+    with torch.autocast('cpu', dtype=torch.float16):
+        model.condition_sample(sampler, visible)
+        for row, matrix in zip(visible, sampler.matrices):
+            reference = legacy_matrix(model, row)
+            assert matrix.dtype == reference.dtype == np.float16
+            np.testing.assert_array_equal(matrix, reference)

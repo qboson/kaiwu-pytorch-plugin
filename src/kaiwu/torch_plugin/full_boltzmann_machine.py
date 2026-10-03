@@ -157,7 +157,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 conditional_terms = self._conditional_ising_terms(s_visible.shape[-1])
             template, visible_coef, hidden_bias, column_sums = conditional_terms
             sub_linear = visible_coef @ s_visible + hidden_bias
-            ising_mat = template.clone()
+            ising_mat = template.to(dtype=sub_linear.dtype, copy=True)
             ising_bias = sub_linear / 4 + column_sums / 8
             ising_mat[:-1, -1] = ising_bias
             ising_mat[-1, :-1] = ising_bias
