@@ -10,17 +10,29 @@ training loop, and result saving for QVAE models.
 import os
 from datetime import datetime
 import torch
-import numpy as np
-from tqdm import tqdm
-from copy import deepcopy
+try:
+    from tqdm import tqdm
+except ImportError:
+    def tqdm(iterable, *args, **kwargs):
+        class _NoOpPbar:
+            def __init__(self, it):
+                self.it = it
+            def __iter__(self):
+                return iter(self.it)
+            def set_description(self, *a, **kw):
+                pass
+        return _NoOpPbar(iterable)
 from torch.utils.data import DataLoader, Subset, TensorDataset
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
+try:
+    import seaborn as sns
+except ImportError:
+    sns = None
 import json
 
 from model import Config, FeatureExtractor, MnistQVAE as QVAE
-from .model_tuner import ModelTuner
+from .model_tuner import ModelTuner, SVITuner
 
 from utils.loadMNIST import loadMNIST
 from utils.helpers import plot_MNIST_output, t_SNE, create_tsne_animation#, save_list_to_txt
@@ -34,7 +46,7 @@ logger = get_logger(__name__)
 class Trainer:
     """统一的训练器类，封装数据加载、模型创建、训练循环、结果保存"""
 
-    def __init__(self, config, custom_train_data=None, custom_test_data=None):
+    def __init__(self, config, custom_train_data=None, custom_test_data=None, backend=None):
         """
         Initialize Trainer with configuration.
 
@@ -42,10 +54,12 @@ class Trainer:
             config (Config): Configuration object containing all parameters.
             custom_train_data (tuple, optional): (X, y) for custom training data.
             custom_test_data (tuple, optional): (X, y) for custom test data.
+            backend (str, optional): Training backend ('legacy' or 'svi'). Defaults to 'legacy'.
         """
         self.config = config
         self.custom_train_data = custom_train_data
         self.custom_test_data = custom_test_data
+        self.backend = backend or getattr(self.config, 'backend', 'legacy')
 
         # 输出目录
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -123,8 +137,11 @@ class Trainer:
         return model
 
     def _setup_tuner(self):
-        """初始化 ModelTuner 并设置优化器"""
-        self.tuner = ModelTuner(config=self.config)
+        """初始化 ModelTuner 或 SVITuner 并设置优化器"""
+        if self.backend == 'svi':
+            self.tuner = SVITuner(config=self.config)
+        else:
+            self.tuner = ModelTuner(config=self.config, backend='legacy')
 
         # 注册模型和数据加载器
         self.tuner.register_model(self.model)

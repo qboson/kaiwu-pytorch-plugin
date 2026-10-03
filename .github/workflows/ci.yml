@@ -64,6 +64,10 @@ jobs:
         run: |
           pytest tests/ -v --cov=src --cov-report=xml
 
+      - name: SVI backend smoke test
+        run: |
+          pytest tests/test_qvae_svi.py -v -k "smoke"
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:

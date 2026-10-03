@@ -5,10 +5,18 @@ This module provides the Trainer class and lower-level training logic (ModelTune
 for training QVAE models with various loss functions and samplers.
 """
 
-from .trainer import Trainer
-from .model_tuner import ModelTuner
+from .model_tuner import ModelTuner, SVITuner
 
-__all__ = [
-    "Trainer",
-    "ModelTuner",
-]
+try:
+    from .trainer import Trainer
+    __all__ = [
+        "Trainer",
+        "ModelTuner",
+        "SVITuner",
+    ]
+except ImportError:
+    Trainer = None
+    __all__ = [
+        "ModelTuner",
+        "SVITuner",
+    ]

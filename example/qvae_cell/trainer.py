@@ -176,35 +176,56 @@ class Trainer:
         """运行一个训练或验证 epoch，并返回平均指标。"""
         model.train(train)
         totals = {key: 0.0 for key in self.metric_keys}
+        backend = getattr(self.args, "backend", "legacy")
+
+        svi = None
+        if backend == "svi" and train:
+            from kaiwu.torch_plugin import Q_SVI
+            svi = Q_SVI(
+                model=model,
+                optim=vae_optimizer,
+                bm_optim=bm_optimizer,
+                bm_weight_decay=self.args.bm_weight_decay,
+            )
 
         for x, batch_idx in loader:
             x = x.to(self.device)
             batch_idx = batch_idx.to(self.device)
-            if train:
-                vae_optimizer.zero_grad()
 
-            with torch.set_grad_enabled(train):
-                # 第一阶段：更新 encoder/decoder，使重构项和 KL 项组成的 ELBO 更优。
-                output, posterior, q, _ = model(x, batch_idx)
-                loss = model.loss(x, output, posterior)
+            if backend == "svi" and train:
+                svi.step(x, batch_idx)
+                loss_dict = svi.get_last_loss_dict()
+                totals["loss"] += loss_dict["vae_loss"]
+                totals["neg_elbo"] += loss_dict["vae_loss"]
+                totals["kl"] += model.last_kl_loss.item()
+                totals["recon_loss"] += model.last_recon_loss.item()
+                totals["bm_loss"] += loss_dict["bm_loss"]
+            else:
                 if train:
-                    loss.backward()
-                    vae_optimizer.step()
+                    vae_optimizer.zero_grad()
 
-            bm_loss_value = 0.0
-            if train:
-                # 第二阶段：固定 encoder 输出 q，单独用 BM 目标更新玻尔兹曼机参数。
-                bm_optimizer.zero_grad()
-                bm_loss = model.bm_loss(q, self.args.bm_weight_decay)
-                bm_loss.backward()
-                bm_optimizer.step()
-                bm_loss_value = bm_loss.item()
+                with torch.set_grad_enabled(train):
+                    # 第一阶段：更新 encoder/decoder，使重构项和 KL 项组成的 ELBO 更优。
+                    output, posterior, q, _ = model(x, batch_idx)
+                    loss = model.loss(x, output, posterior)
+                    if train:
+                        loss.backward()
+                        vae_optimizer.step()
 
-            totals["loss"] += loss.item()
-            totals["neg_elbo"] += loss.item()
-            totals["kl"] += model.last_kl_loss.item()
-            totals["recon_loss"] += model.last_recon_loss.item()
-            totals["bm_loss"] += bm_loss_value
+                bm_loss_value = 0.0
+                if train:
+                    # 第二阶段：固定 encoder 输出 q，单独用 BM 目标更新玻尔兹曼机参数。
+                    bm_optimizer.zero_grad()
+                    bm_loss = model.bm_loss(q, self.args.bm_weight_decay)
+                    bm_loss.backward()
+                    bm_optimizer.step()
+                    bm_loss_value = bm_loss.item()
+
+                totals["loss"] += loss.item()
+                totals["neg_elbo"] += loss.item()
+                totals["kl"] += model.last_kl_loss.item()
+                totals["recon_loss"] += model.last_recon_loss.item()
+                totals["bm_loss"] += bm_loss_value
 
         return {key: value / len(loader) for key, value in totals.items()}
 

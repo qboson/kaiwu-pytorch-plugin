@@ -4,8 +4,15 @@ MNIST Data Loader
 """
 import torch
 from torch.utils.data import DataLoader, Subset
-from torchvision import datasets, transforms
-from torchvision.datasets import MNIST, FashionMNIST, KMNIST
+try:
+    from torchvision import datasets, transforms
+    from torchvision.datasets import MNIST, FashionMNIST, KMNIST
+except ImportError:
+    datasets = None
+    transforms = None
+    MNIST = None
+    FashionMNIST = None
+    KMNIST = None
 
 import logging
 logger = logging.getLogger(__name__)
@@ -32,6 +39,9 @@ def loadMNIST(
     Returns:
         train_loader, test_loader: PyTorch DataLoader objects
     """
+    if MNIST is None:
+        raise ImportError("torchvision is required to load MNIST datasets. Please install torchvision.")
+
     # Dataset mapping
     dataset_map = {
         "mnist": MNIST,
