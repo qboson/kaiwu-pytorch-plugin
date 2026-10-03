@@ -186,3 +186,32 @@ $$
   - 训练后 RBM 权重可视化
   - 分类任务结果：混淆矩阵可视化
   - 重建样本：训练完成后对测试图像进行编码-解码得到的重建
+
+## 七、核心 UnsupervisedDBN 的检查点恢复
+
+`kaiwu.torch_plugin.dbn.UnsupervisedDBN` 的 `state_dict()` 包含版本化的
+`_extra_state`，记录 `mark_as_trained()` 设置的训练就绪状态。恢复时先按原
+`hidden_layers_structure` 和输入维度调用 `create_rbm_layer(...)`，再加载权重：
+
+```python
+import torch
+from kaiwu.torch_plugin.dbn import UnsupervisedDBN
+
+# source_dbn 已完成训练，并调用过 mark_as_trained()
+torch.save(source_dbn.state_dict(), "dbn_weights.pt")
+
+restored = UnsupervisedDBN(hidden_layers_structure=[100, 100])
+restored.create_rbm_layer(input_dim=64)
+restored.load_state_dict(torch.load("dbn_weights.pt", weights_only=True))
+features = restored.transform(data)
+```
+
+就绪和未就绪状态都会保留；加载不会自动创建架构。元数据仅包含普通整数、
+布尔值和字典，支持 PyTorch 的 `weights_only=True` 加载。
+
+旧版字典没有 `_extra_state`，仍可用 `strict=True` 加载，但加载后状态为未就绪；
+确认这些权重确实来自已训练模型后，再显式调用 `restored.mark_as_trained()`。
+缺失或不匹配的权重仍会按 PyTorch 规则报告，不能因为兼容旧元数据而忽略。
+损坏元数据、权重形状错误或不完整/有额外键的加载不会把此 DBN 标为就绪，
+包括 `strict=False` 的不完整加载。权重加载本身遵循 PyTorch 的行为，并不保证
+失败时回滚所有已复制的参数。重新创建 RBM 层会再次清除就绪状态。

@@ -42,6 +42,64 @@ class UnsupervisedDBN(nn.Module):
         self.rbm_layers = None
         self.input_dim = None
         self._is_trained = False
+        self._checkpoint_loading = None
+        self.register_load_state_dict_post_hook(self._finish_checkpoint_load)
+
+    def get_extra_state(self):
+        """Save training readiness as versioned, weights-only-safe metadata."""
+        return {"version": 1, "is_trained": self._is_trained}
+
+    def set_extra_state(self, state):
+        """Restore readiness, rejecting malformed or unsupported metadata.
+
+        Args:
+            state (dict): Metadata returned by ``get_extra_state``.
+
+        Raises:
+            ValueError: If the checkpoint metadata is invalid.
+        """
+        self._is_trained = False
+        if (
+            not isinstance(state, dict)
+            or not isinstance(state.get("version"), int)
+            or isinstance(state.get("version"), bool)
+            or state["version"] != 1
+            or not isinstance(state.get("is_trained"), bool)
+        ):
+            raise ValueError("Invalid or unsupported DBN checkpoint extra state")
+        self._is_trained = state["is_trained"]
+
+    def _load_from_state_dict(
+        self, state_dict, prefix, local_metadata, strict,
+        missing_keys, unexpected_keys, error_msgs,
+    ):
+        """Load legacy weights and defer readiness until child weights load."""
+        self._is_trained = False
+        self._checkpoint_loading = None
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs,
+        )
+        extra_key = prefix + "_extra_state"
+        if extra_key not in state_dict and extra_key in missing_keys:
+            # Legacy checkpoints have no readiness evidence, but their weights
+            # must still load strictly. Require an explicit mark_as_trained().
+            missing_keys.remove(extra_key)
+        self._checkpoint_loading = (self._is_trained, prefix, error_msgs)
+        self._is_trained = False
+
+    def _finish_checkpoint_load(self, module, incompatible_keys):
+        """Only restore readiness after a complete compatible subtree load."""
+        del module
+        if self._checkpoint_loading is None:
+            return
+        is_trained, prefix, error_msgs = self._checkpoint_loading
+        self._checkpoint_loading = None
+        incompatible = any(
+            key.startswith(prefix)
+            for key in incompatible_keys.missing_keys + incompatible_keys.unexpected_keys
+        )
+        self._is_trained = is_trained and not incompatible and not error_msgs
 
     def create_rbm_layer(self, input_dim):
         """Creates the layers of RBMs for the DBN.
