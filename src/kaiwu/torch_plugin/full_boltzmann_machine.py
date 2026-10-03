@@ -111,33 +111,54 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             ising_mat[-1, :num_nodes] = ising_bias
             return ising_mat.cpu().numpy()
 
-    def _hidden_to_ising_matrix(self, s_visible: torch.Tensor) -> np.ndarray:
+    def _conditional_ising_terms(self, num_visible):
+        """Prepare static conditional terms for one sampling call.
+
+        Args:
+            num_visible (int): Number of clamped leading nodes.
+
+        Returns:
+            tuple: Matrix template, hidden-visible weights, hidden biases, and
+            hidden coupling column sums.
+        """
+        with torch.no_grad():
+            quadratic_coef = self.symmetrized_quadratic_coef()
+            hidden_quadratic = quadratic_coef[num_visible:, num_visible:]
+            hidden_bias = self.linear_bias[num_visible:].detach().clone()
+            num_hidden = self.num_nodes - num_visible
+            template = torch.zeros(
+                (num_hidden + 1, num_hidden + 1),
+                device=self.device,
+                dtype=torch.promote_types(quadratic_coef.dtype, hidden_bias.dtype),
+            )
+            template[:-1, :-1] = hidden_quadratic / 8
+            return (
+                template,
+                quadratic_coef[num_visible:, :num_visible],
+                hidden_bias,
+                hidden_quadratic.sum(dim=0),
+            )
+
+    def _hidden_to_ising_matrix(
+        self, s_visible: torch.Tensor, *, conditional_terms=None
+    ) -> np.ndarray:
         """Given visible nodes, convert the model to a submatrix in Ising format.
 
         Args:
-            s_visible (torch.Tensor): State of the visible layer, shape (B, num_visible).
+            s_visible (torch.Tensor): One visible state, shape (num_visible,).
+            conditional_terms (tuple, optional): Static terms prepared for the
+                current sampling call. Recomputed when omitted.
 
         Returns:
             np.ndarray: Submatrix in Ising format.
         """
         with torch.no_grad():
-            linear_bias = self.linear_bias
-            quadratic_coef = self.symmetrized_quadratic_coef()
-            n_vis = s_visible.shape[-1]
-            num_nodes = self.num_nodes
-            n_hid = num_nodes - n_vis
-            sub_quadratic = quadratic_coef[n_vis:, n_vis:]
-            sub_column_sums = torch.sum(sub_quadratic, dim=0)
-            sub_quadratic_vh = quadratic_coef[n_vis:, :n_vis]
-            sub_linear = sub_quadratic_vh @ s_visible + linear_bias[n_vis:]
-
-            ising_mat = torch.zeros(
-                (n_hid + 1, n_hid + 1),
-                device=self.device,
-                dtype=sub_linear.dtype,
-            )
-            ising_mat[:-1, :-1] = sub_quadratic / 8
-            ising_bias = sub_linear / 4 + sub_column_sums / 8
+            if conditional_terms is None:
+                conditional_terms = self._conditional_ising_terms(s_visible.shape[-1])
+            template, visible_coef, hidden_bias, column_sums = conditional_terms
+            sub_linear = visible_coef @ s_visible + hidden_bias
+            ising_mat = template.clone()
+            ising_bias = sub_linear / 4 + column_sums / 8
             ising_mat[:-1, -1] = ising_bias
             ising_mat[-1, :-1] = ising_bias
             return ising_mat.cpu().numpy()
@@ -209,8 +230,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 (shape determined by ``sampler`` and ``sample_params``).
         """
         solutions = []
+        conditional_terms = None
         for i in range(s_visible.size(0)):
-            ising_mat = self._hidden_to_ising_matrix(s_visible[i])
+            if conditional_terms is None:
+                conditional_terms = self._conditional_ising_terms(s_visible.shape[-1])
+            ising_mat = self._hidden_to_ising_matrix(
+                s_visible[i], conditional_terms=conditional_terms
+            )
 
             with kpp_caller_context():
                 solution = sampler.solve(ising_mat)
