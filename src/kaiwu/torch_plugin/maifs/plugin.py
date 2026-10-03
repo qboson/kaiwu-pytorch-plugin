@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from math import ceil
+from numbers import Integral
 
 import numpy as np
 import torch
@@ -255,22 +256,37 @@ class FeatureSelectionWrapper(nn.Module):
             loss_fn: Loss function returning a scalar tensor.
             hessian_mode: ``"full"`` for the full Hessian or ``"diagonal"`` for
                 diagonal-only Hessian rows.
-            max_samples: Optional maximum number of samples used for derivatives.
+            max_samples: Positive integer maximum number of samples used for
+                derivatives, or ``None`` to use all samples. Oversized batches
+                are sliced before concatenation to avoid copying unused samples.
 
         Returns:
             A tuple containing the mask gradient and Hessian as NumPy arrays.
 
         Raises:
+            TypeError: If ``max_samples`` is not an integer or ``None``, or is
+                a boolean.
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
-                no batches, or ``loss_fn`` does not return a scalar tensor.
+                no batches, ``max_samples`` is nonpositive, or ``loss_fn`` does
+                not return a scalar tensor.
         """
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
+        if max_samples is not None:
+            if isinstance(max_samples, bool) or not isinstance(max_samples, Integral):
+                raise TypeError("max_samples must be a positive integer or None")
+            if max_samples <= 0:
+                raise ValueError("max_samples must be positive")
+            max_samples = int(max_samples)
 
         input_batches: list[torch.Tensor] = []
         target_batches: list[torch.Tensor] = []
         count = 0
         for input_batch, target_batch in data_loader:
+            if max_samples is not None:
+                remaining = max_samples - count
+                input_batch = input_batch[:remaining]
+                target_batch = target_batch[:remaining]
             input_batches.append(input_batch)
             target_batches.append(target_batch)
             count += len(input_batch)
@@ -281,9 +297,6 @@ class FeatureSelectionWrapper(nn.Module):
             raise ValueError("data_loader produced no batches")
         input_all = torch.cat(input_batches, dim=0)
         target_all = torch.cat(target_batches, dim=0)
-        if max_samples is not None:
-            input_all = input_all[:max_samples]
-            target_all = target_all[:max_samples]
         input_all = input_all.to(self.mask.device)
         target_all = target_all.to(self.mask.device)
         was_training = self.training
