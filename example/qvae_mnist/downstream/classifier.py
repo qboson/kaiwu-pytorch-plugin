@@ -129,6 +129,8 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y, validation_split=0.2):
         """训练MLP模型"""
+        if self.epochs < 1:
+            raise ValueError("epochs_mlp must be a positive integer")
         if self.input_dim is None:
             self.input_dim = X.shape[1]
             logger.info(f"Auto-detected input_dim: {self.input_dim}")
@@ -209,7 +211,8 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
                     torch.save(best_state, model_save_path)
 
         # 加载最佳模型
-        self.model.load_state_dict(best_state)
+        if best_state is not None:
+            self.model.load_state_dict(best_state)
         logger.info(f"Best Validation Accuracy: {best_val_acc:.2f}%")
 
         # 绘制训练曲线
