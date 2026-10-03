@@ -1,4 +1,5 @@
 import os
+from numbers import Integral
 from tqdm import tqdm
 import logging
 import numpy as np
@@ -8,6 +9,8 @@ from torch.utils.data import DataLoader, TensorDataset
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import check_X_y
 
 from utils.helpers import plot_training_curves
 
@@ -56,7 +59,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             layers.append(nn.ReLU())
             layers.append(nn.Dropout(0.2))
             prev_dim = h
-        layers.append(nn.Linear(prev_dim, self.output_dim))
+        layers.append(nn.Linear(prev_dim, getattr(self, "output_dim_", self.output_dim)))
         return nn.Sequential(*layers).to(self.device)
 
     def _train_mlp_epoch(self, model, data_loader, optimizer, criterion, device):
@@ -128,16 +131,33 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return val_acc, avg_val_loss
 
     def fit(self, X, y, validation_split=0.2):
-        """训练MLP模型"""
+        """Train using contiguous indices and expose original class labels.
+
+        Probability columns follow ``classes_``. ``output_dim=None`` infers the
+        number of classes; an explicit dimension must match that number.
+        """
+        X, y = check_X_y(X, y)
+        check_classification_targets(y)
+        classes, encoded_y = np.unique(y, return_inverse=True)
+        if self.output_dim is not None:
+            if isinstance(self.output_dim, (bool, np.bool_)) or not isinstance(
+                self.output_dim, Integral
+            ):
+                raise ValueError("output_dim must be an integer or None")
+            if self.output_dim != len(classes):
+                raise ValueError(
+                    "output_dim must equal the number of classes; "
+                    "use output_dim=None to infer it"
+                )
         if self.input_dim is None:
             self.input_dim = X.shape[1]
             logger.info(f"Auto-detected input_dim: {self.input_dim}")
         # 数据划分
         X_train, X_val, y_train, y_val = train_test_split(
-            X, y, 
+            X, encoded_y,
             test_size=validation_split, 
             random_state=self.random_state,
-            stratify=y
+            stratify=encoded_y
         )
         # 转为 Tensor
         X_train = torch.FloatTensor(X_train).to(self.device)
@@ -145,7 +165,8 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         X_val = torch.FloatTensor(X_val).to(self.device)
         y_val = torch.LongTensor(y_val).to(self.device)
 
-        self.classes_ = np.unique(y)
+        self.classes_ = classes
+        self.output_dim_ = len(classes)
 
         # 创建数据加载器
         train_dataset = TensorDataset(X_train, y_train)
@@ -235,7 +256,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         with torch.no_grad():
             out = self.model(X_tensor)
             _, pred = out.max(1)
-        return pred.cpu().numpy()
+        return self.classes_[pred.cpu().numpy()]
 
     def predict_proba(self, X):
         self.model.eval()
