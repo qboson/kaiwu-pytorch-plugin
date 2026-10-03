@@ -48,6 +48,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         quadratic_coef = self.quadratic_coef.triu(1)
         return quadratic_coef + quadratic_coef.transpose(0, 1)
 
+    _default_symmetrized_quadratic_coef = symmetrized_quadratic_coef
+
     def clip_parameters(self, h_range, j_range) -> None:
         """Clip linear and quadratic bias weights in-place.
 
@@ -85,8 +87,27 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
         """
-        return -s_all @ self.linear_bias - 0.5 * torch.sum(
-            s_all.matmul(self.symmetrized_quadratic_coef()) * s_all, dim=-1
+        # Keep custom symmetry definitions and reduced-precision autocast on
+        # the existing path. Default real floating-point energy needs only U:
+        # 0.5 * s @ (U + U.T) @ s == s @ U @ s.
+        symmetry = self.symmetrized_quadratic_coef
+        if (
+            getattr(symmetry, "__func__", None)
+            is not BoltzmannMachine._default_symmetrized_quadratic_coef
+            or (
+                torch.amp.autocast_mode.is_autocast_available(s_all.device.type)
+                and torch.is_autocast_enabled(s_all.device.type)
+            )
+            or s_all.dtype not in (torch.float32, torch.float64)
+            or self.quadratic_coef.dtype not in (torch.float32, torch.float64)
+        ):
+            quadratic = symmetry()
+            return -s_all @ self.linear_bias - 0.5 * torch.sum(
+                s_all.matmul(quadratic) * s_all, dim=-1
+            )
+        upper = self.quadratic_coef.triu(1)
+        return -s_all @ self.linear_bias - torch.sum(
+            s_all.matmul(upper) * s_all, dim=-1
         )
 
     def _to_ising_matrix(self):
