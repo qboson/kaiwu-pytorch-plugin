@@ -437,18 +437,26 @@ class QuadraticLinearSolver:
             raise ValueError("qubo_matrix must contain only finite values")
 
         num_variables = qubo_matrix.shape[0]
-        auxiliary_index = num_variables
         ising_matrix = np.zeros((num_variables + 1, num_variables + 1), dtype=float)
+        if num_variables == 0:
+            return ising_matrix
 
-        for row in range(num_variables):
-            diagonal = float(qubo_matrix[row, row])
-            ising_matrix[row, auxiliary_index] += 0.5 * diagonal
-            for col in range(row + 1, num_variables):
-                coefficient = float(qubo_matrix[row, col])
-                pair_weight = 0.25 * coefficient
-                ising_matrix[row, col] += pair_weight
-                ising_matrix[row, auxiliary_index] += pair_weight
-                ising_matrix[col, auxiliary_index] += pair_weight
+        pairs = ising_matrix[:num_variables, :num_variables]
+        auxiliary = ising_matrix[:num_variables, num_variables]
+        scratch = np.triu(qubo_matrix, 1)
+        # Match scalar addition order rather than regrouping row/column sums:
+        # incoming pairs, then the diagonal, then outgoing pairs. Reuse one
+        # square scratch array for both ordered cumulative sums. Scalar legacy
+        # multiplication underflows silently; honor caller overflow/invalid policy.
+        with np.errstate(under="ignore"):
+            scratch *= 0.25
+            np.add(pairs, scratch, out=pairs)
+            np.cumsum(pairs, axis=0, out=scratch)
+            auxiliary[:] = scratch[-1] + 0.5 * np.diag(qubo_matrix)
+            scratch[:] = pairs
+            scratch[:, 0] = auxiliary
+            np.cumsum(scratch, axis=1, out=scratch)
+            auxiliary[:] = scratch[:, -1]
 
         return ising_matrix
 
