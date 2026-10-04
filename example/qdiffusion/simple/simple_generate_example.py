@@ -13,6 +13,7 @@ This script keeps only the smallest useful inference path:
 
 from __future__ import annotations
 
+import argparse
 from pathlib import Path
 
 from _example_bootstrap import ensure_repo_src_on_path
@@ -99,15 +100,66 @@ def decode_tokens(generator, tokens: torch.Tensor) -> str:
 # Example entrypoint.
 
 
-def main() -> None:
+def parse_args(argv=None):
+    """Parses command-line arguments for this example.
+
+    Args:
+        argv: Argument list to parse; defaults to ``sys.argv[1:]``.
+
+    Returns:
+        argparse.Namespace: The parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Minimal QDiffusion example."
+    )
+    parser.add_argument(
+        "--fasta-path",
+        default=None,
+        help=(
+            "FASTA file to read sequences from. Defaults to the bundled "
+            "example proteome location, which is not shipped in the "
+            "repository and must be downloaded first."
+        ),
+    )
+    return parser.parse_args(argv)
+
+
+def resolve_fasta_path(cli_path):
+    """Resolves the FASTA input and fails fast when it is unavailable.
+
+    Args:
+        cli_path: Path passed via ``--fasta-path``, or ``None`` for the
+            documented default location.
+
+    Returns:
+        Path: The FASTA file the example should read.
+
+    Raises:
+        FileNotFoundError: If the resolved FASTA file does not exist. Raised
+            before any pretrained model is built so the user gets an
+            actionable message instead of a failure after a long download.
+    """
+    fasta_path = Path(cli_path) if cli_path is not None else default_fasta_path()
+    if not fasta_path.is_file():
+        raise FileNotFoundError(
+            f"FASTA file not found: {fasta_path}. The example proteome is "
+            "not bundled with the repository; download it (see "
+            "example/qdiffusion/README.md) or pass --fasta-path to point at "
+            "a local FASTA file."
+        )
+    return fasta_path
+
+
+def main(argv=None) -> None:
     """Runs a tiny example generation loop.
 
     The example loads one pretrained ``QDiffusion`` model, reads the first
     usable sequence from the bundled FASTA, and prints the generated result.
     """
+    args = parse_args(argv)
+    fasta_path = resolve_fasta_path(args.fasta_path)
     proposal_ckpt = "airkingbd/dplm_150m"
     energy_ckpt = "airkingbd/dplm_150m"
-    fasta_path = default_fasta_path()
     max_steps = 5
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
