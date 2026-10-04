@@ -127,6 +127,42 @@ def build_generator_from_config(
     )
 
 
+
+def build_comparison_generators(
+    config: "WorkflowConfig", *, device, num_baseline_candidates: int = 1
+) -> tuple[Any, Any]:
+    """Builds the proposal-only baseline and the guided comparison generator.
+
+    Both branches deliberately share every configured generation setting so
+    the final baseline-versus-guided comparison isolates the effect of the
+    learned BM reranker (candidate count and reranking) instead of mixing in
+    decoding-time differences.
+    """
+    baseline_generator = build_generator_from_config(
+        config,
+        device=device,
+        num_candidates=num_baseline_candidates,
+        proposal_temperature=config.generate.proposal_temperature,
+        proposal_noise_scale=config.generate.proposal_noise_scale,
+        energy_temperature=config.generate.energy_temperature,
+        disable_resample=config.generate.disable_resample,
+        resample_ratio=config.generate.resample_ratio,
+        resample_top_p=config.generate.resample_top_p,
+    )
+    guided_generator = build_generator_from_config(
+        config,
+        device=device,
+        num_candidates=config.generate.num_candidates,
+        proposal_temperature=config.generate.proposal_temperature,
+        proposal_noise_scale=config.generate.proposal_noise_scale,
+        energy_temperature=config.generate.energy_temperature,
+        disable_resample=config.generate.disable_resample,
+        resample_ratio=config.generate.resample_ratio,
+        resample_top_p=config.generate.resample_top_p,
+    )
+    return baseline_generator, guided_generator
+
+
 @dataclass
 class DataConfig:
     """Dataset selection and split settings."""
@@ -440,11 +476,10 @@ def main() -> None:
     print(f"Final checkpoint: {final_checkpoint_path}")
 
     # Stage 5: compare a proposal-only baseline against a guided generator that
-    # reloads the best learned energy weights from training.
-    baseline_generator = build_generator_from_config(
-        config,
-        device=device,
-        num_candidates=1,
+    # reloads the best learned energy weights from training. Both branches
+    # share the configured generation settings; only the reranker differs.
+    baseline_generator, guided_generator = build_comparison_generators(
+        config, device=device
     )
     # The baseline branch keeps the proposal path only; it gives us a direct
     # comparison point for how much the learned BM reranker helps.
@@ -455,18 +490,6 @@ def main() -> None:
         seed_base=config.data.seed,
         output_dir=output_dir / "baseline",
         label="proposal_only",
-    )
-
-    guided_generator = build_generator_from_config(
-        config,
-        device=device,
-        num_candidates=config.generate.num_candidates,
-        proposal_temperature=config.generate.proposal_temperature,
-        proposal_noise_scale=config.generate.proposal_noise_scale,
-        energy_temperature=config.generate.energy_temperature,
-        disable_resample=config.generate.disable_resample,
-        resample_ratio=config.generate.resample_ratio,
-        resample_top_p=config.generate.resample_top_p,
     )
     if best_checkpoint_path is None:
         raise RuntimeError("Training did not produce a best checkpoint.")
