@@ -271,5 +271,12 @@ class Trainer:
                     t_now = time.time()
                     self.saver.save_info(self.bm_net, save_path, step, t_now - t_start)
 
+        # 短训练（max_steps 不是 10 的倍数）此前只有 step 0 的初始模型可加载：
+        # 补存最后完成的一步，确保训练结束时的最终权重落盘。
+        if step % 10 != 0:
+            self.saver.save_info(
+                self.bm_net, save_path, step, time.time() - t_start
+            )
+
         pool.close()
         pool.join()
