@@ -53,6 +53,10 @@ class Trainer:
     def batch_indices(self, adata, batch_key):
         """把 obs 中的 batch 分类列编码为整数索引，供 decoder 拼接 one-hot 使用。"""
         batch_categories = adata.obs[batch_key].astype("category")
+        if batch_categories.isna().any():
+            raise ValueError(
+                f"adata.obs[{batch_key!r}] contains missing batch labels"
+            )
         self.n_batches = len(batch_categories.cat.categories)
         return batch_categories.cat.codes.to_numpy()
 
