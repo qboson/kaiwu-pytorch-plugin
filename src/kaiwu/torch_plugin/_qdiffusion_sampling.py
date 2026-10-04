@@ -8,6 +8,15 @@ from __future__ import annotations
 import torch
 
 
+def _sample_gumbel_like(tensor: torch.Tensor) -> torch.Tensor:
+    """Draw Gumbel noise without underflowing the endpoint guard in float16."""
+    uniform = torch.rand_like(tensor)
+    if uniform.dtype in (torch.float16, torch.bfloat16):
+        uniform = uniform.float()
+    noise = -torch.log(-torch.log(uniform + 1e-8) + 1e-8)
+    return noise.to(dtype=tensor.dtype)
+
+
 # Skeptical-remasking helpers.
 
 def topk_masking(
@@ -30,7 +39,7 @@ def topk_masking(
         cutoff.
     """
     if stochastic:
-        gumbel_noise = -torch.log(-torch.log(torch.rand_like(scores) + 1e-8) + 1e-8)
+        gumbel_noise = _sample_gumbel_like(scores)
         ranked_scores = scores + temp * gumbel_noise
     else:
         ranked_scores = scores
@@ -83,7 +92,7 @@ def stochastic_sample_from_categorical(
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
         sampled from the perturbed categorical distribution.
     """
-    gumbel_noise = -torch.log(-torch.log(torch.rand_like(logits) + 1e-8) + 1e-8)
+    gumbel_noise = _sample_gumbel_like(logits)
     noisy_logits = logits + noise_scale * gumbel_noise
     return sample_from_categorical(noisy_logits, temperature)
 
@@ -109,9 +118,7 @@ def stochastic_sample_from_categorical_n(
         whose leading dimension indexes the sampled candidate set.
     """
     expanded_logits = logits.unsqueeze(0).expand(n, *logits.shape)
-    gumbel_noise = -torch.log(
-        -torch.log(torch.rand_like(expanded_logits) + 1e-8) + 1e-8
-    )
+    gumbel_noise = _sample_gumbel_like(expanded_logits)
     noisy_logits = expanded_logits + noise_scale * gumbel_noise
     return sample_from_categorical(noisy_logits, temperature)
 
