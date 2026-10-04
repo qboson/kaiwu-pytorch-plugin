@@ -7,3 +7,8 @@ Discrete diffusion generation for proteins with the generic `Q-Diffusion` core (
 **Examples**: `example/qdiffusion/simple/simple_train_example.py` · `example/qdiffusion/simple/simple_generate_example.py`
 
 **DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome UP000005640
+
+Gumbel perturbations for proposal sampling and stochastic remasking are computed
+in float32 for float16/bfloat16 inputs, then converted back to the input dtype.
+This keeps zero uniform draws finite so that masked logits and protected token
+positions retain their intended meaning during half-precision generation.
