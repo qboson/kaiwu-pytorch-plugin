@@ -17,5 +17,5 @@ python train_qvae_cell.py \
   --sa-iterations-per-t 10 \
   --sa-size-limit 10 \
   --sa-rand-seed 512 \
-  --output-dir OUTPUT_DIR \
+  --output-dir "$OUTPUT_DIR" \
   --checkpoint-every 20
