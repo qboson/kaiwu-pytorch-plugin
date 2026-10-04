@@ -33,8 +33,7 @@ class ModelTuner(object):
 	def save_rbm(self,config_string='test'):
 		logger.info("Saving RBM")
 		f=open(os.path.join(self.outpath,"rbm_{0}.pt".format(config_string)),'wb')
-		print(self._model.prior)
-		torch.save(self._model.prior,f)
+		torch.save(self._model.bm,f)
 		f.close()
 		return
 
