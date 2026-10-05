@@ -711,6 +711,22 @@ def _solve_ising_kaiwu_cim(
     return np.asarray(restored).reshape(1, -1)
 
 
+def _sdk_ising_matrix(ising_matrix: np.ndarray) -> np.ndarray:
+    """Flip the sign of a positively-encoded QUBO Ising matrix for Kaiwu SDK solvers.
+
+    ``QuadraticLinearSolver`` encodes the QUBO objective positively
+    (``s^T M s = f(x) + const``), and the local search backend minimizes that
+    objective directly. Kaiwu SDK solvers (``kw.classical`` / ``kw.cim``)
+    instead **maximize** ``s^T M s``: the SDK's own
+    ``kw.conversion.qubo_matrix_to_ising_matrix`` encodes the QUBO negated
+    (returning the constant offset separately) so that its solvers return the
+    QUBO minimizer. Submitting the positive encoding therefore returns the
+    QUBO *maximizer* — the worst feature set — so the sign is flipped before
+    handing the matrix to SDK backends.
+    """
+    return -np.asarray(ising_matrix, dtype=float)
+
+
 def _binary_from_solver_solution(
     spin_solutions: np.ndarray,
     num_variables: int,
@@ -784,7 +800,7 @@ def solve_qubo(
             max_iter = int(sa_kwargs.pop("max_iter", 2000))
             random_state = int(sa_kwargs.pop("random_state", 0))
             spin_solutions = _solve_ising_sa(
-                ising_matrix,
+                _sdk_ising_matrix(ising_matrix),
                 initial_binary=initial_state,
                 max_iter=max_iter,
                 random_state=random_state,
@@ -793,7 +809,7 @@ def solve_qubo(
         elif solver_name == "kaiwu_cim":
             max_bits = solver_kwargs.get("max_bits", DEFAULT_CIM_MAX_BITS)
             spin_solutions = _solve_ising_kaiwu_cim(
-                ising_matrix,
+                _sdk_ising_matrix(ising_matrix),
                 target_precision=int(
                     solver_kwargs.get(
                         "target_precision",
