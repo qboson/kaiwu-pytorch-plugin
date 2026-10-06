@@ -24,19 +24,36 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         else:
             self.device = device
 
-    def to(self, device=..., dtype=..., non_blocking=...):
+    def to(self, *args, **kwargs):
         """Moves the model to the specified device.
 
+        Accepts the same call forms as :meth:`torch.nn.Module.to`, so
+        ``to(device)``, ``to(dtype)``, ``to(device, dtype, non_blocking)``,
+        ``to(tensor)`` and ``to()`` all work.
+
         Args:
-            device: Target device.
-            dtype: Target data type.
-            non_blocking: Whether the operation should be non-blocking.
+            args: Positional arguments forwarded to ``torch.nn.Module.to``.
+            kwargs: Keyword arguments forwarded to ``torch.nn.Module.to``.
 
         Returns:
             AbstractBoltzmannMachine: The model on the target device.
         """
-        self.device = device
-        return super().to(device)
+        result = super().to(*args, **kwargs)
+        # Read the resolved device/dtype back off a parameter rather than echoing
+        # the arguments. nn.Module.to() has several call forms, so only the
+        # module itself knows where a given call actually landed -- a dtype-only
+        # call leaves the device untouched, and ``to(torch.float64)`` binds the
+        # dtype to a device parameter when the signature names one.
+        param = next(self.parameters(), None)
+        if param is not None:
+            self.device = param.device
+            # GaussianBernoulliRestrictedBoltzmannMachine allocates tensors with
+            # `dtype=self.dtype`, so it has to track the parameters. Only that
+            # subclass defines the attribute.
+            if hasattr(self, "dtype"):
+                # pylint: disable=attribute-defined-outside-init
+                self.dtype = param.dtype
+        return result
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
