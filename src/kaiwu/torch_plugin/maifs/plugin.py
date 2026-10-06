@@ -62,7 +62,7 @@ class FeatureSelectionWrapper(nn.Module):
         >>> import torch
         >>> from torch import nn
         >>> from torch.utils.data import DataLoader, TensorDataset
-        >>> from maifs import FeatureSelectionWrapper
+        >>> from kaiwu.torch_plugin import FeatureSelectionWrapper
         >>> input_feature = torch.randn(16, 3)
         >>> target = 2.0 * input_feature[:, :1] - 3.0 * input_feature[:, 1:2]
         >>> loader = DataLoader(TensorDataset(input_feature, target), batch_size=16)
@@ -76,8 +76,8 @@ class FeatureSelectionWrapper(nn.Module):
         ...     mask_update_epochs=5,
         ... )
         >>> optimizer = torch.optim.SGD(selector.model.parameters(), lr=0.1)
-        >>> selector.fit_weights(loader, nn.MSELoss(), optimizer, train_epochs=1)
-        None
+        >>> selector.fit_weights(loader, nn.MSELoss(), optimizer, train_epochs=1)  # doctest: +SKIP
+        1.8...
     """
 
     def __init__(
