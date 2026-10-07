@@ -40,6 +40,13 @@ kpp_qvae/
 
 ## Training
 
+With `--normalization-method batch`, training needs `--batch-size` of at
+least 2 and at least two observations in the training split. If the last
+training batch contains only one observation, it is joined to the preceding
+batch so that no cells are discarded or repeated. That final batch can contain
+`batch_size + 1` observations. Layer normalization, validation, evaluation and
+the `--load-weights` path retain their usual batch sizes.
+
 The default data file is:
 
 ```text

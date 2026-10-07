@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, RandomSampler, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
@@ -15,6 +15,7 @@ from kaiwu.preprocess import PrecisionReducer
 from kaiwu.torch_plugin import BoltzmannMachine
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder
+from batching import SingletonSafeBatchSampler
 
 
 def set_seed(seed):
@@ -66,12 +67,22 @@ class Trainer:
         )
         x_tensor = torch.tensor(x, dtype=torch.float32)
         batch_tensor = torch.tensor(batch_indices, dtype=torch.long)
+        train_dataset = TensorDataset(x_tensor[train_idx], batch_tensor[train_idx])
+        if (self.args.normalization_method == "batch"
+                and not getattr(self.args, "load_weights", False)):
+            # BatchNorm cannot train a singleton. Retain it in the previous batch.
+            train_loader = DataLoader(
+                train_dataset,
+                batch_sampler=SingletonSafeBatchSampler(
+                    RandomSampler(train_dataset), self.args.batch_size
+                ),
+            )
+        else:
+            train_loader = DataLoader(
+                train_dataset, batch_size=self.args.batch_size, shuffle=True
+            )
         return (
-            DataLoader(
-                TensorDataset(x_tensor[train_idx], batch_tensor[train_idx]),
-                batch_size=self.args.batch_size,
-                shuffle=True,
-            ),
+            train_loader,
             DataLoader(
                 TensorDataset(x_tensor[val_idx], batch_tensor[val_idx]),
                 batch_size=self.args.batch_size,

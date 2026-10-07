@@ -36,6 +36,11 @@ kpp_qvae/
 
 ## 训练
 
+使用 `--normalization-method batch` 时，`--batch-size` 必须至少为 2，且训练
+划分必须包含至少两个观测。若训练尾批只有一个观测，会将它并入前一批，
+不会丢弃或重复细胞；因此最后一批最多有 `batch_size + 1` 个观测。
+Layer normalization、验证、评估和 `--load-weights` 路径保持原组批行为。
+
 默认数据为：
 
 ```text
