@@ -214,6 +214,48 @@ class TestQSVI(unittest.TestCase):
             results[backend] = batch_losses
         self.assertEqual(results["legacy"], results["svi"])
 
+    def test_default_step_invokes_guide_and_generate(self):
+        """Default construction runs the guide and the generative network.
+
+        The loss path must not bypass the guide by consuming the model's
+        composite forward output: the inference and generative programs stay
+        separate, as in pyro.infer.SVI.
+        """
+        model, vae_optim, bm_optim = self._build()
+        calls = {"guide": 0, "generate": 0, "forward": 0}
+
+        original_guide = model.guide
+        original_generate = model.generate
+        original_forward = model.forward
+
+        def spying_guide(*args, **kwargs):
+            calls["guide"] += 1
+            return original_guide(*args, **kwargs)
+
+        def spying_generate(*args, **kwargs):
+            calls["generate"] += 1
+            return original_generate(*args, **kwargs)
+
+        def spying_forward(*args, **kwargs):
+            calls["forward"] += 1
+            return original_forward(*args, **kwargs)
+
+        model.guide = spying_guide
+        model.generate = spying_generate
+        model.forward = spying_forward
+
+        q_svi = Q_SVI(
+            model=model,
+            optim=vae_optim,
+            bm_optim=bm_optim,
+            bm_weight_decay=self.weight_decay,
+        )
+        q_svi.step(torch.rand(4, self.input_dim))
+
+        self.assertEqual(calls["guide"], 1)
+        self.assertEqual(calls["generate"], 1)
+        self.assertEqual(calls["forward"], 0)
+
     def test_pyro_style_guide_and_loss_hooks(self):
         """Custom guide/loss callables are honored, kwargs reach the guide."""
         model, vae_optim, bm_optim = self._build()
@@ -221,8 +263,7 @@ class TestQSVI(unittest.TestCase):
 
         def guide(x, **kwargs):
             seen["guide_kwargs"] = kwargs
-            # Only forward kwargs the composed QVAE.forward understands.
-            return model(x)
+            return model.guide(x)
 
         def loss(x, recon_x, posterior):
             seen["loss_called"] = True
