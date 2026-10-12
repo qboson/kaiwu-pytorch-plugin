@@ -158,3 +158,8 @@ Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 - 为靶点发现提供新线索
 
 **相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)
+
+
+## Smoothing distribution support
+
+`Exponential` smoothing is supported on the closed unit interval. Outside `[0, 1]`, its PDF is zero and log PDF is negative infinity; its CDF is zero below the interval and one above it. The density and sampling formulas inside the interval are unchanged.

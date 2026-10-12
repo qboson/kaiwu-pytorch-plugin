@@ -81,7 +81,9 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Probability density value.
         """
-        return self.beta * torch.exp(-self.beta * zeta) / (1 - torch.exp(-self.beta))
+        bounded = zeta.clamp(0.0, 1.0)
+        density = self.beta * torch.exp(-self.beta * bounded) / (1 - torch.exp(-self.beta))
+        return torch.where((zeta < 0.0) | (zeta > 1.0), 0.0, density)
 
     def cdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Cumulative distribution function.
@@ -92,7 +94,8 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Cumulative distribution value.
         """
-        return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
+        bounded = zeta.clamp(0.0, 1.0)
+        return (1.0 - torch.exp(-self.beta * bounded)) / (1 - torch.exp(-self.beta))
 
     def sample(self, shape: tuple) -> torch.Tensor:
         """Sampling.
@@ -116,11 +119,12 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Log probability density value.
         """
-        return (
+        log_density = (
             torch.log(self.beta)
-            - self.beta * zeta
+            - self.beta * zeta.clamp(0.0, 1.0)
             - torch.log(1 - torch.exp(-self.beta))
         )
+        return torch.where((zeta < 0.0) | (zeta > 1.0), -torch.inf, log_density)
 
 
 class DistUtil:
