@@ -143,7 +143,9 @@ def evaluate_generation_quality(
         normalize_decoded_sequence(sequence) for _, sequence in generated_records
     ]
 
-    paired_count = min(len(reference_sequences), len(generated_sequences))
+    if len(reference_sequences) != len(generated_sequences):
+        raise ValueError("Aligned reference/generated sets must have equal record counts.")
+    paired_count = len(reference_sequences)
     if paired_count == 0:
         raise ValueError(
             "Need at least one aligned reference/generated pair for evaluation."
@@ -211,9 +213,11 @@ def compare_generation_sets(
     guided_records: list[tuple[str, str]],
 ) -> dict[str, float]:
     """Compares baseline and guided generations against each other."""
-    paired_count = min(
-        len(reference_records), len(baseline_records), len(guided_records)
-    )
+    paired_count = len(reference_records)
+    if not paired_count or not (
+        paired_count == len(baseline_records) == len(guided_records)
+    ):
+        raise ValueError("Need nonempty aligned sets with equal record counts.")
     changed_count = 0
     baseline_identity_sum = 0.0
     guided_identity_sum = 0.0
