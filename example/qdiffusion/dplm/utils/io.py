@@ -38,22 +38,36 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
     """Reads all FASTA records from one file."""
     records: list[tuple[str, str]] = []
     header = ""
+    header_line = 0
     sequence_parts: list[str] = []
 
     with fasta_path.open("r", encoding="utf-8") as handle:
-        for line in handle:
+        for line_number, line in enumerate(handle, start=1):
             line = line.strip()
             if not line:
                 continue
             if line.startswith(">"):
                 if header:
+                    if not sequence_parts:
+                        raise ValueError(
+                            f"Empty FASTA sequence at line {header_line} in {fasta_path}"
+                        )
                     records.append((header, "".join(sequence_parts)))
                 header = line[1:]
+                if not header.strip():
+                    raise ValueError(f"Empty FASTA header at line {line_number} in {fasta_path}")
+                header_line = line_number
                 sequence_parts = []
             else:
+                if not header:
+                    raise ValueError(
+                        f"Sequence before FASTA header at line {line_number} in {fasta_path}"
+                    )
                 sequence_parts.append(line)
 
     if header:
+        if not sequence_parts:
+            raise ValueError(f"Empty FASTA sequence at line {header_line} in {fasta_path}")
         records.append((header, "".join(sequence_parts)))
     return records
 
