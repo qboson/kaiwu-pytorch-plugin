@@ -8,7 +8,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from kaiwu.torch_plugin import QSVI, Q_SVI, QVAE, RestrictedBoltzmannMachine
+from kaiwu.torch_plugin import Q_SVI, QSVI, QVAE, RestrictedBoltzmannMachine, Trace_ELBO
 
 
 class DummyEncoder(nn.Module):
@@ -175,6 +175,46 @@ class TestQSVIInterface(unittest.TestCase):
         torch.testing.assert_close(self.model.bm.quadratic_coef, bm_weight_before)
         self.assertIsNone(self.model.encoder.linear.weight.grad)
 
+    def test_default_construction_resolves_guide_not_none(self):
+        """Under default construction with guide=None, Q_SVI resolves self.guide to model.guide."""
+        vae_params = list(self.model.encoder.parameters()) + list(self.model.decoder.parameters())
+        vae_optim = torch.optim.SGD(vae_params, lr=0.1)
+        svi = Q_SVI(model=self.model, optim=vae_optim)
+
+        self.assertIsNotNone(svi.guide)
+        self.assertEqual(svi.guide, self.model.guide)
+        self.assertIsInstance(svi.loss_fn, Trace_ELBO)
+
+    def test_custom_guide_is_invoked_by_svi_step(self):
+        """Custom guide passed to Q_SVI is explicitly invoked during step()."""
+        vae_params = list(self.model.encoder.parameters()) + list(self.model.decoder.parameters())
+        vae_optim = torch.optim.SGD(vae_params, lr=0.1)
+
+        called = {"count": 0}
+
+        def custom_guide(x, *args, **kwargs):
+            called["count"] += 1
+            return self.model.guide(x, *args, **kwargs)
+
+        svi = Q_SVI(model=self.model, guide=custom_guide, optim=vae_optim)
+        self.assertEqual(svi.guide, custom_guide)
+
+        x = torch.rand(4, self.input_dim)
+        loss = svi.step(x)
+        self.assertEqual(called["count"], 1)
+        self.assertGreater(loss, 0.0)
+
+    def test_trace_elbo_differentiable_loss(self):
+        """Trace_ELBO orchestrates guide and model.decode strictly and returns (loss, q)."""
+        elbo = Trace_ELBO()
+        x = torch.rand(4, self.input_dim)
+        loss, q = elbo.differentiable_loss(self.model, self.model.guide, x)
+
+        self.assertTrue(torch.is_tensor(loss))
+        self.assertTrue(loss.requires_grad)
+        self.assertEqual(q.shape, (4, self.latent_dim))
+        self.assertEqual(loss.dim(), 0)
+
 
 class TestQSVILegacyParity(unittest.TestCase):
     """Test strict numerical parity between backend='legacy' and backend='svi'."""
@@ -262,8 +302,8 @@ class TestExampleTrainerIntegration(unittest.TestCase):
 
     def test_model_tuner_svi_backend(self):
         """ModelTuner correctly switches between legacy and SVI backends."""
-        import sys
         import os
+        import sys
 
         # Add example/qvae_mnist to sys.path
         qvae_mnist_path = os.path.abspath(
@@ -332,3 +372,64 @@ class TestExampleTrainerIntegration(unittest.TestCase):
         x_smoke = torch.rand(4, input_dim)
         loss_smoke = svi.step(x_smoke)
         self.assertGreater(loss_smoke, 0.0)
+
+    def test_cell_qvae_svi_backend(self):
+        """CellQVAE with batch conditions operates seamlessly with Q_SVI."""
+        import os
+        import sys
+
+        cell_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../example/qvae_cell")
+        )
+        if cell_path not in sys.path:
+            sys.path.insert(0, cell_path)
+
+        from models import CellQVAE
+
+        input_dim = 8
+        latent_dim = 4
+        n_batches = 2
+
+        config = types.SimpleNamespace(
+            type="CellQVAE",
+            num_latent_units=latent_dim,
+            loss_type="bernoulli",
+            dist_beta=1.0,
+            kl_beta=1e-5,
+            weight_decay=0.01,
+            sampler_type="sa",
+        )
+
+        encoder = DummyEncoder(input_dim, latent_dim)
+        decoder = DummyDecoder(latent_dim + n_batches, input_dim)
+        rbm = RestrictedBoltzmannMachine(latent_dim // 2, latent_dim - latent_dim // 2)
+        sampler = DeterministicSampler()
+
+        cell_model = CellQVAE(
+            input_dimension=input_dim,
+            activation_fct=None,
+            config=config,
+            encoder=encoder,
+            decoder=decoder,
+            bm=rbm,
+            sampler=sampler,
+            n_batches=n_batches,
+        )
+
+        vae_params = list(cell_model.encoder.parameters()) + list(cell_model.decoder.parameters())
+        vae_optim = torch.optim.Adam(vae_params, lr=1e-3)
+        bm_optim = torch.optim.Adam(cell_model.bm.parameters(), lr=1e-3)
+
+        svi = Q_SVI(model=cell_model, optim=vae_optim, bm_optim=bm_optim)
+        self.assertIsNotNone(svi.guide)
+        self.assertEqual(svi.guide, cell_model.guide)
+
+        x = torch.rand(4, input_dim)
+        batch_idx = torch.tensor([0, 1, 0, 1], dtype=torch.long)
+
+        loss = svi.step(x, batch_idx)
+        self.assertIsInstance(loss, float)
+        self.assertGreater(loss, 0.0)
+        self.assertIsNotNone(cell_model.last_recon_loss)
+        self.assertIsNotNone(cell_model.last_kl_loss)
+
