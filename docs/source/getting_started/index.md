@@ -87,4 +87,10 @@ The [Tutorials](tutorials/index.md) section is designed for users who have alrea
 2. [BM Generation](tutorials/bm_generation.md): generative modeling with a fully connected Boltzmann Machine
 3. [Q-VAE (MNIST)](tutorials/qvae_mnist.md): quantum-enhanced variational autoencoder for image generation and representation learning
 
-**Complete Path**: work through all tutorials in order for comprehensive mastery of KPP. See the [Tutorials index](tutorials/index.md) for the full syllabus, including upcoming tutorials (Q-VAE for single-cell transcriptomics, Q-Diffusion for protein sequence generation).
+**Research-grade Case Studies**, extending the hands-on tutorials into full end-to-end pipelines:
+
+1. [Q-VAE for Single-Cell Transcriptomics](tutorials/qvae_cell.md): multi-modal evaluation (UMAP, Leiden, scIB, scGraph, DPT)
+2. [Q-Diffusion for Protein Sequence Generation](tutorials/qdiffusion.md): ESM2 distance and a DPLM backbone
+3. [Q-VAE for Anomaly Detection](tutorials/qvae_anomaly.md): free-energy scoring head and InfoNCE threshold search
+
+**Complete Path**: work through the hands-on tutorials in order, then move on to the case studies for research-grade pipelines. See the [Tutorials index](tutorials/index.md) for the full syllabus.
