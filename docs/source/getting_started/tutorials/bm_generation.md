@@ -65,6 +65,10 @@ $$
 
 where $\alpha$ is set via `cost_param["alpha"]`.
 
+The `num_output` parameter designates which visible units are "outputs" (e.g. labels in a supervised setting), enabling conditional generation — you can fix part of the visible units and let the model generate the rest.
+
+### Sampling Phases
+
 **Negative phase**: `bm_net.sample(worker)` draws a complete joint visible+hidden state from the current BM distribution, approximating the model distribution for the contrastive divergence objective.
 
 **Positive phase**: the positive phase uses two conditional samplings per batch:
@@ -74,9 +78,9 @@ where $\alpha$ is set via `cost_param["alpha"]`.
 
 These two samplings compute the KL term and the NCL term respectively. A cosine schedule with linear warmup stabilizes early training. Multi-process sampling splits each batch across workers, running positive-phase conditional sampling in parallel to accelerate the training loop. All sampling operations are embedded in the PyTorch computation graph, enabling end-to-end backpropagation.
 
-The `num_output` parameter designates which visible units are "outputs" (e.g. labels in a supervised setting), enabling conditional generation — you can fix part of the visible units and let the model generate the rest.
+## Quick Start
 
-## Key Code
+The following snippet shows how to run the training pipeline from a user's perspective, this is exactly what you would execute in `train_bm.ipynb`:
 
 Initialize the BM trainer:
 
@@ -99,6 +103,46 @@ trainer.train(dataset, epochs=50, batch_size=32, n_workers=4)
 ```
 
 After training, generate samples from `sample_bm.ipynb`: the BM samples full visible+hidden states, and the visible portion is rendered as the generated data distribution.
+
+## Key Code
+
+### 1. Trainer Initialization
+
+The `Trainer` class initializes a fully connected `BoltzmannMachine` and sets up shared memory for multiprocess sampling:
+
+```{literalinclude} ../../../../example/bm_generation/trainer.py
+:pyobject: Trainer.__init__
+```
+
+Key initialization details:
+- `BoltzmannMachine(num_nodes=num_visible + num_hidden)` — fully connected graph
+- `share_memory()` — enables multi-process sampling without copying
+- `cost_param = {"alpha": 0.5, "beta": 0.5}` — KL/NCL balance
+
+---
+
+### 2. Training Loop with Cosine Schedule
+
+The training loop uses Adam optimizer with cosine learning-rate schedule and multi-process conditional sampling:
+
+```{literalinclude} ../../../../example/bm_generation/trainer.py
+:pyobject: Trainer.train
+```
+
+Key training details:
+- Optimizer: Adam with weight decay
+- Learning rate: cosine schedule with linear warmup (`num_warmup_steps = max_steps / 20`)
+- Multi-process: `num_processes` workers run `condition_sample` in parallel
+
+---
+
+### 3. Multi-process Sampling Worker
+
+The worker function runs in separate processes, performing both full and partial conditional sampling for the KL and NCL terms:
+
+```{literalinclude} ../../../../example/bm_generation/trainer.py
+:pyobject: process_solve_graph_worker
+```
 
 ## Training and Evaluation
 

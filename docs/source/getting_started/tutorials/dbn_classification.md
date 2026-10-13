@@ -53,6 +53,8 @@ The codebase provides a layered class structure:
 - **`AbstractSupervisedDBNClassifier`**: extends the abstract interface with common classifiers (logistic regression, SVM, random forest).
 - **`SupervisedDBNClassification`**: concrete implementation for classification tasks, including fine-tuning network construction.
 
+### Three Training Modes
+
 After pretraining, three training modes are available:
 
 - **Unsupervised mode**: only pretrain, use the DBN as a fixed feature extractor (`DBNPretrainer.transform`).
@@ -61,12 +63,14 @@ After pretraining, three training modes are available:
 
 The sampler configuration is inherited per RBM layer from the [Quick Start](../quickstart.md).
 
-## Key Code
+## Quick Start
+
+The following snippet shows how to run the pipeline from a user's perspective, this is what you would execute in `supervised_dbn_digits.ipynb`:
 
 Load digits data (same shift augmentation as the RBM tutorial):
 
 ```python
-from dbn_trainer import DBNPretrainer
+from dbn_trainer import DBNTrainer
 from supervised_dbn_digits import SupervisedDBNClassification
 from sklearn.datasets import load_digits
 
@@ -76,7 +80,7 @@ X_train, X_test, y_train, y_test = load_digits(shift_augment=True)
 Greedy layer-wise pretraining:
 
 ```python
-pretrainer = DBNPretrainer(hidden_layers_structure=[100, 100], n_epochs_rbm=10, lr=0.1)
+pretrainer = DBNTrainer(hidden_layers_structure=[100, 100], n_epochs_rbm=10, lr=0.1)
 pretrainer.fit(X_train)
 ```
 
@@ -94,6 +98,49 @@ Fine-tuning mode (optional):
 ```python
 clf_ft = SupervisedDBNClassification(pretrainer, fine_tuning=True, n_iter_backprop=100)
 clf_ft.fit(X_train, y_train)
+```
+
+## Key Code
+
+### 1. DBNTrainer Initialization (SA vs CIM per layer)
+
+The `DBNTrainer` class supports switching between classical Simulated Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers per RBM layer:
+
+```{literalinclude} ../../../../example/dbn_digits/dbn_trainer.py
+:pyobject: DBNTrainer.__init__
+```
+
+When `use_cim=True`:
+- Uses `CIMOptimizer` from `kaiwu.cim`
+- Wrapped in `PrecisionReducer` for precision control
+- Checkpoint manager saves to `./tmp`
+
+When `use_cim=False`:
+- Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`
+
+---
+
+### 2. Greedy Layer-wise Pretraining
+
+The `train()` method iterates through each RBM layer, training one at a time:
+
+```{literalinclude} ../../../../example/dbn_digits/dbn_trainer.py
+:pyobject: DBNTrainer.train
+```
+
+Key pretraining details:
+- Each RBM layer uses the same `objective()` and `sample()` as the Quick Start
+- After training a layer, the output becomes input for the next layer
+- Verbose mode prints progress for each layer
+
+---
+
+### 3. Supervised Classification and Fine-tuning
+
+The `SupervisedDBNClassification` class provides three training modes: unsupervised feature extraction, downstream classifier, and end-to-end fine-tuning.
+
+```{literalinclude} ../../../../example/dbn_digits/supervised_dbn_digits.py
+:pyobject: SupervisedDBNClassification
 ```
 
 ## Training and Evaluation

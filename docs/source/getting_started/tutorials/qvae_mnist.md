@@ -64,7 +64,9 @@ The first term is the reconstruction loss: how well the decoder reconstructs the
 
 The QBM prior is trained using the same positive/negative phase as an RBM: positive phase from the encoder samples, negative phase from QBM sampling. The sampler can be switched between `sa` (classical simulated annealing) and `cim` (quantum CIM) via the `--sampler-type` flag — the rest of the pipeline is unchanged.
 
-## Key Code
+## Quick Start
+
+The following snippet shows how to run the pipeline from a user's perspective, this is what you would execute via `run_pipeline.py`:
 
 Load MNIST and build the Q-VAE pipeline:
 
@@ -92,6 +94,47 @@ from downstream.classifier import MLPClassifier
 
 clf = MLPClassifier(hidden_dim=128)
 clf.fit(model, train_loader, test_loader, epochs=30)
+```
+
+## Key Code
+
+### 1. Model Configuration and Encoder/Decoder
+
+The Q-VAE model uses a standard encoder-decoder architecture, with the QBM prior replacing the Gaussian prior in the latent space:
+
+```{literalinclude} ../../../../example/qvae_mnist/model/networks.py
+:pyobject: BasicEncoder
+```
+
+Key model details:
+- Encoder: maps 784-d MNIST images to 64-d latent space
+- Decoder: reconstructs images from latent samples
+- QBM prior: trained with the same positive/negative phase as an RBM
+
+---
+
+### 2. Q-ELBO Training Loop
+
+The `Trainer` class implements the Q-ELBO optimization loop, combining reconstruction loss with the KL term between encoder posterior and QBM prior:
+
+```{literalinclude} ../../../../example/qvae_mnist/trainer/trainer.py
+:pyobject: Trainer.train
+```
+
+Key training details:
+- Optimizer: Adam with learning rate and weight decay from config
+- Reconstruction loss: Bernoulli cross-entropy (or MSE for continuous data)
+- KL term: pulls encoder posterior toward QBM prior
+- Sampler: switch between SA and CIM via `--sampler-type` flag
+
+---
+
+### 3. Downstream Classification on Learned Representations
+
+After training the Q-VAE, the encoder's hidden representations can be fed to a downstream classifier for supervised evaluation:
+
+```{literalinclude} ../../../../example/qvae_mnist/downstream/classifier.py
+:pyobject: MLPClassifier.fit
 ```
 
 ## Training and Evaluation

@@ -46,12 +46,13 @@ raw pixels (64-d)  →  RBM forward  →  hidden features (n_hidden-d)  →  Log
 
 The dataset uses scikit-learn's 8×8 handwritten digits, augmented by shifting each image up, down, left, and right to expand the training set. The notebook compares the two-stage RBM pipeline against a logistic regression on raw pixels to demonstrate that unsupervised RBM pretraining improves classification accuracy.
 
-## Key Code
+## Quick Start
+
+The following snippet shows how to run the pipeline from a user's perspective, this is exactly what you would execute in a notebook:
 
 Load the digits dataset (with four-direction shift augmentation):
 
 ```python
-from sklearn.datasets import load_digits
 from rbm_digits import RBMRunner
 
 runner = RBMRunner(n_hidden=64, device="cpu")
@@ -71,6 +72,49 @@ from rbm_classifier import train_classifier
 
 accuracy_rbm, accuracy_raw = train_classifier(runner, X_train, X_test, y_train, y_test)
 print(f"RBM features: {accuracy_rbm:.4f} | Raw pixels: {accuracy_raw:.4f}")
+```
+
+## Key Code
+
+### 1. Sampler Initialization (SA vs CIM)
+
+The `RBMRunner` class supports switching between classical Simulated Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers:
+
+```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
+:pyobject: RBMRunner.__init__
+```
+
+When `use_cim=True`:
+- Uses `CIMOptimizer` from `kaiwu.cim`
+- Wrapped in `PrecisionReducer` for precision control
+- Checkpoint manager saves to `./tmp`
+
+When `use_cim=False`:
+- Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`
+
+---
+
+### 2. Training Loop
+
+The training loop follows the same positive/negative phase pattern introduced in the [Quick Start](../quickstart.md), see the training flow diagram there.
+
+```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
+:pyobject: RBMRunner.fit
+```
+
+Key training details:
+- Optimizer: SGD with learning rate from `self.learning_rate`
+- Weight decay: 0.02 for weights, 0.05 for biases
+- Verbose mode prints objective loss and weight statistics every 20 iterations
+
+---
+
+### 3. Feature Extraction and Classification
+
+After training, `RBMRunner.transform()` extracts hidden-layer features, which are then fed to a downstream classifier:
+
+```{literalinclude} ../../../../example/rbm_digits/rbm_classifier.py
+:pyobject: train_classifier
 ```
 
 ## Training and Evaluation
