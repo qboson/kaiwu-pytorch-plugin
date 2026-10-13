@@ -2,6 +2,7 @@
 # Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
+# pylint: disable=too-many-lines  # intentionally self-contained single-file plugin
 """
 QDEQ: a reusable Deep Equilibrium (DEQ) fixed-point plugin for PyTorch.
 
@@ -53,7 +54,7 @@ from typing import Callable, ContextManager, Protocol
 
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
 
 # ---------------------------------------------------------------------------
 # Ising/QUBO fixed-point solving
@@ -61,7 +62,9 @@ import torch.nn as nn
 
 
 @dataclass
-class IsingSolverConfig:
+class IsingSolverConfig:  # pylint: disable=too-many-instance-attributes
+    """Hyperparameters of the Ising/SA fixed-point solver."""
+
     solver_backend: str = "cpu_numpy"
     solver_variant: str = "simple_coeff"
     threshold: int = 12
@@ -85,11 +88,11 @@ class IsingSolverConfig:
     def from_dict(cls, data: object) -> "IsingSolverConfig":
         if not isinstance(data, dict):
             return cls()
-        valid = {field.name for field in cls.__dataclass_fields__.values()}
+        valid = {field.name for field in dataclasses.fields(cls)}
         return cls(**{key: value for key, value in data.items() if key in valid})
 
 
-class LocalAnnealingBackend:
+class LocalAnnealingBackend:  # pylint: disable=too-few-public-methods
     """Small CPU simulated annealing backend for dense Ising matrices."""
 
     def __init__(self, config: IsingSolverConfig):
@@ -126,7 +129,7 @@ def ising_energy(matrix: np.ndarray, spin: np.ndarray) -> float:
     return float(spin @ matrix @ spin)
 
 
-class TorchSimulatedAnnealing:
+class TorchSimulatedAnnealing:  # pylint: disable=too-few-public-methods
     """GPU-friendly simulated annealing backend for dense Ising matrices."""
 
     def __init__(self, config: IsingSolverConfig):
@@ -140,7 +143,9 @@ class TorchSimulatedAnnealing:
         generator = torch.Generator(device=device)
         generator.manual_seed(int(seed))
         start = time.perf_counter()
-        spin = torch.randint(0, 2, (chains, n), device=device, generator=generator, dtype=torch.int64).to(dtype)
+        spin = torch.randint(
+            0, 2, (chains, n), device=device, generator=generator, dtype=torch.int64
+        ).to(dtype)
         spin = spin.mul_(2.0).sub_(1.0)
         energy = torch_ising_energy(matrix, spin)
         best_energy, best_idx = torch.min(energy, dim=0)
@@ -155,7 +160,8 @@ class TorchSimulatedAnnealing:
                 new_energy = torch_ising_energy(matrix, proposal)
                 delta = new_energy - energy
                 accept_prob = torch.exp(-delta / max(temp, 1e-8))
-                accept = (delta <= 0.0) | (torch.rand(chains, device=device, generator=generator) < accept_prob)
+                uniform = torch.rand(chains, device=device, generator=generator)
+                accept = (delta <= 0.0) | (uniform < accept_prob)
                 spin = torch.where(accept.unsqueeze(1), proposal, spin)
                 energy = torch.where(accept, new_energy, energy)
                 current_best, current_idx = torch.min(energy, dim=0)
@@ -175,7 +181,7 @@ def normalize_tensor(v: torch.Tensor) -> torch.Tensor:
     return v / v.norm().clamp_min(1e-9)
 
 
-class CoefficientIsingFixedPointSolver:
+class CoefficientIsingFixedPointSolver:  # pylint: disable=too-few-public-methods
     """Solve z = f(z) by Ising-encoded low-dimensional coefficient updates.
 
     At each outer iteration we build a small basis V, approximate the residual
@@ -187,21 +193,21 @@ class CoefficientIsingFixedPointSolver:
         self.config = config
         self.backend = LocalAnnealingBackend(config)
         self.torch_backend = TorchSimulatedAnnealing(config)
+        self._last_sa_time = 0.0
         self._last_best_energy = float("nan")
         self._last_predicted_energy = float("nan")
         self._last_coeff_norm = float("nan")
 
     @torch.no_grad()
-    def solve(self, f: Callable[[torch.Tensor], torch.Tensor], z0: torch.Tensor) -> dict[str, object]:
+    def solve(
+        self, f: Callable[[torch.Tensor], torch.Tensor], z0: torch.Tensor
+    ) -> dict[str, object]:
         z = z0.detach().clone()
         residual_history: list[torch.Tensor] = []
         update_history: list[torch.Tensor | tuple[torch.Tensor, torch.Tensor]] = []
-        abs_trace: list[float] = []
-        rel_trace: list[float] = []
-        rel_trace_v5: list[float] = []
-        energy_trace: list[float] = []
-        coeff_norm_trace: list[float] = []
-        basis_dim_trace: list[int] = []
+        traces: dict[str, list] = {
+            key: [] for key in ("abs", "rel", "rel_v5", "energy", "coeff_norm", "basis_dim")
+        }
         sa_time = 0.0
         start = time.perf_counter()
         best_z = z.clone()
@@ -209,13 +215,13 @@ class CoefficientIsingFixedPointSolver:
 
         for step in range(1, self.config.threshold + 1):
             residual = f(z) - z
-            abs_res = float(residual.norm().detach().cpu())
             rel_res = float((residual.norm() / z.norm().clamp_min(1e-8)).detach().cpu())
-            fz = residual + z
-            rel_res_v5 = float((residual.norm() / fz.norm().clamp_min(1e-9)).detach().cpu())
-            abs_trace.append(abs_res)
-            rel_trace.append(rel_res)
-            rel_trace_v5.append(rel_res_v5)
+            rel_res_v5 = float(
+                (residual.norm() / (residual + z).norm().clamp_min(1e-9)).detach().cpu()
+            )
+            traces["abs"].append(float(residual.norm().detach().cpu()))
+            traces["rel"].append(rel_res)
+            traces["rel_v5"].append(rel_res_v5)
             tracked_rel = rel_res_v5 if self.config.solver_variant == "v5_dynamic" else rel_res
             if tracked_rel < best_rel:
                 best_rel = tracked_rel
@@ -229,7 +235,7 @@ class CoefficientIsingFixedPointSolver:
                 basis = self._make_basis(residual, residual_history, update_history)
             else:
                 raise ValueError(f"Unsupported solver_variant: {self.config.solver_variant}")
-            basis_dim_trace.append(len(basis))
+            traces["basis_dim"].append(len(basis))
             jv = self._finite_difference_jv(f, z, residual, basis)
             coeff = self._solve_coefficients(residual, jv, step)
             delta = torch.zeros_like(z)
@@ -245,30 +251,39 @@ class CoefficientIsingFixedPointSolver:
             residual_history = residual_history[-self.config.history_size :]
             update_history = update_history[-self.config.history_size :]
             z = next_z
-            energy_trace.append(float(self._last_predicted_energy))
-            coeff_norm_trace.append(float(self._last_coeff_norm))
+            traces["energy"].append(float(self._last_predicted_energy))
+            traces["coeff_norm"].append(float(self._last_coeff_norm))
             sa_time += self._last_sa_time
 
-        result = best_z
+        return self._final_result(f, best_z, traces, sa_time, start)
+
+    def _final_result(
+        self,
+        f: Callable[[torch.Tensor], torch.Tensor],
+        result: torch.Tensor,
+        traces: dict[str, list],
+        sa_time: float,
+        start: float,
+    ) -> dict[str, object]:
         final_residual = f(result) - result
         final_abs = final_residual.norm()
-        final_fz = final_residual + result
         old_final_rel_debug = final_abs / result.norm().clamp_min(1e-8)
-        final_rel_v5 = final_abs / final_fz.norm().clamp_min(1e-9)
-        final_rel = final_rel_v5 if self.config.solver_variant == "v5_dynamic" else old_final_rel_debug
+        final_rel_v5 = final_abs / (final_residual + result).norm().clamp_min(1e-9)
+        is_v5 = self.config.solver_variant == "v5_dynamic"
+        energy_trace = traces["energy"]
         return {
             "result": result,
-            "abs_trace": abs_trace,
-            "rel_trace": rel_trace,
-            "rel_trace_v5": rel_trace_v5,
-            "residual_abs_trace": abs_trace,
-            "residual_rel_trace_v5": rel_trace_v5,
+            "abs_trace": traces["abs"],
+            "rel_trace": traces["rel"],
+            "rel_trace_v5": traces["rel_v5"],
+            "residual_abs_trace": traces["abs"],
+            "residual_rel_trace_v5": traces["rel_v5"],
             "energy_trace": energy_trace,
-            "coeff_norm_trace": coeff_norm_trace,
-            "basis_dim_trace": basis_dim_trace,
-            "nstep": len(abs_trace),
+            "coeff_norm_trace": traces["coeff_norm"],
+            "basis_dim_trace": traces["basis_dim"],
+            "nstep": len(traces["abs"]),
             "final_abs": final_abs,
-            "final_rel": final_rel,
+            "final_rel": final_rel_v5 if is_v5 else old_final_rel_debug,
             "final_rel_v5": final_rel_v5,
             "old_final_rel_debug": old_final_rel_debug,
             "solver_time": time.perf_counter() - start,
@@ -346,7 +361,13 @@ class CoefficientIsingFixedPointSolver:
             jv.append((residual_shifted - residual) / eps)
         return jv
 
-    def _solve_coefficients(self, residual: torch.Tensor, jv: list[torch.Tensor], step: int) -> np.ndarray:
+    def _record_coeff_stats(self, coeff: np.ndarray, quad: np.ndarray, lin: np.ndarray) -> None:
+        self._last_predicted_energy = float(0.5 * coeff @ quad @ coeff + lin @ coeff)
+        self._last_coeff_norm = float(np.linalg.norm(coeff))
+
+    def _solve_coefficients(
+        self, residual: torch.Tensor, jv: list[torch.Tensor], step: int
+    ) -> np.ndarray:
         if self.config.solver_variant == "v5_dynamic":
             return self._solve_coefficients_v5(residual, jv, step)
         if self.config.solver_backend == "gpu_torch":
@@ -355,7 +376,9 @@ class CoefficientIsingFixedPointSolver:
             raise ValueError(f"Unsupported solver_backend: {self.config.solver_backend}")
         basis_count = len(jv)
         bits = self.config.coeff_bits
-        weights = np.array([self.config.coeff_step * (2**idx) for idx in range(bits)], dtype=np.float64)
+        weights = np.array(
+            [self.config.coeff_step * (2**idx) for idx in range(bits)], dtype=np.float64
+        )
         offsets = np.full(basis_count, self.config.coeff_min, dtype=np.float64)
         jv_flat = torch.stack([v.reshape(-1) for v in jv], dim=1)
         residual_flat = residual.reshape(-1, 1)
@@ -385,11 +408,12 @@ class CoefficientIsingFixedPointSolver:
         coeff = offsets.copy()
         for i in range(basis_count):
             coeff[i] += float(np.dot(binary[i * bits : (i + 1) * bits], weights))
-        self._last_predicted_energy = float(0.5 * coeff @ quad @ coeff + lin @ coeff)
-        self._last_coeff_norm = float(np.linalg.norm(coeff))
+        self._record_coeff_stats(coeff, quad, lin)
         return coeff
 
-    def _solve_coefficients_v5(self, residual: torch.Tensor, jv: list[torch.Tensor], step: int) -> np.ndarray:
+    def _solve_coefficients_v5(
+        self, residual: torch.Tensor, jv: list[torch.Tensor], step: int
+    ) -> np.ndarray:
         if self.config.solver_backend != "cpu_numpy":
             raise ValueError("v5_dynamic currently supports only solver_backend=cpu_numpy")
         m = len(jv)
@@ -398,24 +422,32 @@ class CoefficientIsingFixedPointSolver:
         jv_flat = torch.stack([v.reshape(-1) for v in jv], dim=0)
         a_mat = 0.5 * (jv_flat @ jv_flat.t()).detach().cpu().double().numpy()
         b_vec = (jv_flat @ r_flat).detach().cpu().double().numpy()
-        coeff_min, coeff_step, scale = self._v5_residual_scaled_coeff_spec(float(residual.norm().detach().cpu()), m, bits)
+        coeff_min, coeff_step, scale = self._v5_residual_scaled_coeff_spec(
+            float(residual.norm().detach().cpu()), m, bits
+        )
         offset, enc = self._v5_basis_coeff_matrix(m, coeff_min, coeff_step, bits, scale)
         matrix, n_bits = self._v5_build_matrix(a_mat, b_vec, offset, enc)
         spin, elapsed, best_energy = self.backend.solve(matrix, seed=self.config.seed + step)
         self._last_sa_time = elapsed
         self._last_best_energy = best_energy
-        pred_energy, coeff = self._v5_candidate_binary_coeffs(spin, n_bits, offset, enc, a_mat, b_vec)
+        pred_energy, coeff = self._v5_candidate_binary_coeffs(
+            spin, n_bits, offset, enc, a_mat, b_vec
+        )
         self._last_predicted_energy = pred_energy
         self._last_coeff_norm = float(np.linalg.norm(coeff))
         return coeff
 
     @staticmethod
-    def _v5_residual_scaled_coeff_spec(r_norm: float, m: int, bits: int) -> tuple[float, float, float]:
+    def _v5_residual_scaled_coeff_spec(
+        r_norm: float, m: int, bits: int
+    ) -> tuple[float, float, float]:
         scale = r_norm / np.sqrt(max(1, m))
         return -2.0, 4.0 / ((2**bits) - 1), scale
 
     @staticmethod
-    def _v5_basis_coeff_matrix(m: int, coeff_min: float, coeff_step: float, bits: int, scale: float) -> tuple[np.ndarray, np.ndarray]:
+    def _v5_basis_coeff_matrix(
+        m: int, coeff_min: float, coeff_step: float, bits: int, scale: float
+    ) -> tuple[np.ndarray, np.ndarray]:
         n = m * bits
         enc = np.zeros((m, n), dtype=np.float64)
         offset = np.full(m, coeff_min * scale, dtype=np.float64)
@@ -454,7 +486,9 @@ class CoefficientIsingFixedPointSolver:
         candidates.sort(key=lambda item: item[0])
         return candidates[0]
 
-    def _v5_build_matrix(self, a_mat: np.ndarray, b_vec: np.ndarray, offset: np.ndarray, enc: np.ndarray) -> tuple[np.ndarray, int]:
+    def _v5_build_matrix(
+        self, a_mat: np.ndarray, b_vec: np.ndarray, offset: np.ndarray, enc: np.ndarray
+    ) -> tuple[np.ndarray, int]:
         qmat = enc.T @ a_mat @ enc
         qlin = 2.0 * (offset @ a_mat @ enc) + (b_vec @ enc)
         n_bits = qmat.shape[0]
@@ -469,13 +503,19 @@ class CoefficientIsingFixedPointSolver:
         max_abs = max(float(np.max(np.abs(mat))), 1e-12)
         return mat / max_abs * float(self.config.matrix_scale), n_bits
 
-    def _solve_coefficients_torch(self, residual: torch.Tensor, jv: list[torch.Tensor], step: int) -> list[float]:
+    def _solve_coefficients_torch(
+        self, residual: torch.Tensor, jv: list[torch.Tensor], step: int
+    ) -> list[float]:
         basis_count = len(jv)
         bits = int(self.config.coeff_bits)
         device = residual.device
         dtype = torch.float64
-        weights = torch.tensor([self.config.coeff_step * (2**idx) for idx in range(bits)], device=device, dtype=dtype)
-        offsets = torch.full((basis_count,), float(self.config.coeff_min), device=device, dtype=dtype)
+        weights = torch.tensor(
+            [self.config.coeff_step * (2**idx) for idx in range(bits)], device=device, dtype=dtype
+        )
+        offsets = torch.full(
+            (basis_count,), float(self.config.coeff_min), device=device, dtype=dtype
+        )
         jv_flat = torch.stack([v.reshape(-1) for v in jv], dim=1).to(dtype)
         residual_flat = residual.reshape(-1, 1).to(dtype)
         quad = jv_flat.T @ jv_flat
@@ -490,7 +530,9 @@ class CoefficientIsingFixedPointSolver:
                 for j in range(basis_count):
                     for bj in range(bits):
                         idx_j = j * bits + bj
-                        q[idx_i, idx_j] = q[idx_i, idx_j] + 0.5 * quad[i, j] * weights[bi] * weights[bj]
+                        q[idx_i, idx_j] = (
+                            q[idx_i, idx_j] + 0.5 * quad[i, j] * weights[bi] * weights[bj]
+                        )
         for i in range(basis_count):
             for bi in range(bits):
                 idx_i = i * bits + bi
@@ -503,11 +545,11 @@ class CoefficientIsingFixedPointSolver:
         coeff = offsets.clone()
         for i in range(basis_count):
             coeff[i] = coeff[i] + torch.dot(binary[i * bits : (i + 1) * bits], weights)
-        coeff_cpu = coeff.detach().cpu().double().numpy()
-        quad_cpu = quad.detach().cpu().double().numpy()
-        lin_cpu = lin.detach().cpu().double().numpy()
-        self._last_predicted_energy = float(0.5 * coeff_cpu @ quad_cpu @ coeff_cpu + lin_cpu @ coeff_cpu)
-        self._last_coeff_norm = float(np.linalg.norm(coeff_cpu))
+        self._record_coeff_stats(
+            coeff.detach().cpu().double().numpy(),
+            quad.detach().cpu().double().numpy(),
+            lin.detach().cpu().double().numpy(),
+        )
         return [float(x.detach().item()) for x in coeff]
 
 
@@ -555,7 +597,9 @@ def qubo_to_ising_torch(q: torch.Tensor, c: torch.Tensor) -> torch.Tensor:
 # falls back to its ``IsingSolverConfig.threshold``).
 
 
-class Solver(Protocol):
+class Solver(Protocol):  # pylint: disable=too-few-public-methods
+    """Call signature shared by every fixed-point solver plugged into ``QDEQ``."""
+
     def __call__(
         self,
         f: Callable[[torch.Tensor], torch.Tensor],
@@ -584,6 +628,7 @@ def anderson_solver(
     Pluggable into ``QDEQ`` as either ``f_solver`` or ``b_solver``. ``z0``
     has a batch axis followed by arbitrary feature axes.
     """
+    del kwargs  # accepted for ``Solver`` signature compatibility
     if z0.ndim < 2 or z0.numel() == 0:
         raise ValueError("z0 must have nonempty batch and feature dimensions")
     if threshold < 3 or m < 2:
@@ -593,14 +638,14 @@ def anderson_solver(
     bsz, flat_dim = z0.shape[0], z0[0].numel()
     alternative_mode = "rel" if stop_mode == "abs" else "abs"
 
-    X = torch.zeros(bsz, m, flat_dim, dtype=z0.dtype, device=z0.device)
-    F = torch.zeros(bsz, m, flat_dim, dtype=z0.dtype, device=z0.device)
+    x_hist = torch.zeros(bsz, m, flat_dim, dtype=z0.dtype, device=z0.device)
+    f_hist = torch.zeros(bsz, m, flat_dim, dtype=z0.dtype, device=z0.device)
 
-    X[:, 0], F[:, 0] = z0.reshape(bsz, -1), f(z0).reshape(bsz, -1)
-    X[:, 1], F[:, 1] = F[:, 0], f(F[:, 0].reshape_as(z0)).reshape(bsz, -1)
+    x_hist[:, 0], f_hist[:, 0] = z0.reshape(bsz, -1), f(z0).reshape(bsz, -1)
+    x_hist[:, 1], f_hist[:, 1] = f_hist[:, 0], f(f_hist[:, 0].reshape_as(z0)).reshape(bsz, -1)
 
-    H = torch.zeros(bsz, m + 1, m + 1, dtype=z0.dtype, device=z0.device)
-    H[:, 0, 1:] = H[:, 1:, 0] = 1
+    h_mat = torch.zeros(bsz, m + 1, m + 1, dtype=z0.dtype, device=z0.device)
+    h_mat[:, 0, 1:] = h_mat[:, 1:, 0] = 1
     y = torch.zeros(bsz, m + 1, 1, dtype=z0.dtype, device=z0.device)
     y[:, 0] = 1
 
@@ -612,20 +657,20 @@ def anderson_solver(
     for k in range(2, threshold):
         n = min(k, m)
 
-        G = F[:, :n] - X[:, :n]
-        H[:, 1 : n + 1, 1 : n + 1] = torch.bmm(
-            G, G.transpose(1, 2)
+        g_mat = f_hist[:, :n] - x_hist[:, :n]
+        h_mat[:, 1 : n + 1, 1 : n + 1] = torch.bmm(
+            g_mat, g_mat.transpose(1, 2)
         ) + lam * torch.eye(n, dtype=z0.dtype, device=z0.device)[None]
-        alpha = torch.linalg.solve(H[:, : n + 1, : n + 1], y[:, : n + 1])[:, 1 : n + 1, 0]
+        alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], y[:, : n + 1])[:, 1 : n + 1, 0]
 
-        X[:, k % m] = beta * (alpha[:, None] @ F[:, :n])[:, 0] + (1 - beta) * (
-            alpha[:, None] @ X[:, :n]
+        x_hist[:, k % m] = beta * (alpha[:, None] @ f_hist[:, :n])[:, 0] + (1 - beta) * (
+            alpha[:, None] @ x_hist[:, :n]
         )[:, 0]
-        F[:, k % m] = f(X[:, k % m].reshape_as(z0)).reshape(bsz, -1)
+        f_hist[:, k % m] = f(x_hist[:, k % m].reshape_as(z0)).reshape(bsz, -1)
 
-        gx = (F[:, k % m] - X[:, k % m]).view_as(z0)
+        gx = (f_hist[:, k % m] - x_hist[:, k % m]).view_as(z0)
         abs_diff = gx.norm().item()
-        rel_diff = abs_diff / (1e-5 + F[:, k % m].norm().item())
+        rel_diff = abs_diff / (1e-5 + f_hist[:, k % m].norm().item())
         diff_dict = {"abs": abs_diff, "rel": rel_diff}
         trace_dict["abs"].append(abs_diff)
         trace_dict["rel"].append(rel_diff)
@@ -633,7 +678,7 @@ def anderson_solver(
         for mode in ["rel", "abs"]:
             if diff_dict[mode] < lowest_dict[mode]:
                 if mode == stop_mode:
-                    lowest_xest = X[:, k % m].view_as(z0).clone().detach()
+                    lowest_xest = x_hist[:, k % m].view_as(z0).clone().detach()
                 lowest_dict[mode] = diff_dict[mode]
                 lowest_step_dict[mode] = k
 
@@ -683,6 +728,7 @@ def ising_sa_solver(config: IsingSolverConfig) -> Solver:
         stop_mode: str = "rel",
         **kwargs: object,
     ) -> dict:
+        del stop_mode, kwargs  # accepted for ``Solver`` signature compatibility
         cfg = config
         if threshold is not None or eps is not None:
             cfg = dataclasses.replace(
@@ -710,7 +756,9 @@ def ising_sa_solver(config: IsingSolverConfig) -> Solver:
 # graph a second time``.
 
 
-def jac_loss_estimate(f0: torch.Tensor, z0: torch.Tensor, vecs: int = 2, create_graph: bool = True) -> torch.Tensor:
+def jac_loss_estimate(
+    f0: torch.Tensor, z0: torch.Tensor, vecs: int = 2, create_graph: bool = True
+) -> torch.Tensor:
     """Estimate tr(J^T J) = tr(J J^T) via the Hutchinson estimator.
 
     Args:
@@ -727,12 +775,14 @@ def jac_loss_estimate(f0: torch.Tensor, z0: torch.Tensor, vecs: int = 2, create_
     result = 0
     for _ in range(vecs):
         v = torch.randn(*z0.shape).to(z0)
-        vJ = torch.autograd.grad(f0, z0, v, retain_graph=True, create_graph=create_graph)[0]
-        result = result + vJ.norm() ** 2
+        vjp = torch.autograd.grad(f0, z0, v, retain_graph=True, create_graph=create_graph)[0]
+        result = result + vjp.norm() ** 2
     return result / vecs / np.prod(z0.shape)
 
 
-def power_method(f0: torch.Tensor, z0: torch.Tensor, n_iters: int = 200) -> tuple[torch.Tensor, torch.Tensor]:
+def power_method(
+    f0: torch.Tensor, z0: torch.Tensor, n_iters: int = 200
+) -> tuple[torch.Tensor, torch.Tensor]:
     """Estimate the spectral radius of J = df0/dz0 via power iteration on J^T.
 
     A diagnostic, not a convergence guarantee: a dominant real eigenvalue
@@ -754,10 +804,12 @@ def power_method(f0: torch.Tensor, z0: torch.Tensor, n_iters: int = 200) -> tupl
     evalue = None
     tiny = torch.finfo(z0.dtype).tiny
     for _ in range(n_iters):
-        vTJ = torch.autograd.grad(f0, z0, evector, retain_graph=True, create_graph=False)[0]
+        vtj = torch.autograd.grad(f0, z0, evector, retain_graph=True, create_graph=False)[0]
         vector = evector.reshape(bsz, -1)
-        product = vTJ.reshape(bsz, -1)
-        evalue = (product * vector).sum(1, keepdim=True) / vector.square().sum(1, keepdim=True).clamp_min(tiny)
+        product = vtj.reshape(bsz, -1)
+        evalue = (product * vector).sum(1, keepdim=True) / vector.square().sum(
+            1, keepdim=True
+        ).clamp_min(tiny)
         evector = (product / product.norm(dim=1, keepdim=True).clamp_min(tiny)).reshape_as(z0)
     return evector, torch.abs(evalue)
 
@@ -779,7 +831,7 @@ def _solver_kwargs(threshold: int | None, stop_mode: str, eps: float | None = No
     return kwargs
 
 
-class _DEQImplicitGrad(torch.autograd.Function):
+class _DEQImplicitGrad(torch.autograd.Function):  # pylint: disable=abstract-method
     """Identity in the forward direction; in backward, replaces the incoming
     gradient at ``new_z`` with the solution of the linear fixed-point system
     (I - J^T) y = grad_output, where J = d(new_z)/d(z_star). Autograd then
@@ -790,7 +842,9 @@ class _DEQImplicitGrad(torch.autograd.Function):
     """
 
     @staticmethod
-    def forward(ctx, new_z, z_star, b_solver, b_thres, stop_mode, info, b_eps):
+    def forward(  # pylint: disable=arguments-differ
+        ctx, new_z, z_star, b_solver, b_thres, stop_mode, info, b_eps
+    ):
         ctx.b_solver = b_solver
         ctx.b_thres = b_thres
         ctx.stop_mode = stop_mode
@@ -801,7 +855,7 @@ class _DEQImplicitGrad(torch.autograd.Function):
 
     @staticmethod
     @torch.autograd.function.once_differentiable
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output):  # pylint: disable=arguments-differ
         z_star, new_z = ctx.saved_tensors
 
         def backward_fixed_point(y):
@@ -911,7 +965,8 @@ class QDEQ(nn.Module):
     ):
         """
         Args:
-            f_solver: forward fixed-point solver, ``solve(f, z0, threshold, eps=1e-3, stop_mode="rel", **kw) -> dict``.
+            f_solver: forward fixed-point solver,
+                ``solve(f, z0, threshold, eps=1e-3, stop_mode="rel", **kw) -> dict``.
                 Defaults to the Ising/SA solver (``v5_dynamic`` variant) when
                 not given.
             b_solver: backward (implicit-gradient) solver; defaults to
