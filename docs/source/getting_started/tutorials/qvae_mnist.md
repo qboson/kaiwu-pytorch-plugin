@@ -1,160 +1,115 @@
-# Q-VAE：量子变分自编码器
+# Q-VAE: Quantum Variational Autoencoder on MNIST
 
-本教程演示如何训练和评估量子变分自编码器（Quantum Variational Autoencoder, Q-VAE）模型。Q-VAE 结合了变分自编码器和量子玻尔兹曼机，能够实现更强大的生成和表征学习能力。
+> This tutorial combines [Section 4.2: Restricted Boltzmann Machine](../../theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md) with the VAE framework. It replaces the Gaussian prior of a standard VAE with a quantum Boltzmann machine (QBM) and trains the resulting Q-VAE on MNIST for both image generation and representation learning. Building on the [Quick Start](../quickstart.md) training loop, this tutorial adds the encoder–decoder structure and the KL term between the encoder posterior and the QBM prior.
 
-## 目标
+## Overview
 
-- 理解 Q-VAE 的架构和工作原理
-- 在 MNIST 数据集上训练 Q-VAE
-- 进行图像重建和生成
-- 使用 Q-VAE 进行表征学习和分类
-- 使用 t-SNE 可视化潜在空间
+By the end of this tutorial you will be able to:
 
-## 运行环境
+- Understand how a QBM prior replaces the Gaussian prior in a VAE
+- Train a Q-VAE on MNIST and generate reconstructed images
+- Extract learned representations and evaluate them on a downstream classification task
+- Visualize the latent space with t-SNE
 
-**示例位置**: `example/qvae_mnist/`
+## Running the Example
 
-- `train_qvae.ipynb`: 训练 Q-VAE 模型
-- `train_qvae_classifier.ipynb`: 表征学习与分类
-
-**依赖项**:
+**Dependencies**:
 
 ```{code-block} bash
-
- pip install torchvision==0.22.0 torchmetrics[image]
-
-```
-## 1. QVAE 原理概括
-
-QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型** 引入 **变分自编码器 (VAE)** 潜空间的生成模型。其核心思想是：
-
-> **用量子玻尔兹曼机（QBM）替代传统 VAE 中的先验分布，从而构建一个具有量子生成能力的潜变量模型。**
-
-### 模型结构
-
-QVAE 包括以下关键组件：
-
-1. **编码器（Encoder）**  
-   将输入数据 $\mathbf{x}$ 映射为潜变量的近似后验分布  
-   $q_\phi(\mathbf{z}|\mathbf{x})$，通常由神经网络参数化。
-
-2. **先验分布（Prior）**  
-   使用 **量子玻尔兹曼机 (QBM)** 建模潜变量 $\mathbf{z}$ 的先验分布。哈密顿量为：
-
-   $$
-   \mathcal{H}_\theta = \sum_l \Gamma_l \sigma_l^x + \sum_l h_l \sigma_l^z + \sum_{l<m} W_{lm} \sigma_l^z \sigma_m^z
-   $$
-
-3. **解码器（Decoder）**  
-   将潜变量 $\mathbf{z}$ （或其连续松弛变量 $\boldsymbol{\zeta}$ ）映射回数据空间，并使用解码器重建原始数据：
-
-   $$
-   p_\theta(\mathbf{x} | \boldsymbol{\zeta}) \sim \text{Bernoulli}(f_\theta(\boldsymbol{\zeta}))
-   $$
-
-### 训练目标：Q-ELBO
-
-QVAE 使用一个 **量子下界 (Q-ELBO)** 来近似最大化对数似然：
-
-$$
-\mathcal{L}_{\text{Q-ELBO}} = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x} | \boldsymbol{\zeta})] - \tilde{H}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}))
-$$
-
-### QBM 采样与训练
-
-- **正相（positive phase）**：从编码器采样 $\mathbf{z} \sim q_\phi(\mathbf{z}|\mathbf{x})$
-- **负相（negative phase）**：从 QBM 中采样 $\mathbf{z} \sim p_\theta(\mathbf{z})$，使用 **蒙特卡洛方法** 或 **量子退火器**
-
-把能量作为目标函数，objective 的梯度即为基于正相和负相采样计算的梯度。
-
-
-## 2. 模型架构
-
-定义了用于自编码器架构的 `Encoder` 和 `Decoder` 两个模块，均继承自 `nn.Module`。
-
-示例中的 `BasicEncoder` 和 `BasicDecoder` 都由多层全连接层、可配置激活函数和权重衰减组成；具体网络深度和激活函数由配置传入，并不固定包含 LayerNorm。
-编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。
-每个模块提供 `get_weight_decay` 方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。
-
-### 2.1 编码器
-
-```{literalinclude} ../../../../example/qvae_mnist/model/networks.py
-:pyobject: BasicEncoder
-```
-### 2.2 解码器
-
-```{literalinclude} ../../../../example/qvae_mnist/model/networks.py
-:pyobject: BasicDecoder
-```
-### 2.3 Q-VAE 完整模型
-
-参考模块手册中的QVAE类。
-
-## 3. 数据准备
-
-`loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST 的加载与预处理流程，返回训练和测试用的 `DataLoader`。
-
-数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` 将 28×28 图像展平为 784 维向量，适配全连接网络输入。
-训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性；`num_evts_train` 和 `num_evts_test` 还可以限制样本数量，方便快速验证代码。
-
-```{literalinclude} ../../../../example/qvae_mnist/utils/loadMNIST.py
-:pyobject: loadMNIST
+pip install torchvision==0.22.0 torchmetrics[image]
 ```
 
-## 4. 模型训练
+**Run**:
 
-该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。
-模型结合了经典神经网络编码器/解码器与 RBM 或 BM 先验，通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 `--sampler-type sa` 或 `--sampler-type cim` 选择采样器。
-训练过程中记录各项损失指标并定期保存至文件。
-
-命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 `loadMNIST` 展平数据，再由 `get_full_pipeline` 组装 QVAE 和 MLP 分类器：
-
-```{code-block} bash
-
+```bash
 cd example/qvae_mnist
 python run_pipeline.py --epochs 50 --run-tsne
 ```
 
-完整参数可运行 `python run_pipeline.py --help` 查看；首次运行需要根据数据集配置下载或准备数据。
+Or use the interactive notebooks:
 
-```{literalinclude} ../../../../example/qvae_mnist/trainer/trainer.py
-:pyobject: Trainer.train
+```bash
+jupyter notebook train_qvae.ipynb            # train and generate
+jupyter notebook train_qvae_classifier.ipynb  # representation learning + classification
 ```
-## 5. 可视化与评估
-本节提供两类关键可视化工具：
-一是通过 `plot_training_curves` 绘制训练/验证损失与准确率曲线，用于监控模型收敛情况；
-二是利用 `t_SNE` 对 QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。
-两者均支持自动保存高分辨率图像，并可灵活控制是否实时显示，便于实验分析、结果记录。
 
-### 5.1 训练过程可视化
+**Key files**:
 
-```{literalinclude} ../../../../example/qvae_mnist/utils/helpers.py
-:pyobject: plot_training_curves
+- `run_pipeline.py`: end-to-end entry (load data → train Q-VAE → optional t-SNE)
+- `model/networks.py`: `BasicEncoder` / `BasicDecoder`
+- `trainer/trainer.py`: `Trainer.train` — Q-ELBO optimization loop
+- `downstream/classifier.py`: `MLPClassifier.fit` — downstream classifier on learned representations
+
+## How It Works
+
+A standard VAE uses a Gaussian prior $p(\mathbf{z})$ and an encoder $q_\phi(\mathbf{z}|\mathbf{x})$. A Q-VAE replaces the Gaussian prior with a QBM:
+
 ```
-### 5.2 潜在空间可视化
-
-```{literalinclude} ../../../../example/qvae_mnist/utils/helpers.py
-:pyobject: t_SNE
+x (image)  →  Encoder  →  z (latent)  →  QBM prior p(z)  →  Decoder  →  x_recon
 ```
-## 6. 表征学习与分类
 
-Q-VAE 学到的表征可用于下游分类任务：
+The three components are:
 
-`MLPClassifier.fit` 用于训练一个多层感知机(MLP)分类器，输入特征是通过 QVAE 模型提取的数据表征。
-它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。
-在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。
+- **Encoder**: maps the input image $\mathbf{x}$ to the approximate posterior $q_\phi(\mathbf{z}|\mathbf{x})$, parameterized by a neural network.
+- **QBM prior**: models the latent distribution $p_\theta(\mathbf{z})$ using a quantum Boltzmann machine instead of a Gaussian.
+- **Decoder**: maps the latent sample $\mathbf{z}$ back to data space, reconstructing the input as a Bernoulli distribution.
 
-```{literalinclude} ../../../../example/qvae_mnist/downstream/classifier.py
-:pyobject: MLPClassifier.fit
+The training objective is the quantum evidence lower bound (Q-ELBO):
+
+$$
+\mathcal{L}_{\text{Q-ELBO}} = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x}|\mathbf{z})] - \tilde{H}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}))
+$$
+
+The first term is the reconstruction loss: how well the decoder reconstructs the input from the latent sample. The second term is a KL-like divergence that pulls the encoder posterior $q_\phi(\mathbf{z}|\mathbf{x})$ toward the QBM prior $p_\theta(\mathbf{z})$.
+
+The QBM prior is trained using the same positive/negative phase as an RBM: positive phase from the encoder samples, negative phase from QBM sampling. The sampler can be switched between `sa` (classical simulated annealing) and `cim` (quantum CIM) via the `--sampler-type` flag — the rest of the pipeline is unchanged.
+
+## Key Code
+
+Load MNIST and build the Q-VAE pipeline:
+
+```python
+from utils.loadMNIST import loadMNIST
+from run_pipeline import get_full_pipeline
+
+train_loader, test_loader = loadMNIST(dataset="mnist", batch_size=128, flatten=True)
+model, classifier = get_full_pipeline(latent_dim=64, sampler_type="cim")
 ```
-## 7. 科研应用：QBM-VAE
 
-Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
+Train the Q-VAE:
 
-**单细胞转录组学分析**：
+```python
+from trainer.trainer import Trainer
 
-- 显著提升聚类精度
-- 检测传统方法无法辨识的新型细胞亚型
-- 为靶点发现提供新线索
+trainer = Trainer(model, train_loader, test_loader, epochs=50, lr=1e-3)
+trainer.train()
+```
 
-**相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)
+Evaluate downstream classification on learned representations:
+
+```python
+from downstream.classifier import MLPClassifier
+
+clf = MLPClassifier(hidden_dim=128)
+clf.fit(model, train_loader, test_loader, epochs=30)
+```
+
+## Training and Evaluation
+
+- **Training curves**: `plot_training_curves` tracks reconstruction loss, KL divergence, and validation accuracy over epochs.
+- **Latent space**: `t_SNE` reduces the 64-dim latent representation to 2-D, colored by digit class, revealing cluster structure.
+- **Generated samples**: after training, the decoder can generate new images by sampling from the QBM prior and decoding.
+
+## Case Studies
+
+The Q-VAE architecture introduced here scales to larger biological and tabular datasets. See the [Case Studies section](index.md) for end-to-end pipelines built on this tutorial:
+
+- [Q-VAE for Single-Cell Transcriptomics](qvae_cell.md): representation learning on scRNA-seq with UMAP and clustering evaluation.
+- [Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): CleanEnergyQVAE with a free-energy scoring head on tabular benchmarks.
+
+## Summary
+
+- A Q-VAE swaps the Gaussian prior for a QBM, trained with the same positive/negative phase as an RBM.
+- The Q-ELBO combines reconstruction loss with a KL term between the encoder posterior and the QBM prior.
+- The sampler (SA vs CIM) can be switched without changing the rest of the pipeline.
+- Learned representations can be fed to a downstream classifier, as in the RBM feature-learning tutorial.

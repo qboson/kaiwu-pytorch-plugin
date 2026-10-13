@@ -1,152 +1,115 @@
-# BM 生成：玻尔兹曼机数据生成
+# BM Generation: Data Generation with a Fully Connected Boltzmann Machine
 
-本教程演示如何使用全连接玻尔兹曼机（Boltzmann Machine, BM）进行无监督训练和数据生成。该方法适合快速生成大量小规模样本的场景。
+> This tutorial extends the RBM idea to a fully connected Boltzmann Machine (BM), where all nodes are connected (not just across layers). It demonstrates how to train a BM with a mixed KL-divergence + conditional likelihood objective and generate samples from it. The system architecture and sampling interface are introduced in [Introduction](../introduction.md) and [Quick Start](../quickstart.md); the theoretical background is covered in [Section 4.1: The Classic Boltzmann Machine](../../theoretical-foundations/kpp-theoretical-foundations-bm-overall.md). This tutorial focuses on what changes when moving from an RBM to a BM: the new objective terms and conditional sampling that a fully connected graph requires.
 
+## Overview
 
-## 目标
+By the end of this tutorial you will be able to:
 
-- 理解全连接玻尔兹曼机与受限玻尔兹曼机的区别
-- 使用 KL 散度和对比散度训练 BM
-- 实现学习率调度和采样策略
-- 可视化生成样本的分布
+- Understand the difference between an RBM (bipartite) and a BM (fully connected)
+- Train a BM with a combined KL-divergence and negative conditional likelihood objective
+- Implement learning-rate scheduling (cosine with warmup) and multi-process sampling
+- Visualize generated sample distributions
 
-## 运行环境
+## Running the Example
 
-**示例位置**: `example/bm_generation/`
-
-- `train_bm.ipynb`: 训练代码
-- `sample_bm.ipynb`: 采样和测试代码
-
-**依赖项**:
+**Dependencies**:
 
 ```{code-block} bash
-
- pip install kaiwu==1.3.0 pandas matplotlib
-
+pip install kaiwu==1.3.1 pandas matplotlib
 ```
-## 1. 全连接玻尔兹曼机简介
 
-### 1.1 BM vs RBM
+**Run**:
 
-```{list-table}
-:widths: 25 35 40
-:header-rows: 1
-
-* - 特性
-  - 受限玻尔兹曼机（RBM）
-  - 全连接玻尔兹曼机（BM）
-* - 连接结构
-  - 层间全连接，层内无连接
-  - 所有节点全连接
-* - 采样方式
-  - 可并行采样
-  - 需要顺序采样
-* - 训练效率
-  - 较高
-  - 较低
-* - 表达能力
-  - 受限于双分图结构
-  - 更强，可建模任意分布
-
+```bash
+cd example/bm_generation
+jupyter notebook train_bm.ipynb    # training
+jupyter notebook sample_bm.ipynb  # sampling and evaluation
 ```
-### 1.2 适用场景
 
-全连接玻尔兹曼机适用于：
+**Key files**:
 
-- 需要建模复杂依赖关系的场景
-- 小规模样本生成
-- 研究玻尔兹曼分布采样问题
+- `trainer.py`: `Trainer` — BM training loop with cosine learning-rate schedule and multiprocess sampling
+- `data_loader.py`: `CSVDataset` — CSV-to-PyTorch `Dataset` wrapper
+- `saver.py`: `Saver` — checkpoint and loss-log persistence
+- `train_bm.ipynb` / `sample_bm.ipynb`: interactive walkthroughs
 
-### 1.3 数据生成流程
+## How It Works
 
-1. **负相采样**  
-   调用 `self.bm_net.sample(self.worker)` 从当前 BM 的联合分布中生成一组完整的可见-隐含状态样本 `state_all`，用于近似模型分布以计算对比散度类目标。
+Unlike an RBM, a BM has connections within the visible layer, so hidden and visible units cannot be sampled in parallel. The key differences are:
 
-2. **正相采样**  
-   对每个输入批次 `data`，执行两类正相采样：
-   
-   - **完整条件采样**：以完整输入 `data` 为可见层固定值，采样对应的完整状态 `state_v`。
-   - **部分条件采样**：仅固定输入的非输出部分（即 `data[:, :-num_output]`），对输出维度进行自由采样，得到 `state_vi`。
+| Aspect | Restricted Boltzmann Machine (RBM) | Boltzmann Machine (BM) |
+|---|---|---|
+| Connections | Inter-layer only, no intra-layer edges | All nodes connected |
+| Sampling | Parallel (conditional independence within layers) | Sequential (Gibbs sampling or solved by an external sampler) |
+| KPP method | `rbm.get_hidden(v)` | `bm.condition_sample(sampler, v)` |
+| Training efficiency | Higher | Lower |
+| Expressive power | Limited by bipartite structure | Stronger; can model arbitrary distributions |
 
-   这两类采样分别用于计算：
-   
-   - **KL 散度项（kl_divergence）**：衡量模型分布与数据分布的差异。
-   - **负条件似然项（ncl）**：鼓励模型在给定输入条件下正确重建输出部分。
+This example is suitable for:
 
-3. **目标函数构建**  
-   最终优化目标为加权组合：
+- Modeling complex dependencies between variables that an RBM's bipartite structure cannot capture
+- Small-scale sample generation where fully connected interactions matter
+- Studying Boltzmann distribution sampling behavior
 
-  $$
-   \mathcal{L} = \alpha \cdot \text{KL\_divergence} + (1 - \alpha) \cdot \text{NCL}
-  $$
-   其中 $\alpha$ 由 `cost_param["alpha"]` 控制，平衡生成能力与条件一致性。
+The training objective combines two terms:
 
-4. **多进程加速**  
-   将一个 batch 的数据按进程数切分，每个子进程独立调用 `process_solve_graph` 执行正相采样与概率估计，结果合并后用于梯度计算。
+1. **KL divergence**: encourages the model distribution to match the data distribution (unsupervised generation).
+2. **Negative conditional likelihood (NCL)**: when part of the visible units are designated as outputs (`num_output`), the model must reconstruct those outputs given the rest.
 
-### 1.4 数据生成特点
+The combined objective is:
 
-- **支持条件生成**：可指定部分可见单元为观测值，其余单元由模型生成，适用于半监督或序列补全任务。
-- **可微分训练**：所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。
-- **可视化支持**：训练过程中可实时绘制权重矩阵及其梯度，便于调试与分析。
-- **灵活输出结构**：通过 `num_output` 参数显式区分“输入”与“输出”可见单元，适配回归/分类等监督设定。
+$$
+\mathcal{L} = \alpha \cdot \text{KL\_divergence} + (1 - \alpha) \cdot \text{NCL}
+$$
 
+where $\alpha$ is set via `cost_param["alpha"]`.
 
-## 2. 加载数据
+**Negative phase**: `bm_net.sample(worker)` draws a complete joint visible+hidden state from the current BM distribution, approximating the model distribution for the contrastive divergence objective.
 
-`CSVDataset` 是一个继承自 PyTorch `Dataset` 的轻量级数据集封装类，
-用于加载以 NumPy 数组或列表形式存储的结构化数据（如从 CSV 文件读取的数据）。
+**Positive phase**: the positive phase uses two conditional samplings per batch:
 
-该类实现了 `__len__` 和 `__getitem__` 方法，使其可与 `DataLoader` 无缝配合使用。
-每次通过索引访问样本时，会自动将数据转换为 `torch.float32` 类型的张量，确保与神经网络模型的输入要求一致。
-此类适用于无标签的自监督学习任务或作为通用数据加载器的基础组件。
+- **Full conditional**: the entire input batch is fixed as the visible layer, and the corresponding joint state is sampled.
+- **Partial conditional**: only the non-output portion of the input (`data[:, :-num_output]`) is fixed, and the output dimensions are sampled freely.
 
-```{literalinclude} ../../../../example/bm_generation/data_loader.py
-:pyobject: CSVDataset
+These two samplings compute the KL term and the NCL term respectively. A cosine schedule with linear warmup stabilizes early training. Multi-process sampling splits each batch across workers, running positive-phase conditional sampling in parallel to accelerate the training loop. All sampling operations are embedded in the PyTorch computation graph, enabling end-to-end backpropagation.
+
+The `num_output` parameter designates which visible units are "outputs" (e.g. labels in a supervised setting), enabling conditional generation — you can fix part of the visible units and let the model generate the rest.
+
+## Key Code
+
+Initialize the BM trainer:
+
+```python
+from trainer import Trainer
+from data_loader import CSVDataset
+from saver import Saver
+
+dataset = CSVDataset("data.csv")
+trainer = Trainer(
+    n_visible=128, n_hidden=64, num_output=2,
+    alpha=0.5, beta=1e-4, lr=1e-3,
+)
 ```
-## 3. 模型构建
 
-该初始化方法用于配置一个基于玻尔兹曼机的训练框架。它接收输入数据、结果保存器（ `saver` ）和任务处理器（ `worker` ），
-并设定可见层、隐层与输出层的节点数量。内部构建了一个总节点数为可见层与隐层之和的玻尔兹曼网络（`BoltzmannMachine`），并初始化了学习相关的超参数，
-包括动量项和正则化系数（ `alpha` 与 `beta`）。
+Train with multiprocess sampling:
 
-此结构为后续的能量建模、采样训练及模型评估提供了基础支撑，适用于无监督或生成式学习任务。
-
-```{literalinclude} ../../../../example/bm_generation/trainer.py
-:pyobject: Trainer.__init__
+```python
+trainer.train(dataset, epochs=50, batch_size=32, n_workers=4)
 ```
-## 4. 训练流程
 
-### 4.1 学习率调度器
+After training, generate samples from `sample_bm.ipynb`: the BM samples full visible+hidden states, and the visible portion is rendered as the generated data distribution.
 
-`CosineScheduleWithWarmup` 是一个自定义的学习率调度器，继承自 PyTorch 的 `LambdaLR`。
-它在训练初期采用线性 warmup 策略逐步提升学习率，随后应用余弦退火策略平滑地衰减学习率至零。
+## Training and Evaluation
 
-该调度方式有助于模型在初始阶段稳定收敛，并在后期精细调整参数，广泛应用于深度学习任务中以提升训练效果和泛化能力。
-用户可灵活配置 warmup 步数、总训练步数及余弦周期数。
+- **Loss curve**: `Saver` appends each step's loss to `loss.txt`; plot it to confirm convergence.
+- **Checkpoints**: the model is saved periodically as `checkpoint_step_<n>.pt` for later sampling or resumption.
+- **Weight visualization**: during training, the trainer can render weight matrices and their gradients for debugging.
+- **Generated samples**: compare the distribution of generated samples against the original data (histograms / scatter plots in `sample_bm.ipynb`).
 
-```{literalinclude} ../../../../example/bm_generation/trainer.py
-:pyobject: CosineScheduleWithWarmup
-```
-### 4.2 训练器实现
+## Summary
 
-该训练方法实现了基于玻尔兹曼机的自定义优化过程，结合了 KL 散度与负对比似然（NCL）的混合损失函数。
-
-训练中使用 Adam 优化器，并配合带 warmup 的余弦退火学习率调度器以提升收敛稳定性。
-每一步通过采样生成全局状态，并利用多进程并行处理子任务以加速计算。损失值定期输出，模型参数和训练信息每隔若干步保存一次。
-此外，还支持可视化权重及其梯度，便于调试与分析训练动态。
-
-```{literalinclude} ../../../../example/bm_generation/trainer.py
-:pyobject: Trainer.train
-```
-## 5. 保存与加载模型
-
-`Saver` 类用于在模型训练过程中持久化关键信息。
-
-它提供两个功能：
-一是将当前模型以 PyTorch 格式定期保存为带步数编号的文件，便于后续加载或断点续训；
-二是将每一步的损失值追加写入 `loss.txt` 日志文件，支持训练过程的可视化分析与性能追踪。
-
-```{literalinclude} ../../../../example/bm_generation/saver.py
-:pyobject: Saver
-```
+- A BM drops the bipartite restriction, enabling arbitrary dependencies but requiring sequential sampling.
+- The training objective mixes KL divergence (generation) and NCL (conditional reconstruction), controlled by `alpha`.
+- The `num_output` parameter designates output units, enabling conditional generation.
+- Multi-process sampling accelerates the negative phase; cosine warmup stabilizes early training.
