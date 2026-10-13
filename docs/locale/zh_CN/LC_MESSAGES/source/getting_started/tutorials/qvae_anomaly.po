@@ -1,0 +1,57 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the
+# Kaiwu-PyTorch-Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu-PyTorch-Plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-13 14:23+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:1
+msgid "Q-VAE for Energy-Supervised Anomaly Detection"
+msgstr "Q-VAE 用于能量监督异常检测"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:3
+msgid ""
+"**Status**: Coming soon — placeholder page; will be expanded into a full "
+"tutorial."
+msgstr "**状态**：即将推出——占位页面；将在后续扩展为完整教程。"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:5
+msgid ""
+"Tabular anomaly detection with a CleanEnergyQVAE: the Q-VAE latent model is "
+"extended with a free-energy scoring head and an NCE-style contrastive "
+"objective, so normal samples get lower free energy and anomalies get higher "
+"free energy. Covers threshold search (best-F1 over a candidate grid) and "
+"PR/ROC / score-distribution / t-SNE evaluation."
+msgstr ""
+"使用 CleanEnergyQVAE 进行表格数据异常检测：Q-VAE 隐变量模型扩展了自由能量评分头与 NCE "
+"风格对比目标，使正常样本获得更低自由能量、异常样本获得更高自由能量。涵盖阈值搜索（候选网格上的最佳 F1）与 PR/ROC / 分数分布 / t-SNE"
+" 评估。"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:11
+msgid ""
+"**Example**: `example/qvae_anomaly/train_public_ad.py` · "
+"`example/qvae_anomaly/evaluate_public_ad.py` · "
+"`example/qvae_anomaly/qvae_anomaly_demo.ipynb`"
+msgstr ""
+"**示例**：`example/qvae_anomaly/train_public_ad.py` · "
+"`example/qvae_anomaly/evaluate_public_ad.py` · "
+"`example/qvae_anomaly/qvae_anomaly_demo.ipynb`"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:15
+msgid "**Data**: ADBench `38_thyroid.npz` · Kaggle `creditcard.csv`"
+msgstr "**数据**：ADBench `38_thyroid.npz` · Kaggle `creditcard.csv`"

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 15:02+0800\n"
+"POT-Creation-Date: 2026-10-13 14:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -21,325 +21,347 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:1
-msgid "BM 生成：玻尔兹曼机数据生成"
-msgstr "BM 生成：玻尔兹曼机数据生成"
+msgid ""
+"BM Generation: Data Generation with a Fully Connected Boltzmann Machine"
+msgstr "BM 生成：全连接玻尔兹曼机数据生成"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:3
 msgid ""
-"本教程演示如何使用全连接玻尔兹曼机（Boltzmann Machine, BM）进行无监督训练和数据生成。该方法适合快速生成大量小规模样本的场景。"
+"This tutorial extends the RBM idea to a fully connected Boltzmann Machine "
+"(BM), where all nodes are connected (not just across layers). It "
+"demonstrates how to train a BM with a mixed KL-divergence + conditional "
+"likelihood objective and generate samples from it. The system architecture "
+"and sampling interface are introduced in [Introduction](../introduction.md) "
+"and [Quick Start](../quickstart.md); the theoretical background is covered "
+"in [Section 4.1: The Classic Boltzmann Machine](../../theoretical-"
+"foundations/kpp-theoretical-foundations-bm-overall.md). This tutorial "
+"focuses on what changes when moving from an RBM to a BM: the new objective "
+"terms and conditional sampling that a fully connected graph requires."
 msgstr ""
-"本教程演示如何使用全连接玻尔兹曼机（Boltzmann Machine, BM）进行无监督训练和数据生成。该方法适合快速生成大量小规模样本的场景。"
+"本教程将 RBM 的思路扩展到全连接玻尔兹曼机（BM），其中所有节点都相互连接（而不仅仅是跨层连接）。本教程演示如何使用混合 KL 散度 + "
+"条件似然目标训练 "
+"BM，并从中生成样本。系统架构与采样接口已在[简介](../introduction.md)和[快速入门](../quickstart.md)中介绍；理论背景请参阅[第"
+" 4.1 节：经典玻尔兹曼机](../../theoretical-foundations/kpp-theoretical-foundations-"
+"bm-overall.md)。本教程重点关注从 RBM 迁移到 BM 时的变化：全连接图所需的新目标项与条件采样。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:6
-msgid "目标"
-msgstr "目标"
+#: ../../source/getting_started/tutorials/bm_generation.md:5
+msgid "Overview"
+msgstr "概述"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:8
-msgid "理解全连接玻尔兹曼机与受限玻尔兹曼机的区别"
-msgstr "理解全连接玻尔兹曼机与受限玻尔兹曼机的区别"
+#: ../../source/getting_started/tutorials/bm_generation.md:7
+msgid "By the end of this tutorial you will be able to:"
+msgstr "完成本教程后，您将能够："
 
 #: ../../source/getting_started/tutorials/bm_generation.md:9
-msgid "使用 KL 散度和对比散度训练 BM"
-msgstr "使用 KL 散度和对比散度训练 BM"
+msgid ""
+"Understand the difference between an RBM (bipartite) and a BM (fully "
+"connected)"
+msgstr "理解 RBM（二部图）与 BM（全连接）的区别"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:10
-msgid "实现学习率调度和采样策略"
-msgstr "实现学习率调度和采样策略"
+msgid ""
+"Train a BM with a combined KL-divergence and negative conditional likelihood"
+" objective"
+msgstr "使用 KL 散度与负条件似然的组合目标训练 BM"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:11
-msgid "可视化生成样本的分布"
+msgid ""
+"Implement learning-rate scheduling (cosine with warmup) and multi-process "
+"sampling"
+msgstr "实现学习率调度（带 warmup 的余弦退火）与多进程采样"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:12
+msgid "Visualize generated sample distributions"
 msgstr "可视化生成样本的分布"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:13
-msgid "运行环境"
-msgstr "运行环境"
+#: ../../source/getting_started/tutorials/bm_generation.md:14
+msgid "Running the Example"
+msgstr "运行示例"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:15
-msgid "**示例位置**: `example/bm_generation/`"
-msgstr "**示例位置**: `example/bm_generation/`"
+#: ../../source/getting_started/tutorials/bm_generation.md:16
+msgid "**Dependencies**:"
+msgstr "**依赖项**："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:17
-msgid "`train_bm.ipynb`: 训练代码"
-msgstr "`train_bm.ipynb`: 训练代码"
+#: ../../source/getting_started/tutorials/bm_generation.md:22
+msgid "**Run**:"
+msgstr "**运行**："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
-msgid "`sample_bm.ipynb`: 采样和测试代码"
-msgstr "`sample_bm.ipynb`: 采样和测试代码"
+#: ../../source/getting_started/tutorials/bm_generation.md:30
+msgid "**Key files**:"
+msgstr "**关键文件**："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:20
-msgid "**依赖项**:"
-msgstr "**依赖项**:"
+#: ../../source/getting_started/tutorials/bm_generation.md:32
+msgid ""
+"`trainer.py`: `Trainer` — BM training loop with cosine learning-rate "
+"schedule and multiprocess sampling"
+msgstr "`trainer.py`：`Trainer` — 带余弦学习率调度与多进程采样的 BM 训练循环"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:27
-msgid "1. 全连接玻尔兹曼机简介"
-msgstr "1. 全连接玻尔兹曼机简介"
+#: ../../source/getting_started/tutorials/bm_generation.md:33
+msgid "`data_loader.py`: `CSVDataset` — CSV-to-PyTorch `Dataset` wrapper"
+msgstr "`data_loader.py`：`CSVDataset` — CSV 到 PyTorch `Dataset` 的封装"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:29
-msgid "1.1 BM vs RBM"
-msgstr "1.1 BM 与 RBM"
+#: ../../source/getting_started/tutorials/bm_generation.md:34
+msgid "`saver.py`: `Saver` — checkpoint and loss-log persistence"
+msgstr "`saver.py`：`Saver` — 检查点与损失日志持久化"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:36
-msgid "特性"
-msgstr "特性"
+#: ../../source/getting_started/tutorials/bm_generation.md:35
+msgid "`train_bm.ipynb` / `sample_bm.ipynb`: interactive walkthroughs"
+msgstr "`train_bm.ipynb` / `sample_bm.ipynb`：交互式演示"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:37
-msgid "受限玻尔兹曼机（RBM）"
-msgstr "受限玻尔兹曼机（RBM）"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:38
-msgid "全连接玻尔兹曼机（BM）"
-msgstr "全连接玻尔兹曼机（BM）"
+msgid "How It Works"
+msgstr "工作原理"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:39
-msgid "连接结构"
+msgid ""
+"Unlike an RBM, a BM has connections within the visible layer, so hidden and "
+"visible units cannot be sampled in parallel. The key differences are:"
+msgstr "与 RBM 不同，BM 的可见层内部也有连接，因此隐层与可见层无法并行采样。主要区别如下："
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Aspect"
+msgstr "特性"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Restricted Boltzmann Machine (RBM)"
+msgstr "受限玻尔兹曼机（RBM）"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Boltzmann Machine (BM)"
+msgstr "玻尔兹曼机（BM）"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Connections"
 msgstr "连接结构"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:40
-msgid "层间全连接，层内无连接"
-msgstr "层间全连接，层内无连接"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Inter-layer only, no intra-layer edges"
+msgstr "仅层间连接，层内无边"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:41
-msgid "所有节点全连接"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "All nodes connected"
 msgstr "所有节点全连接"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:42
-msgid "采样方式"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Sampling"
 msgstr "采样方式"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:43
-msgid "可并行采样"
-msgstr "可并行采样"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Parallel (conditional independence within layers)"
+msgstr "并行（层内条件独立）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:44
-msgid "需要顺序采样"
-msgstr "需要顺序采样"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Sequential (Gibbs sampling or solved by an external sampler)"
+msgstr "顺序（Gibbs 采样或由外部采样器求解）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:45
-msgid "训练效率"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "KPP method"
+msgstr "KPP 方法"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "`rbm.get_hidden(v)`"
+msgstr "`rbm.get_hidden(v)`"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "`bm.condition_sample(sampler, v)`"
+msgstr "`bm.condition_sample(sampler, v)`"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Training efficiency"
 msgstr "训练效率"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:46
-msgid "较高"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Higher"
 msgstr "较高"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:47
-msgid "较低"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Lower"
 msgstr "较低"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:48
-msgid "表达能力"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Expressive power"
 msgstr "表达能力"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:49
-msgid "受限于双分图结构"
-msgstr "受限于双分图结构"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Limited by bipartite structure"
+msgstr "受限于二部图结构"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:50
-msgid "更强，可建模任意分布"
-msgstr "更强，可建模任意分布"
+#: ../../source/getting_started/tutorials/bm_generation.md:18
+msgid "Stronger; can model arbitrary distributions"
+msgstr "更强；可建模任意分布"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:49
+msgid "This example is suitable for:"
+msgstr "本示例适用于："
+
+#: ../../source/getting_started/tutorials/bm_generation.md:51
+msgid ""
+"Modeling complex dependencies between variables that an RBM's bipartite "
+"structure cannot capture"
+msgstr "建模 RBM 二部图结构无法捕捉的变量间复杂依赖关系"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:52
-msgid "1.2 适用场景"
-msgstr "1.2 适用场景"
+msgid ""
+"Small-scale sample generation where fully connected interactions matter"
+msgstr "需要全连接交互的小规模样本生成"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:54
-msgid "全连接玻尔兹曼机适用于："
-msgstr "全连接玻尔兹曼机适用于："
+#: ../../source/getting_started/tutorials/bm_generation.md:53
+msgid "Studying Boltzmann distribution sampling behavior"
+msgstr "研究玻尔兹曼分布的采样行为"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:56
-msgid "需要建模复杂依赖关系的场景"
-msgstr "需要建模复杂依赖关系的场景"
+#: ../../source/getting_started/tutorials/bm_generation.md:55
+msgid "The training objective combines two terms:"
+msgstr "训练目标由两项组成："
 
 #: ../../source/getting_started/tutorials/bm_generation.md:57
-msgid "小规模样本生成"
-msgstr "小规模样本生成"
+msgid ""
+"**KL divergence**: encourages the model distribution to match the data "
+"distribution (unsupervised generation)."
+msgstr "**KL 散度**：鼓励模型分布与数据分布匹配（无监督生成）。"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:58
-msgid "研究玻尔兹曼分布采样问题"
-msgstr "研究玻尔兹曼分布采样问题"
+msgid ""
+"**Negative conditional likelihood (NCL)**: when part of the visible units "
+"are designated as outputs (`num_output`), the model must reconstruct those "
+"outputs given the rest."
+msgstr "**负条件似然（NCL）**：当部分可见单元被指定为输出（`num_output`）时，模型必须在给定其余输入的条件下重建这些输出。"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:60
-msgid "1.3 数据生成流程"
-msgstr "1.3 数据生成流程"
+msgid "The combined objective is:"
+msgstr "组合目标为："
 
 #: ../../source/getting_started/tutorials/bm_generation.md:62
-msgid ""
-"**负相采样**   调用 `self.bm_net.sample(self.worker)` 从当前 BM 的联合分布中生成一组完整的可见-"
-"隐含状态样本 `state_all`，用于近似模型分布以计算对比散度类目标。"
-msgstr ""
-"**负相采样**   调用 `self.bm_net.sample(self.worker)` 从当前 BM 的联合分布中生成一组完整的可见-"
-"隐含状态样本 `state_all`，用于近似模型分布以计算对比散度类目标。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:65
-msgid "**正相采样**   对每个输入批次 `data`，执行两类正相采样："
-msgstr "**正相采样**   对每个输入批次 `data`，执行两类正相采样："
-
-#: ../../source/getting_started/tutorials/bm_generation.md:68
-msgid "**完整条件采样**：以完整输入 `data` 为可见层固定值，采样对应的完整状态 `state_v`。"
-msgstr "**完整条件采样**：以完整输入 `data` 为可见层固定值，采样对应的完整状态 `state_v`。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:69
-msgid ""
-"**部分条件采样**：仅固定输入的非输出部分（即 `data[:, :-num_output]`），对输出维度进行自由采样，得到 `state_vi`。"
-msgstr ""
-"**部分条件采样**：仅固定输入的非输出部分（即 `data[:, :-num_output]`），对输出维度进行自由采样，得到 `state_vi`。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:71
-msgid "这两类采样分别用于计算："
-msgstr "这两类采样分别用于计算："
-
-#: ../../source/getting_started/tutorials/bm_generation.md:73
-msgid "**KL 散度项（kl_divergence）**：衡量模型分布与数据分布的差异。"
-msgstr "**KL 散度项（kl_divergence）**：衡量模型分布与数据分布的差异。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:74
-msgid "**负条件似然项（ncl）**：鼓励模型在给定输入条件下正确重建输出部分。"
-msgstr "**负条件似然项（ncl）**：鼓励模型在给定输入条件下正确重建输出部分。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:76
-msgid "**目标函数构建**   最终优化目标为加权组合："
-msgstr "**目标函数构建**   最终优化目标为加权组合："
-
-#: ../../source/getting_started/tutorials/bm_generation.md:79
 #, python-brace-format
 msgid ""
 "\n"
-"   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
-"  "
+"\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 msgstr ""
 "\n"
-"   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
-"  "
+"\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:82
-msgid "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"
+#: ../../source/getting_started/tutorials/bm_generation.md:66
+msgid "where $\\alpha$ is set via `cost_param[\"alpha\"]`."
 msgstr "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:84
+#: ../../source/getting_started/tutorials/bm_generation.md:68
 msgid ""
-"**多进程加速**   将一个 batch 的数据按进程数切分，每个子进程独立调用 `process_solve_graph` "
-"执行正相采样与概率估计，结果合并后用于梯度计算。"
+"**Negative phase**: `bm_net.sample(worker)` draws a complete joint "
+"visible+hidden state from the current BM distribution, approximating the "
+"model distribution for the contrastive divergence objective."
 msgstr ""
-"**多进程加速**   将一个 batch 的数据按进程数切分，每个子进程独立调用 `process_solve_graph` "
-"执行正相采样与概率估计，结果合并后用于梯度计算。"
+"**负相**：`bm_net.sample(worker)` 从当前 BM 分布中采样完整的联合可见+隐状态，用于近似对比散度目标中的模型分布。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:87
-msgid "1.4 数据生成特点"
-msgstr "1.4 数据生成特点"
+#: ../../source/getting_started/tutorials/bm_generation.md:70
+msgid ""
+"**Positive phase**: the positive phase uses two conditional samplings per "
+"batch:"
+msgstr "**正相**：正相对每个批次执行两类条件采样："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:89
-msgid "**支持条件生成**：可指定部分可见单元为观测值，其余单元由模型生成，适用于半监督或序列补全任务。"
-msgstr "**支持条件生成**：可指定部分可见单元为观测值，其余单元由模型生成，适用于半监督或序列补全任务。"
+#: ../../source/getting_started/tutorials/bm_generation.md:72
+msgid ""
+"**Full conditional**: the entire input batch is fixed as the visible layer, "
+"and the corresponding joint state is sampled."
+msgstr "**完整条件**：将整个输入批次固定为可见层，采样对应的联合状态。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:90
-msgid "**可微分训练**：所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"
-msgstr "**可微分训练**：所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"
+#: ../../source/getting_started/tutorials/bm_generation.md:73
+msgid ""
+"**Partial conditional**: only the non-output portion of the input (`data[:, "
+":-num_output]`) is fixed, and the output dimensions are sampled freely."
+msgstr "**部分条件**：仅固定输入的非输出部分（`data[:, :-num_output]`），输出维度自由采样。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:91
-msgid "**可视化支持**：训练过程中可实时绘制权重矩阵及其梯度，便于调试与分析。"
-msgstr "**可视化支持**：训练过程中可实时绘制权重矩阵及其梯度，便于调试与分析。"
+#: ../../source/getting_started/tutorials/bm_generation.md:75
+msgid ""
+"These two samplings compute the KL term and the NCL term respectively. A "
+"cosine schedule with linear warmup stabilizes early training. Multi-process "
+"sampling splits each batch across workers, running positive-phase "
+"conditional sampling in parallel to accelerate the training loop. All "
+"sampling operations are embedded in the PyTorch computation graph, enabling "
+"end-to-end backpropagation."
+msgstr ""
+"这两类采样分别计算 KL 项和 NCL 项。带线性 warmup 的余弦调度稳定训练初期。多进程采样将每个批次拆分到多个 "
+"worker，并行执行正相条件采样以加速训练循环。所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:92
-msgid "**灵活输出结构**：通过 `num_output` 参数显式区分“输入”与“输出”可见单元，适配回归/分类等监督设定。"
-msgstr "**灵活输出结构**：通过 `num_output` 参数显式区分“输入”与“输出”可见单元，适配回归/分类等监督设定。"
+#: ../../source/getting_started/tutorials/bm_generation.md:77
+msgid ""
+"The `num_output` parameter designates which visible units are \"outputs\" "
+"(e.g. labels in a supervised setting), enabling conditional generation — you"
+" can fix part of the visible units and let the model generate the rest."
+msgstr "`num_output` 参数指定哪些可见单元为\"输出\"（如监督设定中的标签），实现条件生成——您可以固定部分可见单元，让模型生成其余部分。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:79
+msgid "Key Code"
+msgstr "核心代码"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:81
+msgid "Initialize the BM trainer:"
+msgstr "初始化 BM 训练器："
 
 #: ../../source/getting_started/tutorials/bm_generation.md:95
-msgid "2. 加载数据"
-msgstr "2. 加载数据"
+msgid "Train with multiprocess sampling:"
+msgstr "使用多进程采样训练："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:97
+#: ../../source/getting_started/tutorials/bm_generation.md:101
 msgid ""
-"`CSVDataset` 是一个继承自 PyTorch `Dataset` 的轻量级数据集封装类， 用于加载以 NumPy "
-"数组或列表形式存储的结构化数据（如从 CSV 文件读取的数据）。"
-msgstr ""
-"`CSVDataset` 是一个继承自 PyTorch `Dataset` 的轻量级数据集封装类， 用于加载以 NumPy "
-"数组或列表形式存储的结构化数据（如从 CSV 文件读取的数据）。"
+"After training, generate samples from `sample_bm.ipynb`: the BM samples full"
+" visible+hidden states, and the visible portion is rendered as the generated"
+" data distribution."
+msgstr "训练后，通过 `sample_bm.ipynb` 生成样本：BM 采样完整的可见+隐状态，可见部分作为生成的数据分布可视化。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:100
+#: ../../source/getting_started/tutorials/bm_generation.md:103
+msgid "Training and Evaluation"
+msgstr "训练与评估"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:105
 msgid ""
-"该类实现了 `__len__` 和 `__getitem__` 方法，使其可与 `DataLoader` 无缝配合使用。 "
-"每次通过索引访问样本时，会自动将数据转换为 `torch.float32` 类型的张量，确保与神经网络模型的输入要求一致。 "
-"此类适用于无标签的自监督学习任务或作为通用数据加载器的基础组件。"
-msgstr ""
-"该类实现了 `__len__` 和 `__getitem__` 方法，使其可与 `DataLoader` 无缝配合使用。 "
-"每次通过索引访问样本时，会自动将数据转换为 `torch.float32` 类型的张量，确保与神经网络模型的输入要求一致。 "
-"此类适用于无标签的自监督学习任务或作为通用数据加载器的基础组件。"
+"**Loss curve**: `Saver` appends each step's loss to `loss.txt`; plot it to "
+"confirm convergence."
+msgstr "**损失曲线**：`Saver` 将每步损失追加到 `loss.txt`；绘制该文件确认收敛。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:106
+msgid ""
+"**Checkpoints**: the model is saved periodically as `checkpoint_step_<n>.pt`"
+" for later sampling or resumption."
+msgstr "**检查点**：模型定期保存为 `checkpoint_step_<n>.pt`，用于后续采样或续训。"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:107
-msgid "3. 模型构建"
-msgstr "3. 模型构建"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:109
 msgid ""
-"该初始化方法用于配置一个基于玻尔兹曼机的训练框架。它接收输入数据、结果保存器（ `saver` ）和任务处理器（ `worker` ）， "
-"并设定可见层、隐层与输出层的节点数量。内部构建了一个总节点数为可见层与隐层之和的玻尔兹曼网络（`BoltzmannMachine`），并初始化了学习相关的超参数，"
-" 包括动量项和正则化系数（ `alpha` 与 `beta`）。"
-msgstr ""
-"该初始化方法用于配置一个基于玻尔兹曼机的训练框架。它接收输入数据、结果保存器（ `saver` ）和任务处理器（ `worker` ）， "
-"并设定可见层、隐层与输出层的节点数量。内部构建了一个总节点数为可见层与隐层之和的玻尔兹曼网络（`BoltzmannMachine`），并初始化了学习相关的超参数，"
-" 包括动量项和正则化系数（ `alpha` 与 `beta`）。"
+"**Weight visualization**: during training, the trainer can render weight "
+"matrices and their gradients for debugging."
+msgstr "**权重可视化**：训练过程中，训练器可渲染权重矩阵及其梯度，便于调试。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:108
+msgid ""
+"**Generated samples**: compare the distribution of generated samples against"
+" the original data (histograms / scatter plots in `sample_bm.ipynb`)."
+msgstr "**生成样本**：将生成样本的分布与原始数据对比（`sample_bm.ipynb` 中的直方图/散点图）。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:110
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:112
+msgid ""
+"A BM drops the bipartite restriction, enabling arbitrary dependencies but "
+"requiring sequential sampling."
+msgstr "BM 去除了二部图限制，可建模任意依赖关系，但需要顺序采样。"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:113
-msgid "此结构为后续的能量建模、采样训练及模型评估提供了基础支撑，适用于无监督或生成式学习任务。"
-msgstr "此结构为后续的能量建模、采样训练及模型评估提供了基础支撑，适用于无监督或生成式学习任务。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:118
-msgid "4. 训练流程"
-msgstr "4. 训练流程"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:120
-msgid "4.1 学习率调度器"
-msgstr "4.1 学习率调度器"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:122
 msgid ""
-"`CosineScheduleWithWarmup` 是一个自定义的学习率调度器，继承自 PyTorch 的 `LambdaLR`。 "
-"它在训练初期采用线性 warmup 策略逐步提升学习率，随后应用余弦退火策略平滑地衰减学习率至零。"
-msgstr ""
-"`CosineScheduleWithWarmup` 是一个自定义的学习率调度器，继承自 PyTorch 的 `LambdaLR`。 "
-"它在训练初期采用线性 warmup 策略逐步提升学习率，随后应用余弦退火策略平滑地衰减学习率至零。"
+"The training objective mixes KL divergence (generation) and NCL (conditional"
+" reconstruction), controlled by `alpha`."
+msgstr "训练目标混合 KL 散度（生成）与 NCL（条件重建），由 `alpha` 控制权重。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:125
+#: ../../source/getting_started/tutorials/bm_generation.md:114
 msgid ""
-"该调度方式有助于模型在初始阶段稳定收敛，并在后期精细调整参数，广泛应用于深度学习任务中以提升训练效果和泛化能力。 用户可灵活配置 warmup "
-"步数、总训练步数及余弦周期数。"
-msgstr ""
-"该调度方式有助于模型在初始阶段稳定收敛，并在后期精细调整参数，广泛应用于深度学习任务中以提升训练效果和泛化能力。 用户可灵活配置 warmup "
-"步数、总训练步数及余弦周期数。"
+"The `num_output` parameter designates output units, enabling conditional "
+"generation."
+msgstr "`num_output` 参数指定输出单元，实现条件生成。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:131
-msgid "4.2 训练器实现"
-msgstr "4.2 训练器实现"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:133
-msgid "该训练方法实现了基于玻尔兹曼机的自定义优化过程，结合了 KL 散度与负对比似然（NCL）的混合损失函数。"
-msgstr "该训练方法实现了基于玻尔兹曼机的自定义优化过程，结合了 KL 散度与负对比似然（NCL）的混合损失函数。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:135
+#: ../../source/getting_started/tutorials/bm_generation.md:115
 msgid ""
-"训练中使用 Adam 优化器，并配合带 warmup 的余弦退火学习率调度器以提升收敛稳定性。 "
-"每一步通过采样生成全局状态，并利用多进程并行处理子任务以加速计算。损失值定期输出，模型参数和训练信息每隔若干步保存一次。 "
-"此外，还支持可视化权重及其梯度，便于调试与分析训练动态。"
-msgstr ""
-"训练中使用 Adam 优化器，并配合带 warmup 的余弦退火学习率调度器以提升收敛稳定性。 "
-"每一步通过采样生成全局状态，并利用多进程并行处理子任务以加速计算。损失值定期输出，模型参数和训练信息每隔若干步保存一次。 "
-"此外，还支持可视化权重及其梯度，便于调试与分析训练动态。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:142
-msgid "5. 保存与加载模型"
-msgstr "5. 保存与加载模型"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:144
-msgid "`Saver` 类用于在模型训练过程中持久化关键信息。"
-msgstr "`Saver` 类用于在模型训练过程中持久化关键信息。"
-
-#: ../../source/getting_started/tutorials/bm_generation.md:146
-msgid ""
-"它提供两个功能： 一是将当前模型以 PyTorch 格式定期保存为带步数编号的文件，便于后续加载或断点续训； 二是将每一步的损失值追加写入 "
-"`loss.txt` 日志文件，支持训练过程的可视化分析与性能追踪。"
-msgstr ""
-"它提供两个功能： 一是将当前模型以 PyTorch 格式定期保存为带步数编号的文件，便于后续加载或断点续训； 二是将每一步的损失值追加写入 "
-"`loss.txt` 日志文件，支持训练过程的可视化分析与性能追踪。"
+"Multi-process sampling accelerates the negative phase; cosine warmup "
+"stabilizes early training."
+msgstr "多进程采样加速负相；余弦 warmup 稳定训练初期。"
 
 #~ msgid "**示例位置**: ``example/bm_generation/``"
 #~ msgstr ""
@@ -373,6 +395,8 @@ msgstr ""
 #~ "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot"
 #~ " \\text{NCL}"
 #~ msgstr ""
+#~ "\n"
+#~ "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 
 #~ msgid "其中 :math:`\\alpha` 由 ``cost_param[\"alpha\"]`` 控制，平衡生成能力与条件一致性。"
 #~ msgstr ""
@@ -419,12 +443,16 @@ msgstr ""
 #~ "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot"
 #~ " \\text{NCL}\n"
 #~ msgstr ""
+#~ "\n"
+#~ "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 
 #~ msgid ""
 #~ "\n"
 #~ "   \\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 #~ "  "
 #~ msgstr ""
+#~ "\n"
+#~ "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 
 #~ msgid "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"
 #~ msgstr ""
@@ -434,3 +462,243 @@ msgstr ""
 #~ "\\cdot \\text{NCL}   $$    其中 $\\alpha$ 由 `cost_param[\"alpha\"]` "
 #~ "控制，平衡生成能力与条件一致性。"
 #~ msgstr ""
+#~ "\n"
+#~ "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
+
+#~ msgid "BM 生成：玻尔兹曼机数据生成"
+#~ msgstr "BM 生成：玻尔兹曼机数据生成"
+
+#~ msgid ""
+#~ "本教程演示如何使用全连接玻尔兹曼机（Boltzmann Machine, BM）进行无监督训练和数据生成。该方法适合快速生成大量小规模样本的场景。"
+#~ msgstr ""
+#~ "本教程演示如何使用全连接玻尔兹曼机（Boltzmann Machine, BM）进行无监督训练和数据生成。该方法适合快速生成大量小规模样本的场景。"
+
+#~ msgid "目标"
+#~ msgstr "目标"
+
+#~ msgid "理解全连接玻尔兹曼机与受限玻尔兹曼机的区别"
+#~ msgstr "理解全连接玻尔兹曼机与受限玻尔兹曼机的区别"
+
+#~ msgid "使用 KL 散度和对比散度训练 BM"
+#~ msgstr "使用 KL 散度和对比散度训练 BM"
+
+#~ msgid "实现学习率调度和采样策略"
+#~ msgstr "实现学习率调度和采样策略"
+
+#~ msgid "可视化生成样本的分布"
+#~ msgstr "可视化生成样本的分布"
+
+#~ msgid "运行环境"
+#~ msgstr "运行环境"
+
+#~ msgid "**示例位置**: `example/bm_generation/`"
+#~ msgstr "**示例位置**: `example/bm_generation/`"
+
+#~ msgid "`train_bm.ipynb`: 训练代码"
+#~ msgstr "`train_bm.ipynb`: 训练代码"
+
+#~ msgid "`sample_bm.ipynb`: 采样和测试代码"
+#~ msgstr "`sample_bm.ipynb`: 采样和测试代码"
+
+#~ msgid "1. 全连接玻尔兹曼机简介"
+#~ msgstr "1. 全连接玻尔兹曼机简介"
+
+#~ msgid "1.1 BM vs RBM"
+#~ msgstr "1.1 BM 与 RBM"
+
+#~ msgid "特性"
+#~ msgstr "特性"
+
+#~ msgid "受限玻尔兹曼机（RBM）"
+#~ msgstr "受限玻尔兹曼机（RBM）"
+
+#~ msgid "全连接玻尔兹曼机（BM）"
+#~ msgstr "全连接玻尔兹曼机（BM）"
+
+#~ msgid "连接结构"
+#~ msgstr "连接结构"
+
+#~ msgid "层间全连接，层内无连接"
+#~ msgstr "层间全连接，层内无连接"
+
+#~ msgid "所有节点全连接"
+#~ msgstr "所有节点全连接"
+
+#~ msgid "采样方式"
+#~ msgstr "采样方式"
+
+#~ msgid "可并行采样"
+#~ msgstr "可并行采样"
+
+#~ msgid "需要顺序采样"
+#~ msgstr "需要顺序采样"
+
+#~ msgid "训练效率"
+#~ msgstr "训练效率"
+
+#~ msgid "较高"
+#~ msgstr "较高"
+
+#~ msgid "较低"
+#~ msgstr "较低"
+
+#~ msgid "表达能力"
+#~ msgstr "表达能力"
+
+#~ msgid "受限于双分图结构"
+#~ msgstr "受限于双分图结构"
+
+#~ msgid "更强，可建模任意分布"
+#~ msgstr "更强，可建模任意分布"
+
+#~ msgid "1.2 适用场景"
+#~ msgstr "1.2 适用场景"
+
+#~ msgid "全连接玻尔兹曼机适用于："
+#~ msgstr "全连接玻尔兹曼机适用于："
+
+#~ msgid "需要建模复杂依赖关系的场景"
+#~ msgstr "需要建模复杂依赖关系的场景"
+
+#~ msgid "小规模样本生成"
+#~ msgstr "小规模样本生成"
+
+#~ msgid "研究玻尔兹曼分布采样问题"
+#~ msgstr "研究玻尔兹曼分布采样问题"
+
+#~ msgid "1.3 数据生成流程"
+#~ msgstr "1.3 数据生成流程"
+
+#~ msgid ""
+#~ "**负相采样**   调用 `self.bm_net.sample(self.worker)` 从当前 BM 的联合分布中生成一组完整的可见-"
+#~ "隐含状态样本 `state_all`，用于近似模型分布以计算对比散度类目标。"
+#~ msgstr ""
+#~ "**负相采样**   调用 `self.bm_net.sample(self.worker)` 从当前 BM 的联合分布中生成一组完整的可见-"
+#~ "隐含状态样本 `state_all`，用于近似模型分布以计算对比散度类目标。"
+
+#~ msgid "**正相采样**   对每个输入批次 `data`，执行两类正相采样："
+#~ msgstr "**正相采样**   对每个输入批次 `data`，执行两类正相采样："
+
+#~ msgid "**完整条件采样**：以完整输入 `data` 为可见层固定值，采样对应的完整状态 `state_v`。"
+#~ msgstr "**完整条件采样**：以完整输入 `data` 为可见层固定值，采样对应的完整状态 `state_v`。"
+
+#~ msgid ""
+#~ "**部分条件采样**：仅固定输入的非输出部分（即 `data[:, :-num_output]`），对输出维度进行自由采样，得到 `state_vi`。"
+#~ msgstr ""
+#~ "**部分条件采样**：仅固定输入的非输出部分（即 `data[:, :-num_output]`），对输出维度进行自由采样，得到 `state_vi`。"
+
+#~ msgid "这两类采样分别用于计算："
+#~ msgstr "这两类采样分别用于计算："
+
+#~ msgid "**KL 散度项（kl_divergence）**：衡量模型分布与数据分布的差异。"
+#~ msgstr "**KL 散度项（kl_divergence）**：衡量模型分布与数据分布的差异。"
+
+#~ msgid "**负条件似然项（ncl）**：鼓励模型在给定输入条件下正确重建输出部分。"
+#~ msgstr "**负条件似然项（ncl）**：鼓励模型在给定输入条件下正确重建输出部分。"
+
+#~ msgid "**目标函数构建**   最终优化目标为加权组合："
+#~ msgstr "**目标函数构建**   最终优化目标为加权组合："
+
+#~ msgid ""
+#~ "**多进程加速**   将一个 batch 的数据按进程数切分，每个子进程独立调用 `process_solve_graph` "
+#~ "执行正相采样与概率估计，结果合并后用于梯度计算。"
+#~ msgstr ""
+#~ "**多进程加速**   将一个 batch 的数据按进程数切分，每个子进程独立调用 `process_solve_graph` "
+#~ "执行正相采样与概率估计，结果合并后用于梯度计算。"
+
+#~ msgid "1.4 数据生成特点"
+#~ msgstr "1.4 数据生成特点"
+
+#~ msgid "**支持条件生成**：可指定部分可见单元为观测值，其余单元由模型生成，适用于半监督或序列补全任务。"
+#~ msgstr "**支持条件生成**：可指定部分可见单元为观测值，其余单元由模型生成，适用于半监督或序列补全任务。"
+
+#~ msgid "**可微分训练**：所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"
+#~ msgstr "**可微分训练**：所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"
+
+#~ msgid "**可视化支持**：训练过程中可实时绘制权重矩阵及其梯度，便于调试与分析。"
+#~ msgstr "**可视化支持**：训练过程中可实时绘制权重矩阵及其梯度，便于调试与分析。"
+
+#~ msgid "**灵活输出结构**：通过 `num_output` 参数显式区分“输入”与“输出”可见单元，适配回归/分类等监督设定。"
+#~ msgstr "**灵活输出结构**：通过 `num_output` 参数显式区分“输入”与“输出”可见单元，适配回归/分类等监督设定。"
+
+#~ msgid "2. 加载数据"
+#~ msgstr "2. 加载数据"
+
+#~ msgid ""
+#~ "`CSVDataset` 是一个继承自 PyTorch `Dataset` 的轻量级数据集封装类， 用于加载以 NumPy "
+#~ "数组或列表形式存储的结构化数据（如从 CSV 文件读取的数据）。"
+#~ msgstr ""
+#~ "`CSVDataset` 是一个继承自 PyTorch `Dataset` 的轻量级数据集封装类， 用于加载以 NumPy "
+#~ "数组或列表形式存储的结构化数据（如从 CSV 文件读取的数据）。"
+
+#~ msgid ""
+#~ "该类实现了 `__len__` 和 `__getitem__` 方法，使其可与 `DataLoader` 无缝配合使用。 "
+#~ "每次通过索引访问样本时，会自动将数据转换为 `torch.float32` 类型的张量，确保与神经网络模型的输入要求一致。 "
+#~ "此类适用于无标签的自监督学习任务或作为通用数据加载器的基础组件。"
+#~ msgstr ""
+#~ "该类实现了 `__len__` 和 `__getitem__` 方法，使其可与 `DataLoader` 无缝配合使用。 "
+#~ "每次通过索引访问样本时，会自动将数据转换为 `torch.float32` 类型的张量，确保与神经网络模型的输入要求一致。 "
+#~ "此类适用于无标签的自监督学习任务或作为通用数据加载器的基础组件。"
+
+#~ msgid "3. 模型构建"
+#~ msgstr "3. 模型构建"
+
+#~ msgid ""
+#~ "该初始化方法用于配置一个基于玻尔兹曼机的训练框架。它接收输入数据、结果保存器（ `saver` ）和任务处理器（ `worker` ）， "
+#~ "并设定可见层、隐层与输出层的节点数量。内部构建了一个总节点数为可见层与隐层之和的玻尔兹曼网络（`BoltzmannMachine`），并初始化了学习相关的超参数，"
+#~ " 包括动量项和正则化系数（ `alpha` 与 `beta`）。"
+#~ msgstr ""
+#~ "该初始化方法用于配置一个基于玻尔兹曼机的训练框架。它接收输入数据、结果保存器（ `saver` ）和任务处理器（ `worker` ）， "
+#~ "并设定可见层、隐层与输出层的节点数量。内部构建了一个总节点数为可见层与隐层之和的玻尔兹曼网络（`BoltzmannMachine`），并初始化了学习相关的超参数，"
+#~ " 包括动量项和正则化系数（ `alpha` 与 `beta`）。"
+
+#~ msgid "此结构为后续的能量建模、采样训练及模型评估提供了基础支撑，适用于无监督或生成式学习任务。"
+#~ msgstr "此结构为后续的能量建模、采样训练及模型评估提供了基础支撑，适用于无监督或生成式学习任务。"
+
+#~ msgid "4. 训练流程"
+#~ msgstr "4. 训练流程"
+
+#~ msgid "4.1 学习率调度器"
+#~ msgstr "4.1 学习率调度器"
+
+#~ msgid ""
+#~ "`CosineScheduleWithWarmup` 是一个自定义的学习率调度器，继承自 PyTorch 的 `LambdaLR`。 "
+#~ "它在训练初期采用线性 warmup 策略逐步提升学习率，随后应用余弦退火策略平滑地衰减学习率至零。"
+#~ msgstr ""
+#~ "`CosineScheduleWithWarmup` 是一个自定义的学习率调度器，继承自 PyTorch 的 `LambdaLR`。 "
+#~ "它在训练初期采用线性 warmup 策略逐步提升学习率，随后应用余弦退火策略平滑地衰减学习率至零。"
+
+#~ msgid ""
+#~ "该调度方式有助于模型在初始阶段稳定收敛，并在后期精细调整参数，广泛应用于深度学习任务中以提升训练效果和泛化能力。 用户可灵活配置 warmup "
+#~ "步数、总训练步数及余弦周期数。"
+#~ msgstr ""
+#~ "该调度方式有助于模型在初始阶段稳定收敛，并在后期精细调整参数，广泛应用于深度学习任务中以提升训练效果和泛化能力。 用户可灵活配置 warmup "
+#~ "步数、总训练步数及余弦周期数。"
+
+#~ msgid "4.2 训练器实现"
+#~ msgstr "4.2 训练器实现"
+
+#~ msgid "该训练方法实现了基于玻尔兹曼机的自定义优化过程，结合了 KL 散度与负对比似然（NCL）的混合损失函数。"
+#~ msgstr "该训练方法实现了基于玻尔兹曼机的自定义优化过程，结合了 KL 散度与负对比似然（NCL）的混合损失函数。"
+
+#~ msgid ""
+#~ "训练中使用 Adam 优化器，并配合带 warmup 的余弦退火学习率调度器以提升收敛稳定性。 "
+#~ "每一步通过采样生成全局状态，并利用多进程并行处理子任务以加速计算。损失值定期输出，模型参数和训练信息每隔若干步保存一次。 "
+#~ "此外，还支持可视化权重及其梯度，便于调试与分析训练动态。"
+#~ msgstr ""
+#~ "训练中使用 Adam 优化器，并配合带 warmup 的余弦退火学习率调度器以提升收敛稳定性。 "
+#~ "每一步通过采样生成全局状态，并利用多进程并行处理子任务以加速计算。损失值定期输出，模型参数和训练信息每隔若干步保存一次。 "
+#~ "此外，还支持可视化权重及其梯度，便于调试与分析训练动态。"
+
+#~ msgid "5. 保存与加载模型"
+#~ msgstr "5. 保存与加载模型"
+
+#~ msgid "`Saver` 类用于在模型训练过程中持久化关键信息。"
+#~ msgstr "`Saver` 类用于在模型训练过程中持久化关键信息。"
+
+#~ msgid ""
+#~ "它提供两个功能： 一是将当前模型以 PyTorch 格式定期保存为带步数编号的文件，便于后续加载或断点续训； 二是将每一步的损失值追加写入 "
+#~ "`loss.txt` 日志文件，支持训练过程的可视化分析与性能追踪。"
+#~ msgstr ""
+#~ "它提供两个功能： 一是将当前模型以 PyTorch 格式定期保存为带步数编号的文件，便于后续加载或断点续训； 二是将每一步的损失值追加写入 "
+#~ "`loss.txt` 日志文件，支持训练过程的可视化分析与性能追踪。"

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-14 18:41+0800\n"
+"POT-Creation-Date: 2026-10-13 14:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -18,167 +18,201 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:1
-msgid "RBM 分类：手写数字识别"
+msgid "RBM Classification: Handwritten Digit Recognition"
 msgstr "RBM 分类：手写数字识别"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:3
-msgid "本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。"
-msgstr "本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。"
+msgid ""
+"This tutorial builds on the [Quick Start](../quickstart.md) and [Section "
+"4.2: Restricted Boltzmann Machine](../../theoretical-foundations/kpp-"
+"theoretical-foundations-bm-restricted.md). It walks through a complete two-"
+"stage pipeline: train an RBM on handwritten digits, use its hidden "
+"activations as features, and attach a logistic regression classifier on top."
+" Using the same positive/negative phase loop as the [Quick "
+"Start](../quickstart.md), this tutorial focuses on the feature-extraction "
+"pipeline and downstream classification."
+msgstr ""
+"本教程基于 [Quick Start](../quickstart.md) 和 [4.2 节：受限玻尔兹曼机](../../theoretical-"
+"foundations/kpp-theoretical-foundations-bm-"
+"restricted.md)，演示完整的两阶段流水线：在手写数字上训练 RBM，将其隐层激活作为特征，并在其上接逻辑回归分类器。使用与 [Quick "
+"Start](../quickstart.md) 相同的正相/负相循环，本教程重点关注特征提取流水线和下游分类。"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:5
-msgid "教程目标"
+msgid "Overview"
 msgstr "教程目标"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:7
-msgid "完成本教程后，您将学会："
+msgid "By the end of this tutorial you will be able to:"
 msgstr "完成本教程后，您将学会："
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:9
-msgid "使用 RBM 从图像数据中提取特征"
+msgid "Use an RBM as an unsupervised feature extractor on image data"
 msgstr "使用 RBM 从图像数据中提取特征"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:10
-msgid "将 RBM 作为特征提取器与传统分类器结合"
+msgid ""
+"Compare RBM features against raw pixels in a downstream classification task"
 msgstr "将 RBM 作为特征提取器与传统分类器结合"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:11
-msgid "可视化 RBM 学到的权重和生成的样本"
-msgstr "可视化 RBM 学到的权重和生成的样本"
+msgid ""
+"Visualize learned RBM weights and evaluate the classifier's performance"
+msgstr "可视化 RBM 学到的权重和评估分类器性能"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:12
-msgid "评估分类模型的性能"
-msgstr "评估分类模型的性能"
+msgid "Visualize the confusion matrix of the trained classifier"
+msgstr "可视化训练后分类器的混淆矩阵"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:14
-msgid "运行环境"
+msgid "Running the Example"
 msgstr "运行环境"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:16
-msgid "**示例位置**: `example/rbm_digits/rbm_digits.ipynb`"
-msgstr "**示例位置**: `example/rbm_digits/rbm_digits.ipynb`"
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:18
-msgid "**依赖项**:"
+msgid "**Dependencies**:"
 msgstr "**依赖项**:"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:25
-msgid "1. 数据准备"
-msgstr "1. 数据准备"
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:27
-msgid ""
-"本示例的主入口是 `example/rbm_digits/rbm_digits.ipynb`；分类流水线也可以直接参考 "
-"`example/rbm_digits/rbm_classifier.py` 中的 `train_classifier`。"
-msgstr ""
-"本示例的主入口是 `example/rbm_digits/rbm_digits.ipynb`；分类流水线也可以直接参考 "
-"`example/rbm_digits/rbm_classifier.py` 中的 `train_classifier`。"
+#: ../../source/getting_started/tutorials/rbm_classification.md:22
+msgid "**Run**:"
+msgstr "**运行**:"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:29
-msgid "此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。"
-msgstr "此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。"
+msgid "**Key files**:"
+msgstr "**关键文件**:"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:31
 msgid ""
-"首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。 "
-"接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。 "
-"最后，将所有图像数据展平为二维数组，并划分成训练集和测试集，同时进行归一化处理，确保各特征值位于[0, 1]区间内，为后续模型训练做好准备。"
-msgstr ""
-"首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。 "
-"接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。 "
-"最后，将所有图像数据展平为二维数组，并划分成训练集和测试集，同时进行归一化处理，确保各特征值位于[0, 1]区间内，为后续模型训练做好准备。"
+"`rbm_digits.py`: `RBMRunner` — data loading, RBM training, weight and "
+"confusion-matrix visualization"
+msgstr "`rbm_digits.py`：`RBMRunner` — 数据加载、RBM 训练、权重和混淆矩阵可视化"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:32
+msgid ""
+"`rbm_classifier.py`: `train_classifier` — two-stage RBM + logistic "
+"regression pipeline"
+msgstr "`rbm_classifier.py`：`train_classifier` — 两阶段 RBM + 逻辑回归流水线"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:33
+msgid "`rbm_digits.ipynb`: interactive walkthrough"
+msgstr "`rbm_digits.ipynb`：交互式演示"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:35
-msgid "2. 原理概览"
-msgstr "2. 原理概览"
+msgid "How It Works"
+msgstr "原理概览"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:37
 msgid ""
-"RBM "
-"是一个二部能量模型。可见层和隐层之间有连接，但同一层内部没有连接，因此给定一层后，另一层的各个单元可以并行采样。模型通过能量函数定义样本概率：低能量状态具有更高概率，隐层则将像素组合成更抽象的特征。"
+"The RBM training loop is identical to the [Quick Start](../quickstart.md): "
+"positive phase from data, negative phase from `rbm.sample(sampler)`, and "
+"`rbm.objective(...)` provides the surrogate loss. The theoretical details of"
+" RBM energy functions and conditional independence are covered in [Section "
+"4.2](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
+"restricted.md); here we focus on why RBMs work as unsupervised feature "
+"extractors."
 msgstr ""
-"RBM "
-"是一个二部能量模型。可见层和隐层之间有连接，但同一层内部没有连接，因此给定一层后，另一层的各个单元可以并行采样。模型通过能量函数定义样本概率：低能量状态具有更高概率，隐层则将像素组合成更抽象的特征。"
+"RBM 训练循环与 [Quick Start](../quickstart.md) 完全相同：正相来自数据，负相来自 "
+"`rbm.sample(sampler)`，`rbm.objective(...)` 提供代理损失。RBM 能量函数和条件独立性的理论细节见 [4.2 "
+"节](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
+"restricted.md)；此处我们重点关注为什么 RBM 可以作为无监督特征提取器。"
+
+msgid ""
+"RBMs are bipartite energy-based models: visible and hidden layers are "
+"connected across, but not within, each layer. Lower-energy configurations "
+"have higher probability, and the hidden units learn to combine raw pixels "
+"into more abstract features — exactly what makes RBMs useful as a feature "
+"extraction stage before a downstream classifier."
+msgstr ""
+"RBM 是二部能量模型：可见层与隐层跨层连接，但层内无连接。低能量配置具有更高概率，隐层学习将原始像素组合为更抽象的特征——这正是 RBM "
+"作为下游分类器前特征提取阶段的价值所在。"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:39
 msgid ""
-"训练时使用对比散度近似最大似然梯度：正相统计真实数据及其隐层表示，负相从模型采样并统计重构数据，二者的差异用于更新权重和偏置。训练完成后，`RBMRunner.transform`"
-" 输出隐层特征，再交给逻辑回归等传统分类器。"
-msgstr ""
-"训练时使用对比散度近似最大似然梯度：正相统计真实数据及其隐层表示，负相从模型采样并统计重构数据，二者的差异用于更新权重和偏置。训练完成后，`RBMRunner.transform`"
-" 输出隐层特征，再交给逻辑回归等传统分类器。"
+"The downstream classifier is a standard scikit-learn pipeline, KPP only "
+"contributes the learned features."
+msgstr "下游分类器是标准的 scikit-learn 流水线，KPP 仅提供学习到的特征。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:44
-msgid "2. 模型训练"
-msgstr "2. 模型训练"
+#: ../../source/getting_started/tutorials/rbm_classification.md:41
+msgid "The overall pipeline is:"
+msgstr "整体流水线如下："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:46
-msgid "此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。"
-msgstr "此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。"
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:48
+#: ../../source/getting_started/tutorials/rbm_classification.md:47
 msgid ""
-"首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。 "
-"接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数， "
-"该函数包括了负对数似然估计以及权重和偏置的衰减项。"
+"The dataset uses scikit-learn's 8×8 handwritten digits, augmented by "
+"shifting each image up, down, left, and right to expand the training set. "
+"The notebook compares the two-stage RBM pipeline against a logistic "
+"regression on raw pixels to demonstrate that unsupervised RBM pretraining "
+"improves classification accuracy."
 msgstr ""
-"首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。 "
-"接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数， "
-"该函数包括了负对数似然估计以及权重和偏置的衰减项。"
+"数据集使用 scikit-learn 的 8×8 手写数字，通过将每个图像向上下左右四个方向平移来扩展训练集。notebook 对比两阶段 RBM "
+"流水线与原始像素上的逻辑回归，证明无监督 RBM 预训练能提升分类准确率。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:52
-msgid ""
-"在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息， "
-"并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。"
-msgstr ""
-"在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息， "
-"并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。"
+#: ../../source/getting_started/tutorials/rbm_classification.md:49
+msgid "Key Code"
+msgstr "核心代码"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:58
-msgid "3. 特征提取与分类"
-msgstr "3. 特征提取与分类"
+#: ../../source/getting_started/tutorials/rbm_classification.md:51
+msgid "Load the digits dataset (with four-direction shift augmentation):"
+msgstr "加载数字数据集（带四方向平移增强）："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:60
-msgid "3.1 训练分类器"
-msgstr "3.1 训练分类器"
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:62
-msgid ""
-"本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。"
-msgstr ""
-"本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。"
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:64
-msgid ""
-"首先，通过 `RBMRunner` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 `Pipeline` 中，再接上逻辑回归分类器。 "
-"训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
-msgstr ""
-"首先，通过 `RBMRunner` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 `Pipeline` 中，再接上逻辑回归分类器。 "
-"训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
+#: ../../source/getting_started/tutorials/rbm_classification.md:61
+msgid "Train the RBM:"
+msgstr "训练 RBM："
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:67
-msgid "该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。"
-msgstr "该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。"
+msgid ""
+"Build and evaluate the two-stage classifier (RBM features + logistic "
+"regression) versus raw-pixel baseline:"
+msgstr "构建并评估两阶段分类器（RBM 特征 + 逻辑回归）与原始像素基线对比："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:72
-msgid "3.2 可视化权重"
-msgstr "3.2 可视化权重"
+#: ../../source/getting_started/tutorials/rbm_classification.md:76
+msgid "Training and Evaluation"
+msgstr "训练与评估"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:74
-msgid "该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。"
-msgstr "该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。"
+#: ../../source/getting_started/tutorials/rbm_classification.md:78
+msgid ""
+"**Weight visualization**: `RBMRunner.plot_weights()` renders each hidden "
+"unit's filter as an 8×8 image, showing the digit-like features the RBM has "
+"learned."
+msgstr ""
+"**权重可视化**：`RBMRunner.plot_weights()` 将每个隐单元的滤波器渲染为 8×8 图像，展示 RBM 学到的数字状特征。"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:79
-msgid "3.2 可视化混淆矩阵"
-msgstr "3.2 可视化混淆矩阵"
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:81
 msgid ""
-"该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。 支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。"
+"**Confusion matrix**: `RBMRunner.plot_confusion_matrix(y_test, y_pred)` "
+"produces a heatmap; the notebook saves it as a high-resolution PDF."
 msgstr ""
-"该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。 支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。"
+"**混淆矩阵**：`RBMRunner.plot_confusion_matrix(y_test, y_pred)` 生成热力图；notebook "
+"将其保存为高分辨率 PDF。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:80
+msgid ""
+"The expected result is that RBM features yield a 2–5 percentage point "
+"accuracy gain over raw pixels on the 8×8 digits dataset."
+msgstr "预期结果是 RBM 特征在 8×8 数字数据集上比原始像素提升 2-5 个百分点准确率。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:82
+msgid "Summary"
+msgstr "小结"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:84
+msgid ""
+"An RBM can be used as a fixed feature extractor after unsupervised "
+"pretraining."
+msgstr "RBM 可在无监督预训练后作为固定特征提取器使用。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:85
+msgid ""
+"The KPP training loop (positive / negative phase / objective) is unchanged "
+"from the Quick Start."
+msgstr "KPP 训练循环（正相/负相/目标函数）与 Quick Start 保持一致。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:86
+msgid ""
+"The downstream classifier is a standard scikit-learn pipeline — KPP only "
+"contributes the learned features."
+msgstr "下游分类器是标准的 scikit-learn 流水线——KPP 仅提供学习到的特征。"
 
 #~ msgid "**示例位置**: ``example/rbm_digits/rbm_digits.ipynb``"
 #~ msgstr ""
@@ -187,3 +221,129 @@ msgstr ""
 #~ "首先，通过 ``RBMRunner`` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 ``Pipeline`` "
 #~ "中，再接上逻辑回归分类器。 训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
 #~ msgstr ""
+
+#~ msgid "RBM 分类：手写数字识别"
+#~ msgstr "RBM 分类：手写数字识别"
+
+#~ msgid "本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。"
+#~ msgstr "本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。"
+
+#~ msgid "教程目标"
+#~ msgstr "教程目标"
+
+#~ msgid "完成本教程后，您将学会："
+#~ msgstr "完成本教程后，您将学会："
+
+#~ msgid "使用 RBM 从图像数据中提取特征"
+#~ msgstr "使用 RBM 从图像数据中提取特征"
+
+#~ msgid "将 RBM 作为特征提取器与传统分类器结合"
+#~ msgstr "将 RBM 作为特征提取器与传统分类器结合"
+
+#~ msgid "可视化 RBM 学到的权重和生成的样本"
+#~ msgstr "可视化 RBM 学到的权重和生成的样本"
+
+#~ msgid "评估分类模型的性能"
+#~ msgstr "评估分类模型的性能"
+
+#~ msgid "运行环境"
+#~ msgstr "运行环境"
+
+#~ msgid "**示例位置**: `example/rbm_digits/rbm_digits.ipynb`"
+#~ msgstr "**示例位置**: `example/rbm_digits/rbm_digits.ipynb`"
+
+#~ msgid "1. 数据准备"
+#~ msgstr "1. 数据准备"
+
+#~ msgid ""
+#~ "本示例的主入口是 `example/rbm_digits/rbm_digits.ipynb`；分类流水线也可以直接参考 "
+#~ "`example/rbm_digits/rbm_classifier.py` 中的 `train_classifier`。"
+#~ msgstr ""
+#~ "本示例的主入口是 `example/rbm_digits/rbm_digits.ipynb`；分类流水线也可以直接参考 "
+#~ "`example/rbm_digits/rbm_classifier.py` 中的 `train_classifier`。"
+
+#~ msgid "此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。"
+#~ msgstr "此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。"
+
+#~ msgid ""
+#~ "首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。 "
+#~ "接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。 "
+#~ "最后，将所有图像数据展平为二维数组，并划分成训练集和测试集，同时进行归一化处理，确保各特征值位于[0, 1]区间内，为后续模型训练做好准备。"
+#~ msgstr ""
+#~ "首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。 "
+#~ "接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。 "
+#~ "最后，将所有图像数据展平为二维数组，并划分成训练集和测试集，同时进行归一化处理，确保各特征值位于[0, 1]区间内，为后续模型训练做好准备。"
+
+#~ msgid "2. 原理概览"
+#~ msgstr "2. 原理概览"
+
+#~ msgid ""
+#~ "RBM "
+#~ "是一个二部能量模型。可见层和隐层之间有连接，但同一层内部没有连接，因此给定一层后，另一层的各个单元可以并行采样。模型通过能量函数定义样本概率：低能量状态具有更高概率，隐层则将像素组合成更抽象的特征。"
+#~ msgstr ""
+#~ "RBM "
+#~ "是一个二部能量模型。可见层和隐层之间有连接，但同一层内部没有连接，因此给定一层后，另一层的各个单元可以并行采样。模型通过能量函数定义样本概率：低能量状态具有更高概率，隐层则将像素组合成更抽象的特征。"
+
+#~ msgid ""
+#~ "训练时使用对比散度近似最大似然梯度：正相统计真实数据及其隐层表示，负相从模型采样并统计重构数据，二者的差异用于更新权重和偏置。训练完成后，`RBMRunner.transform`"
+#~ " 输出隐层特征，再交给逻辑回归等传统分类器。"
+#~ msgstr ""
+#~ "训练时使用对比散度近似最大似然梯度：正相统计真实数据及其隐层表示，负相从模型采样并统计重构数据，二者的差异用于更新权重和偏置。训练完成后，`RBMRunner.transform`"
+#~ " 输出隐层特征，再交给逻辑回归等传统分类器。"
+
+#~ msgid "2. 模型训练"
+#~ msgstr "2. 模型训练"
+
+#~ msgid "此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。"
+#~ msgstr "此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。"
+
+#~ msgid ""
+#~ "首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。 "
+#~ "接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数， "
+#~ "该函数包括了负对数似然估计以及权重和偏置的衰减项。"
+#~ msgstr ""
+#~ "首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。 "
+#~ "接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数， "
+#~ "该函数包括了负对数似然估计以及权重和偏置的衰减项。"
+
+#~ msgid ""
+#~ "在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息， "
+#~ "并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。"
+#~ msgstr ""
+#~ "在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息， "
+#~ "并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。"
+
+#~ msgid "3. 特征提取与分类"
+#~ msgstr "3. 特征提取与分类"
+
+#~ msgid "3.1 训练分类器"
+#~ msgstr "3.1 训练分类器"
+
+#~ msgid ""
+#~ "本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。"
+#~ msgstr ""
+#~ "本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。"
+
+#~ msgid ""
+#~ "首先，通过 `RBMRunner` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 `Pipeline` 中，再接上逻辑回归分类器。 "
+#~ "训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
+#~ msgstr ""
+#~ "首先，通过 `RBMRunner` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 `Pipeline` 中，再接上逻辑回归分类器。 "
+#~ "训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。"
+
+#~ msgid "该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。"
+#~ msgstr "该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。"
+
+#~ msgid "3.2 可视化权重"
+#~ msgstr "3.2 可视化权重"
+
+#~ msgid "该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。"
+#~ msgstr "该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。"
+
+#~ msgid "3.2 可视化混淆矩阵"
+#~ msgstr "3.2 可视化混淆矩阵"
+
+#~ msgid ""
+#~ "该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。 支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。"
+#~ msgstr ""
+#~ "该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。 支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。"
