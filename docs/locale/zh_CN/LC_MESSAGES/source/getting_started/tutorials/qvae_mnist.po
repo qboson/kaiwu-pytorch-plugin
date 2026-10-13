@@ -9,15 +9,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 14:23+0800\n"
+"POT-Creation-Date: 2026-10-13 17:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:1
@@ -26,19 +26,20 @@ msgstr "Q-VAE：MNIST 上的量子变分自编码器"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:3
 msgid ""
-"This tutorial combines [Section 4.2: Restricted Boltzmann "
-"Machine](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
-"restricted.md) with the VAE framework. It replaces the Gaussian prior of a "
-"standard VAE with a quantum Boltzmann machine (QBM) and trains the resulting"
-" Q-VAE on MNIST for both image generation and representation learning. "
-"Building on the [Quick Start](../quickstart.md) training loop, this tutorial"
-" adds the encoder–decoder structure and the KL term between the encoder "
-"posterior and the QBM prior."
+"This tutorial combines [Section 4.2: Restricted Boltzmann Machine"
+"](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
+"restricted.md) with the VAE framework. It replaces the Gaussian prior of "
+"a standard VAE with a quantum Boltzmann machine (QBM) and trains the "
+"resulting Q-VAE on MNIST for both image generation and representation "
+"learning. Building on the [Quick Start](../quickstart.md) training loop, "
+"this tutorial adds the encoder–decoder structure and the KL term between "
+"the encoder posterior and the QBM prior."
 msgstr ""
 "本教程将[第 4.2 节：受限玻尔兹曼机](../../theoretical-foundations/kpp-theoretical-"
 "foundations-bm-restricted.md)与 VAE 框架相结合。它用量子玻尔兹曼机（QBM）替代标准 VAE 的高斯先验，并在 "
-"MNIST 上训练得到的 Q-VAE，用于图像生成与表示学习。基于[快速入门](../quickstart.md)的训练循环，本教程新增编码器-"
-"解码器结构以及编码器后验与 QBM 先验之间的 KL 项。"
+"MNIST 上训练得到的 "
+"Q-VAE，用于图像生成与表示学习。基于[快速入门](../quickstart.md)的训练循环，本教程新增编码器-解码器结构以及编码器后验与 "
+"QBM 先验之间的 KL 项。"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:5
 msgid "Overview"
@@ -102,8 +103,8 @@ msgstr "`trainer/trainer.py`：`Trainer.train` — Q-ELBO 优化循环"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:41
 msgid ""
-"`downstream/classifier.py`: `MLPClassifier.fit` — downstream classifier on "
-"learned representations"
+"`downstream/classifier.py`: `MLPClassifier.fit` — downstream classifier "
+"on learned representations"
 msgstr "`downstream/classifier.py`：`MLPClassifier.fit` — 基于学习表示的下游分类器"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:43
@@ -114,11 +115,11 @@ msgstr "工作原理"
 #, python-brace-format
 msgid ""
 "A standard VAE uses a Gaussian prior $p(\\mathbf{z})$ and an encoder "
-"$q_\\phi(\\mathbf{z}|\\mathbf{x})$. A Q-VAE replaces the Gaussian prior with"
-" a QBM:"
+"$q_\\phi(\\mathbf{z}|\\mathbf{x})$. A Q-VAE replaces the Gaussian prior "
+"with a QBM:"
 msgstr ""
-"标准 VAE 使用高斯先验 $p(\\mathbf{z})$ 与编码器 $q_\\phi(\\mathbf{z}|\\mathbf{x})$。Q-VAE"
-" 用 QBM 替代高斯先验："
+"标准 VAE 使用高斯先验 $p(\\mathbf{z})$ 与编码器 "
+"$q_\\phi(\\mathbf{z}|\\mathbf{x})$。Q-VAE 用 QBM 替代高斯先验："
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:51
 msgid "The three components are:"
@@ -127,8 +128,9 @@ msgstr "三个核心组件为："
 #: ../../source/getting_started/tutorials/qvae_mnist.md:53
 #, python-brace-format
 msgid ""
-"**Encoder**: maps the input image $\\mathbf{x}$ to the approximate posterior"
-" $q_\\phi(\\mathbf{z}|\\mathbf{x})$, parameterized by a neural network."
+"**Encoder**: maps the input image $\\mathbf{x}$ to the approximate "
+"posterior $q_\\phi(\\mathbf{z}|\\mathbf{x})$, parameterized by a neural "
+"network."
 msgstr ""
 "**编码器**：将输入图像 $\\mathbf{x}$ 映射到近似后验 "
 "$q_\\phi(\\mathbf{z}|\\mathbf{x})$，由神经网络参数化。"
@@ -136,8 +138,8 @@ msgstr ""
 #: ../../source/getting_started/tutorials/qvae_mnist.md:54
 #, python-brace-format
 msgid ""
-"**QBM prior**: models the latent distribution $p_\\theta(\\mathbf{z})$ using"
-" a quantum Boltzmann machine instead of a Gaussian."
+"**QBM prior**: models the latent distribution $p_\\theta(\\mathbf{z})$ "
+"using a quantum Boltzmann machine instead of a Gaussian."
 msgstr "**QBM 先验**：使用量子玻尔兹曼机而非高斯分布来建模隐分布 $p_\\theta(\\mathbf{z})$。"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:55
@@ -154,146 +156,236 @@ msgstr "训练目标是量子证据下界（Q-ELBO）："
 #: ../../source/getting_started/tutorials/qvae_mnist.md:59
 msgid ""
 "\n"
-"\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x}|\\mathbf{z})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
+"\\mathcal{L}_{\\text{Q-ELBO}} = "
+"\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log "
+"p_\\theta(\\mathbf{x}|\\mathbf{z})] - "
+"\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
 msgstr ""
 "\n"
-"\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
+"\\mathcal{L}_{\\text{Q-ELBO}} = "
+"\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log "
+"p_\\theta(\\mathbf{x}|\\mathbf{z})] - "
+"\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:63
 #, python-brace-format
 msgid ""
-"The first term is the reconstruction loss: how well the decoder reconstructs"
-" the input from the latent sample. The second term is a KL-like divergence "
-"that pulls the encoder posterior $q_\\phi(\\mathbf{z}|\\mathbf{x})$ toward "
-"the QBM prior $p_\\theta(\\mathbf{z})$."
+"The first term is the reconstruction loss: how well the decoder "
+"reconstructs the input from the latent sample. The second term is a KL-"
+"like divergence that pulls the encoder posterior "
+"$q_\\phi(\\mathbf{z}|\\mathbf{x})$ toward the QBM prior "
+"$p_\\theta(\\mathbf{z})$."
 msgstr ""
 "第一项是重建损失：解码器从隐样本重建输入的效果。第二项是类 KL 散度，将编码器后验 "
 "$q_\\phi(\\mathbf{z}|\\mathbf{x})$ 拉向 QBM 先验 $p_\\theta(\\mathbf{z})$。"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:65
 msgid ""
-"The QBM prior is trained using the same positive/negative phase as an RBM: "
-"positive phase from the encoder samples, negative phase from QBM sampling. "
-"The sampler can be switched between `sa` (classical simulated annealing) and"
-" `cim` (quantum CIM) via the `--sampler-type` flag — the rest of the "
-"pipeline is unchanged."
+"The QBM prior is trained using the same positive/negative phase as an "
+"RBM: positive phase from the encoder samples, negative phase from QBM "
+"sampling. The sampler can be switched between `sa` (classical simulated "
+"annealing) and `cim` (quantum CIM) via the `--sampler-type` flag — the "
+"rest of the pipeline is unchanged."
 msgstr ""
-"QBM 先验使用与 RBM 相同的正相/负相训练：正相来自编码器采样，负相来自 QBM 采样。采样器可通过 `--sampler-type` 参数在 "
-"`sa`（经典模拟退火）与 `cim`（量子 CIM）之间切换——流水线其余部分保持不变。"
+"QBM 先验使用与 RBM 相同的正相/负相训练：正相来自编码器采样，负相来自 QBM 采样。采样器可通过 `--sampler-type` "
+"参数在 `sa`（经典模拟退火）与 `cim`（量子 CIM）之间切换——流水线其余部分保持不变。"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:67
-msgid "Key Code"
-msgstr "核心代码"
+msgid "Quick Start"
+msgstr ""
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:69
+msgid ""
+"The following snippet shows how to run the pipeline from a user's "
+"perspective, this is what you would execute via `run_pipeline.py`:"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:71
 msgid "Load MNIST and build the Q-VAE pipeline:"
 msgstr "加载 MNIST 并构建 Q-VAE 流水线："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:79
+#: ../../source/getting_started/tutorials/qvae_mnist.md:81
 msgid "Train the Q-VAE:"
 msgstr "训练 Q-VAE："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:88
+#: ../../source/getting_started/tutorials/qvae_mnist.md:90
 msgid "Evaluate downstream classification on learned representations:"
 msgstr "在学习到的表示上评估下游分类："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:97
+#: ../../source/getting_started/tutorials/qvae_mnist.md:99
+msgid "Key Code"
+msgstr "核心代码"
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:101
+msgid "1. Model Configuration and Encoder/Decoder"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:103
+msgid ""
+"The Q-VAE model uses a standard encoder-decoder architecture, with the "
+"QBM prior replacing the Gaussian prior in the latent space:"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:109
+msgid "Key model details:"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:110
+msgid "Encoder: maps 784-d MNIST images to 64-d latent space"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:111
+msgid "Decoder: reconstructs images from latent samples"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:112
+#, fuzzy
+msgid "QBM prior: trained with the same positive/negative phase as an RBM"
+msgstr "Q-VAE 将高斯先验替换为 QBM，使用与 RBM 相同的正相/负相训练。"
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:116
+msgid "2. Q-ELBO Training Loop"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:118
+#, fuzzy
+msgid ""
+"The `Trainer` class implements the Q-ELBO optimization loop, combining "
+"reconstruction loss with the KL term between encoder posterior and QBM "
+"prior:"
+msgstr "Q-ELBO 将重建损失与编码器后验和 QBM 先验之间的 KL 项相结合。"
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:124
+msgid "Key training details:"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:125
+msgid "Optimizer: Adam with learning rate and weight decay from config"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:126
+msgid "Reconstruction loss: Bernoulli cross-entropy (or MSE for continuous data)"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:127
+msgid "KL term: pulls encoder posterior toward QBM prior"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:128
+msgid "Sampler: switch between SA and CIM via `--sampler-type` flag"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:132
+#, fuzzy
+msgid "3. Downstream Classification on Learned Representations"
+msgstr "在学习到的表示上评估下游分类："
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:134
+msgid ""
+"After training the Q-VAE, the encoder's hidden representations can be fed"
+" to a downstream classifier for supervised evaluation:"
+msgstr ""
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:140
 msgid "Training and Evaluation"
 msgstr "训练与评估"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:99
+#: ../../source/getting_started/tutorials/qvae_mnist.md:142
 msgid ""
-"**Training curves**: `plot_training_curves` tracks reconstruction loss, KL "
-"divergence, and validation accuracy over epochs."
+"**Training curves**: `plot_training_curves` tracks reconstruction loss, "
+"KL divergence, and validation accuracy over epochs."
 msgstr "**训练曲线**：`plot_training_curves` 跟踪各 epoch 的重建损失、KL 散度与验证准确率。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:100
+#: ../../source/getting_started/tutorials/qvae_mnist.md:143
 msgid ""
-"**Latent space**: `t_SNE` reduces the 64-dim latent representation to 2-D, "
-"colored by digit class, revealing cluster structure."
+"**Latent space**: `t_SNE` reduces the 64-dim latent representation to "
+"2-D, colored by digit class, revealing cluster structure."
 msgstr "**隐空间**：`t_SNE` 将 64 维隐表示降维到 2 维，按数字类别着色，展示聚类结构。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:101
+#: ../../source/getting_started/tutorials/qvae_mnist.md:144
 msgid ""
-"**Generated samples**: after training, the decoder can generate new images "
-"by sampling from the QBM prior and decoding."
+"**Generated samples**: after training, the decoder can generate new "
+"images by sampling from the QBM prior and decoding."
 msgstr "**生成样本**：训练后，解码器可通过从 QBM 先验采样并解码来生成新图像。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:103
+#: ../../source/getting_started/tutorials/qvae_mnist.md:146
 msgid "Case Studies"
 msgstr "案例研究"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:105
+#: ../../source/getting_started/tutorials/qvae_mnist.md:148
 msgid ""
 "The Q-VAE architecture introduced here scales to larger biological and "
-"tabular datasets. See the [Case Studies section](index.md) for end-to-end "
-"pipelines built on this tutorial:"
+"tabular datasets. See the [Case Studies section](index.md) for end-to-end"
+" pipelines built on this tutorial:"
 msgstr "此处介绍的 Q-VAE 架构可扩展到更大规模的生物与表格数据集。基于本教程的端到端流水线请参阅[案例研究章节](index.md)："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:107
+#: ../../source/getting_started/tutorials/qvae_mnist.md:150
 msgid ""
 "[Q-VAE for Single-Cell Transcriptomics](qvae_cell.md): representation "
 "learning on scRNA-seq with UMAP and clustering evaluation."
 msgstr "[Q-VAE 用于单细胞转录组学](qvae_cell.md)：scRNA-seq 的表示学习，含 UMAP 与聚类评估。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:108
+#: ../../source/getting_started/tutorials/qvae_mnist.md:151
 msgid ""
 "[Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): "
 "CleanEnergyQVAE with a free-energy scoring head on tabular benchmarks."
-msgstr ""
-"[Q-VAE 用于能量监督异常检测](qvae_anomaly.md)：带自由能量评分头的 CleanEnergyQVAE，在表格基准数据集上验证。"
+msgstr "[Q-VAE 用于能量监督异常检测](qvae_anomaly.md)：带自由能量评分头的 CleanEnergyQVAE，在表格基准数据集上验证。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:110
+#: ../../source/getting_started/tutorials/qvae_mnist.md:153
 msgid "Summary"
 msgstr "小结"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:112
+#: ../../source/getting_started/tutorials/qvae_mnist.md:155
 msgid ""
 "A Q-VAE swaps the Gaussian prior for a QBM, trained with the same "
 "positive/negative phase as an RBM."
 msgstr "Q-VAE 将高斯先验替换为 QBM，使用与 RBM 相同的正相/负相训练。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:113
+#: ../../source/getting_started/tutorials/qvae_mnist.md:156
 msgid ""
-"The Q-ELBO combines reconstruction loss with a KL term between the encoder "
-"posterior and the QBM prior."
+"The Q-ELBO combines reconstruction loss with a KL term between the "
+"encoder posterior and the QBM prior."
 msgstr "Q-ELBO 将重建损失与编码器后验和 QBM 先验之间的 KL 项相结合。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:114
+#: ../../source/getting_started/tutorials/qvae_mnist.md:157
 msgid ""
 "The sampler (SA vs CIM) can be switched without changing the rest of the "
 "pipeline."
 msgstr "采样器（SA 与 CIM）可切换，无需修改流水线其余部分。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:115
+#: ../../source/getting_started/tutorials/qvae_mnist.md:158
 msgid ""
-"Learned representations can be fed to a downstream classifier, as in the RBM"
-" feature-learning tutorial."
+"Learned representations can be fed to a downstream classifier, as in the "
+"RBM feature-learning tutorial."
 msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程所示。"
 
 #~ msgid ""
-#~ "两者结构对称：包含一个全连接层、层归一化（LayerNorm）和双曲正切激活函数，并支持通过 L2 权重衰减进行正则化。 "
-#~ "编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。 每个模块提供 `get_weight_decay` "
-#~ "方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。"
+#~ "两者结构对称：包含一个全连接层、层归一化（LayerNorm）和双曲正切激活函数，并支持通过 L2 "
+#~ "权重衰减进行正则化。 编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。 每个模块提供 "
+#~ "`get_weight_decay` 方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。"
 #~ msgstr ""
 
 #~ msgid "该函数封装了 MNIST 数据集的加载与预处理流程，返回训练和测试用的 `DataLoader`。"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` 将 28×28 图像展平为 784 "
-#~ "维向量，适配全连接网络输入。 训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性。"
+#~ "数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` "
+#~ "将 28×28 图像展平为 784 维向量，适配全连接网络输入。 "
+#~ "训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性。"
 #~ msgstr ""
 
 #~ msgid ""
 #~ "该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。 "
-#~ "模型结合了经典神经网络编码器/解码器与受限玻尔兹曼机（RBM），通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL "
-#~ "散度控制潜在分布与先验的对齐程度。 训练过程中记录各项损失指标并定期保存至文件。"
+#~ "模型结合了经典神经网络编码器/解码器与受限玻尔兹曼机（RBM），通过最小化带权重衰减的负 ELBO "
+#~ "损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。 "
+#~ "训练过程中记录各项损失指标并定期保存至文件。"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "该函数 `train_mlp_classifier` 用于训练一个多层感知机(MLP)分类器，输入特征是通过QVAE模型提取的数据表征。 "
-#~ "它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。 在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。"
+#~ "该函数 `train_mlp_classifier` "
+#~ "用于训练一个多层感知机(MLP)分类器，输入特征是通过QVAE模型提取的数据表征。 "
+#~ "它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。 "
+#~ "在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。"
 #~ msgstr ""
 
 #~ msgid "1、QVAE 原理概括"
@@ -302,7 +394,10 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgid ""
 #~ "\n"
 #~ "\n"
-#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l \\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
+#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l"
+#~ " \\sigma_l^x + \\sum_l h_l \\sigma_l^z "
+#~ "+ \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z"
+#~ "\n"
 #~ "\n"
 #~ "   "
 #~ msgstr ""
@@ -310,7 +405,8 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgid ""
 #~ "\n"
 #~ "\n"
-#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
+#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) "
+#~ "\\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
 #~ "\n"
 #~ "   "
 #~ msgstr ""
@@ -318,47 +414,67 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgid ""
 #~ "\n"
 #~ "\n"
-#~ "\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
+#~ "\\mathcal{L}_{\\text{Q-ELBO}} = "
+#~ "\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log "
+#~ "p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - "
+#~ "\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| "
+#~ "p_\\theta(\\mathbf{z}))\n"
 #~ "\n"
 #~ msgstr ""
 
 #~ msgid ""
 #~ "\n"
-#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l \\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
+#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l"
+#~ " \\sigma_l^x + \\sum_l h_l \\sigma_l^z "
+#~ "+ \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z"
+#~ "\n"
 #~ "   "
 #~ msgstr ""
 #~ "\n"
-#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l \\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z\n"
+#~ "   \\mathcal{H}_\\theta = \\sum_l \\Gamma_l"
+#~ " \\sigma_l^x + \\sum_l h_l \\sigma_l^z "
+#~ "+ \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z"
+#~ "\n"
 #~ "   "
 
 #~ msgid ""
 #~ "\n"
-#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
+#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) "
+#~ "\\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
 #~ "   "
 #~ msgstr ""
 #~ "\n"
-#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
+#~ "   p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) "
+#~ "\\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta}))\n"
 #~ "   "
 
 #~ msgid ""
 #~ "\n"
-#~ "\\mathcal{L}_{\\text{Q-ELBO}} = \\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| p_\\theta(\\mathbf{z}))\n"
+#~ "\\mathcal{L}_{\\text{Q-ELBO}} = "
+#~ "\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log "
+#~ "p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - "
+#~ "\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| "
+#~ "p_\\theta(\\mathbf{z}))\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "$$ \\mathcal{H}_\\theta = \\sum_l \\Gamma_l \\sigma_l^x + \\sum_l h_l "
-#~ "\\sigma_l^z + \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z $$"
+#~ "$$ \\mathcal{H}_\\theta = \\sum_l \\Gamma_l"
+#~ " \\sigma_l^x + \\sum_l h_l \\sigma_l^z "
+#~ "+ \\sum_{l<m} W_{lm} \\sigma_l^z \\sigma_m^z"
+#~ " $$"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "$$ p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) \\sim "
-#~ "\\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta})) $$"
+#~ "$$ p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta}) "
+#~ "\\sim \\text{Bernoulli}(f_\\theta(\\boldsymbol{\\zeta})) "
+#~ "$$"
 #~ msgstr ""
 
 #~ msgid ""
 #~ "$$ \\mathcal{L}_{\\text{Q-ELBO}} = "
-#~ "\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log p_\\theta(\\mathbf{x} "
-#~ "| \\boldsymbol{\\zeta})] - \\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| "
+#~ "\\mathbb{E}_{q_\\phi(\\mathbf{z}|\\mathbf{x})} [\\log "
+#~ "p_\\theta(\\mathbf{x} | \\boldsymbol{\\zeta})] - "
+#~ "\\tilde{H}(q_\\phi(\\mathbf{z}|\\mathbf{x}) \\| "
 #~ "p_\\theta(\\mathbf{z})) $$"
 #~ msgstr ""
 
@@ -366,11 +482,11 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "Q-VAE：量子变分自编码器"
 
 #~ msgid ""
-#~ "本教程演示如何训练和评估量子变分自编码器（Quantum Variational Autoencoder, Q-VAE）模型。Q-VAE "
-#~ "结合了变分自编码器和量子玻尔兹曼机，能够实现更强大的生成和表征学习能力。"
+#~ "本教程演示如何训练和评估量子变分自编码器（Quantum Variational Autoencoder, "
+#~ "Q-VAE）模型。Q-VAE 结合了变分自编码器和量子玻尔兹曼机，能够实现更强大的生成和表征学习能力。"
 #~ msgstr ""
-#~ "本教程演示如何训练和评估量子变分自编码器（Quantum Variational Autoencoder, Q-VAE）模型。Q-VAE "
-#~ "结合了变分自编码器和量子玻尔兹曼机，能够实现更强大的生成和表征学习能力。"
+#~ "本教程演示如何训练和评估量子变分自编码器（Quantum Variational Autoencoder, "
+#~ "Q-VAE）模型。Q-VAE 结合了变分自编码器和量子玻尔兹曼机，能够实现更强大的生成和表征学习能力。"
 
 #~ msgid "目标"
 #~ msgstr "目标"
@@ -406,11 +522,11 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "1. QVAE 原理概括"
 
 #~ msgid ""
-#~ "QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型** 引入 **变分自编码器 (VAE)** "
-#~ "潜空间的生成模型。其核心思想是："
+#~ "QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型**"
+#~ " 引入 **变分自编码器 (VAE)** 潜空间的生成模型。其核心思想是："
 #~ msgstr ""
-#~ "QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型** 引入 **变分自编码器 (VAE)** "
-#~ "潜空间的生成模型。其核心思想是："
+#~ "QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型**"
+#~ " 引入 **变分自编码器 (VAE)** 潜空间的生成模型。其核心思想是："
 
 #~ msgid "**用量子玻尔兹曼机（QBM）替代传统 VAE 中的先验分布，从而构建一个具有量子生成能力的潜变量模型。**"
 #~ msgstr "**用量子玻尔兹曼机（QBM）替代传统 VAE 中的先验分布，从而构建一个具有量子生成能力的潜变量模型。**"
@@ -422,21 +538,21 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "QVAE 包括以下关键组件："
 
 #~ msgid ""
-#~ "**编码器（Encoder）**   将输入数据 $\\mathbf{x}$ 映射为潜变量的近似后验分布   "
-#~ "$q_\\phi(\\mathbf{z}|\\mathbf{x})$，通常由神经网络参数化。"
+#~ "**编码器（Encoder）**   将输入数据 $\\mathbf{x}$ 映射为潜变量的近似后验分布"
+#~ "   $q_\\phi(\\mathbf{z}|\\mathbf{x})$，通常由神经网络参数化。"
 #~ msgstr ""
-#~ "**编码器（Encoder）**   将输入数据 $\\mathbf{x}$ 映射为潜变量的近似后验分布   "
-#~ "$q_\\phi(\\mathbf{z}|\\mathbf{x})$，通常由神经网络参数化。"
+#~ "**编码器（Encoder）**   将输入数据 $\\mathbf{x}$ 映射为潜变量的近似后验分布"
+#~ "   $q_\\phi(\\mathbf{z}|\\mathbf{x})$，通常由神经网络参数化。"
 
 #~ msgid "**先验分布（Prior）**   使用 **量子玻尔兹曼机 (QBM)** 建模潜变量 $\\mathbf{z}$ 的先验分布。哈密顿量为："
 #~ msgstr "**先验分布（Prior）**   使用 **量子玻尔兹曼机 (QBM)** 建模潜变量 $\\mathbf{z}$ 的先验分布。哈密顿量为："
 
 #~ msgid ""
-#~ "**解码器（Decoder）**   将潜变量 $\\mathbf{z}$ （或其连续松弛变量 $\\boldsymbol{\\zeta}$ "
-#~ "）映射回数据空间，并使用解码器重建原始数据："
+#~ "**解码器（Decoder）**   将潜变量 $\\mathbf{z}$ （或其连续松弛变量 "
+#~ "$\\boldsymbol{\\zeta}$ ）映射回数据空间，并使用解码器重建原始数据："
 #~ msgstr ""
-#~ "**解码器（Decoder）**   将潜变量 $\\mathbf{z}$ （或其连续松弛变量 $\\boldsymbol{\\zeta}$ "
-#~ "）映射回数据空间，并使用解码器重建原始数据："
+#~ "**解码器（Decoder）**   将潜变量 $\\mathbf{z}$ （或其连续松弛变量 "
+#~ "$\\boldsymbol{\\zeta}$ ）映射回数据空间，并使用解码器重建原始数据："
 
 #~ msgid "训练目标：Q-ELBO"
 #~ msgstr "训练目标：Q-ELBO"
@@ -455,11 +571,13 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ "q_\\phi(\\mathbf{z}|\\mathbf{x})$"
 
 #~ msgid ""
-#~ "**负相（negative phase）**：从 QBM 中采样 $\\mathbf{z} \\sim "
-#~ "p_\\theta(\\mathbf{z})$，使用 **蒙特卡洛方法** 或 **量子退火器**"
+#~ "**负相（negative phase）**：从 QBM 中采样 $\\mathbf{z}"
+#~ " \\sim p_\\theta(\\mathbf{z})$，使用 **蒙特卡洛方法** 或"
+#~ " **量子退火器**"
 #~ msgstr ""
-#~ "**负相（negative phase）**：从 QBM 中采样 $\\mathbf{z} \\sim "
-#~ "p_\\theta(\\mathbf{z})$，使用 **蒙特卡洛方法** 或 **量子退火器**"
+#~ "**负相（negative phase）**：从 QBM 中采样 $\\mathbf{z}"
+#~ " \\sim p_\\theta(\\mathbf{z})$，使用 **蒙特卡洛方法** 或"
+#~ " **量子退火器**"
 
 #~ msgid "把能量作为目标函数，objective 的梯度即为基于正相和负相采样计算的梯度。"
 #~ msgstr "把能量作为目标函数，objective 的梯度即为基于正相和负相采样计算的梯度。"
@@ -473,13 +591,13 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgid ""
 #~ "示例中的 `BasicEncoder` 和 `BasicDecoder` "
 #~ "都由多层全连接层、可配置激活函数和权重衰减组成；具体网络深度和激活函数由配置传入，并不固定包含 LayerNorm。 "
-#~ "编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。 每个模块提供 `get_weight_decay` "
-#~ "方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。"
+#~ "编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。 每个模块提供 "
+#~ "`get_weight_decay` 方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。"
 #~ msgstr ""
 #~ "示例中的 `BasicEncoder` 和 `BasicDecoder` "
 #~ "都由多层全连接层、可配置激活函数和权重衰减组成；具体网络深度和激活函数由配置传入，并不固定包含 LayerNorm。 "
-#~ "编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。 每个模块提供 `get_weight_decay` "
-#~ "方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。"
+#~ "编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。 每个模块提供 "
+#~ "`get_weight_decay` 方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。"
 
 #~ msgid "2.1 编码器"
 #~ msgstr "2.1 编码器"
@@ -497,39 +615,47 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "3. 数据准备"
 
 #~ msgid ""
-#~ "`loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST 的加载与预处理流程，返回训练和测试用的 "
-#~ "`DataLoader`。"
+#~ "`loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST"
+#~ " 的加载与预处理流程，返回训练和测试用的 `DataLoader`。"
 #~ msgstr ""
-#~ "`loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST 的加载与预处理流程，返回训练和测试用的 "
-#~ "`DataLoader`。"
+#~ "`loadMNIST` 封装了 MNIST、FashionMNIST 和 KMNIST"
+#~ " 的加载与预处理流程，返回训练和测试用的 `DataLoader`。"
 
 #~ msgid ""
-#~ "数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` 将 28×28 图像展平为 784 "
-#~ "维向量，适配全连接网络输入。 训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性；`num_evts_train` 和 "
+#~ "数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` "
+#~ "将 28×28 图像展平为 784 维向量，适配全连接网络输入。 "
+#~ "训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性；`num_evts_train` 和 "
 #~ "`num_evts_test` 还可以限制样本数量，方便快速验证代码。"
 #~ msgstr ""
-#~ "数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` 将 28×28 图像展平为 784 "
-#~ "维向量，适配全连接网络输入。 训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性；`num_evts_train` 和 "
+#~ "数据通过 `ToTensor` 转换为张量，并利用自定义的 `flatten_tensor` "
+#~ "将 28×28 图像展平为 784 维向量，适配全连接网络输入。 "
+#~ "训练加载器启用打乱（shuffle），而测试加载器保持顺序以确保评估一致性；`num_evts_train` 和 "
 #~ "`num_evts_test` 还可以限制样本数量，方便快速验证代码。"
 
 #~ msgid "4. 模型训练"
 #~ msgstr "4. 模型训练"
 
 #~ msgid ""
-#~ "该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。 模型结合了经典神经网络编码器/解码器与 RBM 或 BM "
-#~ "先验，通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 `--sampler-type"
-#~ " sa` 或 `--sampler-type cim` 选择采样器。 训练过程中记录各项损失指标并定期保存至文件。"
+#~ "该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。 "
+#~ "模型结合了经典神经网络编码器/解码器与 RBM 或 BM 先验，通过最小化带权重衰减的负"
+#~ " ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 "
+#~ "`--sampler-type sa` 或 `--sampler-type"
+#~ " cim` 选择采样器。 训练过程中记录各项损失指标并定期保存至文件。"
 #~ msgstr ""
-#~ "该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。 模型结合了经典神经网络编码器/解码器与 RBM 或 BM "
-#~ "先验，通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 `--sampler-type"
-#~ " sa` 或 `--sampler-type cim` 选择采样器。 训练过程中记录各项损失指标并定期保存至文件。"
+#~ "该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。 "
+#~ "模型结合了经典神经网络编码器/解码器与 RBM 或 BM 先验，通过最小化带权重衰减的负"
+#~ " ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 "
+#~ "`--sampler-type sa` 或 `--sampler-type"
+#~ " cim` 选择采样器。 训练过程中记录各项损失指标并定期保存至文件。"
 
 #~ msgid ""
-#~ "命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 `loadMNIST` 展平数据，再由 "
-#~ "`get_full_pipeline` 组装 QVAE 和 MLP 分类器："
+#~ "命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 "
+#~ "`loadMNIST` 展平数据，再由 `get_full_pipeline` 组装 "
+#~ "QVAE 和 MLP 分类器："
 #~ msgstr ""
-#~ "命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 `loadMNIST` 展平数据，再由 "
-#~ "`get_full_pipeline` 组装 QVAE 和 MLP 分类器："
+#~ "命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 "
+#~ "`loadMNIST` 展平数据，再由 `get_full_pipeline` 组装 "
+#~ "QVAE 和 MLP 分类器："
 
 #~ msgid "完整参数可运行 `python run_pipeline.py --help` 查看；首次运行需要根据数据集配置下载或准备数据。"
 #~ msgstr "完整参数可运行 `python run_pipeline.py --help` 查看；首次运行需要根据数据集配置下载或准备数据。"
@@ -538,12 +664,14 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "5. 可视化与评估"
 
 #~ msgid ""
-#~ "本节提供两类关键可视化工具： 一是通过 `plot_training_curves` 绘制训练/验证损失与准确率曲线，用于监控模型收敛情况； 二是利用 "
-#~ "`t_SNE` 对 QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。 "
+#~ "本节提供两类关键可视化工具： 一是通过 `plot_training_curves` "
+#~ "绘制训练/验证损失与准确率曲线，用于监控模型收敛情况； 二是利用 `t_SNE` 对 "
+#~ "QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。 "
 #~ "两者均支持自动保存高分辨率图像，并可灵活控制是否实时显示，便于实验分析、结果记录。"
 #~ msgstr ""
-#~ "本节提供两类关键可视化工具： 一是通过 `plot_training_curves` 绘制训练/验证损失与准确率曲线，用于监控模型收敛情况； 二是利用 "
-#~ "`t_SNE` 对 QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。 "
+#~ "本节提供两类关键可视化工具： 一是通过 `plot_training_curves` "
+#~ "绘制训练/验证损失与准确率曲线，用于监控模型收敛情况； 二是利用 `t_SNE` 对 "
+#~ "QVAE 模型提取的潜在表示进行降维可视化，揭示不同类别在隐空间中的分布结构。 "
 #~ "两者均支持自动保存高分辨率图像，并可灵活控制是否实时显示，便于实验分析、结果记录。"
 
 #~ msgid "5.1 训练过程可视化"
@@ -559,11 +687,13 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "Q-VAE 学到的表征可用于下游分类任务："
 
 #~ msgid ""
-#~ "`MLPClassifier.fit` 用于训练一个多层感知机(MLP)分类器，输入特征是通过 QVAE 模型提取的数据表征。 "
-#~ "它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。 在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。"
+#~ "`MLPClassifier.fit` 用于训练一个多层感知机(MLP)分类器，输入特征是通过 QVAE "
+#~ "模型提取的数据表征。 它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。 "
+#~ "在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。"
 #~ msgstr ""
-#~ "`MLPClassifier.fit` 用于训练一个多层感知机(MLP)分类器，输入特征是通过 QVAE 模型提取的数据表征。 "
-#~ "它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。 在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。"
+#~ "`MLPClassifier.fit` 用于训练一个多层感知机(MLP)分类器，输入特征是通过 QVAE "
+#~ "模型提取的数据表征。 它首先将数据集划分为训练集和验证集，并初始化一个MLP模型、优化器和损失函数。 "
+#~ "在每个训练周期，模型参数根据训练集更新，并在验证集上评估性能。"
 
 #~ msgid "7. 科研应用：QBM-VAE"
 #~ msgstr "7. 科研应用：QBM-VAE"
@@ -584,8 +714,9 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr "为靶点发现提供新线索"
 
 #~ msgid ""
-#~ "**相关论文**：[Quantum-Boosted High-Fidelity Deep "
-#~ "Learning](https://arxiv.org/abs/2508.11190)"
+#~ "**相关论文**：[Quantum-Boosted High-Fidelity Deep"
+#~ " Learning](https://arxiv.org/abs/2508.11190)"
 #~ msgstr ""
-#~ "**相关论文**：[Quantum-Boosted High-Fidelity Deep "
-#~ "Learning](https://arxiv.org/abs/2508.11190)"
+#~ "**相关论文**：[Quantum-Boosted High-Fidelity Deep"
+#~ " Learning](https://arxiv.org/abs/2508.11190)"
+
