@@ -2,42 +2,302 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KPP docs\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-10-14 11:08+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
 "Language: zh_CN\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:1
+#: ../../source/getting_started/tutorials/qdiffusion.md:1
 msgid "Q-Diffusion for Protein Sequence Generation"
 msgstr "Q-Diffusion 蛋白质序列生成"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:3
+#: ../../source/getting_started/tutorials/qdiffusion.md:3
 msgid ""
-"**Status**: Coming soon — placeholder page; will be expanded into a full "
-"tutorial."
-msgstr "**状态**：即将推出——占位页，后续将扩展为完整教程。"
-
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:5
-msgid ""
-"Discrete diffusion generation for proteins with the generic `Q-Diffusion` "
-"core (`src/kaiwu/torch_plugin/qdiffusion.py`) and a DPLM backbone: load a "
-"UniProt proteome FASTA, train with the `objective(...)` interface, and "
-"generate sequences with `generate(...)`."
+"This case study applies the Q-Diffusion framework to protein sequence "
+"generation. It demonstrates how DPLM (Protein Language Model) proposal "
+"models are combined with a BM energy reranker to improve generated sequence "
+"quality. For the overall model hierarchy and how Q-Diffusion fits into KPP's"
+" architecture, see [Architecture Overview](architecture_overview.md)."
 msgstr ""
-"使用通用 `Q-Diffusion` 核心（`src/kaiwu/torch_plugin/qdiffusion.py`）与 DPLM "
-"骨干网络进行蛋白质离散扩散生成：加载 UniProt 蛋白质组 FASTA、通过 `objective(...)` 接口训练、并使用 "
-"`generate(...)` 生成序列。"
+"本案例研究将 Q-Diffusion 框架应用于蛋白质序列生成。它展示了如何将 DPLM（蛋白质语言模型）提议模型与 BM "
+"能量重排序器相结合，以提升生成序列的质量。关于整体模型层次结构以及 Q-Diffusion 如何融入 KPP "
+"架构，请参阅[架构概览](architecture_overview.md)。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:7
-msgid ""
-"**Examples**: `example/qdiffusion/simple/simple_train_example.py` · "
-"`example/qdiffusion/simple/simple_generate_example.py`"
-msgstr ""
-"**示例**：`example/qdiffusion/simple/simple_train_example.py` · "
-"`example/qdiffusion/simple/simple_generate_example.py`"
+#: ../../source/getting_started/tutorials/qdiffusion.md:5
+msgid "Overview"
+msgstr "概述"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qdiffusion.md:9
+#: ../../source/getting_started/tutorials/qdiffusion.md:7
+msgid "By the end of this case study you will be able to:"
+msgstr "完成本案例研究后，您将能够："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:9
 msgid ""
-"**DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome"
-" UP000005640"
-msgstr ""
-"**DPLM 适配**：`example/qdiffusion/dplm/` · **数据**：UniProt 蛋白质组 UP000005640"
+"Understand how Q-Diffusion combines DPLM proposal models with BM energy "
+"reranking"
+msgstr "理解 Q-Diffusion 如何将 DPLM 提议模型与 BM 能量重排序相结合"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:10
+msgid ""
+"Train an energy reranker on top of a pre-trained protein language model"
+msgstr "在预训练蛋白质语言模型之上训练能量重排序器"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:11
+msgid ""
+"Generate protein sequences and evaluate them with ESM2 embedding distances"
+msgstr "生成蛋白质序列，并使用 ESM2 嵌入距离进行评估"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:12
+msgid "Compare baseline vs guided generation quality"
+msgstr "比较基线（baseline）与引导（guided）生成的序列质量"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:14
+msgid "Running the Example"
+msgstr "Running 该 示例"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:16
+msgid "**Dependencies**:"
+msgstr "**依赖项**："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:22
+msgid "**Run**:"
+msgstr "**运行**："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:30
+msgid "Or run the full DPLM workflow:"
+msgstr "或运行完整的 DPLM 工作流："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:36
+msgid "**Key files**:"
+msgstr "**关键文件**："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:38
+msgid "`simple/simple_train_example.py`: minimal Q-Diffusion training example"
+msgstr "`simple/simple_train_example.py`：最小化的 Q-Diffusion 训练示例"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:39
+msgid "`simple/simple_generate_example.py`: minimal generation example"
+msgstr "`simple/simple_generate_example.py`：最小化的生成示例"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:40
+msgid "`dplm/utils/dplm_builder.py`: DPLM → Q-Diffusion assembly helper"
+msgstr "`dplm/utils/dplm_builder.py`：DPLM → Q-Diffusion 组装辅助工具"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:41
+msgid "`dplm/workflows/train.py`: full training and evaluation workflow"
+msgstr "`dplm/workflows/train.py`：完整的训练与评估工作流"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:43
+msgid "How It Works"
+msgstr "工作原理"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:45
+msgid ""
+"Q-Diffusion for protein sequences combines a DPLM proposal model with a BM "
+"energy reranker:"
+msgstr "用于蛋白质序列的 Q-Diffusion 将 DPLM 提议模型与 BM 能量重排序器相结合："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:56
+msgid "The key components:"
+msgstr "关键组件："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:58
+msgid ""
+"**DPLM proposal model**: pre-trained protein language model produces logits "
+"for each position."
+msgstr "**DPLM 提议模型**：预训练的蛋白质语言模型为每个位置生成 logits。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:59
+msgid ""
+"**BM energy reranker**: scores candidate sequences using a Boltzmann Machine"
+" energy function."
+msgstr "**BM 能量重排序器**：使用玻尔兹曼机能量函数对候选序列打分。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:60
+msgid ""
+"**Energy-guided generation**: candidates are weighted by energy, improving "
+"sequence quality."
+msgstr "**能量引导生成**：候选序列按能量加权，从而提升序列质量。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:61
+msgid ""
+"**ESM2 evaluation**: generated sequences are compared to reference proteome "
+"using ESM2 embedding distances."
+msgstr "**ESM2 评估**：使用 ESM2 嵌入距离将生成序列与参考蛋白质组进行比较。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:63
+msgid ""
+"The training objective optimizes the energy reranker, while the DPLM "
+"proposal model remains frozen."
+msgstr "训练目标优化能量重排序器，而 DPLM 提议模型保持冻结（frozen）。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:65
+msgid "Quick Start"
+msgstr "快速开始"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:67
+msgid "The following shows how to run the training and generation pipeline:"
+msgstr "以下展示如何运行训练与生成流程："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:69
+msgid "Build the Q-Diffusion model with DPLM:"
+msgstr "使用 DPLM 构建 Q-Diffusion 模型："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:81
+msgid "Train the energy reranker:"
+msgstr "训练能量重排序器："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:92
+msgid "Generate sequences:"
+msgstr "生成序列："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:101
+msgid "Key Code"
+msgstr "关键代码"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:103
+msgid "1. Q-Diffusion Model Assembly"
+msgstr "1\\. Q-Diffusion 模型组装"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:105
+msgid ""
+"The `dplm_builder.py` assembles a Q-Diffusion model from a DPLM proposal "
+"model and a BM energy reranker:"
+msgstr "`dplm_builder.py` 由一个 DPLM 提议模型和一个 BM 能量重排序器组装出 Q-Diffusion 模型："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:112
+msgid "Key assembly details:"
+msgstr "关键组装细节："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:113
+msgid "Proposal model: DPLM protein language model (frozen)"
+msgstr "提议模型：DPLM 蛋白质语言模型（冻结）"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:114
+msgid "Energy backend: Boltzmann Machine (trainable)"
+msgstr "能量后端：玻尔兹曼机（可训练）"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:115
+msgid "Output: generic `Q-Diffusion` interface"
+msgstr "输出：通用的 `Q-Diffusion` 接口"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:119
+msgid "2. Training Objective"
+msgstr "2\\. 训练目标"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:121
+msgid ""
+"The Q-Diffusion objective combines proposal logits with energy reranking:"
+msgstr "Q-Diffusion 目标函数将提议 logits 与能量重排序相结合："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:127
+msgid "Key training details:"
+msgstr "关键训练细节："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:128
+msgid "Proposal model: frozen, produces logits"
+msgstr "提议模型：冻结，生成 logits"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:129
+msgid "Energy reranker: trainable, scores candidates"
+msgstr "能量重排序器：可训练，为候选序列打分"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:130
+msgid "Loss: energy objective mean, backpropagated through the reranker"
+msgstr "损失：能量目标的均值，通过重排序器反向传播"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:134
+msgid "3. Generation and Evaluation"
+msgstr "3\\. 生成与评估"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:136
+msgid ""
+"The generation loop samples from the proposal model and reranks with energy:"
+msgstr "生成循环从提议模型中采样，并按能量重新排序："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:142
+msgid "Training and Evaluation"
+msgstr "训练 和 评估"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:144
+msgid "**Training curves**: energy objective loss over epochs."
+msgstr "**训练曲线**：各 epoch 的能量目标损失。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:145
+msgid ""
+"**Generated samples**: protein sequences generated by the guided workflow."
+msgstr "**生成样本**：由引导工作流生成的蛋白质序列。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:146
+msgid ""
+"**ESM2 distance**: cosine and L2 distances between generated and reference "
+"proteome embeddings."
+msgstr "**ESM2 距离**：生成序列与参考蛋白质组嵌入之间的余弦距离和 L2 距离。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:147
+msgid ""
+"**Baseline vs guided**: compare baseline (DPLM only) vs guided (DPLM + BM "
+"reranker) quality."
+msgstr "**基线 vs 引导**：比较基线（仅 DPLM）与引导（DPLM + BM 重排序器）的质量。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:149
+msgid "Summary"
+msgstr "总结"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:151
+msgid ""
+"Q-Diffusion combines DPLM proposal models with BM energy reranking for "
+"protein generation."
+msgstr "Q-Diffusion 将 DPLM 提议模型与 BM 能量重排序相结合，用于蛋白质生成。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:152
+msgid ""
+"The energy reranker is trained on top of a frozen protein language model."
+msgstr "能量重排序器在冻结的蛋白质语言模型之上训练。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:153
+msgid ""
+"Guided generation improves sequence quality measured by ESM2 embedding "
+"distances."
+msgstr "引导生成提升了以 ESM2 嵌入距离衡量的序列质量。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:154
+msgid ""
+"The Q-Diffusion framework generalizes from images to sequences with minimal "
+"changes."
+msgstr "Q-Diffusion 框架能以极少的改动从图像泛化到序列。"
+
+#~ msgid ""
+#~ "**Status**: Coming soon — placeholder page; will be expanded into a full "
+#~ "tutorial."
+#~ msgstr "**状态**：即将推出——占位页，后续将扩展为完整教程。"
+
+#~ msgid ""
+#~ "Discrete diffusion generation for proteins with the generic `Q-Diffusion` "
+#~ "core (`src/kaiwu/torch_plugin/qdiffusion.py`) and a DPLM backbone: load a "
+#~ "UniProt proteome FASTA, train with the `objective(...)` interface, and "
+#~ "generate sequences with `generate(...)`."
+#~ msgstr ""
+#~ "使用通用 `Q-Diffusion` 核心（`src/kaiwu/torch_plugin/qdiffusion.py`）与 DPLM "
+#~ "骨干网络进行蛋白质离散扩散生成：加载 UniProt 蛋白质组 FASTA、通过 `objective(...)` 接口训练、并使用 "
+#~ "`generate(...)` 生成序列。"
+
+#~ msgid ""
+#~ "**Examples**: `example/qdiffusion/simple/simple_train_example.py` · "
+#~ "`example/qdiffusion/simple/simple_generate_example.py`"
+#~ msgstr ""
+#~ "**示例**：`example/qdiffusion/simple/simple_train_example.py` · "
+#~ "`example/qdiffusion/simple/simple_generate_example.py`"
+
+#~ msgid ""
+#~ "**DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome"
+#~ " UP000005640"
+#~ msgstr ""
+#~ "**DPLM 适配**：`example/qdiffusion/dplm/` · **数据**：UniProt 蛋白质组 UP000005640"

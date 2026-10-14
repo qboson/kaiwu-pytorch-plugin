@@ -1,0 +1,379 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025 Beijing QBoson Quantum Technology Co., Ltd
+# This file is distributed under the same license as the
+# Kaiwu-PyTorch-Plugin package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaiwu-PyTorch-Plugin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-14 16:05+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:1
+msgid "KPP Architecture Overview"
+msgstr "KPP 架构概览"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:3
+msgid ""
+"This page explains how KPP's model components fit together and how different"
+" model families (RBM, DBN, Q-VAE, Q-Diffusion) build on top of each other. "
+"For the high-level system architecture and component interaction diagram, "
+"see the [Introduction](../introduction.md)."
+msgstr ""
+"本页面解释 KPP "
+"的模型组件如何组合在一起，以及不同模型家族（RBM、DBN、Q-VAE、Q-Diffusion）如何构建在彼此之上。有关高层系统架构和组件交互图，请参见[简介](../introduction.md)。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:5
+msgid "Design Philosophy"
+msgstr "设计理念"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:7
+msgid "KPP is built on two core principles:"
+msgstr "KPP 建立在两个核心原则之上："
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:9
+msgid ""
+"**Decoupled architecture**: energy model definition is separated from "
+"sampling execution. You can swap samplers (SA ↔ CIM) without changing the "
+"model code."
+msgstr "**解耦架构**：能量模型定义与采样执行分离。您可以在不修改模型代码的情况下切换采样器（SA ↔ CIM）。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:10
+msgid ""
+"**Composition over inheritance**: base energy models (RBM/BM) are combined "
+"with user-provided components (encoder, decoder) to build application-"
+"specific models."
+msgstr "**组合优于继承**：基础能量模型（RBM/BM）与用户提供的组件（编码器、解码器）组合，构建特定应用的模型。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:12
+msgid ""
+"This means you can start with a simple RBM for feature extraction, then "
+"extend it into a DBN for deeper representations, or wrap it in a Q-VAE "
+"framework for generative modeling — all within the same PyTorch workflow."
+msgstr ""
+"这意味着您可以从简单的 RBM 开始进行特征提取，然后将其扩展为 DBN 以获得更深层次的表示，或者将其封装在 Q-VAE "
+"框架中进行生成建模——所有这些都在同一个 PyTorch 工作流中完成。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:16
+msgid "Model Families"
+msgstr "模型家族"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:18
+msgid ""
+"Right now, KPP provides four main model families, each building on the "
+"previous one."
+msgstr "目前，KPP 提供四个主要模型家族，每个都建立在前一个之上："
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:20
+msgid ""
+"📖 **Complete API reference**: See the full [Module "
+"API](../../modules/kaiwu.torch_plugin.md) for all classes, methods, and "
+"parameters."
+msgstr ""
+"📖 **完整 API 参考**：完整的[模块 "
+"API](../../modules/kaiwu.torch_plugin.md)涵盖了所有类、方法和参数。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:22
+msgid "1. Boltzmann Machine (BM)"
+msgstr "1\\. 玻尔兹曼机（BM）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:24
+msgid ""
+"**The foundation**: an energy-based model with binary visible and hidden "
+"units."
+msgstr "**基础**：具有二值可见层和隐藏层单元的能量模型。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:26
+msgid ""
+"**Restricted Boltzmann Machine (RBM)**: bipartite graph — visible units only"
+" connect to hidden units, no visible-visible or hidden-hidden connections. "
+"This enables parallel sampling within layers."
+msgstr "**受限玻尔兹曼机（RBM）**：二部图——可见单元仅连接到隐藏单元，没有可见-可见或隐藏-隐藏连接。这使得层内并行采样成为可能。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:27
+msgid ""
+"**Full Boltzmann Machine**: fully connected graph — all units can connect to"
+" each other. Requires sequential (Gibbs) sampling."
+msgstr "**全连接玻尔兹曼机**：全连接图——所有单元都可以相互连接。需要顺序（Gibbs）采样。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:29
+msgid "**Main classes**: `BoltzmannMachine`, `RestrictedBoltzmannMachine`"
+msgstr "**主要类**：`BoltzmannMachine`, `RestrictedBoltzmannMachine`"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:31
+msgid "**Typical use**: unsupervised feature learning, generative modeling."
+msgstr "**典型用途**：无监督特征学习、生成建模。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:33
+msgid ""
+"→ Hands-on: [RBM Classification](rbm_classification.md), [BM "
+"Generation](bm_generation.md)"
+msgstr "→ 实战教程：[RBM 分类](rbm_classification.md)、[BM 生成](bm_generation.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:37
+msgid "2. Deep Belief Network (DBN)"
+msgstr "2\\. 深度置信网络（DBN）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:39
+msgid "**Extension**: stack multiple RBMs into a deep network."
+msgstr "**扩展**：将多个 RBM 堆叠成深度网络。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:41
+msgid ""
+"Each RBM is trained greedily layer-by-layer (unsupervised), then the whole "
+"stack can be fine-tuned (supervised)."
+msgstr "每个 RBM 逐层贪婪训练（无监督），然后整个网络栈可以进行微调（有监督）。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:53
+msgid "**Main class**: `UnsupervisedDBN`"
+msgstr "**主要类**：`UnsupervisedDBN`"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:55
+msgid "**Typical use**: hierarchical feature learning, deep representations."
+msgstr "**典型用途**：层次化特征学习、深度表示。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:57
+msgid "→ Hands-on: [DBN Classification](dbn_classification.md)"
+msgstr "→ 实战教程：[DBN 分类](dbn_classification.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:61
+msgid "3. Quantum Variational Autoencoder (Q-VAE)"
+msgstr "3\\. 量子变分自编码器（Q-VAE）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:63
+msgid ""
+"**Extension**: combine an encoder-decoder architecture with a BM prior."
+msgstr "**扩展**：将编码器-解码器架构与 BM 先验结合。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:65
+msgid ""
+"Instead of the standard Gaussian prior in a VAE, Q-VAE uses a Boltzmann "
+"Machine as the latent prior. The sampler (SA or CIM) handles negative-phase "
+"sampling in the BM."
+msgstr "Q-VAE 不是使用 VAE 中的标准高斯先验，而是使用玻尔兹曼机作为隐变量先验。采样器（SA 或 CIM）处理 BM 中的负相采样。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:71
+msgid "**Components**:"
+msgstr "**组件**："
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:72
+msgid "Encoder: maps input to a latent distribution"
+msgstr "编码器：将输入映射到隐分布"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:73
+msgid "Decoder: reconstructs input from latent samples"
+msgstr "解码器：从隐变量样本重构输入"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:74
+msgid "BM prior: replaces the standard Gaussian prior"
+msgstr "BM 先验：替代标准高斯先验"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:75
+msgid "Sampler: SA (classical) or CIM (quantum)"
+msgstr "采样器：SA（经典）或 CIM（量子）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:77
+msgid "**Main classes**: `QVAE`, `AutoEncoderBase`"
+msgstr "**主要类**：`QVAE`, `AutoEncoderBase`"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:79
+msgid ""
+"**Typical use**: generative modeling, representation learning, anomaly "
+"detection."
+msgstr "**典型用途**：生成建模、表示学习、异常检测。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:81
+msgid "**Application variants** (in `example/`):"
+msgstr "**应用变体**（在 `example/` 中）："
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:82
+msgid "`MNISTQVAE` — image generation (784-d input)"
+msgstr "`MNISTQVAE` — 图像生成（784 维输入）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:83
+msgid ""
+"`CellQVAE` — single-cell transcriptomics (10k+ genes, batch-conditioned)"
+msgstr "`CellQVAE` — 单细胞转录组学（10k+ 基因，批次条件化）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:84
+msgid "`CleanEnergyQVAE` — anomaly detection (free-energy scoring head)"
+msgstr "`CleanEnergyQVAE` — 异常检测（自由能量评分头）"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:86
+msgid ""
+"→ Hands-on: [Q-VAE MNIST](qvae_mnist.md), [Q-VAE Cell](qvae_cell.md), [Q-VAE"
+" Anomaly](qvae_anomaly.md)"
+msgstr ""
+"→ 实战教程：[Q-VAE MNIST](qvae_mnist.md)、[Q-VAE Cell](qvae_cell.md)、[Q-VAE "
+"Anomaly](qvae_anomaly.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:90
+msgid "4. Q-Diffusion"
+msgstr "4\\. Q-Diffusion"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:92
+msgid "**Extension**: discrete diffusion model with a BM energy reranker."
+msgstr "**扩展**：具有 BM 能量重排序器的离散扩散模型。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:94
+msgid ""
+"Combines a pre-trained protein language model (DPLM) as the proposal model "
+"with a trainable BM energy reranker to improve generated sequence quality."
+msgstr "将预训练的蛋白质语言模型（DPLM）作为提议模型，与可训练的 BM 能量重排序器结合，以提高生成序列的质量。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:104
+msgid "**Main classes**: `QDiffusion`, `QDiffusionConfig`"
+msgstr "**主要类**：`QDiffusion`, `QDiffusionConfig`"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:106
+msgid "**Typical use**: protein sequence generation, guided sampling."
+msgstr "**典型用途**：蛋白质序列生成、引导采样。"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:108
+msgid "→ Hands-on: [Q-Diffusion](qdiffusion.md)"
+msgstr "→ 实战教程：[Q-Diffusion](qdiffusion.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:112
+msgid "How to Build a Custom Model"
+msgstr "如何构建自定义模型"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:114
+msgid "Step 1: Choose your base"
+msgstr "步骤 1：选择基础模型"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:115
+msgid "Need feature extraction? → Start with [RBM](rbm_classification.md)"
+msgstr "需要特征提取？→ 从 [RBM](rbm_classification.md) 开始"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:116
+msgid "Need generative modeling? → Start with [BM](bm_generation.md)"
+msgstr "需要生成建模？→ 从 [BM](bm_generation.md) 开始"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:117
+msgid "Need representation learning? → Start with [Q-VAE](qvae_mnist.md)"
+msgstr "需要表示学习？→ 从 [Q-VAE](qvae_mnist.md) 开始"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:119
+msgid "Step 2: Provide your components"
+msgstr "步骤 2：提供组件"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:137
+msgid "Step 3: Train with the standard PyTorch loop"
+msgstr "步骤 3：使用标准 PyTorch 循环训练"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:149
+msgid "Cross-reference Map"
+msgstr "交叉引用表"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "Topic"
+msgstr "主题"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "See also"
+msgstr "另请参阅"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "**Complete API reference**"
+msgstr "**完整 API 参考**"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[Module API](../../modules/kaiwu.torch_plugin.md)"
+msgstr "[模块 API](../../modules/kaiwu.torch_plugin.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "System architecture overview"
+msgstr "系统架构概览"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[Introduction](../introduction.md)"
+msgstr "[简介](../introduction.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "Mathematical foundations"
+msgstr "数学基础"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[Theoretical Foundations](../../theoretical-foundations/index.md)"
+msgstr "[理论基础](../../theoretical-foundations/index.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "RBM hands-on example"
+msgstr "RBM 实战示例"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[RBM Classification](rbm_classification.md)"
+msgstr "[RBM 分类](rbm_classification.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "BM hands-on example"
+msgstr "BM 实战示例"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[BM Generation](bm_generation.md)"
+msgstr "[BM 生成](bm_generation.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "DBN hands-on example"
+msgstr "DBN 实战示例"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[DBN Classification](dbn_classification.md)"
+msgstr "[DBN 分类](dbn_classification.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "Q-VAE hands-on example"
+msgstr "Q-VAE 实战示例"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[Q-VAE MNIST](qvae_mnist.md)"
+msgstr "[Q-VAE MNIST](qvae_mnist.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "Q-VAE case studies"
+msgstr "Q-VAE 案例研究"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[Q-VAE Cell](qvae_cell.md), [Q-VAE Anomaly](qvae_anomaly.md)"
+msgstr "[Q-VAE 单细胞](qvae_cell.md)、[Q-VAE 异常检测](qvae_anomaly.md)"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "Q-Diffusion"
+msgstr "Q-Diffusion"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md
+msgid "[Q-Diffusion](qdiffusion.md)"
+msgstr "[Q-Diffusion](qdiffusion.md)"
+
+#~ msgid ""
+#~ "This page explains how KPP's model components fit together and how different"
+#~ " model families (RBM, DBN, Q-VAE, Q-Diffusion) build on top of each other. "
+#~ "For the high-level system architecture and component interaction diagram, "
+#~ "see [System Architecture & Component Interaction](../introduction.md#system-"
+#~ "architecture--component-interaction) in the Introduction."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "[Introduction → System Architecture](../introduction.md#system-architecture"
+#~ "--component-interaction)"
+#~ msgstr ""
+
+#~ msgid "[Theoretical Foundations](../theoretical-foundations/index.md)"
+#~ msgstr ""
+
+#~ msgid "4. Q-Diffusion (Coming soon)"
+#~ msgstr ""
+
+#~ msgid "Q-Diffusion (coming soon)"
+#~ msgstr ""

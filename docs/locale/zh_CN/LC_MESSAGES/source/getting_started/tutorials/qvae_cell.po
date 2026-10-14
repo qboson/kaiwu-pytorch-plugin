@@ -2,42 +2,323 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KPP docs\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-10-14 11:08+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
 "Language: zh_CN\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:1
+#: ../../source/getting_started/tutorials/qvae_cell.md:1
 msgid "Q-VAE for Single-Cell Transcriptomics"
 msgstr "Q-VAE 单细胞转录组学"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:3
+#: ../../source/getting_started/tutorials/qvae_cell.md:3
 msgid ""
-"**Status**: Coming soon — placeholder page; will be expanded into a full "
-"tutorial."
-msgstr "**状态**：即将推出——占位页，后续将扩展为完整教程。"
-
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:5
-msgid ""
-"Single-cell representation learning with a quantum variational autoencoder "
-"(QVAE): read a single-cell expression matrix, train a QVAE, extract low-"
-"dimensional representations, compute UMAP, analyze the energy distribution, "
-"and evaluate clustering quality against cell-type labels."
+"This case study extends the [Q-VAE MNIST tutorial](qvae_mnist.md) to single-"
+"cell RNA sequencing (scRNA-seq) data. It demonstrates how Q-VAE learns low-"
+"dimensional representations of cell expression profiles, preserves cell-type"
+" structure, and corrects batch effects. Building on the Q-ELBO framework, "
+"this study adds clustering evaluation, UMAP visualization, and scIB "
+"benchmark metrics."
 msgstr ""
-"使用量子变分自编码器（QVAE）进行单细胞表征学习：读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 "
-"UMAP、分析能量分布，并使用细胞类型标签评估聚类质量。"
+"本案例研究将 [Q-VAE MNIST 教程](qvae_mnist.md) 扩展到单细胞 RNA 测序（scRNA-seq）数据。它展示了 Q-VAE"
+" 如何学习细胞表达谱的低维表示、保留细胞类型结构并校正批次效应。在 Q-ELBO 框架之上，本研究新增了聚类评估、UMAP 可视化和 scIB "
+"基准指标。"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:7
-msgid ""
-"**Example**: `example/qvae_cell/train_qvae_cell.ipynb` · "
-"`example/qvae_cell/evaluate_benchmark.py`"
-msgstr ""
-"**示例**：`example/qvae_cell/train_qvae_cell.ipynb` · "
-"`example/qvae_cell/evaluate_benchmark.py`"
+#: ../../source/getting_started/tutorials/qvae_cell.md:5
+msgid "Overview"
+msgstr "概述"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/qvae_cell.md:9
+#: ../../source/getting_started/tutorials/qvae_cell.md:7
+msgid "By the end of this case study you will be able to:"
+msgstr "完成本案例研究后，您将能够："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:9
+msgid "Apply Q-VAE to high-dimensional scRNA-seq expression matrices"
+msgstr "将 Q-VAE 应用于高维 scRNA-seq 表达矩阵"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:10
 msgid ""
-"**Data**: [Kaggle immune-"
-"data](https://www.kaggle.com/datasets/redwoodz/immune-data)"
+"Extract low-dimensional representations that preserve cell-type identity"
+msgstr "提取保留细胞类型身份的低维表示"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:11
+msgid "Evaluate clustering quality with ARI, NMI, and scIB metrics"
+msgstr "使用 ARI、NMI 和 scIB 指标评估聚类质量"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:12
+msgid "Visualize representations with UMAP and energy distribution plots"
+msgstr "使用 UMAP 和能量分布图可视化表示"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:14
+msgid "Running the Example"
+msgstr "Running 该 示例"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:16
+msgid "**Dependencies**:"
+msgstr "**依赖项**："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:22
+msgid "**Run**:"
+msgstr "**运行**："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:29
+msgid "Or use the interactive notebook:"
+msgstr "或使用交互式 Notebook："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:35
+msgid "**Key files**:"
+msgstr "**关键文件**："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:37
+msgid ""
+"`models.py`: `CellQVAE` — Q-VAE with batch-conditioned decoder for scRNA-seq"
+msgstr "`models.py`：`CellQVAE` — 带批次条件化解码器的 Q-VAE，适用于 scRNA-seq"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:38
+msgid "`trainer.py`: `Trainer` — training loop with Q-ELBO optimization"
+msgstr "`trainer.py`：`Trainer` — 带 Q-ELBO 优化的训练循环"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:39
+msgid ""
+"`evaluate_benchmark.py`: unified evaluation (clustering, classification, "
+"scIB, scGraph, DPT)"
+msgstr "`evaluate_benchmark.py`：统一评估（聚类、分类、scIB、scGraph、DPT）"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:40
+msgid "`visualization.py`: UMAP plots, energy distribution, training curves"
+msgstr "`visualization.py`：UMAP 图、能量分布、训练曲线"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:42
+msgid "How It Works"
+msgstr "工作原理"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:44
+msgid ""
+"A Q-VAE for single-cell data replaces the Gaussian prior with a QBM, "
+"learning a low-dimensional representation that captures cell-type-specific "
+"expression patterns:"
+msgstr "用于单细胞数据的 Q-VAE 将高斯先验替换为 QBM，学习能够捕捉细胞类型特异性表达模式的低维表示："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:51
+msgid "The key adaptations from MNIST:"
+msgstr "相对于 MNIST 的关键调整："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:53
+msgid ""
+"**Input dimension**: scRNA-seq matrices are typically 10k–30k genes, "
+"compared to 784 pixels in MNIST."
+msgstr "**输入维度**：scRNA-seq 矩阵通常包含 10k–30k 个基因，而 MNIST 只有 784 个像素。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:54
+msgid ""
+"**Loss type**: MSE loss is used for continuous expression values (vs "
+"Bernoulli for binary pixels)."
+msgstr "**损失类型**：连续表达值使用 MSE 损失（而二值像素使用伯努利损失）。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:55
+msgid ""
+"**Batch correction**: the Q-VAE representation learns to separate cell types"
+" while removing batch effects."
+msgstr "**批次校正**：Q-VAE 表示在消除批次效应的同时学会区分细胞类型。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:56
+msgid ""
+"**Evaluation**: clustering metrics (ARI, NMI) and scIB benchmarks measure "
+"representation quality."
+msgstr "**评估**：聚类指标（ARI、NMI）与 scIB 基准衡量表示质量。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:58
+msgid ""
+"The training objective remains the Q-ELBO: reconstruction loss + KL "
+"divergence between encoder posterior and QBM prior. The sampler can be "
+"switched between SA and CIM without changing the rest of the pipeline."
 msgstr ""
-"**数据**：[Kaggle immune-data](https://www.kaggle.com/datasets/redwoodz/immune-"
-"data)"
+"训练目标仍是 Q-ELBO：重建损失 + 编码器后验与 QBM 先验之间的 KL 散度。采样器可在 SA 与 CIM "
+"之间切换，无需修改流水线的其余部分。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:60
+msgid "Quick Start"
+msgstr "快速开始"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:62
+msgid ""
+"The following shows how to run the training pipeline from the command line:"
+msgstr "以下展示如何从命令行运行训练流程："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:64
+msgid "Train the Q-VAE on immune cell data:"
+msgstr "在免疫细胞数据上训练 Q-VAE："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:75
+msgid "Evaluate clustering quality:"
+msgstr "评估聚类质量："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:85
+msgid "Key Code"
+msgstr "关键代码"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:87
+msgid "1. CellQVAE Model Architecture"
+msgstr "1\\. CellQVAE 模型架构"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:89
+msgid ""
+"The `CellQVAE` model extends the base Q-VAE with a batch-conditioned decoder"
+" for scRNA-seq data:"
+msgstr "`CellQVAE` 模型在基础 Q-VAE 之上增加了批次条件化解码器，用于 scRNA-seq 数据："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:96
+msgid "Key model details:"
+msgstr "关键模型细节："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:97
+msgid "Encoder: `QVAEEncoder` — maps scRNA-seq expression to latent space"
+msgstr "编码器：`QVAEEncoder` — 将 scRNA-seq 表达映射到隐空间"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:98
+msgid "Decoder: `QVAEDecoder` — reconstructs expression from latent samples"
+msgstr "解码器：`QVAEDecoder` — 从隐样本重构表达"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:99
+msgid "Batch conditioning: one-hot batch labels appended to decoder input"
+msgstr "批次条件化：将 one-hot 批次标签拼接到解码器输入"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:100
+msgid "QBM prior: trained with the same positive/negative phase as an RBM"
+msgstr "QBM 先验：使用与 RBM 相同的正相/负相训练"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:104
+msgid "2. Training Loop"
+msgstr "2\\. 训练循环"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:106
+msgid ""
+"The `Trainer` class implements the Q-ELBO optimization loop for scRNA-seq "
+"data:"
+msgstr "`Trainer` 类实现了针对 scRNA-seq 数据的 Q-ELBO 优化循环："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:112
+msgid "Key training details:"
+msgstr "关键训练细节："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:113
+msgid "Optimizer: Adam with learning rate scheduling"
+msgstr "优化器：Adam，带学习率调度"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:114
+msgid "Reconstruction loss: MSE (continuous expression values)"
+msgstr "重建损失：MSE（连续表达值）"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:115
+msgid "KL term: pulls encoder posterior toward QBM prior"
+msgstr "KL 项：将编码器后验拉向 QBM 先验"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:116
+msgid "Sampler: switch between SA and CIM via `--sampler-type`"
+msgstr "采样器：通过 `--sampler-type` 在 SA 与 CIM 之间切换"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:120
+msgid "3. Evaluation Benchmark"
+msgstr "3\\. 评估基准"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:122
+msgid ""
+"The `evaluate_benchmark.py` provides unified evaluation for clustering, "
+"classification, and scIB metrics:"
+msgstr "`evaluate_benchmark.py` 为聚类、分类与 scIB 指标提供统一评估："
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:129
+msgid "Training and Evaluation"
+msgstr "训练 和 评估"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:131
+msgid ""
+"**Training curves**: `plot_training_history` tracks reconstruction loss and "
+"KL divergence over epochs."
+msgstr "**训练曲线**：`plot_training_history` 跟踪各 epoch 的重建损失与 KL 散度。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:132
+msgid ""
+"**UMAP visualization**: `save_umap_plots` reduces the 256-dim latent "
+"representation to 2-D, colored by cell type."
+msgstr "**UMAP 可视化**：`save_umap_plots` 将 256 维隐表示降维到二维，按细胞类型着色。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:133
+msgid ""
+"**Energy distribution**: `save_energy_plots` shows how QBM energy varies "
+"across cell types."
+msgstr "**能量分布**：`save_energy_plots` 展示 QBM 能量在不同细胞类型间的变化。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:134
+msgid ""
+"**Clustering metrics**: ARI, AMI, NMI, Homogeneity, FMI measure clustering "
+"quality."
+msgstr "**聚类指标**：ARI、AMI、NMI、同质性（Homogeneity）、FMI 衡量聚类质量。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:135
+msgid ""
+"**scIB benchmarks**: biological conservation and batch-correction metrics."
+msgstr "**scIB 基准**：生物信息保持与批次校正指标。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:137
+msgid "Summary"
+msgstr "总结"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:139
+msgid ""
+"Q-VAE scales from MNIST to high-dimensional scRNA-seq data with minimal "
+"changes."
+msgstr "Q-VAE 能以极少的改动从 MNIST 扩展到高维 scRNA-seq 数据。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:140
+msgid ""
+"The Q-ELBO framework remains the same; only the loss type and input "
+"dimension change."
+msgstr "Q-ELBO 框架保持不变；仅损失类型与输入维度发生变化。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:141
+msgid ""
+"Learned representations preserve cell-type structure and correct batch "
+"effects."
+msgstr "学习到的表示保留了细胞类型结构并校正了批次效应。"
+
+#: ../../source/getting_started/tutorials/qvae_cell.md:142
+msgid ""
+"The sampler (SA vs CIM) can be switched without changing the rest of the "
+"pipeline."
+msgstr "采样器（SA 与 CIM）可切换，无需修改流水线其余部分。"
+
+#~ msgid ""
+#~ "**Status**: Coming soon — placeholder page; will be expanded into a full "
+#~ "tutorial."
+#~ msgstr "**状态**：即将推出——占位页，后续将扩展为完整教程。"
+
+#~ msgid ""
+#~ "Single-cell representation learning with a quantum variational autoencoder "
+#~ "(QVAE): read a single-cell expression matrix, train a QVAE, extract low-"
+#~ "dimensional representations, compute UMAP, analyze the energy distribution, "
+#~ "and evaluate clustering quality against cell-type labels."
+#~ msgstr ""
+#~ "使用量子变分自编码器（QVAE）进行单细胞表征学习：读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 "
+#~ "UMAP、分析能量分布，并使用细胞类型标签评估聚类质量。"
+
+#~ msgid ""
+#~ "**Example**: `example/qvae_cell/train_qvae_cell.ipynb` · "
+#~ "`example/qvae_cell/evaluate_benchmark.py`"
+#~ msgstr ""
+#~ "**示例**：`example/qvae_cell/train_qvae_cell.ipynb` · "
+#~ "`example/qvae_cell/evaluate_benchmark.py`"
+
+#~ msgid ""
+#~ "**Data**: [Kaggle immune-"
+#~ "data](https://www.kaggle.com/datasets/redwoodz/immune-data)"
+#~ msgstr ""
+#~ "**数据**：[Kaggle immune-data](https://www.kaggle.com/datasets/redwoodz/immune-"
+#~ "data)"

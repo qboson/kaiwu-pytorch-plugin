@@ -12,12 +12,12 @@ msgstr ""
 "POT-Creation-Date: 2026-10-13 17:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:1
@@ -29,15 +29,15 @@ msgid ""
 "This tutorial builds on the [RBM Classification "
 "tutorial](rbm_classification.md) and [Section 4.2: Restricted Boltzmann "
 "Machine](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
-"restricted.md). A Deep Belief Network (DBN) stacks multiple RBM layers: "
-"each RBM is pretrained greedily and unsupervised, then the whole network "
-"is fine-tuned with labeled data. The key new concept is layer-wise "
-"pretraining — the same RBM objective applied sequentially. This tutorial "
-"also covers three training modes: unsupervised feature extraction, "
-"downstream classifier, and end-to-end fine-tuning."
+"restricted.md). A Deep Belief Network (DBN) stacks multiple RBM layers: each"
+" RBM is pretrained greedily and unsupervised, then the whole network is "
+"fine-tuned with labeled data. The key new concept is layer-wise pretraining "
+"— the same RBM objective applied sequentially. This tutorial also covers "
+"three training modes: unsupervised feature extraction, downstream "
+"classifier, and end-to-end fine-tuning."
 msgstr ""
-"本教程基于 [RBM 分类教程](rbm_classification.md) 和 [第 4.2 节：受限玻尔兹曼机"
-"](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
+"本教程基于 [RBM 分类教程](rbm_classification.md) 和 [第 4.2 "
+"节：受限玻尔兹曼机](../../theoretical-foundations/kpp-theoretical-foundations-bm-"
 "restricted.md)。深度信念网络（DBN）堆叠多个 RBM 层：每个 RBM "
 "贪婪无监督预训练，然后整个网络用带标签数据微调。关键新概念是逐层预训练——相同的 RBM "
 "目标按顺序应用。本教程还涵盖三种训练模式：无监督特征提取、下游分类器和端到端微调。"
@@ -90,8 +90,8 @@ msgstr "`dbn_trainer.py`：`DBNPretrainer` — 贪婪逐层 RBM 预训练"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:32
 msgid ""
-"`supervised_dbn_digits.py`: `SupervisedDBNClassification` — supervised "
-"fine-tuning and classification"
+"`supervised_dbn_digits.py`: `SupervisedDBNClassification` — supervised fine-"
+"tuning and classification"
 msgstr "`supervised_dbn_digits.py`：`SupervisedDBNClassification` — 监督微调与分类"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:33
@@ -130,21 +130,21 @@ msgstr "代码库提供分层类结构："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:51
 msgid ""
-"**`DBNPretrainer`**: stacks multiple RBM layers and runs greedy "
-"unsupervised pretraining layer by layer."
+"**`DBNPretrainer`**: stacks multiple RBM layers and runs greedy unsupervised"
+" pretraining layer by layer."
 msgstr "**`DBNPretrainer`**：堆叠多个 RBM 层，逐层执行贪婪无监督预训练。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:52
 msgid ""
-"**`AbstractSupervisedDBN`**: defines the general interface for supervised"
-" DBN training (pretraining, fine-tuning, classification, prediction)."
+"**`AbstractSupervisedDBN`**: defines the general interface for supervised "
+"DBN training (pretraining, fine-tuning, classification, prediction)."
 msgstr "**`AbstractSupervisedDBN`**：定义监督 DBN 训练的通用接口（预训练、前向传播、损失）。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:53
 msgid ""
-"**`AbstractSupervisedDBNClassifier`**: extends the abstract interface "
-"with common classifiers (logistic regression, SVM, random forest)."
-msgstr "**`AbstractSupervisedDBN`**：定义监督 DBN 训练的通用接口（预训练、前向传播、损失）。"
+"**`AbstractSupervisedDBNClassifier`**: extends the abstract interface with "
+"common classifiers (logistic regression, SVM, random forest)."
+msgstr "**`AbstractSupervisedDBNClassifier`**：扩展抽象接口，集成常用分类器（逻辑回归、SVM、随机森林）。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:54
 msgid ""
@@ -154,7 +154,7 @@ msgstr "**`SupervisedDBNClassification`**：分类任务的具体实现，含微
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:56
 msgid "Three Training Modes"
-msgstr ""
+msgstr "三种训练模式"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:58
 msgid "After pretraining, three training modes are available:"
@@ -167,11 +167,10 @@ msgid ""
 msgstr "**无监督模式**：仅预训练，将 DBN 用作固定特征提取器（`DBNPretrainer.transform`）。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:61
-#, fuzzy
 msgid ""
-"**Classifier mode**: attach a downstream classifier (logistic regression,"
-" SVM, or random forest) on top of the last layer, no backprop through the"
-" RBMs."
+"**Classifier mode**: attach a downstream classifier (logistic regression, "
+"SVM, or random forest) on top of the last layer, no backprop through the "
+"RBMs."
 msgstr "**分类器模式**：在预训练特征之上接下游分类器（逻辑回归、SVM 或随机森林）。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:62
@@ -190,14 +189,14 @@ msgstr "采样器配置按 RBM 层从[快速入门](../quickstart.md)继承。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:66
 msgid "Quick Start"
-msgstr ""
+msgstr "快速开始"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:68
 msgid ""
 "The following snippet shows how to run the pipeline from a user's "
 "perspective, this is what you would execute in "
 "`supervised_dbn_digits.ipynb`:"
-msgstr ""
+msgstr "以下代码片段从用户视角展示如何运行整个流程，也就是你在 `supervised_dbn_digits.ipynb` 中执行的内容："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:70
 msgid "Load digits data (same shift augmentation as the RBM tutorial):"
@@ -221,80 +220,75 @@ msgstr "核心代码"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:105
 msgid "1. DBNTrainer Initialization (SA vs CIM per layer)"
-msgstr ""
+msgstr "1\\. DBNTrainer 初始化（每层 SA vs CIM）"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:107
 msgid ""
 "The `DBNTrainer` class supports switching between classical Simulated "
 "Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers per RBM "
 "layer:"
-msgstr ""
+msgstr "`DBNTrainer` 类支持在每一层 RBM 中切换经典模拟退火（SA）与量子相干伊辛机（CIM）采样器："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:113
 msgid "When `use_cim=True`:"
-msgstr ""
+msgstr "当 `use_cim=True` 时："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:114
 msgid "Uses `CIMOptimizer` from `kaiwu.cim`"
-msgstr ""
+msgstr "使用 `kaiwu.cim` 中的 `CIMOptimizer`"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:115
 msgid "Wrapped in `PrecisionReducer` for precision control"
-msgstr ""
+msgstr "封装在 `PrecisionReducer` 中用于精度控制"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:116
 msgid "Checkpoint manager saves to `./tmp`"
-msgstr ""
+msgstr "检查点管理器保存到 `./tmp`"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:118
 msgid "When `use_cim=False`:"
-msgstr ""
+msgstr "当 `use_cim=False` 时："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:119
 msgid "Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`"
-msgstr ""
+msgstr "使用 `kaiwu.classical` 中的 `SimulatedAnnealingOptimizer`"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:123
-#, fuzzy
 msgid "2. Greedy Layer-wise Pretraining"
-msgstr "贪婪逐层预训练："
+msgstr "2\\. 贪婪逐层预训练："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:125
 msgid ""
 "The `train()` method iterates through each RBM layer, training one at a "
 "time:"
-msgstr ""
+msgstr "`train()` 方法逐层遍历 RBM 层，一次训练一层："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:131
 msgid "Key pretraining details:"
-msgstr ""
+msgstr "关键预训练细节："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:132
-#, fuzzy
 msgid ""
-"Each RBM layer uses the same `objective()` and `sample()` as the Quick "
-"Start"
-msgstr "每层使用与[快速入门](../quickstart.md)相同的 `objective()` 和 `sample()`。"
+"Each RBM layer uses the same `objective()` and `sample()` as the Quick Start"
+msgstr "每层使用与快速入门相同的 `objective()` 和 `sample()`。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:133
 msgid "After training a layer, the output becomes input for the next layer"
-msgstr ""
+msgstr "训练完一层后，其输出成为下一层的输入"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:134
 msgid "Verbose mode prints progress for each layer"
-msgstr ""
+msgstr "详细模式会打印每一层的训练进度"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:138
-#, fuzzy
 msgid "3. Supervised Classification and Fine-tuning"
-msgstr "4. SupervisedDBNClassification 具体分类实现"
+msgstr "3\\. 监督分类与微调"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:140
-#, fuzzy
 msgid ""
 "The `SupervisedDBNClassification` class provides three training modes: "
-"unsupervised feature extraction, downstream classifier, and end-to-end "
-"fine-tuning."
+"unsupervised feature extraction, downstream classifier, and end-to-end fine-"
+"tuning."
 msgstr "三种训练模式：无监督特征提取、下游分类器或端到端微调。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:146
@@ -310,15 +304,14 @@ msgstr "**预训练进度**：每个 RBM 层报告其目标损失；`RBMVisualiz
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:149
 msgid ""
-"**Reconstruction visualization**: the notebook encodes test images "
-"through the trained RBM stack and plots the reconstruction error "
-"evolution."
+"**Reconstruction visualization**: the notebook encodes test images through "
+"the trained RBM stack and plots the reconstruction error evolution."
 msgstr "**重建可视化**：笔记本通过训练好的 RBM 堆叠编码测试图像并解码，以可视化重建质量。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:150
 msgid ""
-"**Generated samples**: during pretraining, the notebook can display "
-"samples generated by each RBM layer."
+"**Generated samples**: during pretraining, the notebook can display samples "
+"generated by each RBM layer."
 msgstr "**生成样本**：预训练过程中，笔记本可显示每个 RBM 层生成的样本。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:151
@@ -339,8 +332,8 @@ msgstr "小结"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:156
 msgid ""
-"A DBN stacks RBMs, pretrained greedily one layer at a time using the same"
-" RBM objective."
+"A DBN stacks RBMs, pretrained greedily one layer at a time using the same "
+"RBM objective."
 msgstr "DBN 堆叠 RBM，使用相同的 RBM 目标逐层贪婪预训练。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:157
@@ -351,14 +344,14 @@ msgstr "三种训练模式：无监督特征提取、下游分类器或端到端
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:158
 msgid ""
-"The fine-tuning mode unrolls the RBM stack into a deep network "
-"initialized with pretrained weights, trained with `CrossEntropyLoss`."
+"The fine-tuning mode unrolls the RBM stack into a deep network initialized "
+"with pretrained weights, trained with `CrossEntropyLoss`."
 msgstr "微调模式将 RBM 堆叠展开为深度网络，用预训练权重初始化，实现端到端监督训练。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:159
 msgid ""
-"The sampler (SA vs CIM) is configured per RBM layer and follows the Quick"
-" Start pattern."
+"The sampler (SA vs CIM) is configured per RBM layer and follows the Quick "
+"Start pattern."
 msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。"
 
 #~ msgid "**可见层（``v``）**：输入数据的显式表示（如像素值）。"
@@ -374,14 +367,11 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W"
-#~ " \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} -"
-#~ " \\mathbf{c}^T \\mathbf{h}"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T "
+#~ "\\mathbf{v} - \\mathbf{c}^T \\mathbf{h}"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ "
-#~ "e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}"
+#~ msgid "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}"
 #~ msgstr ""
 
 #~ msgid "其中 :math:`Z` 为配分函数（归一化因子）。可见层的边缘分布为："
@@ -406,15 +396,13 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle "
-#~ "v_i h_j \\rangle_{\\text{data}} - \\langle "
-#~ "v_i h_j \\rangle_{\\text{recon}}\\right)"
+#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle v_i h_j \\rangle_{\\text{data}} -"
+#~ " \\langle v_i h_j \\rangle_{\\text{recon}}\\right)"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "其中 :math:`\\epsilon` 为学习率，:math:`\\langle \\cdot "
-#~ "\\rangle_{\\text{data}}` 和 :math:`\\langle \\cdot"
-#~ " \\rangle_{\\text{recon}}` 分别为数据分布和重构分布的期望。"
+#~ "其中 :math:`\\epsilon` 为学习率，:math:`\\langle \\cdot \\rangle_{\\text{data}}` 和 "
+#~ ":math:`\\langle \\cdot \\rangle_{\\text{recon}}` 分别为数据分布和重构分布的期望。"
 #~ msgstr ""
 
 #~ msgid "**``DBNPretrainer``** 实现多层 RBM 的堆叠与逐层无监督预训练，提供特征提取接口。"
@@ -426,9 +414,8 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "**``AbstractSupervisedDBNClassifier``** 基于 "
-#~ "``AbstractSupervisedDBN``，实现 PyTorch "
-#~ "下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
+#~ "**``AbstractSupervisedDBNClassifier``** 基于 ``AbstractSupervisedDBN``，实现 "
+#~ "PyTorch 下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
 #~ msgstr ""
 
 #~ msgid "**``SupervisedDBNClassification``** 具体分类任务实现、微调网络构建以及训练。"
@@ -462,8 +449,8 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "**创建 RBM 层（``create_rbm_layer`` 方法）** 初始化 "
-#~ "RBM：使用 ``RestrictedBoltzmannMachine`` 定义可见层与隐层维度。"
+#~ "**创建 RBM 层（``create_rbm_layer`` 方法）** 初始化 RBM：使用 "
+#~ "``RestrictedBoltzmannMachine`` 定义可见层与隐层维度。"
 #~ msgstr ""
 
 #~ msgid "**单批次训练步骤（``_train_batch`` 方法）**"
@@ -473,13 +460,12 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "**负相（Negative "
-#~ "Phase）**：通过模拟退火采样器（``SimulatedAnnealingOptimizer``）生成重构样本。"
+#~ "**负相（Negative Phase）**：通过模拟退火采样器（``SimulatedAnnealingOptimizer``）生成重构样本。"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "**单层 RBM 训练（``_train_rbm_layer`` 方法）** - "
-#~ "初始化优化器：采用随机梯度下降（SGD）优化参数。 - DataLoader 处理批量数据。"
+#~ "**单层 RBM 训练（``_train_rbm_layer`` 方法）** - 初始化优化器：采用随机梯度下降（SGD）优化参数。 - "
+#~ "DataLoader 处理批量数据。"
 #~ msgstr ""
 
 #~ msgid "**预训练堆叠 RBM（``fit`` 方法）**"
@@ -531,14 +517,11 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W"
-#~ " \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} -"
-#~ " \\mathbf{c}^T \\mathbf{h}\n"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T "
+#~ "\\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ "
-#~ "e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
+#~ msgid "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
 #~ msgstr ""
 
 #~ msgid "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h})\n"
@@ -554,20 +537,18 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle "
-#~ "v_i h_j \\rangle_{\\text{data}} - \\langle "
-#~ "v_i h_j \\rangle_{\\text{recon}}\\right)\n"
+#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle v_i h_j \\rangle_{\\text{data}} -"
+#~ " \\langle v_i h_j \\rangle_{\\text{recon}}\\right)\n"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "受限玻尔兹曼机（Restricted Boltzmann Machine, "
-#~ "RBM）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden "
-#~ "Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。"
+#~ "受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible "
+#~ "Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "**创建 RBM 层（`create_rbm_layer` 方法）**   初始化 "
-#~ "RBM：使用 `RestrictedBoltzmannMachine` 定义可见层与隐层维度。"
+#~ "**创建 RBM 层（`create_rbm_layer` 方法）**   初始化 RBM：使用 "
+#~ "`RestrictedBoltzmannMachine` 定义可见层与隐层维度。"
 #~ msgstr ""
 
 #~ msgid "**单批次训练步骤（`_train_batch` 方法）**"
@@ -591,15 +572,11 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgid ""
 #~ "\n"
 #~ "\n"
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W"
-#~ " \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} -"
-#~ " \\mathbf{c}^T \\mathbf{h}\n"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 #~ msgstr ""
 #~ "\n"
 #~ "\n"
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W"
-#~ " \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} -"
-#~ " \\mathbf{c}^T \\mathbf{h}\n"
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} - \\mathbf{c}^T \\mathbf{h}\n"
 
 #~ msgid "联合概率分布通过玻尔兹曼分布给出："
 #~ msgstr "联合概率分布通过玻尔兹曼分布给出："
@@ -607,13 +584,11 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgid ""
 #~ "\n"
 #~ "\n"
-#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ "
-#~ "e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
 #~ msgstr ""
 #~ "\n"
 #~ "\n"
-#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ "
-#~ "e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z}\n"
 
 #~ msgid "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
 #~ msgstr "其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
@@ -667,48 +642,38 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgid ""
 #~ "\n"
 #~ "\n"
-#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle "
-#~ "v_i h_j \\rangle_{\\text{data}} - \\langle "
-#~ "v_i h_j \\rangle_{\\text{recon}}\\right)\n"
+#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}}\\right)\n"
 #~ "\n"
 #~ msgstr ""
 #~ "\n"
 #~ "\n"
-#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle "
-#~ "v_i h_j \\rangle_{\\text{data}} - \\langle "
-#~ "v_i h_j \\rangle_{\\text{recon}}\\right)\n"
+#~ "\\Delta W_{ij} = \\epsilon \\left(\\langle v_i h_j \\rangle_{\\text{data}} - \\langle v_i h_j \\rangle_{\\text{recon}}\\right)\n"
 #~ "\n"
 
 #~ msgid ""
-#~ "其中 $\\epsilon$ 为学习率，$\\langle \\cdot "
-#~ "\\rangle_{\\text{data}}$ 和 $\\langle \\cdot "
-#~ "\\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
+#~ "其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle "
+#~ "\\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
 #~ msgstr ""
-#~ "其中 $\\epsilon$ 为学习率，$\\langle \\cdot "
-#~ "\\rangle_{\\text{data}}$ 和 $\\langle \\cdot "
-#~ "\\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
+#~ "其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle "
+#~ "\\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
 
 #~ msgid "$$"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W"
-#~ " \\mathbf{h} - \\mathbf{b}^T \\mathbf{v} -"
-#~ " \\mathbf{c}^T \\mathbf{h} $$ 联合概率分布通过玻尔兹曼分布给出："
+#~ "E(\\mathbf{v}, \\mathbf{h}) = -\\mathbf{v}^T W \\mathbf{h} - \\mathbf{b}^T "
+#~ "\\mathbf{v} - \\mathbf{c}^T \\mathbf{h} $$ 联合概率分布通过玻尔兹曼分布给出："
 #~ msgstr ""
 
 #~ msgid ""
-#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ "
-#~ "e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z} $$ 其中"
-#~ " $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
+#~ "P(\\mathbf{v}, \\mathbf{h}) = \\frac{ e^{-E(\\mathbf{v}, \\mathbf{h})} }{Z} "
+#~ "$$ 其中 $Z$ 为配分函数（归一化因子）。可见层的边缘分布为："
 #~ msgstr ""
 
 #~ msgid "P(\\mathbf{v}) = \\sum_{\\mathbf{h}} P(\\mathbf{v}, \\mathbf{h}) $$"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij}"
-#~ " v_i + c_j\\right) $$ $$"
+#~ msgid "P(h_j=1|\\mathbf{v}) = \\sigma\\left(\\sum_i W_{ij} v_i + c_j\\right) $$ $$"
 #~ msgstr ""
 
 #~ msgid "$$ 其中 $\\sigma(x) = \\frac{1}{1+e^{-x}}$ 为 Sigmoid 激活函数。"
@@ -718,41 +683,34 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr ""
 
 #~ msgid ""
-#~ "$$ 其中 $\\epsilon$ 为学习率，$\\langle \\cdot "
-#~ "\\rangle_{\\text{data}}$ 和 $\\langle \\cdot "
-#~ "\\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
+#~ "$$ 其中 $\\epsilon$ 为学习率，$\\langle \\cdot \\rangle_{\\text{data}}$ 和 $\\langle"
+#~ " \\cdot \\rangle_{\\text{recon}}$ 分别为数据分布和重构分布的期望。"
 #~ msgstr ""
 
 #~ msgid "DBN 分类：深度信念网络"
 #~ msgstr "DBN 分类：深度信念网络"
 
 #~ msgid ""
-#~ "在 RBM 分类的基础上，进一步构建深度信念网络（Deep Belief Network,"
-#~ " DBN），通过堆叠多层 RBM 实现更强大的特征学习能力。"
+#~ "在 RBM 分类的基础上，进一步构建深度信念网络（Deep Belief Network, DBN），通过堆叠多层 RBM 实现更强大的特征学习能力。"
 #~ msgstr ""
-#~ "在 RBM 分类的基础上，进一步构建深度信念网络（Deep Belief Network,"
-#~ " DBN），通过堆叠多层 RBM 实现更强大的特征学习能力。"
+#~ "在 RBM 分类的基础上，进一步构建深度信念网络（Deep Belief Network, DBN），通过堆叠多层 RBM 实现更强大的特征学习能力。"
 
 #~ msgid ""
-#~ "**示例位置**: "
-#~ "`example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 "
+#~ "**示例位置**: `example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 "
 #~ "`example/dbn_digits/dbn_trainer.py` 和 "
 #~ "`example/dbn_digits/supervised_dbn_digits.py`。"
 #~ msgstr ""
-#~ "**示例位置**: "
-#~ "`example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 "
+#~ "**示例位置**: `example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 "
 #~ "`example/dbn_digits/dbn_trainer.py` 和 "
 #~ "`example/dbn_digits/supervised_dbn_digits.py`。"
 
 #~ msgid ""
-#~ "该示例先使用 `load_data` 读取 sklearn 的 8×8 "
-#~ "手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 `DBNPretrainer.fit` 逐层训练"
-#~ " RBM，使用 `transform` 得到下一层输入，最后由 "
+#~ "该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 "
+#~ "`DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 "
 #~ "`SupervisedDBNClassification` 完成分类训练和评估。"
 #~ msgstr ""
-#~ "该示例先使用 `load_data` 读取 sklearn 的 8×8 "
-#~ "手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 `DBNPretrainer.fit` 逐层训练"
-#~ " RBM，使用 `transform` 得到下一层输入，最后由 "
+#~ "该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 "
+#~ "`DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 "
 #~ "`SupervisedDBNClassification` 完成分类训练和评估。"
 
 #~ msgid "目标"
@@ -762,14 +720,12 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr "一、RBM 原理概述"
 
 #~ msgid ""
-#~ "受限玻尔兹曼机（Restricted Boltzmann Machine, "
-#~ "RBM）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden "
-#~ "Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。DBN 的关键思想是把上一层 "
+#~ "受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible "
+#~ "Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。DBN 的关键思想是把上一层 "
 #~ "RBM 输出的隐层概率或采样结果作为下一层 RBM 的可见层，逐层学习越来越抽象的表示。"
 #~ msgstr ""
-#~ "受限玻尔兹曼机（Restricted Boltzmann Machine, "
-#~ "RBM）是一种基于能量的概率图模型，由可见层（Visible Layer）和隐层（Hidden "
-#~ "Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。DBN 的关键思想是把上一层 "
+#~ "受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）是一种基于能量的概率图模型，由可见层（Visible "
+#~ "Layer）和隐层（Hidden Layer）组成，层内无连接，层间全连接。其核心是通过无监督学习学习数据的潜在特征分布。DBN 的关键思想是把上一层 "
 #~ "RBM 输出的隐层概率或采样结果作为下一层 RBM 的可见层，逐层学习越来越抽象的表示。"
 
 #~ msgid "1. 模型结构"
@@ -825,13 +781,11 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ "监督学习的通用接口，用于支持多模式训练策略，包括预训练、微调、分类器训练与预测等抽象方法。"
 
 #~ msgid ""
-#~ "**`AbstractSupervisedDBNClassifier`**   基于 "
-#~ "`AbstractSupervisedDBN`，实现 PyTorch "
-#~ "下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
+#~ "**`AbstractSupervisedDBNClassifier`**   基于 `AbstractSupervisedDBN`，实现 "
+#~ "PyTorch 下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
 #~ msgstr ""
-#~ "**`AbstractSupervisedDBNClassifier`**   基于 "
-#~ "`AbstractSupervisedDBN`，实现 PyTorch "
-#~ "下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
+#~ "**`AbstractSupervisedDBNClassifier`**   基于 `AbstractSupervisedDBN`，实现 "
+#~ "PyTorch 下的通用工具方法封装，包括特征提取、分类器集成（逻辑回归、支持向量机以及随机森林等）。"
 
 #~ msgid "**`SupervisedDBNClassification`**   具体分类任务实现、微调网络构建以及训练。"
 #~ msgstr "**`SupervisedDBNClassification`**   具体分类任务实现、微调网络构建以及训练。"
@@ -888,12 +842,10 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr "**核心方法**："
 
 #~ msgid ""
-#~ "`DBNTrainer` 内部负责创建 RBM 层以及 "
-#~ "`_train_batch`、`_train_rbm_layer` 等单层训练步骤；对外使用的 "
+#~ "`DBNTrainer` 内部负责创建 RBM 层以及 `_train_batch`、`_train_rbm_layer` 等单层训练步骤；对外使用的 "
 #~ "`DBNPretrainer` 则封装了逐层预训练接口。"
 #~ msgstr ""
-#~ "`DBNTrainer` 内部负责创建 RBM 层以及 "
-#~ "`_train_batch`、`_train_rbm_layer` 等单层训练步骤；对外使用的 "
+#~ "`DBNTrainer` 内部负责创建 RBM 层以及 `_train_batch`、`_train_rbm_layer` 等单层训练步骤；对外使用的 "
 #~ "`DBNPretrainer` 则封装了逐层预训练接口。"
 
 #~ msgid "**单层训练过程**"
@@ -903,7 +855,8 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr "**正相（Positive Phase）**：计算隐层激活概率 $P(\\mathbf{h}|\\mathbf{v})$。"
 
 #~ msgid "**负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。"
-#~ msgstr "**负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。"
+#~ msgstr ""
+#~ "**负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。"
 
 #~ msgid "**目标函数**：最小化能量函数加权重衰减（L2 正则化）。"
 #~ msgstr "**目标函数**：最小化能量函数加权重衰减（L2 正则化）。"
@@ -912,21 +865,19 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 #~ msgstr "**反向传播**：更新权重和偏置。"
 
 #~ msgid ""
-#~ "`DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader "
-#~ "处理批量数据；`DBNPretrainer` 只暴露逐层预训练和特征变换接口。"
+#~ "`DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader 处理批量数据；`DBNPretrainer` "
+#~ "只暴露逐层预训练和特征变换接口。"
 #~ msgstr ""
-#~ "`DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader "
-#~ "处理批量数据；`DBNPretrainer` 只暴露逐层预训练和特征变换接口。"
+#~ "`DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader 处理批量数据；`DBNPretrainer` "
+#~ "只暴露逐层预训练和特征变换接口。"
 
 #~ msgid "**预训练堆叠 RBM（`fit` 方法）**：`DBNPretrainer.fit` 依次训练各个 RBM 层，并保存训练好的层。"
 #~ msgstr "**预训练堆叠 RBM（`fit` 方法）**：`DBNPretrainer.fit` 依次训练各个 RBM 层，并保存训练好的层。"
 
 #~ msgid ""
-#~ "**特征变换（`transform` 方法）**：`DBNPretrainer.transform` 依次通过各"
-#~ " RBM，将输入转换为深层特征。"
+#~ "**特征变换（`transform` 方法）**：`DBNPretrainer.transform` 依次通过各 RBM，将输入转换为深层特征。"
 #~ msgstr ""
-#~ "**特征变换（`transform` 方法）**：`DBNPretrainer.transform` 依次通过各"
-#~ " RBM，将输入转换为深层特征。"
+#~ "**特征变换（`transform` 方法）**：`DBNPretrainer.transform` 依次通过各 RBM，将输入转换为深层特征。"
 
 #~ msgid "`DBNPretrainer` 的实际接口可以直接参考："
 #~ msgstr "`DBNPretrainer` 的实际接口可以直接参考："
@@ -1026,4 +977,3 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 
 #~ msgid "重建样本：训练完成后对测试图像进行编码-解码得到的重建"
 #~ msgstr "重建样本：训练完成后对测试图像进行编码-解码得到的重建"
-
