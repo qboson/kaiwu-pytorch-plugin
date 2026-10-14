@@ -15,6 +15,19 @@ keywords:
 >
 > Before you start, make sure you have KPP installed and have gone through the [Quick Start](../quickstart.md). For theoretical background, see [Theoretical Foundations](../../theoretical-foundations/index.md).
 
+## Architecture Overview
+
+New to KPP? Start here to understand how the model families fit together.
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+
+architecture_overview
+```
+
+- [KPP Architecture Overview](architecture_overview.md): Design philosophy, model hierarchy, and how RBM, DBN, Q-VAE, and Q-Diffusion build on each other.
+
 ## Hands-on Tutorials
 
 Start from the sampling bottleneck and work through end-to-end applications that introduce one new concept at a time.
@@ -71,7 +84,7 @@ qvae_mnist
 
 ## Case Studies
 
-Case studies build directly on the hands-on tutorials and show how KPP is used on larger-scale public datasets. Each study packages a complete pipeline — data loading, model definition, training, and evaluation — and lives alongside a runnable example under `example/`. Pages marked *Coming soon* will be expanded in follow-up PRs.
+Case studies build directly on the hands-on tutorials and show how KPP is used on larger-scale public datasets. Each study packages a complete pipeline — data loading, model definition, training, and evaluation — and lives alongside a runnable example under `example/`.
 
 ```{toctree}
 :maxdepth: 1
@@ -82,6 +95,13 @@ qvae_anomaly
 qdiffusion
 ```
 
-- [Q-VAE for Single-Cell Transcriptomics](qvae_cell.md) *Coming soon*: single-cell representation learning with a QVAE; UMAP and clustering evaluation (Leiden, classification, scIB, scGraph, DPT). Example: `example/qvae_cell/`.
-- [Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md) *Coming soon*: CleanEnergyQVAE with a free-energy scoring head and NCE-style contrastive objective on thyroid / creditcard benchmarks. Example: `example/qvae_anomaly/`.
-- [Q-Diffusion for Protein Sequence Generation](qdiffusion.md) *Coming soon*: discrete diffusion with the generic `Q-Diffusion` core and a DPLM backbone. Example: `example/qdiffusion/`.
+- [Q-VAE for Single-Cell Transcriptomics](qvae_cell.md): single-cell representation learning with a QVAE; UMAP and clustering evaluation (Leiden, classification, scIB, scGraph, DPT). Example: `example/qvae_cell/`.
+- [Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): CleanEnergyQVAE with a free-energy scoring head and NCE-style contrastive objective on thyroid / creditcard benchmarks. Example: `example/qvae_anomaly/`.
+- [Q-Diffusion for Protein Sequence Generation](qdiffusion.md): discrete diffusion with a quantum-accelerated energy reranker and a DPLM backbone. Example: `example/qdiffusion/`.
+
+## Coming Soon
+
+More tutorials and case studies are in progress:
+
+- **Feature Selection with Quantum Annealing**: Using CIM for feature selection on tabular datasets, with linear regression and neural network downstream tasks. *Example: `example/feature_selection/`.*
+- **Gaussian-Bernoulli RBM**: Extending RBM to continuous-valued inputs. *API: `GaussianBernoulliRestrictedBoltzmannMachine`.*
