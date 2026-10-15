@@ -1,0 +1,98 @@
+{
+  "stage": "full",
+  "source": "cim_sa",
+  "reference_ids": [
+    "R00",
+    "R05",
+    "R10",
+    "R15",
+    "R20",
+    "R01",
+    "R06",
+    "R11",
+    "R16",
+    "R21",
+    "R02",
+    "R07",
+    "R12",
+    "R17",
+    "R22",
+    "R03",
+    "R08",
+    "R13",
+    "R18",
+    "R23",
+    "R04",
+    "R09",
+    "R14",
+    "R19",
+    "R24"
+  ],
+  "properties": [
+    "qed",
+    "logp"
+  ],
+  "bands": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "seeds": [
+    42
+  ],
+  "n_explore": 10,
+  "n_optimize": 90,
+  "reuse_recorded_exploration": false,
+  "variants": [
+    {
+      "name": "ratio4_gauge1_after5_valid",
+      "penalty_ratio": 4,
+      "selection": "valid_energy",
+      "repeats": 1,
+      "spin_encoding": "gauge"
+    }
+  ],
+  "comparison_rule": "Separate historical and single-call segments. Existing SA uses a different candidate budget; no matched-budget parity claim.",
+  "solvers": [
+    "kaiwu_cim"
+  ],
+  "reads_per_repeat": 10,
+  "sa_sweeps": 1000,
+  "sa_initial_temp_scale": 0.1,
+  "sa_cooling_rate": 0.999,
+  "coupling_bits": 14,
+  "cim_task_mode": "quota",
+  "max_feasibility_batches": 1,
+  "budget_note": "Saved five-call prefixes are replayed without hardware calls; each continuation step uses one 10-candidate CIM call, no feasibility resampling or timeout replacement task.",
+  "output_root": "results/cim_single_v1_26091733",
+  "purpose": "User-authorized single-call CIM continuation from frozen historical trajectory prefixes",
+  "hardware_concurrency_limit": 250,
+  "planned_qubo_steps_per_arm": 25000,
+  "baseline_cim_hardware_calls": 17318,
+  "maximum_cim_calls_for_feasibility_sampling": 17318,
+  "recovery_calls_extra": false,
+  "parameter_selection_refs": [
+    "R00",
+    "R05",
+    "R10",
+    "R15",
+    "R20"
+  ],
+  "parameter_selection_bands": [
+    0,
+    4
+  ],
+  "parameter_selection_run_seed": 42,
+  "run_id_prefix": "qcformal_single_v1_26091733",
+  "condition_order": "reference_band_interleaved",
+  "use_global_hardware_slots": true,
+  "disable_task_resubmission": true,
+  "history_prefix_root": "results/cim_single_v1_26091733/history",
+  "planned_new_cim_hardware_calls": 17318,
+  "historical_completed_steps": 7682,
+  "historical_solver_reads": 384650,
+  "archived_run_configuration": true,
+  "archive_note": "Historical output/history paths identify the completed run; caches are not included. Use README commands for fresh generation."
+}
