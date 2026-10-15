@@ -17,7 +17,8 @@ keywords:
 
 ## Architecture Overview
 
-New to KPP? Start here to understand how the model families fit together.
+<!-- New to KPP? Start here to understand how the model families fit together. -->
+New to KPP? Read this page before the hands-on tutorials. It complements the [Introduction](../introduction.md) system architecture from the model-family perspective.
 
 ```{toctree}
 :maxdepth: 1
@@ -84,7 +85,7 @@ qvae_mnist
 
 ## Case Studies
 
-Case studies build directly on the hands-on tutorials and show how KPP is used on larger-scale public datasets. Each study packages a complete pipeline — data loading, model definition, training, and evaluation — and lives alongside a runnable example under `example/`.
+Case studies build directly on the hands-on tutorials and show how KPP is used on larger-scale public datasets. Each study packages a complete pipeline: data loading, model definition, training, and evaluation, and lives alongside a runnable example under `example/`.
 
 ```{toctree}
 :maxdepth: 1

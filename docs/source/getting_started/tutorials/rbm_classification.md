@@ -48,30 +48,44 @@ The dataset uses scikit-learn's 8×8 handwritten digits, augmented by shifting e
 
 ## Quick Start
 
-The following snippet shows how to run the pipeline from a user's perspective, this is exactly what you would execute in a notebook:
+The pipeline has two stages: train an RBM as an unsupervised feature extractor, then fit a downstream classifier on the extracted features. The steps below condense `example/rbm_digits/rbm_digits.ipynb` with imports omitted. A one-call convenience wrapper (`train_classifier(n_iter=…)` in `rbm_classifier.py`) runs exactly these steps and prints the accuracy comparison.
 
-Load the digits dataset (with four-direction shift augmentation):
+**1. Load the data.** `load_data` returns the 8×8 digits split, augmented by shifting every image in all four directions.
 
 ```python
-from rbm_digits import RBMRunner
-
-runner = RBMRunner(n_hidden=64, device="cpu")
-X_train, X_test, y_train, y_test = runner.load_data()
+runner = RBMRunner(n_components=64, n_iter=20, verbose=True)
+X_train, X_test, y_train, y_test = runner.load_data(plot_img=False)
 ```
 
-Train the RBM:
+**2. Train the feature extractor.** `fit` runs the same positive/negative-phase loop as the Quick Start example; after training, `transform` maps raw pixels to the hidden features used downstream.
 
 ```python
-runner.fit(X_train, epochs=20, batch_size=64, lr=0.1, verbose=True)
+runner.fit(X_train)
 ```
 
-Build and evaluate the two-stage classifier (RBM features + logistic regression) versus raw-pixel baseline:
+**3. Fit and compare a classifier.** `RBMRunner` is a scikit-learn `TransformerMixin`, so it slots into a `Pipeline` directly. Compare the RBM features against a raw-pixel logistic-regression baseline.
 
 ```python
-from rbm_classifier import train_classifier
+pipeline = Pipeline(steps=[
+    ("rbm", runner),
+    ("logistic", LogisticRegression(C=500.0, max_iter=1000, random_state=42)),
+])
+pipeline.fit(X_train, y_train)
+accuracy_rbm = pipeline.score(X_test, y_test)
 
-accuracy_rbm, accuracy_raw = train_classifier(runner, X_train, X_test, y_train, y_test)
-print(f"RBM features: {accuracy_rbm:.4f} | Raw pixels: {accuracy_raw:.4f}")
+baseline = LogisticRegression(C=500.0, max_iter=1000, random_state=42)
+baseline.fit(X_train, y_train)
+accuracy_raw = baseline.score(X_test, y_test)
+```
+
+**4. Visualize the results.** Plot the learned filters and the confusion matrix of the RBM-feature classifier.
+
+```python
+runner.plot_weights(save_pdf=False)
+runner.plot_confusion_matrix(
+    y_test, pipeline.predict(X_test),
+    title_suffix="RBM Features", save_pdf=False,
+)
 ```
 
 ## Key Code
@@ -91,6 +105,8 @@ When `use_cim=True`:
 
 When `use_cim=False`:
 - Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`
+
+The SA / CIM swap behind `sample(sampler)` is introduced in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md).
 
 ---
 

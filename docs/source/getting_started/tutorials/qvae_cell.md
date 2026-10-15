@@ -41,8 +41,7 @@ jupyter notebook train_qvae_cell.ipynb
 
 ## How It Works
 
-A Q-VAE for single-cell data replaces the Gaussian prior with a QBM, learning
-a low-dimensional representation that captures cell-type-specific expression patterns:
+A Q-VAE for single-cell data replaces the Gaussian prior with a QBM, learning a low-dimensional representation that captures cell-type-specific expression patterns:
 
 ```
 scRNA-seq (high-d)  →  Encoder  →  latent (low-d)  →  QBM prior  →  Decoder  →  reconstruction
@@ -59,9 +58,9 @@ The training objective remains the Q-ELBO: reconstruction loss + KL divergence b
 
 ## Quick Start
 
-The following shows how to run the training pipeline from the command line:
+The steps below are the two command-line entry points of `example/qvae_cell`; `train_qvae_cell.ipynb` provides the interactive equivalent, and `scripts/train.sh` runs the first step (training) in one command with default settings.
 
-Train the Q-VAE on immune cell data:
+**1. Train the Q-VAE.** `train_qvae_cell.py` trains `CellQVAE` on a scRNA-seq expression matrix and writes the learned representation back to an AnnData file. `--sampler-type` switches the QBM sampler between SA and CIM without touching the rest of the pipeline.
 
 ```bash
 python train_qvae_cell.py \
@@ -72,15 +71,17 @@ python train_qvae_cell.py \
   --output-dir ./outputs_immune_sa
 ```
 
-Evaluate clustering quality:
+**2. Run the evaluation benchmark.** `evaluate_benchmark.py` computes representation-quality metrics on the saved `X_qvae` embedding, grouped by `--metrics` (valid groups: `clustering`, `classification`, `scib`, `scgraph`, `dpt`, `all`). It prints a per-metric table and saves UMAP and energy-distribution plots.
 
 ```bash
 python evaluate_benchmark.py \
   --h5ad ./outputs_immune_sa/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
-  --metrics clustering
+  --metrics clustering,scib
 ```
+
+The benchmark output is the result of this case study: clustering metrics (ARI, NMI) confirm that cell-type structure is preserved, while the scIB group reports batch-correction quality (e.g., batch ASW) — the numbers you compare across `--sampler-type sa` vs `cim` runs.
 
 ## Key Code
 

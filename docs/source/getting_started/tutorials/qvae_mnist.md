@@ -66,35 +66,42 @@ The QBM prior is trained using the same positive/negative phase as an RBM: posit
 
 ## Quick Start
 
-The following snippet shows how to run the pipeline from a user's perspective, this is what you would execute via `run_pipeline.py`:
+The steps below condense `example/qvae_mnist/train_qvae.ipynb` with imports omitted; the notebook is the interactive walkthrough, and `python run_pipeline.py --epochs 50 --run-tsne` is the equivalent end-to-end script (it also trains the downstream classifier).
 
-Load MNIST and build the Q-VAE pipeline:
-
-```python
-from utils.loadMNIST import loadMNIST
-from run_pipeline import get_full_pipeline
-
-train_loader, test_loader = loadMNIST(dataset="mnist", batch_size=128, flatten=True)
-model, classifier = get_full_pipeline(latent_dim=64, sampler_type="cim")
-```
-
-Train the Q-VAE:
+**1. Build the config.** The `Config` object holds the dataset name, data path, model type, and training hyperparameters in one place.
 
 ```python
-from trainer.trainer import Trainer
-
-trainer = Trainer(model, train_loader, test_loader, epochs=50, lr=1e-3)
-trainer.train()
+config = Config(
+    model_type="QVAE",
+    name="mnist",               # "mnist" / "fashion-mnist" / "kmnist"
+    data_path="./data",
+    batch_size=256,
+    num_epochs=10,
+    lr=1e-3,
+    num_train_samples=60000,
+    num_test_samples=10000,
+    use_cuda=False,
+)
 ```
 
-Evaluate downstream classification on learned representations:
+**2. Train the Q-VAE.** `Trainer(config=config)` builds the model from the config; `train` returns the trained model and the per-epoch train/test losses. With `run_tsne=True` it additionally projects the 64-d latent space to 2-D (colored by digit) and records a training animation. The t-SNE plot is the first check that the QBM prior has learned a structured latent space.
 
 ```python
-from downstream.classifier import MLPClassifier
-
-clf = MLPClassifier(hidden_dim=128)
-clf.fit(model, train_loader, test_loader, epochs=30)
+trainer = Trainer(config=config)
+qvae_model, train_losses, test_losses = trainer.train(
+    run_tsne=True, generate_animation=True, tsne_interval=5,
+)
 ```
+
+**3. Inspect the result.** A steadily decreasing Q-ELBO loss (reconstruction + KL) and a t-SNE with digit-separated clusters confirm training succeeded.
+
+```python
+print(f"final train loss: {train_losses[-1]:.4f} | test loss: {test_losses[-1]:.4f}")
+```
+
+**Evaluation beyond training.** Two downstream tasks complete the picture and are covered in dedicated sections instead of here:
+- **Representation learning + classification**: train a classifier on the learned features (`train_qvae_classifier.ipynb`, or the end-to-end CLI `python run_pipeline.py --epochs 50 --run-tsne`), then report test accuracy — see *Key Code → §3 Downstream Classification on Learned Representations*.
+- **Generation + FID**: `train_qvae.ipynb` samples new images from the QBM prior (`generate_qvae_images`, saved as a grid) and scores them against 10,000 real test images with FID — see *Training and Evaluation* below.
 
 ## Key Code
 

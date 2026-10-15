@@ -28,7 +28,7 @@ jupyter notebook supervised_dbn_digits.ipynb
 
 **Key files**:
 
-- `dbn_trainer.py`: `DBNPretrainer` — greedy layer-wise RBM pretraining
+- `dbn_trainer.py`: `DBNPretrainer` — greedy layer-wise RBM pretraining (internally delegates each layer to a low-level `DBNTrainer`)
 - `supervised_dbn_digits.py`: `SupervisedDBNClassification` — supervised fine-tuning and classification
 - `supervised_dbn_digits.ipynb`: interactive walkthrough
 
@@ -48,7 +48,7 @@ x (64-d)  →  RBM₁  →  h₁ (100-d)  →  RBM₂  →  h₂ (100-d)  →  c
 
 The codebase provides a layered class structure:
 
-- **`DBNPretrainer`**: stacks multiple RBM layers and runs greedy unsupervised pretraining layer by layer.
+- **`DBNPretrainer`**: stacks multiple RBM layers and runs greedy unsupervised pretraining layer by layer (internally delegating each layer to a low-level `DBNTrainer`).
 - **`AbstractSupervisedDBN`**: defines the general interface for supervised DBN training (pretraining, fine-tuning, classification, prediction).
 - **`AbstractSupervisedDBNClassifier`**: extends the abstract interface with common classifiers (logistic regression, SVM, random forest).
 - **`SupervisedDBNClassification`**: concrete implementation for classification tasks, including fine-tuning network construction.
@@ -61,54 +61,56 @@ After pretraining, three training modes are available:
 - **Classifier mode**: attach a downstream classifier (logistic regression, SVM, or random forest) on top of the last layer, no backprop through the RBMs.
 - **Fine-tuning mode**: unroll the stack into a deep neural network initialized with pretrained RBM weights, then backpropagate with labels using `CrossEntropyLoss` and SGD with L2 regularization. Dropout can be enabled to prevent overfitting.
 
-The sampler configuration is inherited per RBM layer from the [Quick Start](../quickstart.md).
+The sampler configuration follows the [Quick Start](../quickstart.md) pattern, per RBM layer.
 
 ## Quick Start
 
-The following snippet shows how to run the pipeline from a user's perspective, this is what you would execute in `supervised_dbn_digits.ipynb`:
+The steps below condense `example/dbn_digits/supervised_dbn_digits.ipynb` with imports omitted; the notebook is the fully runnable demo.
 
-Load digits data (same shift augmentation as the RBM tutorial):
+**1. Load the data.** `load_data` wraps `sklearn.datasets.load_digits` and augments the 8×8 images by shifting them in all four directions.
 
 ```python
-from dbn_trainer import DBNTrainer
-from supervised_dbn_digits import SupervisedDBNClassification
-from sklearn.datasets import load_digits
-
-X_train, X_test, y_train, y_test = load_digits(shift_augment=True)
+X_train, X_test, y_train, y_test = load_data(plot_img=False)
 ```
 
-Greedy layer-wise pretraining:
+**2. Configure the DBN.** Layer-wise RBM pretraining happens inside `fit`; pass the pretraining config (layer sizes, per-layer RBM epochs, batch size) and the training mode directly as keyword arguments. `fine_tuning=True` unrolls the stack into a deep network and backpropagates with labels; `fine_tuning=False` attaches a downstream classifier selected by `classifier_type`.
 
 ```python
-pretrainer = DBNTrainer(hidden_layers_structure=[100, 100], n_epochs_rbm=10, lr=0.1)
-pretrainer.fit(X_train)
+dbn = SupervisedDBNClassification(
+    hidden_layers_structure=[128, 256],
+    learning_rate_rbm=0.1,
+    n_epochs_rbm=2,
+    batch_size=64,
+    fine_tuning=True,
+    classifier_type="logistic",   # used when fine_tuning=False
+    learning_rate=0.1,
+    n_iter_backprop=100,
+    l2_regularization=1e-4,
+    activation_function="sigmoid",
+    verbose=True,
+    random_state=42,
+)
 ```
 
-Supervised classification (classifier mode):
+**3. Train and evaluate.** `fit` runs pretraining and then the chosen mode; `score` reports test accuracy; `transform` extracts layer-wise features.
 
 ```python
-clf = SupervisedDBNClassification(pretrainer, classifier_type="logistic")
-clf.fit(X_train, y_train)
-accuracy = clf.score(X_test, y_test)
-print(f"DBN classifier accuracy: {accuracy:.4f}")
-```
-
-Fine-tuning mode (optional):
-
-```python
-clf_ft = SupervisedDBNClassification(pretrainer, fine_tuning=True, n_iter_backprop=100)
-clf_ft.fit(X_train, y_train)
+dbn.fit(X_train, y_train)
+accuracy = dbn.score(X_test, y_test)
+features = dbn.transform(X_test)
 ```
 
 ## Key Code
 
-### 1. DBNTrainer Initialization (SA vs CIM per layer)
+### 1. DBNPretrainer Initialization (SA vs CIM per layer)
 
-The `DBNTrainer` class supports switching between classical Simulated Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers per RBM layer:
+The `DBNPretrainer` class is the pretraining entry point that `SupervisedDBNClassification` instantiates internally; it supports switching between classical Simulated Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers per RBM layer:
 
 ```{literalinclude} ../../../../example/dbn_digits/dbn_trainer.py
-:pyobject: DBNTrainer.__init__
+:pyobject: DBNPretrainer.__init__
 ```
+
+Internally, `DBNPretrainer` builds an `UnsupervisedDBN` and delegates each layer's training to a `DBNTrainer`.
 
 When `use_cim=True`:
 - Uses `CIMOptimizer` from `kaiwu.cim`
@@ -122,14 +124,15 @@ When `use_cim=False`:
 
 ### 2. Greedy Layer-wise Pretraining
 
-The `train()` method iterates through each RBM layer, training one at a time:
+`DBNPretrainer.fit` creates the RBM stack from the input dimension and iterates through each layer, training one at a time through the internal `DBNTrainer`:
 
 ```{literalinclude} ../../../../example/dbn_digits/dbn_trainer.py
-:pyobject: DBNTrainer.train
+:pyobject: DBNPretrainer.fit
 ```
 
 Key pretraining details:
 - Each RBM layer uses the same `objective()` and `sample()` as the Quick Start
+- `create_rbm_layer(X.shape[1])` builds the RBM stack from the input dimension
 - After training a layer, the output becomes input for the next layer
 - Verbose mode prints progress for each layer
 

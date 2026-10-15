@@ -21,16 +21,17 @@ Right now, KPP provides four main model families, each building on the previous 
 
 ### 1. Boltzmann Machine (BM)
 
-**The foundation**: an energy-based model with binary visible and hidden units.
+**The foundation**: an energy-based model family with visible and hidden units, binary by default, with a Gaussian-Bernoulli variant that models one side as Gaussian for real-valued inputs.
 
-- **Restricted Boltzmann Machine (RBM)**: bipartite graph — visible units only connect to hidden units, no visible-visible or hidden-hidden connections. This enables parallel sampling within layers.
-- **Full Boltzmann Machine**: fully connected graph — all units can connect to each other. Requires sequential (Gibbs) sampling.
+- **Full Boltzmann Machine**: fully connected graph, all units can connect to each other. Requires sequential sampling.
+- **Restricted Boltzmann Machine (RBM)**: bipartite graph, visible units only connect to hidden units, no visible-visible or hidden-hidden connections. This enables parallel sampling within layers.
+- **Gaussian-Bernoulli RBM (GBRBM)**: extends RBM to continuous-valued inputs, one partition is Gaussian (with learned mean/variance) and the other stays Bernoulli; `is_visible_gaussian` picks which side is Gaussian (default: visible).
 
-**Main classes**: `BoltzmannMachine`, `RestrictedBoltzmannMachine`
+**Main classes**: `BoltzmannMachine`, `RestrictedBoltzmannMachine`, `GaussianBernoulliRestrictedBoltzmannMachine`
 
 **Typical use**: unsupervised feature learning, generative modeling.
 
-→ Hands-on: [RBM Classification](rbm_classification.md), [BM Generation](bm_generation.md)
+→ Hands-on: [RBM Classification](rbm_classification.md), [BM Generation](bm_generation.md), GBRBM (Coming Soon)
 
 ---
 
@@ -60,18 +61,18 @@ Input → RBM1 → features1
 
 ### 3. Quantum Variational Autoencoder (Q-VAE)
 
-**Extension**: combine an encoder-decoder architecture with a BM prior.
+**Extension**: combine an encoder-decoder architecture with a QBM prior.
 
-Instead of the standard Gaussian prior in a VAE, Q-VAE uses a Boltzmann Machine as the latent prior. The sampler (SA or CIM) handles negative-phase sampling in the BM.
+Instead of the standard Gaussian prior in a VAE, Q-VAE uses a **quantum Boltzmann machine (QBM)**, a Boltzmann machine whose negative-phase sampling is handled by the SA/CIM sampler, as the latent prior.
 
 ```
-Input → Encoder → latent z → BM prior → Decoder → reconstruction
+Input → Encoder → latent z → QBM prior → Decoder → reconstruction
 ```
 
 **Components**:
 - Encoder: maps input to a latent distribution
 - Decoder: reconstructs input from latent samples
-- BM prior: replaces the standard Gaussian prior
+- QBM prior: a Boltzmann machine prior sampled by SA or CIM
 - Sampler: SA (classical) or CIM (quantum)
 
 **Main classes**: `QVAE`, `AutoEncoderBase`
@@ -79,9 +80,9 @@ Input → Encoder → latent z → BM prior → Decoder → reconstruction
 **Typical use**: generative modeling, representation learning, anomaly detection.
 
 **Application variants** (in `example/`):
-- `MNISTQVAE` — image generation (784-d input)
-- `CellQVAE` — single-cell transcriptomics (10k+ genes, batch-conditioned)
-- `CleanEnergyQVAE` — anomaly detection (free-energy scoring head)
+- `MNISTQVAE`: image generation (784-d input)
+- `CellQVAE`: single-cell transcriptomics (10k+ genes, batch-conditioned)
+- `CleanEnergyQVAE`: anomaly detection (free-energy scoring head)
 
 → Hands-on: [Q-VAE MNIST](qvae_mnist.md), [Q-VAE Cell](qvae_cell.md), [Q-VAE Anomaly](qvae_anomaly.md)
 
@@ -103,7 +104,7 @@ Protein sequence → DPLM proposal → logits → sample candidates
 
 **Main classes**: `QDiffusion`, `QDiffusionConfig`
 
-**Typical use**: protein sequence generation, guided sampling.
+**Typical use**: protein sequence generation, energy-guided sampling.
 
 → Hands-on: [Q-Diffusion](qdiffusion.md)
 
@@ -153,9 +154,7 @@ for epoch in range(num_epochs):
 | **Complete API reference** | [Module API](../../modules/kaiwu.torch_plugin.md) |
 | System architecture overview | [Introduction](../introduction.md) |
 | Mathematical foundations | [Theoretical Foundations](../../theoretical-foundations/index.md) |
-| RBM hands-on example | [RBM Classification](rbm_classification.md) |
-| BM hands-on example | [BM Generation](bm_generation.md) |
-| DBN hands-on example | [DBN Classification](dbn_classification.md) |
-| Q-VAE hands-on example | [Q-VAE MNIST](qvae_mnist.md) |
-| Q-VAE case studies | [Q-VAE Cell](qvae_cell.md), [Q-VAE Anomaly](qvae_anomaly.md) |
-| Q-Diffusion | [Q-Diffusion](qdiffusion.md) |
+| RBM / BM hands-on | [RBM Classification](rbm_classification.md), [BM Generation](bm_generation.md) |
+| DBN hands-on | [DBN Classification](dbn_classification.md) |
+| Q-VAE hands-on & case studies | [Q-VAE MNIST](qvae_mnist.md), [Q-VAE Cell](qvae_cell.md), [Q-VAE Anomaly](qvae_anomaly.md) |
+| Q-Diffusion hands-on | [Q-Diffusion](qdiffusion.md) |

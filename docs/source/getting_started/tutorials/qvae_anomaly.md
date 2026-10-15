@@ -61,25 +61,21 @@ The Q-ELBO still provides the reconstruction loss and KL divergence; the free-en
 
 ## Quick Start
 
-The following shows how to run the training and evaluation pipeline:
+The steps below are the two command-line entry points of `example/qvae_anomaly`; `qvae_anomaly_demo.ipynb` provides the interactive equivalent, and `run_public_ad.sh` runs both steps in one command.
 
-Train on thyroid dataset:
+**1. Train.** `train_public_ad.py` trains `CleanEnergyQVAE` with the energy-supervised loss on a public anomaly benchmark. `--dataset` selects the tabular benchmark (e.g., `thyroid`, `creditcard`); `--lambda-anom` sets the weight of the anomaly energy term relative to the Q-ELBO objective.
 
 ```bash
-python train_public_ad.py --dataset thyroid --epochs 20
+python train_public_ad.py --dataset thyroid --epochs 20 --lambda-anom 1.0
 ```
 
-Evaluate on the best checkpoint:
+**2. Evaluate.** `evaluate_public_ad.py` loads the best checkpoint, searches the best-F1 threshold over a candidate grid, and reports PR-AUC / ROC-AUC with precision, recall, and F1. It also saves the score distribution and PR/ROC curves under the output directory.
 
 ```bash
 python evaluate_public_ad.py --dataset thyroid
 ```
 
-Or run both in one command:
-
-```bash
-bash run_public_ad.sh
-```
+The result is the anomaly-detection report: a clear low/high free-energy separation of normal vs anomalous samples, a best-F1 decision threshold, and the PR-AUC / ROC-AUC you compare across `--lambda-anom` and `--sampler-type` runs.
 
 ## Key Code
 

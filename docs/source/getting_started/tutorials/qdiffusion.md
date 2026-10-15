@@ -42,8 +42,7 @@ python dplm/train_workflow.py
 
 ## How It Works
 
-Q-Diffusion for protein sequences combines a DPLM proposal model with a BM energy
-reranker:
+Q-Diffusion for protein sequences combines a DPLM proposal model with a BM energy reranker:
 
 ```
 protein sequence  →  DPLM proposal  →  logits  →  sample candidates
@@ -58,44 +57,43 @@ The key components:
 1. **DPLM proposal model**: pre-trained protein language model produces logits for each position.
 2. **BM energy reranker**: scores candidate sequences using a Boltzmann Machine energy function.
 3. **Energy-guided generation**: candidates are weighted by energy, improving sequence quality.
-4. **ESM2 evaluation**: generated sequences are compared to reference proteome using ESM2 embedding distances.
+4. **ESM2 evaluation**: generated sequences are compared to the reference proteome using ESM2 embedding distances.
 
 The training objective optimizes the energy reranker, while the DPLM proposal model remains frozen.
 
 ## Quick Start
 
-The following shows how to run the training and generation pipeline:
+The steps below condense `example/qdiffusion/simple/simple_train_example.py`, the minimal teaching example, with imports omitted; run the script for the complete walkthrough.
 
-Build the Q-Diffusion model with DPLM:
+**1. Build the generator.** `build_qdiffusion` assembles the frozen DPLM proposal model and the trainable BM energy reranker; both checkpoint arguments are Hugging Face model IDs.
 
 ```python
-from dplm.utils.dplm_builder import build_qdiffusion
-
 generator = build_qdiffusion(
-    proposal_model="dplm",
-    energy_backend="bm",
-    vocab_size=33,
-)
+    proposal_ckpt="airkingbd/dplm_150m",
+    energy_ckpt="airkingbd/dplm_150m",
+    num_candidates=4,
+    freeze_proposal=True,
+).to(device)
 ```
 
-Train the energy reranker:
+**2. Tokenize one mini-batch.** Encode a few FASTA sequences with the generator's own tokenizer; `targets` is the only tensor the outer loop needs — `objective` creates the noisy states, samples candidates, and builds the energy loss.
 
 ```python
-for epoch in range(num_epochs):
-    for batch in dataloader:
-        objective = generator.objective({"targets": batch})
-        loss = objective["energy_objective"].mean()
-        loss.backward()
-        optimizer.step()
+targets = generator.tokenizer(
+    sequences, return_tensors="pt", add_special_tokens=True, padding=True
+)["input_ids"].to(generator.device)
 ```
 
-Generate sequences:
+**3. Optimize the energy objective.** Only the energy-reranker parameters are trainable; `objective` returns `energy_objective` (plus `logits` and `loss_mask` for monitoring).
 
 ```python
-generated = generator.generate(
-    num_steps=100,
-    batch_size=32,
-)
+optimizer = AdamW([p for p in generator.parameters() if p.requires_grad], lr=1e-4)
+for step in range(1, num_steps + 1):
+    outputs = generator.objective({"targets": targets})
+    loss = outputs["energy_objective"].mean()
+    optimizer.zero_grad(set_to_none=True)
+    loss.backward()
+    optimizer.step()
 ```
 
 ## Key Code
@@ -151,4 +149,4 @@ The generation loop samples from the proposal model and reranks with energy:
 - Q-Diffusion combines DPLM proposal models with BM energy reranking for protein generation.
 - The energy reranker is trained on top of a frozen protein language model.
 - Guided generation improves sequence quality measured by ESM2 embedding distances.
-- The Q-Diffusion framework generalizes from images to sequences with minimal changes.
+- The Q-Diffusion pipeline combines a frozen DPLM proposal model with a trainable BM energy reranker, and the same assembly pattern transfers to other proposal models.
