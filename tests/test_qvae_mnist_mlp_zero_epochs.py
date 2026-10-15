@@ -70,3 +70,33 @@ def test_fit_single_epoch_returns_fitted_model(tmp_path):
     assert set(np.unique(predictions)) <= {0, 1}
     for parameter in classifier.model.parameters():
         assert torch.isfinite(parameter).all()
+
+
+def test_zero_validation_accuracy_keeps_actual_trained_weights(tmp_path, monkeypatch):
+    """A valid run with no validation improvement must not restore None."""
+    from downstream import classifier as classifier_module
+
+    estimator = MLPClassifier(
+        input_dim=4, hidden_dims=[8], output_dim=2, epochs_mlp=2,
+        device="cpu", save_path=str(tmp_path)
+    )
+    initial = {}
+    create_model = estimator._create_model
+
+    def capture_initial_model():
+        model = create_model()
+        initial.update({key: value.detach().clone() for key, value in model.state_dict().items()})
+        return model
+
+    monkeypatch.setattr(estimator, "_create_model", capture_initial_model)
+    # Only control the validation outcome; forward/backward/Adam remain real.
+    monkeypatch.setattr(estimator, "_eval_mlp_epoch", lambda **kwargs: (0.0, 1.0))
+    monkeypatch.setattr(classifier_module, "plot_training_curves", lambda **kwargs: None)
+    features, labels = _toy_data()
+
+    assert estimator.fit(features, labels) is estimator
+    assert any(not torch.equal(initial[key], value)
+               for key, value in estimator.model.state_dict().items())
+    assert estimator.predict(features).shape == labels.shape
+    assert not (tmp_path / "best_mlp_classifier.pth").exists()
+    assert all(torch.isfinite(p).all() for p in estimator.model.parameters())
