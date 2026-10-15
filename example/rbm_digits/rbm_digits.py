@@ -302,10 +302,19 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 rotation=-270,
             )
 
+        # Derive the image layout from the data width instead of assuming the
+        # bundled 8x8 digits dataset, so other square widths also render.
+        num_visible = images.shape[1]
+        side = int(np.sqrt(num_visible))
+        if side * side != num_visible:
+            raise ValueError(
+                f"Cannot lay out {num_visible} visible units as a square image."
+            )
+
         for n in range(num_samples):
-            axes[0, n].imshow(images[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray)
+            axes[0, n].imshow(images[n].view(side, side).cpu().numpy(), cmap=plt.cm.gray)
             axes[1, n].imshow(
-                reconstructions[n].view(8, 8).cpu().numpy(), cmap=plt.cm.gray
+                reconstructions[n].view(side, side).cpu().numpy(), cmap=plt.cm.gray
             )
             axes[0, n].set_title(f"Label: {labels[n]}", fontsize=18)
             axes[0, n].axis("off")
