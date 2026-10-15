@@ -64,6 +64,8 @@ The first term is the reconstruction loss: how well the decoder reconstructs the
 
 The QBM prior is trained using the same positive/negative phase as an RBM: positive phase from the encoder samples, negative phase from QBM sampling. The sampler can be switched between `sa` (classical simulated annealing) and `cim` (quantum CIM) via the `--sampler-type` flag — the rest of the pipeline is unchanged.
 
+---
+
 ## Quick Start
 
 The steps below condense `example/qvae_mnist/train_qvae.ipynb` with imports omitted; the notebook is the interactive walkthrough, and `python run_pipeline.py --epochs 50 --run-tsne` is the equivalent end-to-end script (it also trains the downstream classifier).
@@ -118,8 +120,6 @@ Key model details:
 - Decoder: reconstructs images from latent samples
 - QBM prior: trained with the same positive/negative phase as an RBM
 
----
-
 ### 2. Q-ELBO Training Loop
 
 The `Trainer` class implements the Q-ELBO optimization loop, combining reconstruction loss with the KL term between encoder posterior and QBM prior:
@@ -133,8 +133,6 @@ Key training details:
 - Reconstruction loss: Bernoulli cross-entropy (or MSE for continuous data)
 - KL term: pulls encoder posterior toward QBM prior
 - Sampler: switch between SA and CIM via `--sampler-type` flag
-
----
 
 ### 3. Downstream Classification on Learned Representations
 
@@ -156,6 +154,8 @@ The Q-VAE architecture introduced here scales to larger biological and tabular d
 
 - [Q-VAE for Single-Cell Transcriptomics](qvae_cell.md): representation learning on scRNA-seq with UMAP and clustering evaluation.
 - [Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): CleanEnergyQVAE with a free-energy scoring head on tabular benchmarks.
+
+---
 
 ## Summary
 

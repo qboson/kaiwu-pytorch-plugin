@@ -56,6 +56,8 @@ The key adaptations from MNIST:
 
 The training objective remains the Q-ELBO: reconstruction loss + KL divergence between encoder posterior and QBM prior. The sampler can be switched between SA and CIM without changing the rest of the pipeline.
 
+---
+
 ## Quick Start
 
 The steps below are the two command-line entry points of `example/qvae_cell`; `train_qvae_cell.ipynb` provides the interactive equivalent, and `scripts/train.sh` runs the first step (training) in one command with default settings.
@@ -100,8 +102,6 @@ Key model details:
 - Batch conditioning: one-hot batch labels appended to decoder input
 - QBM prior: trained with the same positive/negative phase as an RBM
 
----
-
 ### 2. Training Loop
 
 The `Trainer` class implements the Q-ELBO optimization loop for scRNA-seq data:
@@ -115,8 +115,6 @@ Key training details:
 - Reconstruction loss: MSE (continuous expression values)
 - KL term: pulls encoder posterior toward QBM prior
 - Sampler: switch between SA and CIM via `--sampler-type`
-
----
 
 ### 3. Evaluation Benchmark
 
@@ -134,6 +132,8 @@ classification, and scIB metrics:
 - **Energy distribution**: `save_energy_plots` shows how QBM energy varies across cell types.
 - **Clustering metrics**: ARI, AMI, NMI, Homogeneity, FMI measure clustering quality.
 - **scIB benchmarks**: biological conservation and batch-correction metrics.
+
+---
 
 ## Summary
 

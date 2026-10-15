@@ -46,6 +46,8 @@ raw pixels (64-d)  →  RBM forward  →  hidden features (n_hidden-d)  →  Log
 
 The dataset uses scikit-learn's 8×8 handwritten digits, augmented by shifting each image up, down, left, and right to expand the training set. The notebook compares the two-stage RBM pipeline against a logistic regression on raw pixels to demonstrate that unsupervised RBM pretraining improves classification accuracy.
 
+---
+
 ## Quick Start
 
 The pipeline has two stages: train an RBM as an unsupervised feature extractor, then fit a downstream classifier on the extracted features. The steps below condense `example/rbm_digits/rbm_digits.ipynb` with imports omitted. A one-call convenience wrapper (`train_classifier(n_iter=…)` in `rbm_classifier.py`) runs exactly these steps and prints the accuracy comparison.
@@ -108,8 +110,6 @@ When `use_cim=False`:
 
 The SA / CIM swap behind `sample(sampler)` is introduced in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md).
 
----
-
 ### 2. Training Loop
 
 The training loop follows the same positive/negative phase pattern introduced in the [Quick Start](../quickstart.md), see the training flow diagram there.
@@ -122,8 +122,6 @@ Key training details:
 - Optimizer: SGD with learning rate from `self.learning_rate`
 - Weight decay: 0.02 for weights, 0.05 for biases
 - Verbose mode prints objective loss and weight statistics every 20 iterations
-
----
 
 ### 3. Feature Extraction and Classification
 
@@ -138,6 +136,8 @@ After training, `RBMRunner.transform()` extracts hidden-layer features, which ar
 - **Weight visualization**: `RBMRunner.plot_weights()` renders each hidden unit's filter as an 8×8 image, showing the digit-like features the RBM has learned.
 - **Confusion matrix**: `RBMRunner.plot_confusion_matrix(y_test, y_pred)` produces a heatmap; the notebook saves it as a high-resolution PDF.
 - The expected result is that RBM features yield a 2–5 percentage point accuracy gain over raw pixels on the 8×8 digits dataset.
+
+---
 
 ## Summary
 

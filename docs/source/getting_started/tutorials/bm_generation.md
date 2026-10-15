@@ -85,6 +85,8 @@ All sampling runs on multiple workers: each batch is split across processes, so 
 
 The sampler abstraction used here, i.e., swap SA ↔ CIM without touching the rest of the pipeline, is introduced in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md).
 
+---
+
 ## Quick Start
 
 The steps below condense `example/bm_generation/train_bm.ipynb` with imports omitted; the notebook is the fully runnable walkthrough.
@@ -143,8 +145,6 @@ Key initialization details:
 - `share_memory()` — enables multi-process sampling without copying
 - `cost_param = {"alpha": 0.5, "beta": 0.5}` — KL/NCL balance
 
----
-
 ### 2. Training Loop with Cosine Schedule
 
 The training loop uses Adam optimizer with cosine learning-rate schedule and multi-process conditional sampling:
@@ -157,8 +157,6 @@ Key training details:
 - Optimizer: Adam with weight decay
 - Learning rate: cosine schedule with linear warmup (`num_warmup_steps = max_steps / 20`)
 - Multi-process: `num_processes` workers run `condition_sample` in parallel
-
----
 
 ### 3. Multi-process Sampling Worker
 
@@ -174,6 +172,8 @@ The worker function runs in separate processes, performing both full and partial
 - **Checkpoints**: the model is saved periodically as `checkpoint_step_<n>.pt` for later sampling or resumption.
 - **Weight visualization**: during training, the trainer can render weight matrices and their gradients for debugging.
 - **Generated samples**: compare the distribution of generated samples against the original data (histograms / scatter plots in `sample_bm.ipynb`).
+
+---
 
 ## Summary
 

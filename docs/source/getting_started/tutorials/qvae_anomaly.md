@@ -59,6 +59,8 @@ The key innovations:
 
 The Q-ELBO still provides the reconstruction loss and KL divergence; the free-energy head adds an anomaly-specific scoring objective.
 
+---
+
 ## Quick Start
 
 The steps below are the two command-line entry points of `example/qvae_anomaly`; `qvae_anomaly_demo.ipynb` provides the interactive equivalent, and `run_public_ad.sh` runs both steps in one command.
@@ -94,8 +96,6 @@ Key model details:
 - Anomaly score: free energy (normal = low, anomaly = high)
 - Loss types: margin, InfoNCE, or both (configurable)
 
----
-
 ### 2. Energy-Supervised Loss
 
 The `losses.py` implements energy-supervised loss to separate normal from
@@ -109,8 +109,6 @@ Key loss details:
 - Normal samples: pulled toward QBM prior (low free energy)
 - Anomalies: pushed away from QBM prior (high free energy)
 - `lambda_anom`: weight for anomaly energy loss (default 1.0)
-
----
 
 ### 3. Threshold Search and Evaluation
 
@@ -128,6 +126,8 @@ over a candidate grid:
 - **Latent t-SNE**: `plot_latent_tsne` reduces latent space to 2-D, colored by label.
 - **Timeseries**: `plot_timeseries_anomaly` shows energy vs time for temporal anomaly detection.
 - **Metrics**: PR-AUC, ROC-AUC, precision, recall, F1.
+
+---
 
 ## Summary
 
