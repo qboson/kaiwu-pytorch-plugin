@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 17:43+0800\n"
+"POT-Creation-Date: 2026-10-15 17:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -29,8 +29,8 @@ msgstr "BM 生成：全连接玻尔兹曼机数据生成"
 msgid ""
 "This tutorial extends the RBM idea to a fully connected Boltzmann Machine "
 "(BM), where all nodes are connected (not just across layers). It "
-"demonstrates how to train a BM with a mixed KL-divergence + conditional "
-"likelihood objective and generate samples from it. The system architecture "
+"demonstrates how to train a BM with a mixed KL-divergence + non-contrastive "
+"loss (NCL) objective and generate samples from it. The system architecture "
 "and sampling interface are introduced in [Introduction](../introduction.md) "
 "and [Quick Start](../quickstart.md); the theoretical background is covered "
 "in [Section 4.1: The Classic Boltzmann Machine](../../theoretical-"
@@ -39,7 +39,7 @@ msgid ""
 "terms and conditional sampling that a fully connected graph requires."
 msgstr ""
 "本教程将 RBM 的思路扩展到全连接玻尔兹曼机（BM），其中所有节点都相互连接（而不仅仅是跨层连接）。本教程演示如何使用混合 KL 散度 + "
-"条件似然目标训练 "
+"非对比损失（NCL）目标训练 "
 "BM，并从中生成样本。系统架构与采样接口已在[简介](../introduction.md)和[快速入门](../quickstart.md)中介绍；理论背景请参阅[第"
 " 4.1 节：经典玻尔兹曼机](../../theoretical-foundations/kpp-theoretical-foundations-"
 "bm-overall.md)。本教程重点关注从 RBM 迁移到 BM 时的变化：全连接图所需的新目标项与条件采样。"
@@ -60,9 +60,9 @@ msgstr "理解 RBM（二部图）与 BM（全连接）的区别"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:10
 msgid ""
-"Train a BM with a combined KL-divergence and negative conditional likelihood"
-" objective"
-msgstr "使用 KL 散度与负条件似然的组合目标训练 BM"
+"Train a BM with a combined KL-divergence and non-contrastive loss (NCL) "
+"objective"
+msgstr "使用 KL 散度与非对比损失（NCL）的组合目标训练 BM"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:11
 msgid ""
@@ -75,162 +75,175 @@ msgid "Visualize generated sample distributions"
 msgstr "可视化生成样本的分布"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:14
+msgid ""
+"The concrete example behind this page is small-sample **RNA-sequence data "
+"augmentation**: the BM is trained on 100 binarized 128-dimensional latent "
+"codes `z` from the `Aptaswitch` task, generates new codes, and generation "
+"quality is judged by a downstream discriminator's predictions before and "
+"after augmentation. The training mechanics below apply to any BM task."
+msgstr ""
+"本页背后的具体示例是小样本 **RNA 序列数据增强**：BM 基于 `Aptaswitch` 任务的 100 个二值化 128 维潜在编码 `z` "
+"进行训练，生成新的编码，并由下游判别器在增强前后的预测值评判生成质量。下文的训练机制适用于任何 BM 任务。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:16
 msgid "Running the Example"
 msgstr "运行示例"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:16
+#: ../../source/getting_started/tutorials/bm_generation.md:18
 msgid "**Dependencies**:"
 msgstr "**依赖项**："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:22
+#: ../../source/getting_started/tutorials/bm_generation.md:24
 msgid "**Run**:"
 msgstr "**运行**："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:30
+#: ../../source/getting_started/tutorials/bm_generation.md:32
 msgid "**Key files**:"
 msgstr "**关键文件**："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:32
+#: ../../source/getting_started/tutorials/bm_generation.md:34
 msgid ""
 "`trainer.py`: `Trainer` — BM training loop with cosine learning-rate "
 "schedule and multiprocess sampling"
 msgstr "`trainer.py`：`Trainer` — 带余弦学习率调度与多进程采样的 BM 训练循环"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:33
+#: ../../source/getting_started/tutorials/bm_generation.md:35
 msgid "`data_loader.py`: `CSVDataset` — CSV-to-PyTorch `Dataset` wrapper"
 msgstr "`data_loader.py`：`CSVDataset` — CSV 到 PyTorch `Dataset` 的封装"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:34
+#: ../../source/getting_started/tutorials/bm_generation.md:36
 msgid "`saver.py`: `Saver` — checkpoint and loss-log persistence"
 msgstr "`saver.py`：`Saver` — 检查点与损失日志持久化"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:35
+#: ../../source/getting_started/tutorials/bm_generation.md:37
 msgid "`train_bm.ipynb` / `sample_bm.ipynb`: interactive walkthroughs"
 msgstr "`train_bm.ipynb` / `sample_bm.ipynb`：交互式演示"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:37
+#: ../../source/getting_started/tutorials/bm_generation.md:39
 msgid "How It Works"
 msgstr "工作原理"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:39
+#: ../../source/getting_started/tutorials/bm_generation.md:41
 msgid ""
 "Unlike an RBM, a BM has connections within the visible layer, so hidden and "
 "visible units cannot be sampled in parallel. The key differences are:"
 msgstr "与 RBM 不同，BM 的可见层内部也有连接，因此隐层与可见层无法并行采样。主要区别如下："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Aspect"
 msgstr "特性"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Restricted Boltzmann Machine (RBM)"
 msgstr "受限玻尔兹曼机（RBM）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Boltzmann Machine (BM)"
 msgstr "玻尔兹曼机（BM）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Connections"
 msgstr "连接结构"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Inter-layer only, no intra-layer edges"
 msgstr "仅层间连接，层内无边"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "All nodes connected"
 msgstr "所有节点全连接"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Sampling"
 msgstr "采样方式"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Parallel (conditional independence within layers)"
 msgstr "并行（层内条件独立）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Sequential (Gibbs sampling or solved by an external sampler)"
 msgstr "顺序（Gibbs 采样或由外部采样器求解）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "KPP method"
 msgstr "KPP 方法"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "`rbm.get_hidden(v)`"
 msgstr "`rbm.get_hidden(v)`"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "`bm.condition_sample(sampler, v)`"
 msgstr "`bm.condition_sample(sampler, v)`"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Training efficiency"
 msgstr "训练效率"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Higher"
 msgstr "较高"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Lower"
 msgstr "较低"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Expressive power"
 msgstr "表达能力"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Limited by bipartite structure"
 msgstr "受限于二部图结构"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:18
+#: ../../source/getting_started/tutorials/bm_generation.md:20
 msgid "Stronger; can model arbitrary distributions"
 msgstr "更强；可建模任意分布"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:49
+#: ../../source/getting_started/tutorials/bm_generation.md:51
 msgid "This example is suitable for:"
 msgstr "本示例适用于："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:51
+#: ../../source/getting_started/tutorials/bm_generation.md:53
 msgid ""
 "Modeling complex dependencies between variables that an RBM's bipartite "
 "structure cannot capture"
 msgstr "建模 RBM 二部图结构无法捕捉的变量间复杂依赖关系"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:52
+#: ../../source/getting_started/tutorials/bm_generation.md:54
 msgid ""
 "Small-scale sample generation where fully connected interactions matter"
 msgstr "需要全连接交互的小规模样本生成"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:53
+#: ../../source/getting_started/tutorials/bm_generation.md:55
 msgid "Studying Boltzmann distribution sampling behavior"
 msgstr "研究玻尔兹曼分布的采样行为"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:55
+#: ../../source/getting_started/tutorials/bm_generation.md:57
 msgid "The training objective combines two terms:"
 msgstr "训练目标由两项组成："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:57
+#: ../../source/getting_started/tutorials/bm_generation.md:59
 msgid ""
 "**KL divergence**: encourages the model distribution to match the data "
 "distribution (unsupervised generation)."
 msgstr "**KL 散度**：鼓励模型分布与数据分布匹配（无监督生成）。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:58
+#: ../../source/getting_started/tutorials/bm_generation.md:60
 msgid ""
-"**Negative conditional likelihood (NCL)**: when part of the visible units "
+"**Non-contrastive loss (NCL)**: a conditional-consistency term that does not"
+" require the free negative-phase sampling. When part of the visible units "
 "are designated as outputs (`num_output`), the model must reconstruct those "
 "outputs given the rest."
-msgstr "**负条件似然（NCL）**：当部分可见单元被指定为输出（`num_output`）时，模型必须在给定其余输入的条件下重建这些输出。"
+msgstr ""
+"**非对比损失（NCL）**：一个无需自由负相采样的条件一致性项。当部分可见单元被指定为输出（`num_output`）时，模型必须在给定其余输入的条件下重建这些输出。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:60
+#: ../../source/getting_started/tutorials/bm_generation.md:62
 msgid "The combined objective is:"
 msgstr "组合目标为："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:62
+#: ../../source/getting_started/tutorials/bm_generation.md:64
 #, python-brace-format
 msgid ""
 "\n"
@@ -239,22 +252,22 @@ msgstr ""
 "\n"
 "\\mathcal{L} = \\alpha \\cdot \\text{KL\\_divergence} + (1 - \\alpha) \\cdot \\text{NCL}\n"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:66
+#: ../../source/getting_started/tutorials/bm_generation.md:68
 msgid "where $\\alpha$ is set via `cost_param[\"alpha\"]`."
 msgstr "其中 $\\alpha$ 由 `cost_param[\"alpha\"]` 控制，平衡生成能力与条件一致性。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:68
+#: ../../source/getting_started/tutorials/bm_generation.md:70
 msgid ""
 "The `num_output` parameter designates which visible units are \"outputs\" "
 "(e.g. labels in a supervised setting), enabling conditional generation — you"
 " can fix part of the visible units and let the model generate the rest."
 msgstr "`num_output` 参数指定哪些可见单元为\"输出\"（如监督设定中的标签），实现条件生成——您可以固定部分可见单元，让模型生成其余部分。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:70
+#: ../../source/getting_started/tutorials/bm_generation.md:73
 msgid "Sampling Phases"
 msgstr "采样阶段"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:72
+#: ../../source/getting_started/tutorials/bm_generation.md:75
 msgid ""
 "**Negative phase**: `bm_net.sample(worker)` draws a complete joint "
 "visible+hidden state from the current BM distribution, approximating the "
@@ -262,188 +275,246 @@ msgid ""
 msgstr ""
 "**负相**：`bm_net.sample(worker)` 从当前 BM 分布中采样完整的联合可见+隐状态，用于近似对比散度目标中的模型分布。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:74
-msgid ""
-"**Positive phase**: the positive phase uses two conditional samplings per "
-"batch:"
-msgstr "**正相**：正相对每个批次执行两类条件采样："
+#: ../../source/getting_started/tutorials/bm_generation.md:77
+msgid "**Positive phase**: two conditional samplings per batch:"
+msgstr "**正相**：每个批次执行两类条件采样："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:76
+#: ../../source/getting_started/tutorials/bm_generation.md:79
 msgid ""
 "**Full conditional**: the entire input batch is fixed as the visible layer, "
 "and the corresponding joint state is sampled."
 msgstr "**完整条件**：将整个输入批次固定为可见层，采样对应的联合状态。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:77
+#: ../../source/getting_started/tutorials/bm_generation.md:80
 msgid ""
 "**Partial conditional**: only the non-output portion of the input (`data[:, "
 ":-num_output]`) is fixed, and the output dimensions are sampled freely."
 msgstr "**部分条件**：仅固定输入的非输出部分（`data[:, :-num_output]`），输出维度自由采样。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:79
+#: ../../source/getting_started/tutorials/bm_generation.md:82
 msgid ""
-"These two samplings compute the KL term and the NCL term respectively. A "
-"cosine schedule with linear warmup stabilizes early training. Multi-process "
-"sampling splits each batch across workers, running positive-phase "
-"conditional sampling in parallel to accelerate the training loop. All "
-"sampling operations are embedded in the PyTorch computation graph, enabling "
-"end-to-end backpropagation."
+"Together they provide the positive-phase statistics. The KL term contrasts "
+"these with the negative-phase free sample (`state_all`). The NCL term "
+"instead measures an energy consistency between the two positive-phase "
+"states, with the output columns zeroed — it needs no negative-phase "
+"sampling."
 msgstr ""
-"这两类采样分别计算 KL 项和 NCL 项。带线性 warmup 的余弦调度稳定训练初期。多进程采样将每个批次拆分到多个 "
-"worker，并行执行正相条件采样以加速训练循环。所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"
+"两者共同提供正相统计。KL 项将它们与负相自由采样（`state_all`）对比。NCL "
+"项则衡量两个正相状态之间的能量一致性（输出列置零）——它无需负相采样。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:81
+#: ../../source/getting_started/tutorials/bm_generation.md:84
+msgid ""
+"All sampling runs on multiple workers: each batch is split across processes,"
+" so the two conditional samplings proceed in parallel. A cosine schedule "
+"with linear warmup stabilizes early training. All sampling operations stay "
+"inside the PyTorch computation graph, enabling end-to-end backpropagation."
+msgstr ""
+"所有采样都在多个 worker 上运行：每个批次按进程切分，两个条件采样并行执行。带线性 warmup 的余弦调度稳定训练初期。所有采样操作都嵌入 "
+"PyTorch 计算图，支持端到端反向传播。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:86
+msgid ""
+"The sampler abstraction used here, i.e., swap SA ↔ CIM without touching the "
+"rest of the pipeline, is introduced in [Integrating Quantum Samplers into "
+"PyTorch](quantum_sampling_pytorch.md)."
+msgstr ""
+"此处使用的采样器抽象，即在不改动流水线其余部分的前提下在 SA ↔ CIM 之间切换，在[将量子采样器集成到 "
+"PyTorch](quantum_sampling_pytorch.md)中介绍。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:88
 msgid "Quick Start"
 msgstr "快速开始"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:83
+#: ../../source/getting_started/tutorials/bm_generation.md:90
 msgid ""
-"The following snippet shows how to run the training pipeline from a user's "
-"perspective, this is exactly what you would execute in `train_bm.ipynb`:"
-msgstr "以下代码片段展示了从用户视角运行训练流程的方式，这正是您在 `train_bm.ipynb` 中会执行的操作："
+"The steps below condense `example/bm_generation/train_bm.ipynb` with imports"
+" omitted; the notebook is the fully runnable walkthrough."
+msgstr ""
+"以下步骤浓缩自 `example/bm_generation/train_bm.ipynb`，省略了 import；该 notebook "
+"即完整可运行的演练。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:85
-msgid "Initialize the BM trainer:"
-msgstr "初始化 BM 训练器："
-
-#: ../../source/getting_started/tutorials/bm_generation.md:99
-msgid "Train with multiprocess sampling:"
-msgstr "使用多进程采样训练："
-
-#: ../../source/getting_started/tutorials/bm_generation.md:105
+#: ../../source/getting_started/tutorials/bm_generation.md:92
 msgid ""
-"After training, generate samples from `sample_bm.ipynb`: the BM samples full"
-" visible+hidden states, and the visible portion is rendered as the generated"
-" data distribution."
-msgstr "训练后，通过 `sample_bm.ipynb` 生成样本：BM 采样完整的可见+隐状态，可见部分作为生成的数据分布可视化。"
+"**1. Build the sampler.** Use simulated annealing (SA) for local debugging; "
+"for quantum hardware, swap in a `CIMOptimizer` wrapped in "
+"`PrecisionReducer`, the rest of the pipeline stays unchanged."
+msgstr ""
+"**1. 构建采样器。** 本地调试使用模拟退火（SA）；接入量子硬件时，换成经 `PrecisionReducer` 包装的 "
+"`CIMOptimizer`——流水线其余部分保持不变。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:107
+#: ../../source/getting_started/tutorials/bm_generation.md:101
+msgid ""
+"**2. Wrap the data.** `CSVDataset` takes a numpy array shaped `(num_columns,"
+" num_rows)` and `DataLoader` provides batching."
+msgstr ""
+"**2. 封装数据。** `CSVDataset` 接收形状为 `(num_columns, num_rows)` 的 numpy "
+"数组，`DataLoader` 负责分批。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:108
+msgid ""
+"**3. Initialize the trainer.** `Trainer` requires three positional "
+"arguments, `(data, saver, worker)`: the dataloader, a `Saver` for "
+"checkpoints and loss logs, and the sampler. `num_output` designates the "
+"trailing visible units used by the conditional (NCL) term; here it is `0`, "
+"so this run is pure unsupervised generation (see How It Works above)."
+msgstr ""
+"**3. 初始化训练器。** `Trainer` 需要三个位置参数——`(data, saver, "
+"worker)`：数据加载器、用于保存检查点与损失日志的 `Saver`，以及采样器。`num_output` "
+"指定用于条件（NCL）项的尾部可见单元；此处为 `0`，因此本次运行为纯无监督生成（见上文工作原理）。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:116
+msgid ""
+"**4. Set the hyperparameters.** Learning rates go through "
+"`set_learning_parameters`; the KL / NCL balance goes through "
+"`set_cost_parameter`, where `alpha` weights the KL term against the NCL "
+"term. `beta` is accepted for API compatibility but is not used by the "
+"current objective."
+msgstr ""
+"**4. 设置超参数。** 学习率通过 `set_learning_parameters` 设置；KL / NCL 的平衡通过 "
+"`set_cost_parameter` 设置——`alpha` 控制 KL 项相对 NCL 项的权重。`beta` 仅用于 API "
+"兼容，当前目标函数不使用它。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:123
+msgid ""
+"**5. Train.** Training counts steps rather than epochs; `num_processes` "
+"parallelizes the positive-phase conditional sampling across workers."
+msgstr "**5. 训练。** 训练按步数而非轮数（epoch）计数；`num_processes` 将正相条件采样并行到多个进程。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:129
+msgid ""
+"After training, `sample_bm.ipynb` loads the checkpoint, samples joint "
+"visible+hidden states with the same sampler, deduplicates them, and compares"
+" the visible slice with the training data via PCA."
+msgstr ""
+"训练结束后，`sample_bm.ipynb` 加载检查点，用同一采样器采样完整的可见+隐藏联合状态，去重后通过 PCA 将可见层切片与训练数据对比。"
+
+#: ../../source/getting_started/tutorials/bm_generation.md:131
 msgid "Key Code"
 msgstr "核心代码"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:109
+#: ../../source/getting_started/tutorials/bm_generation.md:133
 msgid "1. Trainer Initialization"
 msgstr "1\\. 训练器初始化"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:111
+#: ../../source/getting_started/tutorials/bm_generation.md:135
 msgid ""
 "The `Trainer` class initializes a fully connected `BoltzmannMachine` and "
 "sets up shared memory for multiprocess sampling:"
 msgstr "`Trainer` 类初始化一个全连接的 `BoltzmannMachine`，并为多进程采样设置共享内存："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:117
+#: ../../source/getting_started/tutorials/bm_generation.md:141
 msgid "Key initialization details:"
 msgstr "关键初始化细节："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:118
+#: ../../source/getting_started/tutorials/bm_generation.md:142
 msgid ""
 "`BoltzmannMachine(num_nodes=num_visible + num_hidden)` — fully connected "
 "graph"
 msgstr "`BoltzmannMachine(num_nodes=num_visible + num_hidden)` — 全连接图"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:119
+#: ../../source/getting_started/tutorials/bm_generation.md:143
 msgid "`share_memory()` — enables multi-process sampling without copying"
 msgstr "`share_memory()` — 支持多进程采样，无需复制数据"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:120
+#: ../../source/getting_started/tutorials/bm_generation.md:144
 #, python-brace-format
 msgid "`cost_param = {\"alpha\": 0.5, \"beta\": 0.5}` — KL/NCL balance"
 msgstr "`cost_param = {\"alpha\": 0.5, \"beta\": 0.5}` — KL/NCL 平衡"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:124
+#: ../../source/getting_started/tutorials/bm_generation.md:148
 msgid "2. Training Loop with Cosine Schedule"
 msgstr "2\\. 余弦调度训练循环"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:126
+#: ../../source/getting_started/tutorials/bm_generation.md:150
 msgid ""
 "The training loop uses Adam optimizer with cosine learning-rate schedule and"
 " multi-process conditional sampling:"
 msgstr "`trainer.py`：`Trainer` — 带余弦学习率调度与多进程采样的 BM 训练循环"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:132
+#: ../../source/getting_started/tutorials/bm_generation.md:156
 msgid "Key training details:"
 msgstr "关键训练细节："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:133
+#: ../../source/getting_started/tutorials/bm_generation.md:157
 msgid "Optimizer: Adam with weight decay"
 msgstr "优化器：带权重衰减的 Adam"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:134
+#: ../../source/getting_started/tutorials/bm_generation.md:158
 msgid ""
 "Learning rate: cosine schedule with linear warmup (`num_warmup_steps = "
 "max_steps / 20`)"
 msgstr "学习率：带线性预热的余弦调度（`num_warmup_steps = max_steps / 20`）"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:135
+#: ../../source/getting_started/tutorials/bm_generation.md:159
 msgid ""
 "Multi-process: `num_processes` workers run `condition_sample` in parallel"
 msgstr "多进程：`num_processes` 个工作进程并行运行 `condition_sample`"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:139
+#: ../../source/getting_started/tutorials/bm_generation.md:163
 msgid "3. Multi-process Sampling Worker"
 msgstr "3\\. 多进程采样工作进程"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:141
+#: ../../source/getting_started/tutorials/bm_generation.md:165
 msgid ""
 "The worker function runs in separate processes, performing both full and "
 "partial conditional sampling for the KL and NCL terms:"
 msgstr "工作函数在独立进程中运行，为 KL 和 NCL 项执行完整和部分条件采样："
 
-#: ../../source/getting_started/tutorials/bm_generation.md:147
+#: ../../source/getting_started/tutorials/bm_generation.md:171
 msgid "Training and Evaluation"
 msgstr "训练与评估"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:149
+#: ../../source/getting_started/tutorials/bm_generation.md:173
 msgid ""
 "**Loss curve**: `Saver` appends each step's loss to `loss.txt`; plot it to "
 "confirm convergence."
 msgstr "**损失曲线**：`Saver` 将每步损失追加到 `loss.txt`；绘制该文件确认收敛。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:150
+#: ../../source/getting_started/tutorials/bm_generation.md:174
 msgid ""
 "**Checkpoints**: the model is saved periodically as `checkpoint_step_<n>.pt`"
 " for later sampling or resumption."
 msgstr "**检查点**：模型定期保存为 `checkpoint_step_<n>.pt`，用于后续采样或续训。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:151
+#: ../../source/getting_started/tutorials/bm_generation.md:175
 msgid ""
 "**Weight visualization**: during training, the trainer can render weight "
 "matrices and their gradients for debugging."
 msgstr "**权重可视化**：训练过程中，训练器可渲染权重矩阵及其梯度，便于调试。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:152
+#: ../../source/getting_started/tutorials/bm_generation.md:176
 msgid ""
 "**Generated samples**: compare the distribution of generated samples against"
 " the original data (histograms / scatter plots in `sample_bm.ipynb`)."
 msgstr "**生成样本**：将生成样本的分布与原始数据对比（`sample_bm.ipynb` 中的直方图/散点图）。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:154
+#: ../../source/getting_started/tutorials/bm_generation.md:178
 msgid "Summary"
 msgstr "小结"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:156
+#: ../../source/getting_started/tutorials/bm_generation.md:180
 msgid ""
 "A BM drops the bipartite restriction, enabling arbitrary dependencies but "
 "requiring sequential sampling."
 msgstr "BM 去除了二部图限制，可建模任意依赖关系，但需要顺序采样。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:157
+#: ../../source/getting_started/tutorials/bm_generation.md:181
 msgid ""
-"The training objective mixes KL divergence (generation) and NCL (conditional"
-" reconstruction), controlled by `alpha`."
+"The training objective mixes KL divergence (generation) and NCL term "
+"(conditional reconstruction), controlled by `alpha`."
 msgstr "训练目标混合 KL 散度（生成）与 NCL（条件重建），由 `alpha` 控制权重。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:158
+#: ../../source/getting_started/tutorials/bm_generation.md:182
 msgid ""
 "The `num_output` parameter designates output units, enabling conditional "
-"generation."
-msgstr "`num_output` 参数指定输出单元，实现条件生成。"
+"generation (set to 0 for pure unsupervised generation)."
+msgstr "`num_output` 参数指定输出单元，实现条件生成（设为 0 时为纯无监督生成）。"
 
-#: ../../source/getting_started/tutorials/bm_generation.md:159
+#: ../../source/getting_started/tutorials/bm_generation.md:183
 msgid ""
-"Multi-process sampling accelerates the negative phase; cosine warmup "
-"stabilizes early training."
-msgstr "多进程采样加速负相；余弦 warmup 稳定训练初期。"
+"Multi-process sampling parallelizes the positive-phase conditional sampling;"
+" cosine warmup stabilizes early training."
+msgstr "多进程采样并行化正相条件采样；余弦 warmup 稳定训练初期。"
 
 #~ msgid "**示例位置**: ``example/bm_generation/``"
 #~ msgstr ""
@@ -784,3 +855,39 @@ msgstr "多进程采样加速负相；余弦 warmup 稳定训练初期。"
 #~ msgstr ""
 #~ "它提供两个功能： 一是将当前模型以 PyTorch 格式定期保存为带步数编号的文件，便于后续加载或断点续训； 二是将每一步的损失值追加写入 "
 #~ "`loss.txt` 日志文件，支持训练过程的可视化分析与性能追踪。"
+
+#~ msgid ""
+#~ "The following snippet shows how to run the training pipeline from a user's "
+#~ "perspective, this is exactly what you would execute in `train_bm.ipynb`:"
+#~ msgstr "以下代码片段展示了从用户视角运行训练流程的方式，这正是您在 `train_bm.ipynb` 中会执行的操作："
+
+#~ msgid "Initialize the BM trainer:"
+#~ msgstr "初始化 BM 训练器："
+
+#~ msgid "Train with multiprocess sampling:"
+#~ msgstr "使用多进程采样训练："
+
+#~ msgid ""
+#~ "After training, generate samples from `sample_bm.ipynb`: the BM samples full"
+#~ " visible+hidden states, and the visible portion is rendered as the generated"
+#~ " data distribution."
+#~ msgstr "训练后，通过 `sample_bm.ipynb` 生成样本：BM 采样完整的可见+隐状态，可见部分作为生成的数据分布可视化。"
+
+#~ msgid ""
+#~ "The steps below mirror what `train_bm.ipynb` executes, with imports omitted "
+#~ "for readability. The complete runnable entry point is "
+#~ "`example/bm_generation/train_bm.ipynb`."
+#~ msgstr ""
+#~ "以下步骤与 `train_bm.ipynb` 的执行内容一致，为便于阅读省略了 import 语句。完整可运行入口见 "
+#~ "`example/bm_generation/train_bm.ipynb`。"
+
+#~ msgid ""
+#~ "These two samplings compute the KL term and the NCL term respectively. A "
+#~ "cosine schedule with linear warmup stabilizes early training. Multi-process "
+#~ "sampling splits each batch across workers, running positive-phase "
+#~ "conditional sampling in parallel to accelerate the training loop. All "
+#~ "sampling operations are embedded in the PyTorch computation graph, enabling "
+#~ "end-to-end backpropagation."
+#~ msgstr ""
+#~ "这两类采样分别计算 KL 项和 NCL 项。带线性 warmup 的余弦调度稳定训练初期。多进程采样将每个批次拆分到多个 "
+#~ "worker，并行执行正相条件采样以加速训练循环。所有采样操作嵌入 PyTorch 计算图，支持端到端反向传播。"

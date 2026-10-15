@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 16:05+0800\n"
+"POT-Creation-Date: 2026-10-15 16:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -90,127 +90,145 @@ msgstr "1\\. 玻尔兹曼机（BM）"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md:24
 msgid ""
-"**The foundation**: an energy-based model with binary visible and hidden "
-"units."
-msgstr "**基础**：具有二值可见层和隐藏层单元的能量模型。"
+"**The foundation**: an energy-based model family with visible and hidden "
+"units, binary by default, with a Gaussian-Bernoulli variant that models one "
+"side as Gaussian for real-valued inputs."
+msgstr "**基础**：一个基于能量的模型家族，包含可见单元与隐藏单元，默认采用二值单元；另有高斯-伯努利变体，将一侧建模为高斯分布以处理实值输入。"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md:26
 msgid ""
-"**Restricted Boltzmann Machine (RBM)**: bipartite graph — visible units only"
-" connect to hidden units, no visible-visible or hidden-hidden connections. "
-"This enables parallel sampling within layers."
-msgstr "**受限玻尔兹曼机（RBM）**：二部图——可见单元仅连接到隐藏单元，没有可见-可见或隐藏-隐藏连接。这使得层内并行采样成为可能。"
+"**Full Boltzmann Machine**: fully connected graph, all units can connect to "
+"each other. Requires sequential sampling."
+msgstr "**全连接玻尔兹曼机**：全连接图——所有单元都可以相互连接。需要顺序采样。"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md:27
 msgid ""
-"**Full Boltzmann Machine**: fully connected graph — all units can connect to"
-" each other. Requires sequential (Gibbs) sampling."
-msgstr "**全连接玻尔兹曼机**：全连接图——所有单元都可以相互连接。需要顺序（Gibbs）采样。"
+"**Restricted Boltzmann Machine (RBM)**: bipartite graph, visible units only "
+"connect to hidden units, no visible-visible or hidden-hidden connections. "
+"This enables parallel sampling within layers."
+msgstr "**受限玻尔兹曼机（RBM）**：二部图——可见单元仅连接到隐藏单元，没有可见-可见或隐藏-隐藏连接。这使得层内并行采样成为可能。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:29
-msgid "**Main classes**: `BoltzmannMachine`, `RestrictedBoltzmannMachine`"
-msgstr "**主要类**：`BoltzmannMachine`, `RestrictedBoltzmannMachine`"
+#: ../../source/getting_started/tutorials/architecture_overview.md:28
+msgid ""
+"**Gaussian-Bernoulli RBM (GBRBM)**: extends RBM to continuous-valued inputs,"
+" one partition is Gaussian (with learned mean/variance) and the other stays "
+"Bernoulli; `is_visible_gaussian` picks which side is Gaussian (default: "
+"visible)."
+msgstr ""
+"**高斯-伯努利受限玻尔兹曼机（GBRBM）**：将 RBM "
+"扩展到连续值输入，一侧为高斯分布（均值/方差可学习），另一侧保持伯努利分布；`is_visible_gaussian` "
+"决定哪一侧为高斯分布（默认为可见层）。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:31
+#: ../../source/getting_started/tutorials/architecture_overview.md:30
+msgid ""
+"**Main classes**: `BoltzmannMachine`, `RestrictedBoltzmannMachine`, "
+"`GaussianBernoulliRestrictedBoltzmannMachine`"
+msgstr ""
+"**主要类**：`BoltzmannMachine`、`RestrictedBoltzmannMachine`、`GaussianBernoulliRestrictedBoltzmannMachine`"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:32
 msgid "**Typical use**: unsupervised feature learning, generative modeling."
 msgstr "**典型用途**：无监督特征学习、生成建模。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:33
+#: ../../source/getting_started/tutorials/architecture_overview.md:34
 msgid ""
 "→ Hands-on: [RBM Classification](rbm_classification.md), [BM "
-"Generation](bm_generation.md)"
-msgstr "→ 实战教程：[RBM 分类](rbm_classification.md)、[BM 生成](bm_generation.md)"
+"Generation](bm_generation.md), GBRBM (Coming Soon)"
+msgstr ""
+"→ 实战教程：[RBM 分类](rbm_classification.md)、[BM 生成](bm_generation.md)、GBRBM（即将推出）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:37
+#: ../../source/getting_started/tutorials/architecture_overview.md:38
 msgid "2. Deep Belief Network (DBN)"
 msgstr "2\\. 深度置信网络（DBN）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:39
+#: ../../source/getting_started/tutorials/architecture_overview.md:40
 msgid "**Extension**: stack multiple RBMs into a deep network."
 msgstr "**扩展**：将多个 RBM 堆叠成深度网络。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:41
+#: ../../source/getting_started/tutorials/architecture_overview.md:42
 msgid ""
 "Each RBM is trained greedily layer-by-layer (unsupervised), then the whole "
 "stack can be fine-tuned (supervised)."
 msgstr "每个 RBM 逐层贪婪训练（无监督），然后整个网络栈可以进行微调（有监督）。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:53
+#: ../../source/getting_started/tutorials/architecture_overview.md:54
 msgid "**Main class**: `UnsupervisedDBN`"
 msgstr "**主要类**：`UnsupervisedDBN`"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:55
+#: ../../source/getting_started/tutorials/architecture_overview.md:56
 msgid "**Typical use**: hierarchical feature learning, deep representations."
 msgstr "**典型用途**：层次化特征学习、深度表示。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:57
+#: ../../source/getting_started/tutorials/architecture_overview.md:58
 msgid "→ Hands-on: [DBN Classification](dbn_classification.md)"
 msgstr "→ 实战教程：[DBN 分类](dbn_classification.md)"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:61
+#: ../../source/getting_started/tutorials/architecture_overview.md:62
 msgid "3. Quantum Variational Autoencoder (Q-VAE)"
 msgstr "3\\. 量子变分自编码器（Q-VAE）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:63
+#: ../../source/getting_started/tutorials/architecture_overview.md:64
 msgid ""
-"**Extension**: combine an encoder-decoder architecture with a BM prior."
-msgstr "**扩展**：将编码器-解码器架构与 BM 先验结合。"
+"**Extension**: combine an encoder-decoder architecture with a QBM prior."
+msgstr "**扩展**：将编码器-解码器架构与 QBM 先验结合。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:65
+#: ../../source/getting_started/tutorials/architecture_overview.md:66
 msgid ""
-"Instead of the standard Gaussian prior in a VAE, Q-VAE uses a Boltzmann "
-"Machine as the latent prior. The sampler (SA or CIM) handles negative-phase "
-"sampling in the BM."
-msgstr "Q-VAE 不是使用 VAE 中的标准高斯先验，而是使用玻尔兹曼机作为隐变量先验。采样器（SA 或 CIM）处理 BM 中的负相采样。"
+"Instead of the standard Gaussian prior in a VAE, Q-VAE uses a **quantum "
+"Boltzmann machine (QBM)**, a Boltzmann machine whose negative-phase sampling"
+" is handled by the SA/CIM sampler, as the latent prior."
+msgstr ""
+"Q-VAE 不使用 VAE 中的标准高斯先验，而是使用**量子玻尔兹曼机（QBM）**——一种负相采样由 SA/CIM "
+"采样器处理的玻尔兹曼机——作为隐变量先验。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:71
+#: ../../source/getting_started/tutorials/architecture_overview.md:72
 msgid "**Components**:"
 msgstr "**组件**："
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:72
+#: ../../source/getting_started/tutorials/architecture_overview.md:73
 msgid "Encoder: maps input to a latent distribution"
 msgstr "编码器：将输入映射到隐分布"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:73
+#: ../../source/getting_started/tutorials/architecture_overview.md:74
 msgid "Decoder: reconstructs input from latent samples"
 msgstr "解码器：从隐变量样本重构输入"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:74
-msgid "BM prior: replaces the standard Gaussian prior"
-msgstr "BM 先验：替代标准高斯先验"
-
 #: ../../source/getting_started/tutorials/architecture_overview.md:75
+msgid "QBM prior: a Boltzmann machine prior sampled by SA or CIM"
+msgstr "QBM 先验：由 SA 或 CIM 采样的玻尔兹曼机先验"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:76
 msgid "Sampler: SA (classical) or CIM (quantum)"
 msgstr "采样器：SA（经典）或 CIM（量子）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:77
+#: ../../source/getting_started/tutorials/architecture_overview.md:78
 msgid "**Main classes**: `QVAE`, `AutoEncoderBase`"
 msgstr "**主要类**：`QVAE`, `AutoEncoderBase`"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:79
+#: ../../source/getting_started/tutorials/architecture_overview.md:80
 msgid ""
 "**Typical use**: generative modeling, representation learning, anomaly "
 "detection."
 msgstr "**典型用途**：生成建模、表示学习、异常检测。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:81
+#: ../../source/getting_started/tutorials/architecture_overview.md:82
 msgid "**Application variants** (in `example/`):"
 msgstr "**应用变体**（在 `example/` 中）："
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:82
-msgid "`MNISTQVAE` — image generation (784-d input)"
+#: ../../source/getting_started/tutorials/architecture_overview.md:83
+msgid "`MNISTQVAE`: image generation (784-d input)"
 msgstr "`MNISTQVAE` — 图像生成（784 维输入）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:83
+#: ../../source/getting_started/tutorials/architecture_overview.md:84
 msgid ""
-"`CellQVAE` — single-cell transcriptomics (10k+ genes, batch-conditioned)"
+"`CellQVAE`: single-cell transcriptomics (10k+ genes, batch-conditioned)"
 msgstr "`CellQVAE` — 单细胞转录组学（10k+ 基因，批次条件化）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:84
-msgid "`CleanEnergyQVAE` — anomaly detection (free-energy scoring head)"
+#: ../../source/getting_started/tutorials/architecture_overview.md:85
+msgid "`CleanEnergyQVAE`: anomaly detection (free-energy scoring head)"
 msgstr "`CleanEnergyQVAE` — 异常检测（自由能量评分头）"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:86
+#: ../../source/getting_started/tutorials/architecture_overview.md:87
 msgid ""
 "→ Hands-on: [Q-VAE MNIST](qvae_mnist.md), [Q-VAE Cell](qvae_cell.md), [Q-VAE"
 " Anomaly](qvae_anomaly.md)"
@@ -218,61 +236,61 @@ msgstr ""
 "→ 实战教程：[Q-VAE MNIST](qvae_mnist.md)、[Q-VAE Cell](qvae_cell.md)、[Q-VAE "
 "Anomaly](qvae_anomaly.md)"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:90
+#: ../../source/getting_started/tutorials/architecture_overview.md:91
 msgid "4. Q-Diffusion"
 msgstr "4\\. Q-Diffusion"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:92
+#: ../../source/getting_started/tutorials/architecture_overview.md:93
 msgid "**Extension**: discrete diffusion model with a BM energy reranker."
 msgstr "**扩展**：具有 BM 能量重排序器的离散扩散模型。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:94
+#: ../../source/getting_started/tutorials/architecture_overview.md:95
 msgid ""
 "Combines a pre-trained protein language model (DPLM) as the proposal model "
 "with a trainable BM energy reranker to improve generated sequence quality."
 msgstr "将预训练的蛋白质语言模型（DPLM）作为提议模型，与可训练的 BM 能量重排序器结合，以提高生成序列的质量。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:104
+#: ../../source/getting_started/tutorials/architecture_overview.md:105
 msgid "**Main classes**: `QDiffusion`, `QDiffusionConfig`"
 msgstr "**主要类**：`QDiffusion`, `QDiffusionConfig`"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:106
-msgid "**Typical use**: protein sequence generation, guided sampling."
-msgstr "**典型用途**：蛋白质序列生成、引导采样。"
+#: ../../source/getting_started/tutorials/architecture_overview.md:107
+msgid "**Typical use**: protein sequence generation, energy-guided sampling."
+msgstr "**典型用途**：蛋白质序列生成、能量引导采样。"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:108
+#: ../../source/getting_started/tutorials/architecture_overview.md:109
 msgid "→ Hands-on: [Q-Diffusion](qdiffusion.md)"
 msgstr "→ 实战教程：[Q-Diffusion](qdiffusion.md)"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:112
+#: ../../source/getting_started/tutorials/architecture_overview.md:113
 msgid "How to Build a Custom Model"
 msgstr "如何构建自定义模型"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:114
+#: ../../source/getting_started/tutorials/architecture_overview.md:115
 msgid "Step 1: Choose your base"
 msgstr "步骤 1：选择基础模型"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:115
+#: ../../source/getting_started/tutorials/architecture_overview.md:116
 msgid "Need feature extraction? → Start with [RBM](rbm_classification.md)"
 msgstr "需要特征提取？→ 从 [RBM](rbm_classification.md) 开始"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:116
+#: ../../source/getting_started/tutorials/architecture_overview.md:117
 msgid "Need generative modeling? → Start with [BM](bm_generation.md)"
 msgstr "需要生成建模？→ 从 [BM](bm_generation.md) 开始"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:117
+#: ../../source/getting_started/tutorials/architecture_overview.md:118
 msgid "Need representation learning? → Start with [Q-VAE](qvae_mnist.md)"
 msgstr "需要表示学习？→ 从 [Q-VAE](qvae_mnist.md) 开始"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:119
+#: ../../source/getting_started/tutorials/architecture_overview.md:120
 msgid "Step 2: Provide your components"
 msgstr "步骤 2：提供组件"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:137
+#: ../../source/getting_started/tutorials/architecture_overview.md:138
 msgid "Step 3: Train with the standard PyTorch loop"
 msgstr "步骤 3：使用标准 PyTorch 循环训练"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:149
+#: ../../source/getting_started/tutorials/architecture_overview.md:150
 msgid "Cross-reference Map"
 msgstr "交叉引用表"
 
@@ -309,23 +327,17 @@ msgid "[Theoretical Foundations](../../theoretical-foundations/index.md)"
 msgstr "[理论基础](../../theoretical-foundations/index.md)"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "RBM hands-on example"
-msgstr "RBM 实战示例"
+msgid "RBM / BM hands-on"
+msgstr "RBM / BM 实战示例"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "[RBM Classification](rbm_classification.md)"
-msgstr "[RBM 分类](rbm_classification.md)"
+msgid ""
+"[RBM Classification](rbm_classification.md), [BM "
+"Generation](bm_generation.md)"
+msgstr "[RBM 分类](rbm_classification.md)、[BM 生成](bm_generation.md)"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "BM hands-on example"
-msgstr "BM 实战示例"
-
-#: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "[BM Generation](bm_generation.md)"
-msgstr "[BM 生成](bm_generation.md)"
-
-#: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "DBN hands-on example"
+msgid "DBN hands-on"
 msgstr "DBN 实战示例"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
@@ -333,24 +345,20 @@ msgid "[DBN Classification](dbn_classification.md)"
 msgstr "[DBN 分类](dbn_classification.md)"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "Q-VAE hands-on example"
-msgstr "Q-VAE 实战示例"
+msgid "Q-VAE hands-on & case studies"
+msgstr "Q-VAE 实战教程与案例研究"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "[Q-VAE MNIST](qvae_mnist.md)"
-msgstr "[Q-VAE MNIST](qvae_mnist.md)"
+msgid ""
+"[Q-VAE MNIST](qvae_mnist.md), [Q-VAE Cell](qvae_cell.md), [Q-VAE "
+"Anomaly](qvae_anomaly.md)"
+msgstr ""
+"[Q-VAE MNIST](qvae_mnist.md)、[Q-VAE Cell](qvae_cell.md)、[Q-VAE "
+"Anomaly](qvae_anomaly.md)"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "Q-VAE case studies"
-msgstr "Q-VAE 案例研究"
-
-#: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "[Q-VAE Cell](qvae_cell.md), [Q-VAE Anomaly](qvae_anomaly.md)"
-msgstr "[Q-VAE 单细胞](qvae_cell.md)、[Q-VAE 异常检测](qvae_anomaly.md)"
-
-#: ../../source/getting_started/tutorials/architecture_overview.md
-msgid "Q-Diffusion"
-msgstr "Q-Diffusion"
+msgid "Q-Diffusion hands-on"
+msgstr "Q-Diffusion 实战教程"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md
 msgid "[Q-Diffusion](qdiffusion.md)"
@@ -377,3 +385,29 @@ msgstr "[Q-Diffusion](qdiffusion.md)"
 
 #~ msgid "Q-Diffusion (coming soon)"
 #~ msgstr ""
+
+#~ msgid ""
+#~ "**The foundation**: an energy-based model with binary visible and hidden "
+#~ "units."
+#~ msgstr "**基础**：具有二值可见层和隐藏层单元的能量模型。"
+
+#~ msgid "BM prior: replaces the standard Gaussian prior"
+#~ msgstr "BM 先验：替代标准高斯先验"
+
+#~ msgid "[RBM Classification](rbm_classification.md)"
+#~ msgstr "[RBM 分类](rbm_classification.md)"
+
+#~ msgid "BM hands-on example"
+#~ msgstr "BM 实战示例"
+
+#~ msgid "[BM Generation](bm_generation.md)"
+#~ msgstr "[BM 生成](bm_generation.md)"
+
+#~ msgid "Q-VAE hands-on example"
+#~ msgstr "Q-VAE 实战示例"
+
+#~ msgid "[Q-VAE MNIST](qvae_mnist.md)"
+#~ msgstr "[Q-VAE MNIST](qvae_mnist.md)"
+
+#~ msgid "[Q-VAE Cell](qvae_cell.md), [Q-VAE Anomaly](qvae_anomaly.md)"
+#~ msgstr "[Q-VAE 单细胞](qvae_cell.md)、[Q-VAE 异常检测](qvae_anomaly.md)"

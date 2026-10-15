@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 14:23+0800\n"
+"POT-Creation-Date: 2026-10-15 16:33+0800\n"
 "PO-Revision-Date: 2026-09-07 19:10+0800\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -42,8 +42,10 @@ msgstr ""
 " 工作流中。"
 
 #: ../../source/getting_started/index.md:19
-msgid "This guide walks you through the essentials in four parts:"
-msgstr "本指南分四部分介绍核心内容："
+msgid ""
+"This guide walks you through the essentials in four parts, plus the learning"
+" paths:"
+msgstr "本指南分四部分介绍核心内容，外加学习路径："
 
 #: ../../source/getting_started/index.md:31
 msgid "Prerequisite"
@@ -147,21 +149,29 @@ msgid "Next Learning Paths & Resources"
 msgstr "后续学习路径与资源"
 
 #: ../../source/getting_started/index.md:70
-msgid "Tutorials"
-msgstr "教程"
+msgid "Next Steps: Recommended Learning Paths"
+msgstr "后续步骤：推荐学习路径"
 
 #: ../../source/getting_started/index.md:72
 msgid ""
 "The [Tutorials](tutorials/index.md) section is designed for users who have "
 "already installed KPP and read the [Quick Start](quickstart.md) guide. It "
-"provides hands-on, end-to-end examples of KPP in action."
+"provides hands-on, end-to-end examples of KPP in action. The paths below "
+"suggest an order to study it, **each is a subset of the full syllabus** in "
+"the [Tutorials index](tutorials/index.md)."
 msgstr ""
 "[教程](tutorials/index.md)板块面向已安装 KPP 并阅读过[快速入门](quickstart.md)的用户，提供 KPP "
-"实际应用的端到端动手示例。"
+"实际应用的端到端动手示例。下面的路径建议学习顺序，**每条路径都是[教程索引](tutorials/index.md)完整大纲的一个子集**。"
 
 #: ../../source/getting_started/index.md:74
-msgid "Recommended Learning Paths"
-msgstr "推荐学习路径"
+msgid ""
+"**New to the model families?** Read the [KPP Architecture "
+"Overview](tutorials/architecture_overview.md) first. It shows how RBM, DBN, "
+"Q-VAE, and Q-Diffusion build on each other, so you can map every tutorial "
+"onto the model hierarchy."
+msgstr ""
+"**不熟悉各类模型家族？**请先阅读 [KPP 架构概览](tutorials/architecture_overview.md)。它展示了 "
+"RBM、DBN、Q-VAE 与 Q-Diffusion 如何逐层构建，让你能够把每个教程对应到模型层级中。"
 
 #: ../../source/getting_started/index.md:76
 msgid ""
@@ -225,7 +235,7 @@ msgstr "[Q-VAE（MNIST）](tutorials/qvae_mnist.md)：用于图像生成与表�
 msgid ""
 "**Research-grade Case Studies**, extending the hands-on tutorials into full "
 "end-to-end pipelines:"
-msgstr "**研究级案例研究**，将实践教程扩展为完整的端到端流水线："
+msgstr "**案例研究**，将实践教程扩展为完整的端到端流水线："
 
 #: ../../source/getting_started/index.md:92
 msgid ""
@@ -316,3 +326,6 @@ msgstr ""
 #~ msgstr ""
 #~ "**完整路径**：按顺序完成全部教程，全面掌握 KPP。完整课程大纲（含即将推出的教程——单细胞转录组学 Q-VAE、蛋白质序列生成 "
 #~ "Q-Diffusion）请参见[教程索引](tutorials/index.md)。"
+
+#~ msgid "Tutorials"
+#~ msgstr "教程"

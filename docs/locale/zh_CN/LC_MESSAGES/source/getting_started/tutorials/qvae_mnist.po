@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 17:43+0800\n"
+"POT-Creation-Date: 2026-10-15 16:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -187,163 +187,206 @@ msgstr "快速开始"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:69
 msgid ""
-"The following snippet shows how to run the pipeline from a user's "
-"perspective, this is what you would execute via `run_pipeline.py`:"
-msgstr "以下代码片段从用户视角展示如何运行整个流程，也就是你通过 `run_pipeline.py` 执行的内容："
+"The steps below condense `example/qvae_mnist/train_qvae.ipynb` with imports "
+"omitted; the notebook is the interactive walkthrough, and `python "
+"run_pipeline.py --epochs 50 --run-tsne` is the equivalent end-to-end script "
+"(it also trains the downstream classifier)."
+msgstr ""
+"以下步骤浓缩自 `example/qvae_mnist/train_qvae.ipynb`，省略了 import；该 notebook 是交互式演练，而"
+" `python run_pipeline.py --epochs 50 --run-tsne` 是等价的端到端脚本（它还会训练下游分类器）。"
 
 #: ../../source/getting_started/tutorials/qvae_mnist.md:71
-msgid "Load MNIST and build the Q-VAE pipeline:"
-msgstr "加载 MNIST 并构建 Q-VAE 流水线："
+msgid ""
+"**1. Build the config.** The `Config` object holds the dataset name, data "
+"path, model type, and training hyperparameters in one place."
+msgstr "**1. 构建配置。** `Config` 对象将数据集名称、数据路径、模型类型与训练超参数集中在一处。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:81
-msgid "Train the Q-VAE:"
-msgstr "训练 Q-VAE："
+#: ../../source/getting_started/tutorials/qvae_mnist.md:87
+msgid ""
+"**2. Train the Q-VAE.** `Trainer(config=config)` builds the model from the "
+"config; `train` returns the trained model and the per-epoch train/test "
+"losses. With `run_tsne=True` it additionally projects the 64-d latent space "
+"to 2-D (colored by digit) and records a training animation. The t-SNE plot "
+"is the first check that the QBM prior has learned a structured latent space."
+msgstr ""
+"**2. 训练 Q-VAE。** `Trainer(config=config)` 根据配置构建模型；`train` "
+"返回训练后的模型与逐轮（epoch）训练/测试损失。当 `run_tsne=True` 时，它还会将 64 维隐空间投影到 2 "
+"维（按数字类别着色）并录制训练动画。t-SNE 图是检验 QBM 先验是否学到结构化隐空间的第一个信号。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:90
-msgid "Evaluate downstream classification on learned representations:"
-msgstr "在学习到的表示上评估下游分类："
+#: ../../source/getting_started/tutorials/qvae_mnist.md:96
+msgid ""
+"**3. Inspect the result.** A steadily decreasing Q-ELBO loss (reconstruction"
+" + KL) and a t-SNE with digit-separated clusters confirm training succeeded."
+msgstr "**3. 查看结果。** Q-ELBO 损失（重建 + KL）稳步下降、t-SNE 中数字类别聚类分离，即表明训练成功。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:99
+#: ../../source/getting_started/tutorials/qvae_mnist.md:102
+msgid ""
+"**Evaluation beyond training.** Two downstream tasks complete the picture "
+"and are covered in dedicated sections instead of here:"
+msgstr "**训练之外的评估。** 还有两个下游任务补全全貌，它们在专门的小节中展开而非放在这里："
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:103
+msgid ""
+"**Representation learning + classification**: train a classifier on the "
+"learned features (`train_qvae_classifier.ipynb`, or the end-to-end CLI "
+"`python run_pipeline.py --epochs 50 --run-tsne`), then report test accuracy "
+"— see *Key Code → §3 Downstream Classification on Learned Representations*."
+msgstr ""
+"**表示学习 + 分类**：在学到的特征上训练分类器（`train_qvae_classifier.ipynb`，或端到端 CLI `python "
+"run_pipeline.py --epochs 50 --run-tsne`），然后报告测试准确率——见 *Key Code → §3 "
+"在学习到的表示上评估下游分类*。"
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:104
+msgid ""
+"**Generation + FID**: `train_qvae.ipynb` samples new images from the QBM "
+"prior (`generate_qvae_images`, saved as a grid) and scores them against "
+"10,000 real test images with FID — see *Training and Evaluation* below."
+msgstr ""
+"**生成 + FID**：`train_qvae.ipynb` 从 QBM "
+"先验采样新图像（`generate_qvae_images`，保存为网格图），并用 FID 与 10,000 张真实测试图对比打分——见下方 "
+"*训练与评估*。"
+
+#: ../../source/getting_started/tutorials/qvae_mnist.md:106
 msgid "Key Code"
 msgstr "核心代码"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:101
+#: ../../source/getting_started/tutorials/qvae_mnist.md:108
 msgid "1. Model Configuration and Encoder/Decoder"
 msgstr "1\\. 模型配置与编码器/解码器"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:103
+#: ../../source/getting_started/tutorials/qvae_mnist.md:110
 msgid ""
 "The Q-VAE model uses a standard encoder-decoder architecture, with the QBM "
 "prior replacing the Gaussian prior in the latent space:"
 msgstr "Q-VAE 模型使用标准的编码器-解码器架构，以 QBM 先验替换隐空间中的高斯先验："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:109
+#: ../../source/getting_started/tutorials/qvae_mnist.md:116
 msgid "Key model details:"
 msgstr "关键模型细节："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:110
+#: ../../source/getting_started/tutorials/qvae_mnist.md:117
 msgid "Encoder: maps 784-d MNIST images to 64-d latent space"
 msgstr "编码器：将 784 维 MNIST 图像映射到 64 维隐空间"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:111
+#: ../../source/getting_started/tutorials/qvae_mnist.md:118
 msgid "Decoder: reconstructs images from latent samples"
 msgstr "解码器：从隐变量样本重构图像"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:112
+#: ../../source/getting_started/tutorials/qvae_mnist.md:119
 msgid "QBM prior: trained with the same positive/negative phase as an RBM"
 msgstr "Q-VAE 将高斯先验替换为 QBM，使用与 RBM 相同的正相/负相训练。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:116
+#: ../../source/getting_started/tutorials/qvae_mnist.md:123
 msgid "2. Q-ELBO Training Loop"
 msgstr "2\\. Q-ELBO 训练循环"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:118
+#: ../../source/getting_started/tutorials/qvae_mnist.md:125
 msgid ""
 "The `Trainer` class implements the Q-ELBO optimization loop, combining "
 "reconstruction loss with the KL term between encoder posterior and QBM "
 "prior:"
 msgstr "Q-ELBO 将重建损失与编码器后验和 QBM 先验之间的 KL 项相结合。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:124
+#: ../../source/getting_started/tutorials/qvae_mnist.md:131
 msgid "Key training details:"
 msgstr "关键训练细节："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:125
+#: ../../source/getting_started/tutorials/qvae_mnist.md:132
 msgid "Optimizer: Adam with learning rate and weight decay from config"
 msgstr "优化器：Adam，学习率和权重衰减从配置中读取"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:126
+#: ../../source/getting_started/tutorials/qvae_mnist.md:133
 msgid ""
 "Reconstruction loss: Bernoulli cross-entropy (or MSE for continuous data)"
 msgstr "重建损失：伯努利交叉熵（连续数据使用 MSE）"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:127
+#: ../../source/getting_started/tutorials/qvae_mnist.md:134
 msgid "KL term: pulls encoder posterior toward QBM prior"
 msgstr "KL 项：将编码器后验拉向 QBM 先验"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:128
+#: ../../source/getting_started/tutorials/qvae_mnist.md:135
 msgid "Sampler: switch between SA and CIM via `--sampler-type` flag"
 msgstr "采样器：通过 `--sampler-type` 参数在 SA 与 CIM 之间切换"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:132
+#: ../../source/getting_started/tutorials/qvae_mnist.md:139
 msgid "3. Downstream Classification on Learned Representations"
-msgstr "在学习到的表示上评估下游分类："
+msgstr "3\\. 在学习到的表示上评估下游分类："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:134
+#: ../../source/getting_started/tutorials/qvae_mnist.md:141
 msgid ""
 "After training the Q-VAE, the encoder's hidden representations can be fed to"
 " a downstream classifier for supervised evaluation:"
 msgstr "训练完 Q-VAE 后，可以将编码器的隐藏表示输入下游分类器进行监督评估："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:140
+#: ../../source/getting_started/tutorials/qvae_mnist.md:147
 msgid "Training and Evaluation"
 msgstr "训练与评估"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:142
+#: ../../source/getting_started/tutorials/qvae_mnist.md:149
 msgid ""
 "**Training curves**: `plot_training_curves` tracks reconstruction loss, KL "
 "divergence, and validation accuracy over epochs."
 msgstr "**训练曲线**：`plot_training_curves` 跟踪各 epoch 的重建损失、KL 散度与验证准确率。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:143
+#: ../../source/getting_started/tutorials/qvae_mnist.md:150
 msgid ""
 "**Latent space**: `t_SNE` reduces the 64-dim latent representation to 2-D, "
 "colored by digit class, revealing cluster structure."
 msgstr "**隐空间**：`t_SNE` 将 64 维隐表示降维到 2 维，按数字类别着色，展示聚类结构。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:144
+#: ../../source/getting_started/tutorials/qvae_mnist.md:151
 msgid ""
 "**Generated samples**: after training, the decoder can generate new images "
 "by sampling from the QBM prior and decoding."
 msgstr "**生成样本**：训练后，解码器可通过从 QBM 先验采样并解码来生成新图像。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:146
+#: ../../source/getting_started/tutorials/qvae_mnist.md:153
 msgid "Case Studies"
 msgstr "案例研究"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:148
+#: ../../source/getting_started/tutorials/qvae_mnist.md:155
 msgid ""
 "The Q-VAE architecture introduced here scales to larger biological and "
 "tabular datasets. See the [Case Studies section](index.md) for end-to-end "
 "pipelines built on this tutorial:"
 msgstr "此处介绍的 Q-VAE 架构可扩展到更大规模的生物与表格数据集。基于本教程的端到端流水线请参阅[案例研究章节](index.md)："
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:150
+#: ../../source/getting_started/tutorials/qvae_mnist.md:157
 msgid ""
 "[Q-VAE for Single-Cell Transcriptomics](qvae_cell.md): representation "
 "learning on scRNA-seq with UMAP and clustering evaluation."
 msgstr "[Q-VAE 用于单细胞转录组学](qvae_cell.md)：scRNA-seq 的表示学习，含 UMAP 与聚类评估。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:151
+#: ../../source/getting_started/tutorials/qvae_mnist.md:158
 msgid ""
 "[Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): "
 "CleanEnergyQVAE with a free-energy scoring head on tabular benchmarks."
 msgstr ""
 "[Q-VAE 用于能量监督异常检测](qvae_anomaly.md)：带自由能量评分头的 CleanEnergyQVAE，在表格基准数据集上验证。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:153
+#: ../../source/getting_started/tutorials/qvae_mnist.md:160
 msgid "Summary"
 msgstr "小结"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:155
+#: ../../source/getting_started/tutorials/qvae_mnist.md:162
 msgid ""
 "A Q-VAE swaps the Gaussian prior for a QBM, trained with the same "
 "positive/negative phase as an RBM."
 msgstr "Q-VAE 将高斯先验替换为 QBM，使用与 RBM 相同的正相/负相训练。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:156
+#: ../../source/getting_started/tutorials/qvae_mnist.md:163
 msgid ""
 "The Q-ELBO combines reconstruction loss with a KL term between the encoder "
 "posterior and the QBM prior."
 msgstr "Q-ELBO 将重建损失与编码器后验和 QBM 先验之间的 KL 项相结合。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:157
+#: ../../source/getting_started/tutorials/qvae_mnist.md:164
 msgid ""
 "The sampler (SA vs CIM) can be switched without changing the rest of the "
 "pipeline."
 msgstr "采样器（SA 与 CIM）可切换，无需修改流水线其余部分。"
 
-#: ../../source/getting_started/tutorials/qvae_mnist.md:158
+#: ../../source/getting_started/tutorials/qvae_mnist.md:165
 msgid ""
 "Learned representations can be fed to a downstream classifier, as in the RBM"
 " feature-learning tutorial."
@@ -667,3 +710,27 @@ msgstr "学习到的表示可输入下游分类器，如 RBM 特征学习教程�
 #~ msgstr ""
 #~ "**相关论文**：[Quantum-Boosted High-Fidelity Deep "
 #~ "Learning](https://arxiv.org/abs/2508.11190)"
+
+#~ msgid ""
+#~ "The following snippet shows how to run the pipeline from a user's "
+#~ "perspective, this is what you would execute via `run_pipeline.py`:"
+#~ msgstr "以下代码片段从用户视角展示如何运行整个流程，也就是你通过 `run_pipeline.py` 执行的内容："
+
+#~ msgid "Load MNIST and build the Q-VAE pipeline:"
+#~ msgstr "加载 MNIST 并构建 Q-VAE 流水线："
+
+#~ msgid "Train the Q-VAE:"
+#~ msgstr "训练 Q-VAE："
+
+#~ msgid "Evaluate downstream classification on learned representations:"
+#~ msgstr "在学习到的表示上评估下游分类："
+
+#~ msgid ""
+#~ "The steps below mirror `train_qvae.ipynb`; imports are omitted for "
+#~ "readability — the full runnable notebook is "
+#~ "`example/qvae_mnist/train_qvae.ipynb`. A command-line equivalent is `python "
+#~ "run_pipeline.py --epochs 50 --run-tsne`."
+#~ msgstr ""
+#~ "以下步骤与 `train_qvae.ipynb` 一致；为便于阅读省略了 import——完整可运行 notebook 见 "
+#~ "`example/qvae_mnist/train_qvae.ipynb`。等价的命令行入口为 `python run_pipeline.py "
+#~ "--epochs 50 --run-tsne`。"

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 17:43+0800\n"
+"POT-Creation-Date: 2026-10-15 16:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -85,8 +85,11 @@ msgid "**Key files**:"
 msgstr "**关键文件**："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:31
-msgid "`dbn_trainer.py`: `DBNPretrainer` — greedy layer-wise RBM pretraining"
-msgstr "`dbn_trainer.py`：`DBNPretrainer` — 贪婪逐层 RBM 预训练"
+msgid ""
+"`dbn_trainer.py`: `DBNPretrainer` — greedy layer-wise RBM pretraining "
+"(internally delegates each layer to a low-level `DBNTrainer`)"
+msgstr ""
+"`dbn_trainer.py`：`DBNPretrainer` — 贪婪逐层 RBM 预训练（内部将每一层委托给底层 `DBNTrainer`）"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:32
 msgid ""
@@ -131,8 +134,10 @@ msgstr "代码库提供分层类结构："
 #: ../../source/getting_started/tutorials/dbn_classification.md:51
 msgid ""
 "**`DBNPretrainer`**: stacks multiple RBM layers and runs greedy unsupervised"
-" pretraining layer by layer."
-msgstr "**`DBNPretrainer`**：堆叠多个 RBM 层，逐层执行贪婪无监督预训练。"
+" pretraining layer by layer (internally delegating each layer to a low-level"
+" `DBNTrainer`)."
+msgstr ""
+"**`DBNPretrainer`**：堆叠多个 RBM 层，逐层执行贪婪无监督预训练（内部将每一层委托给底层 `DBNTrainer`）。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:52
 msgid ""
@@ -183,9 +188,9 @@ msgstr "**微调模式**：将堆叠展开为深度神经网络，用预训练�
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:64
 msgid ""
-"The sampler configuration is inherited per RBM layer from the [Quick "
-"Start](../quickstart.md)."
-msgstr "采样器配置按 RBM 层从[快速入门](../quickstart.md)继承。"
+"The sampler configuration follows the [Quick Start](../quickstart.md) "
+"pattern, per RBM layer."
+msgstr "采样器配置按 RBM 层遵循[快速入门](../quickstart.md)的模式。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:66
 msgid "Quick Start"
@@ -193,162 +198,189 @@ msgstr "快速开始"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:68
 msgid ""
-"The following snippet shows how to run the pipeline from a user's "
-"perspective, this is what you would execute in "
-"`supervised_dbn_digits.ipynb`:"
-msgstr "以下代码片段从用户视角展示如何运行整个流程，也就是你在 `supervised_dbn_digits.ipynb` 中执行的内容："
+"The steps below condense `example/dbn_digits/supervised_dbn_digits.ipynb` "
+"with imports omitted; the notebook is the fully runnable demo."
+msgstr ""
+"以下步骤浓缩自 `example/dbn_digits/supervised_dbn_digits.ipynb`，省略了 import；该 "
+"notebook 即完整可运行的示例。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:70
-msgid "Load digits data (same shift augmentation as the RBM tutorial):"
-msgstr "加载数字数据（与 RBM 教程相同的位移增强）："
+msgid ""
+"**1. Load the data.** `load_data` wraps `sklearn.datasets.load_digits` and "
+"augments the 8×8 images by shifting them in all four directions."
+msgstr ""
+"**1. 加载数据。** `load_data` 包装 `sklearn.datasets.load_digits`，并通过上下左右四个方向平移增强 "
+"8×8 图像。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:80
-msgid "Greedy layer-wise pretraining:"
-msgstr "贪婪逐层预训练："
+#: ../../source/getting_started/tutorials/dbn_classification.md:76
+msgid ""
+"**2. Configure the DBN.** Layer-wise RBM pretraining happens inside `fit`; "
+"pass the pretraining config (layer sizes, per-layer RBM epochs, batch size) "
+"and the training mode directly as keyword arguments. `fine_tuning=True` "
+"unrolls the stack into a deep network and backpropagates with labels; "
+"`fine_tuning=False` attaches a downstream classifier selected by "
+"`classifier_type`."
+msgstr ""
+"**2. 配置 DBN。** 逐层 RBM 预训练发生在 `fit` 内部；直接将预训练配置（层大小、每层 RBM "
+"轮数、批大小）与训练模式作为关键字参数传入。`fine_tuning=True` "
+"将堆栈展开为深度网络并用标签反向传播；`fine_tuning=False` 则接入由 `classifier_type` 指定的下游分类器。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:87
-msgid "Supervised classification (classifier mode):"
-msgstr "4. SupervisedDBNClassification 具体分类实现"
-
-#: ../../source/getting_started/tutorials/dbn_classification.md:96
-msgid "Fine-tuning mode (optional):"
-msgstr "微调模式（可选）："
+#: ../../source/getting_started/tutorials/dbn_classification.md:95
+msgid ""
+"**3. Train and evaluate.** `fit` runs pretraining and then the chosen mode; "
+"`score` reports test accuracy; `transform` extracts layer-wise features."
+msgstr "**3. 训练与评估。** `fit` 执行预训练及所选模式；`score` 返回测试准确率；`transform` 提取逐层特征。"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:103
 msgid "Key Code"
 msgstr "核心代码"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:105
-msgid "1. DBNTrainer Initialization (SA vs CIM per layer)"
-msgstr "1\\. DBNTrainer 初始化（每层 SA vs CIM）"
+msgid "1. DBNPretrainer Initialization (SA vs CIM per layer)"
+msgstr "1\\. DBNPretrainer 初始化（每层 SA vs CIM）"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:107
 msgid ""
-"The `DBNTrainer` class supports switching between classical Simulated "
-"Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers per RBM "
-"layer:"
-msgstr "`DBNTrainer` 类支持在每一层 RBM 中切换经典模拟退火（SA）与量子相干伊辛机（CIM）采样器："
+"The `DBNPretrainer` class is the pretraining entry point that "
+"`SupervisedDBNClassification` instantiates internally; it supports switching"
+" between classical Simulated Annealing (SA) and quantum Coherent Ising "
+"Machine (CIM) samplers per RBM layer:"
+msgstr ""
+"`DBNPretrainer` 类是 `SupervisedDBNClassification` 内部实例化的预训练入口，支持在每一层 RBM "
+"中切换经典模拟退火（SA）与量子相干伊辛机（CIM）采样器："
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:113
+msgid ""
+"Internally, `DBNPretrainer` builds an `UnsupervisedDBN` and delegates each "
+"layer's training to a `DBNTrainer`."
+msgstr "内部，`DBNPretrainer` 构建 `UnsupervisedDBN`，并将每一层的训练委托给 `DBNTrainer`。"
+
+#: ../../source/getting_started/tutorials/dbn_classification.md:115
 msgid "When `use_cim=True`:"
 msgstr "当 `use_cim=True` 时："
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:114
+#: ../../source/getting_started/tutorials/dbn_classification.md:116
 msgid "Uses `CIMOptimizer` from `kaiwu.cim`"
 msgstr "使用 `kaiwu.cim` 中的 `CIMOptimizer`"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:115
+#: ../../source/getting_started/tutorials/dbn_classification.md:117
 msgid "Wrapped in `PrecisionReducer` for precision control"
 msgstr "封装在 `PrecisionReducer` 中用于精度控制"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:116
+#: ../../source/getting_started/tutorials/dbn_classification.md:118
 msgid "Checkpoint manager saves to `./tmp`"
 msgstr "检查点管理器保存到 `./tmp`"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:118
+#: ../../source/getting_started/tutorials/dbn_classification.md:120
 msgid "When `use_cim=False`:"
 msgstr "当 `use_cim=False` 时："
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:119
+#: ../../source/getting_started/tutorials/dbn_classification.md:121
 msgid "Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`"
 msgstr "使用 `kaiwu.classical` 中的 `SimulatedAnnealingOptimizer`"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:123
+#: ../../source/getting_started/tutorials/dbn_classification.md:125
 msgid "2. Greedy Layer-wise Pretraining"
 msgstr "2\\. 贪婪逐层预训练："
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:125
+#: ../../source/getting_started/tutorials/dbn_classification.md:127
 msgid ""
-"The `train()` method iterates through each RBM layer, training one at a "
-"time:"
-msgstr "`train()` 方法逐层遍历 RBM 层，一次训练一层："
+"`DBNPretrainer.fit` creates the RBM stack from the input dimension and "
+"iterates through each layer, training one at a time through the internal "
+"`DBNTrainer`:"
+msgstr "`DBNPretrainer.fit` 根据输入维度创建 RBM 堆栈，并逐层迭代，通过内部 `DBNTrainer` 依次训练每一层："
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:131
+#: ../../source/getting_started/tutorials/dbn_classification.md:133
 msgid "Key pretraining details:"
 msgstr "关键预训练细节："
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:132
+#: ../../source/getting_started/tutorials/dbn_classification.md:134
 msgid ""
 "Each RBM layer uses the same `objective()` and `sample()` as the Quick Start"
 msgstr "每层使用与快速入门相同的 `objective()` 和 `sample()`。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:133
+#: ../../source/getting_started/tutorials/dbn_classification.md:135
+msgid ""
+"`create_rbm_layer(X.shape[1])` builds the RBM stack from the input dimension"
+msgstr "`create_rbm_layer(X.shape[1])` 根据输入维度构建 RBM 堆栈"
+
+#: ../../source/getting_started/tutorials/dbn_classification.md:136
 msgid "After training a layer, the output becomes input for the next layer"
 msgstr "训练完一层后，其输出成为下一层的输入"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:134
+#: ../../source/getting_started/tutorials/dbn_classification.md:137
 msgid "Verbose mode prints progress for each layer"
 msgstr "详细模式会打印每一层的训练进度"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:138
+#: ../../source/getting_started/tutorials/dbn_classification.md:141
 msgid "3. Supervised Classification and Fine-tuning"
 msgstr "3\\. 监督分类与微调"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:140
+#: ../../source/getting_started/tutorials/dbn_classification.md:143
 msgid ""
 "The `SupervisedDBNClassification` class provides three training modes: "
 "unsupervised feature extraction, downstream classifier, and end-to-end fine-"
 "tuning."
 msgstr "三种训练模式：无监督特征提取、下游分类器或端到端微调。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:146
+#: ../../source/getting_started/tutorials/dbn_classification.md:149
 msgid "Training and Evaluation"
 msgstr "训练与评估"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:148
+#: ../../source/getting_started/tutorials/dbn_classification.md:151
 msgid ""
 "**Pretraining progress**: each RBM layer reports its objective loss; "
 "`RBMVisualizer` renders the learned weight filters at each layer and "
 "monitors weight gradients during training."
 msgstr "**预训练进度**：每个 RBM 层报告其目标损失；`RBMVisualizer` 渲染学习到的滤波器。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:149
+#: ../../source/getting_started/tutorials/dbn_classification.md:152
 msgid ""
 "**Reconstruction visualization**: the notebook encodes test images through "
 "the trained RBM stack and plots the reconstruction error evolution."
 msgstr "**重建可视化**：笔记本通过训练好的 RBM 堆叠编码测试图像并解码，以可视化重建质量。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:150
+#: ../../source/getting_started/tutorials/dbn_classification.md:153
 msgid ""
 "**Generated samples**: during pretraining, the notebook can display samples "
 "generated by each RBM layer."
 msgstr "**生成样本**：预训练过程中，笔记本可显示每个 RBM 层生成的样本。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:151
+#: ../../source/getting_started/tutorials/dbn_classification.md:154
 msgid ""
 "**Confusion matrix**: after classification, `RBMVisualizer` produces a "
 "confusion matrix heatmap."
 msgstr "**混淆矩阵**：分类后，`RBMVisualizer` 生成混淆矩阵热力图。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:152
+#: ../../source/getting_started/tutorials/dbn_classification.md:155
 msgid ""
 "**Comparison**: the notebook compares DBN (2-layer) against single-RBM "
 "features and raw pixels."
 msgstr "**对比**：笔记本将 DBN（2 层）与单 RBM 特征和原始像素进行对比。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:154
+#: ../../source/getting_started/tutorials/dbn_classification.md:157
 msgid "Summary"
 msgstr "小结"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:156
+#: ../../source/getting_started/tutorials/dbn_classification.md:159
 msgid ""
 "A DBN stacks RBMs, pretrained greedily one layer at a time using the same "
 "RBM objective."
 msgstr "DBN 堆叠 RBM，使用相同的 RBM 目标逐层贪婪预训练。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:157
+#: ../../source/getting_started/tutorials/dbn_classification.md:160
 msgid ""
 "Three training modes: unsupervised feature extraction, downstream "
 "classifier, or end-to-end fine-tuning."
 msgstr "三种训练模式：无监督特征提取、下游分类器或端到端微调。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:158
+#: ../../source/getting_started/tutorials/dbn_classification.md:161
 msgid ""
 "The fine-tuning mode unrolls the RBM stack into a deep network initialized "
 "with pretrained weights, trained with `CrossEntropyLoss`."
 msgstr "微调模式将 RBM 堆叠展开为深度网络，用预训练权重初始化，实现端到端监督训练。"
 
-#: ../../source/getting_started/tutorials/dbn_classification.md:159
+#: ../../source/getting_started/tutorials/dbn_classification.md:162
 msgid ""
 "The sampler (SA vs CIM) is configured per RBM layer and follows the Quick "
 "Start pattern."
@@ -977,3 +1009,34 @@ msgstr "采样器（SA 与 CIM）按 RBM 层配置，遵循快速入门模式。
 
 #~ msgid "重建样本：训练完成后对测试图像进行编码-解码得到的重建"
 #~ msgstr "重建样本：训练完成后对测试图像进行编码-解码得到的重建"
+
+#~ msgid ""
+#~ "The following snippet shows how to run the pipeline from a user's "
+#~ "perspective, this is what you would execute in "
+#~ "`supervised_dbn_digits.ipynb`:"
+#~ msgstr "以下代码片段从用户视角展示如何运行整个流程，也就是你在 `supervised_dbn_digits.ipynb` 中执行的内容："
+
+#~ msgid "Load digits data (same shift augmentation as the RBM tutorial):"
+#~ msgstr "加载数字数据（与 RBM 教程相同的位移增强）："
+
+#~ msgid "Greedy layer-wise pretraining:"
+#~ msgstr "贪婪逐层预训练："
+
+#~ msgid "Supervised classification (classifier mode):"
+#~ msgstr "4. SupervisedDBNClassification 具体分类实现"
+
+#~ msgid "Fine-tuning mode (optional):"
+#~ msgstr "微调模式（可选）："
+
+#~ msgid ""
+#~ "The `train()` method iterates through each RBM layer, training one at a "
+#~ "time:"
+#~ msgstr "`train()` 方法逐层遍历 RBM 层，一次训练一层："
+
+#~ msgid ""
+#~ "The steps below mirror `supervised_dbn_digits.ipynb`; imports are omitted "
+#~ "for readability — the full runnable demo is "
+#~ "`example/dbn_digits/supervised_dbn_digits.ipynb`."
+#~ msgstr ""
+#~ "以下步骤与 `supervised_dbn_digits.ipynb` 一致；为便于阅读省略了 import——完整可运行示例见 "
+#~ "`example/dbn_digits/supervised_dbn_digits.ipynb`。"

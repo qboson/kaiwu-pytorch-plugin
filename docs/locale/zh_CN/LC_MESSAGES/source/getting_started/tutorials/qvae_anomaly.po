@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 16:05+0800\n"
+"POT-Creation-Date: 2026-10-15 16:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -152,146 +152,170 @@ msgid "Quick Start"
 msgstr "快速开始"
 
 #: ../../source/getting_started/tutorials/qvae_anomaly.md:64
-msgid "The following shows how to run the training and evaluation pipeline:"
-msgstr "以下展示如何运行训练与评估流程："
+msgid ""
+"The steps below are the two command-line entry points of "
+"`example/qvae_anomaly`; `qvae_anomaly_demo.ipynb` provides the interactive "
+"equivalent, and `run_public_ad.sh` runs both steps in one command."
+msgstr ""
+"以下步骤即 `example/qvae_anomaly` 的两个命令行入口；`qvae_anomaly_demo.ipynb` "
+"提供等价的交互式版本，`run_public_ad.sh` 则一条命令运行两个步骤。"
 
 #: ../../source/getting_started/tutorials/qvae_anomaly.md:66
-msgid "Train on thyroid dataset:"
-msgstr "在甲状腺数据集上训练："
+msgid ""
+"**1. Train.** `train_public_ad.py` trains `CleanEnergyQVAE` with the energy-"
+"supervised loss on a public anomaly benchmark. `--dataset` selects the "
+"tabular benchmark (e.g., `thyroid`, `creditcard`); `--lambda-anom` sets the "
+"weight of the anomaly energy term relative to the Q-ELBO objective."
+msgstr ""
+"**1. 训练。** `train_public_ad.py` 在公开异常检测基准上以能量监督损失训练 "
+"`CleanEnergyQVAE`。`--dataset` 选择表格型基准（如 `thyroid`、`creditcard`）；`--lambda-"
+"anom` 设置异常能量项相对 Q-ELBO 目标的权重。"
 
 #: ../../source/getting_started/tutorials/qvae_anomaly.md:72
-msgid "Evaluate on the best checkpoint:"
-msgstr "在最佳检查点上进行评估："
+msgid ""
+"**2. Evaluate.** `evaluate_public_ad.py` loads the best checkpoint, searches"
+" the best-F1 threshold over a candidate grid, and reports PR-AUC / ROC-AUC "
+"with precision, recall, and F1. It also saves the score distribution and "
+"PR/ROC curves under the output directory."
+msgstr ""
+"**2. 评估。** `evaluate_public_ad.py` 加载最优检查点，在候选网格上搜索 best-F1 阈值，并报告 PR-AUC / "
+"ROC-AUC 及精确率、召回率与 F1。它还会在输出目录下保存分数分布与 PR/ROC 曲线。"
 
 #: ../../source/getting_started/tutorials/qvae_anomaly.md:78
-msgid "Or run both in one command:"
-msgstr "或在一个命令中同时运行两者："
+msgid ""
+"The result is the anomaly-detection report: a clear low/high free-energy "
+"separation of normal vs anomalous samples, a best-F1 decision threshold, and"
+" the PR-AUC / ROC-AUC you compare across `--lambda-anom` and `--sampler-"
+"type` runs."
+msgstr ""
+"结果即异常检测报告：正常与异常样本在自由能上清晰分离（低/高），一个 best-F1 决策阈值，以及你在 `--lambda-anom` 与 "
+"`--sampler-type` 各次运行之间对比的 PR-AUC / ROC-AUC。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:84
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:80
 msgid "Key Code"
 msgstr "关键代码"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:86
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:82
 msgid "1. CleanEnergyQVAE Model"
 msgstr "1\\. CleanEnergyQVAE 模型"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:88
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:84
 msgid ""
 "The `CleanEnergyQVAE` model combines a standard Q-VAE with an RBM free-"
 "energy scoring head:"
 msgstr "`CleanEnergyQVAE` 模型将标准 Q-VAE 与 RBM 自由能评分头相结合："
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:95
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:91
 msgid "Key model details:"
 msgstr "关键模型细节："
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:96
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:92
 msgid ""
 "Encoder/Decoder: `CleanEncoder` / `CleanDecoder` — standard Q-VAE "
 "architecture"
 msgstr "编码器/解码器：`CleanEncoder` / `CleanDecoder` — 标准 Q-VAE 架构"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:97
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:93
 msgid "Free-energy head: RBM on latent space for anomaly scoring"
 msgstr "自由能头：隐空间上的 RBM，用于异常打分"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:98
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:94
 msgid "Anomaly score: free energy (normal = low, anomaly = high)"
 msgstr "异常分数：自由能（正常 = 低，异常 = 高）"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:99
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:95
 msgid "Loss types: margin, InfoNCE, or both (configurable)"
 msgstr "损失类型：margin、InfoNCE 或两者兼有（可配置）"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:103
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:99
 msgid "2. Energy-Supervised Loss"
 msgstr "2\\. 能量监督损失"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:105
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:101
 msgid ""
 "The `losses.py` implements energy-supervised loss to separate normal from "
 "anomalous samples:"
 msgstr "`losses.py` 实现了能量监督损失，以区分正常样本与异常样本："
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:112
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:108
 msgid "Key loss details:"
 msgstr "关键损失细节："
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:113
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:109
 msgid "Normal samples: pulled toward QBM prior (low free energy)"
 msgstr "正常样本：拉向 QBM 先验（低自由能）"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:114
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:110
 msgid "Anomalies: pushed away from QBM prior (high free energy)"
 msgstr "异常样本：推离 QBM 先验（高自由能）"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:115
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:111
 msgid "`lambda_anom`: weight for anomaly energy loss (default 1.0)"
 msgstr "`lambda_anom`：异常能量损失的权重（默认 1.0）"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:119
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:115
 msgid "3. Threshold Search and Evaluation"
 msgstr "3\\. 阈值搜索与评估"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:121
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:117
 msgid ""
 "The `optimize_threshold_rbm` function implements best-F1 threshold search "
 "over a candidate grid:"
 msgstr "`optimize_threshold_rbm` 函数在候选网格上实现最佳 F1 阈值搜索："
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:128
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:124
 msgid "Training and Evaluation"
 msgstr "训练 和 评估"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:130
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:126
 msgid ""
 "**Score distribution**: `plot_score_distribution` shows free energy by label"
 " (normal vs anomaly)."
 msgstr "**分数分布**：`plot_score_distribution` 按标签（正常 vs 异常）展示自由能。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:131
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:127
 msgid ""
 "**PR/ROC curves**: `plot_pr_roc_curve` generates precision-recall and "
 "receiver operating characteristic curves."
 msgstr "**PR/ROC 曲线**：`plot_pr_roc_curve` 生成精确率-召回率曲线与受试者工作特征（ROC）曲线。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:132
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:128
 msgid ""
 "**Latent t-SNE**: `plot_latent_tsne` reduces latent space to 2-D, colored by"
 " label."
 msgstr "**隐空间 t-SNE**：`plot_latent_tsne` 将隐空间降维到二维，按标签着色。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:133
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:129
 msgid ""
 "**Timeseries**: `plot_timeseries_anomaly` shows energy vs time for temporal "
 "anomaly detection."
 msgstr "**时间序列**：`plot_timeseries_anomaly` 展示能量随时间的变化，用于时序异常检测。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:134
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:130
 msgid "**Metrics**: PR-AUC, ROC-AUC, precision, recall, F1."
 msgstr "**指标**：PR-AUC、ROC-AUC、精确率、召回率、F1。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:136
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:132
 msgid "Summary"
 msgstr "总结"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:138
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:134
 msgid ""
 "CleanEnergyQVAE extends Q-VAE with a free-energy scoring head for anomaly "
 "detection."
 msgstr "CleanEnergyQVAE 通过自由能评分头扩展 Q-VAE，用于异常检测。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:139
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:135
 msgid ""
 "Energy-supervised loss separates normal from anomalous samples in latent "
 "space."
 msgstr "能量监督损失在隐空间中将正常样本与异常样本分开。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:140
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:136
 msgid "Threshold search with best-F1 determines the decision boundary."
 msgstr "以最佳 F1 进行阈值搜索可确定决策边界。"
 
-#: ../../source/getting_started/tutorials/qvae_anomaly.md:141
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:137
 msgid ""
 "The Q-ELBO framework remains the same; only the scoring head and loss "
 "objective are added."
@@ -316,3 +340,15 @@ msgstr "Q-ELBO 框架保持不变；仅新增了评分头与损失目标。"
 
 #~ msgid "`lambda_anom`: weight for anomaly energy loss (default 50.0)"
 #~ msgstr ""
+
+#~ msgid "The following shows how to run the training and evaluation pipeline:"
+#~ msgstr "以下展示如何运行训练与评估流程："
+
+#~ msgid "Train on thyroid dataset:"
+#~ msgstr "在甲状腺数据集上训练："
+
+#~ msgid "Evaluate on the best checkpoint:"
+#~ msgstr "在最佳检查点上进行评估："
+
+#~ msgid "Or run both in one command:"
+#~ msgstr "或在一个命令中同时运行两者："

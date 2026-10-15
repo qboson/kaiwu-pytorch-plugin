@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-13 17:43+0800\n"
+"POT-Creation-Date: 2026-10-15 16:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh <LL@li.org>\n"
@@ -149,105 +149,136 @@ msgstr "快速开始"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:51
 msgid ""
-"The following snippet shows how to run the pipeline from a user's "
-"perspective, this is exactly what you would execute in a notebook:"
-msgstr "以下代码片段展示了从用户视角运行流程的方式，这正是您在 notebook 中会执行的操作："
+"The pipeline has two stages: train an RBM as an unsupervised feature "
+"extractor, then fit a downstream classifier on the extracted features. The "
+"steps below condense `example/rbm_digits/rbm_digits.ipynb` with imports "
+"omitted. A one-call convenience wrapper (`train_classifier(n_iter=…)` in "
+"`rbm_classifier.py`) runs exactly these steps and prints the accuracy "
+"comparison."
+msgstr ""
+"该流水线分为两个阶段：先训练 RBM 作为无监督特征提取器，再在提取的特征上拟合下游分类器。以下步骤浓缩自 "
+"`example/rbm_digits/rbm_digits.ipynb`，省略了 import。`rbm_classifier.py` "
+"中的一行式便捷封装（`train_classifier(n_iter=…)`）执行与下面完全相同的步骤，并打印准确率对比。"
 
 #: ../../source/getting_started/tutorials/rbm_classification.md:53
-msgid "Load the digits dataset (with four-direction shift augmentation):"
-msgstr "加载数字数据集（带四方向平移增强）："
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:62
-msgid "Train the RBM:"
-msgstr "训练 RBM："
-
-#: ../../source/getting_started/tutorials/rbm_classification.md:68
 msgid ""
-"Build and evaluate the two-stage classifier (RBM features + logistic "
-"regression) versus raw-pixel baseline:"
-msgstr "构建并评估两阶段分类器（RBM 特征 + 逻辑回归）与原始像素基线对比："
+"**1. Load the data.** `load_data` returns the 8×8 digits split, augmented by"
+" shifting every image in all four directions."
+msgstr "**1. 加载数据。** `load_data` 返回 8×8 手写数字训练/测试划分，并对每张图像做四个方向平移增强。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:77
+#: ../../source/getting_started/tutorials/rbm_classification.md:60
+msgid ""
+"**2. Train the feature extractor.** `fit` runs the same positive/negative-"
+"phase loop as the Quick Start example; after training, `transform` maps raw "
+"pixels to the hidden features used downstream."
+msgstr ""
+"**2. 训练特征提取器。** `fit` 执行与 Quick Start 示例相同的正相/负相循环；训练后 `transform` "
+"将原始像素映射为下游使用的隐层特征。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:66
+msgid ""
+"**3. Fit and compare a classifier.** `RBMRunner` is a scikit-learn "
+"`TransformerMixin`, so it slots into a `Pipeline` directly. Compare the RBM "
+"features against a raw-pixel logistic-regression baseline."
+msgstr ""
+"**3. 拟合并对比分类器。** `RBMRunner` 是 scikit-learn 的 `TransformerMixin`，可直接放入 "
+"`Pipeline`。将 RBM 特征与基于原始像素的逻辑回归基线进行对比。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:81
+msgid ""
+"**4. Visualize the results.** Plot the learned filters and the confusion "
+"matrix of the RBM-feature classifier."
+msgstr "**4. 可视化结果。** 绘制学到的滤波器与基于 RBM 特征的分类器的混淆矩阵。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:91
 msgid "Key Code"
 msgstr "核心代码"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:79
+#: ../../source/getting_started/tutorials/rbm_classification.md:93
 msgid "1. Sampler Initialization (SA vs CIM)"
 msgstr "1\\. 采样器初始化（SA vs CIM）"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:81
+#: ../../source/getting_started/tutorials/rbm_classification.md:95
 msgid ""
 "The `RBMRunner` class supports switching between classical Simulated "
 "Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers:"
 msgstr "`RBMRunner` 类支持在经典模拟退火（SA）和量子相干伊辛机（CIM）采样器之间切换："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:87
+#: ../../source/getting_started/tutorials/rbm_classification.md:101
 msgid "When `use_cim=True`:"
 msgstr "当 `use_cim=True` 时："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:88
+#: ../../source/getting_started/tutorials/rbm_classification.md:102
 msgid "Uses `CIMOptimizer` from `kaiwu.cim`"
 msgstr "使用 `kaiwu.cim` 中的 `CIMOptimizer`"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:89
+#: ../../source/getting_started/tutorials/rbm_classification.md:103
 msgid "Wrapped in `PrecisionReducer` for precision control"
 msgstr "封装在 `PrecisionReducer` 中用于精度控制"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:90
+#: ../../source/getting_started/tutorials/rbm_classification.md:104
 msgid "Checkpoint manager saves to `./tmp`"
 msgstr "检查点管理器保存到 `./tmp`"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:92
+#: ../../source/getting_started/tutorials/rbm_classification.md:106
 msgid "When `use_cim=False`:"
 msgstr "当 `use_cim=False` 时："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:93
+#: ../../source/getting_started/tutorials/rbm_classification.md:107
 msgid "Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`"
 msgstr "使用 `kaiwu.classical` 中的 `SimulatedAnnealingOptimizer`"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:97
+#: ../../source/getting_started/tutorials/rbm_classification.md:109
+msgid ""
+"The SA / CIM swap behind `sample(sampler)` is introduced in [Integrating "
+"Quantum Samplers into PyTorch](quantum_sampling_pytorch.md)."
+msgstr ""
+"`sample(sampler)` 背后的 SA / CIM 切换在[将量子采样器集成到 "
+"PyTorch](quantum_sampling_pytorch.md)中介绍。"
+
+#: ../../source/getting_started/tutorials/rbm_classification.md:113
 msgid "2. Training Loop"
 msgstr "2\\. 训练循环"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:99
+#: ../../source/getting_started/tutorials/rbm_classification.md:115
 msgid ""
 "The training loop follows the same positive/negative phase pattern "
 "introduced in the [Quick Start](../quickstart.md), see the training flow "
 "diagram there."
 msgstr "训练循环遵循[快速开始](../quickstart.md)中介绍的相同正/负相模式，请参见其中的训练流程图。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:105
+#: ../../source/getting_started/tutorials/rbm_classification.md:121
 msgid "Key training details:"
 msgstr "关键训练细节："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:106
+#: ../../source/getting_started/tutorials/rbm_classification.md:122
 msgid "Optimizer: SGD with learning rate from `self.learning_rate`"
 msgstr "优化器：SGD，学习率来自 `self.learning_rate`"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:107
+#: ../../source/getting_started/tutorials/rbm_classification.md:123
 msgid "Weight decay: 0.02 for weights, 0.05 for biases"
 msgstr "权重衰减：权重 0.02，偏置 0.05"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:108
+#: ../../source/getting_started/tutorials/rbm_classification.md:124
 msgid ""
 "Verbose mode prints objective loss and weight statistics every 20 iterations"
 msgstr "详细模式每 20 次迭代打印目标损失和权重统计"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:112
+#: ../../source/getting_started/tutorials/rbm_classification.md:128
 msgid "3. Feature Extraction and Classification"
 msgstr "3\\. 特征提取与分类"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:114
+#: ../../source/getting_started/tutorials/rbm_classification.md:130
 msgid ""
 "After training, `RBMRunner.transform()` extracts hidden-layer features, "
 "which are then fed to a downstream classifier:"
 msgstr "训练完成后，`RBMRunner.transform()` 提取隐藏层特征，然后输入到下游分类器："
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:120
+#: ../../source/getting_started/tutorials/rbm_classification.md:136
 msgid "Training and Evaluation"
 msgstr "训练与评估"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:122
+#: ../../source/getting_started/tutorials/rbm_classification.md:138
 msgid ""
 "**Weight visualization**: `RBMRunner.plot_weights()` renders each hidden "
 "unit's filter as an 8×8 image, showing the digit-like features the RBM has "
@@ -255,7 +286,7 @@ msgid ""
 msgstr ""
 "**权重可视化**：`RBMRunner.plot_weights()` 将每个隐单元的滤波器渲染为 8×8 图像，展示 RBM 学到的数字状特征。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:123
+#: ../../source/getting_started/tutorials/rbm_classification.md:139
 msgid ""
 "**Confusion matrix**: `RBMRunner.plot_confusion_matrix(y_test, y_pred)` "
 "produces a heatmap; the notebook saves it as a high-resolution PDF."
@@ -263,29 +294,29 @@ msgstr ""
 "**混淆矩阵**：`RBMRunner.plot_confusion_matrix(y_test, y_pred)` 生成热力图；notebook "
 "将其保存为高分辨率 PDF。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:124
+#: ../../source/getting_started/tutorials/rbm_classification.md:140
 msgid ""
 "The expected result is that RBM features yield a 2–5 percentage point "
 "accuracy gain over raw pixels on the 8×8 digits dataset."
 msgstr "预期结果是 RBM 特征在 8×8 数字数据集上比原始像素提升 2-5 个百分点准确率。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:126
+#: ../../source/getting_started/tutorials/rbm_classification.md:142
 msgid "Summary"
 msgstr "小结"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:128
+#: ../../source/getting_started/tutorials/rbm_classification.md:144
 msgid ""
 "An RBM can be used as a fixed feature extractor after unsupervised "
 "pretraining."
 msgstr "RBM 可在无监督预训练后作为固定特征提取器使用。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:129
+#: ../../source/getting_started/tutorials/rbm_classification.md:145
 msgid ""
 "The KPP training loop (positive / negative phase / objective) is unchanged "
 "from the Quick Start."
 msgstr "KPP 训练循环（正相/负相/目标函数）与 Quick Start 保持一致。"
 
-#: ../../source/getting_started/tutorials/rbm_classification.md:130
+#: ../../source/getting_started/tutorials/rbm_classification.md:146
 msgid ""
 "The downstream classifier is a standard scikit-learn pipeline, KPP only "
 "contributes the learned features."
@@ -429,3 +460,19 @@ msgstr "下游分类器是标准的 scikit-learn 流水线，KPP 仅提供学习
 #~ "The downstream classifier is a standard scikit-learn pipeline — KPP only "
 #~ "contributes the learned features."
 #~ msgstr "下游分类器是标准的 scikit-learn 流水线——KPP 仅提供学习到的特征。"
+
+#~ msgid ""
+#~ "The following snippet shows how to run the pipeline from a user's "
+#~ "perspective, this is exactly what you would execute in a notebook:"
+#~ msgstr "以下代码片段展示了从用户视角运行流程的方式，这正是您在 notebook 中会执行的操作："
+
+#~ msgid "Load the digits dataset (with four-direction shift augmentation):"
+#~ msgstr "加载数字数据集（带四方向平移增强）："
+
+#~ msgid "Train the RBM:"
+#~ msgstr "训练 RBM："
+
+#~ msgid ""
+#~ "Build and evaluate the two-stage classifier (RBM features + logistic "
+#~ "regression) versus raw-pixel baseline:"
+#~ msgstr "构建并评估两阶段分类器（RBM 特征 + 逻辑回归）与原始像素基线对比："
