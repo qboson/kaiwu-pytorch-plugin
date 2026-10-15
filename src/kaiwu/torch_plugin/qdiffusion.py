@@ -420,6 +420,7 @@ class QDiffusion(nn.Module):
         partial_masks: torch.Tensor | None = None,
         max_steps: int = 500,
         temperature: float = 1.0,
+        record_history: bool = True,
     ) -> dict[str, Any]:
         """Creates the initial decoding state for an external generation loop.
 
@@ -428,6 +429,10 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of fixed positions.
             max_steps: Planned number of decode iterations.
             temperature: Sampling temperature stored in the state payload.
+            record_history: Whether to keep a token snapshot per decode step in
+                ``state["history"]``. Snapshots cost ``(steps + 1) * batch *
+                length * 8`` bytes for int64 tokens, so callers that only need
+                the final tokens can pass ``False`` to avoid retaining them.
 
         Returns:
             dict[str, Any]: A mutable state dictionary suitable for repeated ``step`` calls.
@@ -443,7 +448,8 @@ class QDiffusion(nn.Module):
             ),
             "step": 0,
             "max_steps": max_steps,
-            "history": [output_tokens.clone()],
+            "history": [output_tokens.clone()] if record_history else [],
+            "record_history": record_history,
             "temperature": temperature,
             "partial_masks": partial_masks,
         }
@@ -511,6 +517,8 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of fixed positions.
             temperature: Sampling temperature stored in the decode state.
             return_state: Whether to return the full final state dictionary.
+                Only the returned state carries ``history``; the token-only path
+                does not retain per-step snapshots.
 
         Returns:
             torch.Tensor | dict[str, Any]: Either the final token tensor or the full decode state.
@@ -520,6 +528,7 @@ class QDiffusion(nn.Module):
             partial_masks=partial_masks,
             max_steps=max_steps,
             temperature=temperature,
+            record_history=return_state,
         )
         for _ in range(max_steps):
             state = self.step(state, partial_masks=partial_masks)
@@ -886,7 +895,9 @@ class QDiffusion(nn.Module):
         output_scores.masked_scatter_(output_masks, selected_scores[output_masks])
 
         history = list(state["history"])
-        history.append(output_tokens.clone())
+        # States without the flag predate the opt-out, so they keep recording.
+        if state.get("record_history", True):
+            history.append(output_tokens.clone())
         return {
             "output_tokens": output_tokens,
             "output_scores": output_scores,
