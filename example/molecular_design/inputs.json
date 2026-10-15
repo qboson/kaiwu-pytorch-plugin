@@ -1,0 +1,24 @@
+{
+  "checkpoint": {
+    "path": "checkpoints/checkpoint_qc.pt",
+    "sha256": "1e6d81c49831fd82413e2aa88aa1ed07663bc092bc7dea6bd612a5e19df29209",
+    "included_in_proposed_pr": true
+  },
+  "references": {
+    "path": "references_25.json",
+    "sha256": "03777ab3c24618bf1a1a9ceac137ef3a1168761d4dd686125712c10f80204a68",
+    "included_in_proposed_pr": true
+  },
+  "dataset": {
+    "path": "zinc250k.csv",
+    "sha256": "35e3f1a52b1badc0697e373d73a18ad773f415936ff992f4c6baa2e067b3e6ae",
+    "rows": 249455,
+    "included_in_proposed_pr": false,
+    "required_for": "New generation; not needed for saved-result verification"
+  },
+  "model_training": "Classical annealing proxy; existing checkpoint reused for generation",
+  "base_seed": 42,
+  "conditions_per_solver": 250,
+  "steps_per_condition": 100,
+  "upstream_checked_commit": "f047bce7b1077449967bbe9e9fab5741542b48d4"
+}

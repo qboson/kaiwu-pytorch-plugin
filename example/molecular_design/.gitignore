@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.private/
+*.lic
+zinc250k.csv
+results/new_*/
+results/sqa_cim_matched_v1_20261013/
+
+# These are Python packages, not datasets.
+!cim_sa/qc_mol_design/data/
+!sqa/qc_mol_design/data/

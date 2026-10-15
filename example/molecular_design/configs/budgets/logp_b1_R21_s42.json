@@ -1,0 +1,807 @@
+{
+  "condition": "logp_b1_R21_s42",
+  "source_file": "results/cim_single_v1_26091733/full/ratio4_gauge1_after5_valid/kaiwu_cim/logp_b1_R21_s42/samples_raw.csv",
+  "source_sha256": "2b7684f7692c1f16ba3ec9aaeaccb9e97d3b9f63ef3b32c7681a63a8a48e4a8c",
+  "steps": [
+    {
+      "global_step": 0,
+      "solver_seed": 2001063,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 1,
+      "solver_seed": 2001064,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 2,
+      "solver_seed": 2001065,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 3,
+      "solver_seed": 2001066,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 4,
+      "solver_seed": 2001067,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 5,
+      "solver_seed": 2001068,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 6,
+      "solver_seed": 2001069,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 7,
+      "solver_seed": 2001070,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 8,
+      "solver_seed": 2001071,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 9,
+      "solver_seed": 2001072,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 10,
+      "solver_seed": 2001073,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 11,
+      "solver_seed": 2001074,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 12,
+      "solver_seed": 2001075,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 13,
+      "solver_seed": 2001076,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 14,
+      "solver_seed": 2001077,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 15,
+      "solver_seed": 2001078,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 16,
+      "solver_seed": 2001079,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 17,
+      "solver_seed": 2001080,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 18,
+      "solver_seed": 2001081,
+      "solver_repeats": 5,
+      "feasibility_batches": 1,
+      "candidate_reads": 50,
+      "sampling_regime": "historical_5_calls"
+    },
+    {
+      "global_step": 19,
+      "solver_seed": 2001082,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 20,
+      "solver_seed": 2001083,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 21,
+      "solver_seed": 2001084,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 22,
+      "solver_seed": 2001085,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 23,
+      "solver_seed": 2001086,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 24,
+      "solver_seed": 2001087,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 25,
+      "solver_seed": 2001088,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 26,
+      "solver_seed": 2001089,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 27,
+      "solver_seed": 2001090,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 28,
+      "solver_seed": 2001091,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 29,
+      "solver_seed": 2001092,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 30,
+      "solver_seed": 2001093,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 31,
+      "solver_seed": 2001094,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 32,
+      "solver_seed": 2001095,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 33,
+      "solver_seed": 2001096,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 34,
+      "solver_seed": 2001097,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 35,
+      "solver_seed": 2001098,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 36,
+      "solver_seed": 2001099,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 37,
+      "solver_seed": 2001100,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 38,
+      "solver_seed": 2001101,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 39,
+      "solver_seed": 2001102,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 40,
+      "solver_seed": 2001103,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 41,
+      "solver_seed": 2001104,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 42,
+      "solver_seed": 2001105,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 43,
+      "solver_seed": 2001106,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 44,
+      "solver_seed": 2001107,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 45,
+      "solver_seed": 2001108,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 46,
+      "solver_seed": 2001109,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 47,
+      "solver_seed": 2001110,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 48,
+      "solver_seed": 2001111,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 49,
+      "solver_seed": 2001112,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 50,
+      "solver_seed": 2001113,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 51,
+      "solver_seed": 2001114,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 52,
+      "solver_seed": 2001115,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 53,
+      "solver_seed": 2001116,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 54,
+      "solver_seed": 2001117,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 55,
+      "solver_seed": 2001118,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 56,
+      "solver_seed": 2001119,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 57,
+      "solver_seed": 2001120,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 58,
+      "solver_seed": 2001121,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 59,
+      "solver_seed": 2001122,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 60,
+      "solver_seed": 2001123,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 61,
+      "solver_seed": 2001124,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 62,
+      "solver_seed": 2001125,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 63,
+      "solver_seed": 2001126,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 64,
+      "solver_seed": 2001127,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 65,
+      "solver_seed": 2001128,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 66,
+      "solver_seed": 2001129,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 67,
+      "solver_seed": 2001130,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 68,
+      "solver_seed": 2001131,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 69,
+      "solver_seed": 2001132,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 70,
+      "solver_seed": 2001133,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 71,
+      "solver_seed": 2001134,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 72,
+      "solver_seed": 2001135,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 73,
+      "solver_seed": 2001136,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 74,
+      "solver_seed": 2001137,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 75,
+      "solver_seed": 2001138,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 76,
+      "solver_seed": 2001139,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 77,
+      "solver_seed": 2001140,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 78,
+      "solver_seed": 2001141,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 79,
+      "solver_seed": 2001142,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 80,
+      "solver_seed": 2001143,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 81,
+      "solver_seed": 2001144,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 82,
+      "solver_seed": 2001145,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 83,
+      "solver_seed": 2001146,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 84,
+      "solver_seed": 2001147,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 85,
+      "solver_seed": 2001148,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 86,
+      "solver_seed": 2001149,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 87,
+      "solver_seed": 2001150,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 88,
+      "solver_seed": 2001151,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 89,
+      "solver_seed": 2001152,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 90,
+      "solver_seed": 2001153,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 91,
+      "solver_seed": 2001154,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 92,
+      "solver_seed": 2001155,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 93,
+      "solver_seed": 2001156,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 94,
+      "solver_seed": 2001157,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 95,
+      "solver_seed": 2001158,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 96,
+      "solver_seed": 2001159,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 97,
+      "solver_seed": 2001160,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 98,
+      "solver_seed": 2001161,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    },
+    {
+      "global_step": 99,
+      "solver_seed": 2001162,
+      "solver_repeats": 1,
+      "feasibility_batches": 1,
+      "candidate_reads": 10,
+      "sampling_regime": "single_call"
+    }
+  ]
+}

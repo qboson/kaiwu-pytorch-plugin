@@ -98,3 +98,9 @@ torchmetrics[image]
 ```
 torchvision==0.22.0
 ```
+
+### 分子设计：CIM、SQA 与 SA 对比
+
+`example/molecular_design/` 提供基于图指纹、CRBM 与 QUBO 的分子生成复现示例，并报告同一模型、参考分子和目标区间下的 CIM、SQA、SA 对比。包含 25,000 步／方法的选择结果与离线核验脚本。CIM 与 SQA 的候选预算逐步匹配，SA 预算另行说明。
+
+运行说明与结果见 [molecular_design/README.md](molecular_design/README.md)。该示例直接使用 PyTorch 和 Kaiwu SDK，原实验 SDK 版本与主项目环境不同，请按示例说明配置独立环境。
