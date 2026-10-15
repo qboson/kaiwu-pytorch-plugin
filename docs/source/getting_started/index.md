@@ -16,7 +16,7 @@ keywords:
 > 
 > It offloads Boltzmann sampling to the **Coherent Ising Machine (CIM)** through the Kaiwu SDK, while keeping all other computations, parameter updates, autograd, data loading, in the standard PyTorch workflow.
 
-This guide walks you through the essentials in four parts:
+This guide walks you through the essentials in four parts, plus the learning paths:
 
 ```{toctree}
 :maxdepth: 1
@@ -67,11 +67,11 @@ Jump to the [Quick Start](quickstart.md) page to explore:
 
 ---
 
-# Tutorials
+# Next Steps: Recommended Learning Paths
 
-The [Tutorials](tutorials/index.md) section is designed for users who have already installed KPP and read the [Quick Start](quickstart.md) guide. It provides hands-on, end-to-end examples of KPP in action.
+The [Tutorials](tutorials/index.md) section is designed for users who have already installed KPP and read the [Quick Start](quickstart.md) guide. It provides hands-on, end-to-end examples of KPP in action. The paths below suggest an order to study it, **each is a subset of the full syllabus** in the [Tutorials index](tutorials/index.md).
 
-## Recommended Learning Paths
+> **New to the model families?** Read the [KPP Architecture Overview](tutorials/architecture_overview.md) first. It shows how RBM, DBN, Q-VAE, and Q-Diffusion build on each other, so you can map every tutorial onto the model hierarchy.
 
 **Beginner Path**, from the sampling bottleneck to your first application:
 
