@@ -13,11 +13,16 @@ optimizers are never tracked, preventing false attribution.
 
 How it works
 ------------
-kaiwu SDK's ``@track_data`` decorator inspects ``_caller_context``
-(``threading.local``); when a *source* attribute is present, the
-``alg_name`` is automatically prefixed (e.g. ``sa`` -> ``kpp_sa``).
-``CIMOptimizer._create_task()`` reads the same variable so that
-task payloads carry the ``task_source_detail`` field.
+Some kaiwu builds expose a ``_caller_context`` (``threading.local``) object in
+``kaiwu.license._track_data``; when a *source* attribute is present on it, the
+SDK's ``@track_data`` decorator prefixes ``alg_name`` (e.g. ``sa`` -> ``kpp_sa``)
+and CIM task payloads carry the ``task_source_detail`` field.
+
+That hook is optional. The PyPI build pinned in ``requirements/requirements.txt``
+(``kaiwu==1.3.1``) does not provide it, so on that build the context manager
+degrades to a no-op: sampling still runs, but the SDK never labels the call as
+coming from kpp. ``caller_context_available()`` reports which case applies to the
+installed build.
 
 Global switch
 -------------
@@ -36,10 +41,27 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Module-level cache: shared _caller_context from kaiwu SDK
 # ---------------------------------------------------------------------------
+# Optional hook: only kaiwu builds that ship ``_caller_context`` can attribute a
+# sampler call to kpp. When the import fails, kpp_caller_context() is a no-op and
+# caller_context_available() returns False.
 try:
     from kaiwu.license._track_data import _caller_context as _kpp_caller_context
 except ImportError:
     _kpp_caller_context = None
+
+
+def caller_context_available() -> bool:
+    """Return whether the installed kaiwu build exposes the attribution hook.
+
+    When this is ``False``, ``kpp_caller_context()`` cannot label sampler calls as
+    originating from kpp (the SDK offers no hook to do so); sampling itself is
+    unaffected.
+
+    Returns:
+        bool: ``True`` when ``kaiwu.license._track_data._caller_context`` could be
+        imported from the installed kaiwu build.
+    """
+    return _kpp_caller_context is not None
 
 # ---------------------------------------------------------------------------
 # Global switch
