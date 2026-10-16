@@ -38,6 +38,7 @@ python dplm/train_workflow.py
 - `simple/simple_train_example.py`: minimal Q-Diffusion training example
 - `simple/simple_generate_example.py`: minimal generation example
 - `dplm/utils/dplm_builder.py`: DPLM → Q-Diffusion assembly helper
+- `dplm/models/bm.py`: BM energy reranker (`BMConditionedEnergyModel`)
 - `dplm/workflows/train.py`: full training and evaluation workflow
 
 ## How It Works
@@ -112,9 +113,69 @@ and a BM energy reranker:
 Key assembly details:
 - Proposal model: DPLM protein language model (frozen)
 - Energy backend: Boltzmann Machine (trainable)
-- Output: generic `Q-Diffusion` interface
+- Output: the core `kaiwu.torch_plugin.QDiffusion` module described in the next section.
 
-### 2. Training Objective
+### 2. The QDiffusion Model
+
+`build_qdiffusion` returns the core `kaiwu.torch_plugin.QDiffusion` wrapper. Its constructor wires the four parts:
+
+```{literalinclude} ../../../../src/kaiwu/torch_plugin/qdiffusion.py
+:pyobject: QDiffusion.__init__
+```
+
+- **proposal_model**: the frozen DPLM backbone that predicts token logits (`freeze_proposal=True` freezes it here).
+- **energy_model**: the trainable BM energy reranker that scores candidates.
+- **token_spec**: special-token metadata (`mask_id`, `pad_id`, `bos_id`, `eos_id`).
+- **config**: a `QDiffusionConfig` with generation and training defaults.
+
+The wrapper exposes both training and decoding APIs:
+
+| API | Purpose |
+|---|---|
+| `objective(batch)` | Builds the one-step training objective; returns logits, masks, and `energy_objective`. |
+| `generate(input_tokens, max_steps=500, …)` | Runs the full iterative decoding loop. |
+| `step(state, partial_masks=None)` | Runs one denoising/reranking step. |
+| `proposal(noisy_tokens)` / `energy(noisy, candidate)` | Direct calls to the two backbones. |
+| `tokenizer` | The tokenizer carried by `token_spec`. |
+
+**Key config parameters** (`QDiffusionConfig`):
+
+| Parameter | Default | Meaning |
+|---|---|---|
+| `num_diffusion_timesteps` | 500 | Number of discrete noising steps in the objective. |
+| `num_candidates` | 1 | Proposal candidates sampled per decode step. |
+| `proposal_temperature` | 0.0 | Temperature for proposal-side sampling. |
+| `proposal_noise_scale` | 1.0 | Gumbel noise scale during proposal sampling. |
+| `energy_temperature` | 1.0 | Temperature converting energies into rerank weights. |
+| `disable_resample` | False | Disables repetition-collapse resampling. |
+| `resample_ratio` | 0.25 | Frequency threshold that triggers resampling. |
+| `resample_top_p` | 0.95 | Top-p cutoff used during resampling. |
+| `decoding_strategy` | "reparam-uncond-deterministic-linear" | Skeptical-remasking strategy string. |
+
+The Quick Start passes `num_candidates=4`, overriding the default of 1. The remaining defaults are kept.
+
+### 3. The EnergyModel Interface
+
+The energy side is the `kaiwu.torch_plugin.EnergyModel` interface. Its scoring chain turns token candidates into BM-space energies:
+
+```{literalinclude} ../../../../src/kaiwu/torch_plugin/qdiffusion.py
+:pyobject: EnergyModel.score_visible_logits
+```
+
+1. **Discretize**: `discretize_visible_state` maps visible logits to BM visible conditions via sigmoid.
+2. **Sample**: `sample_hidden_state` draws BM hidden states with `condition_sample` for each visible assignment.
+3. **Score**: the BM energy of each full state is averaged per candidate.
+4. **Diagnose**: `get_last_stats` returns sampling diagnostics (visible/hidden on-ratios).
+
+`score_conditioned` is the abstract entry point; subclasses implement it. This example uses `BMConditionedEnergyModel`, which bridges token space to BM space and then calls the chain above:
+
+```{literalinclude} ../../../../example/qdiffusion/dplm/models/bm.py
+:pyobject: BMConditionedEnergyModel.score_conditioned
+```
+
+The scoring chain is backend-agnostic: the hidden-state sampler is supplied at construction time, so the same interface supports classical and quantum samplers.
+
+### 4. Training Objective
 
 The Q-Diffusion objective combines proposal logits with energy reranking:
 
@@ -127,7 +188,7 @@ Key training details:
 - Energy reranker: trainable, scores candidates
 - Loss: energy objective mean, backpropagated through the reranker
 
-### 3. Generation and Evaluation
+### 5. Generation and Evaluation
 
 The generation loop samples from the proposal model and reranks with energy:
 

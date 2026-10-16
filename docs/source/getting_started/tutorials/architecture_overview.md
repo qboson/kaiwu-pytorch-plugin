@@ -102,9 +102,12 @@ Protein sequence → DPLM proposal → logits → sample candidates
                                           energy-weighted output
 ```
 
-**Main classes**: `QDiffusion`, `QDiffusionConfig`
+**Main classes**: `QDiffusion`, `EnergyModel`, `QDiffusionConfig`
 
 **Typical use**: protein sequence generation, energy-guided sampling.
+
+**Application** (in `example/`):
+- `BMConditionedEnergyModel`: DPLM feature encoder + BM visible-space reranker
 
 → Hands-on: [Q-Diffusion](qdiffusion.md)
 
