@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KPP docs\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-15 16:33+0800\n"
+"POT-Creation-Date: 2026-10-16 10:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -91,58 +91,62 @@ msgid "`dplm/utils/dplm_builder.py`: DPLM → Q-Diffusion assembly helper"
 msgstr "`dplm/utils/dplm_builder.py`：DPLM → Q-Diffusion 组装辅助工具"
 
 #: ../../source/getting_started/tutorials/qdiffusion.md:41
+msgid "`dplm/models/bm.py`: BM energy reranker (`BMConditionedEnergyModel`)"
+msgstr "`dplm/models/bm.py`：BM 能量重排序器（`BMConditionedEnergyModel`）"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:42
 msgid "`dplm/workflows/train.py`: full training and evaluation workflow"
 msgstr "`dplm/workflows/train.py`：完整的训练与评估工作流"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:43
+#: ../../source/getting_started/tutorials/qdiffusion.md:44
 msgid "How It Works"
 msgstr "工作原理"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:45
+#: ../../source/getting_started/tutorials/qdiffusion.md:46
 msgid ""
 "Q-Diffusion for protein sequences combines a DPLM proposal model with a BM "
 "energy reranker:"
 msgstr "用于蛋白质序列的 Q-Diffusion 将 DPLM 提议模型与 BM 能量重排序器相结合："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:55
+#: ../../source/getting_started/tutorials/qdiffusion.md:56
 msgid "The key components:"
 msgstr "关键组件："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:57
+#: ../../source/getting_started/tutorials/qdiffusion.md:58
 msgid ""
 "**DPLM proposal model**: pre-trained protein language model produces logits "
 "for each position."
 msgstr "**DPLM 提议模型**：预训练的蛋白质语言模型为每个位置生成 logits。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:58
+#: ../../source/getting_started/tutorials/qdiffusion.md:59
 msgid ""
 "**BM energy reranker**: scores candidate sequences using a Boltzmann Machine"
 " energy function."
 msgstr "**BM 能量重排序器**：使用玻尔兹曼机能量函数对候选序列打分。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:59
+#: ../../source/getting_started/tutorials/qdiffusion.md:60
 msgid ""
 "**Energy-guided generation**: candidates are weighted by energy, improving "
 "sequence quality."
 msgstr "**能量引导生成**：候选序列按能量加权，从而提升序列质量。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:60
+#: ../../source/getting_started/tutorials/qdiffusion.md:61
 msgid ""
 "**ESM2 evaluation**: generated sequences are compared to the reference "
 "proteome using ESM2 embedding distances."
 msgstr "**ESM2 评估**：使用 ESM2 嵌入距离将生成序列与参考蛋白质组进行比较。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:62
+#: ../../source/getting_started/tutorials/qdiffusion.md:63
 msgid ""
 "The training objective optimizes the energy reranker, while the DPLM "
 "proposal model remains frozen."
 msgstr "训练目标优化能量重排序器，而 DPLM 提议模型保持冻结（frozen）。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:64
+#: ../../source/getting_started/tutorials/qdiffusion.md:67
 msgid "Quick Start"
 msgstr "快速开始"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:66
+#: ../../source/getting_started/tutorials/qdiffusion.md:69
 msgid ""
 "The steps below condense "
 "`example/qdiffusion/simple/simple_train_example.py`, the minimal teaching "
@@ -151,7 +155,7 @@ msgstr ""
 "以下步骤浓缩自 `example/qdiffusion/simple/simple_train_example.py`（最小教学示例），省略了 "
 "import；运行该脚本可获得完整演练。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:68
+#: ../../source/getting_started/tutorials/qdiffusion.md:71
 msgid ""
 "**1. Build the generator.** `build_qdiffusion` assembles the frozen DPLM "
 "proposal model and the trainable BM energy reranker; both checkpoint "
@@ -160,7 +164,7 @@ msgstr ""
 "**1. 构建生成器。** `build_qdiffusion` 将冻结的 DPLM 提议模型与可训练的 BM 能量重排序器组装在一起；两个 "
 "checkpoint 参数均为 Hugging Face 模型 ID。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:79
+#: ../../source/getting_started/tutorials/qdiffusion.md:82
 msgid ""
 "**2. Tokenize one mini-batch.** Encode a few FASTA sequences with the "
 "generator's own tokenizer; `targets` is the only tensor the outer loop needs"
@@ -170,7 +174,7 @@ msgstr ""
 "**2. 编码一个小批次。** 使用生成器自带的 tokenizer 编码几条 FASTA 序列；`targets` "
 "是外层循环唯一需要的张量——`objective` 会创建噪声状态、采样候选并构建能量损失。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:87
+#: ../../source/getting_started/tutorials/qdiffusion.md:90
 msgid ""
 "**3. Optimize the energy objective.** Only the energy-reranker parameters "
 "are trainable; `objective` returns `energy_objective` (plus `logits` and "
@@ -179,117 +183,382 @@ msgstr ""
 "**3. 优化能量目标。** 只有能量重排序器的参数可训练；`objective` 返回 `energy_objective`（以及用于监控的 "
 "`logits` 与 `loss_mask`）。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:99
+#: ../../source/getting_started/tutorials/qdiffusion.md:102
 msgid "Key Code"
 msgstr "关键代码"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:101
+#: ../../source/getting_started/tutorials/qdiffusion.md:104
 msgid "1. Q-Diffusion Model Assembly"
 msgstr "1\\. Q-Diffusion 模型组装"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:103
+#: ../../source/getting_started/tutorials/qdiffusion.md:106
 msgid ""
 "The `dplm_builder.py` assembles a Q-Diffusion model from a DPLM proposal "
 "model and a BM energy reranker:"
 msgstr "`dplm_builder.py` 由一个 DPLM 提议模型和一个 BM 能量重排序器组装出 Q-Diffusion 模型："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:110
+#: ../../source/getting_started/tutorials/qdiffusion.md:113
 msgid "Key assembly details:"
 msgstr "关键组装细节："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:111
+#: ../../source/getting_started/tutorials/qdiffusion.md:114
 msgid "Proposal model: DPLM protein language model (frozen)"
 msgstr "提议模型：DPLM 蛋白质语言模型（冻结）"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:112
+#: ../../source/getting_started/tutorials/qdiffusion.md:115
 msgid "Energy backend: Boltzmann Machine (trainable)"
 msgstr "能量后端：玻尔兹曼机（可训练）"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:113
-msgid "Output: generic `Q-Diffusion` interface"
-msgstr "输出：通用的 `Q-Diffusion` 接口"
+#: ../../source/getting_started/tutorials/qdiffusion.md:116
+msgid ""
+"Output: the core `kaiwu.torch_plugin.QDiffusion` module described in the "
+"next section."
+msgstr "输出：下一节所述的 `kaiwu.torch_plugin.QDiffusion` 核心模块。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:117
-msgid "2. Training Objective"
-msgstr "2\\. 训练目标"
+#: ../../source/getting_started/tutorials/qdiffusion.md:118
+msgid "2. The QDiffusion Model"
+msgstr "2. Q-Diffusion 模型"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:119
+#: ../../source/getting_started/tutorials/qdiffusion.md:120
+msgid ""
+"`build_qdiffusion` returns the core `kaiwu.torch_plugin.QDiffusion` wrapper."
+" Its constructor wires the four parts:"
+msgstr ""
+"`build_qdiffusion` 返回核心 `kaiwu.torch_plugin.QDiffusion` 包装器。其构造函数组装以下四个部分："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:126
+msgid ""
+"**proposal_model**: the frozen DPLM backbone that predicts token logits "
+"(`freeze_proposal=True` freezes it here)."
+msgstr ""
+"**proposal_model**：冻结的 DPLM 骨干网络，用于预测 token logits（此处 `freeze_proposal=True`"
+" 将其冻结）。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:127
+msgid ""
+"**energy_model**: the trainable BM energy reranker that scores candidates."
+msgstr "**energy_model**：可训练的 BM 能量重排序器，为候选序列打分"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:128
+msgid ""
+"**token_spec**: special-token metadata (`mask_id`, `pad_id`, `bos_id`, "
+"`eos_id`)."
+msgstr "**token_spec**：特殊 token 元数据（`mask_id`、`pad_id`、`bos_id`、`eos_id`）。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:129
+msgid ""
+"**config**: a `QDiffusionConfig` with generation and training defaults."
+msgstr "**config**：携带生成与训练默认值的 `QDiffusionConfig`。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:131
+msgid "The wrapper exposes both training and decoding APIs:"
+msgstr "该包装器同时提供训练与解码 API："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "API"
+msgstr "API"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Purpose"
+msgstr "用途"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`objective(batch)`"
+msgstr "`objective(batch)`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid ""
+"Builds the one-step training objective; returns logits, masks, and "
+"`energy_objective`."
+msgstr "构建单步训练目标；返回 logits、掩码与 `energy_objective`。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`generate(input_tokens, max_steps=500, …)`"
+msgstr "`generate(input_tokens, max_steps=500, …)`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Runs the full iterative decoding loop."
+msgstr "运行完整的迭代解码循环。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`step(state, partial_masks=None)`"
+msgstr "`step(state, partial_masks=None)`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Runs one denoising/reranking step."
+msgstr "运行单步去噪/重排序。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`proposal(noisy_tokens)` / `energy(noisy, candidate)`"
+msgstr "`proposal(noisy_tokens)` / `energy(noisy, candidate)`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Direct calls to the two backbones."
+msgstr "直接调用两个骨干网络。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`tokenizer`"
+msgstr "`tokenizer`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "The tokenizer carried by `token_spec`."
+msgstr "由 `token_spec` 携带的 tokenizer。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:141
+msgid "**Key config parameters** (`QDiffusionConfig`):"
+msgstr "**关键配置参数**（`QDiffusionConfig`）："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Parameter"
+msgstr "参数"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Default"
+msgstr "默认值"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Meaning"
+msgstr "含义"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`num_diffusion_timesteps`"
+msgstr "`num_diffusion_timesteps`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "500"
+msgstr "500"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Number of discrete noising steps in the objective."
+msgstr "目标函数中的离散加噪步数。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`num_candidates`"
+msgstr "`num_candidates`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "1"
+msgstr "1"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Proposal candidates sampled per decode step."
+msgstr "每个解码步骤采样的提议候选数。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`proposal_temperature`"
+msgstr "`proposal_temperature`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "0.0"
+msgstr "0.0"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Temperature for proposal-side sampling."
+msgstr "提议侧采样的温度。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`proposal_noise_scale`"
+msgstr "`proposal_noise_scale`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "1.0"
+msgstr "1.0"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Gumbel noise scale during proposal sampling."
+msgstr "提议采样期间的 Gumbel 噪声尺度。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`energy_temperature`"
+msgstr "`energy_temperature`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Temperature converting energies into rerank weights."
+msgstr "将能量转换为重排序权重的温度。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`disable_resample`"
+msgstr "`disable_resample`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "False"
+msgstr "False"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Disables repetition-collapse resampling."
+msgstr "禁用重复坍缩重采样。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`resample_ratio`"
+msgstr "`resample_ratio`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "0.25"
+msgstr "0.25"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Frequency threshold that triggers resampling."
+msgstr "触发重采样的频率阈值。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`resample_top_p`"
+msgstr "`resample_top_p`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "0.95"
+msgstr "0.95"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Top-p cutoff used during resampling."
+msgstr "重采样中使用的 top-p 截断。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "`decoding_strategy`"
+msgstr "`decoding_strategy`"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "\"reparam-uncond-deterministic-linear\""
+msgstr "\"reparam-uncond-deterministic-linear\""
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:122
+msgid "Skeptical-remasking strategy string."
+msgstr "怀疑式重掩码策略字符串。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:155
+msgid ""
+"The Quick Start passes `num_candidates=4`, overriding the default of 1. The "
+"remaining defaults are kept."
+msgstr "快速入门传入 `num_candidates=4`，覆盖默认值 1。其余保持默认。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:157
+msgid "3. The EnergyModel Interface"
+msgstr "3. EnergyModel 接口"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:159
+msgid ""
+"The energy side is the `kaiwu.torch_plugin.EnergyModel` interface. Its "
+"scoring chain turns token candidates into BM-space energies:"
+msgstr "能量侧是 `kaiwu.torch_plugin.EnergyModel` 接口。其打分链将 token 候选转换为 BM 空间能量："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:165
+msgid ""
+"**Discretize**: `discretize_visible_state` maps visible logits to BM visible"
+" conditions via sigmoid."
+msgstr "**离散化**：`discretize_visible_state` 通过 sigmoid 将可见 logits 映射为 BM 可见条件。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:166
+msgid ""
+"**Sample**: `sample_hidden_state` draws BM hidden states with "
+"`condition_sample` for each visible assignment."
+msgstr "**采样**：`sample_hidden_state` 对每个可见赋值使用 `condition_sample` 采样 BM 隐藏态。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:167
+msgid "**Score**: the BM energy of each full state is averaged per candidate."
+msgstr "**打分**：每个完整状态的 BM 能量按候选平均。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:168
+msgid ""
+"**Diagnose**: `get_last_stats` returns sampling diagnostics (visible/hidden "
+"on-ratios)."
+msgstr "**诊断**：`get_last_stats` 返回采样诊断（可见/隐藏开启比例）。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:170
+msgid ""
+"`score_conditioned` is the abstract entry point; subclasses implement it. "
+"This example uses `BMConditionedEnergyModel`, which bridges token space to "
+"BM space and then calls the chain above:"
+msgstr ""
+"`score_conditioned` 是抽象入口；由子类实现。本示例使用 `BMConditionedEnergyModel`，它将 token "
+"空间桥接到 BM 空间，然后调用上述打分链："
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:176
+msgid ""
+"The scoring chain is backend-agnostic: the hidden-state sampler is supplied "
+"at construction time, so the same interface supports classical and quantum "
+"samplers."
+msgstr "打分链与后端无关：隐藏态采样器在构造时提供，因此同一接口同时支持经典与量子采样器。"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:178
+msgid "4. Training Objective"
+msgstr "4. 训练目标"
+
+#: ../../source/getting_started/tutorials/qdiffusion.md:180
 msgid ""
 "The Q-Diffusion objective combines proposal logits with energy reranking:"
 msgstr "Q-Diffusion 目标函数将提议 logits 与能量重排序相结合："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:125
+#: ../../source/getting_started/tutorials/qdiffusion.md:186
 msgid "Key training details:"
 msgstr "关键训练细节："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:126
+#: ../../source/getting_started/tutorials/qdiffusion.md:187
 msgid "Proposal model: frozen, produces logits"
 msgstr "提议模型：冻结，生成 logits"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:127
+#: ../../source/getting_started/tutorials/qdiffusion.md:188
 msgid "Energy reranker: trainable, scores candidates"
 msgstr "能量重排序器：可训练，为候选序列打分"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:128
+#: ../../source/getting_started/tutorials/qdiffusion.md:189
 msgid "Loss: energy objective mean, backpropagated through the reranker"
 msgstr "损失：能量目标的均值，通过重排序器反向传播"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:132
-msgid "3. Generation and Evaluation"
-msgstr "3\\. 生成与评估"
+#: ../../source/getting_started/tutorials/qdiffusion.md:191
+msgid "5. Generation and Evaluation"
+msgstr "5. 生成与评估"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:134
+#: ../../source/getting_started/tutorials/qdiffusion.md:193
 msgid ""
 "The generation loop samples from the proposal model and reranks with energy:"
 msgstr "生成循环从提议模型中采样，并按能量重新排序："
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:140
+#: ../../source/getting_started/tutorials/qdiffusion.md:199
 msgid "Training and Evaluation"
 msgstr "训练 和 评估"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:142
+#: ../../source/getting_started/tutorials/qdiffusion.md:201
 msgid "**Training curves**: energy objective loss over epochs."
 msgstr "**训练曲线**：各 epoch 的能量目标损失。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:143
+#: ../../source/getting_started/tutorials/qdiffusion.md:202
 msgid ""
 "**Generated samples**: protein sequences generated by the guided workflow."
 msgstr "**生成样本**：由引导工作流生成的蛋白质序列。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:144
+#: ../../source/getting_started/tutorials/qdiffusion.md:203
 msgid ""
 "**ESM2 distance**: cosine and L2 distances between generated and reference "
 "proteome embeddings."
 msgstr "**ESM2 距离**：生成序列与参考蛋白质组嵌入之间的余弦距离和 L2 距离。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:145
+#: ../../source/getting_started/tutorials/qdiffusion.md:204
 msgid ""
 "**Baseline vs guided**: compare baseline (DPLM only) vs guided (DPLM + BM "
 "reranker) quality."
 msgstr "**基线 vs 引导**：比较基线（仅 DPLM）与引导（DPLM + BM 重排序器）的质量。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:147
+#: ../../source/getting_started/tutorials/qdiffusion.md:208
 msgid "Summary"
 msgstr "总结"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:149
+#: ../../source/getting_started/tutorials/qdiffusion.md:210
 msgid ""
 "Q-Diffusion combines DPLM proposal models with BM energy reranking for "
 "protein generation."
 msgstr "Q-Diffusion 将 DPLM 提议模型与 BM 能量重排序相结合，用于蛋白质生成。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:150
+#: ../../source/getting_started/tutorials/qdiffusion.md:211
 msgid ""
 "The energy reranker is trained on top of a frozen protein language model."
 msgstr "能量重排序器在冻结的蛋白质语言模型之上训练。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:151
+#: ../../source/getting_started/tutorials/qdiffusion.md:212
 msgid ""
 "Guided generation improves sequence quality measured by ESM2 embedding "
 "distances."
 msgstr "引导生成提升了以 ESM2 嵌入距离衡量的序列质量。"
 
-#: ../../source/getting_started/tutorials/qdiffusion.md:152
+#: ../../source/getting_started/tutorials/qdiffusion.md:213
 msgid ""
 "The Q-Diffusion pipeline combines a frozen DPLM proposal model with a "
 "trainable BM energy reranker, and the same assembly pattern transfers to "
@@ -340,3 +609,6 @@ msgstr "Q-Diffusion 流水线将冻结的 DPLM 提议模型与可训练的 BM �
 #~ "The Q-Diffusion framework generalizes from images to sequences with minimal "
 #~ "changes."
 #~ msgstr "Q-Diffusion 框架能以极少的改动从图像泛化到序列。"
+
+#~ msgid "Output: generic `Q-Diffusion` interface"
+#~ msgstr "输出：通用的 `Q-Diffusion` 接口"

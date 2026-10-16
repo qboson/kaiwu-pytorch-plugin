@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 16:33+0800\n"
+"POT-Creation-Date: 2026-10-16 10:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -251,46 +251,55 @@ msgid ""
 msgstr "将预训练的蛋白质语言模型（DPLM）作为提议模型，与可训练的 BM 能量重排序器结合，以提高生成序列的质量。"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md:105
-msgid "**Main classes**: `QDiffusion`, `QDiffusionConfig`"
-msgstr "**主要类**：`QDiffusion`, `QDiffusionConfig`"
+msgid "**Main classes**: `QDiffusion`, `EnergyModel`, `QDiffusionConfig`"
+msgstr "**主要类**：`QDiffusion`、`EnergyModel`、`QDiffusionConfig`"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md:107
 msgid "**Typical use**: protein sequence generation, energy-guided sampling."
 msgstr "**典型用途**：蛋白质序列生成、能量引导采样。"
 
 #: ../../source/getting_started/tutorials/architecture_overview.md:109
+msgid "**Application** (in `example/`):"
+msgstr "**应用**（在 `example/` 中）："
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:110
+msgid ""
+"`BMConditionedEnergyModel`: DPLM feature encoder + BM visible-space reranker"
+msgstr "`BMConditionedEnergyModel`：DPLM 特征编码器 + BM 可见空间重排序器"
+
+#: ../../source/getting_started/tutorials/architecture_overview.md:112
 msgid "→ Hands-on: [Q-Diffusion](qdiffusion.md)"
 msgstr "→ 实战教程：[Q-Diffusion](qdiffusion.md)"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:113
+#: ../../source/getting_started/tutorials/architecture_overview.md:116
 msgid "How to Build a Custom Model"
 msgstr "如何构建自定义模型"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:115
+#: ../../source/getting_started/tutorials/architecture_overview.md:118
 msgid "Step 1: Choose your base"
 msgstr "步骤 1：选择基础模型"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:116
+#: ../../source/getting_started/tutorials/architecture_overview.md:119
 msgid "Need feature extraction? → Start with [RBM](rbm_classification.md)"
 msgstr "需要特征提取？→ 从 [RBM](rbm_classification.md) 开始"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:117
+#: ../../source/getting_started/tutorials/architecture_overview.md:120
 msgid "Need generative modeling? → Start with [BM](bm_generation.md)"
 msgstr "需要生成建模？→ 从 [BM](bm_generation.md) 开始"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:118
+#: ../../source/getting_started/tutorials/architecture_overview.md:121
 msgid "Need representation learning? → Start with [Q-VAE](qvae_mnist.md)"
 msgstr "需要表示学习？→ 从 [Q-VAE](qvae_mnist.md) 开始"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:120
+#: ../../source/getting_started/tutorials/architecture_overview.md:123
 msgid "Step 2: Provide your components"
 msgstr "步骤 2：提供组件"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:138
+#: ../../source/getting_started/tutorials/architecture_overview.md:141
 msgid "Step 3: Train with the standard PyTorch loop"
 msgstr "步骤 3：使用标准 PyTorch 循环训练"
 
-#: ../../source/getting_started/tutorials/architecture_overview.md:150
+#: ../../source/getting_started/tutorials/architecture_overview.md:153
 msgid "Cross-reference Map"
 msgstr "交叉引用表"
 
