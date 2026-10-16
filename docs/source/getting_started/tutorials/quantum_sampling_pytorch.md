@@ -21,10 +21,15 @@ Note that `sample()` does **not** take a data state as input, nor does it return
 
 ## Creating a CIM Sampler
 
-Real hardware quantum sampling requires configured Kaiwu SDK credentials and real-machine access. `PrecisionReducer` adapts the Ising parameters to hardware precision constraints:
+Real hardware quantum sampling requires configured Kaiwu SDK credentials and real-machine access. A CIM task also writes intermediate records, so the SDK requires a save directory before the sampler is constructed. `PrecisionReducer` adapts the Ising parameters to hardware precision constraints:
 
 ```python
+import kaiwu as kw
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
+# A CIM task writes intermediate records; the SDK requires a save directory
+# before the sampler can be constructed.
+kw.common.CheckpointManager.save_dir = './tmp'
 
 quantum_sampler = CIMOptimizer(task_name="rbm_mnist", wait=True)
 sampler = PrecisionReducer(

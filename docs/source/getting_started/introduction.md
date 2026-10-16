@@ -247,7 +247,12 @@ from kaiwu.classical import SimulatedAnnealingOptimizer
 sampler = SimulatedAnnealingOptimizer()
 
 # Quantum CIM (real QPU)
+import kaiwu as kw
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
+
+# A CIM task writes intermediate records; the SDK requires a save directory
+# before the sampler can be constructed.
+kw.common.CheckpointManager.save_dir = './tmp'
 sampler = CIMOptimizer(task_name="test_rbm", wait=True)
 sampler = PrecisionReducer(
     sampler,
