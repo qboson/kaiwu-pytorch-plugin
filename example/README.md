@@ -88,6 +88,8 @@ This example demonstrates how to train and evaluate a Quantum Variational Autoen
 
 Run the example via `example/qvae_mnist/train_qvae.ipynb`.
 
+The file logger writes new entries to `training.log` in UTF-8, including after midnight rotation.
+
 **Dependencies**
 
 ```
