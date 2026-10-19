@@ -11,8 +11,11 @@
 再从仓库根目录（含 `pyproject.toml` 的目录）安装插件和此示例的额外依赖：
 
 ```bash
-python -m pip install -e . anndata scanpy leidenalg scib_metrics scgraph
+python -m pip install -e . anndata scanpy leidenalg scib_metrics scgraph-eval
 ```
+
+scGraph 评估器的发行包名是 [scgraph-eval](https://pypi.org/project/scgraph-eval/)，
+Python 导入名是 `scgraph`；同名的 `scgraph` 发行包并不是此评估器。
 
 可编辑安装使插件与此示例使用同一版本的源码。Torch、NumPy 和 Kaiwu SDK 的核心依赖版本
 以 `requirements/requirements.txt` 为准，不要在此源码安装之上再安装旧示例说明中的插件版本。

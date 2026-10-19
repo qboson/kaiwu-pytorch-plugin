@@ -16,8 +16,11 @@ install the plugin and the example's additional dependencies from the repository
 root (the directory containing `pyproject.toml`):
 
 ```bash
-python -m pip install -e . anndata scanpy leidenalg scib_metrics scgraph
+python -m pip install -e . anndata scanpy leidenalg scib_metrics scgraph-eval
 ```
+
+The scGraph evaluator is distributed as [scgraph-eval](https://pypi.org/project/scgraph-eval/)
+and imported as `scgraph`; the separate `scgraph` distribution is not this evaluator.
 
 The editable install keeps the plugin and this example on the same source
 revision. Core Torch, NumPy, and Kaiwu SDK versions come from
