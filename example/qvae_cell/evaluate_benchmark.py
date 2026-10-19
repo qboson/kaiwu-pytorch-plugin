@@ -216,7 +216,7 @@ def evaluate_scgraph(
 
     Args:
         adata: AnnData object to evaluate.
-        rep_key: Embedding key used for labeling the result rows.
+        rep_key: Embedding key to evaluate and label in the result rows.
         batch_key: ``adata.obs`` column with batch labels.
         label_key: ``adata.obs`` column with cell-type labels.
         output_dir: Directory for the temporary h5ad file.
@@ -253,7 +253,7 @@ def evaluate_scgraph(
             thres_celltype=thres_celltype,
             only_umap=only_umap,
         )
-        result = analyzer.main()
+        result = analyzer.main(_obsm_list=[rep_key])
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
