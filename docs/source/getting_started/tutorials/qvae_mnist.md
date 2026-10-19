@@ -52,13 +52,18 @@ QVAE 包括以下关键组件：
    p_\theta(\mathbf{x} | \boldsymbol{\zeta}) \sim \text{Bernoulli}(f_\theta(\boldsymbol{\zeta}))
    $$
 
-### 训练目标：Q-ELBO
+### 训练目标与指标口径
 
-QVAE 使用一个 **量子下界 (Q-ELBO)** 来近似最大化对数似然：
+当前实现优化重构损失、加权的 KL 梯度替代项和权重衰减。
+替代项为正负相的批均能量差减去后验熵；负相能量用于估计训练梯度，
+没有计算归一化所需的 `log Z`，因此返回值不是真实 KL，也不能解释为负 ELBO。
+例如两个二元潜变量的先验和后验均匀且相同时，真实 KL 为 0，当前替代项为
+`-2 * log(2)`，约 -1.3863。负值在这一指标口径下不代表数值计算失败。
 
-$$
-\mathcal{L}_{\text{Q-ELBO}} = \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} [\log p_\theta(\mathbf{x} | \boldsymbol{\zeta})] - \tilde{H}(q_\phi(\mathbf{z}|\mathbf{x}) \| p_\theta(\mathbf{z}))
-$$
+对默认无自耦合的二元 BM，若负相样本确实来自当前模型分布，批均替代项为
+批均真实 KL 减去先验熵；先验熵会随 BM 参数改变，不能把它当作固定常数。
+使用该损失早停仅选择替代目标的最优点，不能据此宣称似然或归一化 ELBO 最优。
+小模型可枚举全部状态计算 `log Z` 作独立检查，大模型应单独报告重构指标。
 
 ### QBM 采样与训练
 
@@ -104,7 +109,7 @@ $$
 ## 4. 模型训练
 
 该函数实现了量子变分自编码器（Q-VAE）在 MNIST 数据集上的完整训练流程。
-模型结合了经典神经网络编码器/解码器与 RBM 或 BM 先验，通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 `--sampler-type sa` 或 `--sampler-type cim` 选择采样器。
+模型结合经典编码器/解码器与 RBM 或 BM 先验，通过重构损失、KL 梯度替代项和权重衰减优化。实际运行时可通过 `--sampler-type sa` 或 `--sampler-type cim` 选择采样器。
 训练过程中记录各项损失指标并定期保存至文件。
 
 命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 `loadMNIST` 展平数据，再由 `get_full_pipeline` 组装 QVAE 和 MLP 分类器：

@@ -85,7 +85,7 @@ model_epoch*.pth                  # 按 --checkpoint-every 保存的中间权重
 X_qvae.npy                        # QVAE 表征矩阵
 immune_kpp_qvae.h5ad              # 写入 X_qvae 和 QVAE_Energy 的 AnnData
 training_history.csv              # 训练指标
-training_curves.png               # loss / reconstruction / KL 曲线
+training_curves.png               # loss / reconstruction / KL gradient surrogate 曲线
 qvae_umap_labels_batches.png      # cell type 和 batch UMAP
 qvae_energy_umap.png              # energy UMAP
 qvae_energy_by_celltype.png       # cell type energy 分布
@@ -165,3 +165,5 @@ python evaluate_benchmark.py \
 --lr              默认 1e-4
 --rbm-lr          默认 1e-3
 ```
+
+The legacy history keys `kl` and `neg_elbo` store the KL gradient surrogate and training objective, respectively. They are retained for CSV compatibility; neither is a normalized KL/ELBO estimate. Early stopping selects this training objective, not normalized likelihood.

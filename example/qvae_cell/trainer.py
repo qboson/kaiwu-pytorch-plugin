@@ -184,7 +184,7 @@ class Trainer:
                 vae_optimizer.zero_grad()
 
             with torch.set_grad_enabled(train):
-                # 第一阶段：更新 encoder/decoder，使重构项和 KL 项组成的 ELBO 更优。
+                # 第一阶段：优化重构项与 KL 梯度替代项；该数值不是归一化 ELBO。
                 output, posterior, q, _ = model(x, batch_idx)
                 loss = model.loss(x, output, posterior)
                 if train:
@@ -242,8 +242,8 @@ class Trainer:
                     f"val_loss={val_metrics['loss']:.4f} "
                     f"train_recon={train_metrics['recon_loss']:.4f} "
                     f"val_recon={val_metrics['recon_loss']:.4f} "
-                    f"train_kl={train_metrics['kl']:.4f} "
-                    f"val_kl={val_metrics['kl']:.4f} "
+                    f"train_kl_surrogate={train_metrics['kl']:.4f} "
+                    f"val_kl_surrogate={val_metrics['kl']:.4f} "
                     f"bm_loss={train_metrics['bm_loss']:.4f}"
                 )
 

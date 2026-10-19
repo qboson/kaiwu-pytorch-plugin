@@ -23,7 +23,7 @@ def plot_training_history(history, out_path=None):
     plots = [
         (axes[0], "train_loss", "val_loss", "Total Loss"),
         (axes[1], "train_recon_loss", "val_recon_loss", "Reconstruction Loss"),
-        (axes[2], "train_kl", "val_kl", "KL"),
+        (axes[2], "train_kl", "val_kl", "KL gradient surrogate"),
     ]
     for ax, train_key, val_key, title in plots:
         ax.plot(epochs, history[train_key], label="Train", **plot_kwargs)

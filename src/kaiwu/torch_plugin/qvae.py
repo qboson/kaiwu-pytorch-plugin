@@ -258,7 +258,10 @@ class QVAE(AutoEncoderBase):
         return recon_x, posterior, q, zeta
 
     def loss(self, x, recon_x, posterior):
-        """Compute total loss (reconstruction + KL + weight decay).
+        """Compute reconstruction + weighted KL gradient surrogate + weight decay.
+
+        The surrogate value is not a normalized KL divergence or negative ELBO.
+        It can be negative; compare reconstruction metrics separately.
 
         Args:
             x (torch.Tensor): Input tensor (batch_size, input_dim).
@@ -288,7 +291,7 @@ class QVAE(AutoEncoderBase):
         else:
             raise ValueError(f"Unsupported loss type: {self.config.loss_type}")
 
-        # KL divergence
+        # KL gradient surrogate; its scalar value is not a normalized divergence.
         kl_loss = self._kl_dist_from(posterior).mean()
 
         # Weight decay
@@ -339,13 +342,16 @@ class QVAE(AutoEncoderBase):
         return posterior_dist, zeta
 
     def _kl_dist_from(self, posterior):
-        """Compute KL divergence: cross_entropy - entropy.
+        """Compute the legacy KL gradient surrogate, which can be negative.
+
+        Negative-phase energy supplies a training gradient, not log Z. This
+        value must not be interpreted as a normalized KL divergence.
 
         Args:
             posterior (MixtureGeneric): Posterior distribution.
 
         Returns:
-            torch.Tensor: KL divergence per sample (batch_size,).
+            torch.Tensor: Batch-mean energy difference minus each posterior entropy.
         """
         entropy = torch.sum(posterior.entropy(), dim=1)
         logit_q = posterior.logit_mu
@@ -353,13 +359,13 @@ class QVAE(AutoEncoderBase):
         return cross_entropy - entropy
 
     def _cross_entropy(self, logit_q):
-        """Compute cross-entropy term for KL divergence.
+        """Compute the positive-minus-negative energy training surrogate.
 
         Args:
             logit_q (torch.Tensor): Logits from encoder (batch_size, latent_dim).
 
         Returns:
-            torch.Tensor: Cross-entropy per sample (batch_size,).
+            torch.Tensor: Scalar batch-mean energy difference, without log Z.
         """
         q_prob = torch.sigmoid(logit_q)
         positive = self.bm(q_prob).mean()

@@ -89,7 +89,7 @@ model_epoch*.pth                  # Intermediate weights saved according to --ch
 X_qvae.npy                        # QVAE representation matrix
 immune_kpp_qvae.h5ad              # AnnData file with X_qvae and QVAE_Energy written into it
 training_history.csv              # Training metrics
-training_curves.png               # Loss / reconstruction / KL curves
+training_curves.png               # Loss / reconstruction / KL gradient surrogate curves
 qvae_umap_labels_batches.png      # Cell-type and batch UMAP
 qvae_energy_umap.png              # Energy UMAP
 qvae_energy_by_celltype.png       # Energy distribution by cell type
@@ -172,3 +172,5 @@ The results will be saved as corresponding CSV files and summarized into:
 --lr              Default: 1e-4
 --rbm-lr          Default: 1e-3
 ```
+
+The legacy history keys `kl` and `neg_elbo` store the KL gradient surrogate and training objective, respectively. They are retained for CSV compatibility; neither is a normalized KL/ELBO estimate. Early stopping selects this training objective, not normalized likelihood.
