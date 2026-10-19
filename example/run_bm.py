@@ -31,7 +31,7 @@ if __name__ == "__main__":
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
     objective = rbm.objective(x, s)
-    # Backpropgate gradients
+    # Backpropagate gradients
     print("call backward")
     objective.backward()
     print("after backward")

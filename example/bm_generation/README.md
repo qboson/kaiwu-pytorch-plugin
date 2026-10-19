@@ -13,8 +13,6 @@ Aptaswitch为一类能通过高亲和力和特异性结合特定目标分子（�
 
 性能指标：遇到目标分子时发生构象变化的 Aptaswitch 比例越高，性能越好。
 
-原论文收集384条长度为137的Aptaswitch序列训练判别器，将其他任务的生成器迁移至该领域，并优化z使得生成序列的预测值提升。
-
 模型流程如下图所示：
 
 <img width="641" height="360" alt="1" src="https://github.com/user-attachments/assets/f4c1026e-7e85-448d-8af8-8747b38229b4" />
