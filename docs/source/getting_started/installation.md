@@ -112,6 +112,9 @@ Clone the project from GitHub to your local machine:
 #### Access
 
 - Open `http://localhost:8888` (no token required)
+- Host port 8888 is bound to `127.0.0.1` for local development. This token-free
+  setup is not intended as a shared network service; configure authentication
+  before remote access. See the [network access notes](https://github.com/qboson/kaiwu-pytorch-plugin/blob/main/requirements/README.md#network-access).
 - Project root mounted at `/home/jovyan/work`
 - Use JupyterLab Terminal for command-line work
 

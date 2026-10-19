@@ -153,6 +153,8 @@ requirements/
    docker compose up
    ```  
    Notebook 将在 `http://localhost:8888` 可用（无需 token）。
+   宿主机端口仅绑定到 `127.0.0.1`，用于本地开发。启用远程访问前，请阅读
+   [网络访问说明](requirements/README.md#network-access)，配置认证并检查网络暴露范围。
 
 4. **直接访问插件源码**  
    容器的 `/home/jovyan/work` 已挂载为项目根目录（`../`），因此您可以在 JupyterLab 左侧文件浏览器中直接看到并编辑 `src/`、`setup.py` 等所有文件，**无需在容器内额外执行 `git clone`**。

@@ -142,6 +142,8 @@ requirements/
    docker compose up
    ```
 The notebook will be available at http://localhost:8888 (no token required).
+The host port is bound to `127.0.0.1` for local development. Read the
+[network access notes](requirements/README.md#network-access) before enabling remote access.
 
 4. **Directly access the plugin source code**  
    The container's `/home/jovyan/work` is mounted to the project root (`../`), so you can directly view and edit `src/`, `setup.py`, and all other files in the JupyterLab file browser — **no additional `git clone` inside the container is required**.
