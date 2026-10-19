@@ -59,12 +59,16 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def clip_parameters(self, h_range, j_range) -> None:
         """Clip linear and quadratic bias weights in-place.
 
+        Call after an optimizer update, before the next forward pass. Mutations
+        remain visible to autograd so stale saved tensors cannot be used silently.
+
         Args:
             h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
             j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
         """
-        self.get_parameter("linear_bias").data.clamp_(*h_range)
-        self.get_parameter("quadratic_coef").data.clamp_(*j_range)
+        with torch.no_grad():
+            self.get_parameter("linear_bias").clamp_(*h_range)
+            self.get_parameter("quadratic_coef").clamp_(*j_range)
 
     def get_hidden(
         self,
