@@ -38,6 +38,16 @@ kpp_qvae/
 └── README.md
 ```
 
+## Input preprocessing
+
+`Trainer.adata_to_array` converts `AnnData.X` to a raw float32 matrix. Pass this
+matrix to `Trainer.make_loaders`, which first splits the cell indices. With
+`--loss-type bernoulli`, min-max scaling is fitted only on training cells if
+that training range extends outside `[0, 1]`. The same transformation is used
+for training, validation and full-data evaluation, with values clipped to
+`[0, 1]`. Validation extrema therefore do not affect training inputs or the
+training bias. The default `mse` mode does not rescale expression values.
+
 ## Training
 
 The default data file is:
