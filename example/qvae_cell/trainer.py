@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Dataset, Subset, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
@@ -15,6 +15,21 @@ from kaiwu.preprocess import PrecisionReducer
 from kaiwu.torch_plugin import BoltzmannMachine
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder
+
+
+class _SparseExpressionDataset(Dataset):
+    """Densify one CSR expression row when a loader requests it."""
+
+    def __init__(self, expression, batch_indices):
+        self.expression = expression
+        self.batch_indices = batch_indices
+
+    def __len__(self):
+        return self.expression.shape[0]
+
+    def __getitem__(self, index):
+        row = self.expression[index : index + 1].toarray().reshape(-1)
+        return torch.as_tensor(row, dtype=torch.float32), self.batch_indices[index]
 
 
 def set_seed(seed):
@@ -37,7 +52,9 @@ class Trainer:
         self.n_batches = 0
 
     def adata_to_array(self, adata):
-        """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
+        """Prepare float32 input; preserve sparse MSE data until batch loading."""
+        if self.args.loss_type == "mse" and hasattr(adata.X, "tocsr"):
+            return adata.X.astype(np.float32, copy=False).tocsr()
         x = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
         x = np.asarray(x, dtype=np.float32)
         if self.args.loss_type == "mse":
@@ -64,21 +81,24 @@ class Trainer:
             test_size=self.args.val_percentage,
             random_state=self.args.seed,
         )
-        x_tensor = torch.tensor(x, dtype=torch.float32)
-        batch_tensor = torch.tensor(batch_indices, dtype=torch.long)
+        batch_tensor = torch.as_tensor(batch_indices, dtype=torch.long)
+        if hasattr(x, "tocsr"):
+            dataset = _SparseExpressionDataset(x.tocsr(), batch_tensor)
+        else:
+            dataset = TensorDataset(torch.as_tensor(x, dtype=torch.float32), batch_tensor)
         return (
             DataLoader(
-                TensorDataset(x_tensor[train_idx], batch_tensor[train_idx]),
+                Subset(dataset, train_idx),
                 batch_size=self.args.batch_size,
                 shuffle=True,
             ),
             DataLoader(
-                TensorDataset(x_tensor[val_idx], batch_tensor[val_idx]),
+                Subset(dataset, val_idx),
                 batch_size=self.args.batch_size,
                 shuffle=False,
             ),
             DataLoader(
-                TensorDataset(x_tensor, batch_tensor),
+                dataset,
                 batch_size=self.args.batch_size,
                 shuffle=False,
             ),
