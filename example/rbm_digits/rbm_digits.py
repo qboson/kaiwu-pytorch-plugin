@@ -13,6 +13,7 @@ import seaborn as sns
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import gen_even_slices
+from sklearn.utils.multiclass import unique_labels
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
@@ -345,10 +346,14 @@ class RBMRunner(TransformerMixin, BaseEstimator):
 
     # 绘制混淆矩阵
     def plot_confusion_matrix(self, y_true, y_pred, title_suffix="", save_pdf=False):
-        """绘制混淆矩阵"""
-        cm = confusion_matrix(y_true, y_pred)
+        """绘制混淆矩阵，两轴显示真实类别标签而非矩阵下标。"""
+        labels = unique_labels(y_true, y_pred)
+        cm = confusion_matrix(y_true, y_pred, labels=labels)
         plt.figure(figsize=(10, 8))
-        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+        sns.heatmap(
+            cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=labels, yticklabels=labels,
+        )
         plt.title(f"Confusion Matrix ({title_suffix})", fontsize=18)
         plt.xlabel("Predicted Label", fontsize=16)
         plt.ylabel("True Label", fontsize=16)
