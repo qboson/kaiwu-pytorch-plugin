@@ -214,8 +214,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             torch.Tensor or tuple: Concatenated states in visible-row order.
                 When ``return_counts=True``, also return the per-row solution counts.
         """
-        solutions = []
         counts = []
+        solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
 
