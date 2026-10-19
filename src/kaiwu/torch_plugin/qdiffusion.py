@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from numbers import Integral
 from typing import Any
 
 import numpy as np
@@ -52,12 +53,13 @@ class QDiffusionConfig:
 
     Attributes:
 
-        num_diffusion_timesteps: Number of discrete noising steps used by the
-            training objective.
+        num_diffusion_timesteps: Positive integer number of discrete noising
+            steps used by the training objective.
 
         use_coupled_sampling: Whether to use the coupled corruption variant.
 
-        num_candidates: Number of proposal candidates sampled at each decode step.
+        num_candidates: Positive integer number of proposal candidates sampled
+            at each decode step.
 
         proposal_temperature: Temperature used for proposal-side sampling.
 
@@ -73,6 +75,9 @@ class QDiffusionConfig:
         resample_top_p: Top-p cutoff used during resampling.
 
         decoding_strategy: Skeptical-remasking strategy string.
+
+    Raises:
+        ValueError: If a timestep or candidate count is not a positive integer.
     """
 
     num_diffusion_timesteps: int = 500
@@ -85,6 +90,13 @@ class QDiffusionConfig:
     resample_ratio: float = 0.25
     resample_top_p: float = 0.95
     decoding_strategy: str = "reparam-uncond-deterministic-linear"
+
+    def __post_init__(self) -> None:
+        """Reject invalid sampling counts when constructing the config."""
+        for name in ("num_diffusion_timesteps", "num_candidates"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, Integral) or value <= 0:
+                raise ValueError(f"{name} must be a positive integer")
 
 
 class EnergyModel(nn.Module):
