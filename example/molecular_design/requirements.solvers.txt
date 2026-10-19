@@ -1,0 +1,6 @@
+# Optional: required to rerun software SQA / Neal training, not for offline verification.
+# SQA historical metadata records dwave-samplers 1.8.0; installed separately
+# from the completed CIM environment, where dwave-samplers was absent.
+dwave-samplers==1.8.0
+dimod==0.12.22
+dwave-neal==0.6.0

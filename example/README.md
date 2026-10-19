@@ -112,3 +112,9 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+### Molecular design: CIM, SQA and SA comparison
+
+`example/molecular_design/` reproduces a molecular generation workflow using graph fingerprints, a conditional restricted Boltzmann machine and QUBO optimization. It includes 25,000 selected steps per method, a candidate-budget-matched CIM/SQA comparison, an SA reference with its budget stated separately, and an offline results verifier.
+
+See [molecular_design/README.md](molecular_design/README.md) for the Chinese reproduction guide and results. The example directly uses PyTorch and the Kaiwu SDK; its recorded SDK version differs from the main project's environment and requires a separate environment.

@@ -1,0 +1,11 @@
+# Core environment recorded for the completed CIM experiment (Python 3.10.20).
+# Kaiwu 1.0.33a0 must be installed separately from the provider distribution.
+# The original torch runtime was 2.6.0+cu124; generation ran on CPU.
+numpy==1.26.4
+pandas==2.1.0
+scipy==1.15.3
+scikit-learn==1.7.2
+matplotlib==3.7.3
+tqdm==4.66.4
+rdkit==2026.3.2
+torch==2.6.0

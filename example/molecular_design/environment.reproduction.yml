@@ -1,0 +1,10 @@
+name: qc-mol-reproduction
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.20
+  - pip
+  - pip:
+      - -r requirements.reproduction.txt
+# Optional software solvers: python -m pip install -r requirements.solvers.txt
+# Install Kaiwu SDK 1.0.33a0 separately for Kaiwu SA / CIM.
