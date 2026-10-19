@@ -9,6 +9,14 @@ from kaiwu.torch_plugin.qdiffusion import (
 )
 
 
+DEVICES = [
+    "cpu",
+    pytest.param("cuda", marks=pytest.mark.skipif(
+        not torch.cuda.is_available(), reason="CUDA is not available"
+    )),
+]
+
+
 class ContextProposal(nn.Module):
     """A neural proposal refines repeated tokens once other content is visible."""
 
@@ -33,7 +41,7 @@ class ContextProposal(nn.Module):
 
     def forward(self, tokens):
         context = self.embedding(tokens[:, self.context_start:self.context_stop]).sum(1)
-        logits = (self.positions(torch.arange(tokens.size(1))).unsqueeze(0)
+        logits = (self.positions(torch.arange(tokens.size(1), device=tokens.device)).unsqueeze(0)
                   + self.head(context).unsqueeze(1))
         self.calls.append((tokens.detach().clone(), logits.detach().clone()))
         return logits
@@ -77,11 +85,13 @@ def _public_step(model, inputs, api, protected=None):
 
 @pytest.mark.parametrize("api", ["generate", "step"])
 @pytest.mark.parametrize("padding", [0, 2, 8])
-def test_repeated_editable_content_refines_independently_of_padding(api, padding):
+@pytest.mark.parametrize("device", DEVICES)
+def test_repeated_editable_content_refines_independently_of_padding(api, padding, device):
     """Three copies among five editable tokens exceed .4 with any PAD suffix."""
     torch.manual_seed(41)
     model, proposal, energy = _generator([5, 5, 5, 6, 7])
-    inputs = torch.tensor([[1, 5, 5, 5, 6, 7, 2] + [0] * padding])
+    model.to(device)
+    inputs = torch.tensor([[1, 5, 5, 5, 6, 7, 2] + [0] * padding], device=device)
     original = inputs.clone()
 
     state = _public_step(model, inputs, api)
@@ -93,6 +103,31 @@ def test_repeated_editable_content_refines_independently_of_padding(api, padding
     torch.testing.assert_close(inputs, original)
     torch.testing.assert_close(energy.calls[0][0], original)
     torch.testing.assert_close(energy.calls[0][1], original.ne(0))
+
+
+@pytest.mark.parametrize("device", DEVICES)
+@pytest.mark.parametrize("length", [32, 1024])
+def test_repetition_check_has_bounded_scalar_reads(device, length):
+    """Scanning a batch must not read a device scalar for each token or mask."""
+    model, proposal, _ = _generator([])
+    tokens = (torch.arange(length, device=device) % 8 + 5).repeat(2, 1)
+    scores = torch.zeros_like(tokens, dtype=torch.float32)
+    editable = torch.ones_like(tokens, dtype=torch.bool)
+    editable[0, ::3] = False
+    editable[1] = False
+    original_tokens, original_scores = tokens.clone(), scores.clone()
+
+    with torch.profiler.profile(activities=[torch.profiler.ProfilerActivity.CPU]) as profile:
+        model._resample(tokens, scores, editable)
+
+    scalar_reads = sum(
+        event.count for event in profile.key_averages()
+        if event.key == "aten::_local_scalar_dense"
+    )
+    assert scalar_reads <= 2 * tokens.size(0)
+    assert not proposal.calls
+    torch.testing.assert_close(tokens, original_tokens)
+    torch.testing.assert_close(scores, original_scores)
 
 
 def test_neural_proposal_and_generated_prefix_are_padding_invariant():

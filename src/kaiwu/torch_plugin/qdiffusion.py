@@ -813,27 +813,29 @@ class QDiffusion(nn.Module):
         resample_masks = []
         resample_scores = []
 
-        for batch_index, sequence in enumerate(tokens):
-            editable = editable_token_mask[batch_index]
-            threshold = int(editable.sum()) * self.config.resample_ratio
+        # Copy the batch once per tensor to avoid per-position device synchronization.
+        token_rows = tokens.tolist()
+        editable_rows = editable_token_mask.tolist()
+        for batch_index, (token_row, editable) in enumerate(zip(token_rows, editable_rows)):
+            threshold = sum(editable) * self.config.resample_ratio
             token_positions = {}
             max_frequency = -1
-            for position, token in enumerate(sequence):
+            for position, token in enumerate(token_row):
                 if not editable[position]:
                     continue
-                token = int(token)
                 token_positions.setdefault(token, []).append(position)
                 max_frequency = max(max_frequency, len(token_positions[token]))
 
             if max_frequency < 2 or max_frequency <= threshold:
                 continue
 
+            sequence = tokens[batch_index]
             mask = torch.zeros_like(sequence).bool()
             for token, positions in token_positions.items():
                 if len(positions) >= 2 and len(positions) > threshold:
                     mask |= sequence.eq(token)
 
-            mask &= editable
+            mask &= editable_token_mask[batch_index]
             if not mask.any():
                 continue
 
