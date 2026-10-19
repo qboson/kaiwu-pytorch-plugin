@@ -1,38 +1,37 @@
 """Custom-data labels must not make unsupervised QVAE diagnostics fail."""
-# pylint: disable=import-outside-toplevel,redefined-outer-name,too-few-public-methods
 
 import importlib
 from pathlib import Path
 import sys
-from types import ModuleType
+from types import ModuleType, SimpleNamespace
 
 import numpy as np
 import pytest
 import torch
 
 
-class OfflineSampler:
+def offline_sampler(**kwargs):
     """Replace only the external Ising solver with legal deterministic states."""
+    del kwargs
 
-    def __init__(self, **kwargs):
-        del kwargs
-
-    def solve(self, matrix):
+    def solve(matrix):
         """Return both constant spin assignments with a positive auxiliary spin."""
         states = np.ones((2, len(matrix)), dtype=np.float32)
         states[0, :-1] = -1
         return states
 
+    return SimpleNamespace(solve=solve)
 
-@pytest.fixture
-def example(monkeypatch):
+
+@pytest.fixture(name="example")
+def example_modules(monkeypatch):
     """Import real example modules without a licensed sampler or model downloads."""
     for dependency in ("matplotlib", "pandas", "seaborn", "sklearn", "tqdm",
                        "torchvision", "torchmetrics", "gif", "imageio"):
         pytest.importorskip(dependency)
-    import matplotlib
+    matplotlib = pytest.importorskip("matplotlib")
     matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    plt = pytest.importorskip("matplotlib.pyplot")
 
     folder = Path(__file__).resolve().parents[1] / "example" / "qvae_mnist"
     monkeypatch.syspath_prepend(str(folder))
@@ -47,7 +46,7 @@ def example(monkeypatch):
     ):
         boundary = ModuleType(name)
         for export in exports:
-            setattr(boundary, export, OfflineSampler)
+            setattr(boundary, export, offline_sampler)
         monkeypatch.setitem(sys.modules, name, boundary)
     try:
         trainer = importlib.import_module("trainer.trainer")
