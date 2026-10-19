@@ -242,6 +242,8 @@ def run_generation_over_records(
 
         with torch.no_grad():
             objective_outputs = generator.objective({"targets": target_tokens})
+            # Keep generation independent of diagnostic sampling and candidate counts.
+            seed_torch(seed_base + index)
             generated_tokens = generator.generate(target_tokens, max_steps=max_steps)
 
         decoded_output = generator.tokenizer.batch_decode(
