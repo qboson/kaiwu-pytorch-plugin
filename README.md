@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -75,10 +75,14 @@ The above image shows the project file structure:
 ## Quick Start
 
 ### Requirements
-- python == 3.10
+- Python: 3.10, 3.12, or 3.14
 - kaiwu == 1.4.3
-- torch == 2.7.0
-- numpy == 2.2.6
+- Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
+- Python 3.14: torch == 2.10.0, numpy == 2.3.3
+
+Python 3.11 and 3.13 are not supported. Installation on Python 3.12 and 3.14
+depends on corresponding Kaiwu support. These environments are not ready for
+installation from published packages until Kaiwu provides that support.
 
 ### Code Style
 

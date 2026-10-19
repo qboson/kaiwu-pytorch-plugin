@@ -16,12 +16,17 @@ Before installation, ensure your system meets the following requirements:
 
 | Dependency | Required Version | Role |
 |------------|-----------------|------|
-| Python | 3.10 | Base runtime (tested against 3.10 specifically) |
-| PyTorch | 2.7 | Tensor operations & automatic differentiation |
-| NumPy | 2.2.6 | Linear algebra & SDK interfacing |
+| Python | 3.10, 3.12, 3.14 | Supported even minor versions |
+| PyTorch | 2.7.0 / 2.10.0 | Use 2.10.0 on Python 3.14 |
+| NumPy | 2.2.6 / 2.3.3 | Use 2.3.3 on Python 3.14 |
 | Kaiwu SDK | v1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
 
 > **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK v1.4.3 is the current recommended release.
+
+Python 3.11 and 3.13 are excluded from the supported versions. Installation on
+Python 3.12 and 3.14 depends on corresponding Kaiwu support. Until Kaiwu provides
+that support, installation from published dependencies and the corresponding CI
+jobs cannot pass. Kaiwu packaging is maintained separately from this plugin.
 
 Check the Python version:
 ```bash

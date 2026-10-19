@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -78,10 +78,13 @@ flowchart TD
 
 ### 环境要求
 
-- python == 3.10
+- Python：3.10、3.12 或 3.14
 - kaiwu == 1.4.3
-- torch == 2.7.0
-- numpy == 2.2.6
+- Python 3.10 / 3.12：torch == 2.7.0，numpy == 2.2.6
+- Python 3.14：torch == 2.10.0，numpy == 2.3.3
+
+不支持 Python 3.11 和 3.13。Python 3.12 和 3.14 的安装还需要 Kaiwu
+提供对应版本支持；在此之前，尚不能通过正式发布的依赖完成安装。
 
 ### 代码风格
 

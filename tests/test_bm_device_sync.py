@@ -5,9 +5,9 @@
 child's ``.to()`` override, so device bookkeeping must live in ``_apply``:
 otherwise a BM nested inside another module (for example
 ``EnergyModel.energy_bm``) keeps a stale ``self.device`` after its parameters
-were moved, and ``_to_ising_matrix()`` crashes mixing two devices. The
-``_to_ising_matrix`` implementations therefore also derive their work-buffer
-device from model parameters as defense in depth.
+were moved, and ``_to_ising_matrix()`` crashes mixing two devices. Updating
+``self.device`` after parameter conversion keeps work buffers created with
+that attribute on the same device as the model parameters.
 
 The CUDA-dependent tests below run on any CUDA machine; they cover the
 construct-on-CUDA / move-to-CPU path that CPU-only development machines
