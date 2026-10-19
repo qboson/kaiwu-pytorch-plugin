@@ -5,10 +5,31 @@
 Examples and workflow scripts for the public `Q-Diffusion` module.
 
 ## Data
-[data used for example/qdiffusion](https://www.uniprot.org/proteomes/UP000005640)
+
+The FASTA file is not included in the checkout. Before running the examples,
+download the protein sequences in FASTA format from the
+[UniProt human proteome used by this example](https://www.uniprot.org/proteomes/UP000005640).
+Create the local data directory from the repository root:
+
+```bash
+mkdir -p example/qdiffusion/data
+```
+
+Save the downloaded FASTA as:
+
+```text
+example/qdiffusion/data/UP000005640_9606.fasta
+```
+
+If the download is compressed, decompress it first; the readers open plain-text
+FASTA files. To use another dataset or location, change `fasta_path` or
+`reference_fasta` in the relevant script/workflow configuration. Relative paths
+in the commands below assume you are at the repository root.
 
 
 ## Quick Start
+
+Prepare the FASTA file above before running these commands:
 
 ```bash
 pip install -r example/qdiffusion/requirements.txt
@@ -112,8 +133,11 @@ Inside `Q-Diffusion.objective(...)`, the training path is:
 
 ## Shared Assets
 
-- `data/UP000005640_9606.fasta`: bundled example FASTA
-- `graph/*`: diagrams copied from the original case notes
+- `data/UP000005640_9606.fasta`: local FASTA prepared by the user, not a bundled file
+- `graph/*`: optional local diagrams from the original case notes; not required to run the scripts
+
+Both `data` and `example/qdiffusion/graph/` are ignored by Git, so a fresh clone
+does not contain these assets.
 
 ## Notes
 
