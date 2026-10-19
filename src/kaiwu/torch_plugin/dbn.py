@@ -89,15 +89,14 @@ class UnsupervisedDBN(nn.Module):
             )
 
         data_in = data_in.astype(np.float32)
-        for rbm in self.rbm_layers:
-            with torch.no_grad():
-                hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
-                )
-                data_in = (
-                    hidden_output[:, rbm.num_visible :].cpu().numpy()
-                )  # Extract only the hidden part
-        return data_in
+        if len(self.rbm_layers) == 0:
+            return data_in
+        with torch.no_grad():
+            data_tensor = torch.as_tensor(data_in, device=self.device)
+            for rbm in self.rbm_layers:
+                hidden_output = rbm.get_hidden(data_tensor)
+                data_tensor = hidden_output[:, rbm.num_visible :]
+        return data_tensor.cpu().numpy()
 
     def transform(self, data_in):
         """An sklearn-compatible transform method.
