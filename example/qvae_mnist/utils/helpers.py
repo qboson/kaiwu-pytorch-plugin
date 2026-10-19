@@ -245,7 +245,7 @@ def plot_flattened_images_grid(
 
     features_numpy = features[:num_images].detach().cpu().numpy()
 
-    fig, axes = plt.subplots(grid_size, grid_size, figsize=(5, 5))
+    fig, axes = plt.subplots(grid_size, grid_size, figsize=(5, 5), squeeze=False)
     for i in range(grid_size):
         for j in range(grid_size):
             idx = i * grid_size + j
