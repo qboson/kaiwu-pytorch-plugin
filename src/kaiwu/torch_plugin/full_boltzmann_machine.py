@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Boltzmann Machine"""
 
+from typing import List, Tuple, Union
+
 import numpy as np
 import torch
 
@@ -197,18 +199,23 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Return sampled states of all units
             return s_all
 
-    def condition_sample(self, sampler, s_visible, dtype=torch.float32) -> torch.Tensor:
+    def condition_sample(
+        self, sampler, s_visible, dtype=torch.float32, *, return_counts=False
+    ) -> Union[torch.Tensor, Tuple[torch.Tensor, List[int]]]:
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
             sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
             s_visible: State of the visible layer.
+            dtype: Data type for decoded hidden states.
+            return_counts: Also return the number of solutions for each visible row.
 
         Returns:
-            torch.Tensor: Spins sampled from the model
-                (shape determined by ``sampler`` and ``sample_params``).
+            torch.Tensor or tuple: Concatenated states in visible-row order.
+                When ``return_counts=True``, also return the per-row solution counts.
         """
         solutions = []
+        counts = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
 
@@ -222,6 +229,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 dim=-1,
             )
             solutions.append(solution)
+            counts.append(solution.size(0))
 
         solutions = torch.cat(solutions, dim=0)
+        if return_counts:
+            return solutions, counts
         return solutions

@@ -143,17 +143,13 @@ class EnergyModel(nn.Module):
                 "BM hidden-state sampling requires bm_num_visible, "
                 "bm_num_hidden, and sampler."
             )
-        batched_states = []
-        split_sizes = []
-        for sample_index in range(visible_state.size(0)):
-            sampled_states = self.energy_bm.condition_sample(
-                self.sampler,
-                visible_state[sample_index : sample_index + 1],
-                dtype=visible_state.dtype,
-            )
-            batched_states.append(sampled_states)
-            split_sizes.append(sampled_states.size(0))
-        return torch.cat(batched_states, dim=0), torch.tensor(
+        sampled_states, split_sizes = self.energy_bm.condition_sample(
+            self.sampler,
+            visible_state,
+            dtype=visible_state.dtype,
+            return_counts=True,
+        )
+        return sampled_states, torch.tensor(
             split_sizes,
             device=visible_state.device,
             dtype=torch.long,
