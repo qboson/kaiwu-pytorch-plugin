@@ -200,18 +200,14 @@ def create_tsne_animation(frame_paths, output_path, animation_filename="qvae_tra
         
     for path in frame_paths:
         if os.path.exists(path):
-            img = Image.open(path)
-
-            # 统一尺寸
-            if base_size is None:
-                base_size = img.size
-            else:
-                if img.size != base_size:
+            with Image.open(path) as source:
+                # 统一颜色模式，避免 RGB、RGBA 和灰度帧具有不同的通道数。
+                img = source.convert("RGBA")
+                if base_size is None:
+                    base_size = img.size
+                elif img.size != base_size:
                     img = img.resize(base_size, Image.Resampling.LANCZOS)
-
-            # 转换为numpy数组
-            img_array = np.array(img)
-            images.append(img_array)
+                images.append(np.array(img))
         
     if images:
         # 确保所有图像形状一致
