@@ -168,8 +168,10 @@ class Trainer:
 
     
         # 调试信息
-        logger.info(f"Test labels - unique: {np.unique(y_test)}, count: {len(y_test)}")
-        logger.info(f"Test labels distribution: {np.bincount(y_test)}")
+        unique_labels, label_counts = np.unique(y_test, return_counts=True)
+        logger.info(f"Test labels - unique: {unique_labels}, count: {len(y_test)}")
+        label_distribution = dict(zip(unique_labels.tolist(), label_counts.tolist()))
+        logger.info(f"Test labels distribution: {label_distribution}")
 
         tsne_frames = []
 
