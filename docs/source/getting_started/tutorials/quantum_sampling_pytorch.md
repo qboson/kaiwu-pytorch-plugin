@@ -40,6 +40,10 @@ sampler = PrecisionReducer(
 
 The loop mirrors the [Quick Start](../quickstart.md) example: positive phase from data, negative phase from `sample(sampler)`. Swap in `SimulatedAnnealingOptimizer()` to run the same loop locally.
 
+Local execution still requires a configured Kaiwu SDK license. Complete the
+[SDK configuration and license setup](../installation.md#kaiwu-sdk-configuration--license)
+before calling `sample()`; SA does not require CIM hardware access or QPU quota.
+
 ```python
 import torch
 from torch.optim import SGD
@@ -78,7 +82,7 @@ The table below consolidates the SA-vs-CIM comparison introduced in the [previou
 | Consideration            | `SimulatedAnnealingOptimizer`                                       | `CIMOptimizer`                                        |
 | ------------------------ | ------------------------------------------------------------------- | ----------------------------------------------------- |
 | Run location             | Local CPU                                                           | Kaiwu real-machine service (cloud processor)          |
-| Prerequisite             | None                                                                | SDK credentials, access rights, quota                 |
+| Prerequisite             | Configured SDK license; no CIM hardware access or QPU quota                                                                | SDK credentials, access rights, quota                 |
 | Escape from local minima | Thermal activation (barrier crossing $\propto \exp(-\Delta E / T)$) | Quantum tunneling                                     |
 | Suitable phase           | Debugging, baselines, small experiments                             | Comparative experiments with real-machine access      |
 | End-to-end latency       | Determined by local problem size and settings                       | High — job submission, queuing, and physical evolution |
