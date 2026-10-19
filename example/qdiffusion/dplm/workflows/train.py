@@ -308,6 +308,7 @@ def main() -> None:
         steps=config.train.validation_steps,
     )
     save_json(output_dir / "validation_summary.json", validation_summary)
+    del validation_generator
 
     # Stage 3: build the actual trainable generator and dataloaders. In the
     # default setup, proposal weights stay frozen and the energy side is tuned.
@@ -438,6 +439,8 @@ def main() -> None:
     )
     print(f"Best checkpoint: {best_checkpoint_path}")
     print(f"Final checkpoint: {final_checkpoint_path}")
+    # Loaders and the scheduler retain their generator and optimizer references.
+    del train_loader, val_loader, scheduler, optimizer, train_generator
 
     # Stage 5: compare a proposal-only baseline against a guided generator that
     # reloads the best learned energy weights from training.
@@ -456,6 +459,7 @@ def main() -> None:
         output_dir=output_dir / "baseline",
         label="proposal_only",
     )
+    del baseline_generator
 
     guided_generator = build_generator_from_config(
         config,
@@ -481,6 +485,7 @@ def main() -> None:
         output_dir=output_dir / "guided",
         label="energy_guided",
     )
+    del guided_generator
 
     baseline_quality = evaluate_generation_quality(
         test_records, baseline_records, label="proposal_only"
