@@ -353,7 +353,11 @@ class QVAE(AutoEncoderBase):
         return cross_entropy - entropy
 
     def _cross_entropy(self, logit_q):
-        """Compute cross-entropy term for KL divergence.
+        """Compute the per-observation positive-minus-negative energy surrogate.
+
+        Keep each positive energy separate and subtract the shared negative-phase
+        mean. The caller can then reduce or weight the per-observation values.
+        This surrogate does not include the prior's log partition function.
 
         Args:
             logit_q (torch.Tensor): Logits from encoder (batch_size, latent_dim).
@@ -362,7 +366,7 @@ class QVAE(AutoEncoderBase):
             torch.Tensor: Cross-entropy per sample (batch_size,).
         """
         q_prob = torch.sigmoid(logit_q)
-        positive = self.bm(q_prob).mean()
+        positive = self.bm(q_prob)
         neg_samples = self.bm.sample(self.sampler)
         negative = self.bm(neg_samples).mean()
         return positive - negative
