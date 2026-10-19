@@ -69,11 +69,16 @@ Visualize the distribution of the generated samples to assess fidelity to the or
 Run the training script via `example/bm_generation/train_bm.ipynb`, and execute the sampling/testing script via `example/bm_generation/sample_bm.ipynb`.
 
 **Dependencies**:
-```text
-kaiwu==1.3.0
-pandas
-matplotlib
+
+Follow the [installation guide](../docs/source/getting_started/installation.md)
+to prepare the Kaiwu SDK, then run from the repository root:
+
+```bash
+python -m pip install -e . pandas matplotlib
 ```
+
+This installs the plugin from the same checkout as the examples and uses the
+core dependency versions in `requirements/requirements.txt`.
 
 ---
 
