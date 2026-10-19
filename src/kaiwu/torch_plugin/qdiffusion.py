@@ -267,20 +267,25 @@ class QDiffusion(nn.Module):
             self.device = torch.device(device)
             self.to(device=self.device, dtype=self.dtype)
 
-    def to(self, *args: Any, **kwargs: Any) -> QDiffusion:
-        """Moves the module and refreshes cached device/dtype metadata.
+    def _apply(self, fn, recurse=True) -> QDiffusion:
+        """Refreshes metadata after every PyTorch parameter conversion.
+
+        Parent modules and convenience methods such as ``double()`` call
+        ``_apply`` directly rather than the child's ``to`` method. Updating
+        metadata here keeps those conversion paths consistent with ``to``.
 
         Args:
-            ``*args``: Positional arguments forwarded to ``nn.Module.to``.
-            ``**kwargs``: Keyword arguments forwarded to ``nn.Module.to``.
+            fn: Function applied to each parameter and buffer.
+            recurse: Whether to recurse into child modules.
 
         Returns:
-            QDiffusion: The moved module instance.
+            QDiffusion: The converted module instance.
         """
-        module = super().to(*args, **kwargs)
+        module = super()._apply(fn, recurse)
         try:
-            self.device = next(self.parameters()).device
-            self.dtype = next(self.parameters()).dtype
+            parameter = next(self.parameters())
+            self.device = parameter.device
+            self.dtype = parameter.dtype
         except StopIteration:
             self.device = torch.device("cpu")
         return module
