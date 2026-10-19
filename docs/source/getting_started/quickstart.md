@@ -62,7 +62,7 @@ graph TB
     end
     subgraph External_SDK ["External SDK"]
         G["kaiwu.cim.CIMOptimizer"]
-        H["kaiwu.cim.PrecisionReducer"]
+        H["kaiwu.preprocess.PrecisionReducer"]
         I["kaiwu.classical.SimulatedAnnealingOptimizer"]
     end
     B -->|"implements"| E
@@ -103,7 +103,8 @@ import torch
 import kaiwu as kw
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 from torch.optim import SGD
 
 # Add license authentication

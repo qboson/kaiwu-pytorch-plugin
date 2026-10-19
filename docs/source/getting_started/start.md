@@ -59,7 +59,7 @@ The above diagram shows the project file structure:
 # Requirements
 
 - Python == 3.10
-- kaiwu == v1.2.0
+- kaiwu == 1.4.3
 - torch == 2.7.0
 - numpy == 2.2.6
 

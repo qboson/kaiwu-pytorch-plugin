@@ -20,6 +20,11 @@ from torchvision import transforms
 from torchmetrics.image.fid import FrechetInceptionDistance
 from typing import Union, Optional
 
+import kaiwu as kw
+from kaiwu.classical import SimulatedAnnealingOptimizer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -265,10 +270,6 @@ def plot_flattened_images_grid(
         plt.close()
 
 def init_qvae_sampler(model):
-    import kaiwu as kw
-    from kaiwu.classical import SimulatedAnnealingOptimizer
-    from kaiwu.cim import CIMOptimizer, PrecisionReducer
-
     if model.sampler_type == 'cim':
         kw.common.CheckpointManager.save_dir = './tmp'
         sampler = CIMOptimizer(task_name="qvae_sampling", wait=True)

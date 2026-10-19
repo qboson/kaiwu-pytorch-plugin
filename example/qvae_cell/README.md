@@ -10,9 +10,10 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 
 ## Dependencies
 
+Install the plugin from the repository root with `pip install .`.
+
 ```bash
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
+kaiwu==1.4.3
 torch==2.7.0
 anndata
 scanpy

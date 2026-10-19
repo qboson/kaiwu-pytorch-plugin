@@ -6,9 +6,11 @@
 示例使用数据可以在https://www.kaggle.com/datasets/redwoodz/immune-data下载
 
 ## 依赖
+
+在项目根目录运行 `pip install .` 安装当前插件。
+
 ```
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
+kaiwu==1.4.3
 torch==2.7.0
 anndata
 scanpy

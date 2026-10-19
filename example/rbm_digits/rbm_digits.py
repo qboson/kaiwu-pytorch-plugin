@@ -23,7 +23,8 @@ from torch.optim import SGD
 import kaiwu as kw
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 
 
 def _ensure_result_dir():

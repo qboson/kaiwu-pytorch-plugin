@@ -79,7 +79,7 @@ flowchart TD
 ### 环境要求
 
 - python == 3.10
-- kaiwu == 1.3.1
+- kaiwu == 1.4.3
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -114,7 +114,7 @@ flowchart TD
    pip install -r requirements/requirements.txt
    ```
 
-   Kaiwu SDK 需要单独安装，见下方说明。
+   依赖中已包含 Kaiwu SDK 1.4.3。
 
 4. **安装插件**
 
@@ -126,12 +126,13 @@ flowchart TD
 
 Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有依赖（包括 Kaiwu SDK）均已安装。
 
+Kaiwu 1.4.3 的 Linux 安装包仅支持 x86_64，因此 Docker Compose 已指定 `linux/amd64`，ARM 主机也使用此配置。
+
 **所需项目结构**：
 ```text
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # 已包含 Kaiwu SDK
-├── kaiwu-1.3.1-py3-none-any.whl   # 或从 Qboson 平台下载
 └── docker/
     └── Dockerfile
 ```
@@ -165,7 +166,7 @@ requirements/
 
 ### Kaiwu SDK 安装说明（必需）
 
-现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装
+现在kaiwu版本1.4.3可以直接通过`pip install kaiwu==1.4.3`来安装
 
 其他版本的Kaiwu SDK 的下载和安装步骤如下：
 
@@ -202,7 +203,8 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -338,7 +340,9 @@ python example/qdiffusion/dplm/train_workflow.py
 
 ## 使用量统计
 
-kpp 会在后台隐性统计 `SimulatedAnnealingOptimizer` 和 `CIMOptimizer` 的调用量，用于改进产品和服务质量。**该统计默认开启，对用户代码完全透明，无需修改任何调用逻辑。**
+Kaiwu 1.4.3 未提供 KPP 调用来源统计所需的接口，因此在此版本下不会启用 KPP 专属统计。以下开关仅对提供该接口的 SDK 版本生效，不控制 SDK 自身的统计。
+
+当 SDK 提供上述接口时，kpp 会在后台为 `SimulatedAnnealingOptimizer` 和 `CIMOptimizer` 的调用标记 KPP 来源。**该功能默认开启，无需修改用户代码。**
 
 统计仅在 kpp 调用链路（即通过 `AbstractBoltzmannMachine.sample()` 触发）中生效；直接调用 kaiwu SDK 的优化器不会被统计。
 

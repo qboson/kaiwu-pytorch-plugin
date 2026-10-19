@@ -76,7 +76,7 @@ The above image shows the project file structure:
 
 ### Requirements
 - python == 3.10
-- kaiwu == 1.3.1
+- kaiwu == 1.4.3
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -105,7 +105,7 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    ```bash
    pip install -r requirements/requirements.txt
    ```
-   Kaiwu SDK needs to be installed separately, see the installation instructions below.
+   Kaiwu SDK 1.4.3 is included in the dependencies.
 
 4. **Install the plugin**:
    ```bash
@@ -115,12 +115,13 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
 #### Option 2: Docker Setup (no local environment required)
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
 
+Kaiwu 1.4.3 provides Linux wheels for x86_64 only, so Docker Compose uses `linux/amd64`, including on ARM hosts.
+
 Project structure required:
 ```text
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
@@ -154,7 +155,7 @@ Press `Ctrl+C`, then run:
 
 ### Kaiwu SDK Installation Instructions (Required)
 
-Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+Kaiwu version 1.4.3 can now be installed directly via `pip install kaiwu==1.4.3`.
 
 The download and installation steps for other versions of the Kaiwu SDK are as follows:
 ![](imgs/image.png)
@@ -185,7 +186,8 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -335,7 +337,9 @@ For a more focused walkthrough of the example tree and its data flow, see
 
 ## Usage Statistics
 
-kpp implicitly tracks `SimulatedAnnealingOptimizer` and `CIMOptimizer` call counts in the background to help improve product quality. **This is enabled by default and fully transparent — no changes to user code are required.**
+Kaiwu 1.4.3 does not expose the caller-context hook used for KPP attribution, so KPP-specific statistics are inactive with this release. The controls below apply only to SDK releases that provide that hook; they do not control the SDK's own statistics.
+
+When the hook is available, kpp attributes `SimulatedAnnealingOptimizer` and `CIMOptimizer` calls to KPP in the background. **This attribution is enabled by default and requires no changes to user code.**
 
 Statistics are only collected within the kpp call path (i.e., triggered via `AbstractBoltzmannMachine.sample()`); calling kaiwu SDK optimizers directly is never tracked.
 

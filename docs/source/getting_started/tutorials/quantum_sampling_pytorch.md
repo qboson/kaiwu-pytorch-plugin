@@ -24,7 +24,8 @@ Note that `sample()` does **not** take a data state as input, nor does it return
 Real hardware quantum sampling requires configured Kaiwu SDK credentials and real-machine access. `PrecisionReducer` adapts the Ising parameters to hardware precision constraints:
 
 ```python
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.preprocess import PrecisionReducer
 
 quantum_sampler = CIMOptimizer(task_name="rbm_mnist", wait=True)
 sampler = PrecisionReducer(

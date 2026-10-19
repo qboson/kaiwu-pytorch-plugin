@@ -41,7 +41,7 @@ def main() -> None:
         "max_precision": 8,
         "precision_step": 4,
         "sample_number": 1,
-        "task_mode": "quota",
+        "task_mode": "optimization",
         "interval": 1,
         "project_no": KAIWU_PROJECT_NO,
     }
