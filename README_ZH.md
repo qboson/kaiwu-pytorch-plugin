@@ -104,7 +104,7 @@ flowchart TD
 2. **克隆仓库**
 
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin
    ```
 
@@ -138,7 +138,7 @@ requirements/
 
 1. **克隆仓库**  
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
