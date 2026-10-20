@@ -23,7 +23,7 @@ This section provides two complementary approaches for handwritten digit recogni
 
 This example demonstrates how to use a Restricted Boltzmann Machine (RBM) for feature learning and classification on the handwritten digits dataset (Digits). It is intended for beginners to understand the application workflow of RBMs in image feature extraction and classification, and can serve as a foundation for more advanced experiments and extensions. The main contents include:
 
-* **Data augmentation and preprocessing**: Expanding the dataset of original 8x8 handwritten digit images by shifting them up, down, left, and right, followed by feature normalization using MinMaxScaler;
+* **Data augmentation and preprocessing**: Splitting original 8x8 handwritten digit images before augmentation, shifting training images up, down, left, and right, and fitting MinMaxScaler on the augmented training set. Test images stay unaugmented and use the training scaling parameters;
 * **RBM model training**: Implementing the `RBMRunner` class to encapsulate the RBM training process, with support for visualizing generated samples and weight matrices during training;
 * **Feature extraction and classification**: After training, using the hidden-layer representations from the RBM as features for classification with logistic regression;
 * **Visualization and analysis**: Supporting sample generation and weight visualization during training to help observe and evaluate the learning effects of the model.
@@ -42,6 +42,8 @@ Building upon the RBM approach, this example demonstrates a complete Deep Belief
 * **Advanced Architecture**: PyTorch-based implementation with scikit-learn compatibility through `AbstractSupervisedDBN` base classes.
 
 Run the example via `example/dbn_digits/supervised_dbn_digits.ipynb`.
+
+Both digits examples hold out 20% of original images with `random_state=42` before augmenting the training set. The bundled Digits dataset yields 7,185 training rows and 360 original test images; translated siblings of training images cannot enter the test split.
 
 **Dependencies**
 

@@ -3,7 +3,7 @@
 
 **示例位置**: `example/dbn_digits/supervised_dbn_digits.ipynb`。核心实现位于 `example/dbn_digits/dbn_trainer.py` 和 `example/dbn_digits/supervised_dbn_digits.py`。
 
-该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，并进行平移增强、归一化和训练/测试集划分；随后由 `DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 `SupervisedDBNClassification` 完成分类训练和评估。
+该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，划分原始图像的训练集和测试集，再仅对训练图像进行平移增强，并使用训练集拟合的参数归一化两组数据；随后由 `DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 `SupervisedDBNClassification` 完成分类训练和评估。
 
 ## 目标
 
@@ -173,7 +173,9 @@ $$
 - **数据加载（`load_data` 方法）**
 
   - 数据集：使用 `sklearn.datasets.load_digits` （8×8 手写数字图像）。
-  - 增强：对原始图像进行上下左右平移，扩展数据集。
+  - 划分：先以 `test_size=0.2`、`random_state=42` 划分原始图像，测试集保留未增强的原图。
+  - 增强：仅对训练图像进行上下左右平移，每张训练原图产生五个样本，避免图像及其平移版本同时出现在训练集和测试集。
+  - 归一化：`MinMaxScaler` 仅拟合增强后的训练数据；测试数据使用相同参数变换，超出训练范围的特征可能不在 [0, 1] 内。内置 Digits 数据集得到 7,185 个训练样本和 360 个测试样本。
 
 - **训练过程可视化（`_visualize_training_progress` 方法，设置 `plot_img=True`）**
 
