@@ -53,7 +53,15 @@ which is precisely the Boltzmann distribution needed for training (Eq. {eq}`eq-b
 
 ## Using SA in KPP
 
-The [Quick Start](../quickstart.md) example already trains an RBM with `SimulatedAnnealingOptimizer`. `sample()` constructs the Ising matrix and calls the optimizer; you only pass the sampler to the model:
+The [Quick Start](../quickstart.md) example already trains an RBM with `SimulatedAnnealingOptimizer`.
+Before running the snippet, complete the [SDK license setup](../installation.md#kaiwu-sdk-configuration--license).
+The local SA optimizer also requires an SDK license; local execution does not
+imply license-free execution. The [Kaiwu SDK 1.3.1 installation instructions](https://kaiwu-sdk-docs.qboson.com/zh/v1.3.1/source/getting_started/sdk_installation_instructions.html)
+describe license initialization for both `CIMOptimizer` and `SimulatedAnnealingOptimizer`.
+Without a configured license, the SDK can prompt for credentials, which is unsuitable
+for an unattended script. Follow the installation guide to initialize it explicitly.
+
+`sample()` constructs the Ising matrix and calls the optimizer; you only pass the sampler to the model:
 
 ```python
 import torch

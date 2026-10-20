@@ -9,16 +9,26 @@
 
 [example/qdiffusion 使用的数据](https://www.uniprot.org/proteomes/UP000005640)
 
+仓库不附带 FASTA 数据。运行示例前，请从上面的 UniProt 页面下载蛋白质序列的
+FASTA 文件，并在仓库根目录创建本地数据目录：
+
+```bash
+mkdir -p example/qdiffusion/data
+```
+
 下载数据后，请将 FASTA 文件放到：
 
 ```text
 example/qdiffusion/data/UP000005640_9606.fasta
 ```
 
-如果你使用自己的数据，也可以放在其他位置，但需要在对应脚本中将
-`fasta_path` 或 `reference_fasta` 改成你的实际路径。
+如果下载的是压缩文件，请先解压；读取器接收的是纯文本 FASTA 文件。
+如果你使用自己的数据，也可以放在其他位置，但需要在对应脚本或工作流配置中将
+`fasta_path` 或 `reference_fasta` 改成你的实际路径。下面命令中的相对路径均以仓库根目录为起点。
 
 ## 快速开始
+
+先完成上面的 FASTA 数据准备，再运行：
 
 ```bash
 pip install -r example/qdiffusion/requirements.txt
@@ -122,8 +132,10 @@ factory helper 间接接入。
 
 ## 共享资源
 
-- `data/UP000005640_9606.fasta`：示例使用的 FASTA 数据
-- `graph/*`：从原始案例笔记中整理出的图示资源
+- `data/UP000005640_9606.fasta`：用户在本地准备的 FASTA 数据，不随仓库分发
+- `graph/*`：原始案例笔记中的可选本地图示，运行脚本不需要这些文件
+
+`data` 和 `example/qdiffusion/graph/` 均被 Git 忽略，新克隆的仓库不包含这些资源。
 
 ## 说明
 

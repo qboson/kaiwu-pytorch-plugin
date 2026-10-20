@@ -19,11 +19,14 @@
 
 **依赖项**:
 
+先按[安装指南](../installation.md)准备 Kaiwu SDK，再从仓库根目录执行：
+
 ```{code-block} bash
-
- pip install kaiwu==1.3.0 pandas matplotlib
-
+python -m pip install -e . pandas matplotlib
 ```
+
+这会安装当前源码中的插件，并采用 `requirements/requirements.txt` 中的核心依赖版本，
+避免示例另行固定旧版 SDK，与插件的依赖要求冲突。
 ## 1. 全连接玻尔兹曼机简介
 
 ### 1.1 BM vs RBM

@@ -29,10 +29,10 @@ CASE_ROOT = EXAMPLE_DIR.parent
 
 
 def default_fasta_path() -> Path:
-    """Returns the bundled example FASTA path.
+    """Returns the locally prepared example FASTA path.
 
     Returns:
-        Path: Path to the bundled FASTA file used by this example.
+        Path: Path to the locally prepared FASTA file used by this example.
     """
     return CASE_ROOT / "data" / "UP000005640_9606.fasta"
 
@@ -103,7 +103,7 @@ def main() -> None:
     """Runs a tiny example generation loop.
 
     The example loads one pretrained ``QDiffusion`` model, reads the first
-    usable sequence from the bundled FASTA, and prints the generated result.
+    usable sequence from the locally prepared FASTA, and prints the generated result.
     """
     proposal_ckpt = "airkingbd/dplm_150m"
     energy_ckpt = "airkingbd/dplm_150m"

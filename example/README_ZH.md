@@ -54,11 +54,16 @@ scipy
 
 通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
 **依赖**
+
+先按[安装指南](../docs/source/getting_started/installation.md)准备 Kaiwu SDK，
+再从仓库根目录执行：
+
+```bash
+python -m pip install -e . pandas matplotlib
 ```
-kaiwu==1.3.0
-pandas
-matplotlib
-```
+
+这样会安装与示例来自同一份源码的插件，核心依赖版本以
+`requirements/requirements.txt` 为准。
 
 ---
 

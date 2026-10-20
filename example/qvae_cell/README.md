@@ -10,15 +10,27 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 
 ## Dependencies
 
+Prepare the Kaiwu SDK using the
+[installation guide](../../docs/source/getting_started/installation.md), then
+install the plugin and the example's additional dependencies from the repository
+root (the directory containing `pyproject.toml`):
+
 ```bash
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
-torch==2.7.0
-anndata
-scanpy
-leidenalg
-scib_metrics
-scgraph
+python -m pip install -e . anndata scanpy leidenalg scib_metrics scgraph-eval
+```
+
+The scGraph evaluator is distributed as [scgraph-eval](https://pypi.org/project/scgraph-eval/)
+and imported as `scgraph`; the separate `scgraph` distribution is not this evaluator.
+
+The editable install keeps the plugin and this example on the same source
+revision. Core Torch, NumPy, and Kaiwu SDK versions come from
+`requirements/requirements.txt`; do not install the older plugin version from
+the previous example instructions on top of this checkout.
+
+For the training and evaluation commands below, change to the example directory:
+
+```bash
+cd example/qvae_cell
 ```
 
 ## File Structure
