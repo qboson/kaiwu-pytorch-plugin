@@ -43,17 +43,19 @@ class CosineScheduleWithWarmup(LambdaLR):
         )
 
 
-def process_solve_graph_worker(params):
+def process_solve_graph_worker(params, *, configure_logging=True):
     """子进程执行的具体采样逻辑。
 
     Args:
-        params (tuple): 包含共享模型、采样器、可见层数据分片、输出维度、起始索引的元组。
+        params (tuple): 包含共享模型、采样器、可见层数据分片、输出维度的元组。
+        configure_logging (bool): 子进程设置日志级别；主进程直接调用时禁用。
 
     Returns:
         tuple: (state_v_chunk, state_vi_chunk) 采样后的张量结果。
     """
     bm_shared, sampler, s_visible_chunk, num_output = params
-    kw.common.set_log_level("ERROR")
+    if configure_logging:
+        kw.common.set_log_level("ERROR")
     # 在不计算梯度的情况下进行采样
     with torch.no_grad():
         # 正相位采样 (Condition Sample)
@@ -118,7 +120,6 @@ class Trainer:
             ).to(torch.device("cpu"))
         else:
             self.bm_net_cpu = self.bm_net
-        self.bm_net_cpu.share_memory()
 
         self.cost_param = {"alpha": 0.5, "beta": 0.5}
 
@@ -160,7 +161,7 @@ class Trainer:
     def train(self, max_steps, save_path, num_processes=1):
         """执行模型训练主循环。
 
-        通过多进程并行采样并结合 Adam 优化器更新玻尔兹曼机参数。
+        单进程时直接采样；多进程时并行采样，并结合 Adam 更新参数。
 
         Args:
             max_steps (int): 最大训练步数。
@@ -183,8 +184,10 @@ class Trainer:
         step = 0
         self.saver.save_info(self.bm_net, save_path, 0, 0.0)
 
-        # 预先分配 Pool 以减少重复创建开销
-        pool = mp.Pool(processes=num_processes)
+        # 仅多进程路径需要共享模型存储和进程池。
+        if num_processes != 1:
+            self.bm_net_cpu.share_memory()
+        pool = None if num_processes == 1 else mp.Pool(processes=num_processes)
 
         while step < max_steps:
             for batch_data in self.data:
@@ -201,7 +204,9 @@ class Trainer:
                 # 2. 多进程并行正相位采样 (共享存储模式)
                 # 将本批次数据设为共享内存
                 self._sync_gpu_to_cpu()
-                cpu_data = batch_data.cpu().share_memory_()
+                cpu_data = batch_data.cpu()
+                if pool is not None:
+                    cpu_data.share_memory_()
 
                 # 按进程数切分数据
                 chunks = torch.chunk(cpu_data, num_processes)
@@ -214,7 +219,11 @@ class Trainer:
                 ]
 
                 # 并行执行采样
-                all_results = pool.map(process_solve_graph_worker, sd_args)
+                all_results = (
+                    [process_solve_graph_worker(args, configure_logging=False) for args in sd_args]
+                    if pool is None
+                    else pool.map(process_solve_graph_worker, sd_args)
+                )
 
                 # 3. 汇总结果并计算 Loss
                 kl_divergence = torch.tensor(0.0, device=state_all.device)
@@ -271,5 +280,6 @@ class Trainer:
                     t_now = time.time()
                     self.saver.save_info(self.bm_net, save_path, step, t_now - t_start)
 
-        pool.close()
-        pool.join()
+        if pool is not None:
+            pool.close()
+            pool.join()
