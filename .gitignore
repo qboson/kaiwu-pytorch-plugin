@@ -179,5 +179,7 @@ example/rbm_digits/results/
 example/dbn_digits/results/
 example/qvae_cell/output*/
 example/qdiffusion/graph/
+example/qvae_anomaly/outputs/
+example/qvae_anomaly/data/
 *.h5ad
 article.md

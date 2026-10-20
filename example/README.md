@@ -112,3 +112,34 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+---
+
+### Anomaly Detection Task: Energy-Supervised Q-VAE on Public Benchmarks
+
+This example demonstrates a CleanEnergyQVAE for tabular anomaly detection on two public benchmarks (thyroid, creditcard). It extends the Q-VAE latent model with a free-energy supervised head: instead of scoring samples purely by reconstruction error, the model learns to assign lower free energy to the normal class and higher free energy to the anomaly class via an InfoNCE-style contrastive objective. The main contents include:
+
+* **Public AD benchmarks**: Loads `38_thyroid.npz` (ADBench) and `creditcard.csv`(Kaggle), with 1:20 normal/anomaly train split and balanced val/test;
+* **Energy-supervised Q-VAE**: Residual MLP encoder/decoder + Bernoulli RBM latent, with `lambda_anom` balancing reconstruction and the energy InfoNCE loss;
+* **Threshold tuning**: Grid search over 200 candidate thresholds on validation, maximizing F1, with per-candidate logging;
+* **Evaluation & visualization**: PR/ROC curves, score distributions, and confusion-matrix-aware metrics; output separated per dataset under `outputs/<dataset>/`.
+
+Run the training + evaluation pipeline via:
+
+```bash
+bash example/qvae_anomaly/run_public_ad.sh
+```
+
+or explore interactively via `example/qvae_anomaly/qvae_anomaly_demo.ipynb`.
+
+**Dependencies**
+
+```
+torch
+scikit-learn
+matplotlib
+numpy
+pandas       # creditcard.csv
+```
+
+See `example/qvae_anomaly/README.md` for dataset download links and full options.
