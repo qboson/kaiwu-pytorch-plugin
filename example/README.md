@@ -7,6 +7,20 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+### Exact Likelihood Gradient on CPU
+
+`run_exact_likelihood.py` enumerates all four states of a two-node BM. It
+checks that the exact negative-log-likelihood gradient matches the existing
+`objective` gradient at a uniform model, then shows that one gradient-descent
+step increases the observed state's probability. It uses the normal plugin
+installation (PyTorch and Kaiwu SDK) with no extra dependencies or sampler calls.
+
+Run from the repository root:
+
+```bash
+python example/run_exact_likelihood.py
+```
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:

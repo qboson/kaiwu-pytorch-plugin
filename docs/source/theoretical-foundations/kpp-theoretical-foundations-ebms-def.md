@@ -70,13 +70,28 @@ $$\nabla f(\theta) = \mathbb{E}_{\text{data}}[\nabla \log P_\theta(\mathbf{X})] 
 
 The gradient of $\log Z_\theta$ is:
 
-$$\nabla \log Z_\theta = \frac{1}{Z_\theta} \sum_{\tilde{\mathbf{x}}} \exp(-E_\theta(\tilde{\mathbf{x}})) \nabla E_\theta(\tilde{\mathbf{x}}) = \mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$
+$$\nabla \log Z_\theta = -\frac{1}{Z_\theta} \sum_{\tilde{\mathbf{x}}} \exp(-E_\theta(\tilde{\mathbf{x}})) \nabla E_\theta(\tilde{\mathbf{x}}) = -\mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$
 
 Thus, the gradient of the log-likelihood becomes:
 
 $$\nabla f(\theta) = -\mathbb{E}_{\text{data}}[\nabla E_\theta(\mathbf{X})] + \mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$ (eq-nll-gradient-tf)
 
 This contrastive form, i.e. the difference between an expectation under the **data distribution** and an expectation under the **model distribution,** is the mathematical heart of all Boltzmann machine learning algorithms. The first term lowers the energy of observed data configurations; the second term raises the energy of configurations that the model currently deems probable.
+
+The preceding expression is a **log-likelihood gradient**, used with gradient
+ascent. A PyTorch optimizer that minimizes the negative log-likelihood
+$\mathcal{L}(\theta) = -f(\theta)$ instead uses the opposite sign:
+
+$$\nabla \mathcal{L}(\theta) = \mathbb{E}_{\text{data}}[\nabla E_\theta(\mathbf{X})] - \mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$
+
+This matches the existing KPP `objective` gradient when its negative samples
+represent the model distribution. The CPU
+[exact-likelihood example](https://github.com/qboson/kaiwu-pytorch-plugin/blob/main/example/run_exact_likelihood.py)
+enumerates a two-node BM: both the exact NLL and existing `objective` have an
+edge-weight gradient of $-0.75$ at the uniform starting model. A gradient-descent
+step increases the probability of the observed state from $0.25$ to approximately
+$0.264324$. The example runs as `python example/run_exact_likelihood.py` from the
+repository root with the normal plugin installation.
 
 ## Special Case: Visible-Only Boltzmann Machine
 
@@ -98,7 +113,7 @@ The **gradient** of the log-likelihood with respect to the parameters $\theta$fo
 
 $$\frac{\partial f}{\partial \theta} = -\frac{1}{M} \sum_{m=1}^M \frac{\partial E_\theta(\mathbf{x}^{(m)})}{\partial \theta} + \mathbb{E}_{P_\theta} \left[ \frac{\partial E_\theta(\mathbf{x})}{\partial \theta} \right]$$
 
-The first term is the negative average gradient of the energy at the data points, the direction of steepest descent for lowering data energy. The second term is the expected gradient of the energy under the model's own distribution, the direction that would lower the energy of configurations the model currently favors.
+The first term is the negative average gradient of the energy at the data points, the direction of steepest descent for lowering data energy. The second term is the expected gradient of the energy under the model's own distribution, the direction of steepest ascent for raising the energy of configurations the model currently favors.
 
 The positive sign on the second term means that, overall, we move parameters in the direction that **increases energy** where the model currently puts probability mass. This is the mathematical expression of tug-of-war.
 
