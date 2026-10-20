@@ -280,12 +280,12 @@ class Trainer:
         model.eval()
         reps = []
         with torch.no_grad():
-            for x, batch_idx in eval_loader:
-                _, _, q, zeta = model(
-                    x.to(self.device), batch_idx.to(self.device)
-                )
-                # q 是 encoder logits，zeta 是后验采样/松弛后的潜变量表示。
-                rep = q if self.args.representation == "q" else zeta
+            for x, _ in eval_loader:
+                q = model.encode_logits(x.to(self.device))
+                if self.args.representation == "q":
+                    rep = q
+                else:
+                    _, rep = model.posterior(q, model.config.dist_beta)
                 reps.append(rep.cpu().numpy())
         return np.concatenate(reps, axis=0)
 
