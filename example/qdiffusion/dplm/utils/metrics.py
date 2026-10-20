@@ -210,7 +210,7 @@ def compare_generation_sets(
     baseline_records: list[tuple[str, str]],
     guided_records: list[tuple[str, str]],
 ) -> dict[str, float]:
-    """Compares baseline and guided generations against each other."""
+    """Compares decoded sequences using the quality summary's normalization."""
     paired_count = min(
         len(reference_records), len(baseline_records), len(guided_records)
     )
@@ -223,6 +223,9 @@ def compare_generation_sets(
         baseline_records[:paired_count],
         guided_records[:paired_count],
     ):
+        reference = normalize_decoded_sequence(reference)
+        baseline = normalize_decoded_sequence(baseline)
+        guided = normalize_decoded_sequence(guided)
         if baseline != guided:
             changed_count += 1
         baseline_identity_sum += sequence_identity(reference, baseline)
