@@ -7,6 +7,9 @@ QVAE model implementation for MNIST using BasicEncoder, BasicDecoder and RBM.
 """
 
 from torch import nn
+import os
+import tempfile
+import uuid
 
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
@@ -117,8 +120,16 @@ class MnistQVAE(QVAE):
         """
         sampler_type = sampler_type or getattr(self.config, "sampler_type", "sa")
         if sampler_type == 'cim':
-            kw.common.CheckpointManager.save_dir = './tmp'
-            sampler = CIMOptimizer(task_name="qvae_sampling", wait=True)
+            save_dir = kw.common.CheckpointManager.save_dir
+            if not save_dir:
+                save_dir = tempfile.mkdtemp(prefix="kpp_qvae_cim_")
+                kw.common.CheckpointManager.save_dir = save_dir
+            else:
+                os.makedirs(save_dir, exist_ok=True)
+            sampler = CIMOptimizer(
+                task_name=f"qvae_cim_{uuid.uuid4().hex[:12]}",
+                wait=True,
+            )
             sampler = PrecisionReducer(
                 sampler,
                 precision=8,
