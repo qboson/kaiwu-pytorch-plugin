@@ -79,6 +79,16 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+## Reusing weights in the notebook
+
+In `train_qvae_cell.ipynb`, set `Args.load_weights = True` before creating `args`
+and point `output_dir` to the directory containing `immune_kpp_qvae_best.pth`.
+The weights cell loads that checkpoint on `device_obj`, skips training, and
+continues with representation and energy evaluation. The history cell skips
+training curves because no new training history was produced. Keep model and
+data settings consistent with the checkpoint; a missing or incompatible file
+raises an error rather than starting a new training run.
+
 ## Outputs
 
 The training script will generate the following files under `--output-dir`:
