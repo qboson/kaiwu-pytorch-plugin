@@ -64,26 +64,34 @@ class ModelTuner(object):
 		return
 	
 	def get_input_dimension(self):
+		"""Return flattened feature widths, one per input tensor in a sample."""
 		assert self.train_loader is not None, "Trying to retrieve datapoint from empty train loader"
-		return self.train_loader.get_input_size()
-	
+		for data, _ in self.train_loader.dataset:
+			inputs = data if isinstance(data, (list, tuple)) else [data]
+			return [item.numel() for item in inputs]
+		raise ValueError("Training dataset is empty")
+
 	def get_train_dataset_mean(self):
-		#returns mean of dataset as list
-		#multiple input datasets - multiple means
+		"""Return per-feature means shaped [1, width] for each sample input.
+
+		Iterate the dataset so loader shuffling/drop_last do not change the mean.
+		Only running sums are retained, rather than a copy of every observation.
+		"""
 		assert self.train_loader is not None, "Trying to retrieve datapoint from empty train loader"
-		
-		input_dimension=self.get_input_dimension()
-		imgPerLayer={}	
-		for i in range(0,len(input_dimension)):
-			imgPerLayer[i]=[]	
-		for i, (data, _) in enumerate(self.train_loader.dataset):
-			#loop over all layers
-			for l,d in enumerate(data):	
-				imgPerLayer[l].append(d.view(-1,input_dimension[l]))
-		means=[]
-		for l, imgList in imgPerLayer.items():
-			means.append(torch.mean(torch.stack(imgList),dim=0))
-		return means
+		totals = None
+		count = 0
+		for data, _ in self.train_loader.dataset:
+			inputs = data if isinstance(data, (list, tuple)) else [data]
+			values = [item.detach().reshape(1, -1) for item in inputs]
+			if totals is None:
+				totals = [item.clone() for item in values]
+			else:
+				for total, item in zip(totals, values):
+					total.add_(item)
+			count += 1
+		if count == 0:
+			raise ValueError("Training dataset is empty")
+		return [total / count for total in totals]
 
 	def load_model(self,set_eval=True):
 		logger.info("Loading Model")
