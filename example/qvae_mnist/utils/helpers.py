@@ -868,7 +868,7 @@ def gif_output(x_true, x_recon, epoch=None, max_epochs=None, train_loss=-1,test_
 
 def plot_generative_output(x_true, n_samples=100, output="./output/testVAE.png"):
     n_cols=5
-    n_rows=int(n_samples/n_cols)
+    n_rows=(n_samples + n_cols - 1)//n_cols
     fig,ax = plt.subplots(figsize=(n_cols,n_rows),nrows=n_rows, ncols=n_cols)
     ax_idx=0
     print(x_true.shape)
