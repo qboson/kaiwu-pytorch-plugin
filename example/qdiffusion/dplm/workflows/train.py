@@ -238,7 +238,7 @@ def main() -> None:
     #         "project_no": "YOUR_PROJECT_ID",
     #         "task_mode": "OPTIMIZATION",
     #         "tmp_dir": "./tmp",
-    #         "wait": False,
+    #         "wait": True,
     #     },
     # )
 
