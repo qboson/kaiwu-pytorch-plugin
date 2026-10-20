@@ -4,6 +4,7 @@
 
 import time
 import math
+import warnings
 import torch
 import torch.multiprocessing as mp
 from torch.optim.lr_scheduler import LambdaLR
@@ -149,8 +150,16 @@ class Trainer:
         Args:
             learning_rate (float): 学习率。
             weight_decay_rate (float): 权重衰减率 (L2 正则化)。
-            momentum_rate (float): 动量系数。
+            momentum_rate (float): 已弃用的兼容参数。Adam 使用默认 betas；
+                非零值不会生效，并会发出 FutureWarning。
         """
+        if momentum_rate != 0:
+            warnings.warn(
+                "momentum_rate is deprecated and ignored: this trainer uses Adam "
+                "with its default betas. Pass 0 to retain the current behavior.",
+                FutureWarning,
+                stacklevel=2,
+            )
         self.learning_parameters = {
             "learning_rate": learning_rate,
             "weight_decay_rate": weight_decay_rate,
