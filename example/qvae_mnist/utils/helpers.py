@@ -778,11 +778,16 @@ def plot_MNIST_output(x_true, x_recon, n_samples=5, output="./output/testVAE.png
     fig.savefig(output)
 
 #@title Helper Functions
-def plot_autoencoder_outputs(model, n, dims):
-    decoded_imgs = model.decode(x_test)
+def plot_autoencoder_outputs(model, n=5, dims=(28, 28), x_test=None):
+    if x_test is None:
+        # Keep the historical module-level lookup as a fallback for notebooks.
+        x_test = globals().get("x_test")
+    if x_test is None:
+        raise ValueError("x_test must be provided to plot decoder outputs")
 
-    # number of example digits to show
-    n = 5
+    with torch.no_grad():
+        decoded_imgs = model.decode(x_test)
+
     plt.figure(figsize=(10, 4.5))
     for i in range(n):
         # plot original image
