@@ -1,4 +1,6 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 """Minimal training example for ``QDiffusion``.
@@ -16,13 +18,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from _example_bootstrap import ensure_repo_src_on_path
 import torch
 from torch.optim import AdamW
 
-ensure_repo_src_on_path()
-
-from dplm.utils.dplm_builder import build_qdiffusion
+from example.qdiffusion.dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and data helpers.
 
@@ -148,9 +147,8 @@ def main() -> None:
         lr=learning_rate,
     )
 
+    # ``QDiffusion.train()`` keeps the frozen proposal model in eval mode.
     generator.train()
-    if getattr(generator, "proposal_model", None) is not None:
-        generator.proposal_model.eval()
 
     for step in range(1, num_steps + 1):
         # ``objective`` is the full training step contract for the example: it

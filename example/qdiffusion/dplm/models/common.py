@@ -19,13 +19,23 @@ class DPLMFeatureEncoder(nn.Module):
 
     @property
     def hidden_size(self) -> int:
+        """Returns the backbone hidden width."""
         return int(self.backbone.net.config.hidden_size)
 
     @property
     def tokenizer(self) -> Any:
+        """Returns the backbone tokenizer."""
         return self.backbone.tokenizer
 
     def embed_tokens(self, tokens: torch.Tensor) -> torch.Tensor:
+        """Embeds token ids with the backbone input embedding table.
+
+        Args:
+            tokens: Token ids shaped ``[batch, sequence]``.
+
+        Returns:
+            torch.Tensor: Embeddings shaped ``[batch, sequence, hidden]``.
+        """
         return self.backbone.net.get_input_embeddings()(tokens)
 
     def encode_tokens(
@@ -33,6 +43,17 @@ class DPLMFeatureEncoder(nn.Module):
         tokens: torch.Tensor,
         attention_mask: torch.Tensor | None = None,
     ) -> torch.Tensor:
+        """Encodes token ids into backbone hidden states.
+
+        Args:
+            tokens: Token ids shaped ``[batch, sequence]``.
+
+            attention_mask: Optional padding mask.
+
+        Returns:
+            torch.Tensor: Last hidden states shaped
+            ``[batch, sequence, hidden]``.
+        """
         # This is the plain sequence-encoding path used before any BM-specific
         # projection happens.
         outputs = self.backbone.net(input_ids=tokens, attention_mask=attention_mask)
@@ -44,6 +65,19 @@ class DPLMFeatureEncoder(nn.Module):
         inputs_embeds: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
+        """Encodes a fused token/embedding input into hidden states.
+
+        Args:
+            input_ids: Token ids providing the token pathway.
+
+            inputs_embeds: Embeddings providing the value pathway.
+
+            attention_mask: Padding mask.
+
+        Returns:
+            torch.Tensor: Last hidden states shaped
+            ``[batch, sequence, hidden]``.
+        """
         outputs = self.backbone.net(
             input_ids=input_ids,
             inputs_embeds=inputs_embeds,

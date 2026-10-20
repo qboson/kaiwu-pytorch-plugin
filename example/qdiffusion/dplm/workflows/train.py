@@ -1,93 +1,56 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
 # SPDX-License-Identifier: Apache-2.0
 
-"""Training workflow for running full-corpus ``QDiffusion`` experiments."""
+"""Training workflow for running full-corpus ``QDiffusion`` experiments.
+
+Run from the repository root after ``pip install -e .``:
+
+    python -m example.qdiffusion.dplm.workflows.train
+"""
 
 from __future__ import annotations
 
-import os
 import random
 import json
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-import sys
 from typing import Any
 
-try:
-    from .._example_bootstrap import ensure_repo_src_on_path
-except ImportError:  # pragma: no cover - direct script-path compatibility
-    _WORKFLOW_DIR = Path(__file__).resolve().parent
-    _CASE_DIR = _WORKFLOW_DIR.parent
-    if str(_CASE_DIR) not in sys.path:
-        sys.path.insert(0, str(_CASE_DIR))
-    from _example_bootstrap import ensure_repo_src_on_path
 import torch
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
-ensure_repo_src_on_path()
-
-try:
-    from ..utils.dplm_builder import build_qdiffusion
-    from ..utils.io import (
-        default_fasta_path,
-        default_outputs_root,
-        read_fasta_records,
-        save_json,
-        write_fasta_records,
-    )
-    from ..utils.metrics import (
-        compare_generation_sets,
-        evaluate_generation_quality,
-        save_quality_summary,
-    )
-    from ..utils.runtime import (
-        load_trained_energy_weights,
-        save_checkpoint,
-        seed_torch,
-        summarize_trainable_parameters,
-    )
-    from .workflow_helpers import (
-        build_data_loader_from_records,
-        run_epoch,
-        run_generation_over_records,
-        run_structural_validation,
-        select_records,
-        split_train_val_test,
-        write_markdown_report,
-    )
-except ImportError:  # pragma: no cover - direct script-path compatibility
-    from utils.dplm_builder import build_qdiffusion
-    from utils.io import (
-        default_fasta_path,
-        default_outputs_root,
-        read_fasta_records,
-        save_json,
-        write_fasta_records,
-    )
-    from utils.metrics import (
-        compare_generation_sets,
-        evaluate_generation_quality,
-        save_quality_summary,
-    )
-    from utils.runtime import (
-        load_trained_energy_weights,
-        save_checkpoint,
-        seed_torch,
-        summarize_trainable_parameters,
-    )
-    from workflow_helpers import (
-        build_data_loader_from_records,
-        run_epoch,
-        run_generation_over_records,
-        run_structural_validation,
-        select_records,
-        split_train_val_test,
-        write_markdown_report,
-    )
-
-os.environ.setdefault("BYPROT_EAGER_IMPORTS", "0")
+from ..utils.dplm_builder import build_qdiffusion
+from ..utils.io import (
+    default_fasta_path,
+    default_outputs_root,
+    read_fasta_records,
+    save_json,
+    write_fasta_records,
+)
+from ..utils.metrics import (
+    compare_generation_sets,
+    evaluate_generation_quality,
+    save_quality_summary,
+)
+from ..utils.runtime import (
+    load_trained_energy_weights,
+    save_checkpoint,
+    seed_torch,
+    summarize_trainable_parameters,
+)
+from .workflow_helpers import (
+    build_data_loader_from_records,
+    run_epoch,
+    run_generation_over_records,
+    run_structural_validation,
+    select_records,
+    split_train_val_test,
+    write_markdown_report,
+)
 
 
 def build_generator_from_config(
@@ -316,9 +279,8 @@ def main() -> None:
         device=device,
         num_candidates=config.train.num_candidates,
     )
-    train_generator.train()  # torch train()
-    if getattr(train_generator, "proposal_model", None) is not None:
-        train_generator.proposal_model.eval()
+    # ``QDiffusion.train()`` keeps the frozen proposal model in eval mode.
+    train_generator.train()
     save_json(
         output_dir / "parameter_summary.json",
         summarize_trainable_parameters(train_generator),

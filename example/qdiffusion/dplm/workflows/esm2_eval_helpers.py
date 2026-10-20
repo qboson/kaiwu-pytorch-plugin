@@ -2,38 +2,20 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+import statistics
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
 import torch
 import torch.nn.functional as F
 
-try:
-    from ..utils.io import (
-        normalize_sequence,
-        save_json,
-        save_markdown,
-        write_csv_rows,
-        write_fasta_records,
-    )
-    from ..utils.runtime import seed_torch
-except ImportError:  # pragma: no cover - direct script-path compatibility
-    from utils.io import (
-        normalize_sequence,
-        save_json,
-        save_markdown,
-        write_csv_rows,
-        write_fasta_records,
-    )
-    from utils.runtime import seed_torch
-
-try:
-    import esm
-except ImportError as exc:  # pragma: no cover - import-time environment guard
-    raise SystemExit(
-        "Missing dependency 'esm'. Install facebookresearch/esm first, then rerun."
-    ) from exc
+from ..utils.io import (
+    normalize_sequence,
+    save_markdown,
+    write_fasta_records,
+)
+from ..utils.runtime import seed_torch
 
 
 @dataclass
@@ -67,15 +49,19 @@ class DistanceSummary:
     max_l2_distance: float
 
 
-def maybe_limit_records(
-    records: list[tuple[str, str]], max_records: int | None
-) -> list[tuple[str, str]]:
-    if max_records is None:
-        return records
-    return records[:max_records]
-
-
 def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
+    """Builds an all-mask input of one sequence length.
+
+    Args:
+        generator: Assembled ``QDiffusion`` whose tokenizer/device are used.
+
+        sequence_length: Number of masked positions, matching the reference
+            sequence so the generated output keeps its length.
+
+    Returns:
+        torch.Tensor: Token ids shaped ``[1, sequence_length + specials]``
+        on the generator device.
+    """
     masked_sequence = "".join(["<mask>"] * sequence_length)
     encoded = generator.tokenizer.batch_encode_plus(
         [masked_sequence],
@@ -86,7 +72,7 @@ def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
     return encoded["input_ids"].to(generator.device)
 
 
-def run_generation_over_records(
+def run_masked_generation_over_records(
     generator,
     records: list[tuple[str, str]],
     *,
@@ -95,6 +81,11 @@ def run_generation_over_records(
     output_fasta_path: Path,
     label: str,
 ) -> list[tuple[str, str]]:
+    """Generates from all-mask inputs so each sequence keeps its reference length.
+
+    Deliberately distinct from ``workflow_helpers.run_generation_over_records``,
+    which regenerates while conditioned on the reference sequence itself.
+    """
     generated_records: list[tuple[str, str]] = []
     print(
         f"[{label}] starting generation for {len(records)} sequences "
@@ -129,26 +120,34 @@ def pair_records_by_order(
     reference_records: list[tuple[str, str]],
     candidate_records: list[tuple[str, str]],
 ) -> list[tuple[tuple[str, str], tuple[str, str]]]:
+    """Pairs reference and candidate records position by position.
+
+    Args:
+        reference_records: Reference FASTA records.
+
+        candidate_records: Generated FASTA records.
+
+    Returns:
+        list: ``(reference, candidate)`` pairs truncated to the shorter of
+        the two lists.
+    """
     paired_count = min(len(reference_records), len(candidate_records))
     return list(zip(reference_records[:paired_count], candidate_records[:paired_count]))
-
-
-def pair_records_by_header(
-    reference_records: list[tuple[str, str]],
-    candidate_records: list[tuple[str, str]],
-) -> list[tuple[tuple[str, str], tuple[str, str]]]:
-    candidate_map = {header: (header, seq) for header, seq in candidate_records}
-    pairs: list[tuple[tuple[str, str], tuple[str, str]]] = []
-    for header, sequence in reference_records:
-        candidate = candidate_map.get(header)
-        if candidate is not None:
-            pairs.append(((header, sequence), candidate))
-    return pairs
 
 
 def chunked(
     items: list[tuple[str, str]], batch_size: int
 ) -> Iterable[list[tuple[str, str]]]:
+    """Yields fixed-size slices of records for batched embedding.
+
+    Args:
+        items: FASTA records.
+
+        batch_size: Slice size; the final slice may be smaller.
+
+    Yields:
+        list[tuple[str, str]]: One batch of records.
+    """
     for start in range(0, len(items), batch_size):
         yield items[start : start + batch_size]
 
@@ -156,7 +155,30 @@ def chunked(
 def load_esm2_model(
     model_name: str, device: torch.device
 ) -> tuple[torch.nn.Module, object]:
+    """Loads one frozen ESM2 model from ``esm.pretrained``.
+
+    Args:
+        model_name: Loader name such as ``esm2_t33_650M_UR50D``.
+
+        device: Device the model is moved to.
+
+    Returns:
+        tuple: The eval-mode model and its alphabet.
+
+    Raises:
+        ImportError: If the optional ``esm`` package is missing.
+
+        ValueError: If the loader name is not an ESM2 entry point.
+    """
     print(f"Loading ESM2 model: {model_name} on {device}")
+    try:
+        import esm
+    except ImportError as exc:  # pragma: no cover - environment guard
+        raise ImportError(
+            "Missing dependency 'esm'. Install facebookresearch/esm first "
+            "(see example/qdiffusion/requirements.txt), then rerun."
+        ) from exc
+
     if not hasattr(esm.pretrained, model_name):
         available = sorted(
             name for name in dir(esm.pretrained) if name.startswith("esm2_")
@@ -181,6 +203,27 @@ def embed_sequences(
     batch_size: int,
     pooling: str,
 ) -> dict[str, torch.Tensor]:
+    """Embeds FASTA records with ESM2 and pools per-sequence vectors.
+
+    Args:
+        records: ``(header, sequence)`` FASTA records.
+
+        model: Frozen ESM2 model from ``load_esm2_model``.
+
+        alphabet: Matching ESM alphabet and batch converter.
+
+        device: Device used for embedding.
+
+        batch_size: Records embedded per forward pass.
+
+        pooling: One of ``mean``, ``cls``/``bos``, or ``eos``.
+
+    Returns:
+        dict[str, torch.Tensor]: Header-keyed pooled embeddings on CPU.
+
+    Raises:
+        ValueError: If a sequence is empty or the pooling mode is unknown.
+    """
     if not records:
         return {}
 
@@ -194,18 +237,14 @@ def embed_sequences(
 
     with torch.no_grad():
         for batch_records in chunked(records, batch_size):
-            normalized_batch = [
-                (header, normalize_sequence(sequence))
-                for header, sequence in batch_records
-            ]
-            _, _, tokens = batch_converter(normalized_batch)
+            _, _, tokens = batch_converter(batch_records)
             tokens = tokens.to(device)
 
             outputs = model(tokens, repr_layers=[repr_layer], return_contacts=False)
             token_representations = outputs["representations"][repr_layer]
             lengths = (tokens != alphabet.padding_idx).sum(dim=1)
 
-            for row_index, (header, sequence) in enumerate(normalized_batch):
+            for row_index, (header, sequence) in enumerate(batch_records):
                 seq_len = len(sequence)
                 if seq_len == 0:
                     raise ValueError(
@@ -229,33 +268,40 @@ def embed_sequences(
 
 
 def summarize_distances(label: str, rows: list[PairDistanceRow]) -> DistanceSummary:
+    """Aggregates per-pair distance rows into one summary.
+
+    Args:
+        label: Strategy label recorded in the summary.
+
+        rows: Pair rows produced by ``evaluate_candidate_set``.
+
+    Returns:
+        DistanceSummary: Count, length, and distance statistics.
+
+    Raises:
+        ValueError: If ``rows`` is empty.
+    """
     if not rows:
         raise ValueError(f"No aligned rows were available for label '{label}'.")
 
-    cosine_values = torch.tensor(
-        [row.cosine_distance for row in rows], dtype=torch.float64
-    )
-    l2_values = torch.tensor([row.l2_distance for row in rows], dtype=torch.float64)
-    reference_lengths = torch.tensor(
-        [row.reference_length for row in rows], dtype=torch.float64
-    )
-    candidate_lengths = torch.tensor(
-        [row.candidate_length for row in rows], dtype=torch.float64
-    )
+    cosine_distances = [row.cosine_distance for row in rows]
+    l2_distances = [row.l2_distance for row in rows]
+    reference_lengths = [row.reference_length for row in rows]
+    candidate_lengths = [row.candidate_length for row in rows]
 
     return DistanceSummary(
         label=label,
         paired_count=len(rows),
-        mean_reference_length=float(reference_lengths.mean().item()),
-        mean_candidate_length=float(candidate_lengths.mean().item()),
-        mean_cosine_distance=float(cosine_values.mean().item()),
-        median_cosine_distance=float(cosine_values.median().item()),
-        min_cosine_distance=float(cosine_values.min().item()),
-        max_cosine_distance=float(cosine_values.max().item()),
-        mean_l2_distance=float(l2_values.mean().item()),
-        median_l2_distance=float(l2_values.median().item()),
-        min_l2_distance=float(l2_values.min().item()),
-        max_l2_distance=float(l2_values.max().item()),
+        mean_reference_length=statistics.mean(reference_lengths),
+        mean_candidate_length=statistics.mean(candidate_lengths),
+        mean_cosine_distance=statistics.mean(cosine_distances),
+        median_cosine_distance=statistics.median(cosine_distances),
+        min_cosine_distance=min(cosine_distances),
+        max_cosine_distance=max(cosine_distances),
+        mean_l2_distance=statistics.mean(l2_distances),
+        median_l2_distance=statistics.median(l2_distances),
+        min_l2_distance=min(l2_distances),
+        max_l2_distance=max(l2_distances),
     )
 
 
@@ -266,19 +312,33 @@ def evaluate_candidate_set(
     candidate_records: list[tuple[str, str]],
     reference_embeddings: dict[str, torch.Tensor],
     candidate_embeddings: dict[str, torch.Tensor],
-    pair_mode: str,
 ) -> tuple[list[PairDistanceRow], DistanceSummary]:
-    if pair_mode == "header":
-        pairs = pair_records_by_header(reference_records, candidate_records)
-    elif pair_mode == "order":
-        pairs = pair_records_by_order(reference_records, candidate_records)
-    else:
-        raise ValueError(f"Unsupported pair mode: {pair_mode}")
+    """Scores candidate records against the reference by embedding distance.
+
+    Args:
+        label: Strategy label attached to the rows and summary.
+
+        reference_records: Reference FASTA records.
+
+        candidate_records: Generated FASTA records.
+
+        reference_embeddings: Header-keyed reference embeddings.
+
+        candidate_embeddings: Header-keyed candidate embeddings.
+
+    Returns:
+        tuple: Per-pair ``PairDistanceRow`` rows and the aggregate
+        ``DistanceSummary``.
+
+    Raises:
+        ValueError: If no aligned pairs exist.
+    """
+    pairs = pair_records_by_order(reference_records, candidate_records)
 
     if not pairs:
         raise ValueError(
             f"No aligned pairs found for '{label}'. "
-            "Check --pair-mode and FASTA headers/order."
+            "Check the FASTA record counts and order."
         )
 
     rows: list[PairDistanceRow] = []
@@ -300,22 +360,14 @@ def evaluate_candidate_set(
                 index=index,
                 reference_header=ref_header,
                 candidate_header=cand_header,
-                reference_length=len(normalize_sequence(ref_seq)),
-                candidate_length=len(normalize_sequence(cand_seq)),
+                reference_length=len(ref_seq),
+                candidate_length=len(cand_seq),
                 cosine_distance=float(cosine_distance),
                 l2_distance=float(l2_distance),
             )
         )
 
     return rows, summarize_distances(label, rows)
-
-
-def write_rows_csv(path: Path, rows: list[PairDistanceRow]) -> None:
-    write_csv_rows(path, [asdict(row) for row in rows])
-
-
-def write_summary_json(path: Path, summary: DistanceSummary) -> None:
-    save_json(path, asdict(summary))
 
 
 def write_report(
@@ -326,9 +378,25 @@ def write_report(
     guided_path: Path | None,
     summaries: list[DistanceSummary],
     model_name: str,
-    pair_mode: str,
     pooling: str,
 ) -> None:
+    """Writes the Markdown ESM2 distance report.
+
+    Args:
+        path: Destination Markdown path.
+
+        reference_path: Reference FASTA used for generation/evaluation.
+
+        baseline_path: Baseline FASTA, if produced.
+
+        guided_path: Guided FASTA, if produced.
+
+        summaries: One ``DistanceSummary`` per evaluated strategy.
+
+        model_name: ESM2 model name used for embeddings.
+
+        pooling: Pooling mode used for embeddings.
+    """
     lines = [
         "# ESM2 Embedding Distance Report",
         "",
@@ -344,7 +412,6 @@ def write_report(
             else "- guided: not provided"
         ),
         f"- esm2 model: `{model_name}`",
-        f"- pair mode: `{pair_mode}`",
         f"- pooling: `{pooling}`",
         "",
         "| label | pairs | mean cosine dist | median cosine dist | mean l2 dist | median l2 dist |",
@@ -368,15 +435,17 @@ def write_report(
 
     if len(summaries) == 2:
         baseline_summary, guided_summary = summaries
+        delta_cosine = (
+            guided_summary.mean_cosine_distance - baseline_summary.mean_cosine_distance
+        )
+        delta_l2 = guided_summary.mean_l2_distance - baseline_summary.mean_l2_distance
         lines.extend(
             [
                 "",
                 "## Delta",
                 "",
-                f"- guided minus baseline mean cosine distance: "
-                f"{guided_summary.mean_cosine_distance - baseline_summary.mean_cosine_distance:.6f}",
-                f"- guided minus baseline mean l2 distance: "
-                f"{guided_summary.mean_l2_distance - baseline_summary.mean_l2_distance:.6f}",
+                f"- guided minus baseline mean cosine distance: {delta_cosine:.6f}",
+                f"- guided minus baseline mean l2 distance: {delta_l2:.6f}",
             ]
         )
 

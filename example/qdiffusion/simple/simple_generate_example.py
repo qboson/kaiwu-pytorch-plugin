@@ -1,4 +1,6 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 """Minimal generation example for ``QDiffusion``.
@@ -15,12 +17,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from _example_bootstrap import ensure_repo_src_on_path
 import torch
 
-ensure_repo_src_on_path()
+from kaiwu.torch_plugin import QDiffusion
 
-from dplm.utils.dplm_builder import build_qdiffusion
+from example.qdiffusion.dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and sequence helpers.
 
@@ -82,7 +83,7 @@ def first_usable_sequence(
     raise ValueError("No usable sequence found in FASTA.")
 
 
-def decode_tokens(generator, tokens: torch.Tensor) -> str:
+def decode_tokens(generator: QDiffusion, tokens: torch.Tensor) -> str:
     """Decodes one generated token tensor into sequence text.
 
     Args:
