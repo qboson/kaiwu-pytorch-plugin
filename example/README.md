@@ -30,6 +30,15 @@ This example demonstrates how to use a Restricted Boltzmann Machine (RBM) for fe
 
 Run the example via `example/rbm_digits/rbm_digits.ipynb`.
 
+`RBMRunner` preserves its constructor parameters for sklearn `clone`, `Pipeline`, and
+`GridSearchCV`. Each `fit` creates a fresh RBM and sampler from the current parameters,
+so changes made with `set_params`, including `use_cim`, take effect on the next fit.
+Construction and cloning do not create SDK samplers or change the CIM checkpoint directory.
+An integer `random_state` resets Torch's RNG for initialization and local sampling and is
+also passed to SA as `rand_seed`. With `None`, Torch's current RNG and the SDK's default
+SA seed selection are retained. CIM still has external sampling randomness; the seed
+does not promise deterministic CIM runs.
+
 #### DBN-Based Classification
 
 Building upon the RBM approach, this example demonstrates a complete Deep Belief Network (DBN) implementation with multiple RBM layers, offering more sophisticated feature learning and flexible training strategies. This implementation can be seen as a direct evolution of the RBM approach, demonstrating how stacking multiple RBMs enables learning increasingly abstract representations of the input data. The main contents include:

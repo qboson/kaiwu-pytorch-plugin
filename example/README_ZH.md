@@ -24,6 +24,13 @@
 
 请通过 `example/rbm_digits/rbm_digits.ipynb` 运行该示例。
 
+`RBMRunner` 保存构造参数，支持 sklearn 的 `clone`、`Pipeline` 和 `GridSearchCV`。
+每次 `fit` 都按当前参数创建新的 RBM 和采样器，因此通过 `set_params` 修改的参数
+（包括 `use_cim`）会在下一次训练生效。构造和克隆不会创建 SDK 采样器或修改 CIM
+的检查点目录。整数 `random_state` 会为初始化和本地采样重设 Torch 随机状态，同时
+作为 `rand_seed` 传给 SA；为 `None` 时保留 Torch 当前随机状态及 SDK 默认的 SA
+种子选择。CIM 仍有外部采样随机性，这个种子不保证 CIM 运行结果确定。
+
 #### 基于 DBN 的分类方法
 
 该示例在 RBM 方法的基础上，进一步构建了一个完整的深度信念网络（Deep Belief Network, DBN），包含多层 RBM，提供更复杂的特征学习能力和灵活的训练策略。该实现可视作 RBM 方法的直接演进，展示了如何通过堆叠多个 RBM 来学习输入数据中越来越抽象的表示。主要内容包括：
