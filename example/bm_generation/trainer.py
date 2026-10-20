@@ -128,8 +128,15 @@ class Trainer:
         Args:
             alpha (float): KL 散度的权重系数。
             beta (float): 其他惩罚项（如 NCL）的权重系数。
+
+        Raises:
+            ValueError: If ``alpha`` or ``beta`` is non-finite or negative.
         """
-        self.cost_param = {"alpha": alpha, "beta": beta}
+        for name, value in (("alpha", alpha), ("beta", beta)):
+            value = float(value)
+            if not math.isfinite(value) or value < 0.0:
+                raise ValueError(f"{name} must be a finite non-negative number")
+        self.cost_param = {"alpha": float(alpha), "beta": float(beta)}
 
     def _sync_gpu_to_cpu(self):
         """将主模型的权重原地拷贝到 CPU 共享副本中。
