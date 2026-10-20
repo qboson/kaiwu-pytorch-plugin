@@ -15,6 +15,23 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 ---
 
+### QUBO Solver: Max-Cut and Ising Conversion
+
+`example/qubo_solver/` demonstrates the public `QuadraticLinearSolver` and
+`solve_qubo` helpers on a small Max-Cut problem. It converts the QUBO to an
+auxiliary-spin Ising matrix, solves it with the built-in local-search backend,
+and verifies the result by exhaustive enumeration. No Kaiwu license is needed.
+
+Run it with:
+
+```bash
+python example/qubo_solver/run_qubo_solver.py --nodes 5
+```
+
+See `example/qubo_solver/README.md` for the formulation and expected output.
+
+---
+
 ### Classification Task: Handwritten Digit Recognition
 
 This section provides two complementary approaches for handwritten digit recognition using different neural network architectures, both demonstrating the power of unsupervised feature learning for classification tasks.
