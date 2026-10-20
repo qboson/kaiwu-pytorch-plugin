@@ -204,10 +204,13 @@ class QVAE(AutoEncoderBase):
 
     # -------- Public methods --------
     def set_train_bias(self, mean):
-        """Compute train bias from dataset mean for Bernoulli reconstruction."""
+        """Compute clipped Bernoulli bias, promoting low-precision arithmetic."""
+        compute_dtype = self._train_bias.dtype
+        if compute_dtype in (torch.float16, torch.bfloat16):
+            compute_dtype = torch.float32
         mean = torch.as_tensor(
             mean,
-            dtype=self._train_bias.dtype,
+            dtype=compute_dtype,
             device=self._train_bias.device,
         )
         if mean.numel() == 1:
