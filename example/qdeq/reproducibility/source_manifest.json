@@ -1,0 +1,210 @@
+{
+  "date": "2026-09-10",
+  "comparison": "Compared normalized text (LF and trailing whitespace) or Python AST on the same Python interpreter, after replacing private CIM project defaults with YOUR_CIM_PROJECT. Current snapshot check only, not historical run-time identity. Published hashes use UTF-8 text with LF line endings and no BOM.",
+  "files": [
+    {
+      "file": "itransformer_qdeq.py",
+      "remote_sha256": "510f1709cbc00145ab4610a61dc0ae871c96a4da7a1463a3161ed3e75d26b459",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "952a592b43075166ad99b7714879e74ab3462d8c21231d92bcb38414e47df450"
+    },
+    {
+      "file": "LICENSE",
+      "remote_sha256": "29d2a4c09fa577780522219dc248466977f77cd420354c5e9a0e86550be2b849",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "29d2a4c09fa577780522219dc248466977f77cd420354c5e9a0e86550be2b849"
+    },
+    {
+      "file": "requirements.txt",
+      "remote_sha256": "c537d7154b0e27442d695788439482a1f4768722762e8504e980374a8b7929c1",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "c537d7154b0e27442d695788439482a1f4768722762e8504e980374a8b7929c1"
+    },
+    {
+      "file": "run.py",
+      "remote_sha256": "1b081f60720cb333497a8b8e1f478c44b05f982efc3f4cd5f9e10a7cdccc86b2",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "d1275320a2c50c3eb60555c571675f121abc638c0408bfce0a798094d324dc23"
+    },
+    {
+      "file": "run_qdeq_plugin.py",
+      "remote_sha256": "d1236aa79dff162511cd455c61ce4b4cb1399b84fe7e63552c270c4234cfbacc",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "50a0584790ca4b4370ab6a4b97c53367aa7675533a1d16daab1eb0934fc7419e"
+    },
+    {
+      "file": "data_provider/data_factory.py",
+      "remote_sha256": "cea718d281bcd168ac43d4605b7a3c710adc9bda0c6a755bb23a0a6264670344",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "cea718d281bcd168ac43d4605b7a3c710adc9bda0c6a755bb23a0a6264670344"
+    },
+    {
+      "file": "data_provider/data_loader.py",
+      "remote_sha256": "8e68d2d9ed29f74a7645a96cebe6aee20d53722f4ca993a8f1e6d4b5a997193c",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "8e68d2d9ed29f74a7645a96cebe6aee20d53722f4ca993a8f1e6d4b5a997193c"
+    },
+    {
+      "file": "data_provider/__init__.py",
+      "remote_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "file": "experiments/exp_basic.py",
+      "remote_sha256": "d0854ffd559468e24c417d0f148f97eecf849e3bddbc25e4a94afbb6d182fdf1",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "d0854ffd559468e24c417d0f148f97eecf849e3bddbc25e4a94afbb6d182fdf1"
+    },
+    {
+      "file": "experiments/exp_long_term_forecasting.py",
+      "remote_sha256": "ef4379b98423c7550a771950238aa138cc0fd959217b1ea1983124af778aa022",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "ec01406ece662ba730b4714e9986a8b046079a5528efe442dffa955d9ecca512"
+    },
+    {
+      "file": "experiments/exp_long_term_forecasting_partial.py",
+      "remote_sha256": "2b246fe1820a2db47739ccd272d20d5a4f571fc2d15f1dd546f23b17a326712e",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "12020969cfb0b3bc0c4cf8ccf9409e88a22397c5a8183df73220f719f029d83f"
+    },
+    {
+      "file": "layers/Embed.py",
+      "remote_sha256": "2de7e5049a696d320a23a8bdb6e08e823cf7fa3f246a0a49555fcd729c5c8398",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "62064de269d2f845e74883185643aedd9f18b7f1f136509b0cc506582e3af1bd"
+    },
+    {
+      "file": "layers/SelfAttention_Family.py",
+      "remote_sha256": "38ac67428d528b8e145e4944ca059b40629a8446c891142602d5aaadc38dfd9e",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "cbfaa76f7bd64828fee91a6a0d588d13bdf3045bf060b359d180f6fc50e7eec6"
+    },
+    {
+      "file": "layers/Transformer_EncDec.py",
+      "remote_sha256": "985c31f4ae187b08afaa9663dc960a40544b2ec33ab55389ceab3930edc1ce02",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "985c31f4ae187b08afaa9663dc960a40544b2ec33ab55389ceab3930edc1ce02"
+    },
+    {
+      "file": "layers/__init__.py",
+      "remote_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "file": "model/deq_ising_ts.py",
+      "remote_sha256": "ff8c0ada6f5ffd48933fdbb88822bc12d393b11d8a5c0a0d4cc9fa1cc9ee6c3a",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "890ff77250e5a84c110182fef93c08a2977689567ed48e7c6db7a97e47b89880"
+    },
+    {
+      "file": "model/deq_ising_ts_bench.py",
+      "remote_sha256": "bb00cfc31c8f6a5bbce4f513c58fd463a5e5ffc3e0d31a45745b45fc8c6e61d9",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "bb00cfc31c8f6a5bbce4f513c58fd463a5e5ffc3e0d31a45745b45fc8c6e61d9"
+    },
+    {
+      "file": "model/Flashformer.py",
+      "remote_sha256": "27cab2bbe35900d458a47e54b36f9e1bdbc4cdda0efab3f3f406b7c7a9e1f889",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "27cab2bbe35900d458a47e54b36f9e1bdbc4cdda0efab3f3f406b7c7a9e1f889"
+    },
+    {
+      "file": "model/Flowformer.py",
+      "remote_sha256": "7f9f6e2b6cb74ebcb469fcc85be10267b7872eebf3c5785bd5dad5acbae4553f",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "7f9f6e2b6cb74ebcb469fcc85be10267b7872eebf3c5785bd5dad5acbae4553f"
+    },
+    {
+      "file": "model/iFlashformer.py",
+      "remote_sha256": "980919b44b0c64b23c2e198543df0a2a6527b91cbc97d480a48fd92c1d62aea3",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "e366fc8fa58c3d986e97bbcaf429b903c44154c0fdc14867fd545ac9c2324387"
+    },
+    {
+      "file": "model/iFlowformer.py",
+      "remote_sha256": "d7521d96cf3479e51ab36d9e7907ed910ea74ba1dc2efd00f51936935bfe6028",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "464b4fa41ddc41c63df0ac4ed17384f8b4e7390091c4c4cd24c3b4455f788ba6"
+    },
+    {
+      "file": "model/iInformer.py",
+      "remote_sha256": "495335a637ad96cda567a24948ec6e49c361c99f6f0791bd69afcf633df2de12",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "4b61313755e6556529859bb56f795257b9a27fba416cb354c79ccdeeaf3e3cec"
+    },
+    {
+      "file": "model/Informer.py",
+      "remote_sha256": "6808923ba3ca9d3ca5a590644785da01058e72a17aaf53f74f16b00be36ebf38",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "6808923ba3ca9d3ca5a590644785da01058e72a17aaf53f74f16b00be36ebf38"
+    },
+    {
+      "file": "model/iReformer.py",
+      "remote_sha256": "2a07fe30d661cc8f8d543636e86da30a5756513575307986f2e5c4e83cba2b9b",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "1ae84aadcd754288fec9f4320d65940a707a1caeb1fd21576ea227cf92387a2f"
+    },
+    {
+      "file": "model/iTransformer.py",
+      "remote_sha256": "6f34777a5a12c253a293f79e7e1fd5b6f79ac100b443951e051e269e7e2542db",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "272a03710ae20b94930139b240bad6093823fd1399b7e25f42d1601b9896a539"
+    },
+    {
+      "file": "model/iTransformerQDEQ.py",
+      "remote_sha256": "fd2fef1b2e5805da4292b18beb3d20865d3e46eb2c5dc0adc17b8685fcd5facd",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "fd2fef1b2e5805da4292b18beb3d20865d3e46eb2c5dc0adc17b8685fcd5facd"
+    },
+    {
+      "file": "model/Reformer.py",
+      "remote_sha256": "c347277cc52913c45a5140e5d126398ad543ceb443d54c3b6c50645fd2a58a8a",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "43b01df44445bf32e0bf519d44c6c050d1ac098b915b3a55ef846a6465f83de1"
+    },
+    {
+      "file": "model/Transformer.py",
+      "remote_sha256": "7a816cc3971b99ee21d87479f25cc15498607d34539c95e5d53889588653ff4b",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "7a816cc3971b99ee21d87479f25cc15498607d34539c95e5d53889588653ff4b"
+    },
+    {
+      "file": "model/__init__.py",
+      "remote_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "file": "utils/masking.py",
+      "remote_sha256": "02f453e52cfaec65e34132923add80e7132f188706680fa86d7bd884976e09ef",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "02f453e52cfaec65e34132923add80e7132f188706680fa86d7bd884976e09ef"
+    },
+    {
+      "file": "utils/metrics.py",
+      "remote_sha256": "743a63a7d2661c994027bdbf5bffe8a2892e5ca381b9b319d5e0fb2715cf53ff",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "743a63a7d2661c994027bdbf5bffe8a2892e5ca381b9b319d5e0fb2715cf53ff"
+    },
+    {
+      "file": "utils/timefeatures.py",
+      "remote_sha256": "319b3da2ef15ccae95162b1b4f4a9a0b0da63fa0062a7f6006a06dd567258d85",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "319b3da2ef15ccae95162b1b4f4a9a0b0da63fa0062a7f6006a06dd567258d85"
+    },
+    {
+      "file": "utils/tools.py",
+      "remote_sha256": "0beca0c862392b5d58d19912daf287e1da9df16b4d5c30f1fcd681ac77befed2",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "0beca0c862392b5d58d19912daf287e1da9df16b4d5c30f1fcd681ac77befed2"
+    },
+    {
+      "file": "utils/__init__.py",
+      "remote_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "equivalent_after_formatting_and_cim_placeholder": true,
+      "published_lf_text_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    }
+  ]
+}

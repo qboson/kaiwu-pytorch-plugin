@@ -1,0 +1,87 @@
+{
+  "checkpoint": "checkpoints/ETTh1_96_96_ising_sa_formal_iTransformerQDEQ_ETTh1_M_ft96_sl48_ll96_pl256_dm8_nh1_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth",
+  "torch": "2.4.1",
+  "results": [
+    {
+      "variant": "anderson",
+      "quant": false,
+      "eval_max_abs": 0.0,
+      "training": [
+        {
+          "step": 0,
+          "old_loss": 0.2298792004585266,
+          "plugin_loss": 0.2298792004585266,
+          "gradient_relative": 0.0
+        },
+        {
+          "step": 1,
+          "old_loss": 0.2283511608839035,
+          "plugin_loss": 0.2283511608839035,
+          "gradient_relative": 0.0
+        },
+        {
+          "step": 2,
+          "old_loss": 0.22685874998569489,
+          "plugin_loss": 0.22685874998569489,
+          "gradient_relative": 0.0
+        }
+      ]
+    },
+    {
+      "variant": "ising_sa",
+      "quant": false,
+      "eval_max_abs": 0.0,
+      "training": [
+        {
+          "step": 0,
+          "old_loss": 0.22981838881969452,
+          "plugin_loss": 0.22981838881969452,
+          "gradient_relative": 0.0
+        },
+        {
+          "step": 1,
+          "old_loss": 0.22825495898723602,
+          "plugin_loss": 0.22825495898723602,
+          "gradient_relative": 0.0
+        },
+        {
+          "step": 2,
+          "old_loss": 0.2267434298992157,
+          "plugin_loss": 0.2267434298992157,
+          "gradient_relative": 0.0
+        }
+      ]
+    },
+    {
+      "variant": "ising_sa",
+      "quant": true,
+      "eval_max_abs": 0.0,
+      "training": [
+        {
+          "step": 0,
+          "old_loss": 0.22982202470302582,
+          "plugin_loss": 0.22982202470302582,
+          "gradient_relative": 0.0
+        },
+        {
+          "step": 1,
+          "old_loss": 0.22823409736156464,
+          "plugin_loss": 0.22823409736156464,
+          "gradient_relative": 0.0
+        },
+        {
+          "step": 2,
+          "old_loss": 0.22668196260929108,
+          "plugin_loss": 0.22668196260929108,
+          "gradient_relative": 0.0
+        }
+      ]
+    },
+    {
+      "full_eval_samples": 2785,
+      "old_mse": 0.39415498213669153,
+      "plugin_mse": 0.39415498213669153,
+      "max_abs": 0.0
+    }
+  ]
+}

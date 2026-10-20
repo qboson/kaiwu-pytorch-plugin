@@ -1,0 +1,910 @@
+{
+  "torch": "2.11.0+cpu",
+  "device": "cpu",
+  "source_sha256": {
+    "migration\\qdeq_migration_regression.py": "c9c5fd723c82d81e29f4a1f6cfdb7390bc07d26de9bbf5fab8303f85420e607b",
+    "migration\\src\\nmt_deq_ising\\models\\normalized_decoder.py": "d0b7573919a08a47c573447b555adbca4b69d99f6880ab103e1278d49b0d0516",
+    "migration\\src\\nmt_deq_ising\\solvers\\deq_ising.py": "04670de56583c2a05b2c9354697004701f8bd53424a743a84f2fd8ecdbb2e64e",
+    "qdeq\\__init__.py": "66f37af2a2b5ee26f61bbc3c51572ff67cccb2540f424653192e028e22de52db",
+    "qdeq\\core.py": "9bd14700c0c71d9a789b2845660f5c7bed0a95bf27a5ae0ed25723e1903d2fd2",
+    "qdeq\\diagnostics.py": "4c62b84e864e8d4cee83686711263164be321e0ee311e0c06e9847b09ff2b555",
+    "qdeq\\ising_sa.py": "3a47f306eb776d463e1caf835bf49a21e0dc64915b4ff0cb8b0e2ee09ae68ab1",
+    "qdeq\\solvers.py": "3246b19ddb984f801d4a4892f3f6570fd18a94cd2dd5e009cac172192ec9885b"
+  },
+  "cases": [
+    {
+      "seed": 42,
+      "anchor_alpha": 0.0,
+      "wrapper_error": {
+        "abs": 0.0,
+        "rel": 0.0,
+        "reference_norm": 47.808372497558594,
+        "per_parameter": {
+          "block.alpha_self": {
+            "abs": 0.0,
+            "reference_norm": 0.1387593299150467,
+            "rel": 0.0
+          },
+          "block.alpha_cross": {
+            "abs": 0.0,
+            "reference_norm": 0.21911078691482544,
+            "rel": 0.0
+          },
+          "block.alpha_mlp": {
+            "abs": 0.0,
+            "reference_norm": 0.426103413105011,
+            "rel": 0.0
+          },
+          "block.self_attn.logit_scale": {
+            "abs": 0.0,
+            "reference_norm": 6.93046757760385e-08,
+            "rel": null
+          },
+          "block.self_attn.q.weight": {
+            "abs": 0.0,
+            "reference_norm": 3.361302844950842e-07,
+            "rel": null
+          },
+          "block.self_attn.k.weight": {
+            "abs": 0.0,
+            "reference_norm": 3.9952135466592154e-07,
+            "rel": null
+          },
+          "block.self_attn.v.weight": {
+            "abs": 0.0,
+            "reference_norm": 9.535557746887207,
+            "rel": 0.0
+          },
+          "block.self_attn.out.weight": {
+            "abs": 0.0,
+            "reference_norm": 6.150977611541748,
+            "rel": 0.0
+          },
+          "block.cross_attn.logit_scale": {
+            "abs": 0.0,
+            "reference_norm": 5.329355445837791e-08,
+            "rel": null
+          },
+          "block.cross_attn.q.weight": {
+            "abs": 0.0,
+            "reference_norm": 5.811307346448302e-07,
+            "rel": null
+          },
+          "block.cross_attn.k.weight": {
+            "abs": 0.0,
+            "reference_norm": 7.08836182639061e-07,
+            "rel": null
+          },
+          "block.cross_attn.v.weight": {
+            "abs": 0.0,
+            "reference_norm": 15.446159362792969,
+            "rel": 0.0
+          },
+          "block.cross_attn.out.weight": {
+            "abs": 0.0,
+            "reference_norm": 17.789159774780273,
+            "rel": 0.0
+          },
+          "block.mlp.fc1.weight": {
+            "abs": 0.0,
+            "reference_norm": 10.516890525817871,
+            "rel": 0.0
+          },
+          "block.mlp.fc1.bias": {
+            "abs": 0.0,
+            "reference_norm": 10.516958236694336,
+            "rel": 0.0
+          },
+          "block.mlp.fc2.weight": {
+            "abs": 0.0,
+            "reference_norm": 21.19612693786621,
+            "rel": 0.0
+          },
+          "block.mlp.fc2.bias": {
+            "abs": 0.0,
+            "reference_norm": 30.514015197753906,
+            "rel": 0.0
+          }
+        }
+      },
+      "forward_rel": 0.004421965219080448,
+      "gradient_error": {
+        "ising": {
+          "abs": 0.11122410744428635,
+          "rel": 0.002329664770513773,
+          "reference_norm": 47.74253845214844,
+          "per_parameter": {
+            "block.alpha_self": {
+              "abs": 0.00029943883419036865,
+              "reference_norm": 0.13845989108085632,
+              "rel": 0.0021626395330291395
+            },
+            "block.alpha_cross": {
+              "abs": 0.0017070174217224121,
+              "reference_norm": 0.21740376949310303,
+              "rel": 0.00785182991860022
+            },
+            "block.alpha_mlp": {
+              "abs": 0.002614051103591919,
+              "reference_norm": 0.42348936200141907,
+              "rel": 0.006172648803355678
+            },
+            "block.self_attn.logit_scale": {
+              "abs": 4.9567652204984824e-09,
+              "reference_norm": 6.461738877305834e-08,
+              "rel": null
+            },
+            "block.self_attn.q.weight": {
+              "abs": 2.359891837500072e-08,
+              "reference_norm": 3.3931502230188926e-07,
+              "rel": null
+            },
+            "block.self_attn.k.weight": {
+              "abs": 1.776530211827776e-08,
+              "reference_norm": 4.0139528323379636e-07,
+              "rel": null
+            },
+            "block.self_attn.v.weight": {
+              "abs": 0.022032564505934715,
+              "reference_norm": 9.519868850708008,
+              "rel": 0.002314376894414477
+            },
+            "block.self_attn.out.weight": {
+              "abs": 0.014440052211284637,
+              "reference_norm": 6.140133380889893,
+              "rel": 0.002351748946729205
+            },
+            "block.cross_attn.logit_scale": {
+              "abs": 6.659712781242888e-09,
+              "reference_norm": 5.650545631397108e-08,
+              "rel": null
+            },
+            "block.cross_attn.q.weight": {
+              "abs": 1.2077239830432518e-07,
+              "reference_norm": 5.651276637763658e-07,
+              "rel": null
+            },
+            "block.cross_attn.k.weight": {
+              "abs": 1.676025078722887e-07,
+              "reference_norm": 6.385864708136069e-07,
+              "rel": null
+            },
+            "block.cross_attn.v.weight": {
+              "abs": 0.03131486102938652,
+              "reference_norm": 15.422374725341797,
+              "rel": 0.002030482437826546
+            },
+            "block.cross_attn.out.weight": {
+              "abs": 0.041982900351285934,
+              "reference_norm": 17.757671356201172,
+              "rel": 0.0023642120359787517
+            },
+            "block.mlp.fc1.weight": {
+              "abs": 0.02755318582057953,
+              "reference_norm": 10.496374130249023,
+              "rel": 0.0026250194094335163
+            },
+            "block.mlp.fc1.bias": {
+              "abs": 0.027553832158446312,
+              "reference_norm": 10.496440887451172,
+              "rel": 0.002625064291210156
+            },
+            "block.mlp.fc2.weight": {
+              "abs": 0.04909391701221466,
+              "reference_norm": 21.17201042175293,
+              "rel": 0.0023188122447631945
+            },
+            "block.mlp.fc2.bias": {
+              "abs": 0.07067692279815674,
+              "reference_norm": 30.479297637939453,
+              "rel": 0.002318850113861575
+            }
+          }
+        },
+        "anderson": {
+          "abs": 0.046619951725006104,
+          "rel": 0.0009764866554178298,
+          "reference_norm": 47.74253845214844,
+          "per_parameter": {
+            "block.alpha_self": {
+              "abs": 0.0003822892904281616,
+              "reference_norm": 0.13845989108085632,
+              "rel": 0.002761011058465418
+            },
+            "block.alpha_cross": {
+              "abs": 0.0006204843521118164,
+              "reference_norm": 0.21740376949310303,
+              "rel": 0.002854064368610227
+            },
+            "block.alpha_mlp": {
+              "abs": 0.0020341575145721436,
+              "reference_norm": 0.42348936200141907,
+              "rel": 0.004803326121248182
+            },
+            "block.self_attn.logit_scale": {
+              "abs": 3.6368608125059154e-09,
+              "reference_norm": 6.461738877305834e-08,
+              "rel": null
+            },
+            "block.self_attn.q.weight": {
+              "abs": 1.6931410939946545e-08,
+              "reference_norm": 3.3931502230188926e-07,
+              "rel": null
+            },
+            "block.self_attn.k.weight": {
+              "abs": 1.2557284989611617e-08,
+              "reference_norm": 4.0139528323379636e-07,
+              "rel": null
+            },
+            "block.self_attn.v.weight": {
+              "abs": 0.005410938989371061,
+              "reference_norm": 9.519868850708008,
+              "rel": 0.0005683837744223379
+            },
+            "block.self_attn.out.weight": {
+              "abs": 0.004720390774309635,
+              "reference_norm": 6.140133380889893,
+              "rel": 0.0007687765853753337
+            },
+            "block.cross_attn.logit_scale": {
+              "abs": 1.377497316212839e-08,
+              "reference_norm": 5.650545631397108e-08,
+              "rel": null
+            },
+            "block.cross_attn.q.weight": {
+              "abs": 1.8541801694027527e-07,
+              "reference_norm": 5.651276637763658e-07,
+              "rel": null
+            },
+            "block.cross_attn.k.weight": {
+              "abs": 1.4726295205491624e-07,
+              "reference_norm": 6.385864708136069e-07,
+              "rel": null
+            },
+            "block.cross_attn.v.weight": {
+              "abs": 0.008587714284658432,
+              "reference_norm": 15.422374725341797,
+              "rel": 0.0005568347571368006
+            },
+            "block.cross_attn.out.weight": {
+              "abs": 0.013843763619661331,
+              "reference_norm": 17.757671356201172,
+              "rel": 0.0007795934130083413
+            },
+            "block.mlp.fc1.weight": {
+              "abs": 0.00909732561558485,
+              "reference_norm": 10.496374130249023,
+              "rel": 0.0008667112569251587
+            },
+            "block.mlp.fc1.bias": {
+              "abs": 0.009095042943954468,
+              "reference_norm": 10.496440887451172,
+              "rel": 0.0008664882736421523
+            },
+            "block.mlp.fc2.weight": {
+              "abs": 0.0234315637499094,
+              "reference_norm": 21.17201042175293,
+              "rel": 0.001106723607401729
+            },
+            "block.mlp.fc2.bias": {
+              "abs": 0.03372347354888916,
+              "reference_norm": 30.479297637939453,
+              "rel": 0.0011064386702570037
+            }
+          }
+        }
+      },
+      "backward_residual": {
+        "ising": 0.000692399512019911,
+        "anderson": 0.0005060678939980615
+      },
+      "condition_number": 5.6762781352478955
+    },
+    {
+      "seed": 43,
+      "anchor_alpha": 0.0,
+      "wrapper_error": {
+        "abs": 0.0,
+        "rel": 0.0,
+        "reference_norm": 47.85847091674805,
+        "per_parameter": {
+          "block.alpha_self": {
+            "abs": 0.0,
+            "reference_norm": 0.13841626048088074,
+            "rel": 0.0
+          },
+          "block.alpha_cross": {
+            "abs": 0.0,
+            "reference_norm": 0.2341255247592926,
+            "rel": 0.0
+          },
+          "block.alpha_mlp": {
+            "abs": 0.0,
+            "reference_norm": 0.4435776174068451,
+            "rel": 0.0
+          },
+          "block.self_attn.logit_scale": {
+            "abs": 0.0,
+            "reference_norm": 2.0975260213162983e-06,
+            "rel": 0.0
+          },
+          "block.self_attn.q.weight": {
+            "abs": 0.0,
+            "reference_norm": 1.7404634490958415e-05,
+            "rel": 0.0
+          },
+          "block.self_attn.k.weight": {
+            "abs": 0.0,
+            "reference_norm": 1.450598119845381e-05,
+            "rel": 0.0
+          },
+          "block.self_attn.v.weight": {
+            "abs": 0.0,
+            "reference_norm": 9.480314254760742,
+            "rel": 0.0
+          },
+          "block.self_attn.out.weight": {
+            "abs": 0.0,
+            "reference_norm": 6.165276527404785,
+            "rel": 0.0
+          },
+          "block.cross_attn.logit_scale": {
+            "abs": 0.0,
+            "reference_norm": 2.047996758847148e-06,
+            "rel": 0.0
+          },
+          "block.cross_attn.q.weight": {
+            "abs": 0.0,
+            "reference_norm": 9.340487849840429e-06,
+            "rel": 0.0
+          },
+          "block.cross_attn.k.weight": {
+            "abs": 0.0,
+            "reference_norm": 1.4485142855846789e-05,
+            "rel": 0.0
+          },
+          "block.cross_attn.v.weight": {
+            "abs": 0.0,
+            "reference_norm": 15.488325119018555,
+            "rel": 0.0
+          },
+          "block.cross_attn.out.weight": {
+            "abs": 0.0,
+            "reference_norm": 17.852008819580078,
+            "rel": 0.0
+          },
+          "block.mlp.fc1.weight": {
+            "abs": 0.0,
+            "reference_norm": 10.549312591552734,
+            "rel": 0.0
+          },
+          "block.mlp.fc1.bias": {
+            "abs": 0.0,
+            "reference_norm": 10.549360275268555,
+            "rel": 0.0
+          },
+          "block.mlp.fc2.weight": {
+            "abs": 0.0,
+            "reference_norm": 21.193571090698242,
+            "rel": 0.0
+          },
+          "block.mlp.fc2.bias": {
+            "abs": 0.0,
+            "reference_norm": 30.52783203125,
+            "rel": 0.0
+          }
+        }
+      },
+      "forward_rel": 0.007868237793445587,
+      "gradient_error": {
+        "ising": {
+          "abs": 0.08750215917825699,
+          "rel": 0.001829762477427721,
+          "reference_norm": 47.82159423828125,
+          "per_parameter": {
+            "block.alpha_self": {
+              "abs": 0.00047650933265686035,
+              "reference_norm": 0.13793975114822388,
+              "rel": 0.0034544743534068345
+            },
+            "block.alpha_cross": {
+              "abs": 0.0017984360456466675,
+              "reference_norm": 0.23232708871364594,
+              "rel": 0.007740965789242616
+            },
+            "block.alpha_mlp": {
+              "abs": 0.004098981618881226,
+              "reference_norm": 0.43947863578796387,
+              "rel": 0.009326918955985086
+            },
+            "block.self_attn.logit_scale": {
+              "abs": 1.4257270031237113e-08,
+              "reference_norm": 2.1031628421042114e-06,
+              "rel": 0.006778966300570779
+            },
+            "block.self_attn.q.weight": {
+              "abs": 6.669269936310229e-08,
+              "reference_norm": 1.7416501577827148e-05,
+              "rel": 0.003829282193388849
+            },
+            "block.self_attn.k.weight": {
+              "abs": 5.271906289294748e-08,
+              "reference_norm": 1.4511605513689574e-05,
+              "rel": 0.0036328897476722863
+            },
+            "block.self_attn.v.weight": {
+              "abs": 0.013006751425564289,
+              "reference_norm": 9.473735809326172,
+              "rel": 0.0013729273949944997
+            },
+            "block.self_attn.out.weight": {
+              "abs": 0.00961750652641058,
+              "reference_norm": 6.159493446350098,
+              "rel": 0.0015614119261884401
+            },
+            "block.cross_attn.logit_scale": {
+              "abs": 7.944480628907513e-09,
+              "reference_norm": 2.045849896603613e-06,
+              "rel": 0.0038832177483286642
+            },
+            "block.cross_attn.q.weight": {
+              "abs": 1.2305518737321108e-07,
+              "reference_norm": 9.328635314886924e-06,
+              "rel": 0.01319112423409197
+            },
+            "block.cross_attn.k.weight": {
+              "abs": 1.593297866975263e-07,
+              "reference_norm": 1.443926703359466e-05,
+              "rel": 0.011034478850403328
+            },
+            "block.cross_attn.v.weight": {
+              "abs": 0.02002459391951561,
+              "reference_norm": 15.47661018371582,
+              "rel": 0.0012938617489109524
+            },
+            "block.cross_attn.out.weight": {
+              "abs": 0.028315087780356407,
+              "reference_norm": 17.83504867553711,
+              "rel": 0.0015876092235842293
+            },
+            "block.mlp.fc1.weight": {
+              "abs": 0.01788952574133873,
+              "reference_norm": 10.538663864135742,
+              "rel": 0.001697513648026938
+            },
+            "block.mlp.fc1.bias": {
+              "abs": 0.017889130860567093,
+              "reference_norm": 10.538713455200195,
+              "rel": 0.0016974681906490139
+            },
+            "block.mlp.fc2.weight": {
+              "abs": 0.04241206869482994,
+              "reference_norm": 21.178905487060547,
+              "rel": 0.002002561875576715
+            },
+            "block.mlp.fc2.bias": {
+              "abs": 0.06109929829835892,
+              "reference_norm": 30.506711959838867,
+              "rel": 0.0020028149339330384
+            }
+          }
+        },
+        "anderson": {
+          "abs": 0.09927032887935638,
+          "rel": 0.002075847238302231,
+          "reference_norm": 47.82159423828125,
+          "per_parameter": {
+            "block.alpha_self": {
+              "abs": 0.0007775276899337769,
+              "reference_norm": 0.13793975114822388,
+              "rel": 0.005636719534880706
+            },
+            "block.alpha_cross": {
+              "abs": 0.0017995685338974,
+              "reference_norm": 0.23232708871364594,
+              "rel": 0.007745840331668998
+            },
+            "block.alpha_mlp": {
+              "abs": 0.0037539005279541016,
+              "reference_norm": 0.43947863578796387,
+              "rel": 0.008541713344548684
+            },
+            "block.self_attn.logit_scale": {
+              "abs": 1.747127775786339e-08,
+              "reference_norm": 2.1031628421042114e-06,
+              "rel": 0.008307144557757306
+            },
+            "block.self_attn.q.weight": {
+              "abs": 1.0660755123126364e-07,
+              "reference_norm": 1.7416501577827148e-05,
+              "rel": 0.006121065746463407
+            },
+            "block.self_attn.k.weight": {
+              "abs": 8.014329466732306e-08,
+              "reference_norm": 1.4511605513689574e-05,
+              "rel": 0.00552270350732175
+            },
+            "block.self_attn.v.weight": {
+              "abs": 0.014228302985429764,
+              "reference_norm": 9.473735809326172,
+              "rel": 0.0015018682462543532
+            },
+            "block.self_attn.out.weight": {
+              "abs": 0.010190702974796295,
+              "reference_norm": 6.159493446350098,
+              "rel": 0.0016544709501777216
+            },
+            "block.cross_attn.logit_scale": {
+              "abs": 2.93618152014119e-09,
+              "reference_norm": 2.045849896603613e-06,
+              "rel": 0.0014351891236085539
+            },
+            "block.cross_attn.q.weight": {
+              "abs": 8.408900953327247e-08,
+              "reference_norm": 9.328635314886924e-06,
+              "rel": 0.00901407405208355
+            },
+            "block.cross_attn.k.weight": {
+              "abs": 1.2248602843101253e-07,
+              "reference_norm": 1.443926703359466e-05,
+              "rel": 0.008482842525595955
+            },
+            "block.cross_attn.v.weight": {
+              "abs": 0.023097962141036987,
+              "reference_norm": 15.47661018371582,
+              "rel": 0.0014924432331661491
+            },
+            "block.cross_attn.out.weight": {
+              "abs": 0.030055971816182137,
+              "reference_norm": 17.83504867553711,
+              "rel": 0.0016852195002645255
+            },
+            "block.mlp.fc1.weight": {
+              "abs": 0.020119767636060715,
+              "reference_norm": 10.538663864135742,
+              "rel": 0.0019091383780187301
+            },
+            "block.mlp.fc1.bias": {
+              "abs": 0.020115485414862633,
+              "reference_norm": 10.538713455200195,
+              "rel": 0.0019087230619157691
+            },
+            "block.mlp.fc2.weight": {
+              "abs": 0.04867605119943619,
+              "reference_norm": 21.178905487060547,
+              "rel": 0.0022983270419321376
+            },
+            "block.mlp.fc2.bias": {
+              "abs": 0.07010488957166672,
+              "reference_norm": 30.506711959838867,
+              "rel": 0.00229801525854237
+            }
+          }
+        }
+      },
+      "backward_residual": {
+        "ising": 0.0007023095602122153,
+        "anderson": 0.00099756123621824
+      },
+      "condition_number": 5.625075410625996
+    },
+    {
+      "seed": 42,
+      "anchor_alpha": 0.2,
+      "wrapper_error": {
+        "abs": 0.0,
+        "rel": 0.0,
+        "reference_norm": 30.881275177001953,
+        "per_parameter": {
+          "block.alpha_self": {
+            "abs": 0.0,
+            "reference_norm": 0.32108762860298157,
+            "rel": 0.0
+          },
+          "block.alpha_cross": {
+            "abs": 0.0,
+            "reference_norm": 0.09086389094591141,
+            "rel": 0.0
+          },
+          "block.alpha_mlp": {
+            "abs": 0.0,
+            "reference_norm": 1.1559782028198242,
+            "rel": 0.0
+          },
+          "block.self_attn.logit_scale": {
+            "abs": 0.0,
+            "reference_norm": 0.07033561170101166,
+            "rel": 0.0
+          },
+          "block.self_attn.q.weight": {
+            "abs": 0.0,
+            "reference_norm": 0.3433476686477661,
+            "rel": 0.0
+          },
+          "block.self_attn.k.weight": {
+            "abs": 0.0,
+            "reference_norm": 0.4227360188961029,
+            "rel": 0.0
+          },
+          "block.self_attn.v.weight": {
+            "abs": 0.0,
+            "reference_norm": 5.811195373535156,
+            "rel": 0.0
+          },
+          "block.self_attn.out.weight": {
+            "abs": 0.0,
+            "reference_norm": 3.954108476638794,
+            "rel": 0.0
+          },
+          "block.cross_attn.logit_scale": {
+            "abs": 0.0,
+            "reference_norm": 0.019007202237844467,
+            "rel": 0.0
+          },
+          "block.cross_attn.q.weight": {
+            "abs": 0.0,
+            "reference_norm": 0.5786745548248291,
+            "rel": 0.0
+          },
+          "block.cross_attn.k.weight": {
+            "abs": 0.0,
+            "reference_norm": 0.7574548125267029,
+            "rel": 0.0
+          },
+          "block.cross_attn.v.weight": {
+            "abs": 0.0,
+            "reference_norm": 9.705985069274902,
+            "rel": 0.0
+          },
+          "block.cross_attn.out.weight": {
+            "abs": 0.0,
+            "reference_norm": 12.217123031616211,
+            "rel": 0.0
+          },
+          "block.mlp.fc1.weight": {
+            "abs": 0.0,
+            "reference_norm": 6.488906383514404,
+            "rel": 0.0
+          },
+          "block.mlp.fc1.bias": {
+            "abs": 0.0,
+            "reference_norm": 6.466475009918213,
+            "rel": 0.0
+          },
+          "block.mlp.fc2.weight": {
+            "abs": 0.0,
+            "reference_norm": 13.554760932922363,
+            "rel": 0.0
+          },
+          "block.mlp.fc2.bias": {
+            "abs": 0.0,
+            "reference_norm": 19.610403060913086,
+            "rel": 0.0
+          },
+          "input_a": {
+            "abs": 0.0,
+            "reference_norm": 1.6166486740112305,
+            "rel": 0.0
+          },
+          "input_b": {
+            "abs": 0.0,
+            "reference_norm": 1.8142974376678467,
+            "rel": 0.0
+          }
+        }
+      },
+      "forward_rel": 0.0012590212281793356,
+      "gradient_error": {
+        "ising": {
+          "abs": 0.06422694027423859,
+          "rel": 0.0020816007163375616,
+          "reference_norm": 30.854591369628906,
+          "per_parameter": {
+            "block.alpha_self": {
+              "abs": 0.0006018280982971191,
+              "reference_norm": 0.32048580050468445,
+              "rel": 0.001877861975006042
+            },
+            "block.alpha_cross": {
+              "abs": 0.0007380619645118713,
+              "reference_norm": 0.09160195291042328,
+              "rel": 0.008057273246495252
+            },
+            "block.alpha_mlp": {
+              "abs": 0.0014030933380126953,
+              "reference_norm": 1.157381296157837,
+              "rel": 0.0012122999936758521
+            },
+            "block.self_attn.logit_scale": {
+              "abs": 0.00014555580855812877,
+              "reference_norm": 0.07034113258123398,
+              "rel": 0.0020692844032619544
+            },
+            "block.self_attn.q.weight": {
+              "abs": 0.0008278196910396218,
+              "reference_norm": 0.3437294363975525,
+              "rel": 0.0024083468082209216
+            },
+            "block.self_attn.k.weight": {
+              "abs": 0.0009460896835662425,
+              "reference_norm": 0.4229702651500702,
+              "rel": 0.002236775871775689
+            },
+            "block.self_attn.v.weight": {
+              "abs": 0.01197613775730133,
+              "reference_norm": 5.805840492248535,
+              "rel": 0.002062774162206291
+            },
+            "block.self_attn.out.weight": {
+              "abs": 0.007842207327485085,
+              "reference_norm": 3.951301336288452,
+              "rel": 0.0019847150748698527
+            },
+            "block.cross_attn.logit_scale": {
+              "abs": 0.00010232790373265743,
+              "reference_norm": 0.019089996814727783,
+              "rel": 0.005360289198880969
+            },
+            "block.cross_attn.q.weight": {
+              "abs": 0.0019846789073199034,
+              "reference_norm": 0.5786994695663452,
+              "rel": 0.0034295502444596057
+            },
+            "block.cross_attn.k.weight": {
+              "abs": 0.001501387101598084,
+              "reference_norm": 0.7573773264884949,
+              "rel": 0.0019823502091871653
+            },
+            "block.cross_attn.v.weight": {
+              "abs": 0.020600251853466034,
+              "reference_norm": 9.697101593017578,
+              "rel": 0.0021243720771471856
+            },
+            "block.cross_attn.out.weight": {
+              "abs": 0.02579747512936592,
+              "reference_norm": 12.204243659973145,
+              "rel": 0.0021138118713554667
+            },
+            "block.mlp.fc1.weight": {
+              "abs": 0.016901258379220963,
+              "reference_norm": 6.4786200523376465,
+              "rel": 0.0026087744369454988
+            },
+            "block.mlp.fc1.bias": {
+              "abs": 0.01666203700006008,
+              "reference_norm": 6.4555559158325195,
+              "rel": 0.002581038289699535
+            },
+            "block.mlp.fc2.weight": {
+              "abs": 0.027097323909401894,
+              "reference_norm": 13.545347213745117,
+              "rel": 0.0020004894287172594
+            },
+            "block.mlp.fc2.bias": {
+              "abs": 0.03890431299805641,
+              "reference_norm": 19.596372604370117,
+              "rel": 0.0019852813468846015
+            },
+            "input_a": {
+              "abs": 0.001980394124984741,
+              "reference_norm": 1.6167314052581787,
+              "rel": 0.0012249370047144525
+            },
+            "input_b": {
+              "abs": 0.0021452195942401886,
+              "reference_norm": 1.8142688274383545,
+              "rel": 0.001182415506344293
+            }
+          }
+        },
+        "anderson": {
+          "abs": 0.08666102588176727,
+          "rel": 0.002808691468089819,
+          "reference_norm": 30.854591369628906,
+          "per_parameter": {
+            "block.alpha_self": {
+              "abs": 0.0010630786418914795,
+              "reference_norm": 0.32048580050468445,
+              "rel": 0.003317085001012208
+            },
+            "block.alpha_cross": {
+              "abs": 0.0010890215635299683,
+              "reference_norm": 0.09160195291042328,
+              "rel": 0.011888628232576139
+            },
+            "block.alpha_mlp": {
+              "abs": 0.0014104843139648438,
+              "reference_norm": 1.157381296157837,
+              "rel": 0.0012186859409662432
+            },
+            "block.self_attn.logit_scale": {
+              "abs": 7.605743303429335e-05,
+              "reference_norm": 0.07034113258123398,
+              "rel": 0.0010812654025218866
+            },
+            "block.self_attn.q.weight": {
+              "abs": 0.0009422655566595495,
+              "reference_norm": 0.3437294363975525,
+              "rel": 0.002741300153210442
+            },
+            "block.self_attn.k.weight": {
+              "abs": 0.0010661588748916984,
+              "reference_norm": 0.4229702651500702,
+              "rel": 0.002520647342700141
+            },
+            "block.self_attn.v.weight": {
+              "abs": 0.01286299154162407,
+              "reference_norm": 5.805840492248535,
+              "rel": 0.002215526168656828
+            },
+            "block.self_attn.out.weight": {
+              "abs": 0.00985407643020153,
+              "reference_norm": 3.951301336288452,
+              "rel": 0.002493881278985847
+            },
+            "block.cross_attn.logit_scale": {
+              "abs": 0.00017225871852133423,
+              "reference_norm": 0.019089996814727783,
+              "rel": 0.00902350692842641
+            },
+            "block.cross_attn.q.weight": {
+              "abs": 0.0016340668080374599,
+              "reference_norm": 0.5786994695663452,
+              "rel": 0.002823688104055056
+            },
+            "block.cross_attn.k.weight": {
+              "abs": 0.0014774498995393515,
+              "reference_norm": 0.7573773264884949,
+              "rel": 0.0019507448241016165
+            },
+            "block.cross_attn.v.weight": {
+              "abs": 0.026445215567946434,
+              "reference_norm": 9.697101593017578,
+              "rel": 0.002727125761680003
+            },
+            "block.cross_attn.out.weight": {
+              "abs": 0.03363047540187836,
+              "reference_norm": 12.204243659973145,
+              "rel": 0.0027556378206523256
+            },
+            "block.mlp.fc1.weight": {
+              "abs": 0.02120908536016941,
+              "reference_norm": 6.4786200523376465,
+              "rel": 0.0032737041513210283
+            },
+            "block.mlp.fc1.bias": {
+              "abs": 0.022520707920193672,
+              "reference_norm": 6.4555559158325195,
+              "rel": 0.0034885776242694604
+            },
+            "block.mlp.fc2.weight": {
+              "abs": 0.03758575767278671,
+              "reference_norm": 13.545347213745117,
+              "rel": 0.0027748094662827564
+            },
+            "block.mlp.fc2.bias": {
+              "abs": 0.05502700060606003,
+              "reference_norm": 19.596372604370117,
+              "rel": 0.0028080197145153615
+            },
+            "input_a": {
+              "abs": 0.001772077288478613,
+              "reference_norm": 1.6167314052581787,
+              "rel": 0.0010960863893131505
+            },
+            "input_b": {
+              "abs": 0.0022779852151870728,
+              "reference_norm": 1.8142688274383545,
+              "rel": 0.0012555940887787065
+            }
+          }
+        }
+      },
+      "backward_residual": {
+        "ising": 0.0007126819920568266,
+        "anderson": 0.0006796456313647658
+      },
+      "condition_number": 5.4688390186554825
+    }
+  ]
+}

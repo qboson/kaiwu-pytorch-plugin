@@ -1,0 +1,62 @@
+{
+  "date": "2026-09-10",
+  "note": "Hashes identify currently available assets, not proof they were unchanged since historical training. Data licensing and checkpoint publication remain unresolved.",
+  "assets": [
+    {
+      "path": "./dataset/ETT-small/ETTh1.csv",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 2589657,
+      "sha256": "f18de3ad269cef59bb07b5438d79bb3042d3be49bdeecf01c1cd6d29695ee066"
+    },
+    {
+      "path": "./dataset/electricity/electricity.csv",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 95581762,
+      "sha256": "7e45845d54c5219bad0ae6bc1b5316cf8ff9cead5d33fa998a5a51c2e4a497ad"
+    },
+    {
+      "path": "./dataset/traffic/traffic.csv",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 136478119,
+      "sha256": "cb06463d56fa17d87f47027cd9389ceae82a69eddee51cdb61480e120dab0b16"
+    },
+    {
+      "path": "./dataset/weather/weather.csv",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 7235425,
+      "sha256": "34ee981d07313e51da2a50bb600072c8ae4a69cb4b0651f4cb93a069d7a2ba63"
+    },
+    {
+      "path": "checkpoints/ECL_96_96_theta0_anderson_iTransformer_custom_M_ft96_sl48_ll96_pl512_dm8_nh1_el1_dl512_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 6720226,
+      "sha256": "aeb6f1de6d56f48e336773685ccf46472266b672c0fe9f286055cc3d022b0eeb"
+    },
+    {
+      "path": "checkpoints/ETTh1_96_96_theta0_realign_iTransformer_ETTh1_M_ft96_sl48_ll96_pl256_dm8_nh1_el1_dl256_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 1791714,
+      "sha256": "67238580706430fdcd6797e6c6e82b04dfbce4af7aee4da970cfdbd32bee0cfe"
+    },
+    {
+      "path": "checkpoints/traffic_96_96_theta0_anderson_iTransformer_custom_M_ft96_sl48_ll96_pl512_dm8_nh1_el1_dl512_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 6720226,
+      "sha256": "4f234633f6088fac89893e9c085215b05025bc4eae69303b9e24e31091a47dfa"
+    },
+    {
+      "path": "checkpoints/weather_96_96_theta0_anderson_iTransformer_custom_M_ft96_sl48_ll96_pl512_dm8_nh1_el1_dl512_df1_fctimeF_ebTrue_dtExp_projection_0/checkpoint.pth",
+      "available_on_audited_server": true,
+      "distributed": false,
+      "bytes": 6720226,
+      "sha256": "3fcfbc0cf8e17854bf274efb7a014dd4334fc7acb5a58399f85ca85251d66bf7"
+    }
+  ]
+}
