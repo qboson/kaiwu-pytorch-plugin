@@ -8,6 +8,7 @@ import scanpy as sc
 import torch
 
 from trainer import Trainer, set_seed
+from runtime import resolve_device
 from visualization import (
     plot_training_history,
     save_energy_plots,
@@ -76,8 +77,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-    # 用户指定 GPU 但环境不可用时自动回退 CPU，避免脚本直接失败。
-    args.device_obj = torch.device(args.device if torch.cuda.is_available() else "cpu")
+    # 根据所请求的后端检查可用性，保留显式 CPU/MPS 选择。
+    args.device_obj = resolve_device(args.device)
     set_seed(args.seed)
     setup_plotting()
     os.makedirs(args.output_dir, exist_ok=True)
