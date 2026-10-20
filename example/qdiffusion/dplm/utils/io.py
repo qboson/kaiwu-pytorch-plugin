@@ -12,7 +12,7 @@ CASE_ROOT = Path(__file__).resolve().parents[2]
 
 
 def default_fasta_path() -> Path:
-    """Returns the bundled FASTA path used by the example workflows."""
+    """Returns the locally prepared FASTA path used by the example workflows."""
     return CASE_ROOT / "data" / "UP000005640_9606.fasta"
 
 
