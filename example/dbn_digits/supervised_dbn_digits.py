@@ -383,11 +383,19 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
     def get_layer_activations(self, X, layer_index=None, return_all_layers=False):
         """
         获取指定层或所有层的激活值
+
+        Args:
+            X: NumPy array or torch.Tensor of input features.
+            layer_index: Optional layer index to return.
+            return_all_layers: Whether to return every layer activation.
         """
         if self.unsupervised_dbn is None or self.unsupervised_dbn._n_layers == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
 
-        X_data = X.astype(np.float32)
+        if torch.is_tensor(X):
+            X_data = X.detach().cpu().numpy().astype(np.float32)
+        else:
+            X_data = np.asarray(X, dtype=np.float32)
         all_activations = {}
 
         # 逐层前向传播计算激活值，直到指定层
