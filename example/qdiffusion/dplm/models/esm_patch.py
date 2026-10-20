@@ -361,8 +361,10 @@ class _EsmForDPLM(EsmPreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
+        compute_logits: bool = True,
         **kwargs: Any,
     ):
+        """Return hidden states, optionally skipping the unused LM projection."""
         del (
             attention_mask,
             position_ids,
@@ -387,7 +389,7 @@ class _EsmForDPLM(EsmPreTrainedModel):
         )
 
         sequence_output = outputs[0]
-        logits = self.lm_head(sequence_output)
+        logits = self.lm_head(sequence_output) if compute_logits else None
         return {
             "logits": logits,
             "last_hidden_state": sequence_output,
