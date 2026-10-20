@@ -523,40 +523,23 @@ def plot_latent_space(zeta, label, output='', dimensions=2):
     fig.savefig(output+".pdf")
 
 def plot_image(image, layer, vmin=None, vmax=None):
-    fig = plt.figure(figsize=(20,20))
+    """Plot one image with energy colorbar and return its AxesImage.
 
-    cbar = plt.colorbar(fraction=0.0455)
+    Infer cell coordinates from the displayed image shape. Layer zero keeps
+    the original sparse horizontal ticks; other layers display every column.
+    """
+    fig, ax = plt.subplots(figsize=(20, 20))
+    im = ax.imshow(image, vmin=vmin, vmax=vmax)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.0455)
     cbar.set_label(r'Energy (MeV)', y=0.83)
-    cbar.ax.tick_params()
-   
-    xticks = range(sizes[layer*2 + 1])
-    yticks = range(sizes[layer*2])
-    if layer == 0:
-        xticks = xticks[::10]
-    plt.xticks(xticks)
-    plt.yticks(yticks)
-    plt.xlabel(r'$\eta$ Cell ID')
-    plt.ylabel(r'$\phi$ Cell ID')
-
-    plt.tight_layout()
+    height, width = im.get_array().shape[:2]
+    ax.set_xticks(range(0, width, 10 if layer == 0 else 1))
+    ax.set_yticks(range(height))
+    ax.set_xlabel(r'$\eta$ Cell ID')
+    ax.set_ylabel(r'$\phi$ Cell ID')
+    fig.tight_layout()
     return im
 
-
-    ax_idx=0
-    print(x_true.shape)
-    for i in range(n_samples):
-    # for i in range(n_rows):
-    #     for j in range(n_cols): 
-        if ax_idx%n_cols==0:
-            ax_idx+=1
-        current_ax=plt.subplot(n_rows, n_cols , i+1)
-        plt.imshow(x_true[i].reshape((28, 28)))
-        plt.gray()
-        current_ax.get_xaxis().set_visible(False)
-        current_ax .get_yaxis().set_visible(False)
-    fig = plt.gcf()
-    # fig.tight_layout()
-    fig.savefig(output, bbox_inches='tight')
 
 # Make images respond to changes in the norm of other images (e.g. via the
 # "edit axis, curves and images parameters" GUI on Qt), but be careful not to
