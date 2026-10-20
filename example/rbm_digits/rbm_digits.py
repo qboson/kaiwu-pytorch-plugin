@@ -276,7 +276,12 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             images = images.to(self.device)
             images_binary = (images > 0.5).float()
             hidden_activations = self.rbm.get_hidden(images_binary)
-            reconstructions = self.rbm.sample(self.sampler)[:, : self.rbm.num_visible]
+            # Reconstruct the visible layer from this batch's hidden activations:
+            # an unconditional sample() draw is independent of the input images.
+            hidden_part = hidden_activations[:, self.rbm.num_visible :]
+            reconstructions = self.rbm.get_visible(hidden_part)[
+                :, : self.rbm.num_visible
+            ]
 
         # 显示原始和重构图像
         num_samples = len(images)
