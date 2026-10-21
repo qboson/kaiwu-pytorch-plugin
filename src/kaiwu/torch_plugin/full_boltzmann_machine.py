@@ -5,6 +5,7 @@ import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
+from ._clip_ranges import validate_clip_range
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
@@ -55,6 +56,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
             j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
         """
+        validate_clip_range("h_range", h_range)
+        validate_clip_range("j_range", j_range)
         self.get_parameter("linear_bias").data.clamp_(*h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*j_range)
 
