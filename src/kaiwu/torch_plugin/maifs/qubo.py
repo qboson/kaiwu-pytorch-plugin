@@ -139,6 +139,10 @@ class PrecisionSplitExplorer:
         """
         if max_bits is None:
             raise ValueError("max_bits is required")
+        if isinstance(max_bits, bool) or not isinstance(max_bits, Integral):
+            raise TypeError("max_bits must be a positive integer")
+        if max_bits < 1:
+            raise ValueError("max_bits must be a positive integer")
         if target_precision < 2:
             raise ValueError("target_precision must be at least 2")
         if start_precision is None:
@@ -316,6 +320,8 @@ class PrecisionSplitExplorer:
         ising_matrix = np.asarray(ising_matrix)
         if ising_matrix.ndim != 2 or ising_matrix.shape[0] != ising_matrix.shape[1]:
             raise ValueError("ising_matrix must be a square matrix")
+        if not np.all(np.isfinite(ising_matrix)):
+            raise ValueError("ising_matrix must contain only finite values")
         if ising_matrix.shape[0] > self.max_bits:
             raise ValueError("The original matrix size cannot be larger than max_bits")
 
@@ -390,6 +396,12 @@ class PrecisionSplitExplorer:
         """
         if self.plan is None:
             raise ValueError("search or fit must be called before restoring")
+        solution = np.asarray(solution)
+        if solution.ndim != 1 or solution.shape[0] != self.plan.split_size:
+            raise ValueError(
+                "solution must have one entry per split variable: "
+                f"expected {self.plan.split_size}, got {tuple(solution.shape)}"
+            )
         return _restore_kaiwu_split_solution(solution, self.plan.last_var_idx, vote)
 
 
