@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+import math
+
 import torch
 
 
@@ -56,7 +58,13 @@ def sample_from_categorical(
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
         where ``tokens`` contains sampled token ids and ``scores`` contains
         the associated log-probability-style scores.
+
+    Raises:
+        ValueError: If ``temperature`` is not a finite non-negative number.
     """
+    temperature = float(temperature)
+    if not math.isfinite(temperature) or temperature < 0:
+        raise ValueError("temperature must be a finite non-negative number")
     if temperature:
         dist = torch.distributions.Categorical(logits=logits.div(temperature))
         tokens = dist.sample()
@@ -107,7 +115,15 @@ def stochastic_sample_from_categorical_n(
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
         whose leading dimension indexes the sampled candidate set.
+
+    Raises:
+        TypeError: If ``n`` is not an integer.
+        ValueError: If ``n`` is not positive.
     """
+    if isinstance(n, bool) or not isinstance(n, int):
+        raise TypeError("n must be a positive integer")
+    if n < 1:
+        raise ValueError("n must be a positive integer")
     expanded_logits = logits.unsqueeze(0).expand(n, *logits.shape)
     gumbel_noise = -torch.log(
         -torch.log(torch.rand_like(expanded_logits) + 1e-8) + 1e-8
