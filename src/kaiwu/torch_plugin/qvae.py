@@ -271,8 +271,10 @@ class QVAE(AutoEncoderBase):
             torch.Tensor: Total loss scalar.
 
         Raises:
-            ValueError: If loss_type is not supported.
+            ValueError: If loss_type is not supported or the batch is empty.
         """
+        if x.size(0) == 0:
+            raise ValueError("x must contain at least one sample")
         if self.config.loss_type == "mse":
             recon_loss = F.mse_loss(
                 recon_x, x.view(-1, self._input_dimension), reduction="sum"
