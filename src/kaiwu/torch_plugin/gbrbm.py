@@ -223,7 +223,15 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Complete state tensor with both Gaussian and Bernoulli nodes.
 
+        Raises:
+            ValueError: If ``s_gaussian`` does not have shape
+                (batch, num_gaussian).
         """
+        if s_gaussian.ndim != 2 or s_gaussian.shape[-1] != self.num_gaussian:
+            raise ValueError(
+                f"s_gaussian must have shape (batch, {self.num_gaussian}), "
+                f"got {tuple(s_gaussian.shape)}"
+            )
         with torch.no_grad():
             n_sample = s_gaussian.shape[0]
             s_all = torch.zeros(
@@ -258,7 +266,15 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Complete state tensor with both Gaussian and Bernoulli nodes.
 
+        Raises:
+            ValueError: If ``s_bernoulli`` does not have shape
+                (batch, num_bernoulli).
         """
+        if s_bernoulli.ndim != 2 or s_bernoulli.shape[-1] != self.num_bernoulli:
+            raise ValueError(
+                f"s_bernoulli must have shape (batch, {self.num_bernoulli}), "
+                f"got {tuple(s_bernoulli.shape)}"
+            )
         with torch.no_grad():
             n_sample = s_bernoulli.shape[0]
             s_all = torch.zeros(
