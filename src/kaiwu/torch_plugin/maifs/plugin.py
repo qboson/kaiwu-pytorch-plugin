@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from math import ceil
+from numbers import Integral
 
 import numpy as np
 import torch
@@ -54,7 +55,8 @@ class FeatureSelectionWrapper(nn.Module):
         FeatureSelectionWrapper: Initialized PyTorch feature-selection wrapper.
 
     Raises:
-        TypeError: If ``model`` is not an ``nn.Module``.
+        TypeError: If ``model`` is not an ``nn.Module`` or ``cardinality_k`` is
+            not an integer.
         ValueError: If feature counts, feature-count bounds, or solver names are
             invalid.
 
@@ -107,6 +109,16 @@ class FeatureSelectionWrapper(nn.Module):
             if min_selected_features is None
             else int(min_selected_features)
         )
+
+        if cardinality_k is not None:
+            if isinstance(cardinality_k, bool) or not isinstance(
+                cardinality_k, Integral
+            ):
+                raise TypeError(
+                    "cardinality_k must be a non-negative integer"
+                )
+            if cardinality_k < 0:
+                raise ValueError("cardinality_k must be non-negative")
 
         self.model = model
         self.feature_dim = feature_dim
