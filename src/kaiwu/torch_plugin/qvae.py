@@ -189,6 +189,7 @@ class QVAE(AutoEncoderBase):
         if loss_type is not None and loss_type != configured_loss_type:
             raise ValueError("loss_type must match model.config.loss_type")
 
+        self._validate_input_shape(x)
         x = x.view(-1, self._input_dimension)
         if configured_loss_type == "bernoulli" and self._dataset_mean is not None:
             x = x - torch.as_tensor(self._dataset_mean, dtype=x.dtype, device=x.device)
@@ -219,6 +220,22 @@ class QVAE(AutoEncoderBase):
         clipped_mean = torch.clamp(mean.reshape(-1), 0.001, 0.999).detach()
         self._train_bias.copy_(-torch.log(1 / clipped_mean - 1))
 
+    def _validate_input_shape(self, x: torch.Tensor) -> None:
+        """Rejects inputs that are not ``(batch, input_dimension)`` tensors.
+
+        Args:
+            x: Input tensor supplied by the caller.
+
+        Raises:
+            ValueError: If ``x`` is not two-dimensional with ``input_dimension``
+                columns.
+        """
+        if x.ndim != 2 or x.shape[1] != self._input_dimension:
+            raise ValueError(
+                "x must have shape (batch, input_dimension), "
+                f"expected (*, {self._input_dimension}), got {tuple(x.shape)}"
+            )
+
     def forward(self, x):
         """
         Forward pass through the QVAE.
@@ -230,6 +247,7 @@ class QVAE(AutoEncoderBase):
             tuple: Reconstructed logits, posterior distribution, encoder logits,
                 and reparameterized latent sample.
         """
+        self._validate_input_shape(x)
         x = x.view(-1, self._input_dimension)
 
         # For Bernoulli data, we optionally subtract dataset mean
