@@ -353,8 +353,13 @@ class QDiffusion(nn.Module):
         Returns:
             dict[str, torch.Tensor]: A dictionary containing proposal logits,
             supervision masks, loss weights, and the EBM objective term.
+
+        Raises:
+            ValueError: If the target batch is empty.
         """
         target = batch["targets"]
+        if target.size(0) == 0:
+            raise ValueError("targets must contain at least one sample")
         first_timestep, second_timestep = torch.randint(
             1,
             self.config.num_diffusion_timesteps + 1,
