@@ -25,6 +25,9 @@ flowchart TD
         qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
+        gbrbm["gbrbm.py<br/>GaussianBernoulliRestrictedBoltzmannMachine"]
+        maifs["maifs/<br/>FeatureSelectionWrapper / QuadraticLinearSolver"]
+        usage["usage_stats.py<br/>enable / disable / is_usage_stats_enabled"]
     end
 
     torch --> abm
@@ -33,6 +36,8 @@ flowchart TD
     abm --> rbm
     abm --> qvae
     abm --> qdiff
+    abm --> gbrbm
+    abm --> usage
     dist --> qvae
     rbm --> dbn
 
