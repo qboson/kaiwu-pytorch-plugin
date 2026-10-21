@@ -28,7 +28,28 @@ def topk_masking(
     Returns:
         torch.Tensor: A boolean mask where ``True`` marks positions below the per-sample
         cutoff.
+
+    Raises:
+        TypeError: If ``cutoff_len`` is not an integer tensor.
+        ValueError: If ``cutoff_len`` is not shaped ``(batch, k)`` or its
+            entries are outside ``[0, seq_len - 1]``.
     """
+    if not isinstance(cutoff_len, torch.Tensor):
+        raise TypeError("cutoff_len must be a torch.Tensor")
+    if cutoff_len.ndim != 2 or cutoff_len.shape[0] != scores.shape[0]:
+        raise ValueError(
+            f"cutoff_len must have shape ({scores.shape[0]}, k), "
+            f"got {tuple(cutoff_len.shape)}"
+        )
+    if cutoff_len.dtype != torch.long:
+        raise TypeError("cutoff_len must be an integer tensor")
+    if cutoff_len.numel() and (
+        int(cutoff_len.min()) < 0
+        or int(cutoff_len.max()) >= scores.shape[-1]
+    ):
+        raise ValueError(
+            f"cutoff_len entries must be between 0 and {scores.shape[-1] - 1}"
+        )
     if stochastic:
         gumbel_noise = -torch.log(-torch.log(torch.rand_like(scores) + 1e-8) + 1e-8)
         ranked_scores = scores + temp * gumbel_noise
