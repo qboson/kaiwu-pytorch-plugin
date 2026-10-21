@@ -4,7 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validate_node_count,
+)
 
 
 class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -32,6 +35,8 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         device=None,
     ):
         super().__init__(device=device)
+        num_visible = _validate_node_count("num_visible", num_visible)
+        num_hidden = _validate_node_count("num_hidden", num_hidden)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
