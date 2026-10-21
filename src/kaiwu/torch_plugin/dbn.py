@@ -172,12 +172,22 @@ class UnsupervisedDBN(nn.Module):
             tuple[numpy.ndarray, numpy.ndarray]: A tuple containing:
                 - The reconstructed visible layer data.
                 - The reconstruction error for each sample.
+
+        Raises:
+            ValueError: If ``data_in`` does not have shape
+                (batch, rbm.num_visible).
         """
         if device is None:
             device = rbm.device
 
         # Convert to PyTorch tensor
-        data_in = torch.FloatTensor(data_in).to(device)
+        data_in = torch.as_tensor(data_in, dtype=torch.float32)
+        if data_in.ndim != 2 or data_in.shape[-1] != rbm.num_visible:
+            raise ValueError(
+                f"data_in must have shape (batch, {rbm.num_visible}), "
+                f"got {tuple(data_in.shape)}"
+            )
+        data_in = data_in.to(device)
 
         with torch.no_grad():
             # Get hidden representation using RBM's get_hidden
