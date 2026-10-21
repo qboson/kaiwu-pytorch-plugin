@@ -59,9 +59,8 @@ flowchart TD
     bm --> qvae_cell
 ```
 The above image shows the project file structure:
-- The Kaiwu-torch-plugin section of the code includes base class, Restricted Boltzmann Machine, and Boltzmann Machine.
-- The example section of the code includes examples: qvae for generating digits, digits for digit recognition etc.
-- The test section contains unit tests.
+- The plugin section contains the abstract base class, Restricted Boltzmann Machine, Boltzmann Machine, Gaussian-Bernoulli RBM, QVAE, Q-Diffusion, DBN, MAIFS feature selection, and the usage-statistics switch.
+- The example section contains the runnable examples shown in the graph: digit classification, BM generation, Q-Diffusion, and Q-VAE.
 
 ### Main Features
 - Quantum Support: Inherits from Kaiwu SDK, supports calling photonic quantum computers
