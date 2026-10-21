@@ -333,7 +333,15 @@ class QVAE(AutoEncoderBase):
 
         Returns:
             tuple: Posterior distribution and reparameterized latent sample.
+
+        Raises:
+            ValueError: If ``q_logits`` is not a (batch, latent_units) tensor.
         """
+        if q_logits.ndim != 2 or q_logits.shape[-1] != self._latent_dimensions:
+            raise ValueError(
+                f"q_logits must have shape (batch, {self._latent_dimensions}), "
+                f"got {tuple(q_logits.shape)}"
+            )
         posterior_dist = MixtureGeneric(q_logits, beta)
         zeta = posterior_dist.reparameterize(self.training)
         return posterior_dist, zeta
