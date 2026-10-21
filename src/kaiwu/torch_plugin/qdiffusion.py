@@ -331,7 +331,20 @@ class QDiffusion(nn.Module):
 
         Returns:
             torch.Tensor: A tensor of scalar energies with shape ``[batch, 1]``.
+
+        Raises:
+            ValueError: If the token tensors are not 2-D or differ in batch size.
         """
+        if noisy_tokens.ndim != 2 or candidate_tokens.ndim != 2:
+            raise ValueError(
+                "noisy_tokens and candidate_tokens must be two-dimensional, "
+                f"got {tuple(noisy_tokens.shape)} and {tuple(candidate_tokens.shape)}"
+            )
+        if noisy_tokens.size(0) != candidate_tokens.size(0):
+            raise ValueError(
+                "noisy_tokens and candidate_tokens must have the same batch size, "
+                f"got {noisy_tokens.size(0)} and {candidate_tokens.size(0)}"
+            )
         if attention_mask is None:
             attention_mask = candidate_tokens.ne(self.pad_id)
 
