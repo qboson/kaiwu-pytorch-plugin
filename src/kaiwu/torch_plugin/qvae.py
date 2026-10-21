@@ -309,7 +309,17 @@ class QVAE(AutoEncoderBase):
 
         Returns:
             torch.Tensor: BM loss scalar.
+
+        Raises:
+            ValueError: If ``q`` is not a non-empty (batch, latent_units) tensor.
         """
+        if q.ndim != 2 or q.shape[-1] != self.bm.num_nodes:
+            raise ValueError(
+                f"q must have shape (batch, {self.bm.num_nodes}), "
+                f"got {tuple(q.shape)}"
+            )
+        if q.size(0) == 0:
+            raise ValueError("q must contain at least one sample")
         # Use hard binary samples from q (threshold 0) or sampling from sigmoid(q)
         # positive_state = (q.detach() > 0).float()
         # loss = self.bm.objective(positive_state, self.bm.sample(self.sampler))
