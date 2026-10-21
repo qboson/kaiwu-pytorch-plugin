@@ -196,7 +196,7 @@ class FactorialBernoulliUtil(DistUtil):
         device = self.logit_mu.device
         q = torch.sigmoid(self.logit_mu)
         rho = torch.rand_like(q, device=device)
-        z = (rho < q).float()
+        z = (rho < q).to(q.dtype)
         return z
 
     def entropy(self):
