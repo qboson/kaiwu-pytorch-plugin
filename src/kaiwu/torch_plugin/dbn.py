@@ -17,6 +17,14 @@ from torch import nn
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
 
+def _numpy_output(tensor):
+    """Export inference results, promoting only unsupported BF16 to float32."""
+    result = tensor.detach().cpu()
+    if result.dtype == torch.bfloat16:
+        result = result.float()
+    return result.numpy()
+
+
 # =================== Unsupervised DBN General Model =====================
 class UnsupervisedDBN(nn.Module):
     """A general unsupervised Deep Belief Network (DBN) architecture.
@@ -88,14 +96,18 @@ class UnsupervisedDBN(nn.Module):
                 "Model not trained yet. Call mark_as_trained() after training."
             )
 
-        data_in = data_in.astype(np.float32)
+        if len(self.rbm_layers) == 0:
+            return data_in.astype(np.float32)
         for rbm in self.rbm_layers:
             with torch.no_grad():
                 hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
+                    torch.as_tensor(
+                        data_in, dtype=rbm.quadratic_coef.dtype,
+                        device=rbm.quadratic_coef.device,
+                    )
                 )
-                data_in = (
-                    hidden_output[:, rbm.num_visible :].cpu().numpy()
+                data_in = _numpy_output(
+                    hidden_output[:, rbm.num_visible :]
                 )  # Extract only the hidden part
         return data_in
 
@@ -177,14 +189,16 @@ class UnsupervisedDBN(nn.Module):
             device = rbm.device
 
         # Convert to PyTorch tensor
-        data_in = torch.FloatTensor(data_in).to(device)
+        data_in = torch.as_tensor(
+            data_in, dtype=rbm.quadratic_coef.dtype, device=device
+        )
 
         with torch.no_grad():
             # Get hidden representation using RBM's get_hidden
             hidden_act = rbm.get_hidden(data_in)
             hidden_part = hidden_act[
                 :, rbm.num_visible :
-            ]  # Extract only the hidden part
+            ].to(dtype=rbm.quadratic_coef.dtype)  # Extract only the hidden part
 
             # Reconstruct visible layer (using transposed weights)
             visible_recon = torch.sigmoid(
@@ -193,11 +207,11 @@ class UnsupervisedDBN(nn.Module):
             )
 
             # Calculate reconstruction error
-            recon_errors = (
-                torch.mean((data_in - visible_recon) ** 2, dim=1).cpu().numpy()
+            recon_errors = _numpy_output(
+                torch.mean((data_in - visible_recon) ** 2, dim=1)
             )
 
-        return visible_recon.cpu().numpy(), recon_errors
+        return _numpy_output(visible_recon), recon_errors
 
     @property
     def num_layers(self):
