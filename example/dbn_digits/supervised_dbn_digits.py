@@ -454,6 +454,9 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         if self.unsupervised_dbn._n_layers > 0:
             first_rbm = self.unsupervised_dbn.get_rbm_layer(0)
             input_size = first_rbm.num_visible
+        else:
+            # 没有预训练层时直接从输入维度接输出层（分类器模式已支持该配置）
+            input_size = self.unsupervised_dbn.input_dim
 
         # 构建隐藏层（使用预训练权重初始化）
         for i in range(self.unsupervised_dbn._n_layers):  # 使用新的接口方法遍历层
