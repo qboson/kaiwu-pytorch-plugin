@@ -35,7 +35,9 @@ class DPLMFeatureEncoder(nn.Module):
     ) -> torch.Tensor:
         # This is the plain sequence-encoding path used before any BM-specific
         # projection happens.
-        outputs = self.backbone.net(input_ids=tokens, attention_mask=attention_mask)
+        outputs = self.backbone.net(
+            input_ids=tokens, attention_mask=attention_mask, compute_logits=False,
+        )
         return outputs["last_hidden_state"]
 
     def encode_conditioned(
@@ -48,6 +50,7 @@ class DPLMFeatureEncoder(nn.Module):
             input_ids=input_ids,
             inputs_embeds=inputs_embeds,
             attention_mask=attention_mask,
+            compute_logits=False,
         )
         return outputs["last_hidden_state"]
 
