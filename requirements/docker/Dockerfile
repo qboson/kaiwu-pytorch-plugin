@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 USER jovyan
 
 # 复制 requirements.txt 并安装
-COPY ../requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 如果需要手动安装SDK: 复制 whl 文件并安装
