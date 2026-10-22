@@ -176,10 +176,12 @@ class Trainer:
         """运行一个训练或验证 epoch，并返回平均指标。"""
         model.train(train)
         totals = {key: 0.0 for key in self.metric_keys}
+        num_samples = 0
 
         for x, batch_idx in loader:
             x = x.to(self.device)
             batch_idx = batch_idx.to(self.device)
+            num_samples += x.shape[0]
             if train:
                 vae_optimizer.zero_grad()
 
@@ -200,13 +202,13 @@ class Trainer:
                 bm_optimizer.step()
                 bm_loss_value = bm_loss.item()
 
-            totals["loss"] += loss.item()
-            totals["neg_elbo"] += loss.item()
-            totals["kl"] += model.last_kl_loss.item()
-            totals["recon_loss"] += model.last_recon_loss.item()
-            totals["bm_loss"] += bm_loss_value
+            totals["loss"] += loss.item() * x.shape[0]
+            totals["neg_elbo"] += loss.item() * x.shape[0]
+            totals["kl"] += model.last_kl_loss.item() * x.shape[0]
+            totals["recon_loss"] += model.last_recon_loss.item() * x.shape[0]
+            totals["bm_loss"] += bm_loss_value * x.shape[0]
 
-        return {key: value / len(loader) for key, value in totals.items()}
+        return {key: value / num_samples for key, value in totals.items()}
 
     def train(self, model, train_loader, val_loader, vae_optimizer, bm_optimizer, ckpt_path):
         """完整训练流程：记录曲线、保存最佳权重、按 patience 早停。"""
