@@ -88,8 +88,14 @@ def save_checkpoint(
 def load_trained_energy_weights(
     generator, checkpoint_path: str, device: str
 ) -> dict[str, Any]:
-    """Loads a compact energy-side checkpoint into one generator."""
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    """Load energy weights through CPU storage into existing model devices.
+
+    ``device`` is retained for call compatibility; destination devices are
+    determined by the generator's existing modules, not the checkpoint payload.
+    CPU staging avoids a second complete copy of energy weights on the GPU.
+    """
+    del device
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
     state_dict = checkpoint["state_dict"]
     # Rebuild exactly the energy-side modules we saved during training so rerun
     # and evaluation use the same scorer weights as the best checkpoint.
