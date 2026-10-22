@@ -733,8 +733,6 @@ def plot_calo_images(x_true, x_recon, layer=0, n_samples=5, output="./output/tes
         fig = plt.gcf()
     #  plt.show()
         fig.savefig(output)
-        import sys
-        sys.exit()
     #     im = plt.imshow(image,
     #            aspect=float(sizes[layer*2 + 1])/sizes[layer*2],
     #            interpolation='nearest',
