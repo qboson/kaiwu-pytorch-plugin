@@ -288,6 +288,9 @@ class QDiffusion(nn.Module):
     def forward(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
         """Runs the proposal model on the current noisy state.
 
+        Calls the backbone through the PyTorch module API, honoring its
+        forward pre-hooks and forward hooks.
+
         Args:
             noisy_tokens: Current noisy token tensor.
             ``**kwargs``: Additional keyword arguments forwarded to the proposal model.
@@ -299,7 +302,7 @@ class QDiffusion(nn.Module):
             TypeError: If the proposal model does not implement ``forward``.
         """
         if hasattr(self.proposal_model, "forward"):
-            return self.proposal_model.forward(noisy_tokens, **kwargs)
+            return self.proposal_model(noisy_tokens, **kwargs)
         raise TypeError("proposal_model must implement forward().")
 
     def proposal(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
@@ -322,6 +325,9 @@ class QDiffusion(nn.Module):
     ) -> torch.Tensor:
         """Scores candidate reconstructions conditioned on the noisy state.
 
+        Calls ``EnergyModel.forward`` through the PyTorch module API so that
+        backbone hooks can transform scoring inputs and returned energies.
+
         Args:
             noisy_tokens: Noisy token tensor used as conditioning input.
 
@@ -335,7 +341,7 @@ class QDiffusion(nn.Module):
         if attention_mask is None:
             attention_mask = candidate_tokens.ne(self.pad_id)
 
-        return self.energy_model.score_conditioned(
+        return self.energy_model(
             noisy_tokens=noisy_tokens,
             candidate_tokens=candidate_tokens,
             attention_mask=attention_mask,
