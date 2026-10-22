@@ -52,9 +52,17 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """Clip linear and quadratic bias weights in-place.
 
         Args:
-            h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
-            j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
+            h_range (tuple[float, float]): Range for the linear bias
+                (local fields ``h``), for example, [-1, 1].
+            j_range (tuple[float, float]): Range for the quadratic weights
+                (couplings ``J``), for example, [-1, 1].
+
+        Raises:
+            ValueError: If either range is not a ``(low, high)`` pair with
+                ``low <= high``.
         """
+        self._validate_clip_range("h_range", h_range)
+        self._validate_clip_range("j_range", j_range)
         self.get_parameter("linear_bias").data.clamp_(*h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*j_range)
 
