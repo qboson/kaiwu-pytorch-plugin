@@ -526,11 +526,12 @@ def _solve_ising_local_search(
     if initial_binary is None:
         spins = np.ones(matrix.shape[0], dtype=int)
     else:
-        binary = np.asarray(initial_binary, dtype=int)
+        binary = np.asarray(initial_binary)
         if binary.ndim != 1 or binary.shape[0] != matrix.shape[0] - 1:
             raise ValueError("initial_binary must match the QUBO variable size")
         if not np.all((binary == 0) | (binary == 1)):
             raise ValueError("initial_binary must contain only 0/1 values")
+        binary = (binary == 1).astype(int)
         spins = np.r_[2 * binary - 1, 1].astype(int)
 
     weights = np.triu(matrix)
@@ -606,7 +607,7 @@ def _solve_ising_sa(
         raise ValueError("ising_matrix must contain only finite values")
 
     if initial_binary is not None:
-        binary = np.asarray(initial_binary, dtype=int)
+        binary = np.asarray(initial_binary)
         if binary.ndim != 1 or binary.shape[0] != matrix.shape[0] - 1:
             raise ValueError("initial_binary must match the QUBO variable size")
         if not np.all((binary == 0) | (binary == 1)):
@@ -621,7 +622,7 @@ def _solve_ising_sa(
 
     if result is None:
         raise RuntimeError("SimulatedAnnealingOptimizer did not return a solution.")
-    return np.asarray(result, dtype=int)
+    return np.asarray(result)
 
 
 def _solve_ising_kaiwu_cim(
@@ -715,8 +716,8 @@ def _binary_from_solver_solution(
     spin_solutions: np.ndarray,
     num_variables: int,
 ) -> np.ndarray:
-    """Convert the first auxiliary-spin solver solution to a binary QUBO state."""
-    spin_array = np.asarray(spin_solutions, dtype=float)
+    """Validate raw spins, then decode the first auxiliary-spin solver solution."""
+    spin_array = np.asarray(spin_solutions)
     if spin_array.ndim == 2:
         if spin_array.shape[0] == 0:
             raise RuntimeError("solver must return at least one spin solution")
@@ -730,6 +731,7 @@ def _binary_from_solver_solution(
         raise RuntimeError("spin solution must contain one auxiliary spin")
     if not np.all((spin_solution == -1) | (spin_solution == 1)):
         raise RuntimeError("spin solution must contain only -1/1 values")
+    spin_solution = np.where(spin_solution == 1, 1, -1)
 
     binary = np.rint((spin_solution[:-1] * spin_solution[-1] + 1.0) / 2.0)
     return binary.astype(int)
@@ -747,7 +749,8 @@ def solve_qubo(
     Args:
         quadratic_matrix: QUBO quadratic term.
         linear_vector: QUBO linear term.
-        initial_state: Initial binary state used by local solvers.
+        initial_state: Initial binary state used by local solvers. Original
+            values must equal numeric 0 or 1 before integer normalization.
         solver: Built-in solver name. Supported values are listed in
             ``AVAILABLE_SOLVERS``.
         **solver_kwargs: Solver-specific keyword arguments.
@@ -760,7 +763,7 @@ def solve_qubo(
         ImportError: If ``solver="kaiwu_cim"`` is requested without Kaiwu.
         RuntimeError: If solver execution fails or returns an invalid solution.
     """
-    initial_state = np.asarray(initial_state, dtype=int)
+    initial_state = np.asarray(initial_state)
     solver_name = str(solver)
 
     try:
@@ -772,6 +775,7 @@ def solve_qubo(
             raise ValueError("initial_state must match the QUBO variable size")
         if not np.all((initial_state == 0) | (initial_state == 1)):
             raise ValueError("initial_state must contain only binary 0/1 values")
+        initial_state = (initial_state == 1).astype(int)
 
         if solver_name == "local_search":
             spin_solutions = _solve_ising_local_search(
