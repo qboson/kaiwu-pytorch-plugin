@@ -148,18 +148,8 @@ class CellQVAE(QVAE):
         )
         return torch.cat([zeta, batch_one_hot], dim=-1)
 
-    def _encode(self, x):
-        """按照配置的重构损失编码输入。
-
-        Args:
-            x: 单细胞表达矩阵。
-
-        Returns:
-            ``(q, posterior, zeta)``，分别为编码器 logits、后验分布和潜变量样本。
-
-        Raises:
-            ValueError: 配置了不支持的损失类型。
-        """
+    def encode_logits(self, x):
+        """Encode inputs without sampling a posterior or decoding a reconstruction."""
         x = x.view(-1, self._input_dimension)
         if self.config.loss_type == "mse":
             encoder_x = x
@@ -167,13 +157,15 @@ class CellQVAE(QVAE):
             encoder_x = x
             if self._dataset_mean is not None:
                 encoder_x = encoder_x - torch.as_tensor(
-                    self._dataset_mean,
-                    dtype=x.dtype,
-                    device=x.device,
+                    self._dataset_mean, dtype=x.dtype, device=x.device,
                 )
         else:
             raise ValueError(f"Unsupported loss type: {self.config.loss_type}")
-        q = self.encoder(encoder_x)
+        return self.encoder(encoder_x)
+
+    def _encode(self, x):
+        """Encode inputs and draw the posterior used by the training forward pass."""
+        q = self.encode_logits(x)
         posterior, zeta = self.posterior(q, self.config.dist_beta)
         return q, posterior, zeta
 
