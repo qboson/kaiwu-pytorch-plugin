@@ -287,6 +287,9 @@ def init_qvae_sampler(model):
 
 
 def _apply_train_bias(model, generated_x: torch.Tensor) -> torch.Tensor:
+    loss_type = getattr(getattr(model, "config", None), "loss_type", "bernoulli")
+    if loss_type != "bernoulli":
+        return generated_x
     bias = None
     if hasattr(model, 'train_bias') and model.train_bias is not None:
         bias = model.train_bias
@@ -341,7 +344,7 @@ def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
             # zeta = torch.randn(256, 256).to(device)
             generated_x = model.decoder(zeta)
 
-            generated_x = generated_x + model._train_bias
+            generated_x = _apply_train_bias(model, generated_x)
 
             generated_x = torch.sigmoid(generated_x)
 
