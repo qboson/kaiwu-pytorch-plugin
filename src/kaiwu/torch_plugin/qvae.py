@@ -87,7 +87,21 @@ class AutoEncoderBase(nn.Module):
 
         Args:
             mean (torch.Tensor): Mean of the training data (shape: input_dim).
+                A scalar mean is broadcast over the input dimension; ``None``
+                clears the mean.
+
+        Raises:
+            ValueError: If the mean is neither a scalar nor of length
+                ``input_dimension``.
         """
+        if mean is None:
+            self._dataset_mean = None
+            return
+        mean = torch.as_tensor(mean)
+        if mean.numel() != 1 and mean.numel() != self._input_dimension:
+            raise ValueError(
+                "Dataset mean must be a scalar or match the input dimension."
+            )
         self._dataset_mean = mean
 
     def __repr__(self):
