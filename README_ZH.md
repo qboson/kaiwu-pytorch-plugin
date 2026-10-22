@@ -25,6 +25,9 @@ flowchart TD
         qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
+        gbrbm["gbrbm.py<br/>GaussianBernoulliRestrictedBoltzmannMachine"]
+        maifs["maifs/<br/>FeatureSelectionWrapper / QuadraticLinearSolver"]
+        usage["usage_stats.py<br/>enable / disable / is_usage_stats_enabled"]
     end
 
     torch --> abm
@@ -33,6 +36,8 @@ flowchart TD
     abm --> rbm
     abm --> qvae
     abm --> qdiff
+    abm --> gbrbm
+    abm --> usage
     dist --> qvae
     rbm --> dbn
 
@@ -56,9 +61,8 @@ flowchart TD
 
 上图展示了项目的主要代码结构：
 
-- `kaiwu-torch-plugin` 部分包含抽象基类、RBM、BM、QVAE、Q-Diffusion 和 DBN 等核心模块
-- `example` 部分包含若干示例，包括数字识别、图像生成、蛋白质序列生成和单细胞表征学习
-- `tests` 部分包含对应的基础测试
+- `kaiwu-torch-plugin` 部分包含抽象基类、RBM、BM、GBRBM、QVAE、Q-Diffusion、DBN、MAIFS 特征选择与用量统计开关
+- `example` 部分包含图中列出的可运行示例：数字分类、BM 生成、Q-Diffusion 与 Q-VAE
 
 ### 主要特性
 
