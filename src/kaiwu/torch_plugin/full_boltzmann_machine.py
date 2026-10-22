@@ -143,7 +143,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             return ising_mat.cpu().numpy()
 
     def gibbs_sample(
-        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
+        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None,
+        *, generator: torch.Generator = None,
     ) -> torch.Tensor:
         """Sample from the Boltzmann Machine.
 
@@ -155,7 +156,30 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             num_sample (int, optional): Number of samples.
                 If ``None``, uses batch size of s_visible.
+
+            generator (torch.Generator, optional): Random stream on the sampling
+                device. Defaults to the global stream. Covers initialization,
+                scan order and Bernoulli draws; caller-owned state can be saved
+                and restored without affecting the global RNG.
+
+        Raises:
+            TypeError: If ``generator`` has an unsupported type.
+            ValueError: If its device does not match sampling, or neither an
+                initial visible state nor a sample count is provided.
         """
+        if generator is not None:
+            if not isinstance(generator, torch.Generator):
+                raise TypeError("generator must be a torch.Generator or None")
+            sample_device = torch.device(self.device)
+            generator_device = generator.device
+            if generator_device.type != sample_device.type:
+                raise ValueError("generator must be on the sampling device")
+            if sample_device.type == "cuda":
+                sample_index = sample_device.index
+                if sample_index is None:
+                    sample_index = torch.cuda.current_device()
+                if generator_device.index != sample_index:
+                    raise ValueError("generator must be on the sampling device")
         with torch.no_grad():
             # Initialization: If neither visible unit state nor sample number is provided,
             # raise error
@@ -166,14 +190,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 s_all = torch.bernoulli(
                     torch.full(
                         (s_visible.size(0), self.num_nodes), 0.5, device=self.device
-                    )
+                    ),
+                    generator=generator,
                 )
                 # Replace visible part with given visible unit state
                 s_all[:, : s_visible.size(1)] = s_visible.clone()
             else:
                 # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
-                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
+                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device),
+                    generator=generator,
                 )
 
             # Number of visible units
@@ -181,7 +207,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             q_coef = self.symmetrized_quadratic_coef()
             for _ in range(num_steps):
                 # Random update order (Gibbs sampling)
-                update_order = torch.randperm(self.num_nodes, device=self.device)
+                update_order = torch.randperm(
+                    self.num_nodes, device=self.device, generator=generator
+                )
                 for unit in update_order:
                     if unit < n_vis:
                         # Skip visible units (only sample hidden units)
@@ -193,7 +221,14 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                     # Get activation probability via sigmoid
                     prob = torch.sigmoid(activation)
                     # Sample current unit state according to probability
-                    s_all[:, unit] = (prob > torch.rand_like(prob)).float()
+                    if generator is None:
+                        noise = torch.rand_like(prob)
+                    else:
+                        noise = torch.rand(
+                            prob.shape, dtype=prob.dtype, device=prob.device,
+                            generator=generator,
+                        )
+                    s_all[:, unit] = (prob > noise).float()
             # Return sampled states of all units
             return s_all
 
