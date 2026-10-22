@@ -145,6 +145,9 @@ def run_epoch(
     context = torch.enable_grad if training else torch.no_grad
     with context():
         for batch in tqdm(data_loader, desc=description, unit="batch"):
+            batch_size = int(batch["targets"].shape[0])
+            if batch_size == 0:
+                continue
             outputs = generator.objective({"targets": batch["targets"]})
             loss = outputs["energy_objective"].mean()
 
@@ -158,7 +161,6 @@ def run_epoch(
                     )
                 optimizer.step()
 
-            batch_size = int(batch["targets"].shape[0])
             total_loss += float(loss.item()) * batch_size
             total_examples += batch_size
             for key in tracked_keys:
@@ -167,7 +169,8 @@ def run_epoch(
                         float(outputs[key].item()) * batch_size
                     )
 
-    total_examples = max(total_examples, 1)
+    if total_examples == 0:
+        raise ValueError("An epoch requires at least one example; the loader was empty.")
     metrics = {"energy_objective_mean": total_loss / total_examples}
     for key, value in metric_totals.items():
         metrics[key] = value / total_examples
