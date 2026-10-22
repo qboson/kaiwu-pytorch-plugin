@@ -163,7 +163,7 @@ def _anderson_solver(
     return best_z, {"nstep": nstep, "residual": best_res}
 
 
-def _ising_solver(
+def _ising_fixed_point_solver(
     func: Callable[[torch.Tensor], torch.Tensor],
     z0: torch.Tensor,
     sampler: Any,
@@ -259,6 +259,20 @@ def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -
 
 def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     """Chooses the step coefficients ``a`` minimising ``||r + G^T a||^2 / 2`` with the sampler.
+
+    The objective is the linearised residual after the step ``z <- z + V^T a``:
+
+    - ``r = f(z) - z`` is the current residual, flattened to length ``n``;
+      the fixed point is where ``r = 0``.
+    - ``V`` holds the ``num_basis`` search directions ``v_i`` as rows.
+    - ``G`` holds the directional derivatives of the residual as rows,
+      ``G[i] = J v_i ~ (r(z + h v_i) - r(z)) / h`` with ``J = df/dz - I``
+      the Jacobian of ``r`` and ``h = fd_eps``.
+
+    By first-order Taylor expansion ``r(z + V^T a) ~ r + G^T a``, so
+    minimising ``||r + G^T a||^2 / 2`` picks the step that best cancels the
+    residual. Expanding gives the quadratic form ``a^T H a / 2 + g^T a + const``
+    with ``H = G G^T`` and ``g = G r``.
 
     Each coefficient is encoded by ``config.coeff_bits`` binary variables on a
     uniform grid over ``[-s, s]``, ``s = coeff_range * residual_norm /
@@ -443,7 +457,7 @@ class QDEQ(nn.Module):
         if self.sampler is None:
             raise ValueError("QDEQ requires a sampler to solve the fixed point")
         cfg = self.config
-        return _ising_solver(func, z0, self.sampler, cfg, cfg.f_thres, cfg.f_eps)
+        return _ising_fixed_point_solver(func, z0, self.sampler, cfg, cfg.f_thres, cfg.f_eps)
 
     def solve_context(self) -> contextlib.AbstractContextManager:
         """Context entered around the fixed-point solve. Override to switch layer state.
