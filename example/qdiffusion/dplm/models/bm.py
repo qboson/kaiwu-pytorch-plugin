@@ -39,6 +39,28 @@ class BMConditionedEnergyModel(EnergyModel):
         self.encoder = encoder
         self.feature_projector = nn.Linear(2 * encoder.hidden_size, bm_num_visible)
 
+    def _noisy_features(self, noisy_tokens, attention_mask):
+        """Reuse identical token/mask pairs within a single inference call.
+
+        Training and gradient-enabled calls keep independent encoder rows. No
+        features survive this call, so weight or token changes cannot stale a cache.
+        """
+        if self.training or self.encoder.training or torch.is_grad_enabled():
+            hidden = self.encoder.encode_tokens(noisy_tokens, attention_mask=attention_mask)
+            return masked_mean_pool(hidden, attention_mask)
+
+        # Separate token and mask keys preserve their original dtypes and values.
+        tokens, token_index = torch.unique(noisy_tokens, dim=0, return_inverse=True)
+        masks, mask_index = torch.unique(attention_mask, dim=0, return_inverse=True)
+        pairs, inverse = torch.unique(
+            torch.stack([token_index, mask_index], dim=-1), dim=0, return_inverse=True,
+        )
+        unique_masks = masks[pairs[:, 1]]
+        hidden = self.encoder.encode_tokens(
+            tokens[pairs[:, 0]], attention_mask=unique_masks,
+        )
+        return masked_mean_pool(hidden, unique_masks)[inverse]
+
     def build_conditioned_features(
         self,
         noisy_tokens: torch.Tensor,
@@ -48,15 +70,11 @@ class BMConditionedEnergyModel(EnergyModel):
         # Keep this helper explicit because it is the semantic bridge between
         # sequence modeling and BM scoring: everything after this point operates
         # on BM-space states rather than protein tokens.
-        noisy_hidden = self.encoder.encode_tokens(
-            noisy_tokens,
-            attention_mask=attention_mask,
-        )
+        noisy_features = self._noisy_features(noisy_tokens, attention_mask)
         candidate_hidden = self.encoder.encode_tokens(
             candidate_tokens,
             attention_mask=attention_mask,
         )
-        noisy_features = masked_mean_pool(noisy_hidden, attention_mask)
         candidate_features = masked_mean_pool(candidate_hidden, attention_mask)
         return torch.cat([noisy_features, candidate_features], dim=-1)
 
