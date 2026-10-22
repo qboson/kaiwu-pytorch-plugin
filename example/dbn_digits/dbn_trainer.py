@@ -185,13 +185,13 @@ class DBNTrainer:
                 # Accumulate objective value
                 total_loss += loss.item()
 
+                # 图像输出与 verbose 解耦：plot_img=True 时即使不打印日志也应出图
+                if self.plot_img and i % 20 == 0:
+                    self._visualize_training_progress(rbm, i, epoch, batch_x)
+
                 # Print weight and bias statistics every 20 batches
                 if self.verbose and i % 20 == 0:
                     self._print_layer_stats(rbm)
-
-                    # Sample and weight visualization
-                    if self.plot_img:
-                        self._visualize_training_progress(rbm, i, epoch, batch_x)
 
                     # Record samples
                     if i % 50 == 0:  # Record every 50 batches
