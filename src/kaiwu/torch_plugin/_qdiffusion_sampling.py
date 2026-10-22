@@ -135,10 +135,13 @@ def top_k_top_p_filtering(
 
     Returns:
         torch.Tensor: A tensor with the same shape as ``logits`` where filtered entries are
-        replaced by ``filter_value``.
+        replaced by ``filter_value``. The input ``logits`` tensor is left unmodified.
     """
     original_shape = logits.shape
-    flat_logits = logits.reshape(-1, original_shape[-1])
+    # Work on a copy: ``reshape`` may return a view of the caller's tensor, and
+    # writing the top-k cutoffs in place would corrupt the caller's logits
+    # (and crash outright when the input requires gradient).
+    flat_logits = logits.reshape(-1, original_shape[-1]).clone()
     assert flat_logits.dim() == 2
 
     top_k = min(top_k, flat_logits.size(-1))
