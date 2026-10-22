@@ -115,3 +115,22 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+
+---
+
+### 非默认特征轴上的特征选择
+
+`FeatureSelectionWrapper` 会遮住 `input_feature_axis` 指定的输入轴（默认 `-1`，
+即常见的 `(batch, features)` 布局）。本示例演示特征在前的 `(features, batch)`
+用法，校验恰好未选中的特征被置零，并确认特征轴大小不匹配时会报错。
+
+请通过 `python example/feature_selection_axis/axis_masking.py` 运行该示例。
+
+**依赖项**
+
+```
+torch
+```

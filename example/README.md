@@ -125,3 +125,22 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+
+
+---
+
+### Feature Selection on a Non-Default Feature Axis
+
+`FeatureSelectionWrapper` masks the input axis named by `input_feature_axis`
+(default `-1`, the usual `(batch, features)` layout). This example shows the
+feature-first case `(features, batch)`, verifies that exactly the unselected
+features are zeroed, and checks that a mismatched feature-axis size is rejected.
+
+Run the example via `python example/feature_selection_axis/axis_masking.py`.
+
+**Dependencies**
+
+```
+torch
+```
