@@ -247,6 +247,8 @@ class FeatureSelectionWrapper(nn.Module):
         loss_fn: LossFunction,
         hessian_mode: str = "full",
         max_samples: int | None = 1000,
+        *,
+        compact_diagonal: bool = False,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the loss gradient and Hessian with respect to a soft mask.
 
@@ -256,9 +258,13 @@ class FeatureSelectionWrapper(nn.Module):
             hessian_mode: ``"full"`` for the full Hessian or ``"diagonal"`` for
                 diagonal-only Hessian rows.
             max_samples: Optional maximum number of samples used for derivatives.
+            compact_diagonal: Return a diagonal vector instead of a dense matrix.
+                Only valid with ``hessian_mode="diagonal"``. Second-derivative
+                call counts are unchanged; this reduces retained intermediate storage.
 
         Returns:
-            A tuple containing the mask gradient and Hessian as NumPy arrays.
+            Gradient and Hessian NumPy arrays. The Hessian is a vector only
+            when ``compact_diagonal=True``; the default matrix API is retained.
 
         Raises:
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
@@ -266,6 +272,8 @@ class FeatureSelectionWrapper(nn.Module):
         """
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
+        if compact_diagonal and hessian_mode != "diagonal":
+            raise ValueError("compact_diagonal requires hessian_mode='diagonal'")
 
         input_batches: list[torch.Tensor] = []
         target_batches: list[torch.Tensor] = []
@@ -320,7 +328,10 @@ class FeatureSelectionWrapper(nn.Module):
                 parameter.requires_grad_(requires_grad)
             self.train(was_training)
 
-        hessian = 0.5 * (hessian + hessian.T)
+        if hessian_mode == "full":
+            hessian = 0.5 * (hessian + hessian.T)
+        elif not compact_diagonal:
+            hessian = torch.diag(hessian)
         return (
             _tensor_to_numpy(gradient, dtype=float),
             _tensor_to_numpy(hessian, dtype=float),
@@ -342,7 +353,7 @@ class FeatureSelectionWrapper(nn.Module):
             hessian_mode: ``"full"`` or ``"diagonal"``.
 
         Returns:
-            The requested Hessian row.
+            The full Hessian row or a scalar diagonal entry.
         """
         if gradient[index].requires_grad:
             row = torch.autograd.grad(
@@ -356,9 +367,7 @@ class FeatureSelectionWrapper(nn.Module):
         if row is None:
             row = torch.zeros_like(continuous_mask)
         if hessian_mode == "diagonal":
-            diagonal_row = torch.zeros_like(row)
-            diagonal_row[index] = row[index]
-            return diagonal_row
+            return row[index].clone()
         return row
 
     def _build_qubo(
@@ -376,12 +385,19 @@ class FeatureSelectionWrapper(nn.Module):
             A tuple containing the quadratic matrix and linear vector.
         """
         current_mask = _tensor_to_numpy(self.mask, dtype=float)
-        quadratic_matrix = np.asarray(hessian, dtype=float).copy()
-        linear_vector = (
-            np.asarray(gradient, dtype=float)
-            - quadratic_matrix @ current_mask
-            + self.lambda_reg
-        )
+        hessian = np.asarray(hessian, dtype=float)
+        if hessian.ndim == 1:
+            linear_vector = (
+                np.asarray(gradient, dtype=float) - hessian * current_mask + self.lambda_reg
+            )
+            quadratic_matrix = np.diag(hessian)
+        else:
+            quadratic_matrix = hessian.copy()
+            linear_vector = (
+                np.asarray(gradient, dtype=float)
+                - quadratic_matrix @ current_mask
+                + self.lambda_reg
+            )
         if self.cardinality_k is not None:
             quadratic_matrix += (
                 2.0 * _CARDINALITY_PENALTY * np.ones_like(quadratic_matrix)
@@ -483,11 +499,13 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If derivative computation or projection validation fails.
             RuntimeError: If the configured QUBO solver fails.
         """
+        derivative_options = {"compact_diagonal": True} if hessian_mode == "diagonal" else {}
         gradient, hessian = self.compute_mask_derivatives(
             data_loader,
             loss_fn,
             hessian_mode,
             max_samples,
+            **derivative_options,
         )
         quadratic_matrix, linear_vector = self._build_qubo(gradient, hessian)
         current_mask = _tensor_to_numpy(self.mask, dtype=int)
