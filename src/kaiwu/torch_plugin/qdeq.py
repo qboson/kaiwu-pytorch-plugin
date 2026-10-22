@@ -24,6 +24,7 @@ from __future__ import annotations
 import contextlib
 import math
 import time
+from numbers import Integral
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -488,6 +489,8 @@ class QDEQ(nn.Module):
             torch.Tensor: Differentiable scalar to add to the training loss.
         """
         # E_p ||J^T p||^2 = ||J||_F^2 for standard normal probes p.
+        if isinstance(vecs, bool) or not isinstance(vecs, Integral) or vecs < 1:
+            raise ValueError("vecs must be a positive integer")
         total = 0
         for _ in range(vecs):
             probe = torch.randn_like(z_star)
