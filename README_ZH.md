@@ -79,7 +79,7 @@ flowchart TD
 ### 环境要求
 
 - python == 3.10
-- kaiwu == 1.3.1
+- kaiwu == 1.4.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -131,7 +131,7 @@ Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有�
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # 已包含 Kaiwu SDK
-├── kaiwu-1.3.1-py3-none-any.whl   # 或从 Qboson 平台下载
+├── kaiwu-1.4.1-cp310-*.whl        # 或从 Qboson 平台下载
 └── docker/
     └── Dockerfile
 ```
@@ -165,7 +165,7 @@ requirements/
 
 ### Kaiwu SDK 安装说明（必需）
 
-现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装
+现在kaiwu版本1.4.1可以直接通过`pip install kaiwu==1.4.1`安装（需要 Python 3.10）
 
 其他版本的Kaiwu SDK 的下载和安装步骤如下：
 

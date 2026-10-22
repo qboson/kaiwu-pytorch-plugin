@@ -76,7 +76,7 @@ The above image shows the project file structure:
 
 ### Requirements
 - python == 3.10
-- kaiwu == 1.3.1
+- kaiwu == 1.4.1
 - torch == 2.7.0
 - numpy == 2.2.6
 
@@ -120,7 +120,7 @@ Project structure required:
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
+├── kaiwu-1.4.1-cp310-*.whl        # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
@@ -154,7 +154,7 @@ Press `Ctrl+C`, then run:
 
 ### Kaiwu SDK Installation Instructions (Required)
 
-Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+Kaiwu version 1.4.1 can now be installed directly via `pip install kaiwu==1.4.1` on Python 3.10. 
 
 The download and installation steps for other versions of the Kaiwu SDK are as follows:
 ![](imgs/image.png)
