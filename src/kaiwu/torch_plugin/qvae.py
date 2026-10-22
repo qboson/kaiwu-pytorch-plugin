@@ -291,6 +291,9 @@ class QVAE(AutoEncoderBase):
         # KL divergence
         kl_loss = self._kl_dist_from(posterior).mean()
 
+        self.last_recon_loss = recon_loss.detach()
+        self.last_kl_loss = kl_loss.detach()
+
         # Weight decay
         wd_loss = self._weight_decay_loss()
 
