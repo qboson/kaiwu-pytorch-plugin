@@ -72,6 +72,12 @@ class _ModifiedEsmSelfAttention(EsmSelfAttention):
         query_layer = query_layer.contiguous()
         key_layer = key_layer.contiguous()
         value_layer = value_layer.contiguous()
+        if query_layer.dtype != value_layer.dtype or key_layer.dtype != value_layer.dtype:
+            # The rotary cos/sin cache is a plain attribute that nn.Module.to()
+            # does not cast, so query/key can be upcast while value keeps the
+            # module dtype; SDPA requires all three to match.
+            query_layer = query_layer.to(value_layer.dtype)
+            key_layer = key_layer.to(value_layer.dtype)
         context_layer = F.scaled_dot_product_attention(
             query_layer,
             key_layer,
