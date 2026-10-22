@@ -7,6 +7,10 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+### Gaussian-Bernoulli RBM on Continuous Data
+
+`example/gbrbm/` demonstrates how to use the `GaussianBernoulliRestrictedBoltzmannMachine` class on real-valued data — the RBM variant to use when inputs are continuous rather than binary. It covers contrastive-divergence training (`infer_from_gaussian` for the positive phase, `gibbs_sample` for the negative phase, `objective` for the loss), sample generation from a burned-in Gibbs chain, and free-energy scoring with `marginal_energy`. The default path needs no Kaiwu SDK license; see `example/gbrbm/README.md` for how to switch the negative phase to the Kaiwu SDK sampler.
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:

@@ -7,6 +7,10 @@
 
 这两个脚本均完整展示了模型初始化、采样、目标函数计算、梯度下降和参数更新的全过程，可作为快速上手玻尔兹曼机相关模型的参考示例。
 
+### 在连续值数据上训练高斯-伯努利 RBM
+
+`example/gbrbm/` 演示如何使用 `GaussianBernoulliRestrictedBoltzmannMachine` 处理实值数据——当输入是连续值而非二值时应使用的 RBM 变体。内容覆盖对比散度训练（正相 `infer_from_gaussian`、负相 `gibbs_sample`、损失 `objective`）、用带 burn-in 的 Gibbs 链生成样本，以及用 `marginal_energy` 计算自由能。默认路径无需 Kaiwu SDK license；切换到 Kaiwu SDK 求解器的方式见 `example/gbrbm/README_ZH.md`。
+
 ---
 
 ### 分类任务：手写数字识别
