@@ -97,6 +97,12 @@ class EnergyModel(nn.Module):
         sampler: Any | None = None,
     ) -> None:
         super().__init__()
+        dims = (("bm_num_visible", bm_num_visible), ("bm_num_hidden", bm_num_hidden))
+        for name, value in dims:
+            if value is not None and (
+                isinstance(value, bool) or not isinstance(value, int) or value < 1
+            ):
+                raise ValueError(f"{name} must be a positive integer")
         self.bm_num_visible = bm_num_visible
         self.bm_num_hidden = bm_num_hidden
         self.sampler = sampler
@@ -432,6 +438,10 @@ class QDiffusion(nn.Module):
         Returns:
             dict[str, Any]: A mutable state dictionary suitable for repeated ``step`` calls.
         """
+        if input_tokens.dim() != 2:
+            raise ValueError("input_tokens must be a 2-D (batch, seq_len) tensor")
+        if max_steps < 0:
+            raise ValueError("max_steps must be non-negative")
         output_tokens, output_scores = self._initialize_output_tokens(
             input_tokens, partial_masks=partial_masks
         )
