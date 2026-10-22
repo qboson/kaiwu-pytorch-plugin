@@ -115,3 +115,23 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+
+---
+
+### 向 QVAE 注入自定义组件
+
+`QVAE` 通过工厂方法构建缺失的组件，构造器里显式传入的组件优先。本示例把玩具
+编码器、解码器、玻尔兹曼机与采样器接入一个小子类，并校验构造器确实复用了它们，
+以及前向、loss 与能量计算都能正常工作。
+
+请通过 `python example/qvae_custom_components/custom_qvae.py` 运行该示例。
+
+**依赖项**
+
+```
+torch
+numpy
+```
