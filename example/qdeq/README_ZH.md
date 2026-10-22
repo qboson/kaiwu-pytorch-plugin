@@ -10,6 +10,19 @@
 （模拟退火或 CIM）求解；优化器由调用方创建并传入，与 `QVAE`、`EnergyModel` 的
 `sampler` 用法一致。反向的隐函数梯度方程用 Anderson 加速求解。
 
+## 背景
+
+`QDEQ` 面向存储和位宽受限的场景，例如在边缘设备上部署的时序预测模型：
+
+- **参数更少**：DEQ 不堆叠多个独立的层，而是反复调用同一个共享层直到收敛到不动点，
+  因此只需存储一层的权重；训练显存也不随迭代步数增长。
+- **更新决策离散化**：DEQ 常用的 Anderson 加速在连续实数域上计算历史迭代的组合系数。
+  `QDEQ` 把每个更新系数限制在 `coeff_bits` 位的网格上，通过求解 QUBO 选出系数组合，
+  更新决策本身变成低位宽的，并且可以交给组合优化后端执行，例如 Kaiwu SA 或
+  Kaiwu CIM 物理求解器。
+- **可与量化层配合**：不动点求解和最后一次带梯度的层调用是两个独立阶段，共享层可以
+  在任一阶段使用量化形式，见[与量化模型配合使用](#与量化模型配合使用)。
+
 ## 数据
 
 示例使用 ETTh1 电力变压器数据集（[ETDataset](https://github.com/zhouhaoyi/ETDataset)）。
@@ -59,17 +72,45 @@ z = deq(tokens)            # 与普通层一样调用
 deq.get_last_stats()       # 前向/反向步数、残差、sampler 耗时
 ```
 
-## 示例结果
+`simple_train_example.py` 用默认参数（2 个 epoch）在 CPU 上几分钟即可跑完，
+标准化空间下的测试 MSE 约为 0.43。
 
-运行 `simple_train_example.py`（默认参数，2 个 epoch）的结果，误差在标准化后的空间计算：
+## 结果：Kaiwu CIM 与 Anderson 对比
 
-| 前向求解器 | test MSE | test MAE | 平均前向步数 |
-| --- | ---: | ---: | ---: |
-| Anderson | 0.4263 | 0.4312 | 6.3 |
-| Kaiwu SA | 0.4280 | 0.4326 | 9.2 |
+为了在物理硬件上检验 Ising 求解器，用同一个训练好的 QDEQ checkpoint，分别以
+Kaiwu CIM 后端和经典的 Anderson 求解器做前向求解。设置如下：
 
-用 SA 训练得到的权重分别以 SA 和 Anderson 求解时，测试 MSE 均为 0.4280，说明 Ising
-求解器收敛到了同一个不动点。
+- 模型：iTransformer（`d_model = 256`），编码器为一个共享的 `QDEQ` 层，FP32
+- 数据：ETTh1，回看 96 步，预测 96 步
+- 样本：按顺序取测试集前 128 个窗口（4 个 batch，每个 32）
+- Ising 步：8 个搜索方向，每个系数 10 位
+
+| 前向求解器 | MSE | MAE |
+| --- | ---: | ---: |
+| Anderson | 0.28730 | 0.35111 |
+| Kaiwu CIM | 0.28728 | 0.35110 |
+
+两种求解器的预测结果 MSE 相差不到 0.01%，说明通过 CIM 求得的不动点与经典求解器一致。
+这里用到的 iTransformer 示例会在后续补充。
+
+## 与量化模型配合使用
+
+`QDEQ` 提供两个钩子，子类可以重写它们来切换共享层的状态：
+
+- `solve_context()`：包住整个不动点求解过程，这一阶段不计算梯度
+- `reattach_context()`：包住在不动点处的最后一次层调用，梯度从这里传回
+
+例如，在重新挂接梯度时让共享层使用 W8A8 伪量化（8 位权重和 8 位激活）：
+
+```python
+class QuantizedQDEQ(QDEQ):
+    def reattach_context(self):
+        return self.layer.quantized()   # 开启伪量化的上下文管理器
+```
+
+这样权重只需按 8 位存储。在我们用 iTransformer 做的五个预测数据集实验中，DEQ 共享层
+加上 W8A8 后，静态权重存储比显式多层模型减少 4.3×–12.8×。带 W8A8 量化的
+iTransformer 示例会在后续补充。
 
 ## 求解流程
 
