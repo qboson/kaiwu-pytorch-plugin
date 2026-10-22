@@ -99,7 +99,7 @@ class ModelTuner(object):
 		#set pytorch train mode
 		self._model.train()
 
-		total_train_loss = 0
+		total_train_loss, processed_count = 0, 0
 		for batch_idx, (inputData, label) in enumerate(self.train_loader):
 			#set gradients to zero before backprop. Needed in pytorch
 			# self._optimiser.zero_grad()
@@ -134,17 +134,23 @@ class ModelTuner(object):
 				bm_loss = self._model.bm_loss(q.detach(), getattr(self._config, 'weight_decay', 0.0))
 				bm_loss.backward()
 				self._bm_optimiser.step()
-				total_train_loss += train_loss.item() + bm_loss.item()  # 记录总损失
+				total_train_loss, processed_count = (
+					total_train_loss + (train_loss.item() + bm_loss.item()) * len(inputData),
+					processed_count + len(inputData),
+				)
 			else:
-				total_train_loss += train_loss.item()
+				total_train_loss, processed_count = (
+					total_train_loss + train_loss.item() * len(inputData),
+					processed_count + len(inputData),
+				)
 
 			# Output logging
 			if batch_idx % 100 == 0:
 				logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
 					epoch, batch_idx*len(inputData), len(self.train_loader.dataset),
-					100.*batch_idx/len(self.train_loader), train_loss.data.item()/len(inputData)))
+					100.*batch_idx/len(self.train_loader), train_loss.data.item()))
 		
-		total_train_loss /= len(self.train_loader.dataset)
+		total_train_loss /= processed_count
 		logger.info("Train Loss: {0}".format(total_train_loss))
 		return total_train_loss
 	
@@ -152,7 +158,7 @@ class ModelTuner(object):
 		logger.info("Testing Model")
 		self._model.eval()
 
-		test_loss = 0
+		test_loss, processed_count = 0, 0
 		zeta_list=None
 		label_list=None
 
@@ -161,13 +167,16 @@ class ModelTuner(object):
 				if self._config.type == 'QVAE':
 					# forward 返回: output_logits, posterior, q, zeta
 					output_logits, posterior, q, zeta = self._model(inputData)
-					test_loss += self._model.loss(inputData, output_logits, posterior)
+					test_loss, processed_count = (
+						test_loss + self._model.loss(inputData, output_logits, posterior) * len(inputData),
+						processed_count + len(inputData),
+					)
 
 					# 设置 outputData 为概率值（用于绘图）
 					outputData = torch.sigmoid(output_logits)
                     # # 记录 label_list
                     # label_list = label.detach().numpy() if label_list is None else np.append(label_list, label.detach().numpy(), axis=0)
 
-		test_loss /= len(self.test_loader.dataset)
+		test_loss /= processed_count
 		logger.info("Test Loss: {0}".format(test_loss))
 		return test_loss, inputData, outputData, label_list
