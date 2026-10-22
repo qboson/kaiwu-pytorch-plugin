@@ -125,3 +125,24 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+
+### Verification Case: Does the Documented Loop Learn?
+
+`example/learning_direction/` measures the training claim instead of trusting it.
+For a three-visible / two-hidden RBM every marginal probability is computable by
+enumerating the `2^5` states, so the example reports the exact mean `p(pattern)`
+and the energy gap before and after the documented loop
+(`get_hidden` → `sample` → `objective` → `step`).
+
+```bash
+python example/learning_direction/learning_direction.py
+```
+
+With the default settings the pattern probability rises from `0.124706` to
+`0.132095` and the energy gap turns positive. Negating the objective
+(`flip_sign=True`, documented in the example README) drops the probability to
+`0.0`, so the PASS/FAIL result is sensitive to the update direction rather than to
+noise. The negative phase is an exhaustive ground-state search, so no Kaiwu SDK
+credentials are required.
+
