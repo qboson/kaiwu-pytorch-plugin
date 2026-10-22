@@ -224,12 +224,13 @@ class Decoder(BasicDecoder):
     """Alternative decoder using sequential network."""
 
     def __init__(self, **kwargs):
+        kwargs["create_module_list"] = False
         super().__init__(**kwargs)
         self._network = self._create_network()
 
     def _create_network(self):
         """Create sequential network from node_sequence."""
-        layers = self._node_sequence
+        layers = self._node_sequence or []
         module_layers = []
 
         for idx, (n_in, n_out) in enumerate(layers):
@@ -237,9 +238,17 @@ class Decoder(BasicDecoder):
             # Apply activation function: output activation for last layer
             act_fct = (self._output_activation_fct
                 if idx == len(layers) - 1 else self._activation_fct)
-            module_layers.append(act_fct)
+            if act_fct is not None:
+                module_layers.append(act_fct)
 
         return nn.Sequential(*module_layers)
+
+    def get_weight_decay(self) -> torch.Tensor:
+        """Regularize the registered sequential linear layers."""
+        weights = [layer.weight for layer in self._network if isinstance(layer, nn.Linear)]
+        if not weights:
+            return torch.tensor(0.0)
+        return self.weight_decay * sum(weight.square().sum() for weight in weights)
 
     def decode(self, x):
         """Decode posterior sample."""

@@ -158,3 +158,8 @@ Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 - 为靶点发现提供新线索
 
 **相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)
+
+
+## Sequential decoder
+
+The alternative `Decoder` builds its sequential layers after decoder options are initialized. Omitting an activation leaves that stage linear; an empty network acts as the identity. Its weight-decay term covers the registered sequential linear weights.
