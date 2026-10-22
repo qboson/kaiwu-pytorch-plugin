@@ -125,3 +125,22 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+
+
+---
+
+### Toggling Usage Statistics
+
+KPP reports anonymous usage statistics only from its own sampler path. This
+example shows the default state, the runtime `enable_usage_stats()` /
+`disable_usage_stats()` switch, and the `KPP_STATS_ENABLED` environment
+variable (including the documented `true`/`1`/`yes`/`on` values).
+
+Run the example via `python example/usage_stats_switch/usage_stats_switch.py`.
+
+**Dependencies**
+
+```
+kaiwu-torch-plugin
+```
