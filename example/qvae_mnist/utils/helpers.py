@@ -3,6 +3,7 @@
 Unsorted helper functions
 """
 import os
+import operator
 import datetime
 import pandas as pd
 import numpy as np
@@ -317,12 +318,32 @@ def generate_qvae_images(model, save_path, grid_size=8):
 
 
 def get_real_images(dataloader, n_images=10000):
+    """Collect at most n_images real images without concatenating unused rows.
+
+    Return all available rows when the source is shorter than the request.
+    Batch construction itself remains the responsibility of the data loader.
+    """
+    if isinstance(n_images, bool):
+        raise TypeError("n_images must be a positive integer")
+    try:
+        n_images = operator.index(n_images)
+    except TypeError as exc:
+        raise TypeError("n_images must be a positive integer") from exc
+    if n_images <= 0:
+        raise ValueError("n_images must be a positive integer")
     images = []
+    count = 0
     for batch_imgs, _ in dataloader:
-        images.append(batch_imgs)
-        if sum(img.shape[0] for img in images) >= n_images:
+        needed = min(batch_imgs.shape[0], n_images - count)
+        if needed == 0:
+            continue
+        images.append(batch_imgs[:needed])
+        count += needed
+        if count == n_images:
             break
-    return torch.cat(images, dim=0)[:n_images]
+    if not images:
+        raise ValueError("dataloader produced no images")
+    return torch.cat(images, dim=0)
 
 
 def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
