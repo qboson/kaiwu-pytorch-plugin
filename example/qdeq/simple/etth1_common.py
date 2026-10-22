@@ -23,6 +23,26 @@ DEFAULT_CHECKPOINT = EXAMPLE_ROOT / "checkpoints" / "simple_etth1.pt"
 TRAIN_ROWS, VAL_ROWS, TEST_ROWS = 12 * 30 * 24, 4 * 30 * 24, 4 * 30 * 24
 
 
+def load_checkpoint(path):
+    """Loads a checkpoint saved by ``simple_train_example.py`` on the CPU.
+
+    Args:
+        path: Checkpoint path, as ``Path`` or string.
+
+    Returns:
+        dict: The saved payload with ``state_dict`` and ``sampler`` keys.
+
+    Raises:
+        FileNotFoundError: If the checkpoint does not exist.
+    """
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} not found. Run simple_train_example.py first or pass --checkpoint."
+        )
+    return torch.load(path, map_location="cpu")
+
+
 # Data.
 
 
