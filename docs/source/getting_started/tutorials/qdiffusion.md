@@ -7,3 +7,8 @@ Discrete diffusion generation for proteins with the generic `Q-Diffusion` core (
 **Examples**: `example/qdiffusion/simple/simple_train_example.py` · `example/qdiffusion/simple/simple_generate_example.py`
 
 **DPLM adaptation**: `example/qdiffusion/dplm/` · **Data**: UniProt proteome UP000005640
+
+
+## Aligned quality inputs
+
+The DPLM quality helpers compare records by position and require equal, nonzero record counts. Missing or extra records raise `ValueError` rather than silently scoring a shared prefix. Headers may differ between reference and generated sets; callers must align order before evaluation.
