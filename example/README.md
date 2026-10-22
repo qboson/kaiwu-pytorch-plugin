@@ -125,3 +125,22 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+
+
+---
+
+### Manual Q-Diffusion Decoding
+
+`generate` runs the decode loop internally, but `initialize_state` / `step`
+expose the same loop for custom stopping rules and per-step inspection. This
+example drives it manually, stops when no mask token remains, and checks that
+the manual result matches `generate` under the same seed.
+
+Run the example via `python example/qdiffusion_manual_decode/manual_decode.py`.
+
+**Dependencies**
+
+```
+torch
+```
