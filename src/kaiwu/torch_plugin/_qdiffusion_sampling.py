@@ -26,17 +26,18 @@ def topk_masking(
         temp: Noise temperature applied when ``stochastic`` is enabled.
 
     Returns:
-        torch.Tensor: A boolean mask where ``True`` marks positions below the per-sample
-        cutoff.
+        torch.Tensor: A boolean mask selecting exactly ``cutoff_len`` lowest-ranked
+        positions per row, including when scores tie. Cutoffs from zero to the
+        number of positions are supported.
     """
     if stochastic:
         gumbel_noise = -torch.log(-torch.log(torch.rand_like(scores) + 1e-8) + 1e-8)
         ranked_scores = scores + temp * gumbel_noise
     else:
         ranked_scores = scores
-    sorted_scores = ranked_scores.sort(-1)[0]
-    cutoff = sorted_scores.gather(dim=-1, index=cutoff_len)
-    return ranked_scores < cutoff
+    sorted_indices = ranked_scores.argsort(dim=-1, stable=True)
+    sorted_mask = torch.arange(scores.size(-1), device=scores.device) < cutoff_len
+    return torch.zeros_like(scores, dtype=torch.bool).scatter(-1, sorted_indices, sorted_mask)
 
 
 # Categorical sampling helpers.
