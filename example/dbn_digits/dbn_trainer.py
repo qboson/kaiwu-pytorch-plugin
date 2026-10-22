@@ -171,9 +171,6 @@ class DBNTrainer:
         if self.verbose:
             print("[DBN] Pre-training start:")
 
-        # Record samples during training
-        training_samples = []
-
         # Training loop
         for epoch in range(self.n_epochs_rbm):
             total_loss = 0.0  # Total objective value for the current epoch
@@ -192,22 +189,6 @@ class DBNTrainer:
                     # Sample and weight visualization
                     if self.plot_img:
                         self._visualize_training_progress(rbm, i, epoch, batch_x)
-
-                    # Record samples
-                    if i % 50 == 0:  # Record every 50 batches
-                        training_samples.append(
-                            {
-                                "batch": i,
-                                "epoch": epoch,
-                                "original": batch_x[:5]
-                                .cpu()
-                                .numpy(),  # Save a few original samples
-                                "weights": rbm.quadratic_coef.detach()
-                                .cpu()
-                                .numpy()
-                                .copy(),
-                            }
-                        )
 
                 # Calculate average objective value for the current epoch
                 avg_loss = total_loss / len(loader)
