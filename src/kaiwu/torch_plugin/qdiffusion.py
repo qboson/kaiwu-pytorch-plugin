@@ -14,6 +14,7 @@ import torch
 from torch import nn
 
 from .full_boltzmann_machine import BoltzmannMachine
+from ._qdiffusion_config import validate_generation_config
 from ._qdiffusion_sampling import (
     stochastic_sample_from_categorical,
     stochastic_sample_from_categorical_n,
@@ -243,6 +244,7 @@ class QDiffusion(nn.Module):
         self.energy_model = energy_model
         self.token_spec = token_spec
         self.config = config or QDiffusionConfig()
+        validate_generation_config(self.config)
         self.dtype = dtype
 
         if freeze_proposal:
