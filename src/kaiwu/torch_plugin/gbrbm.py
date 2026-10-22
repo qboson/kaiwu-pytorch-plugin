@@ -181,11 +181,14 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 dim=-1,
             )
 
+    @torch.no_grad()
     def _to_ising_matrix(self):
         """Convert the Bernoulli part to Ising format.
 
         This method converts the Bernoulli part of the model to an equivalent
-        Ising model representation for optimization purposes.
+        Ising model representation for optimization purposes. The NumPy solver
+        boundary is non-differentiable, so conversion does not record autograd
+        operations even when called during gradient-enabled training.
 
         Returns:
             numpy.ndarray: Ising matrix representation of the Bernoulli part.
