@@ -73,6 +73,10 @@ factory helper 间接接入。
 
 如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
+DPLM 网络会使用调用者显式传入的 `attention_mask`，包括提供条件化
+`inputs_embeds` 的情况。省略该参数时，按非 padding token ID 推断掩码。
+掩码中用 `1` 表示可见位置，用 `0` 表示不参与注意力的位置。
+
 它的端到端流程如下：
 
 1. 读取并过滤 FASTA 记录

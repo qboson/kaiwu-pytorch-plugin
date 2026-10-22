@@ -364,7 +364,6 @@ class _EsmForDPLM(EsmPreTrainedModel):
         **kwargs: Any,
     ):
         del (
-            attention_mask,
             position_ids,
             head_mask,
             labels,
@@ -377,7 +376,8 @@ class _EsmForDPLM(EsmPreTrainedModel):
         if input_ids is None:
             raise ValueError("input_ids must be provided for the DPLM example runtime.")
 
-        attention_mask = input_ids.ne(self.pad_id)
+        if attention_mask is None:
+            attention_mask = input_ids.ne(self.pad_id)
         outputs = self.esm(
             input_ids,
             inputs_embeds=inputs_embeds,
