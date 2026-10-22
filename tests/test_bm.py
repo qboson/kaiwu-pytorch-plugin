@@ -116,6 +116,33 @@ class TestBoltzmannMachine(unittest.TestCase):
             self.assertEqual(ising_submat.shape, (3, 3))
             self.assertIsInstance(ising_submat, np.ndarray)
 
+    def test_hidden_to_ising_matrix_bias_scaling(self):
+        """测试_hidden_to_ising_matrix中偏置系数除以8的数学回归正确性"""
+        s_visible = torch.tensor([1.0, 0.0])
+        ising_submat = self.bm._hidden_to_ising_matrix(s_visible)
+
+        # 检查 sub_column_sums / 8 偏置项数学计算
+        # n_vis = 2, n_hid = 2, sub_quadratic = [[0, -6], [-6, 0]]
+        # sub_column_sums = [-6, -6], sub_linear = [0, 0]
+        # ising_bias 应为 sub_linear / 4 + sub_column_sums / 8 = [-0.75, -0.75]
+        expected_bias = np.array([-0.75, -0.75], dtype=np.float32)
+        np.testing.assert_allclose(ising_submat[:-1, -1], expected_bias, rtol=1e-5)
+        np.testing.assert_allclose(ising_submat[-1, :-1], expected_bias, rtol=1e-5)
+
+        # 验证玻尔兹曼机能量与Ising自旋能量差的数学等价性:
+        # Delta E_BM(s_h1, s_h2 | s_v) == - (sigma1^T Q sigma1 - sigma2^T Q sigma2)
+        s_h1 = torch.tensor([1.0, 1.0])
+        s_h2 = torch.tensor([0.0, 0.0])
+        s_full1 = torch.cat([s_visible, s_h1]).unsqueeze(0)
+        s_full2 = torch.cat([s_visible, s_h2]).unsqueeze(0)
+        bm_energy_diff = (self.bm(s_full1) - self.bm(s_full2)).item()
+
+        sigma1 = np.array([1.0, 1.0, 1.0])   # 2*s_h1 - 1, 附加自旋 1
+        sigma2 = np.array([-1.0, -1.0, 1.0]) # 2*s_h2 - 1, 附加自旋 1
+        ising_energy_diff = float(sigma1 @ ising_submat @ sigma1 - sigma2 @ ising_submat @ sigma2)
+
+        self.assertAlmostEqual(bm_energy_diff, -ising_energy_diff, places=5)
+
     def test_condition_sample(self):
         """测试condition_sample功能"""
 
