@@ -95,6 +95,8 @@ qvae_energy_umap.png              # Energy UMAP
 qvae_energy_by_celltype.png       # Energy distribution by cell type
 ```
 
+The reconstruction and KL curves use the raw batch loss components before KL weighting or weight decay. Each `QVAE.loss` call refreshes `last_recon_loss` and `last_kl_loss` as detached scalar tensors for logging; the total loss used for optimization includes `kl_beta` and weight decay.
+
 ## Evaluation
 
 The unified evaluation entry point is `evaluate_benchmark.py`. Use `--metrics` to select the evaluation items to run:
