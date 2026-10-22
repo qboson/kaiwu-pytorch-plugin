@@ -49,10 +49,12 @@ bm_generation
 
 rbm_classification
 dbn_classification
+feature_selection
 ```
 
 - [RBM Classification: Handwritten Digit Recognition](rbm_classification.md): Feature learning and classification with a single RBM. Example: `example/rbm_digits/rbm_digits.ipynb`.
 - [DBN Classification: Deep Belief Networks](dbn_classification.md): Stacking RBMs into a Deep Belief Network for hierarchical features. Example: `example/dbn_digits/supervised_dbn_digits.ipynb`.
+- [Quantum Feature Selection](feature_selection.md): Selecting informative input features with a QUBO-based mask and local/SA/CIM solvers. Example: `example/feature_selection/linear_regression_solvers.py`.
 
 ## Tutorial 3: Quantum Variational Autoencoder (Q-VAE)
 
