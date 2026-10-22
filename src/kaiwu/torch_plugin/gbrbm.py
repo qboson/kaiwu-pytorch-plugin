@@ -135,6 +135,27 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """
         return self.energy(s_all, enable_grad=True)
 
+    @staticmethod
+    def _validate_state_width(
+        state: torch.Tensor,
+        expected: int,
+        name: str,
+    ) -> None:
+        """Rejects a state tensor whose shape does not match the unit count.
+
+        Args:
+            state: Gaussian or Bernoulli state tensor.
+            expected: Required number of units in the last dimension.
+            name: Argument name used in the error message.
+
+        Raises:
+            ValueError: If ``state`` is not two-dimensional or has the wrong width.
+        """
+        if state.ndim != 2 or state.shape[-1] != expected:
+            raise ValueError(
+                f"{name} must have shape (batch, {expected}), got {tuple(state.shape)}"
+            )
+
     def energy(self, s_all: torch.Tensor, enable_grad: bool = False) -> torch.Tensor:
         """Compute the Hamiltonian.
 
@@ -224,6 +245,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Complete state tensor with both Gaussian and Bernoulli nodes.
 
         """
+        self._validate_state_width(s_gaussian, self.num_gaussian, "s_gaussian")
         with torch.no_grad():
             n_sample = s_gaussian.shape[0]
             s_all = torch.zeros(
@@ -259,6 +281,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Complete state tensor with both Gaussian and Bernoulli nodes.
 
         """
+        self._validate_state_width(s_bernoulli, self.num_bernoulli, "s_bernoulli")
         with torch.no_grad():
             n_sample = s_bernoulli.shape[0]
             s_all = torch.zeros(
@@ -295,6 +318,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Samples generated through Gibbs sampling.
         """
+        if s_gaussian is not None:
+            self._validate_state_width(s_gaussian, self.num_gaussian, "s_gaussian")
+        if s_bernoulli is not None:
+            self._validate_state_width(s_bernoulli, self.num_bernoulli, "s_bernoulli")
         n_burnin_ = n_burnin - 1
         with torch.no_grad():
             if s_gaussian is not None:
