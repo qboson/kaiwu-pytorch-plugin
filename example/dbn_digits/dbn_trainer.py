@@ -212,14 +212,18 @@ class DBNTrainer:
                 # Calculate average objective value for the current epoch
                 avg_loss = total_loss / len(loader)
 
-                # Print epoch average loss every 5 batches
+                # Print the running average over the batches processed so far
                 if self.verbose and i % 5 == 0:
-                    print(f"Iteration {i+1}, Average Loss: {avg_loss:.6f}")
+                    print(f"Iteration {i+1}, Average Loss: {total_loss / (i + 1):.6f}")
 
             # Print average loss and data shape for each RBM layer
             if self.verbose:
                 print(f"Layer {layer_idx+1}, Epoch {epoch+1}: Loss {avg_loss:.6f}")
-                print(f"Output shape after layer {layer_idx+1}: {data_in.shape}")
+                # data_in 仍是该层的输入，输出宽度由隐藏单元数决定
+                print(
+                    f"Output shape after layer {layer_idx+1}: "
+                    f"torch.Size([{data_in.shape[0]}, {rbm.num_hidden}])"
+                )
 
             # Print average loss for each epoch
             if self.verbose:
