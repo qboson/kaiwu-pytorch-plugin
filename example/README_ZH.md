@@ -9,6 +9,23 @@
 
 ---
 
+### QUBO 求解：Max-Cut 与 Ising 转换
+
+`example/qubo_solver/` 演示公开的 `QuadraticLinearSolver` 与 `solve_qubo`
+接口。示例在小型 Max-Cut 问题上构造 QUBO，将其转换为带辅助自旋的 Ising
+矩阵，使用内置 `local_search` 后端求解，并用穷举法验证结果。运行该示例
+不需要 Kaiwu 许可证。
+
+运行方式：
+
+```bash
+python example/qubo_solver/run_qubo_solver.py --nodes 5
+```
+
+算法说明与输出示例见 `example/qubo_solver/README_ZH.md`。
+
+---
+
 ### 分类任务：手写数字识别
 
 本节提供了两种互补的方法，分别基于不同的神经网络架构实现手写数字识别，均展示了无监督特征学习在分类任务中的作用。
