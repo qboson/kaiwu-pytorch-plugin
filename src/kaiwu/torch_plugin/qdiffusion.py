@@ -791,11 +791,18 @@ class QDiffusion(nn.Module):
             for the selected candidate per sample.
         """
         energies = self._score_candidates(noisy_tokens, candidate_tokens)
-        neg_energies = -energies
-        neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
-        weights = torch.softmax(neg_energies / self.config.energy_temperature, dim=-1)
-        selected_idx = torch.multinomial(weights, 1).squeeze(-1)
+        temperature = self.config.energy_temperature
         batch_idx = torch.arange(noisy_tokens.size(0), device=noisy_tokens.device)
+        if temperature < 0:
+            raise ValueError("energy_temperature must be non-negative")
+        if temperature == 0:
+            # Deterministic limit of the reranking distribution: lowest energy wins.
+            selected_idx = energies.argmin(dim=-1)
+        else:
+            neg_energies = -energies
+            neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
+            weights = torch.softmax(neg_energies / temperature, dim=-1)
+            selected_idx = torch.multinomial(weights, 1).squeeze(-1)
         return (
             candidate_tokens[batch_idx, selected_idx],
             candidate_scores[batch_idx, selected_idx],
