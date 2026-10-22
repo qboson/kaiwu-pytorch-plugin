@@ -137,7 +137,18 @@ class EnergyModel(nn.Module):
         self,
         visible_state: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Samples BM hidden states for each visible assignment."""
+        """Samples BM hidden states for each visible assignment.
+
+        Args:
+            visible_state: Visible assignments, shape ``(batch, num_visible)``.
+
+        Returns:
+            tuple[torch.Tensor, torch.Tensor]: The concatenated sampled states
+            and the per-assignment solution counts.
+
+        Raises:
+            RuntimeError: If the BM dimensions or the sampler are not configured.
+        """
         if not hasattr(self, "energy_bm") or self.sampler is None:
             raise RuntimeError(
                 "BM hidden-state sampling requires bm_num_visible, "
