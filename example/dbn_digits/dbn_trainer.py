@@ -15,6 +15,14 @@ from kaiwu.torch_plugin.dbn import UnsupervisedDBN
 from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
 
+def _image_layout(num_features: int) -> tuple:
+    """Return a ``(rows, cols)`` layout whose product is ``num_features``."""
+    side = int(num_features**0.5)
+    for rows in range(side, 0, -1):
+        if num_features % rows == 0:
+            return rows, num_features // rows
+    return 1, num_features
+
 # =================== Unsupervised DBN Trainer =====================
 class DBNTrainer:
     """A trainer for the DBN model.
@@ -318,7 +326,7 @@ class DBNTrainer:
             )
 
         plt.figure(figsize=(16, 2))
-        plt.imshow(self._gen_digits_image(display_samples, 8))
+        plt.imshow(self._gen_digits_image(display_samples))
         plt.title(f"Generated Samples - Epoch {epoch+1}, Batch {batch_idx+1}")
         plt.axis("off")
 
@@ -368,6 +376,7 @@ class DBNTrainer:
             epoch (int): The current epoch.
         """
         batch_numpy = batch_data.cpu().numpy()
+        rows, cols = _image_layout(batch_numpy.shape[1])
 
         # Use static reconstruction method
         recon_imgs, _ = UnsupervisedDBN.reconstruct_with_rbm(rbm, batch_numpy)
@@ -382,12 +391,12 @@ class DBNTrainer:
 
         for i in range(n_show):
             # Original image
-            axes[0, i].imshow(original_imgs[i].reshape(8, 8), cmap="gray")
+            axes[0, i].imshow(original_imgs[i].reshape(rows, cols), cmap="gray")
             axes[0, i].set_title(f"Original {i+1}")
             axes[0, i].axis("off")
 
             # Reconstructed image
-            axes[1, i].imshow(recon_imgs[i].reshape(8, 8), cmap="gray")
+            axes[1, i].imshow(recon_imgs[i].reshape(rows, cols), cmap="gray")
             axes[1, i].set_title(f"Reconstructed {i+1}")
             axes[1, i].axis("off")
 
@@ -417,18 +426,22 @@ class DBNTrainer:
             f"Reconstruction Error = {avg_recon_error:.6f}\n"
         )
 
-    def _gen_digits_image(self, data_in, size=8):
+    def _gen_digits_image(self, data_in, size=None):
         """Generates an image from digit data.
 
         Args:
             data_in (numpy.ndarray): The digit data.
             size (int, optional): The size of each digit image (size x size).
-                Defaults to 8.
+                If None, a square-ish layout is derived from the feature count.
 
         Returns:
             numpy.ndarray: A horizontally stacked image of digits.
         """
-        digits = data_in.reshape(20, size, size)
+        if size is None:
+            rows, cols = _image_layout(data_in.shape[1])
+        else:
+            rows = cols = size
+        digits = data_in.reshape(data_in.shape[0], rows, cols)
         image = np.hstack(digits)
         return image
 
