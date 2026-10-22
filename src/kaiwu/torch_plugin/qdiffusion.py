@@ -494,6 +494,7 @@ class QDiffusion(nn.Module):
         )
         return new_state
 
+    @torch.no_grad()
     def generate(
         self,
         input_tokens: torch.Tensor,
@@ -503,7 +504,12 @@ class QDiffusion(nn.Module):
         temperature: float = 1.0,
         return_state: bool = False,
     ) -> torch.Tensor | dict[str, Any]:
-        """Runs a complete iterative decoding loop inside the core class.
+        """Runs a complete iterative decoding loop without recording gradients.
+
+        This inference entry point leaves module train/eval modes and parameter
+        ``requires_grad`` flags unchanged. Returned state scores are detached
+        from autograd. Use ``initialize_state`` and ``step`` directly when a
+        caller-controlled gradient context is required for a custom decode loop.
 
         Args:
             input_tokens: Initial token tensor.
