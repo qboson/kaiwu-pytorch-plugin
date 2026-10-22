@@ -97,6 +97,9 @@ class Exponential(SmoothingDist):
     def sample(self, shape: tuple) -> torch.Tensor:
         """Sampling.
 
+        For beta >= 1, the inverse CDF retains the exp(-beta) survival component
+        to keep upper-tail quantiles accurate when uniform draws approach one.
+
         Args:
             shape (tuple): Sample shape.
 
@@ -105,7 +108,12 @@ class Exponential(SmoothingDist):
         """
         rho = torch.rand(shape)
         zeta = -torch.log(1.0 - (1.0 - torch.exp(-self.beta)) * rho) / self.beta
-        return zeta
+        # Keep the two survival components separate: normalizing first can round
+        # away exp(-beta), even with expm1, and distort upper-tail quantiles.
+        log_tail_survival = torch.logaddexp(
+            torch.log1p(-rho), torch.log(rho) - self.beta
+        )
+        return torch.where(self.beta >= 1.0, -log_tail_survival / self.beta, zeta)
 
     def log_pdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Log probability density.
