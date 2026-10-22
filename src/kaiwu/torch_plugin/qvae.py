@@ -261,7 +261,8 @@ class QVAE(AutoEncoderBase):
         """Compute total loss (reconstruction + KL + weight decay).
 
         Args:
-            x (torch.Tensor): Input tensor (batch_size, input_dim).
+            x (torch.Tensor): Input tensor. Flattened internally to
+                (batch_size, input_dim), so image-shaped inputs are accepted.
             recon_x (torch.Tensor): Reconstructed logits (batch_size, input_dim).
             posterior (MixtureGeneric): Posterior distribution object.
             q (torch.Tensor): Encoder logits (batch_size, latent_dim).
@@ -273,10 +274,9 @@ class QVAE(AutoEncoderBase):
         Raises:
             ValueError: If loss_type is not supported.
         """
+        x = x.view(-1, self._input_dimension)
         if self.config.loss_type == "mse":
-            recon_loss = F.mse_loss(
-                recon_x, x.view(-1, self._input_dimension), reduction="sum"
-            ) / x.size(0)
+            recon_loss = F.mse_loss(recon_x, x, reduction="sum") / x.size(0)
         elif self.config.loss_type == "bernoulli":  # bernoulli
             # recon_loss = F.binary_cross_entropy_with_logits(
             #     recon_x,
