@@ -470,6 +470,8 @@ def evaluate_qvae_fid(trainer, fake_imgs, real_imgs, device, save_path=None, bat
         batch_size=batch_size
     )
     if save_path is not None:
+        # 结果目录可能还不存在，先创建，避免在算完 FID 之后才因写文件失败
+        os.makedirs(save_path, exist_ok=True)
         fid_result_path = os.path.join(save_path, "fid_results.txt")
         with open(fid_result_path, "w") as f:
             f.write(f"FID分数: {fid_score:.4f}\n")
