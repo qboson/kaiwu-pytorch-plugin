@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.multiclass import unique_labels
 
 import torch
 import torch.nn as nn
@@ -632,7 +633,7 @@ class RBMVisualizer:
         save_as="confusion_matrix",
         save_pdf=False,
     ):
-        """绘制混淆矩阵
+        """绘制混淆矩阵，两轴显示真实类别标签而非矩阵下标。
 
         Args:
             y_true: 真实标签
@@ -641,9 +642,13 @@ class RBMVisualizer:
             save_as (str): 保存文件名
             save_pdf (bool): 是否保存为PDF
         """
-        cm = confusion_matrix(y_true, y_pred)
+        labels = unique_labels(y_true, y_pred)
+        cm = confusion_matrix(y_true, y_pred, labels=labels)
         plt.figure(figsize=(10, 8))
-        sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
+        sns.heatmap(
+            cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=labels, yticklabels=labels,
+        )
         plt.title(f"Confusion Matrix ({title_suffix})", fontsize=18)
         plt.xlabel("Predicted Label", fontsize=16)
         plt.ylabel("True Label", fontsize=16)
