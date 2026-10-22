@@ -53,13 +53,18 @@ the form that quantum annealing hardware and CIMs are designed to handle. KPP co
 
 ## Classical and Quantum Samplers in KPP
 
-KPP uses different sampling backends through the same `sample(sampler)` call, used in the [Quick Start](../quickstart.md) example. `SimulatedAnnealingOptimizer` suits local debugging and baseline experiments; `CIMOptimizer` requires valid Kaiwu SDK credentials and real-machine access. The two should be compared on the same model, sampling budget, and evaluation metrics, never inferred from the sampler type alone.
+KPP uses different sampling backends through the same `sample(sampler)` call, used in the [Quick Start](../quickstart.md) example. `SimulatedAnnealingOptimizer` suits local debugging and baseline experiments; `CIMOptimizer` requires valid Kaiwu SDK credentials and real-machine access. A CIM task also writes intermediate records, so the Kaiwu SDK requires a save directory *before* `CIMOptimizer` can be constructed; every runnable example in the repository sets `CheckpointManager.save_dir` first, as shown below. The two should be compared on the same model, sampling budget, and evaluation metrics, never inferred from the sampler type alone.
 
 ```python
+import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
 
 classical_sampler = SimulatedAnnealingOptimizer()
+
+# A CIM task writes intermediate records; the SDK requires a save directory
+# before the sampler can be constructed.
+kw.common.CheckpointManager.save_dir = './tmp'
 quantum_sampler = CIMOptimizer(task_name="my_experiment", wait=True)
 ```
 
