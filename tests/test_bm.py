@@ -132,7 +132,7 @@ class TestBoltzmannMachine(unittest.TestCase):
             self.assertEqual(result.shape, (2, self.num_nodes))
             self.assertIsInstance(result, torch.Tensor)
 
-    def test_get_ising_matrix(self):
+    def test_get_ising_matrix_energy_consistency(self):
         with self.subTest("Unbounded weight range"):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
             J_true = torch.FloatTensor(
