@@ -75,6 +75,14 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+## 在 notebook 中复用权重
+
+在 `train_qvae_cell.ipynb` 中，创建 `args` 前设置 `Args.load_weights = True`，
+并让 `output_dir` 指向包含 `immune_kpp_qvae_best.pth` 的目录。权重单元会加载
+checkpoint 到 `device_obj`，跳过训练，继续进行表征提取和能量评估。由于本次没有
+产生训练历史，曲线单元会跳过绘图。请保持模型和数据配置与 checkpoint 一致；
+文件缺失或不兼容时会直接报错，不会自动开始新训练。
+
 ## 输出
 
 训练脚本会在 `--output-dir` 下生成：
