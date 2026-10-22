@@ -140,14 +140,18 @@ Kaiwu-pytorch-plugin/
 │   ├── gbrbm.py
 │   ├── dbn.py
 │   ├── qvae.py
-│   └── qdiffusion.py
+│   ├── qvae_dist_util.py
+│   ├── qdiffusion.py
+│   ├── usage_stats.py
+│   └── maifs/                # FeatureSelectionWrapper, QuadraticLinearSolver
 ├── example/                   # Application examples
-│   ├── rbm_digits
-│   ├── dbn_digits
+│   ├── rbm_digits/
+│   ├── dbn_digits/
 │   ├── bm_generation/
 │   ├── qvae_mnist/
 │   ├── qvae_cell/
-│   └── qdiffusion/
+│   ├── qdiffusion/
+│   └── feature_selection/
 ├── tests/                      # Test suite
 │   └── test_rbm.py
 ├── requirements/               # Dependencies & Docker
@@ -157,12 +161,16 @@ Kaiwu-pytorch-plugin/
 
 ### Key Code Entities
 
-| Entity                           | Description                                                                                                                        |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **`AbstractBoltzmannMachine`**   | Base class defining the interface for all models                                                                                   |
-| **`BoltzmannMachine`**           | Fully connected; uses `condition_sample()` for positive phase                                                                      |
-| **`RestrictedBoltzmannMachine`** | Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy definition                                               |
-| **`GaussianBernoulliRBM`**       | RBM variant with real-valued visible units (Gaussian distribution) and binary hidden units (Bernoulli distribution), or vice versa |
+| Entity                                           | Description                                                                                                                        |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **`AbstractBoltzmannMachine`**                   | Base class defining the interface for all models                                                                                   |
+| **`BoltzmannMachine`**                           | Fully connected; uses `condition_sample()` for positive phase                                                                      |
+| **`RestrictedBoltzmannMachine`**                 | Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy definition                                               |
+| **`GaussianBernoulliRestrictedBoltzmannMachine`** | RBM variant with real-valued visible units (Gaussian distribution) and binary hidden units (Bernoulli distribution), or vice versa |
+| **`UnsupervisedDBN`**                            | Stack of RBMs with layer-wise pretraining, `transform()` and per-layer `reconstruct()`                                             |
+| **`QVAE`**                                       | Quantum variational autoencoder trained with a Boltzmann-machine prior                                                             |
+| **`QDiffusion`**                                 | Energy-guided discrete diffusion; reranks proposal candidates with an `EnergyModel`                                                |
+| **`FeatureSelectionWrapper`**                    | Hard feature mask trained with the MAIFS QUBO solvers (`local_search`, `sa`, `kaiwu_cim`)                                          |
 
 ## Kaiwu SDK Configuration & License
 
