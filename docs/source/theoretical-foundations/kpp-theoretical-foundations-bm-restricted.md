@@ -173,6 +173,28 @@ $$F_\theta(\mathbf{v}) = -\mathbf{b}^\top \mathbf{v} - \sum_{j=1}^{N_h} \log \le
 
 **This analytical form is a key computational advantage of the RBM over the classic Boltzmann machine.** It allows us to evaluate the relative likelihood of different visible vectors in $O(N_v N_h)$ **time**, without enumerating the $2^{N_h}$ hidden configurations. However, **the absolute likelihood remains intractable**.
 
+The plugin exposes this closed form as `RestrictedBoltzmannMachine.marginal_energy(s_visible, enable_grad=False)`. It returns one free energy per visible vector and uses a stable softplus calculation, including for large hidden logits. The following CPU example compares two visible states:
+
+```python
+import torch
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+
+rbm = RestrictedBoltzmannMachine(
+    num_visible=2,
+    num_hidden=2,
+    quadratic_coef=torch.tensor([[0.4, -0.2], [0.3, 0.5]]),
+    linear_bias=torch.tensor([0.1, -0.1, 0.2, -0.3]),
+    device="cpu",
+)
+visible = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+free_energy = rbm.marginal_energy(visible)
+log_probability_ratio = free_energy[1] - free_energy[0]
+print("F(v):", free_energy)
+print("log(P(v0) / P(v1)):", log_probability_ratio)
+```
+
+The log ratio is $\log P_\theta(\mathbf{v}_0)-\log P_\theta(\mathbf{v}_1)=F_\theta(\mathbf{v}_1)-F_\theta(\mathbf{v}_0)$, so the unknown partition function cancels. This comparison needs neither sampling nor an estimate of $Z_\theta$. The method returns unnormalized free energies; absolute negative log-likelihood is $F_\theta(\mathbf{v})+\log Z_\theta$ and still requires the log partition function. Evaluation disables gradients by default. Pass `enable_grad=True` when using free energy in a differentiable objective to retain gradients for both the input and model parameters.
+
 ## Free Energy vs. Expected Energy
 
 To gain deeper physical intuition, it is instructive to compare the free energy with the **expected energy** under the conditional distribution of hidden units:
