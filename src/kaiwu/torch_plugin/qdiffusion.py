@@ -45,6 +45,16 @@ class SequenceTokenSpec:
     x_id: int | None = None
     tokenizer: Any | None = None
 
+    def __post_init__(self) -> None:
+        """Rejects ids that cannot identify distinct special tokens."""
+        values = [self.pad_id, self.bos_id, self.eos_id, self.mask_id]
+        if self.x_id is not None:
+            values.append(self.x_id)
+        if any(not isinstance(token, int) or token < 0 for token in values):
+            raise ValueError("special-token ids must be non-negative integers")
+        if len(set(values)) != len(values):
+            raise ValueError("special-token ids must be distinct")
+
 
 @dataclass
 class QDiffusionConfig:
