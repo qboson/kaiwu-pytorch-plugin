@@ -191,8 +191,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             numpy.ndarray: Ising matrix representation of the Bernoulli part.
         """
         linear_term = self.quadratic_coef.t() @ (self.mu / self.var) + self.linear_bias
-        quadratic_term = (
-            self.quadratic_coef.t() @ self.diag_precision @ self.quadratic_coef
+        # Apply diagonal precision by row scaling without a Gaussian-size square matrix.
+        quadratic_term = self.quadratic_coef.t() @ (
+            self.quadratic_coef / self.var[:, None]
         )
         column_sums = torch.sum(quadratic_term, dim=0)
         num_nodes = self.num_bernoulli
