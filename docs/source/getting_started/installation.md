@@ -157,12 +157,15 @@ Kaiwu-pytorch-plugin/
 
 ### Key Code Entities
 
-| Entity                           | Description                                                                                                                        |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **`AbstractBoltzmannMachine`**   | Base class defining the interface for all models                                                                                   |
-| **`BoltzmannMachine`**           | Fully connected; uses `condition_sample()` for positive phase                                                                      |
-| **`RestrictedBoltzmannMachine`** | Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy definition                                               |
-| **`GaussianBernoulliRBM`**       | RBM variant with real-valued visible units (Gaussian distribution) and binary hidden units (Bernoulli distribution), or vice versa |
+All entities below are importable from the package root, e.g.
+`from kaiwu.torch_plugin import RestrictedBoltzmannMachine`.
+
+| Entity                                        | Description                                                                                                                        |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **`AbstractBoltzmannMachine`**                | Base class defining the interface for all models                                                                                   |
+| **`BoltzmannMachine`**                        | Fully connected; uses `condition_sample()` for positive phase                                                                      |
+| **`RestrictedBoltzmannMachine`**              | Bipartite graph with `quadratic_coef` and `linear_bias` for custom energy definition                                               |
+| **`GaussianBernoulliRestrictedBoltzmannMachine`** | RBM variant with real-valued visible units (Gaussian distribution) and binary hidden units (Bernoulli distribution), or vice versa |
 
 ## Kaiwu SDK Configuration & License
 
