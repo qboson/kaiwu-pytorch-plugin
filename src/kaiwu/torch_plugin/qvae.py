@@ -77,8 +77,22 @@ class AutoEncoderBase(nn.Module):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def forward(self, x):
+    def forward(self, x, *args, **kwargs):
         """Forward pass. Must be implemented in subclasses."""
+        raise NotImplementedError
+
+    def guide(self, x, *args, **kwargs):
+        """Variational guide q_phi(z|x): infer latent posterior and sample latent code.
+
+        Must be implemented in subclasses.
+        """
+        raise NotImplementedError
+
+    def decode(self, zeta, *args, **kwargs):
+        """Generative decoder p_theta(x|z): decode latent code into data space.
+
+        Must be implemented in subclasses.
+        """
         raise NotImplementedError
 
     def set_dataset_mean(self, mean):
@@ -219,16 +233,18 @@ class QVAE(AutoEncoderBase):
         clipped_mean = torch.clamp(mean.reshape(-1), 0.001, 0.999).detach()
         self._train_bias.copy_(-torch.log(1 / clipped_mean - 1))
 
-    def forward(self, x):
-        """
-        Forward pass through the QVAE.
+    def guide(self, x, *args, **kwargs):
+        """Variational guide q_phi(z|x): infer latent posterior and sample zeta.
 
         Args:
             x (torch.Tensor): Input tensor of shape (batch_size, input_dim).
+            *args, **kwargs: Additional optional condition arguments.
 
         Returns:
-            tuple: Reconstructed logits, posterior distribution, encoder logits,
-                and reparameterized latent sample.
+            tuple: (posterior, q, zeta)
+                - posterior: Posterior distribution object (e.g. MixtureGeneric).
+                - q: Encoder output logits (batch_size, latent_dim).
+                - zeta: Reparameterized latent sample (batch_size, latent_dim).
         """
         x = x.view(-1, self._input_dimension)
 
@@ -248,13 +264,39 @@ class QVAE(AutoEncoderBase):
 
         q = self.encoder(encoder_x)  # encoder must implement forward
         posterior, zeta = self.posterior(q, self.config.dist_beta)
+        return posterior, q, zeta
 
+    def decode(self, zeta, *args, **kwargs):
+        """Generative decoder p_theta(x|z): decode latent sample into data space.
+
+        Args:
+            zeta (torch.Tensor): Latent representation sample (batch_size, latent_dim).
+            *args, **kwargs: Additional optional condition arguments.
+
+        Returns:
+            torch.Tensor: Reconstructed output logits recon_x.
+        """
         recon_x = self.decoder(zeta)  # decoder must implement forward
 
         # Add Bernoulli bias if needed
         if self.config.loss_type == "bernoulli":
             recon_x = recon_x + self._train_bias
 
+        return recon_x
+
+    def forward(self, x, *args, **kwargs):
+        """Forward pass through the QVAE, composing guide and decode.
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, input_dim).
+            *args, **kwargs: Additional optional condition arguments.
+
+        Returns:
+            tuple: Reconstructed logits, posterior distribution, encoder logits,
+                and reparameterized latent sample.
+        """
+        posterior, q, zeta = self.guide(x, *args, **kwargs)
+        recon_x = self.decode(zeta, *args, **kwargs)
         return recon_x, posterior, q, zeta
 
     def loss(self, x, recon_x, posterior):
@@ -264,8 +306,6 @@ class QVAE(AutoEncoderBase):
             x (torch.Tensor): Input tensor (batch_size, input_dim).
             recon_x (torch.Tensor): Reconstructed logits (batch_size, input_dim).
             posterior (MixtureGeneric): Posterior distribution object.
-            q (torch.Tensor): Encoder logits (batch_size, latent_dim).
-            zeta (torch.Tensor): Latent sample (batch_size, latent_dim).
 
         Returns:
             torch.Tensor: Total loss scalar.
@@ -278,11 +318,6 @@ class QVAE(AutoEncoderBase):
                 recon_x, x.view(-1, self._input_dimension), reduction="sum"
             ) / x.size(0)
         elif self.config.loss_type == "bernoulli":  # bernoulli
-            # recon_loss = F.binary_cross_entropy_with_logits(
-            #     recon_x,
-            #     x.view(-1, self._input_dimension),
-            #     reduction='sum'
-            # ) / x.size(0)
             output_dist = FactorialBernoulliUtil(recon_x)
             recon_loss = -output_dist.log_prob_per_var(x).sum(dim=1).mean()
         else:
@@ -296,6 +331,8 @@ class QVAE(AutoEncoderBase):
 
         # Total loss
         total_loss = recon_loss + self.kl_beta * kl_loss + wd_loss
+        self.last_recon_loss = recon_loss.detach()
+        self.last_kl_loss = kl_loss.detach()
         return total_loss
 
     def bm_loss(self, q, bm_weight_decay=0.0):
@@ -379,3 +416,328 @@ class QVAE(AutoEncoderBase):
         if hasattr(self.bm, "linear_bias"):
             wd += self.weight_decay * 0.5 * torch.sum(self.bm.linear_bias**2)
         return wd
+
+
+class Trace_ELBO:
+    """Evidence Lower Bound (ELBO) loss engine aligning with pyro.infer.Trace_ELBO.
+
+    Orchestrates the strictly separated execution of the variational guide q_phi(z|x)
+    and the generative model p_theta(x|z):
+    1. Invokes guide(x, *args, **kwargs) to obtain the variational posterior and sample zeta.
+    2. Invokes model decoding to reconstruct observations from zeta.
+    3. Evaluates the negative ELBO objective:
+       Loss = Reconstruction_Loss + kl_beta * KL_Divergence + Regularization
+
+    Args:
+        num_particles (int): Number of Monte Carlo particles (defaults to 1).
+    """
+
+    def __init__(self, num_particles=1):
+        self.num_particles = num_particles
+
+    def differentiable_loss(self, model, guide, x, *args, **kwargs):
+        """Compute differentiable ELBO loss and return (loss, q).
+
+        Args:
+            model (AutoEncoderBase or nn.Module or callable): Generative model.
+            guide (callable): Variational guide function.
+            x (torch.Tensor): Input batch tensor.
+            *args, **kwargs: Additional condition arguments passed to guide and model.
+
+        Returns:
+            tuple: (loss, q) where loss is the differentiable scalar tensor and
+                q is the encoder output logits for BM optimization.
+        """
+        # Step 1: Variational guide role q_phi(z|x)
+        guide_out = guide(x, *args, **kwargs)
+        if isinstance(guide_out, tuple) and len(guide_out) == 3:
+            posterior, q, zeta = guide_out
+        elif isinstance(guide_out, dict):
+            posterior = guide_out["posterior"]
+            q = guide_out["q"]
+            zeta = guide_out["zeta"]
+        else:
+            raise ValueError(
+                "Guide must return a 3-tuple (posterior, q, zeta) or dict with keys "
+                "('posterior', 'q', 'zeta')."
+            )
+
+        # Step 2: Generative model role p_theta(x|z)
+        if hasattr(model, "decode") and callable(model.decode):
+            recon_x = model.decode(zeta, *args, **kwargs)
+        elif hasattr(model, "decoder") and callable(model.decoder):
+            recon_x = model.decoder(zeta)
+            if (
+                getattr(model, "config", None)
+                and getattr(model.config, "loss_type", None) == "bernoulli"
+                and hasattr(model, "_train_bias")
+            ):
+                recon_x = recon_x + model._train_bias
+        elif callable(model):
+            try:
+                recon_x = model(zeta, *args, **kwargs)
+            except TypeError:
+                recon_x = model(x, zeta, *args, **kwargs)
+        else:
+            raise TypeError("Model must provide a callable decode/decoder method or be callable.")
+
+        # Step 3: Compute negative ELBO
+        if hasattr(model, "loss") and callable(model.loss):
+            loss = model.loss(x, recon_x, posterior)
+        else:
+            raise AttributeError("Model must provide a loss(x, recon_x, posterior) method.")
+
+        return loss, q
+
+    def __call__(self, model, guide, x, *args, **kwargs):
+        return self.differentiable_loss(model, guide, x, *args, **kwargs)
+
+
+class Q_SVI:
+    """Quantum Stochastic Variational Inference (Q-SVI) training engine.
+
+    Aligns with the pyro.infer.SVI interface:
+        svi = Q_SVI(model, guide, optim, loss=Trace_ELBO())
+        svi.step(x, *args, **kwargs)
+
+    Maintains strictly separated roles for:
+    - guide: Variational distribution q_phi(z|x) (recognition network / inference)
+    - model: Generative model p_theta(x|z) with prior p(z)
+    - loss: ELBO loss orchestrator (defaults to Trace_ELBO())
+    while orchestrating the two-stage alternating optimization sequence for
+    Quantum Variational Autoencoders (QVAE):
+    Stage 1: VAE parameter step on ELBO loss.
+    Stage 2: BM parameter step on bm_loss(q.detach()).
+
+    Args:
+        model (AutoEncoderBase or nn.Module or callable): Generative model or QVAE instance.
+        guide (callable, optional): Variational guide function q_phi(z|x).
+            If omitted or None under default construction, automatically resolves
+            to `model.guide`.
+        optim (torch.optim.Optimizer or tuple or dict, optional): Primary optimizer
+            for the encoder/decoder, or a container of (vae_optim, bm_optim).
+        loss (callable, optional): Objective loss function taking (model, guide, *args)
+            or (x, recon_x, posterior). Defaults to Trace_ELBO().
+        bm_optim (torch.optim.Optimizer, optional): Optimizer for the Boltzmann
+            Machine parameters. If provided, two-stage alternating optimization
+            is enabled.
+        bm_weight_decay (float, optional): Weight decay coefficient for BM loss.
+            Defaults to 0.0.
+    """
+
+    def __init__(
+        self,
+        model,
+        guide=None,
+        optim=None,
+        loss=None,
+        bm_optim=None,
+        bm_weight_decay=0.0,
+    ):
+        self._model = None
+        self._guide = None
+        self._guide_is_custom = False
+
+        self.set_model(model, guide=guide)
+
+        if loss is not None:
+            self.loss_fn = loss
+        else:
+            self.loss_fn = Trace_ELBO()
+
+        self.bm_weight_decay = float(bm_weight_decay)
+
+        self.vae_optim = None
+        self.bm_optim = None
+        self.use_two_optimisers = False
+
+        self._configure_optimizers(optim, bm_optim)
+
+        self.last_loss = 0.0
+        self.last_vae_loss = 0.0
+        self.last_bm_loss = 0.0
+
+    @property
+    def model(self):
+        """Current generative model or QVAE instance."""
+        return self._model
+
+    @model.setter
+    def model(self, value):
+        self.set_model(value, guide=self._guide if self._guide_is_custom else None)
+
+    @property
+    def guide(self):
+        """Current variational guide function."""
+        return self._guide
+
+    @guide.setter
+    def guide(self, value):
+        self._guide = value
+        self._guide_is_custom = value is not None
+
+    def set_model(self, model, guide=None):
+        """Set or update the model and resolve its variational guide."""
+        self._model = model
+
+        if guide is not None:
+            self._guide = guide
+            self._guide_is_custom = True
+        elif not self._guide_is_custom:
+            if hasattr(model, "guide") and callable(model.guide):
+                self._guide = model.guide
+            elif hasattr(model, "encoder") and hasattr(model, "posterior"):
+                def _default_guide(x, *args, **kwargs):
+                    x_in = x.view(-1, getattr(model, "_input_dimension", x.size(-1)))
+                    q_logits = model.encoder(x_in)
+                    dist_beta = getattr(getattr(model, "config", None), "dist_beta", 1.0)
+                    post, z = model.posterior(q_logits, dist_beta)
+                    return post, q_logits, z
+                self._guide = _default_guide
+            else:
+                self._guide = None
+
+    def _configure_optimizers(self, optim, bm_optim=None):
+        """Configure VAE and BM optimizers from flexible input types."""
+        if isinstance(optim, (tuple, list)):
+            self.vae_optim = optim[0]
+            self.bm_optim = optim[1] if len(optim) > 1 else bm_optim
+        elif isinstance(optim, dict):
+            self.vae_optim = optim.get("vae") or optim.get("optim")
+            self.bm_optim = optim.get("bm") or bm_optim
+        else:
+            self.vae_optim = optim
+            self.bm_optim = bm_optim
+
+        self.use_two_optimisers = self.bm_optim is not None
+
+    def set_optimizers(self, vae_optim=None, bm_optim=None):
+        """Update or register optimizers on the SVI engine.
+
+        Args:
+            vae_optim (torch.optim.Optimizer, optional): VAE optimizer.
+            bm_optim (torch.optim.Optimizer, optional): BM optimizer.
+        """
+        if vae_optim is not None:
+            self.vae_optim = vae_optim
+        if bm_optim is not None:
+            self.bm_optim = bm_optim
+        self.use_two_optimisers = self.bm_optim is not None
+
+    def _compute_forward_and_loss(self, x, *args, **kwargs):
+        """Internal helper to compute forward pass and loss consistently.
+
+        Strictly invokes the variational guide first, then evaluates the generative model
+        and ELBO loss without conflating model and guide responsibilities.
+        """
+        if self._guide is None:
+            raise ValueError(
+                "A variational guide must be provided to Q_SVI, or the model must "
+                "implement a callable .guide(x) method adhering to the Pyro SVI interface."
+            )
+
+        if hasattr(self.loss_fn, "differentiable_loss"):
+            vae_loss, q = self.loss_fn.differentiable_loss(
+                self.model, self.guide, x, *args, **kwargs
+            )
+        elif callable(self.loss_fn):
+            try:
+                res = self.loss_fn(self.model, self.guide, x, *args, **kwargs)
+                if isinstance(res, tuple):
+                    vae_loss, q = res[0], res[1]
+                else:
+                    vae_loss = res
+                    guide_out = self.guide(x, *args, **kwargs)
+                    q = guide_out[1] if isinstance(guide_out, tuple) else guide_out["q"]
+            except TypeError:
+                guide_out = self.guide(x, *args, **kwargs)
+                if isinstance(guide_out, tuple) and len(guide_out) == 3:
+                    posterior, q, zeta = guide_out
+                else:
+                    raise ValueError("Guide must return (posterior, q, zeta)")
+                if hasattr(self.model, "decode"):
+                    recon_x = self.model.decode(zeta, *args, **kwargs)
+                else:
+                    recon_x = self.model.decoder(zeta)
+                vae_loss = self.loss_fn(x, recon_x, posterior)
+        else:
+            raise TypeError("loss_fn must be callable or provide differentiable_loss.")
+
+        return vae_loss, q
+
+    def step(self, x, *args, **kwargs):
+        """Take a single optimization step on batch x.
+
+        Maintains the two-stage alternating optimization sequence:
+        1. Zero grad on VAE optimizer, compute ELBO loss via guide and generative model,
+           backward pass, step VAE optimizer.
+        2. If BM optimizer is present, zero grad on BM optimizer, compute
+           bm_loss on q.detach(), backward pass, step BM optimizer.
+
+        Args:
+            x (torch.Tensor): Input batch tensor.
+            *args: Additional positional arguments for model and guide.
+            **kwargs: Additional keyword arguments for model and guide.
+
+        Returns:
+            float: Total scalar step loss (VAE loss + BM loss if two-stage).
+        """
+        if self.vae_optim is not None:
+            self.vae_optim.zero_grad()
+
+        vae_loss, q = self._compute_forward_and_loss(x, *args, **kwargs)
+        vae_loss.backward()
+
+        if self.vae_optim is not None:
+            self.vae_optim.step()
+
+        self.last_vae_loss = vae_loss.item()
+        total_loss = self.last_vae_loss
+
+        if self.use_two_optimisers and hasattr(self.model, "bm_loss"):
+            self.bm_optim.zero_grad()
+            bm_loss = self.model.bm_loss(q.detach(), self.bm_weight_decay)
+            bm_loss.backward()
+            self.bm_optim.step()
+
+            self.last_bm_loss = bm_loss.item()
+            total_loss += self.last_bm_loss
+        else:
+            self.last_bm_loss = 0.0
+
+        self.last_loss = total_loss
+        return float(total_loss)
+
+    def evaluate_loss(self, x, *args, **kwargs):
+        """Evaluate loss on batch x without parameter updates.
+
+        Args:
+            x (torch.Tensor): Input batch tensor.
+            *args: Additional positional arguments for model and guide.
+            **kwargs: Additional keyword arguments for model and guide.
+
+        Returns:
+            float: Total evaluated scalar loss.
+        """
+        with torch.no_grad():
+            vae_loss, q = self._compute_forward_and_loss(x, *args, **kwargs)
+            total_loss = vae_loss.item()
+            if self.use_two_optimisers and hasattr(self.model, "bm_loss"):
+                bm_loss = self.model.bm_loss(q.detach(), self.bm_weight_decay)
+                total_loss += bm_loss.item()
+            return float(total_loss)
+
+    evaluate = evaluate_loss
+
+    def get_last_loss_dict(self):
+        """Return the dictionary of loss components from the last step."""
+        return {
+            "total_loss": self.last_loss,
+            "vae_loss": self.last_vae_loss,
+            "bm_loss": self.last_bm_loss,
+        }
+
+
+# Public alias for naming consistency
+QSVI = Q_SVI
+
