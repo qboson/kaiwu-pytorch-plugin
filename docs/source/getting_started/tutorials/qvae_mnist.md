@@ -158,3 +158,21 @@ Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 - 为靶点发现提供新线索
 
 **相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)
+
+
+## Downstream MLP class labels
+
+The example `MLPClassifier` encodes class labels to contiguous training indices.
+`predict` returns the original labels (including noncontiguous integers or
+strings), and `predict_proba` columns follow the sorted `classes_` order.
+
+The default `output_dim=10` continues to match a complete ten-class MNIST task.
+For a class subset or a different classification task, pass the exact number of
+classes, or use `output_dim=None` to infer it during each fit. A mismatched
+explicit dimension raises before training instead of exposing extra probability
+columns. The inferred `output_dim_` does not replace the constructor parameter.
+
+Refitting replaces the class mapping and network. Invalid output dimensions
+are rejected before overwriting an existing fitted mapping or network. This
+label contract does not change network optimization, best-weight selection,
+plotting, or QVAE training.
