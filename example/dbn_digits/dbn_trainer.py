@@ -65,6 +65,7 @@ class DBNTrainer:
         self.drop_last = drop_last
         self.plot_img = plot_img
         self.random_state = random_state
+        self.use_cim = use_cim
 
         if use_cim:
             kw.common.CheckpointManager.save_dir = './tmp'
@@ -467,23 +468,27 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
         self.drop_last = drop_last
         self.plot_img = plot_img
         self.random_state = random_state
+        self.use_cim = use_cim
 
         # 创建模型和训练器
         self._dbn = UnsupervisedDBN(hidden_layers_structure)
-        self._trainer = DBNTrainer(
-            learning_rate_rbm=learning_rate_rbm,
-            n_epochs_rbm=n_epochs_rbm,
-            batch_size=batch_size,
-            verbose=verbose,
-            shuffle=shuffle,
-            drop_last=drop_last,
-            plot_img=plot_img,
-            random_state=random_state,
-            use_cim=use_cim,
-        )
+        self._trainer = DBNTrainer(**self._trainer_parameters())
+
+    def _trainer_parameters(self):
+        """Return current constructor parameters accepted by DBNTrainer."""
+        names = ("learning_rate_rbm", "n_epochs_rbm", "batch_size", "verbose",
+                 "shuffle", "drop_last", "plot_img", "random_state", "use_cim")
+        return {name: getattr(self, name) for name in names}
 
     def fit(self, X, y=None):
         """训练模型"""
+        parameters = self._trainer_parameters()
+        if self._trainer.use_cim != self.use_cim:
+            self._trainer = DBNTrainer(**parameters)
+        else:
+            for name, value in parameters.items():
+                setattr(self._trainer, name, value)
+        self._dbn = UnsupervisedDBN(self.hidden_layers_structure)
         self._dbn.create_rbm_layer(X.shape[1])
         self._trainer.train(self._dbn, X)
         return self

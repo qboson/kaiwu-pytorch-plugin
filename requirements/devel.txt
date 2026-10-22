@@ -2,6 +2,11 @@
 
 pytest==8.3.5
 pytest-cov==6.1.1
+# DBN example regressions use these existing optional example dependencies.
+scikit-learn>=1.5,<1.8
+scipy
+matplotlib
+seaborn
 isort>=5.10.0
 pip-licenses==5.5.0
 pylint==3.3.7
