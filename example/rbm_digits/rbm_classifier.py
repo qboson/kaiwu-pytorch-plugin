@@ -54,7 +54,7 @@ def train_classifier(n_iter=2, use_cim=False):
     start_time = time.time()
     classifier.fit(X_train, y_train)
     training_time = time.time() - start_time
-    print(f"RBM Pipline training completed in {training_time:.2f} seconds")
+    print(f"RBM Pipeline training completed in {training_time:.2f} seconds")
 
     # 训练 Logistic regression
     logistic_classifier = LogisticRegression(C=500.0, max_iter=1000, random_state=42)

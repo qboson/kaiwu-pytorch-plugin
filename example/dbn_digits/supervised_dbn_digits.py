@@ -294,7 +294,7 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
     def _train_classifier(self, X, y):
         """训练下游分类器"""
         if self.verbose:
-            print(f"Training pipline classifier: {self.classifier_type}")
+            print(f"Training Pipeline classifier: {self.classifier_type}")
 
         # 提取特征
         X_features = self.transform(X)
