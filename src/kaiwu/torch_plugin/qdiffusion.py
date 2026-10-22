@@ -790,6 +790,8 @@ class QDiffusion(nn.Module):
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
             for the selected candidate per sample.
         """
+        if candidate_tokens.size(1) == 1:
+            return candidate_tokens[:, 0], candidate_scores[:, 0]
         energies = self._score_candidates(noisy_tokens, candidate_tokens)
         neg_energies = -energies
         neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
