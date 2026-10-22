@@ -586,9 +586,17 @@ def _solve_ising_sa(
         max_iter: Backward-compatible positive iteration hint from the previous
             local SA solver. Kaiwu-specific schedule options should be passed
             through ``optimizer_kwargs``.
-        random_state: Seed applied to NumPy before invoking Kaiwu SA.
+        random_state: Default ``rand_seed`` passed to Kaiwu SA, without
+            reseeding NumPy's global RNG.
         **optimizer_kwargs: Keyword arguments passed to
-            ``kw.classical.SimulatedAnnealingOptimizer``.
+            ``kw.classical.SimulatedAnnealingOptimizer``. An explicit
+            ``rand_seed`` overrides ``random_state``, including ``None``.
+
+    Notes:
+        With SDK 1.3.1, the default single-process optimizer uses a local RNG
+        when given an integer seed. Explicit ``rand_seed=None`` and multi-process
+        execution retain SDK-native behavior that can change the global NumPy
+        random state.
 
     Returns:
         One or more spin solutions encoded as ``-1`` and ``1`` values.
@@ -612,11 +620,10 @@ def _solve_ising_sa(
         if not np.all((binary == 0) | (binary == 1)):
             raise ValueError("initial_binary must contain only 0/1 values")
 
-    resolved_kwargs = {"size_limit": 1}
+    resolved_kwargs = {"size_limit": 1, "rand_seed": int(random_state)}
     resolved_kwargs.update(optimizer_kwargs)
     optimizer = kw.classical.SimulatedAnnealingOptimizer(**resolved_kwargs)
 
-    np.random.seed(int(random_state))
     result = optimizer.solve(matrix)
 
     if result is None:
