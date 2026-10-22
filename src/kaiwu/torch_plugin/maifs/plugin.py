@@ -124,6 +124,45 @@ class FeatureSelectionWrapper(nn.Module):
         self._trained_epochs = 0
         self.register_buffer("mask", torch.ones(self.feature_dim))
 
+    def get_extra_state(self) -> torch.Tensor:
+        """Save completed epochs so checkpoint resumes keep mask-update cadence.
+
+        Returns:
+            A scalar int64 tensor, independent of the mask's floating-point dtype.
+        """
+        return torch.tensor(
+            self._trained_epochs, dtype=torch.int64, device=self.mask.device
+        )
+
+    def set_extra_state(self, state: torch.Tensor) -> None:
+        """Restore the completed epoch count from a saved scalar tensor.
+
+        Args:
+            state: Epoch counter returned by ``get_extra_state``.
+        """
+        self._trained_epochs = int(state.item())
+
+    def _load_from_state_dict(
+        self,
+        state_dict: dict[str, torch.Tensor],
+        prefix: str,
+        local_metadata: dict[str, object],
+        strict: bool,
+        missing_keys: list[str],
+        unexpected_keys: list[str],
+        error_msgs: list[str],
+    ) -> None:
+        """Load state, accepting legacy checkpoints with unknown epoch progress."""
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs,
+        )
+        extra_key = prefix + "_extra_state"
+        if extra_key not in state_dict:
+            self._trained_epochs = 0
+            if extra_key in missing_keys:
+                missing_keys.remove(extra_key)
+
     def _mask_view(
         self,
         input_feature: torch.Tensor,
