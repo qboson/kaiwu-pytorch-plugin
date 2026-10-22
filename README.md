@@ -25,10 +25,13 @@ flowchart TD
         qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
+        qdeq["qdeq.py<br/>QDEQ"]
     end
 
     torch --> abm
     kaiwu --> abm
+    torch --> qdeq
+    kaiwu --> qdeq
     abm --> bm
     abm --> rbm
     abm --> qvae
@@ -43,6 +46,7 @@ flowchart TD
         qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
         qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
         qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
+        qdeq_example["qdeq<br/>ETTh1 forecasting with QDEQ"]
     end
 
     rbm --> rbm_digits
@@ -52,9 +56,10 @@ flowchart TD
     qvae --> qvae_mnist
     qvae --> qvae_cell
     bm --> qvae_cell
+    qdeq --> qdeq_example
 ```
 The above image shows the project file structure:
-- The Kaiwu-torch-plugin section of the code includes base class, Restricted Boltzmann Machine, and Boltzmann Machine.
+- The Kaiwu-torch-plugin section of the code includes the base class, Restricted Boltzmann Machine, Boltzmann Machine, QVAE, Q-Diffusion, DBN and QDEQ.
 - The example section of the code includes examples: qvae for generating digits, digits for digit recognition etc.
 - The test section contains unit tests.
 
@@ -65,6 +70,8 @@ The above image shows the project file structure:
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
 - Q-Diffusion Support: Includes a public `QDiffusion` module for energy-guided
   discrete generation with DPLM backbones
+- QDEQ Support: Includes a public `QDEQ` module that turns a weight-tied layer
+  into a fixed-point layer whose updates are chosen by Kaiwu Ising samplers
 
 ### Plugin Advantages
 
