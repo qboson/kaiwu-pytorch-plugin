@@ -49,7 +49,7 @@ except ImportError:
 # the environment variable.
 # ---------------------------------------------------------------------------
 _stats_enabled: Optional[bool] = None  # None means follow env var
-# Cached env-var parse result to avoid os.environ.get() on every call
+# Retained for backward compatibility; no longer used for control flow.
 _env_stats_cache: Optional[bool] = None
 
 
@@ -57,15 +57,16 @@ def _is_stats_enabled() -> bool:
     """Return whether the statistics feature is enabled.
 
     Priority: code-level setting > env var > default (True).
+
+    The environment variable is re-read on every evaluation so that runtime
+    changes to ``KPP_STATS_ENABLED`` are honored. Once ``enable_usage_stats``
+    or ``disable_usage_stats`` is called, the explicit code-level switch takes
+    precedence and the environment variable is no longer consulted.
     """
-    global _env_stats_cache  # pylint: disable=global-statement
     if _stats_enabled is not None:
         return _stats_enabled
-    if _env_stats_cache is not None:
-        return _env_stats_cache
     env_val = os.environ.get("KPP_STATS_ENABLED", "true").lower()
-    _env_stats_cache = env_val in ("true", "1", "yes", "on")
-    return _env_stats_cache
+    return env_val in ("true", "1", "yes", "on")
 
 
 def enable_usage_stats() -> None:
