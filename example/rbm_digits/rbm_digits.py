@@ -266,7 +266,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         save_pdf=False,
     ):
         """
-        绘制原始和重构图像
+        绘制原始图像及其确定性均值场重构，不调用先验采样器。
         """
         if self.rbm is None:
             raise ValueError("RBM model not trained yet. Call fit first.")
@@ -276,7 +276,9 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             images = images.to(self.device)
             images_binary = (images > 0.5).float()
             hidden_activations = self.rbm.get_hidden(images_binary)
-            reconstructions = self.rbm.sample(self.sampler)[:, : self.rbm.num_visible]
+            reconstructions = self.rbm.get_visible(
+                hidden_activations[:, self.rbm.num_visible :]
+            )[:, : self.rbm.num_visible]
 
         # 显示原始和重构图像
         num_samples = len(images)
@@ -284,6 +286,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         fig, axes = plt.subplots(
             2,
             num_samples,
+            squeeze=False,
             gridspec_kw={"wspace": 0, "hspace": 0.1},
             figsize=(2 * num_samples, 4),
         )
