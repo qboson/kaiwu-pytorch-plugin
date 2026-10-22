@@ -8,6 +8,7 @@ from math import ceil
 import numpy as np
 import torch
 from torch import nn
+from torch.nn.attention import SDPBackend, sdpa_kernel
 
 from .qubo import solve_qubo
 
@@ -61,6 +62,7 @@ class FeatureSelectionWrapper(nn.Module):
     Examples:
         >>> import torch
         >>> from torch import nn
+from torch.nn.attention import SDPBackend, sdpa_kernel
         >>> from torch.utils.data import DataLoader, TensorDataset
         >>> from maifs import FeatureSelectionWrapper
         >>> input_feature = torch.randn(16, 3)
@@ -250,6 +252,9 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the loss gradient and Hessian with respect to a soft mask.
 
+        Use mathematical scaled-dot-product attention within this calculation
+        because fused attention kernels may not implement second derivatives.
+
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
             loss_fn: Loss function returning a scalar tensor.
@@ -293,25 +298,28 @@ class FeatureSelectionWrapper(nn.Module):
             parameter.requires_grad_(False)
 
         try:
-            continuous_mask = (
-                self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
-            )
-            loss = loss_fn(
-                self.model(self.apply_mask(input_all, continuous_mask)),
-                target_all,
-            )
-            if loss.ndim != 0:
-                raise ValueError("loss_fn must return a scalar tensor")
-            gradient = torch.autograd.grad(
-                loss,
-                continuous_mask,
-                create_graph=True,
-            )[0]
-            rows = [
-                self._hessian_row(gradient, continuous_mask, index, hessian_mode)
-                for index in range(self.feature_dim)
-            ]
-            hessian = torch.stack(rows)
+            # Fused SDPA kernels can lack double backward. Keep the fallback
+            # local to mask derivatives; normal model training stays unchanged.
+            with sdpa_kernel(SDPBackend.MATH):
+                continuous_mask = (
+                    self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
+                )
+                loss = loss_fn(
+                    self.model(self.apply_mask(input_all, continuous_mask)),
+                    target_all,
+                )
+                if loss.ndim != 0:
+                    raise ValueError("loss_fn must return a scalar tensor")
+                gradient = torch.autograd.grad(
+                    loss,
+                    continuous_mask,
+                    create_graph=True,
+                )[0]
+                rows = [
+                    self._hessian_row(gradient, continuous_mask, index, hessian_mode)
+                    for index in range(self.feature_dim)
+                ]
+                hessian = torch.stack(rows)
         finally:
             for parameter, requires_grad in zip(
                 self.model.parameters(),
