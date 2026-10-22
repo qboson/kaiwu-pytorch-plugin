@@ -150,3 +150,8 @@
 ```{literalinclude} ../../../../example/bm_generation/saver.py
 :pyobject: Saver
 ```
+
+
+## Sampling worker cleanup
+
+The training loop owns its multiprocessing pool through a context manager. Worker processes are terminated and joined when training exits, including errors while reading data, sampling, optimizing or saving. Exceptions continue to propagate to the caller.
