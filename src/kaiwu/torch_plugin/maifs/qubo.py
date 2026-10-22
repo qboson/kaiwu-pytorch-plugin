@@ -421,6 +421,11 @@ class QuadraticLinearSolver:
     def qubo_matrix_to_ising_matrix(qubo_matrix: np.ndarray) -> np.ndarray:
         """Convert an upper-triangular QUBO matrix to an auxiliary-spin Ising matrix.
 
+        The returned upper-triangular matrix ``M`` represents the positive
+        objective ``s.T @ M @ s``. With ``x = (s[:-1] * s[-1] + 1) / 2``,
+        this equals ``x.T @ qubo_matrix @ x`` up to a state-independent constant.
+        SDK adapters convert it to ``-(M + M.T) / 2`` for submission.
+
         Args:
             qubo_matrix: Upper-triangular QUBO matrix.
 
@@ -460,11 +465,13 @@ class QuadraticLinearSolver:
         """Convert QUBO terms to the equivalent Ising matrix.
 
         Args:
-            quadratic_matrix: QUBO quadratic term.
+            quadratic_matrix: QUBO quadratic term ``Q`` in
+                ``0.5 * x.T @ Q @ x + linear_vector @ x``.
             linear_vector: QUBO linear term.
 
         Returns:
-            Ising matrix with one auxiliary spin appended.
+            Upper-triangular positive Ising objective with one auxiliary spin
+            appended, using the convention of ``qubo_matrix_to_ising_matrix``.
 
         Raises:
             ValueError: If terms have incompatible shapes or non-finite values.
@@ -496,6 +503,12 @@ class QuadraticLinearSolver:
             linear_vector + 0.5 * np.diag(symmetric_quadratic),
         )
         return self.qubo_matrix_to_ising_matrix(qubo_matrix)
+
+
+def _to_kaiwu_ising_matrix(ising_matrix: np.ndarray) -> np.ndarray:
+    """Map the positive spin objective to the SDK's symmetric negative Hamiltonian."""
+    matrix = np.asarray(ising_matrix, dtype=float)
+    return -(matrix + matrix.T) / 2
 
 
 def _solve_ising_local_search(
@@ -576,7 +589,10 @@ def _solve_ising_sa(
     random_state: int = 0,
     **optimizer_kwargs: object,
 ) -> np.ndarray:
-    """Solve an Ising matrix with Kaiwu classical simulated annealing.
+    """Solve a positive spin objective with Kaiwu classical simulated annealing.
+
+    Symmetrize and negate the objective matrix before SDK submission, so its
+    negative Hamiltonian has the same minima as the original objective.
 
     Args:
         ising_matrix: Square Ising matrix with an auxiliary spin.
@@ -617,7 +633,7 @@ def _solve_ising_sa(
     optimizer = kw.classical.SimulatedAnnealingOptimizer(**resolved_kwargs)
 
     np.random.seed(int(random_state))
-    result = optimizer.solve(matrix)
+    result = optimizer.solve(_to_kaiwu_ising_matrix(matrix))
 
     if result is None:
         raise RuntimeError("SimulatedAnnealingOptimizer did not return a solution.")
@@ -637,7 +653,10 @@ def _solve_ising_kaiwu_cim(
     task_mode: Any = DEFAULT_CIM_TASK_MODE,
     interval: int | None = None,
 ) -> np.ndarray:
-    """Split Ising precision and solve directly with Kaiwu CIMOptimizer.
+    """Split Ising precision and solve a positive objective with Kaiwu CIMOptimizer.
+
+    Convert to the SDK's symmetric negative-Hamiltonian convention before
+    precision adaptation and splitting, preserving the split penalty direction.
 
     Args:
         ising_matrix: Ising matrix to submit after precision splitting.
@@ -667,7 +686,7 @@ def _solve_ising_kaiwu_cim(
         max_precision=max_precision,
         precision_step=precision_step,
     )
-    plan = explorer.search(ising_matrix)
+    plan = explorer.search(_to_kaiwu_ising_matrix(ising_matrix))
 
     submit_matrix = np.asarray(np.round(plan.split_matrix), dtype=int)
     resolved_save_dir = Path(
