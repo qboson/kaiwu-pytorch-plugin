@@ -347,17 +347,25 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                     samples.append(s_all)
             return torch.concat(samples)
 
-    def sample(self, sampler) -> torch.Tensor:
+    def sample(self, sampler, *, no_random: bool = True) -> torch.Tensor:
         """Sample from the model with the abstract sampler interface.
 
         Args:
             sampler: External optimizer that solves the Bernoulli-side Ising model.
+            no_random: Return Gaussian conditional means when True (the
+                backward-compatible default). Set False to draw Gaussian
+                conditional samples with variance ``self.var``, preserving
+                their second moments when used in the negative training phase.
 
         Returns:
             torch.tensor: Full Gaussian-Bernoulli states.
+
+        The Bernoulli distribution is determined by the external sampler;
+        randomized Gaussian conditionals do not ensure that it samples the
+        model's Boltzmann distribution. Both modes return detached states.
         """
         s_bernoulli = super().sample(sampler).to(device=self.device, dtype=self.dtype)
-        return self.infer_from_bernoulli(s_bernoulli, no_random=True)
+        return self.infer_from_bernoulli(s_bernoulli, no_random=no_random)
 
     def positive_phase_energy_expectation(
         self,
