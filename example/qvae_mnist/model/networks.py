@@ -44,8 +44,9 @@ class Network(nn.Module):
 class BasicEncoder(Network):
     """Encoder with linear layers and activation function."""
 
-    def __init__(self, weight_decay=0.0, **kwargs):
+    def __init__(self, output_activation_fct=None, weight_decay=0.0, **kwargs):
         super().__init__(**kwargs)
+        self._output_activation_fct = output_activation_fct
         self.weight_decay = weight_decay
 
     def forward(self, x):
@@ -55,8 +56,11 @@ class BasicEncoder(Network):
     def encode(self, x):
         """Encode input through layers."""
         logger.debug("encode")
-        for layer in self._layers:
-            if self._activation_fct:
+        nr_layers = len(self._layers)
+        for idx, layer in enumerate(self._layers):
+            if idx == nr_layers - 1 and self._output_activation_fct:
+                x = self._output_activation_fct(layer(x))
+            elif self._activation_fct:
                 x = self._activation_fct(layer(x))
             else:
                 x = layer(x)
