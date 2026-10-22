@@ -204,7 +204,16 @@ class QVAE(AutoEncoderBase):
 
     # -------- Public methods --------
     def set_train_bias(self, mean):
-        """Compute train bias from dataset mean for Bernoulli reconstruction."""
+        """Compute train bias from dataset mean for Bernoulli reconstruction.
+
+        Args:
+            mean (torch.Tensor or float): Non-finite values are rejected.
+
+        Raises:
+            ValueError: If the mean is non-finite or has an incompatible shape.
+        """
+        if not torch.isfinite(torch.as_tensor(mean)).all():
+            raise ValueError("Dataset mean must contain only finite values.")
         mean = torch.as_tensor(
             mean,
             dtype=self._train_bias.dtype,
