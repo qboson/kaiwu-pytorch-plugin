@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from math import ceil
+from itertools import chain
+from math import ceil, fsum
 
 import numpy as np
 import torch
@@ -14,6 +15,35 @@ from .qubo import solve_qubo
 Batch = tuple[torch.Tensor, torch.Tensor]
 LossFunction = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
 _CARDINALITY_PENALTY = 10.0
+
+
+def _best_projection_index(
+    mask: np.ndarray,
+    quadratic: np.ndarray,
+    linear: np.ndarray,
+    fields: np.ndarray,
+    error_bound: np.ndarray,
+    change: int,
+) -> int:
+    """Resolve the best eligible gain, accurately summing ambiguous rows."""
+    eligible = np.flatnonzero(mask == (1 if change < 0 else 0))
+    gains = change * fields[eligible] + 0.5 * np.diag(quadratic)[eligible]
+    bounds = error_bound[eligible]
+    best_upper_bound = float(np.min(gains + bounds))
+    candidates = eligible[gains - bounds <= best_upper_bound]
+    best_gain, best_index = float("inf"), -1
+    for index in candidates:
+        terms = (
+            change * float(weight) * int(bit)
+            for column, (weight, bit) in enumerate(zip(quadratic[index], mask))
+            if column != index
+        )
+        gain = fsum(chain(terms, (
+            change * float(linear[index]), change * float(quadratic[index, index]) / 2,
+        )))
+        if gain < best_gain:
+            best_gain, best_index = gain, int(index)
+    return best_index
 
 
 def _tensor_to_numpy(
@@ -397,6 +427,11 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> np.ndarray:
         """Project a candidate mask into the configured feature-count bounds.
 
+        Use incremental QUBO gains with accurate row sums near ties. Exact
+        gain ties favor the lowest index. Unlike complete energy subtraction,
+        gains remain visible beside large state-independent energy constants;
+        numerically ambiguous choices may therefore differ from a full scan.
+
         Args:
             candidate_mask: Binary mask proposed by the QUBO solver.
             quadratic_matrix: QUBO quadratic term.
@@ -407,7 +442,10 @@ class FeatureSelectionWrapper(nn.Module):
 
         Raises:
             ValueError: If ``candidate_mask`` has the wrong shape or contains
-                non-binary values.
+                non-binary values, or a required projection has invalid QUBO
+                coefficient shapes, non-finite coefficients, or absolute
+                symmetric row sums plus linear terms exceeding one eighth of
+                the float64 maximum.
         """
         projected = np.asarray(candidate_mask, dtype=int).copy()
         if projected.shape != (self.feature_dim,):
@@ -415,47 +453,52 @@ class FeatureSelectionWrapper(nn.Module):
         if not np.all((projected == 0) | (projected == 1)):
             raise ValueError("candidate_mask must contain only binary 0/1 values")
 
-        def objective_after_change(index: int, value: int) -> float:
-            """Evaluate the QUBO objective after flipping one projected bit.
-
-            Args:
-                index: Candidate mask index to change.
-                value: Binary value to assign at ``index``.
-
-            Returns:
-                Objective value after the candidate change.
-            """
-            changed = projected.copy()
-            changed[index] = value
-            return float(
-                0.5 * changed @ quadratic_matrix @ changed
-                + linear_vector @ changed
-            )
-
         selected_count = int(projected.sum())
-        while selected_count > self.max_selected_features:
-            selected_indices = np.flatnonzero(projected)
-            drop_index = min(
-                selected_indices,
-                key=lambda index: (
-                    objective_after_change(int(index), 0),
-                    int(index),
-                ),
+        enforce_minimum = self._min_selected_features_explicit or selected_count == 0
+        if selected_count <= self.max_selected_features and (
+            not enforce_minimum or selected_count >= self.min_selected_features
+        ):
+            return projected
+
+        quadratic = np.asarray(quadratic_matrix, dtype=float)
+        linear = np.asarray(linear_vector, dtype=float)
+        if quadratic.shape != (self.feature_dim, self.feature_dim) or linear.shape != (
+            self.feature_dim,
+        ):
+            raise ValueError("QUBO coefficient shapes must match feature_dim")
+        if not np.isfinite(quadratic).all() or not np.isfinite(linear).all():
+            raise ValueError("QUBO coefficients must contain finite values")
+        symmetric = 0.5 * quadratic + 0.5 * quadratic.T
+        with np.errstate(over="ignore"):
+            scale = np.sum(np.abs(symmetric), axis=1) + np.abs(linear)
+        if np.any(scale > np.finfo(float).max / 8):
+            raise ValueError("QUBO row sums exceed the safe float64 range")
+        fields = np.einsum("ij,j->i", symmetric, projected) + linear
+        changes = 0
+
+        def best_index(change: int) -> int:
+            """Bound field summation and accumulated update roundoff."""
+            error_bound = (
+                16 * np.finfo(float).eps * (self.feature_dim + 2 * changes + 4)
+                * np.maximum(scale, np.finfo(float).tiny)
             )
-            projected[int(drop_index)] = 0
+            return _best_projection_index(
+                projected, symmetric, linear, fields, error_bound, change,
+            )
+
+        while selected_count > self.max_selected_features:
+            drop_index = best_index(-1)
+            projected[drop_index] = 0
+            fields -= symmetric[:, drop_index]
+            changes += 1
             selected_count -= 1
 
         enforce_minimum = self._min_selected_features_explicit or selected_count == 0
         while enforce_minimum and selected_count < self.min_selected_features:
-            unselected_indices = np.flatnonzero(projected == 0)
-            add_index = min(
-                unselected_indices,
-                key=lambda index: (
-                    objective_after_change(int(index), 1),
-                    int(index),
-                ),
-            )
-            projected[int(add_index)] = 1
+            add_index = best_index(1)
+            projected[add_index] = 1
+            fields += symmetric[:, add_index]
+            changes += 1
             selected_count += 1
 
         return projected
