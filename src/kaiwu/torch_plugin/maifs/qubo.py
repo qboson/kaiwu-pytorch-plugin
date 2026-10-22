@@ -101,7 +101,8 @@ class PrecisionSplitExplorer:
         penalty: Optional splitting penalty coefficient.
         round_to_increment: Whether Kaiwu should round values to the increment.
         start_precision: Starting source precision for the search.
-        precision_step: Coarse-search precision step.
+        precision_step: Coarse-probe spacing; untested higher precisions are
+            checked before accepting a feasible plan.
 
     Raises:
         ValueError: If precision bounds, precision step, or bit limit are invalid.
@@ -131,7 +132,7 @@ class PrecisionSplitExplorer:
             round_to_increment: Whether Kaiwu should round values to the
                 increment.
             start_precision: Starting source precision for the search.
-            precision_step: Coarse-search precision step.
+            precision_step: Coarse-probe spacing, not an early-stop criterion.
 
         Raises:
             ValueError: If precision or bit-count settings are invalid.
@@ -306,62 +307,70 @@ class PrecisionSplitExplorer:
             ising_matrix: Original Ising matrix.
 
         Returns:
-            The best feasible precision-split plan found by the search.
+            The highest feasible precision-split plan in the configured interval.
+            Coarse probes include both endpoints; any untested precision above
+            their best result is checked in descending order. Each precision is
+            tried at most once, without assuming monotone split sizes.
+
+        Notes:
+            Each call invalidates the previous plan before input validation.
+            Failed calls leave no restorable plan and retain only this call's
+            completed attempts. At most the best and current plan coexist;
+            ``max_bits`` limits accepted plans, not SDK preprocessing memory.
 
         Raises:
             ValueError: If the original matrix is not square or already exceeds
                 ``max_bits``.
             RuntimeError: If no feasible precision is found.
         """
+        # A new search invalidates the previous problem, even on validation failure.
+        self.plan = None
+        self.history = []
         ising_matrix = np.asarray(ising_matrix)
         if ising_matrix.ndim != 2 or ising_matrix.shape[0] != ising_matrix.shape[1]:
             raise ValueError("ising_matrix must be a square matrix")
         if ising_matrix.shape[0] > self.max_bits:
             raise ValueError("The original matrix size cannot be larger than max_bits")
 
-        self.history = []
         best_plan = None
-        previous_coarse_precision = None
+        attempted = set()
         source_precision = self.start_precision
 
+        # Split sizes need not be monotone in source precision. Continue coarse
+        # probing after an infeasible plan and always include the upper endpoint.
         while True:
-            plan = self._evaluate(
-                ising_matrix,
-                source_precision,
-                "coarse",
-            )
+            plan = self._evaluate(ising_matrix, source_precision, "coarse")
+            attempted.add(source_precision)
             if plan.split_size <= self.max_bits:
                 best_plan = plan
-                previous_coarse_precision = source_precision
                 if source_precision == self.max_precision:
                     self.plan = best_plan
                     return best_plan
-                source_precision = min(
-                    source_precision + self.precision_step,
-                    self.max_precision,
-                )
+            del plan
+            if source_precision == self.max_precision:
+                break
+            source_precision = min(
+                source_precision + self.precision_step, self.max_precision,
+            )
+
+        # Only untested precisions above the best coarse result can improve it.
+        # Descending order makes the first feasible fine result the global best.
+        lower_bound = (
+            self.start_precision if best_plan is None else best_plan.source_precision + 1
+        )
+        for fine_precision in range(self.max_precision, lower_bound - 1, -1):
+            if fine_precision in attempted:
                 continue
+            plan = self._evaluate(ising_matrix, fine_precision, "fine")
+            if plan.split_size <= self.max_bits:
+                best_plan = plan
+                break
+            del plan
 
-            if previous_coarse_precision is not None:
-                for fine_precision in range(
-                    previous_coarse_precision + 1,
-                    source_precision,
-                ):
-                    fine_plan = self._evaluate(
-                        ising_matrix,
-                        fine_precision,
-                        "fine",
-                    )
-                    if fine_plan.split_size <= self.max_bits:
-                        best_plan = fine_plan
-                    else:
-                        break
-
-            if best_plan is not None:
-                best_plan.history = list(self.history)
-                self.plan = best_plan
-                return best_plan
-            break
+        if best_plan is not None:
+            best_plan.history = list(self.history)
+            self.plan = best_plan
+            return best_plan
 
         msg = (
             "No feasible precision found: split matrix size exceeds max_bits "
@@ -385,11 +394,11 @@ class PrecisionSplitExplorer:
             Restored solution over the original variables.
 
         Raises:
-            ValueError: If ``search`` has not been called.
+            ValueError: If the latest ``search`` has not completed successfully.
             ImportError: If the Kaiwu restoration helper is unavailable.
         """
         if self.plan is None:
-            raise ValueError("search or fit must be called before restoring")
+            raise ValueError("search must complete successfully before restoring")
         return _restore_kaiwu_split_solution(solution, self.plan.last_var_idx, vote)
 
 
@@ -644,7 +653,8 @@ def _solve_ising_kaiwu_cim(
         target_precision: Target precision for the split Ising matrix.
         max_bits: Maximum allowed split variable count.
         max_precision: Maximum source precision to test.
-        precision_step: Coarse-search precision step.
+        precision_step: Coarse-probe spacing; untested higher precisions are
+            checked before accepting a feasible plan.
         sample_number: Requested solution count for Kaiwu CIM.
         save_dir: Optional directory used by Kaiwu checkpoint records.
         cleanup_records: Whether to delete generated checkpoint records.
