@@ -10,9 +10,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
-from kaiwu.torch_plugin import BoltzmannMachine
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.torch_plugin import BoltzmannMachine, Q_SVI
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder
 
@@ -35,6 +34,9 @@ class Trainer:
         self.args = args
         self.device = device
         self.n_batches = 0
+        # backend='svi' 时按 (model, optimizer) 组合惰性构建并缓存的 Q_SVI 内核。
+        self._q_svi = None
+        self._q_svi_key = None
 
     def adata_to_array(self, adata):
         """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
@@ -172,14 +174,41 @@ class Trainer:
         bm_optimizer = torch.optim.Adam(model.bm.parameters(), lr=self.args.rbm_lr)
         return model, vae_optimizer, bm_optimizer
 
+    def _ensure_q_svi(self, model, vae_optimizer, bm_optimizer):
+        """按当前的模型和优化器组合构建（或复用缓存的）Q_SVI 内核。"""
+        key = (id(model), id(vae_optimizer), id(bm_optimizer))
+        if self._q_svi is None or self._q_svi_key != key:
+            self._q_svi = Q_SVI(
+                model=model,
+                optim=vae_optimizer,
+                bm_optim=bm_optimizer,
+                bm_weight_decay=self.args.bm_weight_decay,
+            )
+            self._q_svi_key = key
+
     def run_epoch(self, model, loader, vae_optimizer, bm_optimizer, train=True):
         """运行一个训练或验证 epoch，并返回平均指标。"""
         model.train(train)
+        if train and getattr(self.args, "backend", "legacy") == "svi":
+            self._ensure_q_svi(model, vae_optimizer, bm_optimizer)
         totals = {key: 0.0 for key in self.metric_keys}
 
         for x, batch_idx in loader:
             x = x.to(self.device)
             batch_idx = batch_idx.to(self.device)
+
+            # SVI 后端：两阶段更新委托给 Q_SVI.step，backward 顺序与 legacy 分支逐行对齐。
+            if train and self._q_svi is not None:
+                self._q_svi.step(x, batch_idx=batch_idx)
+                loss_value = self._q_svi.last_loss
+                bm_loss_value = self._q_svi.last_bm_loss or 0.0
+                totals["loss"] += loss_value
+                totals["neg_elbo"] += loss_value
+                totals["kl"] += model.last_kl_loss.item()
+                totals["recon_loss"] += model.last_recon_loss.item()
+                totals["bm_loss"] += bm_loss_value
+                continue
+
             if train:
                 vae_optimizer.zero_grad()
 

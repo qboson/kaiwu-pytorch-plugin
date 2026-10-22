@@ -6,7 +6,7 @@ from .full_boltzmann_machine import BoltzmannMachine
 from .maifs import FeatureSelectionWrapper, QuadraticLinearSolver
 from .qdeq import QDEQ, QDEQConfig
 from .qdiffusion import EnergyModel, QDiffusion, QDiffusionConfig
-from .qvae import QVAE
+from .qvae import Q_SVI, QVAE
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
 from .usage_stats import (
@@ -22,6 +22,7 @@ __all__ = [
     "BoltzmannMachine",
     "EnergyModel",
     "QVAE",
+    "Q_SVI",
     "UnsupervisedDBN",
     "QDEQ",
     "QDEQConfig",

@@ -56,6 +56,12 @@ def parse_args():
     parser.add_argument("--loss-type", default="mse", choices=["mse", "bernoulli"])
     parser.add_argument("--representation", default="q", choices=["zeta", "q"])
     parser.add_argument("--load-weights", action="store_true")
+    parser.add_argument(
+        "--backend",
+        default="svi",
+        choices=["svi", "legacy"],
+        help="QVAE trainer backend: 'svi' (Q_SVI kernel, pilot default) or 'legacy' (inline loop)",
+    )
     parser.add_argument("--sampler-type", default="sa", choices=["sa", "cim"])
     parser.add_argument("--sa-initial-temperature", type=float, default=1000)
     parser.add_argument("--sa-alpha", type=float, default=0.5)

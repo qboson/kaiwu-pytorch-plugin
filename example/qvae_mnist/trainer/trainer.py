@@ -124,7 +124,7 @@ class Trainer:
 
     def _setup_tuner(self):
         """初始化 ModelTuner 并设置优化器"""
-        self.tuner = ModelTuner(config=self.config)
+        self.tuner = ModelTuner(config=self.config, backend=getattr(self.config, 'backend', 'legacy'))
 
         # 注册模型和数据加载器
         self.tuner.register_model(self.model)

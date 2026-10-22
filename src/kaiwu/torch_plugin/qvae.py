@@ -219,17 +219,27 @@ class QVAE(AutoEncoderBase):
         clipped_mean = torch.clamp(mean.reshape(-1), 0.001, 0.999).detach()
         self._train_bias.copy_(-torch.log(1 / clipped_mean - 1))
 
-    def forward(self, x):
+    def guide(self, x, **kwargs):
         """
-        Forward pass through the QVAE.
+        Inference network (the SVI guide): encode inputs and sample latents.
+
+        Runs the encoder and the variational posterior, returning the encoder
+        logits, the posterior distribution and the reparameterized latent
+        sample. Together with ``generate`` this decomposes ``forward`` into
+        the two programs pyro.infer.SVI keeps separate: the guide proposes
+        latents given the input, the generative network scores them.
 
         Args:
             x (torch.Tensor): Input tensor of shape (batch_size, input_dim).
+            ``**kwargs``: Conditioners accepted for signature parity with
+                ``generate`` (e.g. ``batch_idx``); ignored by the plain
+                encoder.
 
         Returns:
-            tuple: Reconstructed logits, posterior distribution, encoder logits,
-                and reparameterized latent sample.
+            tuple: Encoder logits, posterior distribution, and reparameterized
+                latent sample.
         """
+        del kwargs
         x = x.view(-1, self._input_dimension)
 
         # For Bernoulli data, we optionally subtract dataset mean
@@ -248,13 +258,47 @@ class QVAE(AutoEncoderBase):
 
         q = self.encoder(encoder_x)  # encoder must implement forward
         posterior, zeta = self.posterior(q, self.config.dist_beta)
+        return q, posterior, zeta
 
+    def generate(self, zeta, **kwargs):
+        """
+        Generative network: reconstruct inputs from latent samples.
+
+        Runs the decoder on the reparameterized latent sample produced by the
+        guide and applies the Bernoulli reconstruction bias when configured.
+
+        Args:
+            zeta (torch.Tensor): Reparameterized latent sample of shape
+                (batch_size, latent_dim).
+            ``**kwargs``: Conditioners accepted for signature parity with the
+                guide (e.g. ``batch_idx``); ignored by the plain decoder.
+
+        Returns:
+            torch.Tensor: Reconstructed logits of shape (batch_size,
+            input_dim).
+        """
+        del kwargs
         recon_x = self.decoder(zeta)  # decoder must implement forward
 
         # Add Bernoulli bias if needed
         if self.config.loss_type == "bernoulli":
             recon_x = recon_x + self._train_bias
 
+        return recon_x
+
+    def forward(self, x):
+        """
+        Forward pass through the QVAE (guide followed by generate).
+
+        Args:
+            x (torch.Tensor): Input tensor of shape (batch_size, input_dim).
+
+        Returns:
+            tuple: Reconstructed logits, posterior distribution, encoder logits,
+                and reparameterized latent sample.
+        """
+        q, posterior, zeta = self.guide(x)
+        recon_x = self.generate(zeta)
         return recon_x, posterior, q, zeta
 
     def loss(self, x, recon_x, posterior):
@@ -293,6 +337,11 @@ class QVAE(AutoEncoderBase):
 
         # Weight decay
         wd_loss = self._weight_decay_loss()
+
+        # Expose the components for logging/metric aggregation; detached so
+        # callers can ``.item()`` them without holding the autograd graph.
+        self.last_recon_loss = recon_loss.detach()
+        self.last_kl_loss = kl_loss.detach()
 
         # Total loss
         total_loss = recon_loss + self.kl_beta * kl_loss + wd_loss
@@ -379,3 +428,112 @@ class QVAE(AutoEncoderBase):
         if hasattr(self.bm, "linear_bias"):
             wd += self.weight_decay * 0.5 * torch.sum(self.bm.linear_bias**2)
         return wd
+
+
+class Q_SVI:  # pylint: disable=invalid-name,too-few-public-methods
+    """Lightweight SVI-style training kernel for QVAE models.
+
+    The external interface mirrors ``pyro.infer.SVI`` (``model`` / ``guide`` /
+    ``loss`` / ``step``) without requiring pyro. Following pyro's separation
+    of the two programs, ``step(x)`` always invokes the guide and the
+    generative model separately:
+
+    - the **guide** is the inference network: the encoder followed by the
+      variational posterior, producing the encoder logits ``q``, the
+      posterior distribution and the reparameterized latent sample ``zeta``;
+    - the **generative model** scores the sampled latents through
+      ``model.generate`` (the decoder likelihood, plus the Bernoulli
+      reconstruction bias when configured). The BM prior enters the loss
+      through the KL term of ``model.loss``.
+
+    Each ``step(x)`` then runs the two-phase alternating update:
+
+    1. zero the VAE optimiser, run the guide, reconstruct through the
+       generative network, compute the loss and step the encoder/decoder
+       optimiser;
+    2. zero the BM optimiser, compute ``bm_loss`` on the detached posterior
+       logits ``q`` and step the BM optimiser.
+
+    The op order matches the legacy ``ModelTuner`` loop batch-for-batch, so
+    under fixed seeds both backends reproduce identical loss curves.
+
+    Args:
+        model (QVAE): Model exposing ``guide``/``generate`` (or ``forward``),
+            ``loss`` and ``bm_loss`` (any ``AutoEncoderBase`` subclass
+            qualifies).
+        guide (callable, optional): Inference callable
+            ``guide(x, **kwargs) -> (q, posterior, zeta)``; defaults to
+            ``model.guide``, the encoder-based variational posterior.
+        optim (torch.optim.Optimizer): Optimiser over the encoder/decoder
+            parameters (phase 1).
+        loss (callable, optional): Loss callable
+            ``(x, recon_x, posterior) -> torch.Tensor``; defaults to
+            ``model.loss``. Unlike pyro this is a plain callable, not an ELBO
+            object.
+        bm_optim (torch.optim.Optimizer, optional): Optimiser over the BM
+            parameters (phase 2). When omitted, ``step`` performs only the
+            single-stage VAE update.
+        bm_weight_decay (float, optional): Weight decay forwarded to
+            ``model.bm_loss``. Defaults to ``0.0``.
+    """
+
+    def __init__(
+        self,
+        model,
+        guide=None,
+        optim=None,
+        loss=None,
+        bm_optim=None,
+        bm_weight_decay=0.0,
+    ):
+        if model is None:
+            raise ValueError("Q_SVI requires a model exposing loss/bm_loss.")
+        if optim is None:
+            raise ValueError("Q_SVI requires a VAE optimiser (optim).")
+        self.model = model
+        self.guide = guide
+        self.optim = optim
+        self.loss_fn = loss
+        self.bm_optim = bm_optim
+        self.bm_weight_decay = bm_weight_decay
+        self.last_loss = None
+        self.last_bm_loss = None
+
+    def step(self, x, **kwargs):
+        """Run one two-phase SVI update on a single batch.
+
+        Args:
+            x (torch.Tensor): Input tensor (batch_size, input_dim).
+            ``**kwargs``: Additional keyword arguments forwarded to the guide
+                and the generative network (e.g. ``batch_idx`` for
+                batch-conditioned decoders).
+
+        Returns:
+            float: Sum of the phase-1 loss and the phase-2 BM loss (the BM
+            term is ``0.0`` in single-stage mode), matching the loss the
+            legacy ``ModelTuner`` accumulates per batch.
+        """
+        # Phase 1: guide proposes latents, generative model reconstructs, the
+        # loss drives the encoder/decoder update.
+        self.optim.zero_grad()
+        guide = self.guide if self.guide is not None else self.model.guide
+        q, posterior, zeta = guide(x, **kwargs)
+        recon_x = self.model.generate(zeta, **kwargs)
+        loss_fn = self.loss_fn if self.loss_fn is not None else self.model.loss
+        loss = loss_fn(x, recon_x, posterior)
+        loss.backward()
+        self.optim.step()
+
+        # Phase 2: update the BM prior on the detached posterior logits.
+        bm_loss_value = 0.0
+        self.last_bm_loss = None
+        if self.bm_optim is not None:
+            self.bm_optim.zero_grad()
+            bm_loss = self.model.bm_loss(q.detach(), self.bm_weight_decay)
+            bm_loss.backward()
+            self.bm_optim.step()
+            bm_loss_value = bm_loss.item()
+            self.last_bm_loss = bm_loss_value
+
+        self.last_loss = loss.item()
+        return self.last_loss + bm_loss_value

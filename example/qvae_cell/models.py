@@ -177,6 +177,34 @@ class CellQVAE(QVAE):
         posterior, zeta = self.posterior(q, self.config.dist_beta)
         return q, posterior, zeta
 
+    def guide(self, x, **kwargs):
+        """推断网络（SVI guide）：编码输入并从后验采样潜变量。
+
+        Args:
+            x: 单细胞表达矩阵。
+            ``**kwargs``: 保留参数，与基类 guide 签名对齐。
+
+        Returns:
+            ``(q, posterior, zeta)``，分别为编码器 logits、后验分布和潜变量样本。
+        """
+        del kwargs
+        return self._encode(x)
+
+    def generate(self, zeta, **kwargs):
+        """生成网络：带 batch 条件地解码潜变量样本。
+
+        Args:
+            zeta: QVAE 潜变量。
+            ``**kwargs``: 可含 ``batch_idx``，每个样本的 batch 整数索引。
+
+        Returns:
+            重构结果（Bernoulli 损失下含 train bias）。
+        """
+        recon_x = self.decoder(self._decoder_input(zeta, kwargs.get("batch_idx")))
+        if self.config.loss_type == "bernoulli":
+            recon_x = recon_x + self._train_bias
+        return recon_x
+
     def forward(self, x, batch_idx=None):
         """执行带可选 batch 条件的 QVAE 前向传播。
 
@@ -188,10 +216,8 @@ class CellQVAE(QVAE):
             ``(recon_x, posterior, q, zeta)``，分别为重构结果、后验分布、
             编码器 logits 和潜变量样本。
         """
-        q, posterior, zeta = self._encode(x)
-        recon_x = self.decoder(self._decoder_input(zeta, batch_idx))
-        if self.config.loss_type == "bernoulli":
-            recon_x = recon_x + self._train_bias
+        q, posterior, zeta = self.guide(x)
+        recon_x = self.generate(zeta, batch_idx=batch_idx)
         return recon_x, posterior, q, zeta
 
     def energy(self, x, loss_type):
