@@ -739,7 +739,7 @@ class RBMVisualizer:
         # 保存结果
         if save_pdf:
             plt.savefig(
-                f"results/reconstructed_images_{title_suffix}.pdf",
+                f"{self.result_dir}/reconstructed_images_{title_suffix}.pdf",
                 dpi=300,
                 bbox_inches="tight",
                 format="pdf",
