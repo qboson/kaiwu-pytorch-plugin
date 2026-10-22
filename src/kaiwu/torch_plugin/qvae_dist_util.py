@@ -196,7 +196,7 @@ class FactorialBernoulliUtil(DistUtil):
         device = self.logit_mu.device
         q = torch.sigmoid(self.logit_mu)
         rho = torch.rand_like(q, device=device)
-        z = (rho < q).float()
+        z = (rho < q).to(dtype=q.dtype)
         return z
 
     def entropy(self):
@@ -284,7 +284,7 @@ class MixtureGeneric(FactorialBernoulliUtil):
         # Only let the gradient flow to q, not zeta itself
         zeta = zeta.detach() + grad_term
 
-        return zeta
+        return zeta.to(dtype=q.dtype)
 
     def log_prob_per_var(self, samples: torch.Tensor) -> torch.Tensor:
         """Compute log probability of samples under the mixture of overlapping distributions.
