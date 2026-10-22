@@ -257,15 +257,16 @@ class QVAE(AutoEncoderBase):
 
         return recon_x, posterior, q, zeta
 
-    def loss(self, x, recon_x, posterior):
+    def loss(self, x, recon_x, posterior, *, diagnose_zero_weight_kl=False):
         """Compute total loss (reconstruction + KL + weight decay).
 
         Args:
             x (torch.Tensor): Input tensor (batch_size, input_dim).
             recon_x (torch.Tensor): Reconstructed logits (batch_size, input_dim).
             posterior (MixtureGeneric): Posterior distribution object.
-            q (torch.Tensor): Encoder logits (batch_size, latent_dim).
-            zeta (torch.Tensor): Latent sample (batch_size, latent_dim).
+            diagnose_zero_weight_kl (bool): Compute the KL surrogate even when
+                kl_beta is zero. Defaults to False to avoid unused BM sampling.
+                This does not disable the separate bm_loss update.
 
         Returns:
             torch.Tensor: Total loss scalar.
@@ -289,7 +290,11 @@ class QVAE(AutoEncoderBase):
             raise ValueError(f"Unsupported loss type: {self.config.loss_type}")
 
         # KL divergence
-        kl_loss = self._kl_dist_from(posterior).mean()
+        kl_loss = (
+            self._kl_dist_from(posterior).mean()
+            if self.kl_beta != 0 or diagnose_zero_weight_kl
+            else recon_loss.new_zeros(())
+        )
 
         # Weight decay
         wd_loss = self._weight_decay_loss()
