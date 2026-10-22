@@ -1,4 +1,5 @@
 import os
+from numbers import Integral
 from tqdm import tqdm
 import logging
 import numpy as np
@@ -36,6 +37,14 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         self.lr = lr_mlp
         self.batch_size = batch_size_mlp
         self.epochs = epochs_mlp
+        for name, value in (
+            ("epochs_mlp", epochs_mlp),
+            ("batch_size_mlp", batch_size_mlp),
+        ):
+            if isinstance(value, bool) or not isinstance(value, Integral):
+                raise TypeError(f"{name} must be a positive integer")
+            if value < 1:
+                raise ValueError(f"{name} must be a positive integer")
         self.device = device
         self.random_state = random_state
         self.save_path = save_path
