@@ -158,3 +158,8 @@ Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 - 为靶点发现提供新线索
 
 **相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)
+
+
+## Feature input precision
+
+`FeatureExtractor.extract` and `transform` convert inputs to the current model parameter dtype and device at each call. This also applies after converting the model after constructing the extractor. Label values are preserved.
