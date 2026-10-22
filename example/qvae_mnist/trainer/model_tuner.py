@@ -128,7 +128,7 @@ class ModelTuner(object):
 				self._optimiser.step()
 			
 			# 第二阶段：更新 BM 参数（仅在两阶段模式下）
-			if self._use_two_optimisers and (self._config.type in ['QVAE', 'CellQVAE']):
+			if self._use_two_optimisers:
 				self._bm_optimiser.zero_grad()
 				# 使用提取的 q 计算 BM 损失（注意 q 应已 detach，但为安全再次 detach）
 				bm_loss = self._model.bm_loss(q.detach(), getattr(self._config, 'weight_decay', 0.0))
