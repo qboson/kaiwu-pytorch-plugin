@@ -261,7 +261,7 @@ def build_cim_eval_config(
     task_mode: str | None = None,
     sample_number: int | None = None,
     tmp_dir: str | None = None,
-    wait: bool = False,
+    wait: bool = True,
     interval: int = 1,
     use_precision_reducer: bool = False,
     precision: int = 8,
@@ -299,7 +299,7 @@ def build_cim_eval_config(
             or ``"SAMPLING"``.
         sample_number: Optional CIM sample count used for sampling mode.
         tmp_dir: Optional checkpoint/cache directory required by some CIM runs.
-        wait: Whether to block until CIM execution finishes.
+        wait: Must be True because BM scoring requires completed CIM solutions.
         interval: Polling interval in minutes.
         use_precision_reducer: Whether to wrap the CIM optimizer with
             ``PrecisionReducer``.
@@ -327,6 +327,8 @@ def build_cim_eval_config(
         EvalConfig: An evaluation config that routes BM hidden-state solving
         through ``CIMOptimizer``.
     """
+    if wait is not True:
+        raise ValueError("DPLM BM scoring requires synchronous CIM sampling: set wait=True.")
     return EvalConfig(
         reference_fasta=reference_fasta,
         proposal_ckpt=proposal_ckpt,
@@ -512,7 +514,7 @@ def main() -> None:
     #     project_no="YOUR_PROJECT_ID",
     #     task_mode="OPTIMIZATION",
     #     tmp_dir="./tmp",
-    #     wait=False,
+    #     wait=True,
     # )
 
     device = torch.device(config.device)

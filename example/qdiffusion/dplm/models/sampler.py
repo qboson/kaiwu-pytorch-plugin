@@ -11,7 +11,12 @@ def build_bm_sampler(
     sampler_type: str,
     sampler_kwargs: dict[str, Any] | None = None,
 ) -> Any:
-    """Builds one sampler object for BM hidden-state sampling."""
+    """Builds one sampler object for BM hidden-state sampling.
+
+    CIM sampling requires ``wait=True`` (the default), because the scoring
+    loop consumes completed solutions without an asynchronous polling loop.
+    Explicit nonblocking configurations raise ValueError before construction.
+    """
     sampler_kwargs = dict(sampler_kwargs or {})
     if sampler_type == "sa":
         from kaiwu.classical import SimulatedAnnealingOptimizer
@@ -26,6 +31,11 @@ def build_bm_sampler(
         return SimulatedAnnealingOptimizer(**default_kwargs)
 
     if sampler_type == "cim":
+        # Core BM scoring consumes a completed solution immediately; it has no
+        # asynchronous task polling/resume loop.
+        wait = sampler_kwargs.get("wait", True)
+        if wait is not True:
+            raise ValueError("DPLM BM scoring requires synchronous CIM sampling: set wait=True.")
         import kaiwu as kw
 
         # CIM lives behind the main ``kaiwu.cim`` namespace and may expose
@@ -56,7 +66,7 @@ def build_bm_sampler(
 
         optimizer_kwargs = {
             "task_name": sampler_kwargs.get("task_name", "qdiffusion_bm"),
-            "wait": sampler_kwargs.get("wait", False),
+            "wait": wait,
             "interval": sampler_kwargs.get("interval", 1),
         }
         optional_optimizer_keys = (
