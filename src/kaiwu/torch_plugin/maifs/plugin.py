@@ -49,6 +49,8 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
+        input_batch_axis: Input sample axis used when collecting derivative
+            batches. Targets always have their sample axis first.
 
     Returns:
         FeatureSelectionWrapper: Initialized PyTorch feature-selection wrapper.
@@ -92,6 +94,8 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: int | None = None,
         input_feature_axis: int = -1,
         solver_kwargs: dict[str, object] | None = None,
+        *,
+        input_batch_axis: int = 0,
     ) -> None:
 
         super().__init__()
@@ -120,6 +124,7 @@ class FeatureSelectionWrapper(nn.Module):
             None if mask_update_epochs is None else int(mask_update_epochs)
         )
         self.input_feature_axis = int(input_feature_axis)
+        self.input_batch_axis = int(input_batch_axis)
         self._min_selected_features_explicit = explicit_min
         self._trained_epochs = 0
         self.register_buffer("mask", torch.ones(self.feature_dim))
@@ -241,6 +246,38 @@ class FeatureSelectionWrapper(nn.Module):
             raise ValueError("data_loader produced no batches")
         return total_loss / batch_count
 
+    def _derivative_batch_axis(
+        self,
+        input_batch: torch.Tensor,
+        target_batch: torch.Tensor,
+    ) -> int:
+        """Validate and normalize the input sample axis for mask learning.
+
+        Args:
+            input_batch: A batch of model inputs.
+            target_batch: Targets with a leading sample dimension.
+
+        Returns:
+            The normalized input sample axis.
+
+        Raises:
+            ValueError: If the sample axis is invalid, coincides with the feature
+                axis, or input and target sample counts differ.
+        """
+        if not -input_batch.ndim <= self.input_batch_axis < input_batch.ndim:
+            raise ValueError(
+                f"input_batch_axis {self.input_batch_axis} is out of range "
+                f"for an input tensor with {input_batch.ndim} dimensions"
+            )
+        axis = self.input_batch_axis % input_batch.ndim
+        if axis == self.input_feature_axis % input_batch.ndim:
+            raise ValueError("input batch and feature axes must be different")
+        if target_batch.ndim == 0:
+            raise ValueError("target_batch must have a leading sample dimension")
+        if input_batch.shape[axis] != target_batch.shape[0]:
+            raise ValueError("input and target sample counts must match")
+        return axis
+
     def compute_mask_derivatives(
         self,
         data_loader: Iterable[Batch],
@@ -256,13 +293,16 @@ class FeatureSelectionWrapper(nn.Module):
             hessian_mode: ``"full"`` for the full Hessian or ``"diagonal"`` for
                 diagonal-only Hessian rows.
             max_samples: Optional maximum number of samples used for derivatives.
+                Samples are collected along ``input_batch_axis``; targets remain
+                batch-first, and other input dimensions are retained.
 
         Returns:
             A tuple containing the mask gradient and Hessian as NumPy arrays.
 
         Raises:
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
-                no batches, or ``loss_fn`` does not return a scalar tensor.
+                no batches, input/target sample layouts are inconsistent, or
+                ``loss_fn`` does not return a scalar tensor.
         """
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
@@ -270,19 +310,23 @@ class FeatureSelectionWrapper(nn.Module):
         input_batches: list[torch.Tensor] = []
         target_batches: list[torch.Tensor] = []
         count = 0
+        batch_axis = 0
         for input_batch, target_batch in data_loader:
+            batch_axis = self._derivative_batch_axis(input_batch, target_batch)
             input_batches.append(input_batch)
             target_batches.append(target_batch)
-            count += len(input_batch)
+            count += input_batch.shape[batch_axis]
             if max_samples is not None and count >= max_samples:
                 break
 
         if not input_batches:
             raise ValueError("data_loader produced no batches")
-        input_all = torch.cat(input_batches, dim=0)
+        input_all = torch.cat(input_batches, dim=batch_axis)
         target_all = torch.cat(target_batches, dim=0)
         if max_samples is not None:
-            input_all = input_all[:max_samples]
+            sample_slice = [slice(None)] * input_all.ndim
+            sample_slice[batch_axis] = slice(None, max_samples)
+            input_all = input_all[tuple(sample_slice)]
             target_all = target_all[:max_samples]
         input_all = input_all.to(self.mask.device)
         target_all = target_all.to(self.mask.device)
