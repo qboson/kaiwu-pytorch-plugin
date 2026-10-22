@@ -136,7 +136,18 @@ def top_k_top_p_filtering(
     Returns:
         torch.Tensor: A tensor with the same shape as ``logits`` where filtered entries are
         replaced by ``filter_value``.
+
+    Raises:
+        TypeError: If ``top_k`` is not an integer.
+        ValueError: If ``top_k`` is negative or ``top_p`` is outside ``(0, 1]``.
     """
+    if isinstance(top_k, bool) or not isinstance(top_k, int):
+        raise TypeError("top_k must be a non-negative integer")
+    if top_k < 0:
+        raise ValueError("top_k must be a non-negative integer")
+    top_p = float(top_p)
+    if not torch.isfinite(torch.tensor(top_p)) or not 0.0 < top_p <= 1.0:
+        raise ValueError("top_p must be in (0, 1]")
     original_shape = logits.shape
     flat_logits = logits.reshape(-1, original_shape[-1])
     assert flat_logits.dim() == 2
