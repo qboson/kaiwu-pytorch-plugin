@@ -146,3 +146,13 @@ A: 您可以通过以下渠道获取帮助：
 1. **GitHub Issues**：[提交问题](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues)
 2. **开发者社区**：玻色量子开发者社区
 3. **联系邮箱**：developer@boseq.com
+
+## How does `max_samples` bound feature-selection derivative collection?
+
+`FeatureSelectionWrapper.compute_mask_derivatives` accepts a positive integer
+(including NumPy integer scalars), or `None` to use every sample. Booleans,
+nonintegers, and nonpositive limits are rejected before reading the loader.
+Collection keeps only the required prefix of the last batch before concatenating
+inputs and targets. This bounds the extra concatenation storage by the selected
+sample count; the loader still constructs its original batches, and the full
+Hessian still uses quadratic storage in the feature count.
