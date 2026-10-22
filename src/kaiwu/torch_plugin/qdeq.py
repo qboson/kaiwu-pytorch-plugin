@@ -24,6 +24,7 @@ from __future__ import annotations
 import contextlib
 import math
 import time
+from numbers import Integral
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -368,6 +369,32 @@ class QDEQ(nn.Module):
         self.config = config or QDEQConfig()
         if self.config.stop_mode not in ("rel", "abs"):
             raise ValueError("stop_mode must be 'rel' or 'abs'")
+        cfg = self.config
+        for name, value in (
+            ("f_thres", cfg.f_thres),
+            ("b_thres", cfg.b_thres),
+            ("num_basis", cfg.num_basis),
+            ("coeff_bits", cfg.coeff_bits),
+            ("history_size", cfg.history_size),
+            ("anderson_m", cfg.anderson_m),
+        ):
+            if isinstance(value, bool) or not isinstance(value, Integral) or value < 1:
+                raise ValueError(f"{name} must be a positive integer")
+        if (
+            isinstance(cfg.jac_loss_vecs, bool)
+            or not isinstance(cfg.jac_loss_vecs, Integral)
+            or cfg.jac_loss_vecs < 0
+        ):
+            raise ValueError("jac_loss_vecs must be a non-negative integer")
+        for name, value in (
+            ("f_eps", cfg.f_eps),
+            ("b_eps", cfg.b_eps),
+            ("coeff_range", cfg.coeff_range),
+            ("fd_eps", cfg.fd_eps),
+            ("anderson_lam", cfg.anderson_lam),
+        ):
+            if not math.isfinite(float(value)) or float(value) <= 0:
+                raise ValueError(f"{name} must be a finite positive number")
         self.last_jac_loss = None
         self._last_stats: dict[str, float] = {}
 
