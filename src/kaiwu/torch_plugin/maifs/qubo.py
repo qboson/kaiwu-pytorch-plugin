@@ -398,7 +398,25 @@ def _restore_kaiwu_split_solution(
     last_var_idx: Any,
     vote: bool,
 ) -> np.ndarray:
-    """Restore a split Kaiwu solution across supported Kaiwu versions."""
+    """Restore a split Kaiwu solution across supported Kaiwu versions.
+
+    Args:
+        solution: Binary solution over the split variables.
+        last_var_idx: Mapping returned by the Kaiwu splitting helper.
+        vote: Whether Kaiwu should restore by majority vote.
+
+    Returns:
+        Restored solution over the original variables.
+
+    Raises:
+        TypeError: If vote is not a boolean.
+        ValueError: If solution is not binary.
+    """
+    if not isinstance(vote, bool):
+        raise TypeError("vote must be a boolean")
+    binary = np.asarray(solution)
+    if not np.all((binary == 0) | (binary == 1)):
+        raise ValueError("solution must contain only binary 0/1 values")
     preprocess_module = importlib.import_module("kaiwu.preprocess")
     restore_with_vote = cast(
         Callable[[np.ndarray, Any, bool], np.ndarray] | None,
