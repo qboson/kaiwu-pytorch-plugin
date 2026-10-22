@@ -419,7 +419,7 @@ class QDiffusion(nn.Module):
         input_tokens: torch.Tensor,
         partial_masks: torch.Tensor | None = None,
         max_steps: int = 500,
-        temperature: float = 1.0,
+        temperature: float | None = None,
     ) -> dict[str, Any]:
         """Creates the initial decoding state for an external generation loop.
 
@@ -427,7 +427,8 @@ class QDiffusion(nn.Module):
             input_tokens: Initial token tensor.
             partial_masks: Optional boolean mask of fixed positions.
             max_steps: Planned number of decode iterations.
-            temperature: Sampling temperature stored in the state payload.
+            temperature: Sampling temperature used for proposal sampling during
+                decoding. ``None`` keeps ``config.proposal_temperature``.
 
         Returns:
             dict[str, Any]: A mutable state dictionary suitable for repeated ``step`` calls.
@@ -500,7 +501,7 @@ class QDiffusion(nn.Module):
         *,
         max_steps: int = 500,
         partial_masks: torch.Tensor | None = None,
-        temperature: float = 1.0,
+        temperature: float | None = None,
         return_state: bool = False,
     ) -> torch.Tensor | dict[str, Any]:
         """Runs a complete iterative decoding loop inside the core class.
@@ -509,7 +510,8 @@ class QDiffusion(nn.Module):
             input_tokens: Initial token tensor.
             max_steps: Number of decode iterations to run.
             partial_masks: Optional boolean mask of fixed positions.
-            temperature: Sampling temperature stored in the decode state.
+            temperature: Sampling temperature used for proposal sampling during
+                decoding. ``None`` keeps ``config.proposal_temperature``.
             return_state: Whether to return the full final state dictionary.
 
         Returns:
@@ -721,21 +723,29 @@ class QDiffusion(nn.Module):
         raise ValueError(f"Unexpected candidate tensor shape {tuple(tensor.shape)}.")
 
     def _sample_candidates(
-        self, logits: torch.Tensor, num_candidates: int
+        self,
+        logits: torch.Tensor,
+        num_candidates: int,
+        temperature: float | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Samples proposal candidates from logits.
 
         Args:
             logits: Proposal logits for the current decode step.
             num_candidates: Number of candidates to sample per sequence.
+            temperature: Sampling temperature. ``None`` falls back to
+                ``config.proposal_temperature``.
 
         Returns:
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` shaped as
             ``[batch, num_candidates, seq_len]``.
         """
+        resolved_temperature = (
+            self.config.proposal_temperature if temperature is None else temperature
+        )
         samples, scores = stochastic_sample_from_categorical_n(
             logits,
-            temperature=self.config.proposal_temperature,
+            temperature=resolved_temperature,
             noise_scale=self.config.proposal_noise_scale,
             n=num_candidates,
         )
@@ -873,7 +883,9 @@ class QDiffusion(nn.Module):
             logits = logits.type_as(output_scores)
 
         candidate_tokens, candidate_scores = self._sample_candidates(
-            logits, self.config.num_candidates
+            logits,
+            self.config.num_candidates,
+            temperature=state.get("temperature"),
         )
         selected_tokens, selected_scores = self._select_candidates(
             output_tokens, candidate_tokens, candidate_scores
