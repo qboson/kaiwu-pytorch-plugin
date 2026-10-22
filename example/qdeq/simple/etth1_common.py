@@ -281,4 +281,6 @@ def evaluate(model: DEQForecaster, loader: DataLoader) -> dict[str, float]:
         absolute += torch.sum(torch.abs(forecast - target)).item()
         count += target.numel()
         steps.append(model.deq.get_last_stats()["forward_nstep"])
+    if count == 0:
+        raise ValueError("evaluate() needs a loader with at least one sample")
     return {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}
