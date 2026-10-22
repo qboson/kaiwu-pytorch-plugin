@@ -58,6 +58,9 @@ try:
         write_markdown_report,
     )
 except ImportError:  # pragma: no cover - direct script-path compatibility
+    _WORKFLOW_DIR = Path(__file__).resolve().parent
+    if str(_WORKFLOW_DIR) not in sys.path:
+        sys.path.insert(0, str(_WORKFLOW_DIR))
     from utils.dplm_builder import build_qdiffusion
     from utils.io import (
         default_fasta_path,
