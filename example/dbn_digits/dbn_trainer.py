@@ -210,7 +210,7 @@ class DBNTrainer:
                         )
 
                 # Calculate average objective value for the current epoch
-                avg_loss = total_loss / len(loader)
+                avg_loss = total_loss / (i + 1)
 
                 # Print epoch average loss every 5 batches
                 if self.verbose and i % 5 == 0:
@@ -277,11 +277,11 @@ class DBNTrainer:
             rbm (RestrictedBoltzmannMachine): The RBM layer.
         """
         print(
-            f"jmean {torch.abs(rbm.quadratic_coef).mean().item():.6f}"
+            f"jmean {torch.abs(rbm.quadratic_coef).mean().item():.6f}, "
             f"jmax {torch.abs(rbm.quadratic_coef).max().item():.6f}"
         )
         print(
-            f"hmean {torch.abs(rbm.linear_bias).mean().item():.6f}"
+            f"hmean {torch.abs(rbm.linear_bias).mean().item():.6f}, "
             f"hmax {torch.abs(rbm.linear_bias).max().item():.6f}"
         )
 
