@@ -484,6 +484,9 @@ class DBNPretrainer(BaseEstimator, TransformerMixin):
 
     def fit(self, X, y=None):
         """训练模型"""
+        # 先设置随机种子再创建 RBM 层，否则层的随机初始化不受 random_state 控制。
+        if self.random_state is not None:
+            self._trainer._set_random_seed()
         self._dbn.create_rbm_layer(X.shape[1])
         self._trainer.train(self._dbn, X)
         return self
