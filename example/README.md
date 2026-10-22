@@ -125,3 +125,25 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+
+### Bring Your Own Sampler: A Verified Custom Solver
+
+`example/local_sampler/` documents the sampler contract the plugin relies on and
+checks a pure-PyTorch Metropolis sampler against brute-force enumeration, so the
+interface can be exercised without Kaiwu SDK credentials.
+
+`model.get_ising_matrix()` returns an `(N + 1) x (N + 1)` auxiliary-spin matrix
+`M` with `E(x) = c - y^T M y` (`y = [2x - 1, +1]`), which means low-energy states
+are the **maximizers** of `s^T M s`; `solve(M)` must return `(num_reads, N + 1)`
+spins in `{-1, +1}` that follow that direction.
+
+```bash
+python example/local_sampler/local_sampler.py
+```
+
+The script builds a four-node Boltzmann machine with three degenerate ground
+states, compares `model.sample(sampler)` with the exhaustive minimum
+(`minimal-energy draws: 32/32 -> PASS`) and runs a short training smoke test.
+No license is required. See `example/local_sampler/README.md` for the contract
+details and expected output.
