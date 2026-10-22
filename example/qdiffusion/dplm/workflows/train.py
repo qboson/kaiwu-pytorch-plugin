@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import os
+import operator
 import random
 import json
 from dataclasses import asdict, dataclass, field
@@ -226,9 +227,24 @@ def build_default_workflow_config() -> WorkflowConfig:
     )
 
 
+def validate_training_epochs(value: int) -> int:
+    """Require at least one epoch so final/best checkpoints can be produced."""
+    if isinstance(value, bool):
+        raise TypeError("train.epochs must be a positive integer")
+    try:
+        epochs = operator.index(value)
+    except TypeError as exc:
+        raise TypeError("train.epochs must be a positive integer") from exc
+    if epochs <= 0:
+        raise ValueError("train.epochs must be a positive integer")
+    return epochs
+
+
 def main() -> None:
     """Runs the final self-contained full workflow."""
     config = build_default_workflow_config()
+    # Validate before device checks, output creation, or pretrained model loads.
+    config.train.epochs = validate_training_epochs(config.train.epochs)
     # For custom samplers, keep the top-level structure and only swap this block.
     #
     # config.sampler = SamplerConfig(
