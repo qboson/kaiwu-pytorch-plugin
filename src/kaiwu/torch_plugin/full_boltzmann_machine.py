@@ -208,6 +208,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
         """
+        if s_visible.dim() != 2:
+            raise ValueError("s_visible must have shape (batch, num_visible)")
+        if s_visible.size(1) > self.num_nodes:
+            raise ValueError("s_visible width must not exceed num_nodes")
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
