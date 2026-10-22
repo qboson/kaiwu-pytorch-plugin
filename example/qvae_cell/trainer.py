@@ -10,8 +10,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.cim import CIMOptimizer, PrecisionReducer
 from kaiwu.torch_plugin import BoltzmannMachine
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder

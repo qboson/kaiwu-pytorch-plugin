@@ -17,6 +17,9 @@ scib_metrics
 scgraph
 ```
 
+Kaiwu 1.3.1 的硬件精度适配器为 `kaiwu.cim.PrecisionReducer`。
+使用 `--sampler-type sa` 时，trainer 仅创建本地模拟退火采样器。
+
 ## 文件结构
 
 ```text
