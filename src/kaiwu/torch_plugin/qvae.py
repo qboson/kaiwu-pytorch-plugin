@@ -64,7 +64,8 @@ class AutoEncoderBase(nn.Module):
         self._latent_dimensions = config.num_latent_units
         self._input_dimension = input_dimension[0]  # single input dimension
         self._activation_fct = activation_fct
-        self._dataset_mean = None  # for Bernoulli bias correction
+        # Extra state persists the optional mean, including its unset state.
+        self.register_buffer("_dataset_mean", None, persistent=False)
 
     @abc.abstractmethod
     def _create_encoder(self):
@@ -83,12 +84,51 @@ class AutoEncoderBase(nn.Module):
 
     def set_dataset_mean(self, mean):
         """
-        Set dataset mean for bias correction.
+        Set nontrainable dataset statistics for encoder centering.
 
         Args:
-            mean (torch.Tensor): Mean of the training data (shape: input_dim).
+            mean (torch.Tensor or scalar): Mean of the training data. ``None``
+                disables centering. The mean is included in model checkpoints.
         """
-        self._dataset_mean = mean
+        self.register_buffer(
+            "_dataset_mean",
+            None if mean is None else torch.as_tensor(mean).detach().clone(),
+            persistent=False,
+        )
+
+    def get_extra_state(self):
+        """Return a tensor snapshot of the optional centering mean."""
+        if self._dataset_mean is None:
+            return torch.empty(0)
+        return self._dataset_mean.detach().clone()
+
+    def set_extra_state(self, state):
+        """Restore the mean; an empty tensor represents disabled centering."""
+        if not isinstance(state, torch.Tensor):
+            raise TypeError("Dataset-mean checkpoint state must be a tensor")
+        self.set_dataset_mean(None if state.numel() == 0 else state)
+
+    def _load_from_state_dict(
+        self, state_dict, prefix, local_metadata, strict,
+        missing_keys, unexpected_keys, error_msgs,
+    ):
+        """Load centering state with legacy compatibility and parameter properties."""
+        extra_key = prefix + "_extra_state"
+        if extra_key not in state_dict:
+            state_dict[extra_key] = self.get_extra_state()
+        mean_state = state_dict[extra_key]
+        if (
+            not local_metadata.get("assign_to_params_buffers", False)
+            and isinstance(mean_state, torch.Tensor)
+            and mean_state.numel() > 0
+        ):
+            parameter = next(self.parameters(), None)
+            if parameter is not None:
+                state_dict[extra_key] = mean_state.to(parameter)
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs,
+        )
 
     def __repr__(self):
         parameter_string = "\n".join([str(par) for par in self.__dict__.items()])
