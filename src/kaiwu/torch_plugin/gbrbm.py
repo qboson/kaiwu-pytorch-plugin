@@ -29,8 +29,13 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             and hidden nodes are Bernoulli. Defaults to True.
         eps (float, optional): Small value to avoid numerical issues.
             Defaults to 1e-8.
-        dtype (torch.dtype, optional): Data type for tensor construction.
-            Defaults to torch.float32.
+        dtype (torch.dtype, optional): Data type for all internally constructed
+            parameters and states. Defaults to torch.float32.
+        linear_bias (torch.Tensor, optional): Bernoulli-side bias with shape
+            ``[num_bernoulli]``. Supplied tensors must match ``dtype`` and ``device``.
+        quadratic_coef (torch.Tensor, optional): Coupling weights with shape
+            ``[num_gaussian, num_bernoulli]``. Supplied tensors must match ``dtype``
+            and ``device``.
         device (torch.device, optional): Device to construct tensors.
     """
 
@@ -74,12 +79,18 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef
             if quadratic_coef is not None
-            else torch.randn((self.num_gaussian, self.num_bernoulli)).to(self.device)
+            else torch.randn(
+                (self.num_gaussian, self.num_bernoulli),
+                dtype=self.dtype,
+                device=self.device,
+            )
         )
         self.linear_bias = torch.nn.Parameter(
             linear_bias
             if linear_bias is not None
-            else torch.zeros(self.num_bernoulli).to(self.device)
+            else torch.zeros(
+                self.num_bernoulli, dtype=self.dtype, device=self.device
+            )
         )
 
         self.init_parameter(std=0.01, init_var=1)
