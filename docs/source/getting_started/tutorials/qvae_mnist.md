@@ -158,3 +158,8 @@ Q-VAE 的进阶版本 QBM-VAE 在科研中展示了重要价值：
 - 为靶点发现提供新线索
 
 **相关论文**：[Quantum-Boosted High-Fidelity Deep Learning](https://arxiv.org/abs/2508.11190)
+
+
+## Downstream classifier epoch losses
+
+The downstream MLP reports the mean cross-entropy over processed samples. Each batch loss is weighted by its actual sample count, so a short final batch does not receive the same weight as a full batch. Validation losses are therefore comparable across batch sizes.
