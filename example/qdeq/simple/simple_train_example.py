@@ -27,14 +27,22 @@ from etth1_common import (
 )
 
 
+def _positive_int(text: str) -> int:
+    """Returns a strictly positive integer for argparse."""
+    value = int(text)
+    if value < 1:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return value
+
+
 def parse_args() -> argparse.Namespace:
     """Parses command-line options."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--sampler", choices=["sa", "anderson", "cim"], default="sa")
-    parser.add_argument("--epochs", type=int, default=2)
-    parser.add_argument("--max-train-batches", type=int, default=60)
+    parser.add_argument("--epochs", type=_positive_int, default=2)
+    parser.add_argument("--max-train-batches", type=_positive_int, default=60)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=0)
     return parser.parse_args()
