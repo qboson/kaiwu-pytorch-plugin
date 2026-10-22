@@ -81,14 +81,15 @@ class Trainer:
                 num_evts_test=self.config.num_test_samples,
                 use_cuda=self.config.use_cuda
             )
-        # 计算数据集均值
-        total_sum = 0
-        total_count = 0
+        # 计算数据集均值（按特征/像素，供 Bernoulli 偏置校正使用）
+        feature_sum = None
+        sample_count = 0
         for data, _ in self.train_loader:
-            total_sum += data.sum()
-            total_count += data.numel()
-        self.dataset_mean = total_sum / total_count
-        logger.info(f"Dataset mean: {self.dataset_mean:.4f}")
+            batch_sum = data.sum(dim=0)
+            feature_sum = batch_sum if feature_sum is None else feature_sum + batch_sum
+            sample_count += data.shape[0]
+        self.dataset_mean = feature_sum.reshape(-1) / sample_count
+        logger.info(f"Dataset mean: {self.dataset_mean.mean().item():.4f}")
         return self.train_loader, self.test_loader
 
     def _create_model(self):
