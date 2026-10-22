@@ -381,8 +381,14 @@ class QDiffusion(nn.Module):
         timesteps = sample_outputs["t"]
         loss_mask = sample_outputs["loss_mask"]
 
-        with torch.no_grad():
-            logits = self.forward(noisy_tokens).detach()
+        proposal_trainable = any(
+            parameter.requires_grad for parameter in self.proposal_model.parameters()
+        )
+        if proposal_trainable:
+            logits = self.forward(noisy_tokens)
+        else:
+            with torch.no_grad():
+                logits = self.forward(noisy_tokens).detach()
 
         negative_tokens, _ = self._sample_candidates(logits, self.config.num_candidates)
         positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
