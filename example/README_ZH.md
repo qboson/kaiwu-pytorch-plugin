@@ -115,3 +115,22 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+
+---
+
+### 用量统计开关
+
+KPP 只在自己的采样路径上上报匿名用量统计。本示例演示默认状态、运行时的
+`enable_usage_stats()` / `disable_usage_stats()` 切换，以及 `KPP_STATS_ENABLED`
+环境变量（含 `true`/`1`/`yes`/`on` 这几个文档化取值）。
+
+请通过 `python example/usage_stats_switch/usage_stats_switch.py` 运行该示例。
+
+**依赖项**
+
+```
+kaiwu-torch-plugin
+```
