@@ -140,10 +140,15 @@ class FeatureSelectionWrapper(nn.Module):
 
         Raises:
             ValueError: If ``input_feature`` has no dimensions or the configured
-                feature axis does not match ``feature_dim``.
+                feature axis is out of range or does not match ``feature_dim``.
         """
         if input_feature.ndim == 0:
             raise ValueError("input_feature must have at least one dimension")
+        if not -input_feature.ndim <= self.input_feature_axis < input_feature.ndim:
+            raise ValueError(
+                f"input_feature_axis {self.input_feature_axis} is out of range "
+                f"for an input tensor with {input_feature.ndim} dimensions"
+            )
         axis = self.input_feature_axis % input_feature.ndim
         axis_size = input_feature.shape[axis]
         if axis_size != self.feature_dim:
@@ -165,12 +170,19 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> torch.Tensor:
         """Apply the current or provided feature mask to an input tensor.
 
+        The configured ``input_feature_axis`` must be in the input tensor's
+        dimension range. Negative axes count backwards from the last dimension.
+
         Args:
             input_feature: Input tensor to mask.
             mask: Optional mask to use instead of ``self.mask``.
 
         Returns:
             The masked input tensor.
+
+        Raises:
+            ValueError: If the input is scalar, the feature axis is out of range,
+                or the feature dimension does not match ``feature_dim``.
         """
         resolved_mask = self.mask if mask is None else mask
         return input_feature * self._mask_view(input_feature, resolved_mask)
