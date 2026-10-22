@@ -1,17 +1,45 @@
-"""QDEQ public interface, solver and gradient tests with Kaiwu simulated annealing."""
+"""QDEQ public interface, solver and gradient tests."""
 
 import unittest
 
+import numpy as np
 import torch
 
 import kaiwu.torch_plugin as plugin
-from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
 
 
-def kaiwu_sa(seed=0):
-    """Kaiwu simulated annealing with default settings and a fixed seed."""
-    return SimulatedAnnealingOptimizer(rand_seed=seed)
+class LocalSearchSampler:
+    """Deterministic stand-in for a Kaiwu optimizer that needs no license.
+
+    Like the Kaiwu optimizers it maximises ``s^T J s`` over spins ``s``, here
+    by single-spin-flip descent from a few random starts. Each start is
+    returned as one solution row.
+    """
+
+    def __init__(self, restarts=4, seed=0):
+        self.restarts = restarts
+        self.seed = seed
+
+    def solve(self, ising_mat):
+        """Returns one locally optimal spin row per restart."""
+        rng = np.random.default_rng(self.seed)
+        coupling = (ising_mat + ising_mat.T) / 2
+        np.fill_diagonal(coupling, 0.0)
+        rows = []
+        for _ in range(self.restarts):
+            spins = rng.choice([-1.0, 1.0], size=coupling.shape[0])
+            field = coupling @ spins
+            while True:
+                # Flipping spin i changes s^T J s by -4 s_i (J s)_i.
+                gain = -4.0 * spins * field
+                i = int(np.argmax(gain))
+                if gain[i] <= 1e-12:
+                    break
+                spins[i] = -spins[i]
+                field += 2.0 * spins[i] * coupling[:, i]
+            rows.append(spins.copy())
+        return np.stack(rows)
 
 
 class LinearLayer(torch.nn.Module):
@@ -51,7 +79,7 @@ class TestQDEQConstruction(unittest.TestCase):
     def test_rejects_unknown_stop_mode(self):
         """Unknown stop-mode names are rejected at construction."""
         with self.assertRaises(ValueError):
-            QDEQ(LinearLayer(), kaiwu_sa(), QDEQConfig(stop_mode="max"))
+            QDEQ(LinearLayer(), LocalSearchSampler(), QDEQConfig(stop_mode="max"))
 
 
 class TestIsingForward(unittest.TestCase):
@@ -64,8 +92,8 @@ class TestIsingForward(unittest.TestCase):
         self.exact = torch.linalg.solve(eye - self.layer.weight.detach(), self.x.T).T
 
     def test_converges_to_fixed_point(self):
-        """Kaiwu SA steps reach (I - W)^-1 x."""
-        deq = QDEQ(self.layer, kaiwu_sa(), solve_config()).eval()
+        """Ising steps reach (I - W)^-1 x."""
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config()).eval()
         out = deq(self.x)
         stats = deq.get_last_stats()
         torch.testing.assert_close(out, self.exact, rtol=1e-5, atol=1e-5)
@@ -86,7 +114,7 @@ class TestImplicitGradient(unittest.TestCase):
 
     def test_gradient_matches_implicit_function_theorem(self):
         """Input and parameter gradients come from the implicit backward pass."""
-        deq = QDEQ(self.layer, kaiwu_sa(), solve_config())
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config())
         (deq(self.x) * self.weight).sum().backward()
         torch.testing.assert_close(self.x.grad, self.expected, rtol=1e-5, atol=1e-5)
         self.assertIsNotNone(self.layer.weight.grad)
@@ -94,7 +122,7 @@ class TestImplicitGradient(unittest.TestCase):
 
     def test_eval_mode_builds_no_implicit_graph(self):
         """Evaluation without gradients attaches no backward hook."""
-        deq = QDEQ(self.layer, kaiwu_sa(), solve_config()).eval()
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config()).eval()
         with torch.no_grad():
             out = deq(self.x)
         self.assertFalse(out.requires_grad)
@@ -102,7 +130,7 @@ class TestImplicitGradient(unittest.TestCase):
 
     def test_jacobian_loss_keeps_implicit_gradient(self):
         """Adding the regulariser leaves the implicit gradient of the output unchanged."""
-        deq = QDEQ(self.layer, kaiwu_sa(), solve_config(jac_loss_vecs=2))
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config(jac_loss_vecs=2))
         out = deq(self.x)
         (out.sum() + deq.last_jac_loss).backward()
         eye = torch.eye(6, dtype=torch.float64)
@@ -149,7 +177,7 @@ class TestHooksAndRegulariser(unittest.TestCase):
                 """Records the final layer call."""
                 return Recorder("reattach")
 
-        HookedQDEQ(Layer(), kaiwu_sa(), QDEQConfig(f_thres=4))(torch.randn(2, 4))
+        HookedQDEQ(Layer(), LocalSearchSampler(), QDEQConfig(f_thres=4))(torch.randn(2, 4))
         self.assertEqual(events[0], "solve:enter")
         self.assertEqual(events[-3:], ["reattach:enter", "grad", "reattach:exit"])
         self.assertNotIn("grad", events[:-3])
