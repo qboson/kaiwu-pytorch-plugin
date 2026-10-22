@@ -40,11 +40,12 @@ def build_bm_sampler(
                 "the current runtime."
             )
 
-        tmp_dir = sampler_kwargs.get("tmp_dir")
-        if tmp_dir:
-            # Some CIM runtimes require a checkpoint/cache directory before the
-            # optimizer can submit or resume remote jobs.
-            kw.common.CheckpointManager.save_dir = tmp_dir
+        # The CIM runtime requires a checkpoint/cache directory before the
+        # optimizer can be constructed (``ValueError: The save directory is
+        # required``), so fall back to the ``./tmp`` directory the other
+        # examples use when the caller does not provide one.
+        tmp_dir = sampler_kwargs.get("tmp_dir") or "./tmp"
+        kw.common.CheckpointManager.save_dir = tmp_dir
 
         task_mode = sampler_kwargs.get("task_mode")
         if isinstance(task_mode, str):
