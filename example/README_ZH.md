@@ -115,3 +115,20 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+### 验证案例：文档化的训练循环真的在学习吗？
+
+`example/learning_direction/` 把"训练有效"这句话变成可测量的结果。三可见/两隐藏的 RBM 只有
+`2^5` 个状态，因此可以直接穷举出精确的边际概率；示例会在文档化训练循环
+（`get_hidden` → `sample` → `objective` → `step`）前后，报告训练模式的精确平均 `p(pattern)`
+与能量差。
+
+```bash
+python example/learning_direction/learning_direction.py
+```
+
+默认参数下模式概率从 `0.124706` 升到 `0.132095`，能量差由负转正。把目标取反
+（示例 README 里的 `flip_sign=True`）会把概率打到 `0.0`，说明 PASS/FAIL 对更新方向敏感、
+不是数值噪声。负相位使用穷举基态，因此**不需要 Kaiwu SDK 许可证**。
