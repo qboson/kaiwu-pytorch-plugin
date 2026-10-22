@@ -100,3 +100,20 @@ torchmetrics[image]
 ```
 torchvision==0.22.0
 ```
+---
+
+### 时间序列预测：基于QDEQ的ETTh1预测
+
+该示例在 ETTh1 数据集上训练一个参照 iTransformer 的小型预测模型，其编码器是一个 `QDEQ` 深度均衡层，不动点由 Kaiwu 模拟退火、CIM 或经典 Anderson 方法求解。主要内容包括：
+
+* **深度均衡层**：权重共享的变量间注意力块通过 `QDEQ` 求不动点，反向使用隐函数定理；
+* **Ising 求解器**：每一步更新的系数编码为 QUBO，交由传入的 Kaiwu 优化器求解；
+* **求解器对比**：同一份权重可分别用 SA、CIM、Anderson 评估。
+
+数据准备与运行命令见 `example/qdeq/README_ZH.md`，入口为 `example/qdeq/simple/simple_train_example.py`。
+
+**依赖项**
+
+```
+pandas
+```
