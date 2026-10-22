@@ -1,3 +1,4 @@
+import copy
 import os
 from tqdm import tqdm
 import logging
@@ -164,7 +165,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         train_acc_history = []
         val_acc_history = []
 
-        best_val_acc = 0.0
+        best_val_acc = float('-inf')
         best_state = None
         epoch_pbar = tqdm(range(1, self.epochs + 1), desc="Training MLP")
         for epoch in epoch_pbar:
@@ -203,7 +204,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             # 选择最佳模型
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
-                best_state = self.model.state_dict()
+                best_state = copy.deepcopy(self.model.state_dict())
                 if self.save_path is not None:
                     model_save_path = os.path.join(self.save_path, "best_mlp_classifier.pth")
                     torch.save(best_state, model_save_path)
