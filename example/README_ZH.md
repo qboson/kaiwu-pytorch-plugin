@@ -115,3 +115,19 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+### 最小 Q-Diffusion 示例：自带能量模型
+
+`example/qdiffusion_minimal/` 演示了 `QDiffusion` 的扩展点——仓库自带的 DPLM 示例把它藏在
+checkpoint 与 Hugging Face 下载之后：自定义 `EnergyModel` 子类对候选进行重排。
+
+```bash
+python example/qdiffusion_minimal/qdiffusion_minimal.py
+```
+
+脚本用六词表构造玩具 proposal 与 `BagOfTokensEnergy` 能量模型，对一条部分掩码的序列解码，
+并报告能量模型被调用了几次（`energy-model calls`）、掩码是否全部解码。纯 PyTorch：不需要
+checkpoint、不需要下载、不需要 Kaiwu SDK 许可证。`EnergyModel` 的契约见
+`example/qdiffusion_minimal/README_ZH.md`。
