@@ -646,8 +646,13 @@ def _solve_ising_kaiwu_cim(
         max_precision: Maximum source precision to test.
         precision_step: Coarse-search precision step.
         sample_number: Requested solution count for Kaiwu CIM.
-        save_dir: Optional directory used by Kaiwu checkpoint records.
-        cleanup_records: Whether to delete generated checkpoint records.
+        save_dir: Optional checkpoint base directory. Each invocation creates a
+            unique child directory for its records. When omitted, uses the
+            existing SDK checkpoint directory or a temporary default base.
+        cleanup_records: Whether to remove the current job directory after a
+            successful solve, restoration and spin validation. Failed-job
+            records are retained for inspection, including when this option
+            is True.
         project_no: Optional Kaiwu project number.
         task_mode: Kaiwu CIM task mode.
         interval: Optional Kaiwu polling interval.
@@ -657,7 +662,7 @@ def _solve_ising_kaiwu_cim(
 
     Raises:
         ImportError: If the optional Kaiwu package is unavailable.
-        RuntimeError: If Kaiwu CIM does not return a solution.
+        RuntimeError: If Kaiwu CIM does not return a valid spin solution.
     """
 
 
@@ -670,14 +675,14 @@ def _solve_ising_kaiwu_cim(
     plan = explorer.search(ising_matrix)
 
     submit_matrix = np.asarray(np.round(plan.split_matrix), dtype=int)
+    previous_save_dir = kw.common.CheckpointManager.save_dir
+    checkpoint_base = save_dir if save_dir is not None else previous_save_dir
     resolved_save_dir = Path(
-        save_dir
-        if save_dir is not None
+        checkpoint_base
+        if checkpoint_base is not None
         else Path(tempfile.gettempdir()) / "feature_selection_kaiwu_cim"
-    )
+    ).resolve()
     resolved_save_dir.mkdir(parents=True, exist_ok=True)
-    if save_dir is not None or kw.common.CheckpointManager.save_dir is None:
-        kw.common.CheckpointManager.save_dir = str(resolved_save_dir)
 
     task_hash = hashlib.md5(
         np.ascontiguousarray(submit_matrix).tobytes()
@@ -692,23 +697,26 @@ def _solve_ising_kaiwu_cim(
     }
     if interval is not None:
         cim_kwargs["interval"] = int(interval)
-    optimizer = kw.cim.CIMOptimizer(**cim_kwargs)
-
-    result = optimizer.solve(submit_matrix)
-    if result is None:
-        raise RuntimeError("CIMOptimizer did not return a solution.")
-    result = np.asarray(result)
-    result = result.reshape(1, -1) if result.ndim == 1 else result
-    if result.shape[0] == 0:
-        raise RuntimeError("CIMOptimizer returned no solutions.")
-    restored = explorer.restore_solution(result[0])
-    if cleanup_records:
-        for child in resolved_save_dir.iterdir():
-            if child.is_dir():
-                shutil.rmtree(child, ignore_errors=True)
-            elif child.exists():
-                child.unlink()
-    return np.asarray(restored).reshape(1, -1)
+    job_save_dir = Path(
+        tempfile.mkdtemp(prefix="feature_selection_cim_", dir=resolved_save_dir)
+    )
+    try:
+        kw.common.CheckpointManager.save_dir = str(job_save_dir)
+        optimizer = kw.cim.CIMOptimizer(**cim_kwargs)
+        result = optimizer.solve(submit_matrix)
+        if result is None:
+            raise RuntimeError("CIMOptimizer did not return a solution.")
+        result = np.asarray(result)
+        result = result.reshape(1, -1) if result.ndim == 1 else result
+        if result.shape[0] == 0:
+            raise RuntimeError("CIMOptimizer returned no solutions.")
+        restored = np.asarray(explorer.restore_solution(result[0])).reshape(1, -1)
+        _binary_from_solver_solution(restored, ising_matrix.shape[0] - 1)
+        if cleanup_records:
+            shutil.rmtree(job_save_dir, ignore_errors=True)
+        return restored
+    finally:
+        kw.common.CheckpointManager.save_dir = previous_save_dir
 
 
 def _binary_from_solver_solution(
