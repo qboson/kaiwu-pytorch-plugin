@@ -125,3 +125,23 @@ Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 ```
 torchvision==0.22.0
 ```
+
+
+
+---
+
+### Constrained Generation: Fixing Part of the Sequence
+
+`QDiffusion.generate(..., partial_masks=...)` keeps selected positions of the
+input sequence unchanged while the remaining positions are decoded. This
+example uses a toy proposal model and a toy energy model, so it runs offline
+without a checkpoint or a Kaiwu license, and prints both the fixed and the
+editable positions.
+
+Run the example via `python example/qdiffusion_constrained/constrained_generate.py`.
+
+**Dependencies**
+
+```
+torch
+```
