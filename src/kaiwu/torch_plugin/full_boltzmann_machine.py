@@ -207,7 +207,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
+                An empty visible batch yields an empty ``(0, num_nodes)`` tensor.
         """
+        if s_visible.size(0) == 0:
+            return torch.empty(
+                0, self.num_nodes, device=self.device, dtype=dtype
+            )
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
