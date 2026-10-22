@@ -758,24 +758,22 @@ def plot_calo_images(x_true, x_recon, layer=0, n_samples=5, output="./output/tes
 
 
 def plot_MNIST_output(x_true, x_recon, n_samples=5, output="./output/testVAE.png"):
-    plt.figure(figsize=(10, 4.5))
-    for i in range(n_samples):
-        # plot original image
-        ax = plt.subplot(2, n_samples, i + 1)
-        plt.imshow(x_true[i].reshape((28, 28)))
-        plt.gray()
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+    """Save reconstruction comparisons and release this call's figure."""
+    fig = plt.figure(figsize=(10, 4.5))
+    try:
+        for i in range(n_samples):
+            ax = fig.add_subplot(2, n_samples, i + 1)
+            ax.imshow(x_true[i].reshape((28, 28)), cmap="gray")
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
 
-        ax = plt.subplot(2, n_samples, i + 1 + n_samples)
-        decImg=x_recon[i].reshape((28, 28))
-        plt.imshow(decImg)
-        plt.gray()
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
-    fig = plt.gcf()
-  #  plt.show()
-    fig.savefig(output)
+            ax = fig.add_subplot(2, n_samples, i + 1 + n_samples)
+            ax.imshow(x_recon[i].reshape((28, 28)), cmap="gray")
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+        fig.savefig(output)
+    finally:
+        plt.close(fig)
 
 #@title Helper Functions
 def plot_autoencoder_outputs(model, n, dims):
