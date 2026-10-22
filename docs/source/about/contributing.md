@@ -13,8 +13,8 @@
 ```bash
 conda create -n quantum_env python=3.10
 conda activate quantum_env
-git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-cd Kaiwu-pytorch-plugin
+git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+cd kaiwu-pytorch-plugin
 pip install -r requirements/requirements.txt
 pip install .
 ```
