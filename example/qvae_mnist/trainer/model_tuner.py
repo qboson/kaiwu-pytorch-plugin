@@ -163,8 +163,12 @@ class ModelTuner(object):
 					output_logits, posterior, q, zeta = self._model(inputData)
 					test_loss += self._model.loss(inputData, output_logits, posterior)
 
-					# 设置 outputData 为概率值（用于绘图）
-					outputData = torch.sigmoid(output_logits)
+					# Bernoulli logits 转概率；MSE decoder 已返回连续重构值。
+					outputData = (
+						torch.sigmoid(output_logits)
+						if self._config.loss_type == 'bernoulli'
+						else output_logits
+					)
                     # # 记录 label_list
                     # label_list = label.detach().numpy() if label_list is None else np.append(label_list, label.detach().numpy(), axis=0)
 
