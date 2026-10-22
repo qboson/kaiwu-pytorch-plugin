@@ -97,6 +97,12 @@ class EnergyModel(nn.Module):
         sampler: Any | None = None,
     ) -> None:
         super().__init__()
+        dims = (("bm_num_visible", bm_num_visible), ("bm_num_hidden", bm_num_hidden))
+        for name, value in dims:
+            if value is not None and (
+                isinstance(value, bool) or not isinstance(value, int) or value < 1
+            ):
+                raise ValueError(f"{name} must be a positive integer")
         self.bm_num_visible = bm_num_visible
         self.bm_num_hidden = bm_num_hidden
         self.sampler = sampler
