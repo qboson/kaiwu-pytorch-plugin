@@ -323,6 +323,13 @@ class RBMRunner(TransformerMixin, BaseEstimator):
     def plot_weights(self, save_as="qbm_weights", save_pdf=False):
         """绘制权重"""
         weights = self.rbm.quadratic_coef.detach().cpu().numpy()
+        # 每个分量的形状由可见单元数决定，避免把 8x8 的数据集布局写死
+        num_visible = weights.shape[0]
+        side = int(np.sqrt(num_visible))
+        if side * side != num_visible:
+            raise ValueError(
+                f"Cannot lay out {num_visible} visible units as a square image."
+            )
 
         fig, axes = plt.subplots(
             8, 16, gridspec_kw={"wspace": 0.1, "hspace": 0.1}, figsize=(16, 7)
@@ -332,7 +339,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
 
         for i, ax in enumerate(axes.flatten()):
             if i < weights.shape[1]:
-                ax.imshow(weights[:, i].reshape(8, 8), cmap=plt.cm.gray)
+                ax.imshow(weights[:, i].reshape(side, side), cmap=plt.cm.gray)
             ax.axis("off")
 
         # 保存结果
