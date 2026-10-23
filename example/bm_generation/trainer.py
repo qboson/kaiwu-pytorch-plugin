@@ -47,23 +47,38 @@ def process_solve_graph_worker(params):
     """子进程执行的具体采样逻辑。
 
     Args:
-        params (tuple): 包含共享模型、采样器、可见层数据分片、输出维度、起始索引的元组。
+        params (tuple): 包含共享模型、采样器、可见层数据分片、输出维度的元组。
 
     Returns:
-        tuple: (state_v_chunk, state_vi_chunk) 采样后的张量结果。
+        tuple: 两类拼接状态，以及各原始观察对应的完整条件、部分条件解数量。
     """
     bm_shared, sampler, s_visible_chunk, num_output = params
     kw.common.set_log_level("ERROR")
     # 在不计算梯度的情况下进行采样
     with torch.no_grad():
         # 正相位采样 (Condition Sample)
-        state_v_chunk = bm_shared.condition_sample(sampler, s_visible_chunk).detach()
+        state_v_groups = [
+            bm_shared.condition_sample(sampler, row.unsqueeze(0)).detach()
+            for row in s_visible_chunk
+        ]
         # 输入条件采样
-        state_vi_chunk = bm_shared.condition_sample(
-            sampler, s_visible_chunk[:, :-num_output]
-        ).detach()
+        state_vi_groups = [
+            bm_shared.condition_sample(sampler, row.unsqueeze(0)).detach()
+            for row in s_visible_chunk[:, :-num_output]
+        ]
 
-    return state_v_chunk, state_vi_chunk
+    return (
+        torch.cat(state_v_groups, dim=0),
+        torch.cat(state_vi_groups, dim=0),
+        [states.size(0) for states in state_v_groups],
+        [states.size(0) for states in state_vi_groups],
+    )
+
+
+def _mean_conditional_energy(model, states, counts):
+    """Average conditional energies with equal weight per observed data row."""
+    energies = model(states)
+    return torch.stack([group.mean() for group in energies.split(counts)]).mean()
 
 
 class Trainer:
@@ -227,17 +242,23 @@ class Trainer:
                 combined_vi = torch.cat([res[1] for res in all_results], dim=0).to(
                     self.bm_net.device
                 )
+                counts_v = [count for res in all_results for count in res[2]]
+                counts_vi = [count for res in all_results for count in res[3]]
 
-                # 计算 KL 散度项
-                kl_divergence = self.bm_net.objective(combined_v, state_all)
+                # 先对每个条件的解求均值，再对原始观察等权平均。
+                kl_divergence = _mean_conditional_energy(
+                    self.bm_net, combined_v, counts_v
+                ) - self.bm_net(state_all).mean()
 
                 # 计算 NCL (Non-Contrastive Loss) 类似项
-                # 保持原逻辑：将输出部分置零后计算 objective
+                # 保持原有状态变换，两个条件相分别按原始观察平均。
                 v_ncl = combined_v.clone()
                 vi_ncl = combined_vi.clone()
                 v_ncl[:, -self.num_output :] = 0.0
                 vi_ncl[:, -self.num_output :] = 0.0
-                ncl = self.bm_net.objective(v_ncl, vi_ncl)
+                ncl = _mean_conditional_energy(
+                    self.bm_net, v_ncl, counts_v
+                ) - _mean_conditional_energy(self.bm_net, vi_ncl, counts_vi)
 
                 # 组合目标函数
                 obj = (
