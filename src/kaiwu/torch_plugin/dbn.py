@@ -8,6 +8,7 @@ This module contains the DBN class and functions for training the DBN+model
 or only the model. Training the DBN+model will save the likelihood values
 and prediction accuracy during the training process.
 """
+
 import numpy as np
 
 
@@ -69,6 +70,29 @@ class UnsupervisedDBN(nn.Module):
         self._is_trained = False
         return self
 
+    def _parameter_device(self, module):
+        """Return the device ``module`` parameters currently live on.
+
+        ``self.device`` is a plain attribute captured when the DBN is built.
+        ``nn.Module.to`` on a parent moves each RBM through ``_apply`` and does
+        not refresh this attribute, so a later visible batch built from
+        ``self.device`` lands off the weights. Callers that mix those
+        activations with ``quadratic_coef`` / ``linear_bias`` must follow the
+        parameter device instead.
+
+        Args:
+            module (torch.nn.Module): Module whose parameters define the device.
+                Typically one entry of ``rbm_layers``.
+
+        Returns:
+            torch.device: Device of the first parameter, or ``self.device`` when
+            ``module`` has no parameters.
+        """
+        parameter = next(module.parameters(), None)
+        if parameter is None:
+            return self.device
+        return parameter.device
+
     def forward(self, data_in):
         """Performs a forward pass to transform the input data.
 
@@ -92,7 +116,7 @@ class UnsupervisedDBN(nn.Module):
         for rbm in self.rbm_layers:
             with torch.no_grad():
                 hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
+                    torch.FloatTensor(data_in).to(self._parameter_device(rbm))
                 )
                 data_in = (
                     hidden_output[:, rbm.num_visible :].cpu().numpy()
@@ -132,7 +156,7 @@ class UnsupervisedDBN(nn.Module):
             raise ValueError(f"Layer index {layer_index} out of range.")
 
         rbm = self.rbm_layers[layer_index]
-        return self.reconstruct_with_rbm(rbm, data_in, self.device)
+        return self.reconstruct_with_rbm(rbm, data_in, self._parameter_device(rbm))
 
     def mark_as_trained(self):
         """Marks the model as trained.
