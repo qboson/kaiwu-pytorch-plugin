@@ -113,7 +113,7 @@ python3 -m pylint --rcfile=pylintrc tests/test_fid_calculator_parameter_device.p
 | SHA | Summary |
 |-----|---------|
 | `b040aa1750d5181da1ed657c6eb031a19decca85` | place FID updates on the live parameter device |
-| branch head | lock the #164 matrix (meta identity, poisoned cuda cache, `zeros_like` return) and sync this PR body |
+| `6e883b4cbf32033f7fdb968e86b9cd37cfa6faca` | lock the #164 matrix (meta identity, poisoned cuda cache, `zeros_like` return) and sync this PR body |
 
 ## Merge-ready checklist
 
