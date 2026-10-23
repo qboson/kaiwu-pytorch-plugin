@@ -33,7 +33,7 @@ def seed_torch(seed: int) -> None:
 def encode_sequence(
     generator, sequence: str, max_length: int | None = None
 ) -> torch.Tensor:
-    """Tokenizes one protein sequence to ``[1, seq_len]`` on the generator device."""
+    """Tokenizes one protein sequence to ``[1, seq_len]`` on the parameter device."""
     if max_length is not None:
         sequence = sequence[:max_length]
     encoded = generator.tokenizer(
@@ -108,7 +108,9 @@ def load_trained_energy_weights(
     state_dict = checkpoint["state_dict"]
     # Rebuild exactly the energy-side modules we saved during training so rerun
     # and evaluation use the same scorer weights as the best checkpoint.
-    generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
+    generator.energy_model.encoder.backbone.load_state_dict(
+        state_dict["energy_encoder"]
+    )
     generator.energy_model.feature_projector.load_state_dict(
         state_dict["feature_projector"]
     )
