@@ -16,6 +16,8 @@ import numpy as np
 
 import kaiwu as kw
 
+from .._kaiwu_compat import normalize_task_mode
+
 AVAILABLE_SOLVERS = (
     "local_search",
     "sa",
@@ -27,7 +29,7 @@ DEFAULT_CIM_MAX_BITS = 1000
 DEFAULT_CIM_MAX_PRECISION = 32
 DEFAULT_CIM_PRECISION_STEP = 4
 DEFAULT_CIM_SAMPLE_NUMBER = 1
-DEFAULT_CIM_TASK_MODE = "quota"
+DEFAULT_CIM_TASK_MODE = "optimization"
 
 
 def _get_kaiwu_precision_helpers() -> tuple[Any, Any]:
@@ -687,9 +689,10 @@ def _solve_ising_kaiwu_cim(
         "task_name": task_name,
         "wait": True,
         "project_no": None if project_no is None else str(project_no),
-        "task_mode": task_mode,
         "sample_number": int(sample_number),
     }
+    if task_mode is not None:
+        cim_kwargs["task_mode"] = normalize_task_mode(task_mode)
     if interval is not None:
         cim_kwargs["interval"] = int(interval)
     optimizer = kw.cim.CIMOptimizer(**cim_kwargs)

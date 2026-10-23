@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -75,10 +75,32 @@ The above image shows the project file structure:
 ## Quick Start
 
 ### Requirements
-- python == 3.10
-- kaiwu == 1.3.1
-- torch == 2.7.0
-- numpy == 2.2.6
+- Python: 3.10, 3.12, or 3.14
+- kaiwu >= 1.3.1, <= 1.4.3
+- Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
+- Python 3.14: torch == 2.10.0, numpy == 2.3.3
+
+Python 3.11 and 3.13 are not supported. Installation on Python 3.12 and 3.14
+depends on corresponding Kaiwu support. These environments are not ready for
+installation from published packages until Kaiwu provides that support.
+
+Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
+1.4.2, and 1.4.3. The same model code handles the precision-reducer location
+change and translates CIM mode names (`quota` / `sample` and
+`optimization` / `sampling`, case-insensitive) for the installed SDK.
+The published SDK wheels in this range require Python 3.10; plugin Python
+support does not add Python versions to those SDK wheels.
+
+SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10, covering the interface
+change and the newest supported release. Run CI manually with
+`all-kaiwu-versions` enabled to include 1.4.1 and 1.4.2. These jobs test local
+solving and CIM construction without submitting cloud tasks. Use a regular
+`pip install .` for cross-SDK checks: SDK 1.3.1 uses a regular package whose
+namespace does not discover the plugin through an editable installation.
+
+Example dependencies are pinned by Python version in `requirements/requirements_example.txt`; QDiffusion uses `example/qdiffusion/requirements.txt`. The development requirements include both sets.
+
+On Apple Silicon macOS, set `NUMBA_THREADING_LAYER=workqueue` before running single-cell examples or the full test suite; see the [installation guide](docs/source/getting_started/installation.md).
 
 ### Code Style
 
@@ -105,7 +127,8 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    ```bash
    pip install -r requirements/requirements.txt
    ```
-   Kaiwu SDK needs to be installed separately, see the installation instructions below.
+   Kaiwu SDK 1.3.1 through 1.4.3 is supported; a fresh install selects 1.4.3.
+   To select an older SDK, install it together with the plugin: `pip install "kaiwu==1.3.1" .`.
 
 4. **Install the plugin**:
    ```bash
@@ -115,12 +138,13 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
 #### Option 2: Docker Setup (no local environment required)
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
 
+Kaiwu 1.4.3 provides Linux wheels for x86_64 only, so Docker Compose uses `linux/amd64`, including on ARM hosts.
+
 Project structure required:
 ```text
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
@@ -154,7 +178,7 @@ Press `Ctrl+C`, then run:
 
 ### Kaiwu SDK Installation Instructions (Required)
 
-Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+Kaiwu version 1.4.3 can now be installed directly via `pip install kaiwu==1.4.3`.
 
 The download and installation steps for other versions of the Kaiwu SDK are as follows:
 ![](imgs/image.png)
@@ -185,7 +209,8 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -335,7 +360,9 @@ For a more focused walkthrough of the example tree and its data flow, see
 
 ## Usage Statistics
 
-kpp implicitly tracks `SimulatedAnnealingOptimizer` and `CIMOptimizer` call counts in the background to help improve product quality. **This is enabled by default and fully transparent — no changes to user code are required.**
+Kaiwu 1.4.3 does not expose the caller-context hook used for KPP attribution, so KPP-specific statistics are inactive with this release. The controls below apply only to SDK releases that provide that hook; they do not control the SDK's own statistics.
+
+When the hook is available, kpp attributes `SimulatedAnnealingOptimizer` and `CIMOptimizer` calls to KPP in the background. **This attribution is enabled by default and requires no changes to user code.**
 
 Statistics are only collected within the kpp call path (i.e., triggered via `AbstractBoltzmannMachine.sample()`); calling kaiwu SDK optimizers directly is never tracked.
 

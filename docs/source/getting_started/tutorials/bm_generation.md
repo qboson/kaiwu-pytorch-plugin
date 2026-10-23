@@ -21,7 +21,7 @@
 
 ```{code-block} bash
 
- pip install kaiwu==1.3.0 pandas matplotlib
+ pip install kaiwu==1.4.3 pandas matplotlib
 
 ```
 ## 1. 全连接玻尔兹曼机简介

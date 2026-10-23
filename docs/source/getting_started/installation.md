@@ -16,12 +16,37 @@ Before installation, ensure your system meets the following requirements:
 
 | Dependency | Required Version | Role |
 |------------|-----------------|------|
-| Python | 3.10 | Base runtime (tested against 3.10 specifically) |
-| PyTorch | 2.7 | Tensor operations & automatic differentiation |
-| NumPy | 2.2.6 | Linear algebra & SDK interfacing |
-| Kaiwu SDK | v1.3.1+ | Ising optimization backend (classical SA + quantum CIM) |
+| Python | 3.10, 3.12, 3.14 | Supported even minor versions |
+| PyTorch | 2.7.0 / 2.10.0 | Use 2.10.0 on Python 3.14 |
+| NumPy | 2.2.6 / 2.3.3 | Use 2.3.3 on Python 3.14 |
+| Kaiwu SDK | 1.3.1–1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
 
-> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK v1.3.1 is the current recommended release.
+> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK 1.3.1 through 1.4.3 is supported; 1.4.3 is the default for a fresh installation.
+
+Python 3.11 and 3.13 are excluded from the supported versions. Installation on
+Python 3.12 and 3.14 depends on corresponding Kaiwu support. Until Kaiwu provides
+that support, installation from published dependencies and the corresponding CI
+jobs cannot pass. Kaiwu packaging is maintained separately from this plugin.
+
+### Kaiwu SDK compatibility
+
+The supported published SDK releases are 1.3.1, 1.4.0, 1.4.1, 1.4.2, and
+1.4.3. Their official wheels require Python 3.10. Select one in the same
+installation command as the plugin, for example:
+
+```bash
+python -m pip install "kaiwu==1.3.1" .
+```
+
+Use an isolated environment for each SDK version. Use regular installation
+rather than `pip install -e .` for SDK 1.3.1: its regular `kaiwu` package
+otherwise hides the editable plugin. The shared compatibility module handles
+the `PrecisionReducer` move from `kaiwu.cim` to `kaiwu.preprocess` and translates
+both old and new CIM mode names. Model algorithms are shared across versions.
+
+Regular SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10. The manual
+`all-kaiwu-versions` CI option also checks 1.4.1 and 1.4.2. These interface
+checks do not submit licensed or cloud tasks.
 
 Check the Python version:
 ```bash
@@ -62,6 +87,29 @@ Install the project dependencies:
 pip install -r requirements/requirements.txt
 ```
 
+For all examples, including image and single-cell workflows, install:
+
+```bash
+pip install -r requirements/requirements_example.txt
+```
+
+QDiffusion has an additional dependency list:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
+
+Both lists select versions for the active Python environment. For development,
+`pip install -r requirements/devel.txt` installs both lists and the test/documentation tools.
+
+On Apple Silicon macOS, set the following before running single-cell examples or
+the full test suite. It avoids a conflict between Numba and PyTorch's OpenMP
+libraries.
+
+```bash
+export NUMBA_THREADING_LAYER=workqueue
+```
+
 4. **Install the Plugin**
 ```bash
 pip install .
@@ -79,13 +127,14 @@ to confirm PyTorch is installed.
 
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
 
+Kaiwu 1.4.3 provides Linux wheels for x86_64 only. Docker Compose selects `linux/amd64`; ARM hosts require x86_64 emulation.
+
 #### Required Project Structure
 
 ```bash
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
@@ -174,13 +223,13 @@ Kaiwu-PyTorch-Plugin depends on the **Kaiwu SDK** to provide quantum computing c
 The Kaiwu SDK is available on PyPI. You can install it directly:
 
 ```bash
-pip install kaiwu==1.3.1
+pip install kaiwu==1.4.3
 ```
 
 Alternatively, add the following line to your `requirements.txt`:
 
 ```text
-kaiwu==1.3.1
+kaiwu==1.4.3
 ```
 
 #### Option B: Install from Official Wheel
@@ -188,11 +237,11 @@ kaiwu==1.3.1
 If you need a specific version or have network restrictions, download the SDK wheel from the QBoson platform:
 
 > 1. Visit the <u>Kaiwu SDK download page</u> on the QBoson platform
-> 2. Download the wheel package suitable for your system (e.g., `kaiwu-1.3.1-py3-none-any.whl`)
+> 2. Download the wheel package suitable for your system (e.g., `kaiwu-1.4.3-cp310-none-macosx_12_0_arm64.whl` for Python 3.10 on macOS arm64)
 > 3. Install the wheel:
 
 ```bash
-pip install kaiwu-1.3.1-py3-none-any.whl
+pip install kaiwu-1.4.3-cp310-none-macosx_12_0_arm64.whl
 ```
 
 ### Step 2: Set Environment Variables
@@ -257,7 +306,7 @@ After installation, run the following code to verify that the installation was s
 
 ### Three Verification Steps
 
-1. **Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.3.1+) are loaded
+1. **Check versions:** Confirm PyTorch (2.x) & Kaiwu SDK (v1.4.3) are loaded
 2. **Test SDK backend:** Verify the classical SA solver works
 3. **Instantiate KPP model:** Confirm `RestrictedBoltzmannMachine` imports and initializes
 
@@ -269,13 +318,13 @@ import torch
 print(f"PyTorch version: {torch.__version__}")
 
 # Verify Kaiwu SDK
-import kaiwu
+from importlib.metadata import version
 import numpy as np
 from kaiwu.classical import SimulatedAnnealingOptimizer
 opt = SimulatedAnnealingOptimizer()
 mat = np.array([[1, -1], [-1, 1]])
 result = opt.solve(mat)
-print(f"Kaiwu SDK version: {kaiwu.__version__}")
+print(f"Kaiwu SDK version: {version('kaiwu')}")
 print(result)
 
 # Verify Kaiwu-PyTorch-Plugin
@@ -290,7 +339,7 @@ print(f"RBM created with {rbm.num_visible} visible and {rbm.num_hidden} hidden u
 
 ```bash
 PyTorch version: 2.7.0
-Kaiwu SDK version: 1.3.1
+Kaiwu SDK version: 1.4.3
 Solver result: [array([1, -1]), array([-1, 1])]
 Kaiwu-PyTorch-Plugin imported successfully!
 RBM created with 10 visible and 5 hidden units

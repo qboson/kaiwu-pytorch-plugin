@@ -19,10 +19,10 @@ pip install -r requirements/requirements.txt
 pip install .
 ```
 
-Kaiwu SDK 为必需依赖。可直接安装 1.3.1 版本：
+Kaiwu SDK 为必需依赖。可直接安装 1.4.3 版本：
 
 ```bash
-pip install kaiwu==1.3.1
+pip install kaiwu==1.4.3
 ```
 
 其他版本的安装方式请参阅[安装指南](../getting_started/installation.md)。参与开发时，额外安装开发依赖：
