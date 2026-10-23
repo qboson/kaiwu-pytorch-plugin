@@ -265,7 +265,10 @@ class QDiffusion(nn.Module):
                 self.device = torch.device("cpu")
         else:
             self.device = torch.device(device)
-            self.to(device=self.device, dtype=self.dtype)
+        # Apply the requested dtype in both branches: with a device it was
+        # already applied through ``to``; without one it must not be skipped,
+        # otherwise ``self.dtype`` disagrees with the submodule parameters.
+        self.to(device=self.device, dtype=self.dtype)
 
     def to(self, *args: Any, **kwargs: Any) -> QDiffusion:
         """Moves the module and refreshes cached device/dtype metadata.
@@ -576,7 +579,9 @@ class QDiffusion(nn.Module):
             input_tokens, partial_masks=partial_masks
         )
         output_tokens = input_tokens.masked_fill(output_mask, self.mask_id)
-        output_scores = torch.zeros_like(output_tokens, dtype=torch.float)
+        # Score buffers follow the wrapper dtype so that converted models keep
+        # consistent score precision through reranking and resampling.
+        output_scores = torch.zeros_like(output_tokens, dtype=self.dtype)
         return output_tokens, output_scores
 
     def _sample(
