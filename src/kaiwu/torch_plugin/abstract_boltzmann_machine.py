@@ -47,6 +47,20 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             self.device = parameter.device
         return module
 
+    def _model_device(self) -> torch.device:
+        """Return the device where module parameters currently live.
+
+        Callers may still pass activations on CPU while parameters were placed on
+        an accelerator (or moved via a parent ``_apply``). Public entry points
+        should align inputs with this device before mixing them with parameters.
+
+        Returns:
+            torch.device: Device of the first parameter, or ``self.device`` when
+            the module has no parameters.
+        """
+        parameter = next(self.parameters(), None)
+        return parameter.device if parameter is not None else self.device
+
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
 

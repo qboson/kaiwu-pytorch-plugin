@@ -85,6 +85,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
         """
+        s_all = s_all.to(self._model_device())
         return -s_all @ self.linear_bias - 0.5 * torch.sum(
             s_all.matmul(self.symmetrized_quadratic_coef()) * s_all, dim=-1
         )
