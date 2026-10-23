@@ -22,8 +22,10 @@ class TinyCNN(nn.Module):
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Return class logits for flattened image inputs.
 
-        ``inputs`` is aligned to the live parameter device. Dtype is unchanged
-        and the caller tensor is not modified in place.
+        ``inputs`` is aligned to the live parameter device before the reshape.
+        Conv activations stay on that device, so the linear head needs no
+        second move. Dtype is unchanged. The caller tensor is not modified in
+        place, and a same-device batch keeps its storage.
         """
         images = _on_parameter_device(self, inputs).view(
             -1, 1, self.image_size, self.image_size
@@ -42,8 +44,10 @@ class SimpleRNN(nn.Module):
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Return class logits for sequence inputs.
 
-        ``inputs`` is aligned to the live parameter device. Dtype is unchanged
-        and the caller tensor is not modified in place.
+        ``inputs`` is aligned to the live parameter device. The recurrent
+        state stays on that device, so the linear head needs no second move.
+        Dtype is unchanged. The caller tensor is not modified in place, and a
+        same-device batch keeps its storage.
         """
         _sequence, hidden = self.rnn(_on_parameter_device(self, inputs))
         return self.head(hidden[-1])
@@ -60,8 +64,10 @@ class SimpleLSTM(nn.Module):
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         """Return class logits for sequence inputs.
 
-        ``inputs`` is aligned to the live parameter device. Dtype is unchanged
-        and the caller tensor is not modified in place.
+        ``inputs`` is aligned to the live parameter device. The recurrent
+        state stays on that device, so the linear head needs no second move.
+        Dtype is unchanged. The caller tensor is not modified in place, and a
+        same-device batch keeps its storage.
         """
         _sequence, (hidden, _cell) = self.lstm(_on_parameter_device(self, inputs))
         return self.head(hidden[-1])
@@ -70,9 +76,10 @@ class SimpleLSTM(nn.Module):
 def _parameter_device(module: nn.Module, fallback: torch.Tensor) -> torch.device:
     """Return the device ``module`` parameters currently live on.
 
-    A parent ``_apply`` moves conv, recurrent, and linear weights without
-    calling the child ``.to``. Classifier forwards follow those weights.
-    An empty module falls back to ``fallback.device``.
+    A parent ``_apply`` moves conv, recurrent, and linear weights together
+    and does not call the child ``.to``. Forwards follow the first parameter,
+    which stays on the same device as the linear head after that move. An
+    empty module falls back to ``fallback.device``.
     """
     parameter = next(module.parameters(), None)
     if parameter is None:
@@ -85,6 +92,7 @@ def _on_parameter_device(module: nn.Module, inputs: torch.Tensor) -> torch.Tenso
 
     ``Tensor.to`` returns the same object when the device already matches, so
     same-device callers keep their storage. A different device is a copy.
-    The caller tensor is not written in place.
+    The caller tensor is not written in place. These classifiers do not take
+    an embedding index, an attention mask, or a dropout index.
     """
     return inputs.to(device=_parameter_device(module, inputs))
