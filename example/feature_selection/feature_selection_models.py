@@ -1,3 +1,5 @@
+"""Small classifiers used by the feature-selection examples."""
+
 from __future__ import annotations
 
 import torch
@@ -18,8 +20,14 @@ class TinyCNN(nn.Module):
         )
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """Return class logits for flattened image inputs."""
-        images = inputs.view(-1, 1, self.image_size, self.image_size)
+        """Return class logits for flattened image inputs.
+
+        ``inputs`` is aligned to the live parameter device. Dtype is unchanged
+        and the caller tensor is not modified in place.
+        """
+        images = _on_parameter_device(self, inputs).view(
+            -1, 1, self.image_size, self.image_size
+        )
         return self.net(images)
 
 
@@ -32,8 +40,12 @@ class SimpleRNN(nn.Module):
         self.head = nn.Linear(8, 2)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """Return class logits for sequence inputs."""
-        _sequence, hidden = self.rnn(inputs)
+        """Return class logits for sequence inputs.
+
+        ``inputs`` is aligned to the live parameter device. Dtype is unchanged
+        and the caller tensor is not modified in place.
+        """
+        _sequence, hidden = self.rnn(_on_parameter_device(self, inputs))
         return self.head(hidden[-1])
 
 
@@ -46,6 +58,33 @@ class SimpleLSTM(nn.Module):
         self.head = nn.Linear(8, 2)
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-        """Return class logits for sequence inputs."""
-        _sequence, (hidden, _cell) = self.lstm(inputs)
+        """Return class logits for sequence inputs.
+
+        ``inputs`` is aligned to the live parameter device. Dtype is unchanged
+        and the caller tensor is not modified in place.
+        """
+        _sequence, (hidden, _cell) = self.lstm(_on_parameter_device(self, inputs))
         return self.head(hidden[-1])
+
+
+def _parameter_device(module: nn.Module, fallback: torch.Tensor) -> torch.device:
+    """Return the device ``module`` parameters currently live on.
+
+    A parent ``_apply`` moves conv, recurrent, and linear weights without
+    calling the child ``.to``. Classifier forwards follow those weights.
+    An empty module falls back to ``fallback.device``.
+    """
+    parameter = next(module.parameters(), None)
+    if parameter is None:
+        return fallback.device
+    return parameter.device
+
+
+def _on_parameter_device(module: nn.Module, inputs: torch.Tensor) -> torch.Tensor:
+    """Return ``inputs`` on the parameter device without changing dtype.
+
+    ``Tensor.to`` returns the same object when the device already matches, so
+    same-device callers keep their storage. A different device is a copy.
+    The caller tensor is not written in place.
+    """
+    return inputs.to(device=_parameter_device(module, inputs))
