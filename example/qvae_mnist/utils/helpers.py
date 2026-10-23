@@ -337,7 +337,7 @@ def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
             # 从平滑分布采样
             zeta = smoothing_dist.sample(shape)
             zeta = zeta.to(z.device)
-            zeta = torch.where(z == 0.0, zeta, 0)
+            zeta = torch.where(z == 0.0, zeta, 1 - zeta)
             # zeta = torch.randn(256, 256).to(device)
             generated_x = model.decoder(zeta)
 
