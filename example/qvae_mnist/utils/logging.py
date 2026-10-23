@@ -16,7 +16,9 @@ def get_console_handler():
     return handler
 
 def get_file_handler():
-    handler = TimedRotatingFileHandler(LOG_FILE, when="midnight", delay=True)
+    handler = TimedRotatingFileHandler(
+        LOG_FILE, when="midnight", delay=True, encoding="utf-8"
+    )
     handler.setFormatter(FORMATTER)
     return handler
 

@@ -73,6 +73,8 @@ matplotlib
 
 请通过 `example/qvae_mnist/train_qvae.ipynb` 运行该示例。
 
+文件日志以 UTF-8 编码向 `training.log` 写入新记录，午夜轮转后也使用相同编码。
+
 **依赖项**
 
 ```
