@@ -148,6 +148,27 @@ class QVAE(AutoEncoderBase):
         self.last_kl_loss = None
         self.create_networks()
 
+    def _bm_parameter_device(self) -> torch.device:
+        """Device where the Boltzmann-machine parameters live.
+
+        QVAE keeps the encoder, decoder, and BM as sibling submodules, so a
+        caller can move only ``self.bm`` across devices. Parent
+        ``nn.Module.to`` moves that child through ``_apply`` and does not
+        call ``BM.to``. The plain ``bm.device`` attribute can also lag the
+        parameters. Each call reads the live parameter device and does not
+        cache it or consult ``bm.device``, matching the #164 contract.
+
+        A parameter-free BM falls back to another QVAE parameter, then CPU,
+        so the helper does not raise ``StopIteration``.
+        """
+        parameter = next(self.bm.parameters(), None)
+        if parameter is not None:
+            return parameter.device
+        own = next(self.parameters(), None)
+        if own is not None:
+            return own.device
+        return torch.device("cpu")
+
     def create_networks(self):
         """Create components that were not supplied to the constructor."""
         if self.encoder is None:
@@ -196,7 +217,9 @@ class QVAE(AutoEncoderBase):
             raise ValueError(f"Unsupported loss type: {configured_loss_type}")
 
         q = self.encoder(x)
-        return self.bm((q > 0).float())
+        bm_device = self._bm_parameter_device()
+        visible_state = (q > 0).to(device=bm_device, dtype=q.dtype).float()
+        return self.bm(visible_state)
 
     @abc.abstractmethod
     def _create_sampler(self, sampler_type):
@@ -314,9 +337,9 @@ class QVAE(AutoEncoderBase):
         # positive_state = (q.detach() > 0).float()
         # loss = self.bm.objective(positive_state, self.bm.sample(self.sampler))
         # Alternatively, use the probabilities from sigmoid(q) for a softer loss signal to BM
-        loss = self.bm.objective(
-            torch.sigmoid(q.detach()), self.bm.sample(self.sampler)
-        )
+        bm_device = self._bm_parameter_device()
+        positive_state = torch.sigmoid(q.detach()).to(device=bm_device)
+        loss = self.bm.objective(positive_state, self.bm.sample(self.sampler))
         if bm_weight_decay > 0:
             if hasattr(self.bm, "quadratic_coef"):
                 loss += bm_weight_decay * torch.sum(self.bm.quadratic_coef**2)
@@ -361,7 +384,8 @@ class QVAE(AutoEncoderBase):
         Returns:
             torch.Tensor: Cross-entropy per sample (batch_size,).
         """
-        q_prob = torch.sigmoid(logit_q)
+        bm_device = self._bm_parameter_device()
+        q_prob = torch.sigmoid(logit_q.to(device=bm_device))
         positive = self.bm(q_prob).mean()
         neg_samples = self.bm.sample(self.sampler)
         negative = self.bm(neg_samples).mean()
