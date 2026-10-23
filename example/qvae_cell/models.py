@@ -197,6 +197,8 @@ class CellQVAE(QVAE):
     def energy(self, x, loss_type):
         """计算单细胞样本在 BM 潜空间中的能量。
 
+        二值潜状态使用 BM 参数的 dtype 和 device；无参数 BM 使用编码器输出类型。
+
         Args:
             x: 单细胞表达矩阵。
             loss_type: 损失类型，必须与模型配置一致。
@@ -210,4 +212,6 @@ class CellQVAE(QVAE):
         if loss_type != self.config.loss_type:
             raise ValueError("loss_type must match model.config.loss_type")
         q, _, _ = self._encode(x)
-        return self.bm((q > 0).float())
+        bm_parameter = next(self.bm.parameters(), None)
+        binary_states = (q > 0).to(q if bm_parameter is None else bm_parameter)
+        return self.bm(binary_states)
