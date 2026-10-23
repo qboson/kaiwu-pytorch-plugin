@@ -9,3 +9,6 @@ torch>=2.0
 omegaconf>=2.3,<3
 tqdm>=4.66,<5
 transformers==4.39.2
+# The ESM2 evaluation stage (dplm/workflows/esm2_eval_helpers.py)
+# imports the ``esm`` package, published on PyPI as ``fair-esm``.
+fair-esm>=2.0,<3
