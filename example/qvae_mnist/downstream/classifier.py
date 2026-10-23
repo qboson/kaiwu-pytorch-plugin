@@ -244,15 +244,22 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return self.device
 
     def _features_on_parameter_device(self, features):
-        """把特征复制成参数设备上的 float32 张量。
+        """把特征放到当前参数的设备和 dtype 上。
 
-        不改调用方数组。dtype 保持 float32，与 ``_create_model`` 的权重一致。
+        设备和 dtype 都已经对齐的张量原样返回，调用方存储保持不变。
+        NumPy 会复制，不和调用方缓冲区共用存储，也不原地改写。
+        没有参数时用构造偏好和 float32，与 ``_create_model`` 一致。
         """
-        return torch.tensor(
-            np.asarray(features),
-            dtype=torch.float32,
-            device=self._parameter_device(),
-        )
+        device = self._parameter_device()
+        dtype = torch.float32
+        model = self.model
+        if model is not None:
+            parameter = next(model.parameters(), None)
+            if parameter is not None:
+                dtype = parameter.dtype
+        if torch.is_tensor(features):
+            return features.to(dtype=dtype, device=device)
+        return torch.tensor(np.asarray(features), dtype=dtype, device=device)
 
     def predict(self, X):
         """在当前参数设备上返回类别编号。"""
