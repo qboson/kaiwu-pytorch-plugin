@@ -47,6 +47,11 @@ class Trainer:
         self.custom_train_data = custom_train_data
         self.custom_test_data = custom_test_data
 
+        # 训练设备：由 config.use_cuda 决定，且必须与模型/数据保持一致
+        self.device = torch.device(
+            "cuda" if config.use_cuda and torch.cuda.is_available() else "cpu"
+        )
+
         # 输出目录
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.output_dir = config.output_dir or f"./output/{self.config.type}_{self.timestamp}"
@@ -115,6 +120,7 @@ class Trainer:
             raise ValueError(f"Unsupported model type: {self.config.type}")
 
         model.create_networks()
+        model.to(self.device)
         self.model = model
         logger.info(f"Sampler created: {self.config.sampler_type}")
         logger.info(f"Model created: {self.config.type}")
@@ -220,14 +226,14 @@ class Trainer:
     def _save_reconstruction(self, epoch, input_data, output_data):
         """保存重建图像"""
         if isinstance(input_data, list):
-            x_true = input_data[0][:10].detach().numpy()
+            x_true = input_data[0][:10].detach().cpu().numpy()
         else:
-            x_true = input_data[:10].detach().numpy()
+            x_true = input_data[:10].detach().cpu().numpy()
 
         if isinstance(output_data, list):
-            x_recon = output_data[0][:10].detach().numpy()
+            x_recon = output_data[0][:10].detach().cpu().numpy()
         else:
-            x_recon = output_data[:10].detach().numpy()
+            x_recon = output_data[:10].detach().cpu().numpy()
 
         plot_MNIST_output(
             x_true, x_recon,

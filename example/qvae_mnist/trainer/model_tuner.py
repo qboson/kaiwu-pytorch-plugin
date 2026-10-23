@@ -98,9 +98,11 @@ class ModelTuner(object):
 		logger.info("Training Model")
 		#set pytorch train mode
 		self._model.train()
+		device = next(self._model.parameters()).device
 
 		total_train_loss = 0
 		for batch_idx, (inputData, label) in enumerate(self.train_loader):
+			inputData = inputData.to(device)
 			#set gradients to zero before backprop. Needed in pytorch
 			# self._optimiser.zero_grad()
 
@@ -156,8 +158,10 @@ class ModelTuner(object):
 		zeta_list=None
 		label_list=None
 
+		device = next(self._model.parameters()).device
 		with torch.no_grad():
 			for batch_idx, (inputData, label) in enumerate(self.test_loader):
+				inputData = inputData.to(device)
 				if self._config.type == 'QVAE':
 					# forward 返回: output_logits, posterior, q, zeta
 					output_logits, posterior, q, zeta = self._model(inputData)
