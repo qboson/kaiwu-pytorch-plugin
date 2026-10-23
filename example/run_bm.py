@@ -25,12 +25,19 @@ if __name__ == "__main__":
     # Example of one iteration in a training loop
     # Generate a sample set from the model
 
-    x = rbm.condition_sample(sampler, x)
+    # Keep each observation's conditional solutions together: a sampler may
+    # return a different number of solutions for each observation.
+    conditional_states = [
+        rbm.condition_sample(sampler, row.unsqueeze(0)) for row in x
+    ]
     s = rbm.sample(sampler)
     opt_rbm.zero_grad()
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
-    objective = rbm.objective(x, s)
+    positive_energy = torch.stack(
+        [rbm(states).mean() for states in conditional_states]
+    ).mean()
+    objective = positive_energy - rbm(s).mean()
     # Backpropgate gradients
     print("call backward")
     objective.backward()

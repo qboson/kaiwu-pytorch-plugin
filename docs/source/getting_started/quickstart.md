@@ -87,9 +87,14 @@ graph TB
 | Topology       |            Bipartite            |        Fully connected         |
 | Positive phase | `get_hidden(x, bernoulli=True)` | `condition_sample(sampler, x)` |
 | Negative phase |        `sample(sampler)`        |       `sample(sampler)`        |
-| Objective      |        `objective(h, s)`        |       `objective(h, s)`        |
+| Objective      |        `objective(h, s)`        | Mean energy per observation minus mean negative-phase energy (see below) |
 
 > **Note:** BM uses `condition_sample()` because fully-connected networks require sampling conditioned on visible units, not a deterministic hidden-layer computation.
+
+For BM, keep each observation's nonempty conditional sample group and average its
+energies before averaging across observations. Passing all groups directly to
+`objective(h, s)` is equivalent only when every observation returns the same number
+of solutions; otherwise it reweights the training data by the solver's row counts.
 
 ## Code Examples
 
@@ -192,12 +197,18 @@ if __name__ == "__main__":
     # Example of one iteration in a training loop
     # Generate a sample set from the model
 
-    x = bm.condition_sample(sampler, x)
+    # Keep observations equally weighted even when solution counts differ.
+    conditional_states = [
+        bm.condition_sample(sampler, row.unsqueeze(0)) for row in x
+    ]
     s = bm.sample(sampler)
     opt_bm.zero_grad()
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
-    objective = bm.objective(x, s)
+    positive_energy = torch.stack(
+        [bm(states).mean() for states in conditional_states]
+    ).mean()
+    objective = positive_energy - bm(s).mean()
     # Backpropagate gradients
     print("call backward")
     objective.backward()
