@@ -122,7 +122,32 @@ class FeatureSelectionWrapper(nn.Module):
         self.input_feature_axis = int(input_feature_axis)
         self._min_selected_features_explicit = explicit_min
         self._trained_epochs = 0
-        self.register_buffer("mask", torch.ones(self.feature_dim))
+        self.register_buffer(
+            "mask",
+            torch.ones(self.feature_dim, device=self._parameter_device(model)),
+        )
+
+    @staticmethod
+    def _parameter_device(module: nn.Module) -> torch.device:
+        """Return the device the wrapped parameters live on.
+
+        The mask is a buffer on this wrapper, not on the wrapped module.
+        ``wrapper.model.to(...)`` updates parameters without moving that
+        buffer, so batch placement follows the parameters.
+
+        Args:
+            module: Module whose parameters supply the device.
+
+        Returns:
+            Device of the first parameter, otherwise the first buffer, otherwise CPU.
+        """
+        parameter = next(module.parameters(), None)
+        if parameter is not None:
+            return parameter.device
+        buffer = next(module.buffers(), None)
+        if buffer is not None:
+            return buffer.device
+        return torch.device("cpu")
 
     def _mask_view(
         self,
@@ -173,6 +198,7 @@ class FeatureSelectionWrapper(nn.Module):
             The masked input tensor.
         """
         resolved_mask = self.mask if mask is None else mask
+        input_feature = input_feature.to(self._parameter_device(self.model))
         return input_feature * self._mask_view(input_feature, resolved_mask)
 
     def forward(self, input_feature: torch.Tensor) -> torch.Tensor:
@@ -216,8 +242,9 @@ class FeatureSelectionWrapper(nn.Module):
         for _ in range(train_epochs):
             epoch_batches = 0
             for input_batch, target_batch in data_loader:
-                input_batch = input_batch.to(self.mask.device)
-                target_batch = target_batch.to(self.mask.device)
+                device = self._parameter_device(self.model)
+                input_batch = input_batch.to(device)
+                target_batch = target_batch.to(device)
                 optimizer.zero_grad(set_to_none=True)
                 loss = loss_fn(self(input_batch), target_batch)
                 if loss.ndim != 0:
@@ -284,8 +311,9 @@ class FeatureSelectionWrapper(nn.Module):
         if max_samples is not None:
             input_all = input_all[:max_samples]
             target_all = target_all[:max_samples]
-        input_all = input_all.to(self.mask.device)
-        target_all = target_all.to(self.mask.device)
+        device = self._parameter_device(self.model)
+        input_all = input_all.to(device)
+        target_all = target_all.to(device)
         was_training = self.training
         original_requires_grad = [p.requires_grad for p in self.model.parameters()]
         self.eval()
@@ -294,7 +322,10 @@ class FeatureSelectionWrapper(nn.Module):
 
         try:
             continuous_mask = (
-                self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
+                self.mask.detach()
+                .clone()
+                .to(device=device, dtype=input_all.dtype)
+                .requires_grad_(True)
             )
             loss = loss_fn(
                 self.model(self.apply_mask(input_all, continuous_mask)),
