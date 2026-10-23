@@ -13,6 +13,7 @@ from torch import nn
 from torch.nn import init
 
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .usage_stats import kpp_caller_context
 
 
 class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -145,6 +146,39 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             init.normal_(self.linear_bias, 0, std)
             self.linear_bias.data.clip_(-bound, bound)
 
+    def _model_device(self) -> torch.device:
+        """Return the device the parameters live on.
+
+        ``self.device`` is refreshed only when the module is moved. Caller
+        states and buffers therefore follow the parameters, so a stale cache
+        cannot allocate on a different device.
+
+        Returns:
+            torch.device: Device of the first parameter, or ``self.device``
+            when the module has no parameters.
+        """
+        parameter = next(self.parameters(), None)
+        return parameter.device if parameter is not None else self.device
+
+    def _bernoulli_from_sampler(self, sampler) -> torch.Tensor:
+        """Decode sampler spins onto the parameter device.
+
+        ``AbstractBoltzmannMachine.sample`` places the decoded spins on the
+        cached ``self.device``. When that cache is stale the round trip drops
+        the values, so the Bernoulli state is built here instead.
+
+        Args:
+            sampler: External optimizer that solves the Bernoulli-side Ising model.
+
+        Returns:
+            torch.tensor: Bernoulli states on the parameter device.
+        """
+        ising_mat = self.get_ising_matrix()
+        with kpp_caller_context():
+            solution = sampler.solve(ising_mat)
+        solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
+        return torch.tensor(solution, dtype=self.dtype, device=self._model_device())
+
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
 
@@ -171,6 +205,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         """
         with torch.set_grad_enabled(enable_grad):
+            s_all = s_all.to(self._model_device())
             s_gaussian = s_all[:, : self.num_gaussian]
             s_bernoulli = s_all[:, self.num_gaussian :]
             return (
@@ -193,6 +228,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Free Hamiltonian of Gaussian nodes.
         """
+        s_gaussian = s_gaussian.to(self._model_device())
         with torch.no_grad():
             return 0.5 * torch.sum(
                 (s_gaussian - self.mu).square() / self.var, dim=-1
@@ -219,7 +255,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         column_sums = torch.sum(quadratic_term, dim=0)
         num_nodes = self.num_bernoulli
         ising_mat = torch.zeros(
-            (num_nodes + 1, num_nodes + 1), device=self.device, dtype=self.dtype
+            (num_nodes + 1, num_nodes + 1),
+            device=self._model_device(),
+            dtype=self.dtype,
         )
         ising_mat[:-1, :-1] = quadratic_term * 0.125
         ising_linear = linear_term * 0.25 + column_sums * 0.125
@@ -247,9 +285,13 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         """
         with torch.no_grad():
+            s_gaussian = s_gaussian.to(self._model_device())
             n_sample = s_gaussian.shape[0]
             s_all = torch.zeros(
-                n_sample, self.num_nodes, device=self.device, dtype=self.dtype
+                n_sample,
+                self.num_nodes,
+                device=self._model_device(),
+                dtype=self.dtype,
             )
             s_all[:, : self.num_gaussian] = s_gaussian
             prob = torch.sigmoid(
@@ -282,9 +324,13 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         """
         with torch.no_grad():
+            s_bernoulli = s_bernoulli.to(self._model_device())
             n_sample = s_bernoulli.shape[0]
             s_all = torch.zeros(
-                n_sample, self.num_nodes, device=self.device, dtype=self.dtype
+                n_sample,
+                self.num_nodes,
+                device=self._model_device(),
+                dtype=self.dtype,
             )
             s_all[:, self.num_gaussian :] = s_bernoulli
             mu = s_bernoulli @ self.quadratic_coef.t() + self.mu
@@ -319,36 +365,37 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """
         n_burnin_ = n_burnin - 1
         with torch.no_grad():
+            device = self._model_device()
             if s_gaussian is not None:
+                s_gaussian = s_gaussian.to(device)
                 n_sample = s_gaussian.shape[0]
                 s_all = torch.zeros(
-                    n_sample, self.num_nodes, device=self.device, dtype=self.dtype
+                    n_sample, self.num_nodes, device=device, dtype=self.dtype
                 )
                 s_all[:, : self.num_gaussian] = s_gaussian
                 gaussian_start = True
             elif s_bernoulli is not None:
+                s_bernoulli = s_bernoulli.to(device)
                 n_sample = s_bernoulli.shape[0]
                 s_all = torch.zeros(
-                    n_sample, self.num_nodes, device=self.device, dtype=self.dtype
+                    n_sample, self.num_nodes, device=device, dtype=self.dtype
                 )
                 s_all[:, self.num_gaussian :] = s_bernoulli
                 gaussian_start = False
             elif sampler is not None:
-                s_bernoulli = (
-                    super().sample(sampler).to(device=self.device, dtype=self.dtype)
-                )
+                s_bernoulli = self._bernoulli_from_sampler(sampler)
                 n_sample = s_bernoulli.shape[0]
                 s_all = torch.zeros(
-                    n_sample, self.num_nodes, device=self.device, dtype=self.dtype
+                    n_sample, self.num_nodes, device=device, dtype=self.dtype
                 )
                 s_all[:, self.num_gaussian :] = s_bernoulli
                 gaussian_start = False
             else:
                 s_gaussian = torch.randn(
-                    n_sample, self.num_gaussian, device=self.device, dtype=self.dtype
+                    n_sample, self.num_gaussian, device=device, dtype=self.dtype
                 )
                 s_all = torch.zeros(
-                    n_sample, self.num_nodes, device=self.device, dtype=self.dtype
+                    n_sample, self.num_nodes, device=device, dtype=self.dtype
                 )
                 s_all[:, : self.num_gaussian] = s_gaussian
                 gaussian_start = True
@@ -378,7 +425,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Full Gaussian-Bernoulli states.
         """
-        s_bernoulli = super().sample(sampler).to(device=self.device, dtype=self.dtype)
+        s_bernoulli = self._bernoulli_from_sampler(sampler)
         return self.infer_from_bernoulli(s_bernoulli, no_random=True)
 
     def positive_phase_energy_expectation(
@@ -396,6 +443,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Expected Hamiltonian values.
         """
+        s_gaussian = s_gaussian.to(self._model_device())
         prob_bernoulli = self.infer_from_gaussian(s_gaussian, binarize=False)[
             :, self.num_gaussian :
         ]
