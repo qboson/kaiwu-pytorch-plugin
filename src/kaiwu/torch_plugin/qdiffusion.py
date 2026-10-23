@@ -110,7 +110,15 @@ class EnergyModel(nn.Module):
         candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor | None:
-        """Runs conditioned energy scoring through the PyTorch module API."""
+        """Runs conditioned energy scoring through the PyTorch module API.
+
+        Args:
+            noisy_tokens: Noisy conditioning tokens, shape ``(batch, seq_len)``.
+            candidate_tokens: Candidate tokens to score, same shape.
+            attention_mask: Boolean mask of real candidate positions.
+        Returns:
+            torch.Tensor | None: One score per candidate from ``score_conditioned``.
+        """
         return self.score_conditioned(
             noisy_tokens=noisy_tokens,
             candidate_tokens=candidate_tokens,
@@ -123,7 +131,11 @@ class EnergyModel(nn.Module):
         candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor | None:
-        """Scores candidates conditioned on noisy tokens."""
+        """Scores candidates conditioned on noisy tokens.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement scoring.
+        """
         del noisy_tokens, candidate_tokens, attention_mask
         raise NotImplementedError(
             "EnergyModel subclasses must implement score_conditioned()."
