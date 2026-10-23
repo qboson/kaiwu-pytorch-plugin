@@ -130,13 +130,15 @@ def _expected_features(rbm, batch: np.ndarray) -> np.ndarray:
 
 
 def _spy_get_hidden(rbm, seen: dict):
-    """Record the device of the batch ``transform`` hands to ``get_hidden``."""
+    """Record the batch ``transform`` hands to ``get_hidden`` and its device."""
 
     def _spy(s_visible, *args, **kwargs):
+        seen["batch"] = s_visible
         seen["input"] = s_visible.device
         output = RUNNER.RestrictedBoltzmannMachine.get_hidden(
             rbm, s_visible, *args, **kwargs
         )
+        seen["output_tensor"] = output
         seen["output"] = output.device
         return output
 
@@ -311,6 +313,211 @@ class TestRBMRunnerParameterDevice(unittest.TestCase):
             RUNNER.RestrictedBoltzmannMachine.to = original
 
         self.assertEqual(recorded, [CPU])
+        self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
+
+    def test_numpy_float32_is_not_aliased(self):
+        """``get_hidden`` must not share storage with a float32 NumPy caller.
+
+        ``torch.FloatTensor`` on a float32 array aliases that buffer. A later
+        in-place write would change the caller's data. NumPy has to be copied.
+        """
+        runner = _runner()
+        rbm = RUNNER.RestrictedBoltzmannMachine(4, 2, device=CPU)
+        _attach(runner, rbm, CPU)
+        batch = np.arange(20, dtype=np.float32).reshape(5, 4).copy()
+        pointer = batch.__array_interface__["data"][0]
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        features = runner.transform(batch)
+        seen["batch"].view(-1)[0] = -1
+
+        self.assertEqual(batch.__array_interface__["data"][0], pointer)
+        self.assertNotEqual(seen["batch"].data_ptr(), pointer)
+        self.assertEqual(float(batch.ravel()[0]), 0.0)
+        self.assertTrue(np.isfinite(features).all())
+        np.testing.assert_allclose(
+            features,
+            _expected_features(rbm, np.arange(20, dtype=np.float32).reshape(5, 4)),
+        )
+
+    def test_same_device_cpu_tensor_keeps_identity(self):
+        """A float32 CPU tensor already on the parameter device keeps storage."""
+        runner = _runner()
+        rbm = RUNNER.RestrictedBoltzmannMachine(4, 2, device=CPU)
+        _attach(runner, rbm, CPU)
+        batch = torch.arange(20, dtype=torch.float32).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        features = runner.transform(batch)
+
+        self.assertIs(seen["batch"], batch)
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.device, CPU)
+        self.assertEqual(batch.dtype, torch.float32)
+        self.assertTrue(
+            torch.equal(batch, torch.arange(20, dtype=torch.float32).reshape(5, 4))
+        )
+        np.testing.assert_allclose(features, _expected_features(rbm, batch.numpy()))
+
+    def test_noncontiguous_cpu_tensor_keeps_storage(self):
+        """A noncontiguous CPU view keeps its storage when the device matches."""
+        runner = _runner()
+        rbm = RUNNER.RestrictedBoltzmannMachine(4, 2, device=CPU)
+        _attach(runner, rbm, CPU)
+        base = torch.arange(40, dtype=torch.float32).reshape(5, 8)
+        view = base[:, :4]
+        pointer = view.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+        self.assertFalse(view.is_contiguous())
+
+        features = runner.transform(view)
+
+        self.assertIs(seen["batch"], view)
+        self.assertEqual(view.data_ptr(), pointer)
+        self.assertFalse(seen["batch"].is_contiguous())
+        self.assertFalse(view.is_contiguous())
+        self.assertEqual(view.device, CPU)
+        self.assertTrue(np.isfinite(features).all())
+        np.testing.assert_allclose(
+            features, _expected_features(rbm, view.contiguous().numpy())
+        )
+
+    def test_meta_batch_already_aligned_keeps_storage(self):
+        """A meta batch that already matches the weights keeps its storage."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        _apply_device(parent, META)
+        batch = torch.empty(5, 4, device=META)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        with self.assertRaises(NotImplementedError) as caught:
+            runner.transform(batch)
+
+        self.assertIn("meta", str(caught.exception).lower())
+        self.assertIs(seen["batch"], batch)
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(seen["batch"].device, META)
+        self.assertEqual(seen["batch"].dtype, torch.float32)
+        self.assertEqual(seen["output"].device, META)
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(runner.device, META)
+
+    def test_dtype_only_transform_follows_parameter_dtype(self):
+        """A parent dtype cast keeps CPU and ``transform`` still returns features."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        batch = _batch()
+        pointer = batch.__array_interface__["data"][0]
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        parent.to(dtype=torch.float64)
+        features = runner.transform(batch)
+
+        parameter = next(rbm.parameters())
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(parameter.dtype, torch.float64)
+        self.assertEqual(parameter.device, CPU)
+        self.assertEqual(runner.device, CPU)
+        self.assertEqual(batch.__array_interface__["data"][0], pointer)
+        self.assertEqual(seen["batch"].dtype, torch.float64)
+        self.assertEqual(seen["batch"].device, CPU)
+        self.assertNotEqual(seen["batch"].data_ptr(), pointer)
+        self.assertEqual(features.shape, (batch.shape[0], rbm.num_hidden))
+        self.assertTrue(np.isfinite(features).all())
+
+    def test_float64_tensor_keeps_identity(self):
+        """A float64 tensor matching float64 weights keeps object identity."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        parent.to(dtype=torch.float64)
+        batch = torch.arange(20, dtype=torch.float64).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        features = runner.transform(batch)
+
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertIs(seen["batch"], batch)
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.dtype, torch.float64)
+        self.assertEqual(batch.device, CPU)
+        self.assertEqual(runner.device, CPU)
+        self.assertTrue(np.isfinite(features).all())
+
+    def test_float64_parameters_survive_meta_apply(self):
+        """float64 weights stay float64 on meta and do not rewrite the caller."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        parent.to(dtype=torch.float64)
+        _apply_device(parent, META)
+        batch = torch.arange(20, dtype=torch.float32).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        with self.assertRaises(NotImplementedError) as caught:
+            runner.transform(batch)
+
+        parameter = next(rbm.parameters())
+        self.assertIn("meta", str(caught.exception).lower())
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(parameter.dtype, torch.float64)
+        self.assertEqual(parameter.device, META)
+        self.assertEqual(runner.device, META)
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.dtype, torch.float32)
+        self.assertEqual(batch.device, CPU)
+        self.assertIsNot(seen["batch"], batch)
+        self.assertEqual(seen["batch"].dtype, torch.float64)
+        self.assertEqual(seen["batch"].device, META)
+        self.assertEqual(seen["output"].device, META)
+        self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
+
+    def test_fit_copies_training_batch_onto_fallback(self):
+        """Refit copies the batch onto ``_device`` and leaves the old RBM put."""
+        runner = _runner()
+        old = RecordingRBM(4, 2, device=META)
+        _attach(runner, old, CPU)
+        batch = np.arange(16, dtype=np.float32).reshape(4, 4).copy()
+        pointer = batch.__array_interface__["data"][0]
+        seen: dict = {}
+        original = RUNNER.RestrictedBoltzmannMachine.get_hidden
+
+        def _stop(rbm, visible, *args, **kwargs):  # pylint: disable=unused-argument
+            seen["input"] = visible
+            seen["module"] = rbm
+            raise RuntimeError("stop before sampling")
+
+        RUNNER.RestrictedBoltzmannMachine.get_hidden = _stop
+        try:
+            with self.assertRaisesRegex(RuntimeError, "stop before sampling"):
+                runner.fit(batch)
+        finally:
+            RUNNER.RestrictedBoltzmannMachine.get_hidden = original
+
+        self.assertEqual(batch.__array_interface__["data"][0], pointer)
+        np.testing.assert_array_equal(
+            batch, np.arange(16, dtype=np.float32).reshape(4, 4)
+        )
+        self.assertNotEqual(seen["input"].data_ptr(), pointer)
+        self.assertEqual(seen["input"].device, CPU)
+        self.assertEqual(seen["input"].dtype, torch.float32)
+        self.assertIsNot(seen["module"], old)
+        self.assertEqual(old.direct_to_calls, [])
+        self.assertEqual(next(old.parameters()).device, META)
+        self.assertEqual(next(runner.rbm.parameters()).device, CPU)
         self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
 
 
