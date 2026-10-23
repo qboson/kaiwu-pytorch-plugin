@@ -70,7 +70,17 @@ class Exponential(SmoothingDist):
         Args:
             beta (float or torch.Tensor): Parameter of exponential distribution.
         """
-        self.beta = torch.tensor(beta, dtype=torch.float32)
+        self.beta = torch.as_tensor(beta, dtype=torch.float32)
+
+    @staticmethod
+    def _beta_on_device(beta: torch.Tensor, ref: torch.Tensor) -> torch.Tensor:
+        """Return ``beta`` co-located with a reference tensor.
+
+        ``MixtureGeneric`` keeps logits on the accelerator while ``beta`` is
+        constructed as a plain tensor. All smoothing math therefore resolves the
+        parameter device from the active samples instead of a stale CPU cache.
+        """
+        return beta.to(device=ref.device, dtype=ref.dtype)
 
     def pdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Probability density function.
@@ -81,7 +91,8 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Probability density value.
         """
-        return self.beta * torch.exp(-self.beta * zeta) / (1 - torch.exp(-self.beta))
+        beta = self._beta_on_device(self.beta, zeta)
+        return beta * torch.exp(-beta * zeta) / (1 - torch.exp(-beta))
 
     def cdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Cumulative distribution function.
@@ -92,19 +103,33 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Cumulative distribution value.
         """
-        return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
+        beta = self._beta_on_device(self.beta, zeta)
+        return (1.0 - torch.exp(-beta * zeta)) / (1 - torch.exp(-beta))
 
-    def sample(self, shape: tuple) -> torch.Tensor:
+    def sample(
+        self,
+        shape: tuple,
+        *,
+        device: torch.device | str | None = None,
+        dtype: torch.dtype | None = None,
+    ) -> torch.Tensor:
         """Sampling.
 
         Args:
             shape (tuple): Sample shape.
+            device: Device for the returned sample. Defaults to ``beta``'s device.
+            dtype: Dtype for the returned sample. Defaults to ``beta``'s dtype.
 
         Returns:
             torch.Tensor: Sample result.
         """
-        rho = torch.rand(shape)
-        zeta = -torch.log(1.0 - (1.0 - torch.exp(-self.beta)) * rho) / self.beta
+        resolved_device = (
+            torch.device(device) if device is not None else self.beta.device
+        )
+        resolved_dtype = dtype if dtype is not None else self.beta.dtype
+        rho = torch.rand(shape, device=resolved_device, dtype=resolved_dtype)
+        beta = self._beta_on_device(self.beta, rho)
+        zeta = -torch.log(1.0 - (1.0 - torch.exp(-beta)) * rho) / beta
         return zeta
 
     def log_pdf(self, zeta: torch.Tensor) -> torch.Tensor:
@@ -116,10 +141,11 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Log probability density value.
         """
+        beta = self._beta_on_device(self.beta, zeta)
         return (
-            torch.log(self.beta)
-            - self.beta * zeta
-            - torch.log(1 - torch.exp(-self.beta))
+            torch.log(beta)
+            - beta * zeta
+            - torch.log(1 - torch.exp(-beta))
         )
 
 
@@ -264,9 +290,12 @@ class MixtureGeneric(FactorialBernoulliUtil):
         z = super().reparameterize(is_training=False)
         shape = z.shape
 
-        # Sample from smoothing distribution
-        zeta = self.smoothing_dist.sample(shape)
-        zeta = zeta.to(z.device)
+        # Sample from smoothing distribution on the posterior parameter device.
+        zeta = self.smoothing_dist.sample(
+            shape,
+            device=z.device,
+            dtype=z.dtype,
+        )
 
         zeta = torch.where(z == 0.0, zeta, 1.0 - zeta)
 
