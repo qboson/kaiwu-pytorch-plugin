@@ -77,8 +77,44 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         else:
             self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
             print("Using Simulated Annealing optimizer")
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.rbm = None  # 用于存储训练好的RBM模型
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    @property
+    def device(self):
+        """返回当前 RBM 参数所在设备。
+
+        父模块通过 ``_apply`` 搬走参数时不会调用本对象的赋值，构造时记下的设备会过期。
+        已经有参数时以参数设备为准；还没有 RBM 时回退到构造偏好。
+        """
+        rbm = self.rbm
+        if rbm is not None:
+            parameter = next(rbm.parameters(), None)
+            if parameter is not None:
+                return parameter.device
+        return self._device
+
+    @device.setter
+    def device(self, value):
+        """只更新构造偏好，不移动已经挂上的 RBM。"""
+        self._device = torch.device(value)
+
+    def _batch_on_parameter_device(self, batch):
+        """把 batch 放到当前 RBM 参数的设备和 dtype 上。
+
+        设备和 dtype 都已经对齐的张量原样返回，调用方存储保持不变。
+        NumPy 会复制，不和调用方缓冲区共用存储，也不原地改写。
+        """
+        device = self.device
+        dtype = torch.float32
+        rbm = self.rbm
+        if rbm is not None:
+            parameter = next(rbm.parameters(), None)
+            if parameter is not None:
+                dtype = parameter.dtype
+        if torch.is_tensor(batch):
+            return batch.to(dtype=dtype, device=device)
+        return torch.tensor(np.asarray(batch), dtype=dtype, device=device)
 
     def gen_digits_image(self, X, size=8):
         """
@@ -108,7 +144,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             X.shape[1],  # 可见层单元数（特征维度）
             self.n_components,  # 隐层单元数
         )
-        rbm.to(self.device)  # 将模型移动到指定设备（CPU/GPU）
+        rbm.to(self._device)  # 新模型放到构造偏好，不跟随已被移走的旧参数
         self.rbm = rbm
 
         # 初始化优化器
@@ -120,7 +156,8 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         batch_slices = list(
             gen_even_slices(n_batches * self.batch_size, n_batches, n_samples=n_samples)
         )
-        X_torch = torch.FloatTensor(X).to(self.device)  # 转为torch张量并移动到设备
+        # 新模型已经挂上，batch 跟随它的参数设备和 dtype，并复制 NumPy
+        X_torch = self._batch_on_parameter_device(X)
         idx = 0
 
         # 训练循环
@@ -243,6 +280,9 @@ class RBMRunner(TransformerMixin, BaseEstimator):
     def transform(self, X):
         """
         提取隐藏层特征
+
+        batch 放到当前参数的设备和 dtype 上。已经对齐的张量保持原存储；
+        NumPy 会复制。父模块 ``_apply`` 搬走参数后，这里读到的是新设备。
         Args:
             X: 输入数据，形状为 (n_samples, n_features)
         Returns:
@@ -250,7 +290,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         """
         if self.rbm is None:
             raise ValueError("RBM model not trained yet. Call fit first.")
-        X_torch = torch.FloatTensor(X).to(self.device)
+        X_torch = self._batch_on_parameter_device(X)
         with torch.no_grad():
             hidden_output = self.rbm.get_hidden(X_torch)
             features = hidden_output[:, self.rbm.num_visible :]
