@@ -21,6 +21,45 @@ from transformers.models.esm.modeling_esm import (
 )
 
 
+def _parameter_device(module: nn.Module, fallback: torch.Tensor) -> torch.device:
+    """Return the device ``module`` parameters currently live on.
+
+    A parent ``_apply`` moves embedding weights without calling ``.to``.
+    Attention masks and fused embeddings have to follow those weights. An
+    empty module falls back to ``fallback.device``.
+    """
+    parameter = next(module.parameters(), None)
+    if parameter is None:
+        return fallback.device
+    return parameter.device
+
+
+def _align_embedding_activations(
+    embeddings: nn.Module,
+    fallback: torch.Tensor,
+    attention_mask: Optional[torch.Tensor],
+    inputs_embeds: Optional[torch.Tensor],
+    batch_size: int,
+    seq_length: int,
+    past_key_values_length: int,
+) -> tuple[torch.Tensor, Optional[torch.Tensor]]:
+    """Place the mask and fused embeddings on the embedding parameter device.
+
+    Caller tensors are not written in place, and their dtypes stay put.
+    """
+    device = _parameter_device(embeddings, fallback)
+    if inputs_embeds is not None:
+        inputs_embeds = inputs_embeds.to(device=device)
+    if attention_mask is None:
+        attention_mask = torch.ones(
+            (batch_size, seq_length + past_key_values_length),
+            device=device,
+        )
+    else:
+        attention_mask = attention_mask.to(device=device)
+    return attention_mask, inputs_embeds
+
+
 class _ModifiedEsmSelfAttention(EsmSelfAttention):
     """Custom ESM attention block using scaled-dot-product attention."""
 
@@ -224,17 +263,21 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
             raise ValueError("You have to specify either input_ids or inputs_embeds")
 
         batch_size, seq_length = input_shape
-        device = input_ids.device if input_ids is not None else inputs_embeds.device
+        fallback = input_ids if input_ids is not None else inputs_embeds
+        device = fallback.device
 
         past_key_values_length = (
             past_key_values[0][0].shape[2] if past_key_values is not None else 0
         )
-
-        if attention_mask is None:
-            attention_mask = torch.ones(
-                ((batch_size, seq_length + past_key_values_length)),
-                device=device,
-            )
+        attention_mask, inputs_embeds = _align_embedding_activations(
+            self.embeddings,
+            fallback,
+            attention_mask,
+            inputs_embeds,
+            batch_size,
+            seq_length,
+            past_key_values_length,
+        )
 
         extended_attention_mask = self.get_extended_attention_mask(
             attention_mask, input_shape
