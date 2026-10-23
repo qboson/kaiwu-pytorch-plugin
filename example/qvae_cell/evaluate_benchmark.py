@@ -271,6 +271,9 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
     from the learned representation? A stronger representation should usually
     yield higher held-out classification scores.
 
+    Cells without reference annotations are excluded before splitting. Literal
+    string labels such as "nan" remain valid; counts report the evaluated cohort.
+
     Args:
         adata: AnnData object with an embedding in ``adata.obsm``.
         rep_key: Embedding key, such as ``X_qvae``.
@@ -283,8 +286,12 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
         One-row DataFrame with accuracy, weighted precision, weighted recall,
         weighted F1, and class count.
     """
-    x = adata.obsm[rep_key]
-    labels = adata.obs[label_key].astype(str).to_numpy()
+    annotations = adata.obs[label_key]
+    valid = annotations.notna().to_numpy()
+    if not valid.any():
+        raise ValueError("Classification requires non-missing reference labels")
+    x = adata.obsm[rep_key][valid]
+    labels = annotations[valid].astype(str).to_numpy()
     encoder = LabelEncoder()
     y = encoder.fit_transform(labels)
 
@@ -316,6 +323,8 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
                 "rep_key": rep_key,
                 "label_key": label_key,
                 "classifier": "logistic_regression",
+                "n_labeled_cells": int(valid.sum()),
+                "n_missing_labels": int((~valid).sum()),
                 "test_size": test_size,
                 "accuracy": metrics.accuracy_score(y_test, y_pred),
                 "precision_weighted": metrics.precision_score(
