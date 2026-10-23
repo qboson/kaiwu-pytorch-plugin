@@ -5,7 +5,10 @@ import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validate_ising_solutions,
+)
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -202,11 +205,17 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         Args:
             sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
+                Each ``solve`` call must return a nonempty 2D batch of exact
+                -1/+1 spins for the hidden Ising matrix, including its gauge spin.
             s_visible: State of the visible layer.
 
         Returns:
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
+
+        Raises:
+            RuntimeError: If any condition has no available sampler results
+                or an invalid Ising batch. No partial result is returned.
         """
         solutions = []
         for i in range(s_visible.size(0)):
@@ -215,6 +224,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             with kpp_caller_context():
                 solution = sampler.solve(ising_mat)
 
+            solution = _validate_ising_solutions(solution, ising_mat.shape[0])
             solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
             solution = torch.tensor(solution, dtype=dtype, device=self.device)
             solution = torch.cat(
