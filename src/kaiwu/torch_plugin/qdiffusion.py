@@ -845,7 +845,9 @@ class QDiffusion(nn.Module):
         new_tokens, new_scores = stochastic_sample_from_categorical(
             logits, temperature=0.0
         )
-        resample_input.masked_scatter_(resample_masks, new_tokens[resample_masks])
+        resample_input = resample_input.masked_scatter(
+            resample_masks, new_tokens[resample_masks]
+        )
         resample_scores.masked_scatter_(resample_masks, new_scores[resample_masks])
         tokens[to_be_resampled] = resample_input
         scores[to_be_resampled] = resample_scores
@@ -882,7 +884,9 @@ class QDiffusion(nn.Module):
         if not self.config.disable_resample:
             self._resample(selected_tokens, selected_scores)
 
-        output_tokens.masked_scatter_(output_masks, selected_tokens[output_masks])
+        output_tokens = output_tokens.masked_scatter(
+            output_masks, selected_tokens[output_masks]
+        )
         output_scores.masked_scatter_(output_masks, selected_scores[output_masks])
 
         history = list(state["history"])
