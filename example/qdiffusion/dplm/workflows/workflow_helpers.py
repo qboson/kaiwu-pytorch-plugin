@@ -41,13 +41,26 @@ def select_records(
     max_length: int,
     max_records: int | None,
 ) -> list[tuple[str, str]]:
+    """Selects usable records by length and caps the result count.
+
+    Args:
+        records: FASTA records to filter.
+        min_length: Minimum acceptable sequence length.
+        max_length: Maximum acceptable sequence length.
+        max_records: Maximum number of records to keep; ``None`` keeps all.
+
+    Returns:
+        list[tuple[str, str]]: The filtered records, at most ``max_records`` long.
+    """
+    if max_records is not None and max_records < 0:
+        raise ValueError("max_records must be non-negative or None")
     selected: list[tuple[str, str]] = []
     for header, sequence in records:
+        if max_records is not None and len(selected) >= max_records:
+            break
         if len(sequence) < min_length or len(sequence) > max_length:
             continue
         selected.append((header, sequence))
-        if max_records is not None and len(selected) >= max_records:
-            break
     return selected
 
 
