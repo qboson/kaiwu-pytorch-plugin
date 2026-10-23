@@ -78,12 +78,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
 
+        ``s_all`` is aligned to the live parameter device so a caller batch can
+        stay on CPU after a parent ``_apply`` moves the weights. The caller's
+        tensor is not modified in place.
+
         Args:
             s_all (torch.tensor): Tensor of shape (B, N), where B is batch size,
                 N is the number of variables in the model.
 
         Returns:
-            torch.tensor: Hamiltonian of shape (B,).
+            torch.tensor: Hamiltonian of shape (B,), on the parameter device.
         """
         s_all = s_all.to(self._model_device())
         return -s_all @ self.linear_bias - 0.5 * torch.sum(
