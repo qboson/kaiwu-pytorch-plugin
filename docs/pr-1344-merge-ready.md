@@ -44,8 +44,8 @@ PYTHONPATH=src python3 -m pytest tests/test_qdeq_device_sync.py -v
 
 | SHA | Summary |
 |-----|---------|
-| `b1c8cb2e` | Initial `QDEQ._layer_device` + input alignment |
-| _(see branch tip)_ | Strengthened #164-style regression matrix + this doc |
+| `b1c8cb2e212d0cb5f436ac6a2a3828b095bd07d6` | Initial `QDEQ._layer_device` + input alignment |
+| `e4f75a340395958092390fd8ce25b13a5485444a` | Strengthened #164-style regression matrix + docs |
 
 ## Merge-ready checklist
 
