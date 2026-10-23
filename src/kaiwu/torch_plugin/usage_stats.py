@@ -46,11 +46,11 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Env var: KPP_STATS_ENABLED; values "true"/"1" enable, anything else disables.
 # Enabled by default.  The code-level _stats_enabled takes precedence over
-# the environment variable.
+# the environment variable.  The env var is read on every call so that
+# changes made after import (e.g. os.environ[...] = "false") take effect.
 # ---------------------------------------------------------------------------
 _stats_enabled: Optional[bool] = None  # None means follow env var
-# Cached env-var parse result to avoid os.environ.get() on every call
-_env_stats_cache: Optional[bool] = None
+_MISSING = object()  # sentinel distinguishing "absent" from "set to None"
 
 
 def _is_stats_enabled() -> bool:
@@ -58,21 +58,16 @@ def _is_stats_enabled() -> bool:
 
     Priority: code-level setting > env var > default (True).
     """
-    global _env_stats_cache  # pylint: disable=global-statement
     if _stats_enabled is not None:
         return _stats_enabled
-    if _env_stats_cache is not None:
-        return _env_stats_cache
     env_val = os.environ.get("KPP_STATS_ENABLED", "true").lower()
-    _env_stats_cache = env_val in ("true", "1", "yes", "on")
-    return _env_stats_cache
+    return env_val in ("true", "1", "yes", "on")
 
 
 def enable_usage_stats() -> None:
     """Enable kpp usage statistics (enabled by default; usually not needed)."""
-    global _stats_enabled, _env_stats_cache  # pylint: disable=global-statement
+    global _stats_enabled  # pylint: disable=global-statement
     _stats_enabled = True
-    _env_stats_cache = None  # reset cache so code setting takes precedence
     logger.info("kpp usage stats enabled")
 
 
@@ -112,9 +107,17 @@ def kpp_caller_context(source: str = "kpp"):
         yield
         return
 
-    old_value = getattr(_kpp_caller_context, "source", None)
+    old_value = getattr(_kpp_caller_context, "source", _MISSING)
     _kpp_caller_context.source = source
     try:
         yield
     finally:
-        _kpp_caller_context.source = old_value
+        if old_value is _MISSING:
+            # The attribute did not exist before; restore that exact state
+            # instead of leaving a stale `source = None` behind.
+            try:
+                delattr(_kpp_caller_context, "source")
+            except AttributeError:
+                pass
+        else:
+            _kpp_caller_context.source = old_value

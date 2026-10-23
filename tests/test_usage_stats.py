@@ -70,6 +70,34 @@ class TestKppCallerContext(unittest.TestCase):
             self.assertEqual(ctx.source, "myframework")
         self.assertIsNone(ctx.source)
 
+    def test_context_restores_attribute_absence(self):
+        """A previously absent `source` attribute is absent again on exit."""
+        import threading
+
+        us = _get_us()
+        original = us._kpp_caller_context
+        fake_ctx = threading.local()
+        us._kpp_caller_context = fake_ctx
+        us.enable_usage_stats()
+
+        def _restore():
+            us._kpp_caller_context = original
+            us.disable_usage_stats()
+
+        self.addCleanup(_restore)
+
+        self.assertFalse(hasattr(fake_ctx, "source"))
+        with us.kpp_caller_context("kpp"):
+            self.assertEqual(fake_ctx.source, "kpp")
+        self.assertFalse(hasattr(fake_ctx, "source"))
+
+        # An existing None value is preserved as None, not deleted.
+        fake_ctx.source = None
+        with us.kpp_caller_context("kpp"):
+            self.assertEqual(fake_ctx.source, "kpp")
+        self.assertTrue(hasattr(fake_ctx, "source"))
+        self.assertIsNone(fake_ctx.source)
+
     def test_noop_when_disabled(self):
         """When disabled, context manager does not modify source."""
         us = _get_us()
@@ -90,21 +118,35 @@ class TestStatsSwitch(unittest.TestCase):
     """Test the global statistics switch."""
 
     def setUp(self):
-        """Reset switch state before each test."""
+        """Reset switch state and snapshot the outer environment."""
         us = _get_us()
         us._stats_enabled = None
-        us._env_stats_cache = None
+        self._outer_env = os.environ.get("KPP_STATS_ENABLED")
+        self.addCleanup(self._restore_outer_state)
 
-    def tearDown(self):
-        """Reset after each test to avoid pollution."""
+    def _restore_outer_state(self):
+        """Restore the caller's switch and environment exactly."""
         us = _get_us()
         us._stats_enabled = None
-        us._env_stats_cache = None
-        os.environ.pop("KPP_STATS_ENABLED", None)
+        if self._outer_env is None:
+            os.environ.pop("KPP_STATS_ENABLED", None)
+        else:
+            os.environ["KPP_STATS_ENABLED"] = self._outer_env
 
     def test_default_enabled(self):
         """Stats are enabled by default."""
         us = _get_us()
+        os.environ.pop("KPP_STATS_ENABLED", None)
+        self.assertTrue(us.is_usage_stats_enabled())
+
+    def test_env_change_after_first_query_is_honored(self):
+        """KPP_STATS_ENABLED changes made after import take effect."""
+        us = _get_us()
+        os.environ["KPP_STATS_ENABLED"] = "true"
+        self.assertTrue(us.is_usage_stats_enabled())
+        os.environ["KPP_STATS_ENABLED"] = "false"
+        self.assertFalse(us.is_usage_stats_enabled())
+        os.environ["KPP_STATS_ENABLED"] = "true"
         self.assertTrue(us.is_usage_stats_enabled())
 
     def test_env_var_disable(self):
@@ -139,7 +181,6 @@ class TestStatsSwitch(unittest.TestCase):
         for val in ("true", "1", "yes", "on"):
             os.environ["KPP_STATS_ENABLED"] = val
             us = _get_us()
-            us._env_stats_cache = None
             self.assertTrue(us.is_usage_stats_enabled(), f"Failed for value: {val}")
 
     def test_env_var_false_values(self):
@@ -147,7 +188,6 @@ class TestStatsSwitch(unittest.TestCase):
         for val in ("false", "0", "no", "off", "anything"):
             os.environ["KPP_STATS_ENABLED"] = val
             us = _get_us()
-            us._env_stats_cache = None
             self.assertFalse(us.is_usage_stats_enabled(), f"Failed for value: {val}")
 
 
