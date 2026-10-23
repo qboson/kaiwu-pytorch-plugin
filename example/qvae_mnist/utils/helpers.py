@@ -373,15 +373,30 @@ class FIDCalculator:
         self.device = device
         self.fid = FrechetInceptionDistance(feature=feature).to(device)
         self.preprocessor = FIDImagePreprocessor()
-    
+
+    def _metric_device(self) -> torch.device:
+        """返回当前 FID 网络参数所在的设备。
+
+        ``self.device`` 只记录构造时的偏好。父模块通过 ``_apply`` 搬走
+        ``self.fid`` 时不会改这个属性。每次更新重读第一个参数；没有参数时
+        退回第一个 buffer，再没有则退回构造偏好。
+        """
+        parameter = next(self.fid.parameters(), None)
+        if parameter is not None:
+            return parameter.device
+        buffer = next(self.fid.buffers(), None)
+        if buffer is not None:
+            return buffer.device
+        return self.device
+
     def update_batch(self, images: torch.Tensor, real: bool):
         """处理并更新单一批次"""
         # 输入假定为 [0,1] float，先缩放至 [0,255] uint8
         images_uint8 = (images * 255).clamp(0, 255).to(torch.uint8)
         # 预处理（形状、通道、尺寸）
         processed = self.preprocessor(images_uint8)
-        # 移动到设备并更新
-        self.fid.update(processed.to(self.device), real=real)
+        # 预处理在输入所在设备上完成，再送到当前参数设备。
+        self.fid.update(processed.to(self._metric_device()), real=real)
     
     def compute(self) -> float:
         """计算最终 FID 分数"""
