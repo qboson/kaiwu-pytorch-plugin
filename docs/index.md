@@ -27,6 +27,12 @@ source/modules/kaiwu.torch_plugin
 ```{toctree}
 :maxdepth: 2
 
+source/modules/maifs
+
+```
+```{toctree}
+:maxdepth: 2
+
 source/faq/index
 
 ```
