@@ -76,13 +76,31 @@ The above image shows the project file structure:
 
 ### Requirements
 - Python: 3.10, 3.12, or 3.14
-- kaiwu == 1.4.3
+- kaiwu >= 1.3.1, <= 1.4.3
 - Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
 - Python 3.14: torch == 2.10.0, numpy == 2.3.3
 
 Python 3.11 and 3.13 are not supported. Installation on Python 3.12 and 3.14
 depends on corresponding Kaiwu support. These environments are not ready for
 installation from published packages until Kaiwu provides that support.
+
+Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
+1.4.2, and 1.4.3. The same model code handles the precision-reducer location
+change and translates CIM mode names (`quota` / `sample` and
+`optimization` / `sampling`, case-insensitive) for the installed SDK.
+The published SDK wheels in this range require Python 3.10; plugin Python
+support does not add Python versions to those SDK wheels.
+
+SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10, covering the interface
+change and the newest supported release. Run CI manually with
+`all-kaiwu-versions` enabled to include 1.4.1 and 1.4.2. These jobs test local
+solving and CIM construction without submitting cloud tasks. Use a regular
+`pip install .` for cross-SDK checks: SDK 1.3.1 uses a regular package whose
+namespace does not discover the plugin through an editable installation.
+
+Example dependencies are pinned by Python version in `requirements/requirements_example.txt`; QDiffusion uses `example/qdiffusion/requirements.txt`. The development requirements include both sets.
+
+On Apple Silicon macOS, set `NUMBA_THREADING_LAYER=workqueue` before running single-cell examples or the full test suite; see the [installation guide](docs/source/getting_started/installation.md).
 
 ### Code Style
 
@@ -109,7 +127,8 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    ```bash
    pip install -r requirements/requirements.txt
    ```
-   Kaiwu SDK 1.4.3 is included in the dependencies.
+   Kaiwu SDK 1.3.1 through 1.4.3 is supported; a fresh install selects 1.4.3.
+   To select an older SDK, install it together with the plugin: `pip install "kaiwu==1.3.1" .`.
 
 4. **Install the plugin**:
    ```bash
@@ -191,7 +210,7 @@ from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17

@@ -79,12 +79,28 @@ flowchart TD
 ### 环境要求
 
 - Python：3.10、3.12 或 3.14
-- kaiwu == 1.4.3
+- kaiwu >= 1.3.1, <= 1.4.3
 - Python 3.10 / 3.12：torch == 2.7.0，numpy == 2.2.6
 - Python 3.14：torch == 2.10.0，numpy == 2.3.3
 
 不支持 Python 3.11 和 3.13。Python 3.12 和 3.14 的安装还需要 Kaiwu
 提供对应版本支持；在此之前，尚不能通过正式发布的依赖完成安装。
+
+Kaiwu 兼容范围包括已发布的 1.3.1、1.4.0、1.4.1、1.4.2、1.4.3。
+同一套模型代码兼容降精度工具的位置变化，并按所装 SDK 转换计算模式；
+旧写法 `quota` / `sample` 和新写法 `optimization` / `sampling` 均可使用，
+不区分大小写。这些正式 SDK 安装包仅提供 Python 3.10 版本；
+插件支持其他 Python 版本不代表旧 SDK 安装包也支持。
+
+SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口变化前后
+及最新支持版本。手动运行 CI 时开启 `all-kaiwu-versions` 可检查全部五版。
+检查使用本地求解和云端求解器构造，不会提交云端任务。
+跨 SDK 检查使用普通的 `pip install .`；1.3.1 的包结构不能通过可编辑安装
+自动发现插件。
+
+示例依赖在 `requirements/requirements_example.txt` 中按 Python 版本固定，QDiffusion 使用 `example/qdiffusion/requirements.txt`。开发环境安装清单已包含这两组依赖。
+
+Apple Silicon Mac 用户运行单细胞示例或完整测试前，需要设置 `NUMBA_THREADING_LAYER=workqueue`，具体见[安装说明](docs/source/getting_started/installation.md)。
 
 ### 代码风格
 
@@ -117,7 +133,8 @@ flowchart TD
    pip install -r requirements/requirements.txt
    ```
 
-   依赖中已包含 Kaiwu SDK 1.4.3。
+   支持 Kaiwu SDK 1.3.1 至 1.4.3；全新安装默认选择 1.4.3。
+   指定旧版时，将它和插件一起安装：`pip install "kaiwu==1.3.1" .`。
 
 4. **安装插件**
 
@@ -207,7 +224,7 @@ from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17

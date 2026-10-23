@@ -23,7 +23,7 @@ from typing import Union, Optional
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 import logging
 logger = logging.getLogger(__name__)

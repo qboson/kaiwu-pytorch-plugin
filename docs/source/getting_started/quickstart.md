@@ -104,7 +104,7 @@ import kaiwu as kw
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 from torch.optim import SGD
 
 # Add license authentication

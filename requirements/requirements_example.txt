@@ -1,6 +1,35 @@
-scikit-learn
-matplotlib
-scipy
-torchvision==0.22.0
-torchmetrics[image]
-seaborn
+-r requirements.txt
+
+# Python 3.14 needs matching binary packages; keep 3.10 and 3.12 together.
+scikit-learn==1.7.2
+matplotlib==3.10.3; python_version < "3.14"
+matplotlib==3.10.7; python_version >= "3.14"
+# SciPy 1.14.1 avoids the macOS PROPACK loader failure in the 1.15.3 wheels.
+scipy==1.14.1; python_version < "3.14"
+scipy==1.16.3; python_version >= "3.14"
+torchvision==0.22.0; python_version < "3.14"
+torchvision==0.25.0; python_version >= "3.14"
+torchmetrics[image]==1.8.2
+torch-fidelity==0.3.0
+seaborn==0.13.2
+pandas==2.2.3; python_version < "3.14"
+pandas==2.3.3; python_version >= "3.14"
+Pillow==12.0.0
+gif==23.3.0
+imageio==2.37.0
+joblib==1.5.2
+tqdm==4.67.1
+ipython==8.37.0; python_version < "3.14"
+ipython==9.6.0; python_version >= "3.14"
+anndata==0.11.4
+scanpy==1.11.5
+numba==0.68.0
+leidenalg==0.11.0
+scib-metrics==0.5.3; python_version < "3.14"
+scib-metrics==0.5.8; python_version >= "3.14"
+# Keep scIB's JAX requirements compatible with each SciPy baseline.
+jax==0.6.2; python_version < "3.14"
+jaxlib==0.6.2; python_version < "3.14"
+jax==0.11.2; python_version >= "3.14"
+jaxlib==0.11.2; python_version >= "3.14"
+scgraph-eval==0.1.2

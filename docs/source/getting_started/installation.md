@@ -19,14 +19,34 @@ Before installation, ensure your system meets the following requirements:
 | Python | 3.10, 3.12, 3.14 | Supported even minor versions |
 | PyTorch | 2.7.0 / 2.10.0 | Use 2.10.0 on Python 3.14 |
 | NumPy | 2.2.6 / 2.3.3 | Use 2.3.3 on Python 3.14 |
-| Kaiwu SDK | v1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
+| Kaiwu SDK | 1.3.1–1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
 
-> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK v1.4.3 is the current recommended release.
+> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK 1.3.1 through 1.4.3 is supported; 1.4.3 is the default for a fresh installation.
 
 Python 3.11 and 3.13 are excluded from the supported versions. Installation on
 Python 3.12 and 3.14 depends on corresponding Kaiwu support. Until Kaiwu provides
 that support, installation from published dependencies and the corresponding CI
 jobs cannot pass. Kaiwu packaging is maintained separately from this plugin.
+
+### Kaiwu SDK compatibility
+
+The supported published SDK releases are 1.3.1, 1.4.0, 1.4.1, 1.4.2, and
+1.4.3. Their official wheels require Python 3.10. Select one in the same
+installation command as the plugin, for example:
+
+```bash
+python -m pip install "kaiwu==1.3.1" .
+```
+
+Use an isolated environment for each SDK version. Use regular installation
+rather than `pip install -e .` for SDK 1.3.1: its regular `kaiwu` package
+otherwise hides the editable plugin. The shared compatibility module handles
+the `PrecisionReducer` move from `kaiwu.cim` to `kaiwu.preprocess` and translates
+both old and new CIM mode names. Model algorithms are shared across versions.
+
+Regular SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10. The manual
+`all-kaiwu-versions` CI option also checks 1.4.1 and 1.4.2. These interface
+checks do not submit licensed or cloud tasks.
 
 Check the Python version:
 ```bash
@@ -65,6 +85,29 @@ cd kaiwu-pytorch-plugin
 Install the project dependencies:
 ```bash
 pip install -r requirements/requirements.txt
+```
+
+For all examples, including image and single-cell workflows, install:
+
+```bash
+pip install -r requirements/requirements_example.txt
+```
+
+QDiffusion has an additional dependency list:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
+
+Both lists select versions for the active Python environment. For development,
+`pip install -r requirements/devel.txt` installs both lists and the test/documentation tools.
+
+On Apple Silicon macOS, set the following before running single-cell examples or
+the full test suite. It avoids a conflict between Numba and PyTorch's OpenMP
+libraries.
+
+```bash
+export NUMBA_THREADING_LAYER=workqueue
 ```
 
 4. **Install the Plugin**

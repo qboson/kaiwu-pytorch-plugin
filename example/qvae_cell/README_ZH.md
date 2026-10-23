@@ -9,14 +9,20 @@
 
 在项目根目录运行 `pip install .` 安装当前插件。
 
+在项目根目录安装示例依赖：
+
+```bash
+pip install -r requirements/requirements_example.txt
 ```
-kaiwu==1.4.3
-torch==2.7.0
-anndata
-scanpy
-leidenalg
-scib_metrics
-scgraph
+
+安装清单会为 Python 3.10、3.12、3.14 选择固定版本，包括 AnnData、Scanpy、
+Leiden、scIB metrics 和 `scgraph-eval`。后者提供评估脚本使用的 `scgraph` 模块。
+
+Apple Silicon Mac 用户需要在运行示例前，在同一终端执行以下设置，避免 Numba
+和 PyTorch 的 OpenMP 库冲突：
+
+```bash
+export NUMBA_THREADING_LAYER=workqueue
 ```
 
 ## 文件结构

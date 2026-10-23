@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Any
 
 import kaiwu as kw
-from kaiwu.cim import CIMOptimizer, TaskMode
+from kaiwu.cim import CIMOptimizer
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer, normalize_task_mode
 
 
 def build_bm_sampler(
@@ -34,9 +34,7 @@ def build_bm_sampler(
             # optimizer can submit or resume remote jobs.
             kw.common.CheckpointManager.save_dir = tmp_dir
 
-        task_mode = sampler_kwargs.get("task_mode")
-        if isinstance(task_mode, str):
-            task_mode = getattr(TaskMode, task_mode, task_mode)
+        task_mode = normalize_task_mode(sampler_kwargs.get("task_mode"))
 
         optimizer_kwargs = {
             "task_name": sampler_kwargs.get("task_name", "qdiffusion_bm"),

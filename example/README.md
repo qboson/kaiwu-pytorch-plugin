@@ -70,7 +70,7 @@ Run the training script via `example/bm_generation/train_bm.ipynb`, and execute 
 
 **Dependencies**:
 ```text
-kaiwu==1.4.3
+kaiwu>=1.3.1,<=1.4.3
 pandas
 matplotlib
 ```

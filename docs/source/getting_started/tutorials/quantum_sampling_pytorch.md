@@ -25,7 +25,7 @@ Real hardware quantum sampling requires configured Kaiwu SDK credentials and rea
 
 ```python
 from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 quantum_sampler = CIMOptimizer(task_name="rbm_mnist", wait=True)
 sampler = PrecisionReducer(
