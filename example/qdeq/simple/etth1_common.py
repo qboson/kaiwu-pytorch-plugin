@@ -180,6 +180,26 @@ class AndersonDEQ(QDEQ):
         return best_z, {"nstep": nstep, "residual": best_res}
 
 
+def _parameter_device(module: nn.Module, fallback: torch.device) -> torch.device:
+    """Return the device ``module`` parameters currently live on.
+
+    A parent ``nn.Module.to`` moves this forecaster through ``_apply`` and never
+    calls a ``to`` override, so a cached device would go stale. The history
+    batch has to follow the parameters that are about to consume it.
+
+    Args:
+        module: Module whose parameters supply the device.
+        fallback: Device used when ``module`` has no parameters.
+
+    Returns:
+        torch.device: Device of the first parameter, otherwise ``fallback``.
+    """
+    parameter = next(module.parameters(), None)
+    if parameter is None:
+        return fallback
+    return parameter.device
+
+
 class DEQForecaster(nn.Module):
     """Small iTransformer-style forecaster whose encoder is a single ``QDEQ`` layer.
 
@@ -214,9 +234,15 @@ class DEQForecaster(nn.Module):
         self.head = nn.Linear(d_model, pred_len)
 
     def forward(self, history: torch.Tensor) -> torch.Tensor:
-        """Maps a (batch, seq_len, variables) history to a (batch, pred_len, variables) forecast."""
+        """Maps a (batch, seq_len, variables) history to a (batch, pred_len, variables) forecast.
+
+        The history is placed on the live ``embed`` parameter device. Parent
+        moves update those weights through ``_apply`` and leave the caller
+        batch where it was; the caller's tensor is not modified in place.
+        """
         # Normalise each window per variable, embed each variable's series as
         # one token, solve the equilibrium over tokens and project to the horizon.
+        history = history.to(_parameter_device(self.embed, history.device))
         mean = history.mean(dim=1, keepdim=True)
         std = history.std(dim=1, keepdim=True) + 1e-5
         tokens = self.embed(((history - mean) / std).transpose(1, 2))
