@@ -380,6 +380,23 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
             print("Feature importance is only available in classifier mode")
             return None
 
+    def _batch_on_rbm_parameters(self, rbm, data_in):
+        """把可见层放到该 RBM 参数当前的设备和 dtype 上。
+
+        ``unsupervised_dbn.device`` 在构造 DBN 时写入。父模块通过 ``_apply``
+        搬走 RBM 参数时不会刷新这个普通属性，所以激活不能再读它。已经有参数时
+        以参数的设备和 dtype 为准；没有参数时才退回该缓存。NumPy 会复制。
+        """
+        parameter = next(rbm.parameters(), None)
+        if parameter is None:
+            cached = getattr(self.unsupervised_dbn, "device", None)
+            device = cached if isinstance(cached, torch.device) else torch.device("cpu")
+            dtype = torch.float32
+        else:
+            device = parameter.device
+            dtype = parameter.dtype
+        return torch.tensor(np.asarray(data_in), dtype=dtype, device=device)
+
     def get_layer_activations(self, X, layer_index=None, return_all_layers=False):
         """
         获取指定层或所有层的激活值
@@ -394,7 +411,7 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         for i in range(self.unsupervised_dbn._n_layers):
             rbm = self.unsupervised_dbn.get_rbm_layer(i)
             with torch.no_grad():
-                X_tensor = torch.FloatTensor(X_data).to(self.unsupervised_dbn.device)
+                X_tensor = self._batch_on_rbm_parameters(rbm, X_data)
                 hidden_output = rbm.get_hidden(X_tensor)
 
                 # 提取隐藏层激活值（去掉可见层部分）
