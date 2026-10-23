@@ -148,6 +148,32 @@ class QVAE(AutoEncoderBase):
         self.last_kl_loss = None
         self.create_networks()
 
+    @staticmethod
+    def _parameter_device(module, fallback):
+        """Return the device ``module`` parameters currently live on.
+
+        Encoder, decoder, and the Bernoulli bias buffer are separate pieces of
+        state. Moving one of them (or moving the parent through ``_apply``,
+        which does not refresh a cached device) leaves caller activations on
+        another device. Reconstruction follows the parameters of the submodule
+        it is about to use, and falls back to ``fallback`` when that submodule
+        has no parameters.
+
+        Args:
+            module (torch.nn.Module): Submodule whose parameters define the
+                device. Typically ``encoder`` or ``decoder``.
+            fallback (torch.Tensor): Tensor used when ``module`` has no
+                parameters.
+
+        Returns:
+            torch.device: Device of the first parameter, otherwise
+            ``fallback.device``.
+        """
+        parameter = next(module.parameters(), None)
+        if parameter is None:
+            return fallback.device
+        return parameter.device
+
     def create_networks(self):
         """Create components that were not supplied to the constructor."""
         if self.encoder is None:
@@ -231,6 +257,7 @@ class QVAE(AutoEncoderBase):
                 and reparameterized latent sample.
         """
         x = x.view(-1, self._input_dimension)
+        x = x.to(self._parameter_device(self.encoder, x))
 
         # For Bernoulli data, we optionally subtract dataset mean
         if self.config.loss_type == "bernoulli":
@@ -249,11 +276,13 @@ class QVAE(AutoEncoderBase):
         q = self.encoder(encoder_x)  # encoder must implement forward
         posterior, zeta = self.posterior(q, self.config.dist_beta)
 
-        recon_x = self.decoder(zeta)  # decoder must implement forward
+        decoder_zeta = zeta.to(self._parameter_device(self.decoder, zeta))
+        recon_x = self.decoder(decoder_zeta)  # decoder must implement forward
 
-        # Add Bernoulli bias if needed
+        # Add Bernoulli bias if needed. The bias buffer stays put when only the
+        # decoder submodule is moved, so match the reconstruction device.
         if self.config.loss_type == "bernoulli":
-            recon_x = recon_x + self._train_bias
+            recon_x = recon_x + self._train_bias.to(device=recon_x.device)
 
         return recon_x, posterior, q, zeta
 
@@ -273,6 +302,9 @@ class QVAE(AutoEncoderBase):
         Raises:
             ValueError: If loss_type is not supported.
         """
+        aligned_device = self._parameter_device(self.decoder, recon_x)
+        recon_x = recon_x.to(aligned_device)
+        x = x.to(device=aligned_device)
         if self.config.loss_type == "mse":
             recon_loss = F.mse_loss(
                 recon_x, x.view(-1, self._input_dimension), reduction="sum"
