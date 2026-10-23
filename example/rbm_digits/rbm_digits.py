@@ -77,8 +77,27 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         else:
             self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
             print("Using Simulated Annealing optimizer")
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.rbm = None  # 用于存储训练好的RBM模型
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    @property
+    def device(self):
+        """返回当前 RBM 参数所在设备。
+
+        父模块通过 ``_apply`` 搬走参数时不会调用本对象的赋值，构造时记下的设备会过期。
+        已经有参数时以参数设备为准；还没有 RBM 时回退到构造偏好。
+        """
+        rbm = self.rbm
+        if rbm is not None:
+            parameter = next(rbm.parameters(), None)
+            if parameter is not None:
+                return parameter.device
+        return self._device
+
+    @device.setter
+    def device(self, value):
+        """只更新构造偏好，不移动已经挂上的 RBM。"""
+        self._device = torch.device(value)
 
     def gen_digits_image(self, X, size=8):
         """
@@ -108,7 +127,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             X.shape[1],  # 可见层单元数（特征维度）
             self.n_components,  # 隐层单元数
         )
-        rbm.to(self.device)  # 将模型移动到指定设备（CPU/GPU）
+        rbm.to(self._device)  # 新模型放到构造偏好，不跟随已被移走的旧参数
         self.rbm = rbm
 
         # 初始化优化器
