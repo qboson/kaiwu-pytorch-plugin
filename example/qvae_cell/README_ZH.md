@@ -34,6 +34,14 @@ kpp_qvae/
 └── README.md
 ```
 
+## 输入预处理
+
+`Trainer.adata_to_array` 将 `AnnData.X` 转成原始 float32 矩阵，再将该矩阵传给
+`Trainer.make_loaders`，后者先划分细胞索引。使用 `--loss-type bernoulli` 时，
+若训练集范围超出 `[0, 1]`，只使用训练细胞拟合 min-max 归一化范围。
+训练、验证和全量评估使用同一变换，并将结果裁剪到 `[0, 1]`。
+因此，验证集极值不会影响训练输入或训练偏置。默认的 `mse` 模式不缩放表达值。
+
 ## 训练
 
 默认数据为：
