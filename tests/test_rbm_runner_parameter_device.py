@@ -15,6 +15,8 @@ batch handed to ``get_hidden`` follows the live parameter device, while a new
 ``fit`` still places its model on the construction preference.
 
 CPU cases use ``meta``. CUDA cases are skipped unless a GPU is present.
+Same-device tensors keep their storage. NumPy is copied. A dtype-only move
+keeps the parameter device, and the batch follows that dtype.
 """
 
 from __future__ import annotations
@@ -189,18 +191,24 @@ class TestRBMRunnerParameterDevice(unittest.TestCase):
         self.assertEqual(runner.device, CPU)
 
     def test_parent_to_does_not_call_rbm_to(self):
-        """A parent move relocates weights without calling the child ``.to()``."""
-        runner = _runner()
-        rbm = RecordingRBM(4, 2, device=CPU)
-        parent = _attach(runner, rbm, CPU)
+        """Positional and keyword ``Module.to(meta)`` do not call child ``.to``."""
+        moves = (None, {"device": META})
+        for kwargs in moves:
+            with self.subTest(kwargs=kwargs):
+                runner = _runner()
+                rbm = RecordingRBM(4, 2, device=CPU)
+                parent = _attach(runner, rbm, CPU)
+                if kwargs is None:
+                    parent.to(META)
+                else:
+                    parent.to(**kwargs)
 
-        parent.to(META)
-
-        self.assertEqual(rbm.direct_to_calls, [])
-        self.assertEqual(next(rbm.parameters()).device, META)
-        self.assertEqual(rbm.device, META)
-        self.assertEqual(runner.device, META)
-        self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
+                self.assertEqual(rbm.direct_to_calls, [])
+                self.assertEqual(next(rbm.parameters()).device, META)
+                self.assertEqual(rbm.device, META)
+                self.assertEqual(runner.device, META)
+                fallback = runner._device  # pylint: disable=protected-access
+                self.assertEqual(fallback, CPU)
 
     def test_parent_apply_places_batch_on_parameter_device(self):
         """``transform`` must feed ``get_hidden`` on the live parameter device."""
@@ -262,6 +270,13 @@ class TestRBMRunnerParameterDevice(unittest.TestCase):
         _spy_get_hidden(rbm, seen)
 
         _apply_device(parent, META)
+        with self.assertRaises(NotImplementedError) as blocked:
+            parent.to(CPU)
+        self.assertIn("meta", str(blocked.exception).lower())
+        self.assertEqual(next(rbm.parameters()).device, META)
+        self.assertEqual(runner.device, META)
+        self.assertEqual(rbm.direct_to_calls, [])
+
         with self.assertRaises(NotImplementedError) as caught:
             runner.transform(batch)
         self.assertIn("meta", str(caught.exception).lower())
@@ -405,7 +420,7 @@ class TestRBMRunnerParameterDevice(unittest.TestCase):
         self.assertEqual(batch.data_ptr(), pointer)
         self.assertEqual(seen["batch"].device, META)
         self.assertEqual(seen["batch"].dtype, torch.float32)
-        self.assertEqual(seen["output"].device, META)
+        self.assertEqual(seen["output"], META)
         self.assertEqual(rbm.direct_to_calls, [])
         self.assertEqual(runner.device, META)
 
@@ -482,7 +497,7 @@ class TestRBMRunnerParameterDevice(unittest.TestCase):
         self.assertIsNot(seen["batch"], batch)
         self.assertEqual(seen["batch"].dtype, torch.float64)
         self.assertEqual(seen["batch"].device, META)
-        self.assertEqual(seen["output"].device, META)
+        self.assertEqual(seen["output"], META)
         self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
 
     def test_fit_copies_training_batch_onto_fallback(self):
@@ -519,6 +534,97 @@ class TestRBMRunnerParameterDevice(unittest.TestCase):
         self.assertEqual(next(old.parameters()).device, META)
         self.assertEqual(next(runner.rbm.parameters()).device, CPU)
         self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
+
+    def test_cpu_tensor_storage_survives_meta_apply(self):
+        """A CPU tensor stays put while ``get_hidden`` observes a meta copy."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        batch = torch.arange(20, dtype=torch.float32).reshape(5, 4)
+        pointer = batch.data_ptr()
+        before = batch.clone()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+        _apply_device(parent, META)
+
+        with self.assertRaises(NotImplementedError) as caught:
+            runner.transform(batch)
+
+        self.assertIn("meta", str(caught.exception).lower())
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.device, CPU)
+        self.assertEqual(batch.dtype, torch.float32)
+        self.assertTrue(torch.equal(batch, before))
+        self.assertIsNot(seen["batch"], batch)
+        self.assertEqual(seen["batch"].device, META)
+        self.assertEqual(seen["batch"].dtype, torch.float32)
+        self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
+
+        base = torch.arange(40, dtype=torch.float32).reshape(5, 8)
+        view = base[:, :4]
+        view_pointer = view.data_ptr()
+        self.assertFalse(view.is_contiguous())
+        seen.clear()
+        with self.assertRaises(NotImplementedError):
+            runner.transform(view)
+        self.assertEqual(view.data_ptr(), view_pointer)
+        self.assertFalse(view.is_contiguous())
+        self.assertEqual(view.device, CPU)
+        self.assertIsNot(seen["batch"], view)
+        self.assertEqual(seen["batch"].device, META)
+
+    def test_direct_dtype_move_keeps_cpu(self):
+        """A direct ``.to(dtype=...)`` is the one recorded call and stays on CPU."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        _attach(runner, rbm, CPU)
+
+        rbm.to(dtype=torch.float64)
+        features = runner.transform(_batch())
+
+        parameter = next(rbm.parameters())
+        self.assertEqual(len(rbm.direct_to_calls), 1)
+        self.assertEqual(parameter.dtype, torch.float64)
+        self.assertEqual(parameter.device, CPU)
+        self.assertEqual(rbm.device, CPU)
+        self.assertEqual(runner.device, CPU)
+        self.assertEqual(features.shape[1], rbm.num_hidden)
+        self.assertTrue(np.isfinite(features).all())
+
+    def test_assignment_does_not_move_parameters(self):
+        """Writing ``device`` updates ``_device`` and leaves parameter storage."""
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        _attach(runner, rbm, CPU)
+        parameter = next(rbm.parameters())
+        pointer = parameter.data_ptr()
+
+        runner.device = META
+
+        self.assertEqual(runner._device, META)  # pylint: disable=protected-access
+        self.assertEqual(runner.device, CPU)
+        self.assertEqual(parameter.data_ptr(), pointer)
+        self.assertEqual(parameter.device, CPU)
+        self.assertEqual(rbm.direct_to_calls, [])
+
+    def test_cached_device_placement_mixes_meta_and_cpu(self):
+        """Placing the batch on the construction cache reproduces the mix."""
+        runner = _runner()
+        rbm = RUNNER.RestrictedBoltzmannMachine(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        _apply_device(parent, META)
+        cached = runner._device  # pylint: disable=protected-access
+        visible = torch.tensor(_batch(), dtype=torch.float32, device=cached)
+
+        with self.assertRaises(RuntimeError) as caught:
+            rbm.get_hidden(visible)
+
+        message = str(caught.exception).lower()
+        self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
+        self.assertEqual(runner.device, META)
+        self.assertIn("meta", message)
+        self.assertIn("cpu", message)
 
 
 @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
@@ -619,3 +725,169 @@ class TestRBMRunnerParameterDeviceCUDA(unittest.TestCase):
         self.assertEqual(runner.device.type, "cuda")
         self.assertEqual(runner._device, CPU)  # pylint: disable=protected-access
         np.testing.assert_allclose(features, _expected_features(reference, batch))
+
+    def test_cpu_tensor_storage_survives_cuda_apply(self):
+        """A CPU tensor stays put; features match a CPU clone of the weights."""
+        cuda = torch.device("cuda")
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        weights = {
+            name: value.detach().cpu().clone()
+            for name, value in rbm.state_dict().items()
+        }
+        parent = _attach(runner, rbm, CPU)
+        batch = torch.arange(20, dtype=torch.float32).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+        _apply_device(parent, cuda)
+
+        features = runner.transform(batch)
+
+        reference = RUNNER.RestrictedBoltzmannMachine(
+            4,
+            2,
+            quadratic_coef=weights["quadratic_coef"],
+            linear_bias=weights["linear_bias"],
+            device=CPU,
+        )
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.device, CPU)
+        self.assertEqual(batch.dtype, torch.float32)
+        self.assertIsNot(seen["batch"], batch)
+        self.assertEqual(seen["batch"].device.type, "cuda")
+        self.assertEqual(seen["output"].type, "cuda")
+        self.assertEqual(runner.device.type, "cuda")
+        self.assertTrue(np.isfinite(features).all())
+        np.testing.assert_allclose(
+            features, _expected_features(reference, batch.numpy())
+        )
+
+    def test_batch_already_on_cuda_keeps_storage(self):
+        """A CUDA batch, contiguous or not, keeps storage when weights match."""
+        cuda = torch.device("cuda")
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        _apply_device(parent, cuda)
+        batch = torch.arange(20, dtype=torch.float32, device=cuda).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        features = runner.transform(batch)
+
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertIs(seen["batch"], batch)
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertTrue(np.isfinite(features).all())
+        self.assertEqual(seen["output"].type, "cuda")
+
+        base = torch.arange(40, dtype=torch.float32, device=cuda).reshape(5, 8)
+        view = base[:, :4]
+        view_pointer = view.data_ptr()
+        self.assertFalse(view.is_contiguous())
+        seen.clear()
+        runner.transform(view)
+        self.assertIs(seen["batch"], view)
+        self.assertEqual(view.data_ptr(), view_pointer)
+        self.assertFalse(view.is_contiguous())
+        self.assertFalse(seen["batch"].is_contiguous())
+
+    def test_parent_to_cuda_skips_child_to(self):
+        """``parent.to`` onto CUDA does not call the child ``.to``."""
+        cuda = torch.device("cuda")
+        moves = (None, {"device": "cuda"})
+        for kwargs in moves:
+            with self.subTest(kwargs=kwargs):
+                runner = _runner()
+                rbm = RecordingRBM(4, 2, device=CPU)
+                parent = _attach(runner, rbm, CPU)
+                if kwargs is None:
+                    parent.to(cuda)
+                else:
+                    parent.to(**kwargs)
+
+                self.assertEqual(rbm.direct_to_calls, [])
+                self.assertEqual(next(rbm.parameters()).device.type, "cuda")
+                self.assertEqual(runner.device.type, "cuda")
+                fallback = runner._device  # pylint: disable=protected-access
+                self.assertEqual(fallback, CPU)
+
+    def test_cuda_batch_is_copied_onto_cpu_parameters(self):
+        """A CUDA batch is copied onto CPU parameters. Caller storage stays."""
+        cuda = torch.device("cuda")
+        runner = _runner()
+        rbm = RUNNER.RestrictedBoltzmannMachine(4, 2, device=CPU)
+        _attach(runner, rbm, CPU)
+        batch = torch.arange(20, dtype=torch.float32, device=cuda).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        features = runner.transform(batch)
+
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.device.type, "cuda")
+        self.assertEqual(batch.dtype, torch.float32)
+        self.assertIsNot(seen["batch"], batch)
+        self.assertEqual(seen["batch"].device, CPU)
+        self.assertEqual(runner.device, CPU)
+        self.assertTrue(np.isfinite(features).all())
+        np.testing.assert_allclose(
+            features, _expected_features(rbm, batch.detach().cpu().numpy())
+        )
+
+    def test_float64_survives_cuda_apply(self):
+        """float64 weights stay float64 across a CUDA ``_apply``."""
+        cuda = torch.device("cuda")
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        parent.to(dtype=torch.float64)
+        _apply_device(parent, cuda)
+        batch = torch.arange(20, dtype=torch.float32).reshape(5, 4)
+        pointer = batch.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        features = runner.transform(batch)
+
+        parameter = next(rbm.parameters())
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(parameter.dtype, torch.float64)
+        self.assertEqual(parameter.device.type, "cuda")
+        self.assertEqual(runner.device.type, "cuda")
+        self.assertEqual(batch.data_ptr(), pointer)
+        self.assertEqual(batch.dtype, torch.float32)
+        self.assertEqual(batch.device, CPU)
+        self.assertIsNot(seen["batch"], batch)
+        self.assertEqual(seen["batch"].dtype, torch.float64)
+        self.assertEqual(seen["batch"].device.type, "cuda")
+        self.assertTrue(np.isfinite(features).all())
+
+    def test_dtype_only_after_cuda_stays_cuda(self):
+        """A parent dtype cast after a CUDA move does not call child ``.to``."""
+        cuda = torch.device("cuda")
+        runner = _runner()
+        rbm = RecordingRBM(4, 2, device=CPU)
+        parent = _attach(runner, rbm, CPU)
+        _apply_device(parent, cuda)
+        matched = torch.arange(20, dtype=torch.float64, device=cuda).reshape(5, 4)
+        pointer = matched.data_ptr()
+        seen: dict = {}
+        _spy_get_hidden(rbm, seen)
+
+        parent.to(dtype=torch.float64)
+        features = runner.transform(matched)
+
+        parameter = next(rbm.parameters())
+        self.assertEqual(rbm.direct_to_calls, [])
+        self.assertEqual(parameter.dtype, torch.float64)
+        self.assertEqual(parameter.device.type, "cuda")
+        self.assertEqual(runner.device.type, "cuda")
+        self.assertIs(seen["batch"], matched)
+        self.assertEqual(matched.data_ptr(), pointer)
+        self.assertEqual(matched.dtype, torch.float64)
+        self.assertTrue(np.isfinite(features).all())
