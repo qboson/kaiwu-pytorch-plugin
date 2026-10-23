@@ -144,7 +144,7 @@ class CellQVAE(QVAE):
         if batch_idx is None:
             raise ValueError("batch_idx is required when n_batches > 0")
         batch_one_hot = (
-            F.one_hot(batch_idx, num_classes=self.n_batches).float().to(zeta.device)
+            F.one_hot(batch_idx, num_classes=self.n_batches).to(zeta)
         )
         return torch.cat([zeta, batch_one_hot], dim=-1)
 
