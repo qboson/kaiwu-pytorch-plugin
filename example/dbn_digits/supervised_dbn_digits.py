@@ -461,7 +461,12 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         return torch.tensor(features, dtype=dtype, device=device)
 
     def _align_fine_tune_labels(self, labels, device):
-        """把类别编号放到 ``device`` 上，dtype 为 long。"""
+        """把类别编号放到 ``device`` 上，dtype 为 long。
+
+        ``CrossEntropyLoss`` 即使权重在 meta 上也不接受 CPU 类别下标。
+        int32 会转成 long。已经在该设备上的 long 张量保持原存储，
+        调用方张量不原地改写。
+        """
         if torch.is_tensor(labels):
             return labels.to(dtype=torch.long, device=device)
         return torch.tensor(labels, dtype=torch.long, device=device)
