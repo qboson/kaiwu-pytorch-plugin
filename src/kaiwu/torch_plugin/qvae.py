@@ -190,8 +190,9 @@ class QVAE(AutoEncoderBase):
             raise ValueError("loss_type must match model.config.loss_type")
 
         x = x.view(-1, self._input_dimension)
-        if configured_loss_type == "bernoulli" and self._dataset_mean is not None:
-            x = x - torch.as_tensor(self._dataset_mean, dtype=x.dtype, device=x.device)
+        if configured_loss_type == "bernoulli":
+            if self._dataset_mean is not None:
+                x = x - torch.as_tensor(self._dataset_mean, dtype=x.dtype, device=x.device)
         elif configured_loss_type != "mse":
             raise ValueError(f"Unsupported loss type: {configured_loss_type}")
 
