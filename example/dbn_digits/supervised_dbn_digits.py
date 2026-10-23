@@ -433,19 +433,51 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def _device_without_parameters(self, features):
+        """微调网络没有参数时，才回退到输入或 DBN 设备缓存。"""
+        if torch.is_tensor(features):
+            return features.device
+        cached = getattr(self.unsupervised_dbn, "device", None)
+        if isinstance(cached, torch.device):
+            return cached
+        return torch.device("cpu")
+
+    def _align_fine_tune_features(self, features):
+        """把特征放到微调参数的设备和 dtype 上。
+
+        网络已有参数时不读取 ``unsupervised_dbn.device``。父模块 ``_apply``
+        会移动这些参数，但不会调用 ``fine_tune_network.to``。张量输入不原地
+        改写；NumPy 输入会复制。
+        """
+        parameter = next(self.fine_tune_network.parameters(), None)
+        if parameter is None:
+            dtype = torch.float32
+            device = self._device_without_parameters(features)
+        else:
+            dtype = parameter.dtype
+            device = parameter.device
+        if torch.is_tensor(features):
+            return features.to(dtype=dtype, device=device)
+        return torch.tensor(features, dtype=dtype, device=device)
+
+    def _align_fine_tune_labels(self, labels, device):
+        """把类别编号放到 ``device`` 上，dtype 为 long。
+
+        ``CrossEntropyLoss`` 即使权重在 meta 上也不接受 CPU 类别下标。
+        int32 会转成 long。已经在该设备上的 long 张量保持原存储，
+        调用方张量不原地改写。
+        """
+        if torch.is_tensor(labels):
+            return labels.to(dtype=torch.long, device=device)
+        return torch.tensor(labels, dtype=torch.long, device=device)
+
     def _fine_tuning(self, X, y):
         """微调实现"""
         if self.verbose:
             print("Starting fine-tuning...")
 
         self._build_fine_tune_network()
-
-        # 转换为PyTorch张量
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
-        y_tensor = torch.LongTensor(y).to(self.unsupervised_dbn.device)
-
-        # 训练微调网络
-        self._train_fine_tune_network(X_tensor, y_tensor)
+        self._train_fine_tune_network(X, y)
 
     def _build_fine_tune_network(self):
         """构建微调网络"""
@@ -483,6 +515,8 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
 
     def _train_fine_tune_network(self, X_tensor, y_tensor):
         """训练微调网络"""
+        X_tensor = self._align_fine_tune_features(X_tensor)
+        y_tensor = self._align_fine_tune_labels(y_tensor, X_tensor.device)
         criterion = nn.CrossEntropyLoss()
         optimizer = self._create_optimizer(self.fine_tune_network.parameters())
         loader = self._create_data_loader(X_tensor, y_tensor, shuffle=True)
@@ -522,7 +556,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
 
     def _predict_with_fine_tuning(self, X):
         """使用微调网络预测 - 具体实现"""
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
+        X_tensor = self._align_fine_tune_features(X)
         self.fine_tune_network.eval()
 
         with torch.no_grad():
@@ -532,7 +566,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
 
     def _predict_proba_fine_tuning(self, X):
         """使用微调网络预测概率 - 具体实现"""
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
+        X_tensor = self._align_fine_tune_features(X)
         self.fine_tune_network.eval()
 
         with torch.no_grad():
