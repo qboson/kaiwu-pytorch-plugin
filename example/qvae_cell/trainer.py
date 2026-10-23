@@ -172,14 +172,34 @@ class Trainer:
         bm_optimizer = torch.optim.Adam(model.bm.parameters(), lr=self.args.rbm_lr)
         return model, vae_optimizer, bm_optimizer
 
+    def _parameter_device(self, module, fallback):
+        """返回模块参数当前所在的设备。
+
+        父模块通过 ``_apply`` 移动参数时不会更新构造时记下的
+        ``Trainer.device``。这里每次重新读取参数设备；模块没有参数时，
+        退回 ``fallback`` 自己的设备，避免把调用方张量搬到过期缓存上。
+
+        Args:
+            module: 即将执行计算的模型。
+            fallback: 没有参数时用于决定设备的张量。
+
+        Returns:
+            torch.device: 本批次应使用的设备。
+        """
+        parameter = next(module.parameters(), None)
+        if parameter is None:
+            return fallback.device
+        return parameter.device
+
     def run_epoch(self, model, loader, vae_optimizer, bm_optimizer, train=True):
         """运行一个训练或验证 epoch，并返回平均指标。"""
         model.train(train)
         totals = {key: 0.0 for key in self.metric_keys}
 
         for x, batch_idx in loader:
-            x = x.to(self.device)
-            batch_idx = batch_idx.to(self.device)
+            device = self._parameter_device(model, x)
+            x = x.to(device)
+            batch_idx = batch_idx.to(device)
             if train:
                 vae_optimizer.zero_grad()
 
@@ -281,9 +301,8 @@ class Trainer:
         reps = []
         with torch.no_grad():
             for x, batch_idx in eval_loader:
-                _, _, q, zeta = model(
-                    x.to(self.device), batch_idx.to(self.device)
-                )
+                device = self._parameter_device(model, x)
+                _, _, q, zeta = model(x.to(device), batch_idx.to(device))
                 # q 是 encoder logits，zeta 是后验采样/松弛后的潜变量表示。
                 rep = q if self.args.representation == "q" else zeta
                 reps.append(rep.cpu().numpy())
@@ -295,5 +314,11 @@ class Trainer:
         energies = []
         with torch.no_grad():
             for x, _ in eval_loader:
-                energies.extend(model.energy(x.to(self.device), self.args.loss_type).cpu().numpy().tolist())
+                device = self._parameter_device(model, x)
+                energies.extend(
+                    model.energy(x.to(device), self.args.loss_type)
+                    .cpu()
+                    .numpy()
+                    .tolist()
+                )
         return energies
