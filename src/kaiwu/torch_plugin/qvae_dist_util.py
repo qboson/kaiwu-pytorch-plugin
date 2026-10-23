@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 """Distribution utility classes used in QVAE model"""
+
 import torch
 import torch.nn.functional as F
 
@@ -142,11 +143,7 @@ class Exponential(SmoothingDist):
             torch.Tensor: Log probability density value.
         """
         beta = self._beta_on_device(self.beta, zeta)
-        return (
-            torch.log(beta)
-            - beta * zeta
-            - torch.log(1 - torch.exp(-beta))
-        )
+        return torch.log(beta) - beta * zeta - torch.log(1 - torch.exp(-beta))
 
 
 class DistUtil:
