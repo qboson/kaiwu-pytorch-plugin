@@ -89,7 +89,9 @@ class QDEQConfig:
     jac_loss_vecs: int = 0
 
 
-def _residual_norms(residual: torch.Tensor, f_value: torch.Tensor) -> tuple[float, float]:
+def _residual_norms(
+    residual: torch.Tensor, f_value: torch.Tensor
+) -> tuple[float, float]:
     """Returns the absolute and relative norms of a fixed-point residual.
 
     Args:
@@ -146,14 +148,20 @@ def _anderson_solver(
         # alpha = argmin ||sum_i alpha_i (f(x_i) - x_i)||^2  s.t.  sum_i alpha_i = 1.
         g_mat = f_hist[:, :n] - x_hist[:, :n]
         eye = torch.eye(n, dtype=z0.dtype, device=z0.device)[None]
-        h_mat[:, 1 : n + 1, 1 : n + 1] = g_mat @ g_mat.transpose(1, 2) + config.anderson_lam * eye
-        alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])[:, 1 : n + 1, 0]
+        h_mat[:, 1 : n + 1, 1 : n + 1] = (
+            g_mat @ g_mat.transpose(1, 2) + config.anderson_lam * eye
+        )
+        alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])[
+            :, 1 : n + 1, 0
+        ]
         # The next iterate mixes the stored images and overwrites the oldest slot.
         x_hist[:, k % m] = (alpha[:, None] @ f_hist[:, :n])[:, 0]
         f_hist[:, k % m] = func(x_hist[:, k % m].reshape_as(z0)).reshape(bsz, -1)
 
         nstep = k - 1
-        abs_res, rel_res = _residual_norms(f_hist[:, k % m] - x_hist[:, k % m], f_hist[:, k % m])
+        abs_res, rel_res = _residual_norms(
+            f_hist[:, k % m] - x_hist[:, k % m], f_hist[:, k % m]
+        )
         tracked = rel_res if config.stop_mode == "rel" else abs_res
         # Iterations are not monotone, so the best iterate seen is returned.
         if tracked < best_res:
@@ -208,12 +216,16 @@ def _ising_fixed_point_solver(
             break
 
         # G[i] = (r(z + h v_i) - r(z)) / h approximates J v_i for each direction v_i.
-        basis = _search_directions(residual, history_r, history_dz, history_dr, config.num_basis)
+        basis = _search_directions(
+            residual, history_r, history_dz, history_dr, config.num_basis
+        )
         shifted = z + config.fd_eps * basis
         g_mat = torch.stack([(func(zs) - zs - residual).reshape(-1) for zs in shifted])
         g_mat = (g_mat / config.fd_eps).double()
         start = time.perf_counter()
-        coeff = _sample_coefficients(g_mat, residual.reshape(-1).double(), abs_res, sampler, config)
+        coeff = _sample_coefficients(
+            g_mat, residual.reshape(-1).double(), abs_res, sampler, config
+        )
         sampler_time += time.perf_counter() - start
         if coeff is None:
             break
@@ -230,7 +242,9 @@ def _ising_fixed_point_solver(
     return best_z, {"nstep": nstep, "residual": best_res, "sampler_time": sampler_time}
 
 
-def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -> torch.Tensor:
+def _search_directions(
+    residual, history_r, history_dz, history_dr, num_basis
+) -> torch.Tensor:
     """Builds the unit search directions of one Ising step.
 
     Directions are taken in order from ``-r``, past residuals and pairs of
@@ -304,7 +318,9 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     # a = offset + enc @ x with x binary, spanning [-R, R] * scale in 2**bits levels.
     scale = config.coeff_range * residual_norm / math.sqrt(config.num_basis)
     offset = np.full(config.num_basis, -scale)
-    weights = 2.0 * scale / (2**config.coeff_bits - 1) * 2.0 ** np.arange(config.coeff_bits)
+    weights = (
+        2.0 * scale / (2**config.coeff_bits - 1) * 2.0 ** np.arange(config.coeff_bits)
+    )
     enc = np.kron(np.eye(config.num_basis), weights)
 
     # min_a a^T H a / 2 + g^T a  ==  min_x x^T Q x  with
@@ -371,6 +387,22 @@ class QDEQ(nn.Module):
         self.last_jac_loss = None
         self._last_stats: dict[str, float] = {}
 
+    def _layer_device(self, x: torch.Tensor) -> torch.device:
+        """Returns the device the wrapped layer's parameters live on.
+
+        Callers may still pass ``x`` on CPU after a parent ``.to()`` moved only
+        the submodule parameters to an accelerator. Aligning ``x`` (and ``z0``)
+        here avoids mixed-device ``layer(z, x)`` calls.
+
+        Args:
+            x: Forward input used when the layer has no parameters.
+
+        Returns:
+            torch.device: Device of the first layer parameter, else ``x.device``.
+        """
+        parameter = next(self.layer.parameters(), None)
+        return parameter.device if parameter is not None else x.device
+
     def forward(self, x: torch.Tensor, z0: torch.Tensor | None = None) -> torch.Tensor:
         """Returns the layer output at its fixed point.
 
@@ -381,8 +413,11 @@ class QDEQ(nn.Module):
         Returns:
             torch.Tensor: ``layer(z*, x)``.
         """
-        z0 = torch.zeros_like(x) if z0 is None else z0
+        layer_device = self._layer_device(x)
+        x = x.to(layer_device)
+        z0 = torch.zeros_like(x) if z0 is None else z0.to(layer_device)
         cfg = self.config
+
         def func(z):
             return self.layer(z, x)
 
@@ -405,7 +440,9 @@ class QDEQ(nn.Module):
         self._attach_implicit_backward(new_z, z_star)
         return new_z
 
-    def _attach_implicit_backward(self, new_z: torch.Tensor, z_star: torch.Tensor) -> None:
+    def _attach_implicit_backward(
+        self, new_z: torch.Tensor, z_star: torch.Tensor
+    ) -> None:
         """Replaces the gradient ``g`` reaching ``new_z`` by the solution of ``y = J^T y + g``.
 
         ``J = d new_z / d z_star``; this is the implicit function theorem
@@ -424,13 +461,17 @@ class QDEQ(nn.Module):
 
             # y -> J^T y + g, evaluated with one vector-Jacobian product per call.
             def backward_map(y):
-                vjp = torch.autograd.grad(new_z, z_star, y, retain_graph=True, allow_unused=True)[0]
+                vjp = torch.autograd.grad(
+                    new_z, z_star, y, retain_graph=True, allow_unused=True
+                )[0]
                 return grad if vjp is None else vjp + grad
 
             solution, stats = _anderson_solver(
                 backward_map, torch.zeros_like(grad), cfg, cfg.b_thres, cfg.b_eps
             )
-            self._last_stats.update({f"backward_{key}": value for key, value in stats.items()})
+            self._last_stats.update(
+                {f"backward_{key}": value for key, value in stats.items()}
+            )
             # Autograd continues from new_z with the solved gradient.
             return solution
 
@@ -457,7 +498,9 @@ class QDEQ(nn.Module):
         if self.sampler is None:
             raise ValueError("QDEQ requires a sampler to solve the fixed point")
         cfg = self.config
-        return _ising_fixed_point_solver(func, z0, self.sampler, cfg, cfg.f_thres, cfg.f_eps)
+        return _ising_fixed_point_solver(
+            func, z0, self.sampler, cfg, cfg.f_thres, cfg.f_eps
+        )
 
     def solve_context(self) -> contextlib.AbstractContextManager:
         """Context entered around the fixed-point solve. Override to switch layer state.
@@ -476,7 +519,9 @@ class QDEQ(nn.Module):
         return contextlib.nullcontext()
 
     @staticmethod
-    def jacobian_loss(new_z: torch.Tensor, z_star: torch.Tensor, vecs: int = 1) -> torch.Tensor:
+    def jacobian_loss(
+        new_z: torch.Tensor, z_star: torch.Tensor, vecs: int = 1
+    ) -> torch.Tensor:
         """Hutchinson estimate of ``||d new_z / d z_star||_F^2 / z_star.numel()``.
 
         Args:
@@ -491,7 +536,9 @@ class QDEQ(nn.Module):
         total = 0
         for _ in range(vecs):
             probe = torch.randn_like(z_star)
-            vjp = torch.autograd.grad(new_z, z_star, probe, retain_graph=True, create_graph=True)[0]
+            vjp = torch.autograd.grad(
+                new_z, z_star, probe, retain_graph=True, create_graph=True
+            )[0]
             total = total + vjp.norm() ** 2
         return total / vecs / z_star.numel()
 
