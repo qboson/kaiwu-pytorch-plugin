@@ -6,6 +6,21 @@ from pathlib import Path
 from typing import Any
 
 import torch
+from torch import nn
+
+
+def parameter_device(module: nn.Module) -> torch.device:
+    """Return the device where ``module`` parameters currently live.
+
+    ``QDiffusion`` caches ``device`` on construction and only refreshes it when
+    ``.to()`` runs on the wrapper itself. Parent-initiated moves (for example
+    ``nn.Module.to`` on a container) relocate parameters without updating that
+    cache, so example code must follow parameters instead of ``generator.device``.
+    """
+    parameter = next(module.parameters(), None)
+    if parameter is not None:
+        return parameter.device
+    return torch.device("cpu")
 
 
 def seed_torch(seed: int) -> None:
@@ -26,7 +41,7 @@ def encode_sequence(
         return_tensors="pt",
         add_special_tokens=True,
     )
-    return encoded["input_ids"].to(generator.device)
+    return encoded["input_ids"].to(parameter_device(generator))
 
 
 def summarize_trainable_parameters(generator) -> dict[str, int]:
