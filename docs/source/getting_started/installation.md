@@ -297,6 +297,37 @@ RBM created with 10 visible and 5 hidden units
 ```
 If no error occurs, your environment is ready. You can now build models and validate with classical samplers, then switch to the quantum sampler.
 
+## Usage Statistics
+
+kpp collects implicit usage statistics for `SimulatedAnnealingOptimizer` and
+`CIMOptimizer` calls made through `AbstractBoltzmannMachine.sample()`. The
+feature is **enabled by default** and requires no code changes; optimizers you
+call directly are never tracked.
+
+If you prefer to opt out, set the environment variable before running your
+program:
+
+```bash
+# Disable stats reporting
+export KPP_STATS_ENABLED=false
+
+# Enable stats (default)
+export KPP_STATS_ENABLED=true
+```
+
+You can also toggle the feature at runtime:
+
+```python
+from kaiwu.torch_plugin import disable_usage_stats, enable_usage_stats, is_usage_stats_enabled
+
+print(is_usage_stats_enabled())  # True by default
+disable_usage_stats()
+enable_usage_stats()
+```
+
+See the *Usage Statistics* section of the project README for details on what
+is collected.
+
 ## Development Environment Setup (Optional)
 
 If you plan to participate in the development of the plugin, you can install the development dependencies:
