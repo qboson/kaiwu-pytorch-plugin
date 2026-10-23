@@ -378,8 +378,10 @@ class FIDCalculator:
         """返回当前 FID 网络参数所在的设备。
 
         ``self.device`` 只记录构造时的偏好。父模块通过 ``_apply`` 搬走
-        ``self.fid`` 时不会改这个属性。每次更新重读第一个参数；没有参数时
-        退回第一个 buffer，再没有则退回构造偏好。
+        ``self.fid`` 时不会改这个属性，也不会调用子模块的 ``.to``。
+        把该属性改成 ``meta``，或在没有 GPU 时改成 ``cuda``，也不能覆盖
+        参数设备。每次更新重读第一个参数；没有参数时退回第一个 buffer，
+        再没有则退回构造偏好。
         """
         parameter = next(self.fid.parameters(), None)
         if parameter is not None:
@@ -396,6 +398,7 @@ class FIDCalculator:
         # 预处理（形状、通道、尺寸）
         processed = self.preprocessor(images_uint8)
         # 预处理在输入所在设备上完成，再送到当前参数设备。
+        # 设备已一致时 ``Tensor.to`` 返回同一对象（含非连续视图）。
         self.fid.update(processed.to(self._metric_device()), real=real)
     
     def compute(self) -> float:
