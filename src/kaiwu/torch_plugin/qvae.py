@@ -152,14 +152,22 @@ class QVAE(AutoEncoderBase):
         """Device where the Boltzmann-machine parameters live.
 
         QVAE keeps the encoder, decoder, and BM as sibling submodules, so a
-        caller can move only ``self.bm`` (or only the encoder) across devices.
-        BM-facing code must align latent tensors with the BM parameter device
-        before invoking the prior, matching the #164 device-sync contract.
+        caller can move only ``self.bm`` across devices. Parent
+        ``nn.Module.to`` moves that child through ``_apply`` and does not
+        call ``BM.to``. The plain ``bm.device`` attribute can also lag the
+        parameters. Each call reads the live parameter device and does not
+        cache it or consult ``bm.device``, matching the #164 contract.
+
+        A parameter-free BM falls back to another QVAE parameter, then CPU,
+        so the helper does not raise ``StopIteration``.
         """
         parameter = next(self.bm.parameters(), None)
         if parameter is not None:
             return parameter.device
-        return next(self.parameters()).device
+        own = next(self.parameters(), None)
+        if own is not None:
+            return own.device
+        return torch.device("cpu")
 
     def create_networks(self):
         """Create components that were not supplied to the constructor."""
