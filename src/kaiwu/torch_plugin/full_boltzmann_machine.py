@@ -133,7 +133,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             ising_mat = torch.zeros(
                 (n_hid + 1, n_hid + 1),
-                device=self.device,
+                device=self._model_device(),
                 dtype=sub_linear.dtype,
             )
             ising_mat[:-1, :-1] = sub_quadratic / 8
@@ -162,6 +162,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
             if s_visible is not None:
+                s_visible = s_visible.to(self._model_device())
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
@@ -173,7 +174,11 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             else:
                 # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
-                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
+                    torch.full(
+                        (num_sample, self.num_nodes),
+                        0.5,
+                        device=self._model_device(),
+                    )
                 )
 
             # Number of visible units
@@ -181,7 +186,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             q_coef = self.symmetrized_quadratic_coef()
             for _ in range(num_steps):
                 # Random update order (Gibbs sampling)
-                update_order = torch.randperm(self.num_nodes, device=self.device)
+                update_order = torch.randperm(
+                    self.num_nodes, device=self._model_device()
+                )
                 for unit in update_order:
                     if unit < n_vis:
                         # Skip visible units (only sample hidden units)
@@ -208,6 +215,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
         """
+        s_visible = s_visible.to(self._model_device())
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
@@ -216,7 +224,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 solution = sampler.solve(ising_mat)
 
             solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
-            solution = torch.tensor(solution, dtype=dtype, device=self.device)
+            solution = torch.tensor(solution, dtype=dtype, device=self._model_device())
             solution = torch.cat(
                 [s_visible[i].unsqueeze(0).expand(solution.shape[0], -1), solution],
                 dim=-1,

@@ -5,6 +5,7 @@
 
 
 """Abstract base class for Boltzmann Machines."""
+
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
@@ -46,6 +47,21 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         if parameter is not None:
             self.device = parameter.device
         return module
+
+    def _model_device(self) -> torch.device:
+        """Returns the device the module parameters live on.
+
+        Public entry points accept caller-supplied tensors that may still sit on
+        CPU while the parameters were placed on an accelerator. Moving the input
+        here keeps a mixed-device call from raising a device-mismatch
+        RuntimeError.
+
+        Returns:
+            torch.device: Device of the first parameter, or self.device when the
+            module carries no parameters.
+        """
+        parameter = next(self.parameters(), None)
+        return parameter.device if parameter is not None else self.device
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
@@ -115,6 +131,6 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
         solution = torch.FloatTensor(solution)
-        solution = solution.to(self.device)
+        solution = solution.to(self._model_device())
 
         return solution
