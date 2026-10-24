@@ -54,7 +54,7 @@ This PR does **not** change the fine-tune batch path owned by **#1378** (the `_f
 - A CUDA batch that already matches, contiguous or not, keeps identity and `data_ptr`.
 - A CPU cache does not pull CUDA weights back to the host.
 - `parent.to(dtype=torch.float64)` after a CUDA move stays on CUDA and follows the float64 dtype.
-- CUDA → CPU → CUDA is reread; the CPU stop ignores a poisoned CUDA cache and matches the original CPU weight copy.
+- CUDA, then CPU, is reread; the CPU stop ignores a poisoned CUDA cache and matches the original CPU weight copy.
 
 ## Dedupe
 
@@ -117,7 +117,7 @@ The 12 CPU sub-cases run on every machine; the 6 CUDA tests are collected and sk
 | `4febb03` | place layer activations on the live RBM parameter device (initial fix, 6-test module) |
 | `ce6d791` | pass tensors through `Tensor.to` instead of NumPy |
 | `2c8b9a2` | lock the #164 device matrix (meta identity, poisoned cache, `zeros_like` return, multi-layer) |
-| docs commit | sync this PR body |
+| branch head | sync this PR body |
 
 ## Merge-ready checklist
 
