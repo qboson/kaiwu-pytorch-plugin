@@ -103,13 +103,11 @@ class Trainer:
                 config=self.config
             )
         elif self.config.type == 'CellQVAE':
-            model = CellQVAE(
-                input_dimension=input_dim,
-                activation_fct=self.config.activation_fct,
-                bm_type=self.config.bm_type,
-                sampler_type=self.config.sampler_type,
-                config=self.config,
-                n_batches=self.n_batches,
+            # CellQVAE lives in the qvae_cell example; building it here previously
+            # raised NameError on the missing symbol.
+            raise NotImplementedError(
+                "CellQVAE is not supported by the MNIST example; "
+                "use the qvae_cell example instead."
             )
         else:
             raise ValueError(f"Unsupported model type: {self.config.type}")
