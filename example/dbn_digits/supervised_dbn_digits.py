@@ -381,11 +381,16 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
             return None
 
     def _batch_on_rbm_parameters(self, rbm, data_in):
-        """把可见层放到该 RBM 参数当前的设备和 dtype 上。
+        """Place a visible batch on the live RBM parameter device and dtype.
 
-        ``unsupervised_dbn.device`` 在构造 DBN 时写入。父模块通过 ``_apply``
-        搬走 RBM 参数时不会刷新这个普通属性，所以激活不能再读它。已经有参数时
-        以参数的设备和 dtype 为准；没有参数时才退回该缓存。NumPy 会复制。
+        ``unsupervised_dbn.device`` is captured when the DBN is constructed.
+        A parent module moves the stacked RBMs through ``_apply`` and never
+        refreshes that plain attribute, so the parameter device must win. The
+        cache is only a fallback for an RBM without parameters.
+
+        A tensor that already matches is returned unchanged, keeping identity
+        and ``data_ptr``. A different device or dtype is a copy. NumPy is
+        copied with ``torch.tensor``, so the caller buffer is never aliased.
         """
         parameter = next(rbm.parameters(), None)
         if parameter is None:
@@ -395,6 +400,9 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         else:
             device = parameter.device
             dtype = parameter.dtype
+
+        if isinstance(data_in, torch.Tensor):
+            return data_in.to(device=device, dtype=dtype)
         return torch.tensor(np.asarray(data_in), dtype=dtype, device=device)
 
     def get_layer_activations(self, X, layer_index=None, return_all_layers=False):
@@ -404,7 +412,10 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         if self.unsupervised_dbn is None or self.unsupervised_dbn._n_layers == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
 
-        X_data = X.astype(np.float32)
+        if isinstance(X, torch.Tensor):
+            X_data = X
+        else:
+            X_data = np.asarray(X, dtype=np.float32)
         all_activations = {}
 
         # 逐层前向传播计算激活值，直到指定层
