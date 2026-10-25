@@ -3,6 +3,8 @@
 Unsorted helper functions
 """
 import os
+import tempfile
+import uuid
 import datetime
 import pandas as pd
 import numpy as np
@@ -270,8 +272,16 @@ def init_qvae_sampler(model):
     from kaiwu.cim import CIMOptimizer, PrecisionReducer
 
     if model.sampler_type == 'cim':
-        kw.common.CheckpointManager.save_dir = './tmp'
-        sampler = CIMOptimizer(task_name="qvae_sampling", wait=True)
+        save_dir = kw.common.CheckpointManager.save_dir
+        if not save_dir:
+            save_dir = tempfile.mkdtemp(prefix="kpp_qvae_cim_")
+            kw.common.CheckpointManager.save_dir = save_dir
+        else:
+            os.makedirs(save_dir, exist_ok=True)
+        sampler = CIMOptimizer(
+            task_name=f"qvae_cim_{uuid.uuid4().hex[:12]}",
+            wait=True,
+        )
         worker = PrecisionReducer(
             sampler,
             precision=8,

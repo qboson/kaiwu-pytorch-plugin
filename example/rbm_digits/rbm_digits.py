@@ -6,6 +6,8 @@ Restricted Boltzmann Machine
 包含RBM的类  以及训练RBM+model/仅训练model的函数 训练RBM+model会保存训练过程中的似然值和预测准确率
 """
 import os
+import tempfile
+import uuid
 import numpy as np
 from scipy.ndimage import shift
 import matplotlib.pyplot as plt
@@ -64,8 +66,16 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         self.random_state = random_state
 
         if use_cim:
-            kw.common.CheckpointManager.save_dir = './tmp'
-            sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+            save_dir = kw.common.CheckpointManager.save_dir
+            if not save_dir:
+                save_dir = tempfile.mkdtemp(prefix="kpp_rbm_cim_")
+                kw.common.CheckpointManager.save_dir = save_dir
+            else:
+                os.makedirs(save_dir, exist_ok=True)
+            sampler = CIMOptimizer(
+                task_name=f"rbm_cim_{uuid.uuid4().hex[:12]}",
+                wait=True,
+            )
             self.sampler = PrecisionReducer(
                 sampler,
                 precision=8,
@@ -73,7 +83,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
                 target_bits=550,
                 only_feasible_solution=False,
             )
-            print("Using CIM optimizer")
+            print(f"Using CIM optimizer (checkpoints: {save_dir})")
         else:
             self.sampler = SimulatedAnnealingOptimizer(alpha=0.999, size_limit=100)
             print("Using Simulated Annealing optimizer")

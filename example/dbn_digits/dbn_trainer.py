@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 from sklearn.base import BaseEstimator, TransformerMixin
+import os
+import tempfile
+import uuid
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -67,8 +70,16 @@ class DBNTrainer:
         self.random_state = random_state
 
         if use_cim:
-            kw.common.CheckpointManager.save_dir = './tmp'
-            sampler = CIMOptimizer(task_name="test_kpp", wait=True)
+            save_dir = kw.common.CheckpointManager.save_dir
+            if not save_dir:
+                save_dir = tempfile.mkdtemp(prefix="kpp_dbn_cim_")
+                kw.common.CheckpointManager.save_dir = save_dir
+            else:
+                os.makedirs(save_dir, exist_ok=True)
+            sampler = CIMOptimizer(
+                task_name=f"dbn_cim_{uuid.uuid4().hex[:12]}",
+                wait=True,
+            )
             self.sampler = PrecisionReducer(
                 sampler,
                 precision=8,
