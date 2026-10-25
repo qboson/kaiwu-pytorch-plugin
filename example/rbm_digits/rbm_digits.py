@@ -62,6 +62,9 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         self.verbose = verbose
         self.plot_img = plot_img
         self.random_state = random_state
+        # sklearn's get_params/clone read constructor arguments back off the
+        # instance, so use_cim has to be stored like the other parameters.
+        self.use_cim = use_cim
 
         if use_cim:
             kw.common.CheckpointManager.save_dir = './tmp'
