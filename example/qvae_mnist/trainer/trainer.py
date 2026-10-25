@@ -173,6 +173,10 @@ class Trainer:
 
         tsne_frames = []
 
+        # Integer division used to be zero for runs shorter than ten epochs,
+        # which made the progress check below raise ZeroDivisionError.
+        log_interval = max(1, self.config.num_epochs // 10)
+
         epoch_pbar = tqdm(range(1, self.config.num_epochs + 1), desc="Training Progress")
         for epoch in epoch_pbar:
             train_loss = self.tuner.train(epoch)
@@ -187,7 +191,7 @@ class Trainer:
 
             epoch_pbar.set_description(f"Epoch {epoch}/{self.config.num_epochs} - Train Loss: {train_loss:.2f}, Test Loss: {test_loss:.2f}")
 
-            if epoch % (self.config.num_epochs // 10) == 0 or epoch == self.config.num_epochs:
+            if epoch % log_interval == 0 or epoch == self.config.num_epochs:
                 self._save_reconstruction(epoch, input_data, output_data)
                 logger.info(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Test Loss={test_loss:.4f}")
 
