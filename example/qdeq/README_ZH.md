@@ -120,5 +120,5 @@ iTransformer 示例会在后续补充。
 2. 取 `num_basis` 个搜索方向 `V`（`-r`、历史残差与历史更新）
 3. 有限差分估计 `G = J V`
 4. 把 `min_a ||r + G a||^2` 中的系数 `a` 用 `coeff_bits` 位二进制编码，
-   经 `kaiwu.conversion.qubo_matrix_to_ising_matrix` 转成带辅助自旋的 Ising 矩阵后交给 `sampler.solve`
+   经 `kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix` 转成带辅助自旋的 Ising 矩阵后交给 `sampler.solve`
 5. 解码最优解，更新 `z ← z + V a`

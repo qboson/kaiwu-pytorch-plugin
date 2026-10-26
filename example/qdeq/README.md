@@ -141,5 +141,5 @@ Each forward step:
 3. estimates `G = J V` by finite differences
 4. encodes the coefficients `a` of `min_a ||r + G a||^2` with `coeff_bits` bits
    each, converts the QUBO to an Ising matrix with one auxiliary spin through
-   `kaiwu.conversion.qubo_matrix_to_ising_matrix`, and calls `sampler.solve`
+   `kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix`, and calls `sampler.solve`
 5. decodes the best solution and updates `z ← z + V a`
