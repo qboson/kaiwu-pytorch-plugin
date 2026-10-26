@@ -65,7 +65,9 @@ def parse_args():
     parser.add_argument("--sa-rand-seed", type=int, default=512)
     parser.add_argument("--project-no", default="26035324")
     parser.add_argument("--task-name", default="demo2_qvae")
-    parser.add_argument("--task-mode", default="sample", choices=["sample", "quota"])
+    parser.add_argument(
+        "--task-mode", default="sampling", choices=["sampling", "optimization"]
+    )
     parser.add_argument("--sample-number", type=int, default=16)
     parser.add_argument("--precision", type=int, default=8)
     parser.add_argument("--truncated-precision", type=int, default=10)

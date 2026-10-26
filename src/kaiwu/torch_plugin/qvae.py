@@ -294,6 +294,10 @@ class QVAE(AutoEncoderBase):
         # Weight decay
         wd_loss = self._weight_decay_loss()
 
+        # Keep current logging values without retaining their computation graphs.
+        self.last_recon_loss = recon_loss.detach()
+        self.last_kl_loss = kl_loss.detach()
+
         # Total loss
         total_loss = recon_loss + self.kl_beta * kl_loss + wd_loss
         return total_loss

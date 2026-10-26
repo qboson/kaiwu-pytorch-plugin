@@ -10,15 +10,23 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 
 ## Dependencies
 
+Install the plugin from the repository root with `pip install .`.
+
+Install the example dependencies from the repository root:
+
 ```bash
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
-torch==2.7.0
-anndata
-scanpy
-leidenalg
-scib_metrics
-scgraph
+pip install -r requirements/requirements_example.txt
+```
+
+The requirements select fixed versions for Python 3.10, 3.12, and 3.14,
+including AnnData, Scanpy, Leiden, scIB metrics, and `scgraph-eval`.
+The latter provides the `scgraph` module used by the evaluation script.
+
+On Apple Silicon macOS, run this in the same terminal before starting the example
+to avoid a Numba/PyTorch OpenMP conflict:
+
+```bash
+export NUMBA_THREADING_LAYER=workqueue
 ```
 
 ## File Structure
