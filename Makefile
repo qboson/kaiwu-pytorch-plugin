@@ -7,7 +7,7 @@ all_tests: test_install
 	$(MAKE) pylint pytest
 
 test_install:
-	$(PYTHON) -m pip install -i https://mirrors.aliyun.com/pypi/simple -r requirements/devel.txt scikit-learn==1.7.2 scipy==1.14.1 tqdm==4.67.1
+	$(PYTHON) -m pip install -r requirements/devel.txt
 	$(PYTHON) -m pip install .
 
 pylint:
