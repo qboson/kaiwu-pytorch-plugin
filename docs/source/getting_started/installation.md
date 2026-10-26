@@ -16,12 +16,17 @@ Before installation, ensure your system meets the following requirements:
 
 | Dependency | Required Version | Role |
 |------------|-----------------|------|
-| Python | 3.10 | Base runtime (tested against 3.10 specifically) |
-| PyTorch | 2.7 | Tensor operations & automatic differentiation |
-| NumPy | 2.2.6 | Linear algebra & SDK interfacing |
+| Python | 3.10, 3.12, 3.14 | Supported even minor versions |
+| PyTorch | 2.7.0 / 2.10.0 | Use 2.10.0 on Python 3.14 |
+| NumPy | 2.2.6 / 2.3.3 | Use 2.3.3 on Python 3.14 |
 | Kaiwu SDK | 1.3.1–1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
 
 > **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK releases 1.3.1 through 1.4.3 are supported; a fresh installation selects 1.4.3.
+
+Python 3.11 and 3.13 are excluded from the supported versions. Installation on
+Python 3.12 and 3.14 depends on corresponding Kaiwu support. Until Kaiwu provides
+that support, installation from published dependencies and the corresponding CI
+jobs cannot pass. Kaiwu packaging is maintained separately from this plugin.
 
 ### Kaiwu SDK compatibility
 
@@ -82,6 +87,29 @@ Install the project dependencies:
 pip install -r requirements/requirements.txt
 ```
 
+For all examples, including image and single-cell workflows, install:
+
+```bash
+pip install -r requirements/requirements_example.txt
+```
+
+QDiffusion has an additional dependency list:
+
+```bash
+pip install -r example/qdiffusion/requirements.txt
+```
+
+Both lists select versions for the active Python environment. For development,
+`pip install -r requirements/devel.txt` installs both lists and the test/documentation tools.
+
+On Apple Silicon macOS, set the following before running single-cell examples or
+the full test suite. It avoids a conflict between Numba and PyTorch's OpenMP
+libraries.
+
+```bash
+export NUMBA_THREADING_LAYER=workqueue
+```
+
 4. **Install the Plugin**
 ```bash
 pip install .
@@ -105,7 +133,6 @@ The Docker setup builds a pre‑configured Jupyter notebook environment with all
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```

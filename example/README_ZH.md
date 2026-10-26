@@ -55,7 +55,7 @@ scipy
 通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
 **依赖**
 ```
-kaiwu==1.3.0
+kaiwu==1.3.1
 pandas
 matplotlib
 ```

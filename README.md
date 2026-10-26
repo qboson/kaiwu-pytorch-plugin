@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -75,10 +75,18 @@ The above image shows the project file structure:
 ## Quick Start
 
 ### Requirements
-- python == 3.10
+- Python: 3.10, 3.12, or 3.14
 - kaiwu >= 1.3.1, <= 1.4.3
-- torch == 2.7.0
-- numpy == 2.2.6
+- Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
+- Python 3.14: torch == 2.10.0, numpy == 2.3.3
+
+Python 3.11 and 3.13 are not supported. Installation on Python 3.12 and 3.14
+depends on corresponding Kaiwu support. These environments are not ready for
+installation from published packages until Kaiwu provides that support.
+
+Example dependencies are pinned by Python version in `requirements/requirements_example.txt`; QDiffusion uses `example/qdiffusion/requirements.txt`. The development requirements include both sets.
+
+On Apple Silicon macOS, set `NUMBA_THREADING_LAYER=workqueue` before running single-cell examples or the full test suite; see the [installation guide](docs/source/getting_started/installation.md).
 
 Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
 1.4.2, and 1.4.3. The same model code handles the precision-reducer location

@@ -2,7 +2,7 @@
 :format: html
 
 ```
-[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/) [![License](https://img.shields.io/badge/License-Apache%202.0-green)](https://opensource.org/licenses/Apache-2.0)
+[![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue)](https://www.python.org/) [![License](https://img.shields.io/badge/License-Apache%202.0-green)](https://opensource.org/licenses/Apache-2.0)
 
 # Kaiwu-PyTorch-Plugin
 
@@ -58,10 +58,13 @@ The above diagram shows the project file structure:
 
 # Requirements
 
-- Python == 3.10
-- kaiwu == v1.2.0
-- torch == 2.7.0
-- numpy == 2.2.6
+- Python: 3.10, 3.12, or 3.14
+- kaiwu == 1.3.1
+- Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
+- Python 3.14: torch == 2.10.0, numpy == 2.3.3
+
+Installation on Python 3.12 and 3.14 requires corresponding Kaiwu support.
+Until it is available, installation from published dependencies remains pending.
 
 # Code Style
 

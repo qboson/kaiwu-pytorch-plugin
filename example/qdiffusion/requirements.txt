@@ -1,11 +1,11 @@
-# Install a CUDA-matched PyTorch build first, for example:
-# pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-#
-# Then install the remaining dependencies with:
-# pip install -r requirements.txt
+# Install a CUDA build matching the pinned PyTorch version first when needed.
+# The same version without a CUDA suffix can use the default package index.
+-r ../../requirements/requirements.txt
 
-numpy>=1.24,<3
-torch>=2.0
-omegaconf>=2.3,<3
-tqdm>=4.66,<5
-transformers==4.39.2
+omegaconf==2.3.0
+tqdm==4.67.1
+fair-esm==2.0.0
+transformers==4.39.2; python_version < "3.14"
+transformers==4.49.0; python_version >= "3.14"
+tokenizers==0.15.2; python_version < "3.14"
+tokenizers==0.21.4; python_version >= "3.14"

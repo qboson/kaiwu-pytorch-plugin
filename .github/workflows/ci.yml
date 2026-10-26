@@ -8,7 +8,7 @@ on:
         type: boolean
         default: false
   push:
-    branches: [main, develop, kaiwu-sdk-compat]
+    branches: [main, develop, kaiwu-sdk-compat, python-dependency-compat]
   pull_request:
     branches: [main]
 
@@ -18,29 +18,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        python-version: ["3.10"]
         kaiwu-version: ${{ fromJSON(inputs.all-kaiwu-versions && '["1.3.1", "1.4.0", "1.4.1", "1.4.2", "1.4.3"]' || '["1.3.1", "1.4.0", "1.4.3"]') }}
+
+        include:
+          - python-version: "3.12"
+            kaiwu-version: "1.4.3"
+          - python-version: "3.14"
+            kaiwu-version: "1.4.3"
 
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Python 3.10
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v7
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python-version }}
 
       - name: Cache pip dependencies
         uses: actions/cache@v6
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-py310-kaiwu${{ matrix.kaiwu-version }}-pip-${{ hashFiles('requirements/*.txt', 'example/**/requirements.txt', 'pyproject.toml') }}
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}-pip-${{ hashFiles('requirements/*.txt', 'example/**/requirements.txt', 'pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-py310-kaiwu${{ matrix.kaiwu-version }}-pip-
+            ${{ runner.os }}-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install torch==2.7.0 --index-url https://download.pytorch.org/whl/cpu
-          pip install -r requirements/devel.txt "kaiwu==${{ matrix.kaiwu-version }}" scikit-learn==1.7.2 scipy==1.14.1 tqdm==4.67.1
+          python -m pip install "torch==${{ matrix.python-version == '3.14' && '2.10.0' || '2.7.0' }}" --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements/devel.txt "kaiwu==${{ matrix.kaiwu-version }}"
           pip install .
           python -m pip check
           python -I -c "import sys; import kaiwu.torch_plugin as p; assert p.__file__.startswith(sys.prefix), p.__file__"
@@ -56,14 +63,14 @@ jobs:
             --with-urls \
             --allow-only "MIT;LGPL;BSD;MPL;Apache;Unlicense;PSF" \
             --partial-match \
-            --output-file dependency-licenses-${{ matrix.kaiwu-version }}.json  # 按 Kaiwu 版本保存结果（多版本矩阵场景）
+            --output-file dependency-licenses-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}.json  # 按 Python 和 Kaiwu 版本保存结果
 
       # 可选：上传许可证检查结果（便于归档查看）
       - name: Upload license report
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-licenses-${{ matrix.kaiwu-version }}
-          path: dependency-licenses-${{ matrix.kaiwu-version }}.json
+          name: dependency-licenses-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}
+          path: dependency-licenses-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}.json
           retention-days: 7 # 结果保留 7 天（可调整）
 
       - name: Lint with pylint

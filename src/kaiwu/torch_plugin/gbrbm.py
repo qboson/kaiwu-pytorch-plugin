@@ -97,6 +97,25 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         self.eps = eps
 
+    def _apply(self, fn, recurse=True):
+        """Convert model parameters and synchronize their data type.
+
+        The base class updates ``self.device`` after conversion. This model
+        also uses ``self.dtype`` to create sampling states, so it must match
+        the converted parameters. Updating it here covers both direct
+        conversions and conversions initiated by a parent module.
+
+        Args:
+            fn: Function applied to each parameter and buffer.
+            recurse: Whether to recurse into child modules.
+
+        Returns:
+            GaussianBernoulliRestrictedBoltzmannMachine: The converted model.
+        """
+        module = super()._apply(fn, recurse)
+        self.dtype = self.mu.dtype
+        return module
+
     @property
     def var(self):
         """torch.tensor: Variance of Gaussian units, clipped to avoid numerical issues."""

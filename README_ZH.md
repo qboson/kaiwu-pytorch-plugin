@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -78,10 +78,17 @@ flowchart TD
 
 ### 环境要求
 
-- python == 3.10
+- Python：3.10、3.12 或 3.14
 - kaiwu >= 1.3.1, <= 1.4.3
-- torch == 2.7.0
-- numpy == 2.2.6
+- Python 3.10 / 3.12：torch == 2.7.0，numpy == 2.2.6
+- Python 3.14：torch == 2.10.0，numpy == 2.3.3
+
+不支持 Python 3.11 和 3.13。Python 3.12 和 3.14 的安装还需要 Kaiwu
+提供对应版本支持；在此之前，尚不能通过正式发布的依赖完成安装。
+
+示例依赖在 `requirements/requirements_example.txt` 中按 Python 版本固定，QDiffusion 使用 `example/qdiffusion/requirements.txt`。开发环境安装清单已包含这两组依赖。
+
+Apple Silicon Mac 用户运行单细胞示例或完整测试前，需要设置 `NUMBA_THREADING_LAYER=workqueue`，具体见[安装说明](docs/source/getting_started/installation.md)。
 
 Kaiwu 兼容范围包括已发布的 1.3.1、1.4.0、1.4.1、1.4.2、1.4.3。
 同一套模型代码兼容降精度工具的位置变化，并按所装 SDK 转换计算模式；
@@ -125,7 +132,7 @@ SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口�
    pip install -r requirements/requirements.txt
    ```
 
-   Kaiwu SDK 需要单独安装，见下方说明。
+   依赖中已包含 Kaiwu SDK 1.3.1。
 
 4. **安装插件**
 

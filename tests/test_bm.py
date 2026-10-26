@@ -160,8 +160,9 @@ class TestBoltzmannMachine(unittest.TestCase):
                 self.bm(s) - self.bm(s2),
                 -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
             )
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
-                -x2 @ ising_mat @ x2.T
+            self.assertEqual(
+                (self.bm(s) - self.bm(s2)).item(),
+                (-x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)).item(),
             )
 
     def test_hidden_to_ising(self):
@@ -194,8 +195,9 @@ class TestBoltzmannMachine(unittest.TestCase):
                 self.bm(s) - self.bm(s2),
                 -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
             )
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
-                -x2 @ ising_mat @ x2.T
+            self.assertEqual(
+                (self.bm(s) - self.bm(s2)).item(),
+                (-x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)).item(),
             )
 
 
