@@ -83,7 +83,7 @@ Run the training script via `example/bm_generation/train_bm.ipynb`, and execute 
 
 **Dependencies**:
 ```text
-kaiwu==1.3.1
+kaiwu>=1.3.1,<=1.4.3
 pandas
 matplotlib
 ```
@@ -103,9 +103,8 @@ Run the example via `example/qvae_mnist/train_qvae.ipynb`.
 
 **Dependencies**
 
-```
-torchvision==0.22.0
-torchmetrics[image]
+```bash
+pip install -r requirements/requirements_example.txt
 ```
 
 ---
@@ -122,6 +121,6 @@ This extended example demonstrates how pre-trained Q-VAE representations can be 
 Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 
 **Dependencies**
-```
-torchvision==0.22.0
+```bash
+pip install -r requirements/requirements_example.txt
 ```

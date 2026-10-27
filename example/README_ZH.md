@@ -55,7 +55,7 @@ scipy
 通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
 **依赖**
 ```
-kaiwu==1.3.1
+kaiwu>=1.3.1,<=1.4.3
 pandas
 matplotlib
 ```
@@ -75,9 +75,8 @@ matplotlib
 
 **依赖项**
 
-```
-torchvision==0.22.0
-torchmetrics[image]
+```bash
+pip install -r requirements/requirements_example.txt
 ```
 
 ---
@@ -95,8 +94,8 @@ torchmetrics[image]
 
 **依赖项**
 
-```
-torchvision==0.22.0
+```bash
+pip install -r requirements/requirements_example.txt
 ```
 ---
 

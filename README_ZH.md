@@ -132,7 +132,7 @@ SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口�
    pip install -r requirements/requirements.txt
    ```
 
-   依赖中已包含 Kaiwu SDK 1.3.1。
+   依赖中已包含 Kaiwu SDK，支持 1.3.1 至 1.4.3。
 
 4. **安装插件**
 

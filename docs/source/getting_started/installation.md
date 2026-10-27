@@ -87,6 +87,10 @@ Install the project dependencies:
 pip install -r requirements/requirements.txt
 ```
 
+On Linux, install matching PyTorch and TorchVision builds from the same CPU
+or CUDA package index before the example or development dependencies. Use
+the versions selected for your Python version in the requirements files.
+
 For all examples, including image and single-cell workflows, install:
 
 ```bash

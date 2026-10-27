@@ -59,7 +59,7 @@ The above diagram shows the project file structure:
 # Requirements
 
 - Python: 3.10, 3.12, or 3.14
-- kaiwu == 1.3.1
+- kaiwu >= 1.3.1, <= 1.4.3
 - Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
 - Python 3.14: torch == 2.10.0, numpy == 2.3.3
 
