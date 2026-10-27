@@ -11,9 +11,10 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
 import kaiwu as kw
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 EXAMPLE_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_PATH = EXAMPLE_ROOT / "data" / "ETTh1.csv"
