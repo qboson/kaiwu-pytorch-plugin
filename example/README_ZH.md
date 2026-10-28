@@ -115,3 +115,22 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+
+---
+
+### 手动驱动 Q-Diffusion 解码
+
+`generate` 在内部跑完解码循环，而 `initialize_state` / `step` 把同一循环暴露出来，
+便于自定义停止条件与逐步检查。本示例手动驱动循环、在没有 mask token 时停止，并校验
+同样种子下结果与 `generate` 一致。
+
+请通过 `python example/qdiffusion_manual_decode/manual_decode.py` 运行该示例。
+
+**依赖项**
+
+```
+torch
+```
