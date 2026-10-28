@@ -11,12 +11,7 @@ import torch
 
 @pytest.fixture
 def trainer_module(monkeypatch):
-    import kaiwu
     from example.qvae_cell import models
-    # main has an unrelated SDK import issue tracked by #202. Use the real
-    # SDK class only to import the trainer; these tests never create a sampler.
-    monkeypatch.setattr(kaiwu.preprocess, "PrecisionReducer",
-                        kaiwu.cim.PrecisionReducer, raising=False)
     monkeypatch.setitem(sys.modules, "models", models)
     path = Path(__file__).resolve().parents[1] / "example/qvae_cell/trainer.py"
     spec = importlib.util.spec_from_file_location("cell_tail_trainer", path)
