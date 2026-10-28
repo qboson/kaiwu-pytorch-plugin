@@ -79,9 +79,20 @@ flowchart TD
 ### 环境要求
 
 - python == 3.10
-- kaiwu == 1.3.1
+- kaiwu >= 1.3.1, <= 1.4.3
 - torch == 2.7.0
 - numpy == 2.2.6
+
+Kaiwu 兼容范围包括已发布的 1.3.1、1.4.0、1.4.1、1.4.2、1.4.3。
+同一套模型代码兼容降精度工具的位置变化，并按所装 SDK 转换计算模式；
+旧写法 `quota` / `sample` 和新写法 `optimization` / `sampling` 均可使用，
+不区分大小写。这些正式 SDK 安装包仅提供 Python 3.10 版本。
+
+SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口变化前后
+及最新支持版本。手动运行 CI 时开启 `all-kaiwu-versions` 可检查全部五版。
+检查使用本地求解和云端求解器构造，不会提交云端任务。
+跨 SDK 检查使用普通的 `pip install .`；1.3.1 的包结构不能通过可编辑安装
+自动发现插件。
 
 ### 代码风格
 
@@ -202,7 +213,8 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -338,7 +350,9 @@ python example/qdiffusion/dplm/train_workflow.py
 
 ## 使用量统计
 
-kpp 会在后台隐性统计 `SimulatedAnnealingOptimizer` 和 `CIMOptimizer` 的调用量，用于改进产品和服务质量。**该统计默认开启，对用户代码完全透明，无需修改任何调用逻辑。**
+Kaiwu 1.4.3 未提供 KPP 调用来源统计所需的接口，因此在此版本下不会启用 KPP 专属统计。以下开关仅对提供该接口的 SDK 版本生效，不控制 SDK 自身的统计。
+
+当 SDK 提供上述接口时，kpp 会在后台为 `SimulatedAnnealingOptimizer` 和 `CIMOptimizer` 的调用标记 KPP 来源。**该功能默认开启，无需修改用户代码。**
 
 统计仅在 kpp 调用链路（即通过 `AbstractBoltzmannMachine.sample()` 触发）中生效；直接调用 kaiwu SDK 的优化器不会被统计。
 
