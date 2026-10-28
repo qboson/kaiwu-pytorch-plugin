@@ -115,3 +115,22 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+### 自带采样器：可验证的自定义求解器
+
+`example/local_sampler/` 展示了插件依赖的采样器契约，并用穷举真值验证一个纯 PyTorch 的
+Metropolis 采样器，因此无需 Kaiwu SDK 许可证即可在本机跑通这套接口。
+
+`model.get_ising_matrix()` 返回 `(N + 1) x (N + 1)` 的辅助自旋矩阵 `M`，满足
+`E(x) = c - y^T M y`（`y = [2x - 1, +1]`），即**低能量状态是 `s^T M s` 的最大值点**；
+`solve(M)` 必须返回形状 `(num_reads, N + 1)`、取值 `{-1, +1}` 的自旋。
+
+```bash
+python example/local_sampler/local_sampler.py
+```
+
+脚本构造一个具有三个简并基态的四节点玻尔兹曼机，把 `model.sample(sampler)` 的解码结果与
+穷举最小值对照（`minimal-energy draws: 32/32 -> PASS`），并跑一小段训练冒烟测试；全程
+不需要许可证。契约细节与预期输出见 `example/local_sampler/README_ZH.md`。
