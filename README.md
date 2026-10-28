@@ -76,9 +76,22 @@ The above image shows the project file structure:
 
 ### Requirements
 - python == 3.10
-- kaiwu == 1.3.1
+- kaiwu >= 1.3.1, <= 1.4.3
 - torch == 2.7.0
 - numpy == 2.2.6
+
+Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
+1.4.2, and 1.4.3. The same model code handles the precision-reducer location
+change and translates CIM mode names (`quota` / `sample` and
+`optimization` / `sampling`, case-insensitive) for the installed SDK.
+The published SDK wheels in this range require Python 3.10.
+
+SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10, covering the interface
+change and the newest supported release. Run CI manually with
+`all-kaiwu-versions` enabled to include 1.4.1 and 1.4.2. These jobs test local
+solving and CIM construction without submitting cloud tasks. Use a regular
+`pip install .` for cross-SDK checks: SDK 1.3.1 uses a regular package whose
+namespace does not discover the plugin through an editable installation.
 
 ### Code Style
 
@@ -105,7 +118,7 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    ```bash
    pip install -r requirements/requirements.txt
    ```
-   Kaiwu SDK needs to be installed separately, see the installation instructions below.
+   Kaiwu SDK 1.3.1 through 1.4.3 is supported; install a specific version with `pip install "kaiwu==1.3.1" .`.
 
 4. **Install the plugin**:
    ```bash
@@ -185,7 +198,8 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -335,7 +349,9 @@ For a more focused walkthrough of the example tree and its data flow, see
 
 ## Usage Statistics
 
-kpp implicitly tracks `SimulatedAnnealingOptimizer` and `CIMOptimizer` call counts in the background to help improve product quality. **This is enabled by default and fully transparent — no changes to user code are required.**
+Kaiwu 1.4.3 does not expose the caller-context hook used for KPP attribution, so KPP-specific statistics are inactive with this release. The controls below apply only to SDK releases that provide that hook; they do not control the SDK's own statistics.
+
+When the hook is available, kpp attributes `SimulatedAnnealingOptimizer` and `CIMOptimizer` calls to KPP in the background. **This attribution is enabled by default and requires no changes to user code.**
 
 Statistics are only collected within the kpp call path (i.e., triggered via `AbstractBoltzmannMachine.sample()`); calling kaiwu SDK optimizers directly is never tracked.
 

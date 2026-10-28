@@ -74,17 +74,28 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             ),
         )
         self.quadratic_coef = torch.nn.Parameter(
-            quadratic_coef
-            if quadratic_coef is not None
-            else torch.randn((self.num_gaussian, self.num_bernoulli)).to(self.device)
+            (
+                quadratic_coef
+                if quadratic_coef is not None
+                else torch.randn((self.num_gaussian, self.num_bernoulli))
+            ).to(dtype=self.dtype, device=self.device)
         )
         self.linear_bias = torch.nn.Parameter(
-            linear_bias
-            if linear_bias is not None
-            else torch.zeros(self.num_bernoulli).to(self.device)
+            (
+                linear_bias
+                if linear_bias is not None
+                else torch.zeros(self.num_bernoulli)
+            ).to(dtype=self.dtype, device=self.device)
         )
 
-        self.init_parameter(std=0.01, init_var=1)
+        # Only parameters the caller did not supply are (re-)initialized, so an
+        # explicitly weighted model survives construction (as in the RBM).
+        self.init_parameter(
+            std=0.01,
+            init_var=1,
+            init_quadratic=quadratic_coef is None,
+            init_linear=linear_bias is None,
+        )
 
         self.eps = eps
 
@@ -113,7 +124,12 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         return torch.diag(1 / self.var)
 
     def init_parameter(
-        self, init_var: float = 1, std: float = 0.01, max_fold: float = 16
+        self,
+        init_var: float = 1,
+        std: float = 0.01,
+        max_fold: float = 16,
+        init_quadratic: bool = True,
+        init_linear: bool = True,
     ):
         """Initialize model parameters with normal distribution.
 
@@ -124,15 +140,21 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 Defaults to 0.01.
             max_fold (float, optional): Maximum factor for clipping parameters.
                 Defaults to 16.
+            init_quadratic (bool, optional): Whether to (re-)initialize the
+                quadratic coefficients. Defaults to True.
+            init_linear (bool, optional): Whether to (re-)initialize the linear
+                bias. Defaults to True.
         """
         bound = max_fold * std
         init.normal_(self.mu, 0, std)
         self.get_parameter("mu").data.clip_(-bound, bound)
         init.constant_(self.log_var, np.log(init_var))
-        init.normal_(self.quadratic_coef, 0, std)
-        self.quadratic_coef.data.clip_(-bound, bound)
-        init.normal_(self.linear_bias, 0, std)
-        self.linear_bias.data.clip_(-bound, bound)
+        if init_quadratic:
+            init.normal_(self.quadratic_coef, 0, std)
+            self.quadratic_coef.data.clip_(-bound, bound)
+        if init_linear:
+            init.normal_(self.linear_bias, 0, std)
+            self.linear_bias.data.clip_(-bound, bound)
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
