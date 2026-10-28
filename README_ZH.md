@@ -25,10 +25,13 @@ flowchart TD
         qdiff["qdiffusion.py<br/>QDiffusion"]
         dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
         dbn["dbn.py<br/>UnsupervisedDBN"]
+        qdeq["qdeq.py<br/>QDEQ"]
     end
 
     torch --> abm
     kaiwu --> abm
+    torch --> qdeq
+    kaiwu --> qdeq
     abm --> bm
     abm --> rbm
     abm --> qvae
@@ -43,6 +46,7 @@ flowchart TD
         qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
         qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
         qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
+        qdeq_example["qdeq<br/>ETTh1 forecasting with QDEQ"]
     end
 
     rbm --> rbm_digits
@@ -52,11 +56,12 @@ flowchart TD
     qvae --> qvae_mnist
     qvae --> qvae_cell
     bm --> qvae_cell
+    qdeq --> qdeq_example
 ```
 
 上图展示了项目的主要代码结构：
 
-- `kaiwu-torch-plugin` 部分包含抽象基类、RBM、BM、QVAE、Q-Diffusion 和 DBN 等核心模块
+- `kaiwu-torch-plugin` 部分包含抽象基类、RBM、BM、QVAE、Q-Diffusion、DBN 和 QDEQ 等核心模块
 - `example` 部分包含若干示例，包括数字识别、图像生成、蛋白质序列生成和单细胞表征学习
 - `tests` 部分包含对应的基础测试
 
@@ -67,6 +72,7 @@ flowchart TD
 - 灵活架构：支持自定义可见层和隐藏层维度
 - 可扩展性：模块化设计便于扩展新的能量函数和采样方法
 - Q-Diffusion 支持：提供公开的 `QDiffusion` 模块，用于基于 DPLM backbone 的能量引导离散生成
+- QDEQ 支持：提供公开的 `QDEQ` 模块，把权重共享层变成不动点层，前向更新由 Kaiwu Ising 求解器选择
 
 ### 插件优势
 

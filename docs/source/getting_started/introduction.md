@@ -65,6 +65,7 @@ graph TD
         FullBM["full_boltzmann_machine.py<br>BoltzmannMachine"]
         QDiff["qdiffusion.py<br>QDiffusion"]
         QVAE["qvae.py<br>QVAE"]
+        QDEQ["qdeq.py<br>QDEQ"]
     end
     subgraph Examples
         rbm_digits["rbm_digits"]
@@ -73,11 +74,14 @@ graph TD
         qdiffusion["qdiffusion"]
         qvae_mnist["qvae_mnist"]
         qvae_cell["qvae_cell"]
+        qdeq_example["qdeq"]
     end
     %% 顶部到插件
     PyTorch --> Abstract
     SA -.-> Abstract
     CIM -.-> Abstract
+    PyTorch --> QDEQ
+    SA -.-> QDEQ
     %% 插件内部
     Abstract --> RBM
     Abstract --> GBRBM
@@ -92,6 +96,7 @@ graph TD
     QDiff --> qdiffusion
     QVAE --> qvae_mnist
     QVAE --> qvae_cell
+    QDEQ --> qdeq_example
 ```
 
 **Layer Breakdown:**
@@ -101,9 +106,9 @@ graph TD
 * - Layer
   - Contents
 * - **Application Layer**
-  - `rbm_digits`, `dbn_digits`, `bm_generation`, `qvae_mnist`, `qvae_cell`, `qdiffusion`
+  - `rbm_digits`, `dbn_digits`, `bm_generation`, `qvae_mnist`, `qvae_cell`, `qdiffusion`, `qdeq`
 * - **KPP Layer**
-  - `AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, `BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, `QDiffusion`; `_to_ising_matrix()`, `sample()`, `objective()`
+  - `AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, `BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, `QDiffusion`, `QDEQ`; `_to_ising_matrix()`, `sample()`, `objective()`
 * - **Kaiwu SDK Layer**
   - Classical (SA) & Quantum (CIM) optimizers
 ```
@@ -235,6 +240,8 @@ classDiagram
   - BM as prior in a VAE
 * - **QDiffusion**
   - Energy-guided sampling for discrete sequence generation
+* - **QDEQ**
+  - Deep equilibrium layer whose fixed-point updates are chosen by Ising solvers
 ```    
 
 ### Core Concept 3: Hardware Abstraction & Extension
