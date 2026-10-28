@@ -44,4 +44,3 @@ def test_forward_still_uses_posterior_samples():
     model.posterior.assert_called_once_with(q, config.dist_beta)
     torch.testing.assert_close(zeta, sentinel)
     torch.testing.assert_close(output, model.decoder(sentinel))
-
