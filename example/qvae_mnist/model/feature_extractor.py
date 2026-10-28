@@ -51,6 +51,8 @@ class FeatureExtractor:
             _, _, q, zeta = self.model(X_tensor)
             if self.feature_type == 'q':
                 feat = q.cpu().numpy()
-            else:
+            elif self.feature_type == 'zeta':
                 feat = zeta.cpu().numpy()
+            else:
+                raise ValueError("feature_type must be 'q' or 'zeta'")
         return feat
