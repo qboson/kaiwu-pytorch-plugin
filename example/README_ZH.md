@@ -115,3 +115,22 @@ torchvision==0.22.0
 ```
 pandas
 ```
+
+```
+
+
+---
+
+### 约束生成：固定序列中的一部分
+
+`QDiffusion.generate(..., partial_masks=...)` 会保持输入序列中被标记的位置不变，
+只解码其余位置。本示例使用玩具提议模型与玩具能量模型，无需 checkpoint 或 Kaiwu
+许可证即可离线运行，并打印固定位置与可编辑位置的结果。
+
+请通过 `python example/qdiffusion_constrained/constrained_generate.py` 运行该示例。
+
+**依赖项**
+
+```
+torch
+```
