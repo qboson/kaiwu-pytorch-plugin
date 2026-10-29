@@ -54,6 +54,8 @@ python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
 ```
 
+`--seed` controls both the sampler and PyTorch's random search directions in the forecast script, matching the training script's seeding behavior.
+
 `--sampler` accepts:
 
 - `sa`: Kaiwu simulated annealing (`kaiwu.classical.SimulatedAnnealingOptimizer`), runs locally
