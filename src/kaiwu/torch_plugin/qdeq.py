@@ -292,8 +292,8 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
         ``G`` or ``r`` contains non-finite values.
 
     Raises:
-        RuntimeError: If ``sampler.solve`` does not return spin rows of the
-            Ising matrix size.
+        RuntimeError: If ``sampler.solve`` does not return finite ``-1``/``1``
+            spin rows of the Ising matrix size.
     """
     # ||r + G^T a||^2 / 2 = a^T H a / 2 + g^T a + const with H = G G^T, g = G r.
     hess = (g_mat @ g_mat.T).cpu().numpy()
@@ -317,11 +317,13 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     with kpp_caller_context():
         solution = sampler.solve(ising_mat)
     spins = np.atleast_2d(np.asarray(solution, dtype=np.float64))
-    if spins.shape[0] == 0 or spins.shape[1] != enc.shape[1] + 1:
+    if spins.ndim != 2 or spins.shape[0] == 0 or spins.shape[1] != enc.shape[1] + 1:
         raise RuntimeError(
             f"sampler must return spin rows of length {enc.shape[1] + 1}, "
             f"got shape {spins.shape}"
         )
+    if not np.all(np.isin(spins, (-1.0, 1.0))):
+        raise RuntimeError("sampler must return finite spin values of -1 or 1")
     # The last spin is the auxiliary spin; x_i = (s_i s_aux + 1) / 2 is invariant
     # to flipping every spin. Every returned row is decoded and the best kept.
     coeffs = offset + ((spins[:, :-1] * spins[:, -1:] + 1) / 2) @ enc.T
