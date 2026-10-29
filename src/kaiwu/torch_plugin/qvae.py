@@ -350,7 +350,9 @@ class QVAE(AutoEncoderBase):
         entropy = torch.sum(posterior.entropy(), dim=1)
         logit_q = posterior.logit_mu
         cross_entropy = self._cross_entropy(logit_q)
-        return cross_entropy - entropy
+        # The BM is the fixed side of the KL term, so align the posterior
+        # entropy with the device its energies were computed on.
+        return cross_entropy - entropy.to(cross_entropy.device)
 
     def _cross_entropy(self, logit_q):
         """Compute cross-entropy term for KL divergence.
