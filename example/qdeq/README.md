@@ -84,6 +84,12 @@ z = deq(tokens)            # called like any other layer
 deq.get_last_stats()       # forward/backward steps, residuals, sampler time
 ```
 
+With `jac_loss_vecs > 0`, `deq.last_jac_loss` is a differentiable Jacobian
+penalty that can be added to the training loss. If `layer(z, x)` does not
+depend on `z`, its penalty is zero and its input and parameter gradients
+are unchanged. A constant output without an autograd graph is also accepted;
+it keeps `requires_grad=False` and needs no implicit backward hook.
+
 `simple_train_example.py` with default arguments (2 epochs) finishes in a few
 minutes on a CPU and reaches a test MSE of about 0.43 in the standardised space.
 
