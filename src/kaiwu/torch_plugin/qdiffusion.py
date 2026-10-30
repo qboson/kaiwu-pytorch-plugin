@@ -666,16 +666,24 @@ class QDiffusion(nn.Module):
 
         Args:
             timesteps: Sampled diffusion timesteps.
-            weighting: Weighting strategy name.
+            weighting: Weighting strategy name (``"linear"`` or ``"constant"``).
 
         Returns:
             torch.Tensor: A column vector of normalized per-sample weights.
+
+        Raises:
+            ValueError: If ``weighting`` is not a supported strategy.
         """
         num_timesteps = self.config.num_diffusion_timesteps
-        weight = {
-            "linear": num_timesteps - (timesteps - 1),
-            "constant": num_timesteps * torch.ones_like(timesteps),
-        }[weighting]
+        if weighting == "linear":
+            weight = num_timesteps - (timesteps - 1)
+        elif weighting == "constant":
+            weight = num_timesteps * torch.ones_like(timesteps)
+        else:
+            raise ValueError(
+                f"Unsupported timestep weighting {weighting!r}; "
+                "expected 'linear' or 'constant'"
+            )
         return weight[:, None].float() / num_timesteps
 
     def _mask_logits(self, logits: torch.Tensor) -> torch.Tensor:
