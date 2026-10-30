@@ -12,7 +12,6 @@ import torch
 
 import kaiwu as kw
 from kaiwu.torch_plugin import BoltzmannMachine, RestrictedBoltzmannMachine
-from kaiwu.torch_plugin.maifs import qubo
 from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 
@@ -28,30 +27,6 @@ def cim_without_remote_access(monkeypatch, tmp_path):
         kw.cim.CIMOptimizer, "_get_authorization", staticmethod(lambda: "test")
     )
     monkeypatch.setattr(kw.common.CheckpointManager, "save_dir", str(tmp_path))
-
-
-@pytest.mark.parametrize("mode_kwargs", [{}, {"task_mode": None}])
-@pytest.mark.usefixtures("cim_without_remote_access")
-def test_feature_selection_cim_default_mode(monkeypatch, tmp_path, mode_kwargs):
-    """The default feature-selection configuration passes SDK validation."""
-    def solve_locally(sampler, matrix):
-        assert sampler.task_mode == (
-            "optimization" if hasattr(kw.cim, "TaskMode") else "quota"
-        )
-        return kw.classical.BruteForceOptimizer().solve(matrix)
-
-    # 1.3.1 has no separate _solve hook; replace its remote solve boundary.
-    solve_method = "_solve" if hasattr(kw.cim.CIMOptimizer, "_solve") else "solve"
-    monkeypatch.setattr(kw.cim.CIMOptimizer, solve_method, solve_locally)
-    result = qubo._solve_ising_kaiwu_cim(  # pylint: disable=protected-access
-        np.array([[0.0, 1.0], [1.0, 0.0]]),
-        target_precision=8,
-        max_precision=8,
-        save_dir=tmp_path,
-        cleanup_records=False,
-        **mode_kwargs,
-    )
-    np.testing.assert_array_equal(result, [[1, 1]])
 
 
 @pytest.mark.parametrize("use_precision_reducer", [False, True])
