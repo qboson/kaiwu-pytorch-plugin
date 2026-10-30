@@ -38,7 +38,7 @@ def test_feature_selection_cim_default_mode(monkeypatch, tmp_path, mode_kwargs):
         assert sampler.task_mode == (
             "optimization" if hasattr(kw.cim, "TaskMode") else "quota"
         )
-        return kw.classical.BruteForceOptimizer().solve(matrix)
+        return np.ones((1, matrix.shape[0]), dtype=int)
 
     # 1.3.1 has no separate _solve hook; replace its remote solve boundary.
     solve_method = "_solve" if hasattr(kw.cim.CIMOptimizer, "_solve") else "solve"
