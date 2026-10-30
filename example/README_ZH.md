@@ -148,3 +148,13 @@ scgraph
 ```
 pandas
 ```
+
+### 均衡传播：Digits 分类
+
+`example/ep_digits/` 在 `sklearn.datasets.load_digits` 上训练 64-32-10 的均衡传播网络。每个单元使用 1 个比特，K 比特 QUBO 由 Kaiwu 1.3.1 模拟退火松弛，并与同宽度的反向传播 MLP 对照。命令和结果见 [example/ep_digits/README_ZH.md](ep_digits/README_ZH.md)。
+
+**依赖项**
+
+```
+scikit-learn
+```
