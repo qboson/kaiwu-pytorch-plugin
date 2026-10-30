@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import warnings
 from pathlib import Path
+from numbers import Integral
 from typing import Optional, Tuple
 
 import numpy as np
@@ -129,11 +130,22 @@ def split_dataset(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Randomly shuffle and split into train / valid / test.
-    Uses CFG defaults when sizes are not specified.
+    None selects the corresponding CFG default; zero leaves that split empty.
+    Counts must be nonnegative integers, and their sum must fit in the dataset.
     """
-    n_tr = n_train or CFG.n_train
-    n_vl = n_valid or CFG.n_valid
-    n_te = n_test  or CFG.n_test
+    counts = []
+    for name, value, default in (
+        ("n_train", n_train, CFG.n_train),
+        ("n_valid", n_valid, CFG.n_valid),
+        ("n_test", n_test, CFG.n_test),
+    ):
+        count = default if value is None else value
+        if isinstance(count, bool) or not isinstance(count, Integral):
+            raise TypeError(f"{name} must be a nonnegative integer")
+        if count < 0:
+            raise ValueError(f"{name} must be a nonnegative integer")
+        counts.append(int(count))
+    n_tr, n_vl, n_te = counts
 
     total = n_tr + n_vl + n_te
     if len(data) < total:
