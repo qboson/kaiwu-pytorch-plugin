@@ -107,6 +107,14 @@ class FeatureSelectionWrapper(nn.Module):
             if min_selected_features is None
             else int(min_selected_features)
         )
+        if min_selected_features < 0 or max_selected_features < 0:
+            raise ValueError("feature-count bounds must be non-negative")
+        if min_selected_features > max_selected_features:
+            raise ValueError(
+                "min_selected_features must not exceed max_selected_features"
+            )
+        if max_selected_features > feature_dim:
+            raise ValueError("feature-count bounds must not exceed feature_dim")
 
         self.model = model
         self.feature_dim = feature_dim
