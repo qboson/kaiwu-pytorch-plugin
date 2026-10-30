@@ -137,12 +137,18 @@ class EnergyModel(nn.Module):
         self,
         visible_state: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Samples BM hidden states for each visible assignment."""
+        """Samples BM hidden states for each visible assignment.
+
+        An empty visible batch yields empty states and empty split sizes.
+        """
         if not hasattr(self, "energy_bm") or self.sampler is None:
             raise RuntimeError(
                 "BM hidden-state sampling requires bm_num_visible, "
                 "bm_num_hidden, and sampler."
             )
+        if visible_state.size(0) == 0:
+            empty = torch.empty(0, device=visible_state.device, dtype=torch.long)
+            return visible_state.new_empty((0, self.energy_bm.num_nodes)), empty
         batched_states = []
         split_sizes = []
         for sample_index in range(visible_state.size(0)):
@@ -180,10 +186,16 @@ class EnergyModel(nn.Module):
         return dict(self._last_stats)
 
     def score_visible_logits(self, visible_logits: torch.Tensor) -> torch.Tensor:
-        """Scores visible logits under the conditioned BM energy model."""
+        """Scores visible logits under the conditioned BM energy model.
+
+        An empty batch yields empty scores and leaves the last diagnostics
+        untouched.
+        """
         if self.bm_num_visible is None:
             raise RuntimeError("BM visible-logit scoring requires bm_num_visible.")
         visible_state = self.discretize_visible_state(visible_logits)
+        if visible_state.size(0) == 0:
+            return visible_state.new_empty((0, 1))
         full_states, split_sizes = self.sample_hidden_state(visible_state)
         hidden_state = full_states[:, self.bm_num_visible :]
         self._set_last_stats(
