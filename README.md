@@ -142,7 +142,7 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
 
 2. **Clone this repository locally**:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin
    ```
 
@@ -172,7 +172,7 @@ requirements/
 
 1. **Clone the repository:**:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
