@@ -151,6 +151,11 @@ class EnergyModel(nn.Module):
                 visible_state[sample_index : sample_index + 1],
                 dtype=visible_state.dtype,
             )
+            if sampled_states.size(0) == 0:
+                raise RuntimeError(
+                    "sampler returned no solutions for the conditioned Ising "
+                    "matrix; energy scores would be NaN"
+                )
             batched_states.append(sampled_states)
             split_sizes.append(sampled_states.size(0))
         return torch.cat(batched_states, dim=0), torch.tensor(
