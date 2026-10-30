@@ -97,6 +97,18 @@ class EnergyModel(nn.Module):
         sampler: Any | None = None,
     ) -> None:
         super().__init__()
+        if (bm_num_visible is None) != (bm_num_hidden is None):
+            raise ValueError(
+                "bm_num_visible and bm_num_hidden must be provided together"
+            )
+        for name, value in (
+            ("bm_num_visible", bm_num_visible),
+            ("bm_num_hidden", bm_num_hidden),
+        ):
+            if value is not None and (
+                isinstance(value, bool) or not isinstance(value, int) or value <= 0
+            ):
+                raise ValueError(f"{name} must be a positive integer")
         self.bm_num_visible = bm_num_visible
         self.bm_num_hidden = bm_num_hidden
         self.sampler = sampler
