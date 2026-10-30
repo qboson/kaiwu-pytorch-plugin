@@ -205,8 +205,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             s_visible: State of the visible layer.
 
         Returns:
-            torch.Tensor: Spins sampled from the model
-                (shape determined by ``sampler`` and ``sample_params``).
+            torch.Tensor: Spins sampled from the model, with one row per
+                solution returned by ``sampler`` and ``num_nodes`` columns.
         """
         solutions = []
         for i in range(s_visible.size(0)):
