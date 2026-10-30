@@ -11,6 +11,7 @@ a QVAE with a Boltzmann machine prior.
 
 import abc
 import logging
+import math
 
 import torch
 from torch import nn
@@ -309,7 +310,15 @@ class QVAE(AutoEncoderBase):
 
         Returns:
             torch.Tensor: BM loss scalar.
+
+        Raises:
+            ValueError: If ``bm_weight_decay`` is not finite and non-negative.
         """
+        bm_weight_decay = float(bm_weight_decay)
+        if not math.isfinite(bm_weight_decay) or bm_weight_decay < 0:
+            raise ValueError(
+                "bm_weight_decay must be a finite non-negative number"
+            )
         # Use hard binary samples from q (threshold 0) or sampling from sigmoid(q)
         # positive_state = (q.detach() > 0).float()
         # loss = self.bm.objective(positive_state, self.bm.sample(self.sampler))
