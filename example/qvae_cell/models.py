@@ -177,6 +177,18 @@ class CellQVAE(QVAE):
         posterior, zeta = self.posterior(q, self.config.dist_beta)
         return q, posterior, zeta
 
+    def guide(self, x, *args, **kwargs):
+        """变分推断 Guide：返回 (posterior, q, zeta)。"""
+        q, posterior, zeta = self._encode(x)
+        return posterior, q, zeta
+
+    def decode(self, zeta, batch_idx=None, *args, **kwargs):
+        """生成模型解码器：给定潜变量样本和可选 batch 索引生成重构数据。"""
+        recon_x = self.decoder(self._decoder_input(zeta, batch_idx))
+        if self.config.loss_type == "bernoulli":
+            recon_x = recon_x + self._train_bias
+        return recon_x
+
     def forward(self, x, batch_idx=None):
         """执行带可选 batch 条件的 QVAE 前向传播。
 
@@ -188,10 +200,8 @@ class CellQVAE(QVAE):
             ``(recon_x, posterior, q, zeta)``，分别为重构结果、后验分布、
             编码器 logits 和潜变量样本。
         """
-        q, posterior, zeta = self._encode(x)
-        recon_x = self.decoder(self._decoder_input(zeta, batch_idx))
-        if self.config.loss_type == "bernoulli":
-            recon_x = recon_x + self._train_bias
+        posterior, q, zeta = self.guide(x)
+        recon_x = self.decode(zeta, batch_idx=batch_idx)
         return recon_x, posterior, q, zeta
 
     def energy(self, x, loss_type):

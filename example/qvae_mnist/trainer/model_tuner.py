@@ -9,13 +9,15 @@ logger = get_logger(__name__)
 logger.setLevel('WARNING')
 
 class ModelTuner(object):
-	def __init__(self, config=None):
+	def __init__(self, config=None, backend='legacy'):
 		self._config=config
+		self.backend=backend or getattr(config, 'backend', 'legacy')
 		self._model=None
 		self._optimiser = None          # 主优化器（单阶段模式）
 		self._vae_optimiser = None      # VAE 部分优化器（两阶段）
 		self._bm_optimiser = None       # BM 部分优化器（两阶段）
 		self._use_two_optimisers = False
+		self._svi = None
 
 		self.train_loader=None
 		self.test_loader=None
@@ -41,6 +43,7 @@ class ModelTuner(object):
 	def register_model(self,model):
 		logger.debug("Register Model")
 		self._model=model
+		self._svi=None
 		return
 
 	def register_optimiser(self,optimiser):
@@ -48,6 +51,7 @@ class ModelTuner(object):
 		logger.debug("Register Model")
 		self._optimiser=optimiser
 		self._use_two_optimisers = False
+		self._svi=None
 		return
 
 	def register_two_optimisers(self, vae_optimiser, bm_optimiser):
@@ -56,7 +60,27 @@ class ModelTuner(object):
 		self._vae_optimiser = vae_optimiser
 		self._bm_optimiser = bm_optimiser
 		self._use_two_optimisers = True
+		self._svi=None
 		return
+
+	def _setup_svi(self):
+		"""初始化或刷新 Q_SVI 引擎"""
+		if self._svi is None and self._model is not None:
+			from kaiwu.torch_plugin import Q_SVI
+			optim = self._vae_optimiser if self._use_two_optimisers else self._optimiser
+			bm_optim = self._bm_optimiser if self._use_two_optimisers else None
+			bm_weight_decay = getattr(self._config, 'weight_decay', 0.0) if self._config else 0.0
+			self._svi = Q_SVI(
+				model=self._model,
+				optim=optim,
+				bm_optim=bm_optim,
+				bm_weight_decay=bm_weight_decay,
+			)
+		elif self._svi is not None:
+			optim = self._vae_optimiser if self._use_two_optimisers else self._optimiser
+			bm_optim = self._bm_optimiser if self._use_two_optimisers else None
+			self._svi.model = self._model
+			self._svi.set_optimizers(vae_optim=optim, bm_optim=bm_optim)
 
 	def register_dataLoaders(self,train_loader,test_loader):
 		self.train_loader=train_loader
@@ -100,53 +124,67 @@ class ModelTuner(object):
 		self._model.train()
 
 		total_train_loss = 0
-		for batch_idx, (inputData, label) in enumerate(self.train_loader):
-			#set gradients to zero before backprop. Needed in pytorch
-			# self._optimiser.zero_grad()
+		if self.backend == 'svi':
+			self._setup_svi()
+			for batch_idx, (inputData, label) in enumerate(self.train_loader):
+				step_loss = self._svi.step(inputData)
+				total_train_loss += step_loss
 
-			# 第一阶段：更新 VAE 参数
-			if self._use_two_optimisers:
-				self._vae_optimiser.zero_grad()
-			else:
-				self._optimiser.zero_grad()
+				# Output logging
+				if batch_idx % 100 == 0:
+					logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+						epoch, batch_idx*len(inputData), len(self.train_loader.dataset),
+						100.*batch_idx/len(self.train_loader), step_loss/len(inputData)))
+		else:
+			for batch_idx, (inputData, label) in enumerate(self.train_loader):
+				#set gradients to zero before backprop. Needed in pytorch
+				# self._optimiser.zero_grad()
 
-			if self._config.type == 'QVAE':
-				# 注意：forward 返回: output_logits, posterior_dist, q_logits, zeta
-				output_logits, posterior, q, zeta = self._model(inputData)
-				# 直接使用 forward 返回的 logits 和 posterior 计算损失
-				train_loss = self._model.loss(inputData, output_logits, posterior)
-			else:
-				logger.debug("ERROR Unknown Model Type")
-				raise NotImplementedError
+				# 第一阶段：更新 VAE 参数
+				if self._use_two_optimisers:
+					self._vae_optimiser.zero_grad()
+				else:
+					self._optimiser.zero_grad()
 
-			train_loss.backward()
-			# total_train_loss += train_loss.item()
-			# self._optimiser.step()
-			if self._use_two_optimisers:
-				self._vae_optimiser.step()
-			else:
-				self._optimiser.step()
-			
-			# 第二阶段：更新 BM 参数（仅在两阶段模式下）
-			if self._use_two_optimisers and (self._config.type in ['QVAE', 'CellQVAE']):
-				self._bm_optimiser.zero_grad()
-				# 使用提取的 q 计算 BM 损失（注意 q 应已 detach，但为安全再次 detach）
-				bm_loss = self._model.bm_loss(q.detach(), getattr(self._config, 'weight_decay', 0.0))
-				bm_loss.backward()
-				self._bm_optimiser.step()
-				total_train_loss += train_loss.item() + bm_loss.item()  # 记录总损失
-			else:
-				total_train_loss += train_loss.item()
+				if self._config.type == 'QVAE':
+					# 注意：forward 返回: output_logits, posterior_dist, q_logits, zeta
+					output_logits, posterior, q, zeta = self._model(inputData)
+					# 直接使用 forward 返回的 logits 和 posterior 计算损失
+					train_loss = self._model.loss(inputData, output_logits, posterior)
+				else:
+					logger.debug("ERROR Unknown Model Type")
+					raise NotImplementedError
 
-			# Output logging
-			if batch_idx % 100 == 0:
-				logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-					epoch, batch_idx*len(inputData), len(self.train_loader.dataset),
-					100.*batch_idx/len(self.train_loader), train_loss.data.item()/len(inputData)))
+				train_loss.backward()
+				# total_train_loss += train_loss.item()
+				# self._optimiser.step()
+				if self._use_two_optimisers:
+					self._vae_optimiser.step()
+				else:
+					self._optimiser.step()
+				
+				# 第二阶段：更新 BM 参数（仅在两阶段模式下）
+				if self._use_two_optimisers and (self._config.type in ['QVAE', 'CellQVAE']):
+					self._bm_optimiser.zero_grad()
+					# 使用提取的 q 计算 BM 损失（注意 q 应已 detach，但为安全再次 detach）
+					bm_loss = self._model.bm_loss(q.detach(), getattr(self._config, 'weight_decay', 0.0))
+					bm_loss.backward()
+					self._bm_optimiser.step()
+					total_train_loss += train_loss.item() + bm_loss.item()  # 记录总损失
+				else:
+					total_train_loss += train_loss.item()
+
+				# Output logging
+				if batch_idx % 100 == 0:
+					logger.info('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+						epoch, batch_idx*len(inputData), len(self.train_loader.dataset),
+						100.*batch_idx/len(self.train_loader), train_loss.data.item()/len(inputData)))
 		
 		total_train_loss /= len(self.train_loader.dataset)
 		logger.info("Train Loss: {0}".format(total_train_loss))
 		return total_train_loss
+
+	train_epoch = train
 	
 	def test(self):
 		logger.info("Testing Model")
@@ -171,3 +209,14 @@ class ModelTuner(object):
 		test_loss /= len(self.test_loader.dataset)
 		logger.info("Test Loss: {0}".format(test_loss))
 		return test_loss, inputData, outputData, label_list
+
+	def eval_pr(self):
+		"""Evaluate test loss and return metrics."""
+		return self.test()
+
+
+class SVITuner(ModelTuner):
+	"""Model tuner utilizing the unified Q_SVI training backend."""
+
+	def __init__(self, config=None, backend='svi'):
+		super().__init__(config=config, backend=backend)
