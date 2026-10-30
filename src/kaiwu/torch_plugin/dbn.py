@@ -128,7 +128,7 @@ class UnsupervisedDBN(nn.Module):
         if self.rbm_layers is None or len(self.rbm_layers) == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
 
-        if layer_index >= len(self.rbm_layers):
+        if layer_index < 0 or layer_index >= len(self.rbm_layers):
             raise ValueError(f"Layer index {layer_index} out of range.")
 
         rbm = self.rbm_layers[layer_index]
