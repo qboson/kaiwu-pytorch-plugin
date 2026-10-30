@@ -218,6 +218,11 @@ class DEQForecaster(nn.Module):
         """Maps a (batch, seq_len, variables) history to a (batch, pred_len, variables) forecast."""
         # Normalise each window per variable, embed each variable's series as
         # one token, solve the equilibrium over tokens and project to the horizon.
+        if history.size(1) != self.embed.in_features:
+            raise ValueError(
+                f"history has {history.size(1)} time steps but the model expects "
+                f"{self.embed.in_features}"
+            )
         mean = history.mean(dim=1, keepdim=True)
         std = history.std(dim=1, keepdim=True) + 1e-5
         tokens = self.embed(((history - mean) / std).transpose(1, 2))
