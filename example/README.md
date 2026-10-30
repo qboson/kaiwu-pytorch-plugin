@@ -16,6 +16,18 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 - `dplm/`: protein-case workflow utilities and adapter code
 
 For details, see `example/qdiffusion/README.md`。
+### QDEQ
+
+`example/qdeq/simple/` trains a small iTransformer-style forecaster on ETTh1
+whose encoder is one `QDEQ` layer, with the fixed point solved by Kaiwu
+simulated annealing, CIM or the Anderson baseline. See
+[example/qdeq/README.md](qdeq/README.md) for data and commands.
+
+**Dependencies**
+
+```
+pandas
+```
 
 ---
 
