@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from numbers import Integral
 from typing import Any
 
 import numpy as np
@@ -138,6 +139,13 @@ class EnergyModel(nn.Module):
         visible_state: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Samples BM hidden states for each visible assignment."""
+        if self.bm_num_visible is not None and (
+            visible_state.ndim != 2 or visible_state.shape[-1] != self.bm_num_visible
+        ):
+            raise ValueError(
+                f"visible_state must have shape (batch, {self.bm_num_visible}), "
+                f"got {tuple(visible_state.shape)}"
+            )
         if not hasattr(self, "energy_bm") or self.sampler is None:
             raise RuntimeError(
                 "BM hidden-state sampling requires bm_num_visible, "
@@ -432,6 +440,10 @@ class QDiffusion(nn.Module):
         Returns:
             dict[str, Any]: A mutable state dictionary suitable for repeated ``step`` calls.
         """
+        if isinstance(max_steps, bool) or not isinstance(max_steps, Integral):
+            raise TypeError("max_steps must be a non-negative integer")
+        if max_steps < 0:
+            raise ValueError("max_steps must be a non-negative integer")
         output_tokens, output_scores = self._initialize_output_tokens(
             input_tokens, partial_masks=partial_masks
         )
