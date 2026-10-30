@@ -104,7 +104,12 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
         Returns:
             torch.Tensor: Spins sampled from the model.
+
+        Raises:
+            TypeError: If ``sampler`` does not provide a ``solve`` method.
         """
+        if not callable(getattr(sampler, "solve", None)):
+            raise TypeError("sampler must provide a solve() method")
         ising_mat = self.get_ising_matrix()
 
         # kpp stats: set _caller_context so kaiwu @track_data decorator
