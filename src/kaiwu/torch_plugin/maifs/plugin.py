@@ -95,6 +95,8 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> None:
 
         super().__init__()
+        if not isinstance(model, nn.Module):
+            raise TypeError("model must be a torch.nn.Module")
         explicit_min = min_selected_features is not None
         feature_dim = int(feature_dim)
         max_selected_features = (
