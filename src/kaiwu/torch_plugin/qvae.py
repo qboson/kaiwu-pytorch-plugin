@@ -219,6 +219,17 @@ class QVAE(AutoEncoderBase):
         clipped_mean = torch.clamp(mean.reshape(-1), 0.001, 0.999).detach()
         self._train_bias.copy_(-torch.log(1 / clipped_mean - 1))
 
+    def set_dataset_mean(self, mean):
+        """Set the dataset mean and refresh the Bernoulli reconstruction bias.
+
+        Args:
+            mean (torch.Tensor or float or None): Dataset mean with the input
+                feature dimension, a scalar, or ``None`` to clear it.
+        """
+        super().set_dataset_mean(mean)
+        if mean is not None:
+            self.set_train_bias(mean)
+
     def forward(self, x):
         """
         Forward pass through the QVAE.
