@@ -64,6 +64,7 @@ def build_loaders(
 
     Strides above 1 subsample the windows to keep the example small.
     """
+    data_path = Path(data_path)
     if not data_path.exists():
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
