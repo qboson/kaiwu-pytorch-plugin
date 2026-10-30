@@ -38,10 +38,12 @@ def load_reference_manifest(
     test_df: Optional[pd.DataFrame] = None,
     expected_count: int = 25,
 ) -> List[ReferenceMolecule]:
-    """Load and fully validate the immutable reference set."""
+    """Load and validate a reference list or an object containing ``references``."""
     manifest_path = Path(path)
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-    raw_refs = payload.get("references", payload)
+    raw_refs = payload.get("references") if isinstance(payload, dict) else payload
+    if not isinstance(raw_refs, list) or not all(isinstance(item, dict) for item in raw_refs):
+        raise ValueError("reference manifest must contain a list of reference objects")
     refs = [ReferenceMolecule(**item) for item in raw_refs]
 
     if len(refs) != expected_count:
