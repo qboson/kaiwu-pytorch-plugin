@@ -541,13 +541,16 @@ class QDiffusion(nn.Module):
             partial_masks: Optional boolean mask of positions that should remain fixed.
 
         Returns:
-            torch.Tensor: A boolean mask where ``True`` marks editable non-special positions.
+            torch.Tensor: A boolean mask where ``True`` marks editable non-special
+            positions. Reserved ``x_id`` positions are not editable either.
         """
         editable_token_mask = (
             output_tokens.ne(self.pad_id)
             & output_tokens.ne(self.bos_id)
             & output_tokens.ne(self.eos_id)
         )
+        if self.x_id is not None:
+            editable_token_mask &= output_tokens.ne(self.x_id)
         if partial_masks is not None:
             editable_token_mask &= ~partial_masks
         return editable_token_mask
