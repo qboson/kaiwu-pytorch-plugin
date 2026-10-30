@@ -75,10 +75,10 @@ $$P_\theta(\mathbf{v}) = \frac{\exp(-F_\theta(\mathbf{v}))}{\sum_{\tilde{\mathbf
 
 Even with hidden units marginalized out, the denominator still sums over all $2^{N_{\text{vis}}}$ visible configurations. The intractability remains.
 
-## The Consequence: Exact Maximum Likelihood Is Impossible
-The intractability of $Z_\theta$ has a stark implication: **exact maximum likelihood learning of a Boltzmann machine is computationally impossible for all but the smallest toy problems.** Any practical training algorithm must rely on approximations.
+## The Consequence: Exact Maximum Likelihood Is Intractable
+The intractability of $Z_\theta$ has a stark implication: **exact maximum likelihood learning of a Boltzmann machine is computationally intractable for all but the smallest toy problems.** Any practical training algorithm must rely on approximations.
 
-This is not merely an engineering inconvenience; it is a fundamental computational barrier. The partition function sum is a prototypical #P-complete problem in computational complexity theory, meaning it is at least as hard as counting the number of satisfying assignments to a Boolean formula.
+This is not merely an engineering inconvenience; it is a fundamental computational barrier. The partition function sum is a prototypical #P-hard problem in computational complexity theory, meaning it is at least as hard as counting the number of satisfying assignments to a Boolean formula.
 
 ## Hessian and Non-Convexity
 
@@ -86,7 +86,7 @@ The difficulty extends beyond the gradient. The Hessian of the log-likelihood fu
 
 $$\nabla^2 f(\theta) = -\text{Cov}_\theta(\mathbf{S})$$
 
-where $\mathbf{S}$ is the vector of sufficient statistics (e.g., $X_i$ and $X_i X_j$). This means the Hessian is negative definite, and the optimization is **concave**—there are no non-global local minima when all units are visible.
+where $\mathbf{S}$ is the vector of sufficient statistics (e.g., $X_i$ and $X_i X_j$). This means the Hessian is negative semidefinite (negative definite when the covariance has full rank), and the optimization is **concave**—there are no non-global local minima when all units are visible.
 
 However, when hidden units are introduced, the Hessian becomes:
 
