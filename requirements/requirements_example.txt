@@ -4,3 +4,7 @@ scipy
 torchvision==0.22.0
 torchmetrics[image]
 seaborn
+
+# example/qvae_mnist/utils/helpers.py imports these at module level (GIF/PNG output helpers)
+gif
+imageio
