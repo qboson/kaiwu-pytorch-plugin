@@ -43,13 +43,13 @@ or, in matrix form:
 
 $$E(\mathbf{x}) = -\frac{1}{2} \mathbf{x}^\top \mathbf{W} \mathbf{x} - \mathbf{b}^\top \mathbf{x}$$
 
-To verify that energy never increases, consider a flip of unit $i$from $x_i$ to $x_i' = -x_i$. The change in energy is:
+To verify that energy never increases, consider a flip of unit $i$ from $x_i$ to $x_i' = -x_i$. The change in energy is:
 
 $$\Delta E = E(\mathbf{x}') - E(\mathbf{x}) = (x_i - x_i')\left( \sum_{j \neq i} w_{ij} x_j + b_i \right)$$
 
 If $x_i'$ is chosen to be $ \text{sign}(\sum w_{ij} x_j + b_i)$, then the term in parentheses has the same sign as $x_i'$. Since $x_i$ has the opposite sign, the product $(x_i - x_i')$ is non-zero and opposite in sign to the parenthesized term, ensuring $\Delta E \leq 0$. Energy strictly decreases unless the unit is already aligned with its input.
 
-Because the energy is bounded below (for finite weights and binary units), the network must eventually reach a **local minimum** of the energy function, where no single-unit flip can further lower the energy. These local minima are the **attractors** of the dynamic, which states toward which nearby initial configurations evolve.
+Because the energy is bounded below (for finite weights and binary units), the network must eventually reach a **local minimum** of the energy function, where no single-unit flip can further lower the energy. These local minima are the **attractors** of the dynamics: states toward which nearby initial configurations evolve.
 
 ## Storing Memories as Attractors
 The Hopfield network is not merely a dynamical curiosity; it is a model of **content-addressable memory**. The goal is to store a set of desired patterns $\{\boldsymbol{\xi}^1, \boldsymbol{\xi}^2, \ldots, \boldsymbol{\xi}^P\}$ as attractors of network dynamics. When presented with a corrupted or partial version of a stored pattern as the initial state, the network's deterministic descent down the energy landscape will restore the complete, original memory.
@@ -90,7 +90,7 @@ The Hopfield network's capacity is not infinite. As the number of stored pattern
 Moreover, the Hebbian learning rule creates **spurious attractors,** stable states that do not correspond to any stored memory. These arise from:
 
 - **Mixture states**: Linear combinations of an odd number of stored patterns.
-- **Spin-reversed states**: The global negation of any stored pattern is also an attractor.
+- **Spin-reversed states**: With zero external bias ($b_i = 0$), the global negation of any stored pattern is also an attractor. A non-zero bias breaks this symmetry.
 - **Random valleys**: Intrinsic local minima of the disordered energy landscape.
 
 These spurious attractors are the price of distributed, content-addressable storage. They limit the practical capacity of the network and can trap dynamics in unintended states.
