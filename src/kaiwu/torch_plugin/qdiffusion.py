@@ -138,6 +138,13 @@ class EnergyModel(nn.Module):
         visible_state: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Samples BM hidden states for each visible assignment."""
+        if self.bm_num_visible is not None and (
+            visible_state.ndim != 2 or visible_state.shape[-1] != self.bm_num_visible
+        ):
+            raise ValueError(
+                f"visible_state must have shape (batch, {self.bm_num_visible}), "
+                f"got {tuple(visible_state.shape)}"
+            )
         if not hasattr(self, "energy_bm") or self.sampler is None:
             raise RuntimeError(
                 "BM hidden-state sampling requires bm_num_visible, "
