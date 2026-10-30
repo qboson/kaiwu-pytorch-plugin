@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Boltzmann Machine"""
 
+from numbers import Integral
+
 import numpy as np
 import torch
 
@@ -155,7 +157,15 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             num_sample (int, optional): Number of samples.
                 If ``None``, uses batch size of s_visible.
+
+        Raises:
+            ValueError: If ``num_steps`` is not a non-negative integer.
+            TypeError: If ``num_steps`` is not an integer.
         """
+        if isinstance(num_steps, bool) or not isinstance(num_steps, Integral):
+            raise TypeError("num_steps must be a non-negative integer")
+        if num_steps < 0:
+            raise ValueError("num_steps must be a non-negative integer")
         with torch.no_grad():
             # Initialization: If neither visible unit state nor sample number is provided,
             # raise error
