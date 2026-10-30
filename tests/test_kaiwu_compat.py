@@ -38,20 +38,23 @@ def test_feature_selection_cim_default_mode(monkeypatch, tmp_path, mode_kwargs):
         assert sampler.task_mode == (
             "optimization" if hasattr(kw.cim, "TaskMode") else "quota"
         )
-        return np.ones((1, matrix.shape[0]), dtype=int)
+        return kw.classical.BruteForceOptimizer().solve(matrix)
 
     # 1.3.1 has no separate _solve hook; replace its remote solve boundary.
     solve_method = "_solve" if hasattr(kw.cim.CIMOptimizer, "_solve") else "solve"
     monkeypatch.setattr(kw.cim.CIMOptimizer, solve_method, solve_locally)
+    ising_matrix = np.array([[0.0, 1.0], [1.0, 0.0]])
     result = qubo._solve_ising_kaiwu_cim(  # pylint: disable=protected-access
-        np.array([[0.0, 1.0], [1.0, 0.0]]),
+        ising_matrix,
         target_precision=8,
         max_precision=8,
         save_dir=tmp_path,
         cleanup_records=False,
         **mode_kwargs,
     )
-    np.testing.assert_array_equal(result, [[1, 1]])
+    assert result.shape == (1, 2)
+    assert np.isin(result, [-1, 1]).all()
+    np.testing.assert_allclose(result[0] @ ising_matrix @ result[0], -2.0)
 
 
 @pytest.mark.parametrize("use_precision_reducer", [False, True])
