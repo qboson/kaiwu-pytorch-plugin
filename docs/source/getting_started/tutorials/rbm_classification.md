@@ -1,86 +1,146 @@
-# RBM 分类：手写数字识别
+# RBM Classification: Handwritten Digit Recognition
 
-本教程演示如何使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程。
+> This tutorial builds on the [Quick Start](../quickstart.md) and [Section 4.2: Restricted Boltzmann Machine](../../theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md). It walks through a complete two-stage pipeline: train an RBM on handwritten digits, use its hidden activations as features, and attach a logistic regression classifier on top. Using the same positive/negative phase loop as the [Quick Start](../quickstart.md), this tutorial focuses on the feature-extraction pipeline and downstream classification.
 
-## 教程目标
+## Overview
 
-完成本教程后，您将学会：
+By the end of this tutorial you will be able to:
 
-- 使用 RBM 从图像数据中提取特征
-- 将 RBM 作为特征提取器与传统分类器结合
-- 可视化 RBM 学到的权重和生成的样本
-- 评估分类模型的性能
+- Use an RBM as an unsupervised feature extractor on image data
+- Compare RBM features against raw pixels in a downstream classification task
+- Visualize learned RBM weights and evaluate the classifier's performance
+- Visualize the confusion matrix of the trained classifier
 
-## 运行环境
+## Running the Example
 
-**示例位置**: `example/rbm_digits/rbm_digits.ipynb`
-
-**依赖项**:
+**Dependencies**:
 
 ```{code-block} bash
+pip install scikit-learn matplotlib scipy
+```
 
- pip install scikit-learn matplotlib scipy
+**Run**:
+
+```bash
+cd example/rbm_digits
+jupyter notebook rbm_digits.ipynb
+```
+
+**Key files**:
+
+- `rbm_digits.py`: `RBMRunner` — data loading, RBM training, weight and confusion-matrix visualization
+- `rbm_classifier.py`: `train_classifier` — two-stage RBM + logistic regression pipeline
+- `rbm_digits.ipynb`: interactive walkthrough
+
+## How It Works
+
+The RBM training loop is identical to the [Quick Start](../quickstart.md): positive phase from data, negative phase from `rbm.sample(sampler)`, and `rbm.objective(...)` provides the surrogate loss. The theoretical details of RBM energy functions and conditional independence are covered in [Section 4.2](../../theoretical-foundations/kpp-theoretical-foundations-bm-restricted.md); here we focus on why RBMs work as unsupervised feature extractors.
+
+RBMs are bipartite energy-based models: visible and hidden layers are connected across, but not within, each layer. Lower-energy configurations have higher probability, and the hidden units learn to combine raw pixels into more abstract features — exactly what makes RBMs useful as a feature extraction stage before a downstream classifier.
+
+The overall pipeline is:
 
 ```
-## 1. 数据准备
+raw pixels (64-d)  →  RBM forward  →  hidden features (n_hidden-d)  →  LogisticRegression  →  class
+```
 
-本示例的主入口是 `example/rbm_digits/rbm_digits.ipynb`；分类流水线也可以直接参考 `example/rbm_digits/rbm_classifier.py` 中的 `train_classifier`。
+The dataset uses scikit-learn's 8×8 handwritten digits, augmented by shifting each image up, down, left, and right to expand the training set. The notebook compares the two-stage RBM pipeline against a logistic regression on raw pixels to demonstrate that unsupervised RBM pretraining improves classification accuracy.
 
-此部分将展示如何载入经典的数字手写体数据集，并通过简单的数据增强技术（如向四个方向平移图像）来扩展该数据集，以提高模型的泛化能力。  
+---
 
-首先，我们使用`load_digits`从`sklearn`库中加载数据，获取8x8像素的手写数字图像及其标签。
-接着，对每个原始图像向上下左右四个方向平移，创建更多的训练样本。
-最后，将所有图像数据展平为二维数组，并划分成训练集和测试集，同时进行归一化处理，确保各特征值位于[0, 1]区间内，为后续模型训练做好准备。
+## Quick Start
 
-## 2. 原理概览
+The pipeline has two stages: train an RBM as an unsupervised feature extractor, then fit a downstream classifier on the extracted features. The steps below condense `example/rbm_digits/rbm_digits.ipynb` with imports omitted. A one-call convenience wrapper (`train_classifier(n_iter=…)` in `rbm_classifier.py`) runs exactly these steps and prints the accuracy comparison.
 
-RBM 是一个二部能量模型。可见层和隐层之间有连接，但同一层内部没有连接，因此给定一层后，另一层的各个单元可以并行采样。模型通过能量函数定义样本概率：低能量状态具有更高概率，隐层则将像素组合成更抽象的特征。
+**1. Load the data.** `load_data` returns the 8×8 digits split, augmented by shifting every image in all four directions.
 
-训练时使用对比散度近似最大似然梯度：正相统计真实数据及其隐层表示，负相从模型采样并统计重构数据，二者的差异用于更新权重和偏置。训练完成后，`RBMRunner.transform` 输出隐层特征，再交给逻辑回归等传统分类器。
+```python
+runner = RBMRunner(n_components=64, n_iter=20, verbose=True)
+X_train, X_test, y_train, y_test = runner.load_data(plot_img=False)
+```
+
+**2. Train the feature extractor.** `fit` runs the same positive/negative-phase loop as the Quick Start example; after training, `transform` maps raw pixels to the hidden features used downstream.
+
+```python
+runner.fit(X_train)
+```
+
+**3. Fit and compare a classifier.** `RBMRunner` is a scikit-learn `TransformerMixin`, so it slots into a `Pipeline` directly. Compare the RBM features against a raw-pixel logistic-regression baseline.
+
+```python
+pipeline = Pipeline(steps=[
+    ("rbm", runner),
+    ("logistic", LogisticRegression(C=500.0, max_iter=1000, random_state=42)),
+])
+pipeline.fit(X_train, y_train)
+accuracy_rbm = pipeline.score(X_test, y_test)
+
+baseline = LogisticRegression(C=500.0, max_iter=1000, random_state=42)
+baseline.fit(X_train, y_train)
+accuracy_raw = baseline.score(X_test, y_test)
+```
+
+**4. Visualize the results.** Plot the learned filters and the confusion matrix of the RBM-feature classifier.
+
+```python
+runner.plot_weights(save_pdf=False)
+runner.plot_confusion_matrix(
+    y_test, pipeline.predict(X_test),
+    title_suffix="RBM Features", save_pdf=False,
+)
+```
+
+## Key Code
+
+### 1. Sampler Initialization (SA vs CIM)
+
+The `RBMRunner` class supports switching between classical Simulated Annealing (SA) and quantum Coherent Ising Machine (CIM) samplers:
 
 ```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
-:pyobject: RBMRunner.load_data
+:pyobject: RBMRunner.__init__
 ```
-## 2. 模型训练
 
-此部分展示了如何训练一个受限玻尔兹曼机（RBM）模型。
+When `use_cim=True`:
+- Uses `CIMOptimizer` from `kaiwu.cim`
+- Wrapped in `PrecisionReducer` for precision control
+- Checkpoint manager saves to `./tmp`
 
-首先，基于输入数据的特征维度和预设的隐层单元数初始化RBM模型，并将模型放置在指定设备上（如CPU或GPU）。
-接着，定义了随机梯度下降（SGD）优化器用于更新模型参数。整个训练过程采用小批量梯度下降法逐步调整模型参数以最小化目标函数，
-该函数包括了负对数似然估计以及权重和偏置的衰减项。
+When `use_cim=False`:
+- Uses `SimulatedAnnealingOptimizer` from `kaiwu.classical`
 
-在训练过程中，如果启用了`verbose`模式，则会定期输出当前迭代的目标函数值及模型参数统计信息，
-并可视化生成的样本图像和模型参数，便于实时监控模型的学习进度和效果。
+The SA / CIM swap behind `sample(sampler)` is introduced in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md).
+
+### 2. Training Loop
+
+The training loop follows the same positive/negative phase pattern introduced in the [Quick Start](../quickstart.md), see the training flow diagram there.
 
 ```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
 :pyobject: RBMRunner.fit
 ```
-## 3. 特征提取与分类
 
-### 3.1 训练分类器
+Key training details:
+- Optimizer: SGD with learning rate from `self.learning_rate`
+- Weight decay: 0.02 for weights, 0.05 for biases
+- Verbose mode prints objective loss and weight statistics every 20 iterations
 
-本节展示了如何构建并训练一个由受限玻尔兹曼机（RBM）和逻辑回归组成的两阶段分类流水线，并将其与仅使用原始像素特征的逻辑回归模型进行性能对比。
+### 3. Feature Extraction and Classification
 
-首先，通过 `RBMRunner` 加载并预处理手写数字数据集，随后将 RBM 作为特征提取器嵌入到 `Pipeline` 中，再接上逻辑回归分类器。
-训练过程中分别记录两种方法的耗时，并在测试集上评估其准确率与分类报告。
-
-该实验旨在验证 RBM 学习到的高层特征是否能提升下游分类器的性能，同时也为理解深度学习中无监督预训练的作用提供直观示例。
+After training, `RBMRunner.transform()` extracts hidden-layer features, which are then fed to a downstream classifier:
 
 ```{literalinclude} ../../../../example/rbm_digits/rbm_classifier.py
 :pyobject: train_classifier
 ```
-### 3.2 可视化权重
 
-该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。
+## Training and Evaluation
 
-```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
-:pyobject: RBMRunner.plot_weights
-```
-### 3.2 可视化混淆矩阵
+- **Weight visualization**: `RBMRunner.plot_weights()` renders each hidden unit's filter as an 8×8 image, showing the digit-like features the RBM has learned.
+- **Confusion matrix**: `RBMRunner.plot_confusion_matrix(y_test, y_pred)` produces a heatmap; the notebook saves it as a high-resolution PDF.
+- The expected result is that RBM features yield a 2–5 percentage point accuracy gain over raw pixels on the 8×8 digits dataset.
 
-该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。
-支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。
+---
 
-```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
-:pyobject: RBMRunner.plot_confusion_matrix
-```
+## Summary
+
+- An RBM can be used as a fixed feature extractor after unsupervised pretraining.
+- The KPP training loop (positive / negative phase / objective) is unchanged from the Quick Start.
+- The downstream classifier is a standard scikit-learn pipeline, KPP only contributes the learned features.
