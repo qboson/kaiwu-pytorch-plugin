@@ -733,6 +733,9 @@ class QDiffusion(nn.Module):
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` shaped as
             ``[batch, num_candidates, seq_len]``.
         """
+        # Training and decoding both consume these candidates, so exclude the
+        # reserved tokens here instead of relying on every caller to mask.
+        logits = self._mask_logits(logits)
         samples, scores = stochastic_sample_from_categorical_n(
             logits,
             temperature=self.config.proposal_temperature,
