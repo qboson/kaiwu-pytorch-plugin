@@ -144,7 +144,7 @@ class ModelTuner(object):
 					epoch, batch_idx*len(inputData), len(self.train_loader.dataset),
 					100.*batch_idx/len(self.train_loader), train_loss.data.item()/len(inputData)))
 		
-		total_train_loss /= len(self.train_loader.dataset)
+		total_train_loss /= len(self.train_loader)
 		logger.info("Train Loss: {0}".format(total_train_loss))
 		return total_train_loss
 	
@@ -168,6 +168,6 @@ class ModelTuner(object):
                     # # 记录 label_list
                     # label_list = label.detach().numpy() if label_list is None else np.append(label_list, label.detach().numpy(), axis=0)
 
-		test_loss /= len(self.test_loader.dataset)
+		test_loss /= len(self.test_loader)
 		logger.info("Test Loss: {0}".format(test_loss))
 		return test_loss, inputData, outputData, label_list
