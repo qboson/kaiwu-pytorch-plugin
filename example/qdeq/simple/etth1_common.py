@@ -242,8 +242,8 @@ def build_sampler(sampler_type: str, seed: int = 0):
     if sampler_type == "anderson":
         return None
     if sampler_type == "sa":
-        # A short annealing schedule keeps the example fast; QDEQ decodes
-        # every returned row and keeps the best one.
+        # Return 20 solutions (size_limit counts output solutions, not annealing
+        # steps); QDEQ decodes every returned row and keeps the best one.
         return SimulatedAnnealingOptimizer(
             initial_temperature=100.0,
             alpha=0.95,
