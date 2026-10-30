@@ -344,6 +344,11 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_all[:, self.num_gaussian :] = s_bernoulli
                 gaussian_start = False
             else:
+                if n_sample is None:
+                    raise ValueError(
+                        "Either s_gaussian, s_bernoulli, sampler or n_sample "
+                        "must be provided."
+                    )
                 s_gaussian = torch.randn(
                     n_sample, self.num_gaussian, device=self.device, dtype=self.dtype
                 )
