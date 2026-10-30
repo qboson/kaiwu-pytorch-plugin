@@ -21,6 +21,14 @@ from .qvae_dist_util import MixtureGeneric, FactorialBernoulliUtil
 logger = logging.getLogger(__name__)
 
 
+def _validated_loss_weight(name, value):
+    """Return a finite non-negative loss coefficient."""
+    value = float(value)
+    if not torch.isfinite(torch.tensor(value)).item() or value < 0.0:
+        raise ValueError(f"{name} must be a finite non-negative number")
+    return value
+
+
 # Base Class for all AutoEncoder models
 class AutoEncoderBase(nn.Module):
     """
@@ -133,8 +141,10 @@ class QVAE(AutoEncoderBase):
 
         # Parameters from config
         self.dist_beta = self.config.dist_beta
-        self.kl_beta = self.config.kl_beta
-        self.weight_decay = self.config.weight_decay
+        self.kl_beta = _validated_loss_weight("kl_beta", self.config.kl_beta)
+        self.weight_decay = _validated_loss_weight(
+            "weight_decay", self.config.weight_decay
+        )
 
         # Explicitly supplied components take precedence over subclass factories.
         self.encoder = encoder
