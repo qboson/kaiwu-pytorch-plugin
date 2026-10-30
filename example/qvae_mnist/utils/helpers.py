@@ -391,6 +391,28 @@ class FIDCalculator:
     def reset(self):
         self.fid.reset()
 
+def _fid_images_to_tensor(
+    images: Union[torch.Tensor, list, tuple],
+) -> torch.Tensor:
+    """Normalize FID inputs to a float tensor, including lists of tensors."""
+    if isinstance(images, torch.Tensor):
+        return images
+    if (
+        isinstance(images, (list, tuple))
+        and images
+        and all(isinstance(item, (torch.Tensor, np.ndarray)) for item in images)
+    ):
+        flattened = []
+        for item in images:
+            tensor = item if isinstance(item, torch.Tensor) else torch.as_tensor(item)
+            if tensor.ndim <= 1:
+                flattened.append(tensor.reshape(1, -1))
+            else:
+                flattened.append(tensor.reshape(tensor.shape[0], -1))
+        return torch.cat(flattened, dim=0)
+    return torch.tensor(images, dtype=torch.float32)
+
+
 def compute_fid_in_batches(
     fake_imgs: Union[torch.Tensor, list, tuple],
     real_imgs: Union[torch.Tensor, list, tuple],
@@ -399,10 +421,8 @@ def compute_fid_in_batches(
 ) -> float:
     """计算 FID"""
     # 确保输入为 Tensor，并转为 float 类型（便于缩放）
-    if not isinstance(fake_imgs, torch.Tensor):
-        fake_imgs = torch.tensor(fake_imgs, dtype=torch.float32)
-    if not isinstance(real_imgs, torch.Tensor):
-        real_imgs = torch.tensor(real_imgs, dtype=torch.float32)
+    fake_imgs = _fid_images_to_tensor(fake_imgs)
+    real_imgs = _fid_images_to_tensor(real_imgs)
     
     # 创建计算器
     calculator = FIDCalculator(device)
