@@ -513,6 +513,13 @@ def _to_kaiwu_ising_matrix(ising_matrix: np.ndarray) -> np.ndarray:
     return -(matrix + matrix.T) / 2
 
 
+def _best_spin_row(spin_rows: np.ndarray, ising_matrix: np.ndarray) -> np.ndarray:
+    """Return the row with the lowest positive Ising objective ``s^T M s``."""
+    rows = np.atleast_2d(np.asarray(spin_rows, dtype=float))
+    scores = np.einsum("bi,ij,bj->b", rows, ising_matrix, rows)
+    return rows[int(np.argmin(scores))]
+
+
 def _solve_ising_local_search(
     ising_matrix: np.ndarray,
     initial_binary: np.ndarray | None = None,
@@ -674,7 +681,7 @@ def _solve_ising_kaiwu_cim(
         interval: Optional Kaiwu polling interval.
 
     Returns:
-        Restored spin solutions over the original variables.
+        The restored spin solution with the lowest positive Ising objective.
 
     Raises:
         ImportError: If the optional Kaiwu package is unavailable.
@@ -723,21 +730,22 @@ def _solve_ising_kaiwu_cim(
     result = result.reshape(1, -1) if result.ndim == 1 else result
     if result.shape[0] == 0:
         raise RuntimeError("CIMOptimizer returned no solutions.")
-    restored = explorer.restore_solution(result[0])
+    restored = np.asarray([explorer.restore_solution(row) for row in result])
+    best_spin = _best_spin_row(restored, ising_matrix)
     if cleanup_records:
         for child in resolved_save_dir.iterdir():
             if child.is_dir():
                 shutil.rmtree(child, ignore_errors=True)
             elif child.exists():
                 child.unlink()
-    return np.asarray(restored).reshape(1, -1)
+    return np.asarray(best_spin).reshape(1, -1)
 
 
 def _binary_from_solver_solution(
     spin_solutions: np.ndarray,
     num_variables: int,
 ) -> np.ndarray:
-    """Convert the first auxiliary-spin solver solution to a binary QUBO state."""
+    """Convert one auxiliary-spin solver solution to a binary QUBO state."""
     spin_array = np.asarray(spin_solutions, dtype=float)
     if spin_array.ndim == 2:
         if spin_array.shape[0] == 0:
@@ -852,6 +860,6 @@ def solve_qubo(
         ) from exc
 
     return _binary_from_solver_solution(
-        spin_solutions,
+        _best_spin_row(spin_solutions, ising_matrix),
         initial_state.shape[0],
     )
