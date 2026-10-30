@@ -183,6 +183,12 @@ class EnergyModel(nn.Module):
         """Scores visible logits under the conditioned BM energy model."""
         if self.bm_num_visible is None:
             raise RuntimeError("BM visible-logit scoring requires bm_num_visible.")
+        if visible_logits.ndim != 2 or visible_logits.shape[-1] != self.bm_num_visible:
+            raise ValueError(
+                "visible_logits last dimension must equal "
+                f"bm_num_visible ({self.bm_num_visible}), "
+                f"got {tuple(visible_logits.shape)}"
+            )
         visible_state = self.discretize_visible_state(visible_logits)
         full_states, split_sizes = self.sample_hidden_state(visible_state)
         hidden_state = full_states[:, self.bm_num_visible :]
