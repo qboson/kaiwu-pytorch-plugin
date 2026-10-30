@@ -60,11 +60,11 @@ The partition function $Z$ is defined as the sum of Boltzmann factors over all p
 
 $$Z = \sum_{\tilde{\mathbf{x}}} \exp\left(-\frac{E(\tilde{\mathbf{x}})}{k_B T}\right)$$
 
-Its role is purely normalizing, it ensures that the probabilities over all states sum to one:
+Its role is purely normalizing: it ensures that the probabilities over all states sum to one:
 
 $$\sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}}) = \frac{1}{Z} \sum_{\tilde{\mathbf{x}}} \exp\left(-\frac{E(\tilde{\mathbf{x}})}{k_B T}\right) = 1$$
 
-While mathematically simple in definition, the partition function is computationally formidable. For a system of $N$binary units, the sum runs over $2^N$ distinct configurations. This exponential growth is already severe at modest sizes: For even modest $N$(say, $N=100$, this number exceeds the estimated number of stars in the observable universe. The intractability of **exact** partition-function computation is the central computational challenge that shapes every aspect of Boltzmann machine learning, from training algorithms to architectural constraints.
+While mathematically simple in definition, the partition function is computationally formidable. For a system of $N$ binary units, the sum runs over $2^N$ distinct configurations. This exponential growth is already severe at modest sizes: for even modest $N$ (say, $N=100$), this number exceeds the estimated number of stars in the observable universe. The intractability of **exact** partition-function computation is the central computational challenge that shapes every aspect of Boltzmann machine learning, from training algorithms to architectural constraints.
 
 ## The Thermodynamic Limit and Ensemble Equivalence
 For a macroscopic system (large $N$), the canonical and microcanonical ensembles become equivalent. This is because the energy fluctuations in the canonical ensemble scale as:
@@ -107,8 +107,8 @@ The Boltzmann distribution reframes the learning problem in probabilistic terms.
 The challenge, as we shall see, lies in estimating how the partition function $Z_\theta$ changes as we modify the parameters. Because $Z_\theta$ depends on all $2^N$ states, we cannot compute it, or its gradient exactly. The remainder of this tutorial series is, in large measure, a study of how to circumvent this intractability through clever sampling techniques and architectural restrictions.
 
 ## Summary
-- The **Boltzmann distribution** $P(\mathbf{x}) \propto \exp(-E(\mathbf{x})/T)$emerges naturally at thermal equilibrium and forms the probabilistic core of the Boltzmann machine.
-- The **partition function** $Z$normalizes the distribution but requires summing over an exponential number of states, making exact computation infeasible for large systems.
+- The **Boltzmann distribution** $P(\mathbf{x}) \propto \exp(-E(\mathbf{x})/T)$ emerges naturally at thermal equilibrium and forms the probabilistic core of the Boltzmann machine.
+- The **partition function** $Z$ normalizes the distribution but requires summing over an exponential number of states, making exact computation infeasible for large systems.
 - In neural terms, **equilibrium** means the network's stochastic dynamics have converged to a stationary distribution defined by its weights and biases.
 - Learning in a Boltzmann machine is equivalent to **energy landscape shaping**: lowering the energy of observed data configurations while implicitly raising the energy elsewhere.
 - The intractability of $Z$ motivates the development of approximate inference and learning algorithms, which will be explored in subsequent sections.

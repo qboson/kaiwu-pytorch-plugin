@@ -34,7 +34,7 @@ To store a set of $P$ patterns $\{\boldsymbol{\xi}^1, \boldsymbol{\xi}^2, \ldots
 
 $$w_{ij} = \frac{1}{N} \sum_{\mu=1}^P \xi_i^\mu \xi_j^\mu$$
 
-The factor $1/N$ (or sometimes $1/P$ is a normalization constant that prevents weights from growing without bound as more patterns are added. The weight matrix can be written compactly as:
+The factor $1/N$ (or sometimes $1/P$) is a normalization constant that prevents weights from growing without bound as more patterns are added. The weight matrix can be written compactly as:
 
 $$\mathbf{W} = \frac{1}{N} \sum_{\mu=1}^P \boldsymbol{\xi}^\mu (\boldsymbol{\xi}^\mu)^\top - \frac{P}{N} \mathbf{I}$$
 
@@ -84,7 +84,7 @@ While elegant and biologically motivated, pure Hebbian learning has significant 
 1. **Spurious Minima**: The crosstalk between stored patterns creates unintended energy minima, mixture states and random valleys, that trap dynamics.
 2. **Storage Capacity**: The number of patterns that can be reliably stored scales only linearly with $N$, with a proportionality constant of approximately 0.14. Beyond this, the network undergoes a phase transition to a spin-glass state where no patterns are retrievable.
 3. **Catastrophic Forgetting**: Storing a new pattern modifies all weights and can destabilize previously stored memories. There is no mechanism to protect old memories while learning new ones.
-4. **No Unlearning of Spurious States**: Once a spurious minimum is created, pure Hebbian learning offers no way to eliminate it. The rule only adds basins; it never fills them in.These limitations motivated the development of more sophisticated learning algorithms, including the **Boltzmann machine learning rule**, which uses a combination of Hebbian and anti-Hebbian updates guided by the difference between data-driven and model-driven correlations.
+4. **No Unlearning of Spurious States**: Once a spurious minimum is created, pure Hebbian learning offers no way to eliminate it. The rule only adds basins; it never fills them in. These limitations motivated the development of more sophisticated learning algorithms, including the **Boltzmann machine learning rule**, which uses a combination of Hebbian and anti-Hebbian updates guided by the difference between data-driven and model-driven correlations.
 
 ## From Hebbian Storage to Probabilistic Learning
 The Boltzmann machine inherits the energy-based architecture of the Hopfield network and the idea that learning corresponds to modifying the energy landscape. However, it replaces the simple Hebbian storage prescription with a **principled probabilistic learning algorithm**.
@@ -93,7 +93,7 @@ In a Boltzmann machine, the goal is not merely to store a set of patterns as att
 
 $$\Delta w_{ij} \propto \langle x_i x_j \rangle_{\text{data}} - \langle x_i x_j \rangle_{\text{model}}$$
 
-This is sometimes called the **contrastive Hebbian rule** or **delta rule**. The first term, $\langle x_i x_j \rangle_{\text{data}}$, is the average correlation between units $i$ and $j$when the visible units are clamped to data examples. This term is **Hebbian**: it strengthens connections between units that are co-active in the data.
+This is sometimes called the **contrastive Hebbian rule** or **delta rule**. The first term, $\langle x_i x_j \rangle_{\text{data}}$, is the average correlation between units $i$ and $j$ when the visible units are clamped to data examples. This term is **Hebbian**: it strengthens connections between units that are co-active in the data.
 
 The second term, $ \langle x_i x_j \rangle_{\text{model}}$, is the average correlation when the network runs freely from its own equilibrium distribution. This term is **anti-Hebbian**: it weakens connections that are spuriously co-active in the model's own fantasies.
 
