@@ -14,7 +14,7 @@ import gif
 import imageio
 from PIL import Image
 import torch
-from torch.distributions import Exponential
+from kaiwu.torch_plugin.qvae_dist_util import Exponential
 from sklearn.manifold import TSNE
 from torchvision import transforms
 from torchmetrics.image.fid import FrechetInceptionDistance
@@ -302,7 +302,7 @@ def generate_qvae_images(model, save_path, grid_size=8):
     model.eval()
     sampler = init_qvae_sampler(model)
     z = model.bm.sample(sampler)
-    zeta = torch.distributions.Exponential(model.dist_beta).sample(z.shape).to(z.device)
+    zeta = Exponential(model.dist_beta).sample(z.shape).to(z.device)
     zeta = torch.where(z == 0.0, zeta, 1 - zeta)
     with torch.no_grad():
         generated_x = model.decoder(zeta)
@@ -328,18 +328,21 @@ def get_real_images(dataloader, n_images=10000):
 
 def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
     model.eval()
+    if batch_size < 1:
+        raise ValueError("batch_size must be a positive integer")
     imgs = []
     sampler = init_qvae_sampler(model)
+    collected = 0
+    progress = tqdm(total=n_images)
     with torch.no_grad():
-        for _ in tqdm(range(n_images // batch_size)):
+        while collected < n_images:
             z = model.bm.sample(sampler)
             shape = z.shape
             smoothing_dist = Exponential(dist_beta)
-            # 从平滑分布采样
+            # 从平滑分布采样（截断到 [0, 1]，与训练一致）
             zeta = smoothing_dist.sample(shape)
             zeta = zeta.to(z.device)
-            zeta = torch.where(z == 0.0, zeta, 0)
-            # zeta = torch.randn(256, 256).to(device)
+            zeta = torch.where(z == 0.0, zeta, 1 - zeta)
             generated_x = model.decoder(zeta)
 
             generated_x = generated_x + model._train_bias
@@ -347,6 +350,9 @@ def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
             generated_x = torch.sigmoid(generated_x)
 
             imgs.append(generated_x)
+            collected += generated_x.size(0)
+            progress.update(generated_x.size(0))
+    progress.close()
     return torch.cat(imgs, dim=0)[:n_images]
 
 class FIDImagePreprocessor:
