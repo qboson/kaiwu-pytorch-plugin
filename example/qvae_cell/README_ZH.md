@@ -145,7 +145,7 @@ python evaluate_benchmark.py \
   --root-cell-type HSPCs
 ```
 
-`bash scripts/eval.sh` 等价于运行 `--metrics clustering`。结果会保存为对应的 CSV，并汇总到：
+`bash scripts/eval.sh` 等价于运行 `--metrics all`，会依次评估 clustering、classification、scib、scgraph、dpt 五组指标；只跑聚类请使用 `--metrics clustering`（或 `bash scripts/eval_clustering.sh`）。结果会保存为对应的 CSV，并汇总到：
 
 ```text
 <output_dir>/X_qvae_benchmark_summary.csv
