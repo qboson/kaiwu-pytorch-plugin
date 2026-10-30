@@ -402,7 +402,8 @@ class QDEQ(nn.Module):
         if cfg.jac_loss_vecs > 0:
             self.last_jac_loss = self.jacobian_loss(new_z, z_star, cfg.jac_loss_vecs)
         # 3. Replace the one-step gradient with the implicit-function gradient.
-        self._attach_implicit_backward(new_z, z_star)
+        if new_z.requires_grad:
+            self._attach_implicit_backward(new_z, z_star)
         return new_z
 
     def _attach_implicit_backward(self, new_z: torch.Tensor, z_star: torch.Tensor) -> None:
@@ -486,13 +487,21 @@ class QDEQ(nn.Module):
 
         Returns:
             torch.Tensor: Differentiable scalar to add to the training loss.
+            Outputs independent of ``z_star`` have a zero Jacobian penalty.
         """
         # E_p ||J^T p||^2 = ||J||_F^2 for standard normal probes p.
-        total = 0
+        # Anchor zero to z_star so backward remains valid without connecting
+        # the regulariser to the output's implicit-backward hook.
+        total = z_star.sum() * 0.0
+        if not new_z.requires_grad:
+            return total
         for _ in range(vecs):
             probe = torch.randn_like(z_star)
-            vjp = torch.autograd.grad(new_z, z_star, probe, retain_graph=True, create_graph=True)[0]
-            total = total + vjp.norm() ** 2
+            vjp = torch.autograd.grad(
+                new_z, z_star, probe, retain_graph=True, create_graph=True, allow_unused=True
+            )[0]
+            if vjp is not None:
+                total = total + vjp.norm() ** 2
         return total / vecs / z_star.numel()
 
     def get_last_stats(self) -> dict[str, float]:
