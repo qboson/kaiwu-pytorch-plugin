@@ -55,16 +55,16 @@ def parse_metrics(value):
     items = [item.strip().lower() for item in value.split(",") if item.strip()]
     if not items:
         raise ValueError("--metrics cannot be empty")
-    if items == ["all"]:
-        return list(VALID_METRICS)
 
-    unknown = sorted(set(items) - set(VALID_METRICS))
+    unknown = sorted(set(items) - set(VALID_METRICS) - {"all"})
     if unknown:
         raise ValueError(
             f"Unknown metric group(s): {', '.join(unknown)}. "
             f"Valid values: {', '.join(VALID_METRICS)}, all"
         )
-    return items
+    if "all" in items:
+        return list(VALID_METRICS)
+    return list(dict.fromkeys(items))
 
 
 def require_key(mapping, key, name):
