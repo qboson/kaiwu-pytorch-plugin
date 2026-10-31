@@ -70,8 +70,11 @@ class DistanceSummary:
 def maybe_limit_records(
     records: list[tuple[str, str]], max_records: int | None
 ) -> list[tuple[str, str]]:
+    """Return the requested positive prefix, or all records for ``None``."""
     if max_records is None:
         return records
+    if max_records <= 0:
+        raise ValueError("max_records must be positive or None")
     return records[:max_records]
 
 
