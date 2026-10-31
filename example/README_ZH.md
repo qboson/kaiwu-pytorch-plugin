@@ -133,6 +133,7 @@ scanpy
 leidenalg
 scib_metrics
 scgraph
+```
 ### 时间序列预测：基于QDEQ的ETTh1预测
 
 该示例在 ETTh1 数据集上训练一个参照 iTransformer 的小型预测模型，其编码器是一个 `QDEQ` 深度均衡层，不动点由 Kaiwu 模拟退火、CIM 或经典 Anderson 方法求解。主要内容包括：
@@ -142,6 +143,8 @@ scgraph
 * **求解器对比**：同一份权重可分别用 SA、CIM、Anderson 评估。
 
 数据准备与运行命令见 `example/qdeq/README_ZH.md`，入口为 `example/qdeq/simple/simple_train_example.py`。
+
+运行 `python example/qdeq/simple/reproducible_cpu.py` 可在 CPU 上演示独立随机流与检查点重放，无需数据集或云端任务。
 
 **依赖项**
 

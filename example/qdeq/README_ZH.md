@@ -23,6 +23,37 @@
 - **可与量化层配合**：不动点求解和最后一次带梯度的层调用是两个独立阶段，共享层可以
   在任一阶段使用量化形式，见[与量化模型配合使用](#与量化模型配合使用)。
 
+## 可复现的 QDEQ 随机流
+
+传入调用方持有的生成器，让 QDEQ 的随机搜索方向和 Jacobian 正则项探针
+与其他 Torch 随机操作相互独立：
+
+```python
+rng = torch.Generator(device="cpu").manual_seed(17)
+model = QDEQ(layer, sampler, config, generator=rng)
+```
+
+生成器会随每次抽样推进；复用同一个对象会继续随机流，而非在每次调用时重置
+种子。恢复检查点时，分别保存 `model.state_dict()` 和 `rng.get_state()`，
+再通过 `model.load_state_dict(...)` 与 `rng.set_state(...)` 恢复。
+模型状态字典不会自动保存生成器状态。求解失败也可能消耗随机数；如果重试
+需要精确重放，应恢复事先保存的生成器状态。
+
+生成器必须与张量处在匹配的设备上；移动模型不会移动生成器。
+默认的 `generator=None` 保留现有全局随机流行为。这个选项不会设置 Kaiwu
+优化器、用户提供的层内部随机操作或子类自定义前向求解器的种子；这些随机性
+仍需单独控制，也不承诺不同设备之间的逐位一致性。
+直接调用 `QDEQ.jacobian_loss` 时同样可以传入 `generator=`。
+
+安装插件后，可运行 CPU 检查点恢复示例：
+
+```bash
+python example/qdeq/simple/reproducible_cpu.py
+```
+
+它验证输出和正则项探针可重放、全局 Torch 随机流保持不变，以及训练梯度有限。
+示例对微型 Ising 问题进行穷举，无需数据集、量子硬件或云端任务。
+
 ## 数据
 
 示例使用 ETTh1 电力变压器数据集（[ETDataset](https://github.com/zhouhaoyi/ETDataset)）。
