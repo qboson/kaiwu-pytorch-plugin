@@ -380,6 +380,31 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
             print("Feature importance is only available in classifier mode")
             return None
 
+    def _batch_on_rbm_parameters(self, rbm, data_in):
+        """Place a visible batch on the live RBM parameter device and dtype.
+
+        ``unsupervised_dbn.device`` is captured when the DBN is constructed.
+        A parent module moves the stacked RBMs through ``_apply`` and never
+        refreshes that plain attribute, so the parameter device must win. The
+        cache is only a fallback for an RBM without parameters.
+
+        A tensor that already matches is returned unchanged, keeping identity
+        and ``data_ptr``. A different device or dtype is a copy. NumPy is
+        copied with ``torch.tensor``, so the caller buffer is never aliased.
+        """
+        parameter = next(rbm.parameters(), None)
+        if parameter is None:
+            cached = getattr(self.unsupervised_dbn, "device", None)
+            device = cached if isinstance(cached, torch.device) else torch.device("cpu")
+            dtype = torch.float32
+        else:
+            device = parameter.device
+            dtype = parameter.dtype
+
+        if isinstance(data_in, torch.Tensor):
+            return data_in.to(device=device, dtype=dtype)
+        return torch.tensor(np.asarray(data_in), dtype=dtype, device=device)
+
     def get_layer_activations(self, X, layer_index=None, return_all_layers=False):
         """
         获取指定层或所有层的激活值
@@ -387,14 +412,17 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         if self.unsupervised_dbn is None or self.unsupervised_dbn._n_layers == 0:
             raise ValueError("No RBM layers found. Please fit the model first.")
 
-        X_data = X.astype(np.float32)
+        if isinstance(X, torch.Tensor):
+            X_data = X
+        else:
+            X_data = np.asarray(X, dtype=np.float32)
         all_activations = {}
 
         # 逐层前向传播计算激活值，直到指定层
         for i in range(self.unsupervised_dbn._n_layers):
             rbm = self.unsupervised_dbn.get_rbm_layer(i)
             with torch.no_grad():
-                X_tensor = torch.FloatTensor(X_data).to(self.unsupervised_dbn.device)
+                X_tensor = self._batch_on_rbm_parameters(rbm, X_data)
                 hidden_output = rbm.get_hidden(X_tensor)
 
                 # 提取隐藏层激活值（去掉可见层部分）
