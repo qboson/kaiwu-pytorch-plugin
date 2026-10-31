@@ -868,22 +868,24 @@ class QDiffusion(nn.Module):
             output_tokens, partial_masks=partial_masks
         )
 
-        logits = self._mask_logits(self.forward(output_tokens))
-        if logits.dtype != output_scores.dtype:
-            logits = logits.type_as(output_scores)
+        # Fully fixed batches have no candidates to propose or rerank.
+        if output_masks.any():
+            logits = self._mask_logits(self.forward(output_tokens))
+            if logits.dtype != output_scores.dtype:
+                logits = logits.type_as(output_scores)
 
-        candidate_tokens, candidate_scores = self._sample_candidates(
-            logits, self.config.num_candidates
-        )
-        selected_tokens, selected_scores = self._select_candidates(
-            output_tokens, candidate_tokens, candidate_scores
-        )
+            candidate_tokens, candidate_scores = self._sample_candidates(
+                logits, self.config.num_candidates
+            )
+            selected_tokens, selected_scores = self._select_candidates(
+                output_tokens, candidate_tokens, candidate_scores
+            )
 
-        if not self.config.disable_resample:
-            self._resample(selected_tokens, selected_scores)
+            if not self.config.disable_resample:
+                self._resample(selected_tokens, selected_scores)
 
-        output_tokens.masked_scatter_(output_masks, selected_tokens[output_masks])
-        output_scores.masked_scatter_(output_masks, selected_scores[output_masks])
+            output_tokens.masked_scatter_(output_masks, selected_tokens[output_masks])
+            output_scores.masked_scatter_(output_masks, selected_scores[output_masks])
 
         history = list(state["history"])
         history.append(output_tokens.clone())
