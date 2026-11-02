@@ -59,6 +59,10 @@ class DBNTrainer:
                 Defaults to None.
         """
         self.learning_rate_rbm = learning_rate_rbm
+        if not np.isfinite(learning_rate_rbm) or learning_rate_rbm <= 0:
+            raise ValueError("learning_rate_rbm must be a finite positive number")
+        if n_epochs_rbm < 1:
+            raise ValueError("n_epochs_rbm must be a positive integer")
         self.n_epochs_rbm = n_epochs_rbm
         self.batch_size = batch_size
         self.verbose = verbose
@@ -96,6 +100,12 @@ class DBNTrainer:
         """
         if not isinstance(dbn, UnsupervisedDBN):
             raise ValueError("dbn must be an instance of UnsupervisedDBN")
+
+        data_in = np.asarray(data_in)
+        if data_in.ndim != 2 or data_in.shape[0] == 0 or data_in.shape[1] == 0:
+            raise ValueError(
+                "data_in must be a 2-D array with at least one sample and one feature"
+            )
 
         # Save DBN reference
         self.dbn_ref = dbn
@@ -168,6 +178,11 @@ class DBNTrainer:
             shuffle=self.shuffle,
             drop_last=self.drop_last,
         )
+        if len(loader) == 0:
+            raise ValueError(
+                "training loader produced no batches; "
+                "check data_in, batch_size and drop_last"
+            )
 
         if self.verbose:
             print("[DBN] Pre-training start:")
