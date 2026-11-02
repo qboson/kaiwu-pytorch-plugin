@@ -58,6 +58,8 @@ class DBNTrainer:
             dbn_ref (UnsupervisedDBN, optional): A reference to the DBN model.
                 Defaults to None.
         """
+        if not np.isfinite(learning_rate_rbm) or learning_rate_rbm <= 0:
+            raise ValueError("learning_rate_rbm must be a finite positive number")
         self.learning_rate_rbm = learning_rate_rbm
         self.n_epochs_rbm = n_epochs_rbm
         self.batch_size = batch_size
