@@ -59,6 +59,12 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         self.n_components = n_components
         self.learning_rate = learning_rate
         self.batch_size = batch_size
+        if not np.isfinite(learning_rate) or learning_rate <= 0:
+            raise ValueError("learning_rate must be a finite positive number")
+        if n_iter < 1:
+            raise ValueError("n_iter must be a positive integer")
+        if batch_size < 1:
+            raise ValueError("batch_size must be a positive integer")
         self.n_iter = n_iter
         self.verbose = verbose
         self.plot_img = plot_img
@@ -104,6 +110,13 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             X: 训练数据，形状为 (n_samples, n_features)
             y: 忽略，为兼容scikit-learn接口
         """
+        X = np.asarray(X)
+        if X.ndim != 2 or X.shape[0] == 0 or X.shape[1] == 0:
+            raise ValueError(
+                "X must be a 2-D array with at least one sample and one feature"
+            )
+        if not np.isfinite(X).all():
+            raise ValueError("X must contain only finite values")
         # 初始化受限玻尔兹曼机（RBM）模型
         rbm = RestrictedBoltzmannMachine(
             X.shape[1],  # 可见层单元数（特征维度）
