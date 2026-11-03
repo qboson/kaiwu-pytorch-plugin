@@ -79,13 +79,15 @@ def extract_spikes(
         Array of shape ``(n_spikes, spike_length)``.
     """
     starts = np.asarray(spike_start, dtype=np.int64).copy()
+    max_start = max(len(signal) - spike_length, 0)
+    starts = np.clip(starts, 0, max_start)
     spikes = np.zeros((len(starts), spike_length), dtype=np.float64)
     for row in range(len(starts)):
         spikes[row, :] = signal[starts[row]: starts[row] + spike_length]
 
     if align_to_peak:
         peaks = np.argmax(spikes, axis=1)
-        starts = starts - (peak_index - peaks)
+        starts = np.clip(starts - (peak_index - peaks), 0, max_start)
         for row in range(len(starts)):
             spikes[row, :] = signal[starts[row]: starts[row] + spike_length]
 
