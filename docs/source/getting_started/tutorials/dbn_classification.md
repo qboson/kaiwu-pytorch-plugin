@@ -97,6 +97,21 @@ $$
 
 ## 三、核心类功能和接口概述
 
+`UnsupervisedDBN` 在调用 `create_rbm_layer(input_dim)` 时才创建 RBM 层。创建前可以安全读取
+`num_layers` 和 `output_dim`，也可以通过 `get_rbm_layer(index)` 检查某层是否存在。
+这些接口报告已创建的网络结构，与是否完成训练无关：
+
+| 模型状态 | `num_layers` | `output_dim` |
+| --- | --- | --- |
+| 尚未创建 RBM 层 | `0` | `None` |
+| 已创建一个或多个 RBM 层 | 已创建的层数 | 最后一层的隐层维度 |
+| 空结构 `hidden_layers_structure=[]` 已完成创建 | `0` | `input_dim` |
+
+`get_rbm_layer(index)` 支持 Python 序列的负索引，例如 `-1` 表示最后一层。
+尚未创建层、空结构以及超出正负索引范围时均返回 `None`。
+`forward` 和 `transform` 仍要求先创建层，并在训练完成后调用 `mark_as_trained()`；
+重新创建层会重置训练状态。
+
 ### 1. DBNPretrainer 无监督训练DBN
 
 - **关键参数**：
