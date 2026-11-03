@@ -72,6 +72,12 @@ z = deq(tokens)            # 与普通层一样调用
 deq.get_last_stats()       # 前向/反向步数、残差、sampler 耗时
 ```
 
+训练模式下，每次反向传播都使用隐函数梯度。同一输出用于分别计算多个损失时，
+除最后一次反向传播外，请按 PyTorch 的用法设置 `retain_graph=True`。默认的
+`torch.autograd.functional.jacobian` 所需的重复一阶 VJP 也适用。反向钩子挂在
+独立的输出副本上，因此重复反向传播和下游原地激活不会使其失效；额外内存为
+一份输出张量的大小，与求解器迭代次数无关。
+
 `simple_train_example.py` 用默认参数（2 个 epoch）在 CPU 上几分钟即可跑完，
 标准化空间下的测试 MSE 约为 0.43。
 

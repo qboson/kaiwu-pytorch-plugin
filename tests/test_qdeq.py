@@ -1,10 +1,13 @@
 """QDEQ public interface, solver and gradient tests."""
 
+import gc
 import unittest
+import weakref
 
 import numpy as np
 import torch
 
+from kaiwu.classical import BruteForceOptimizer
 import kaiwu.torch_plugin as plugin
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
 
@@ -127,6 +130,90 @@ class TestImplicitGradient(unittest.TestCase):
             out = deq(self.x)
         self.assertFalse(out.requires_grad)
         self.assertNotIn("backward_nstep", deq.get_last_stats())
+
+    def test_multiple_losses_accumulate_implicit_gradients(self):
+        """Every backward on a retained output uses its own implicit gradient."""
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config())
+        out = deq(self.x)
+        eye = torch.eye(6, dtype=torch.float64)
+        fixed_point = torch.linalg.solve(eye - self.layer.weight.detach(), self.x.detach().T).T
+        accumulated = torch.zeros_like(self.x)
+        weights = (self.weight, self.weight.flip(1) + 0.25)
+
+        for index, weight in enumerate(weights):
+            with self.subTest(loss=index):
+                (out * weight).sum().backward(retain_graph=index == 0)
+                accumulated += torch.linalg.solve(eye - self.layer.weight.detach().T, weight.T).T
+                torch.testing.assert_close(self.x.grad, accumulated, rtol=1e-5, atol=1e-5)
+                torch.testing.assert_close(
+                    self.layer.weight.grad, accumulated.T @ fixed_point, rtol=1e-5, atol=1e-5
+                )
+
+    def test_functional_jacobian_matches_implicit_function_theorem(self):
+        """Jacobian rows remain implicit when autograd reuses one forward graph."""
+        layer = LinearLayer(dim=2)
+        with torch.no_grad():
+            layer.weight.copy_(0.5 * torch.eye(2, dtype=torch.float64))
+        deq = QDEQ(
+            layer,
+            BruteForceOptimizer(),
+            solve_config(num_basis=1, coeff_bits=2),
+        )
+        x = torch.tensor([[1.0, -2.0]], dtype=torch.float64)
+        jacobian = torch.autograd.functional.jacobian(deq, x)
+        expected = 2.0 * torch.eye(2, dtype=torch.float64).reshape(1, 2, 1, 2)
+        torch.testing.assert_close(jacobian, expected, rtol=1e-5, atol=1e-5)
+
+    def test_inplace_activation_keeps_implicit_gradient(self):
+        """A downstream in-place activation does not bypass the backward rule."""
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config())
+        out = deq(self.x)
+        weight = (out.detach() > 0).to(out.dtype)
+        out.relu_().sum().backward()
+        eye = torch.eye(6, dtype=torch.float64)
+        expected = torch.linalg.solve(eye - self.layer.weight.detach().T, weight.T).T
+        torch.testing.assert_close(self.x.grad, expected, rtol=1e-5, atol=1e-5)
+
+    def test_nested_qdeq_keeps_inner_implicit_gradients(self):
+        """An outer solve can repeatedly differentiate through an inner QDEQ."""
+        config = solve_config(num_basis=1, coeff_bits=2)
+
+        class NestedLayer(torch.nn.Module):
+            """The inner fixed point makes this map z / 2 + 2 x."""
+
+            def __init__(self):
+                super().__init__()
+                layer = LinearLayer(dim=2)
+                with torch.no_grad():
+                    layer.weight.copy_(0.5 * torch.eye(2, dtype=torch.float64))
+                self.inner = QDEQ(layer, BruteForceOptimizer(), config)
+
+            def forward(self, z, x):
+                return self.inner(0.25 * z + x)
+
+        deq = QDEQ(NestedLayer(), BruteForceOptimizer(), config)
+        x = torch.tensor([[1.0, -2.0]], dtype=torch.float64, requires_grad=True)
+        out = deq(x)
+        torch.testing.assert_close(out, 4.0 * x, rtol=1e-5, atol=1e-5)
+        out.sum().backward()
+        torch.testing.assert_close(x.grad, torch.full_like(x, 4.0), rtol=1e-5, atol=1e-5)
+
+    def test_backward_hook_does_not_keep_forward_graph_alive(self):
+        """Discarding a completed graph releases its output, input and module."""
+        def run_backward():
+            layer = LinearLayer(dim=2)
+            deq = QDEQ(layer, LocalSearchSampler(), solve_config())
+            x = torch.ones(1, 2, dtype=torch.float64, requires_grad=True)
+            out = deq(x)
+            refs = (weakref.ref(out), weakref.ref(x), weakref.ref(deq))
+            loss = out.sum()
+            del out
+            loss.backward()
+            return refs
+
+        refs = run_backward()
+        gc.collect()
+        self.assertTrue(all(ref() is None for ref in refs))
 
     def test_jacobian_loss_keeps_implicit_gradient(self):
         """Adding the regulariser leaves the implicit gradient of the output unchanged."""
