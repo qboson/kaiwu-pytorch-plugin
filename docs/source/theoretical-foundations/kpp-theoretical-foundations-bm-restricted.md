@@ -156,7 +156,7 @@ The marginal probability of a visible vector is then:
 
 $$P_\theta(\mathbf{v}) = \frac{\exp(-F_\theta(\mathbf{v}))}{\sum_{\tilde{\mathbf{v}}} \exp(-F_\theta(\tilde{\mathbf{v}}))}$$
 
-While the denominator (partition function over visible states) remains intractable, i.e. still sums over all $2^{N_v}$ visible configurations, the free energy itself is cheap to compute for any given $\mathbf{v}$. This allows, for example, comparing the relative likelihood of different visible vectors, even though the absolute likelihood remains intractable.
+For large layers, the denominator remains expensive to compute exactly because it requires an exponential sum. The free energy itself is cheap to compute for any given $\mathbf{v}$. This allows, for example, comparing the relative likelihood of different visible vectors. Small RBMs can also be normalized exactly by enumerating the smaller layer, as shown below.
 
 ## Free Energy and Its Analytical Form
 In an RBM, the hidden units are conditionally independent given the visible units. This allows us to sum out the hidden units analytically. Substituting the RBM energy function:
@@ -171,7 +171,53 @@ Thus, free energy has a closed-form expression:
 
 $$F_\theta(\mathbf{v}) = -\mathbf{b}^\top \mathbf{v} - \sum_{j=1}^{N_h} \log \left( 1 + \exp\left( c_j + \sum_i v_i w_{ij} \right) \right)$$ (eq-rbm-free-energy)
 
-**This analytical form is a key computational advantage of the RBM over the classic Boltzmann machine.** It allows us to evaluate the relative likelihood of different visible vectors in $O(N_v N_h)$ **time**, without enumerating the $2^{N_h}$ hidden configurations. However, **the absolute likelihood remains intractable**.
+**This analytical form is a key computational advantage of the RBM over the classic Boltzmann machine.** It allows us to evaluate the relative likelihood of different visible vectors in $O(N_v N_h)$ **time**, without enumerating the $2^{N_h}$ hidden configurations. Absolute likelihood additionally requires the partition function.
+
+## Exact Normalization for Small Binary RBMs
+
+`RestrictedBoltzmannMachine.exact_log_partition(max_enumerated_units=20, enable_grad=False)` returns the scalar $\log Z$ for the binary states $v_i,h_j\in\{0,1\}$. It enumerates the smaller layer and sums out the other layer analytically. When the visible layer is smaller, it computes
+
+$$\log Z = \operatorname{logsumexp}_{\mathbf{v}\in\{0,1\}^{N_v}}\left(\mathbf{b}^\top\mathbf{v}+\sum_j\operatorname{softplus}\left(c_j+(\mathbf{v}^\top\mathbf{W})_j\right)\right).$$
+
+When the hidden layer is smaller, it instead enumerates hidden states and uses the analogous expression with $\mathbf{W}^\top$ and the two biases exchanged. Each mathematical softplus term is evaluated as the two-state `logsumexp([0, logit])`. This avoids softplus's default linear threshold, which would discard representable Float64 curvature near logits of 20. Stable `logsumexp` operations avoid constructing exponentials of large energies. This method evaluates the current parameters directly and uses no sampler, random draws, or cached normalization.
+
+The state count is $2^m$, where $m=\min(N_v,N_h)$. Dense computation costs $O(2^m N_v N_h)$ time, and states and intermediate activations require memory proportional to $2^m(N_v+N_h)$. The default guard rejects $m>20$ before allocating states; the limit must be a nonnegative integer, with booleans rejected. Raising it permits a larger exponential allocation, rather than providing a large-model approximation. Even at the default limit, the other layer's width and retained autograd intermediates can require substantial memory. Use a lower limit when appropriate for the available resources.
+
+Calculations and the result use the parameters' current dtype and device. Float32 and float64 are suitable for small-model reference calculations; lower precision has correspondingly larger rounding error. Stable operations do not remove floating-point error or make an unrepresentable result finite. The default disables autograd explicitly. `enable_grad=True` preserves parameter gradients and higher derivatives, including inside `torch.no_grad()`; ordinary PyTorch inference-mode restrictions still apply.
+
+The following standalone CPU example computes normalized visible probabilities and takes one exact likelihood step. The free-energy expression is written inline, so the example requires only the partition-function method introduced here:
+
+```python
+import torch
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine as RBM
+
+rbm = RBM(
+    2, 1,
+    quadratic_coef=torch.tensor([[0.4], [-0.3]], dtype=torch.float64),
+    linear_bias=torch.tensor([0.2, -0.1, 0.3], dtype=torch.float64),
+)
+visible_states = torch.tensor(
+    [[0., 0.], [0., 1.], [1., 0.], [1., 1.]], dtype=torch.float64
+)
+
+def free_energy(visible):
+    logits = visible @ rbm.quadratic_coef + rbm.hidden_bias
+    log_terms = torch.logsumexp(torch.stack((torch.zeros_like(logits), logits), -1), -1)
+    return -visible @ rbm.visible_bias - log_terms.sum(-1)
+
+with torch.no_grad():
+    nll = free_energy(visible_states) + rbm.exact_log_partition()
+    assert torch.allclose(torch.exp(-nll).sum(), torch.tensor(1., dtype=torch.float64))
+
+data = visible_states[[0, 3, 3]]
+optimizer = torch.optim.SGD(rbm.parameters(), lr=0.05)
+optimizer.zero_grad()
+loss = free_energy(data).mean() + rbm.exact_log_partition(enable_grad=True)
+loss.backward()
+optimizer.step()
+```
+
+This exact negative log-likelihood and its gradients provide a reference for CPU experiments on small binary RBMs. They do not replace approximate normalization or sampling methods for large models, and an exact gradient alone makes no guarantee about training convergence.
 
 ## Free Energy vs. Expected Energy
 
