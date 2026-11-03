@@ -81,7 +81,8 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Probability density value.
         """
-        return self.beta * torch.exp(-self.beta * zeta) / (1 - torch.exp(-self.beta))
+        denominator = -torch.expm1(-self.beta)
+        return self.beta * torch.exp(-self.beta * zeta) / denominator
 
     def cdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Cumulative distribution function.
@@ -92,7 +93,8 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Cumulative distribution value.
         """
-        return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
+        denominator = -torch.expm1(-self.beta)
+        return -torch.expm1(-self.beta * zeta) / denominator
 
     def sample(self, shape: tuple) -> torch.Tensor:
         """Sampling.
@@ -104,7 +106,8 @@ class Exponential(SmoothingDist):
             torch.Tensor: Sample result.
         """
         rho = torch.rand(shape)
-        zeta = -torch.log(1.0 - (1.0 - torch.exp(-self.beta)) * rho) / self.beta
+        denominator = -torch.expm1(-self.beta)
+        zeta = -torch.log1p(-denominator * rho) / self.beta
         return zeta
 
     def log_pdf(self, zeta: torch.Tensor) -> torch.Tensor:
@@ -116,10 +119,11 @@ class Exponential(SmoothingDist):
         Returns:
             torch.Tensor: Log probability density value.
         """
+        denominator = -torch.expm1(-self.beta)
         return (
             torch.log(self.beta)
             - self.beta * zeta
-            - torch.log(1 - torch.exp(-self.beta))
+            - torch.log(denominator)
         )
 
 
@@ -296,9 +300,12 @@ class MixtureGeneric(FactorialBernoulliUtil):
             torch.Tensor: Log probability matrix, shape (num_samples, num_vars).
         """
         q = torch.sigmoid(self.logit_mu)
-        pdf_0 = self.smoothing_dist.pdf(samples)
-        pdf_1 = self.smoothing_dist.pdf(1.0 - samples)
-        log_prob = torch.log(q * pdf_1 + (1 - q) * pdf_0)
+        log_pdf_0 = self.smoothing_dist.log_pdf(samples)
+        log_pdf_1 = self.smoothing_dist.log_pdf(1.0 - samples)
+        log_prob = torch.logaddexp(
+            torch.log(q) + log_pdf_1,
+            torch.log1p(-q) + log_pdf_0,
+        )
         return log_prob
 
     def log_ratio(self, zeta: torch.Tensor) -> torch.Tensor:
