@@ -15,7 +15,10 @@ from utils.helpers import plot_training_curves
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class MLPClassifier(BaseEstimator, ClassifierMixin):
+class MLPClassifier(ClassifierMixin, BaseEstimator):
+    input_dim_: int
+    device_: torch.device
+
     def __init__(
         self, 
         input_dim=None, 
@@ -33,31 +36,54 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         self.hidden_dims = hidden_dims
         self.output_dim = output_dim
         self.weight_decay = weight_decay
-        self.lr = lr_mlp
-        self.batch_size = batch_size_mlp
-        self.epochs = epochs_mlp
+        self.lr_mlp = lr_mlp
+        self.batch_size_mlp = batch_size_mlp
+        self.epochs_mlp = epochs_mlp
         self.device = device
         self.random_state = random_state
         self.save_path = save_path
 
-        if self.device is None:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        torch.manual_seed(self.random_state)
-
         self.model = None
         self.classes_ = None
+
+    @property
+    def lr(self):
+        """Backward-compatible alias for the public learning-rate parameter."""
+        return self.lr_mlp
+
+    @lr.setter
+    def lr(self, value):
+        self.lr_mlp = value
+
+    @property
+    def batch_size(self):
+        """Backward-compatible alias for the public MLP batch-size parameter."""
+        return self.batch_size_mlp
+
+    @batch_size.setter
+    def batch_size(self, value):
+        self.batch_size_mlp = value
+
+    @property
+    def epochs(self):
+        """Backward-compatible alias for the public MLP epoch parameter."""
+        return self.epochs_mlp
+
+    @epochs.setter
+    def epochs(self, value):
+        self.epochs_mlp = value
 
     def _create_model(self):
         """创建 MLP PyTorch 模型"""
         layers = []
-        prev_dim = self.input_dim
+        prev_dim = self.input_dim_
         for h in self.hidden_dims:
             layers.append(nn.Linear(prev_dim, h))
             layers.append(nn.ReLU())
             layers.append(nn.Dropout(0.2))
             prev_dim = h
         layers.append(nn.Linear(prev_dim, self.output_dim))
-        return nn.Sequential(*layers).to(self.device)
+        return nn.Sequential(*layers).to(self.device_)
 
     def _train_mlp_epoch(self, model, data_loader, optimizer, criterion, device):
         """训练单个epoch
@@ -129,9 +155,12 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
     def fit(self, X, y, validation_split=0.2):
         """训练MLP模型"""
+        self.input_dim_ = X.shape[1] if self.input_dim is None else self.input_dim
+        self.device_ = torch.device(self.device) if self.device is not None else torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
         if self.input_dim is None:
-            self.input_dim = X.shape[1]
-            logger.info(f"Auto-detected input_dim: {self.input_dim}")
+            logger.info(f"Auto-detected input_dim: {self.input_dim_}")
         # 数据划分
         X_train, X_val, y_train, y_val = train_test_split(
             X, y, 
@@ -140,10 +169,10 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             stratify=y
         )
         # 转为 Tensor
-        X_train = torch.FloatTensor(X_train).to(self.device)
-        y_train = torch.LongTensor(y_train).to(self.device)
-        X_val = torch.FloatTensor(X_val).to(self.device)
-        y_val = torch.LongTensor(y_val).to(self.device)
+        X_train = torch.FloatTensor(X_train).to(self.device_)
+        y_train = torch.LongTensor(y_train).to(self.device_)
+        X_val = torch.FloatTensor(X_val).to(self.device_)
+        y_val = torch.LongTensor(y_val).to(self.device_)
 
         self.classes_ = np.unique(y)
 
@@ -154,6 +183,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         # 创建模型
+        torch.manual_seed(self.random_state)
         self.model = self._create_model()
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         criterion = nn.CrossEntropyLoss()
@@ -174,7 +204,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
                 data_loader=train_loader,
                 optimizer=optimizer,
                 criterion=criterion,
-                device=self.device
+                device=self.device_
             )
 
             # 验证
@@ -182,7 +212,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
                 model=self.model,
                 data_loader=val_loader,
                 criterion=criterion,
-                device=self.device
+                device=self.device_
             )
 
             # 记录历史
@@ -231,7 +261,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
     def predict(self, X):
         self.model.eval()
-        X_tensor = torch.FloatTensor(X).to(self.device)
+        X_tensor = torch.FloatTensor(X).to(self.device_)
         with torch.no_grad():
             out = self.model(X_tensor)
             _, pred = out.max(1)
@@ -239,7 +269,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
     def predict_proba(self, X):
         self.model.eval()
-        X_tensor = torch.FloatTensor(X).to(self.device)
+        X_tensor = torch.FloatTensor(X).to(self.device_)
         with torch.no_grad():
             out = self.model(X_tensor)
             probs = torch.softmax(out, dim=1)
