@@ -27,21 +27,74 @@ class UnsupervisedDBN(nn.Module):
         hidden_layers_structure (list, optional): A list of integers
             representing the number of hidden units in each layer.
             Defaults to [100, 100].
+        device (torch.device or str, optional): Device the RBM layers are
+            placed on when :meth:`create_rbm_layer` builds them. Defaults to
+            CUDA when available, CPU otherwise.
+
+    Raises:
+        ValueError: If ``hidden_layers_structure`` is not a list of positive
+            integers.
     """
 
-    def __init__(self, hidden_layers_structure=None):
+    def __init__(self, hidden_layers_structure=None, device=None):
         super().__init__()
-        self.hidden_layers_structure = (
-            hidden_layers_structure
-            if hidden_layers_structure is not None
-            else [100, 100]
-        )
+        if hidden_layers_structure is None:
+            hidden_layers_structure = [100, 100]
+        if not isinstance(hidden_layers_structure, (list, tuple)):
+            raise ValueError(
+                "hidden_layers_structure must be a list of layer sizes, "
+                f"got {type(hidden_layers_structure).__name__}"
+            )
+        sizes = []
+        for size in hidden_layers_structure:
+            try:
+                as_int = int(size)
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise ValueError(
+                    "hidden_layers_structure must contain positive integers, "
+                    f"got {size!r}"
+                ) from exc
+            if not isinstance(size, (str, bytes)) and size != as_int:
+                raise ValueError(
+                    "hidden_layers_structure must contain positive integers, "
+                    f"got {size!r}"
+                )
+            if as_int <= 0:
+                raise ValueError(
+                    "hidden_layers_structure must contain positive integers, "
+                    f"got {size!r}"
+                )
+            sizes.append(as_int)
+        self.hidden_layers_structure = sizes
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if device is None:
+            self.device = torch.device(
+                "cuda" if torch.cuda.is_available() else "cpu"
+            )
+        else:
+            self.device = torch.device(device)
 
         self.rbm_layers = None
         self.input_dim = None
         self._is_trained = False
+
+    def to(self, *args, **kwargs):
+        """Moves the DBN to a device, keeping ``self.device`` in sync.
+
+        ``forward`` and ``create_rbm_layer`` route data and new RBM layers
+        through ``self.device``, so a plain ``nn.Module.to`` would move the
+        parameters while leaving later calls on the stale device. The target
+        device may be given positionally (``to("cpu")``) or as the
+        ``device`` keyword; other arguments are forwarded to
+        ``nn.Module.to``.
+
+        Returns:
+            UnsupervisedDBN: The model on the target device.
+        """
+        device = kwargs.get("device", args[0] if args else ...)
+        if device is not ...:
+            self.device = torch.device(device)
+        return super().to(*args, **kwargs)
 
     def create_rbm_layer(self, input_dim):
         """Creates the layers of RBMs for the DBN.
