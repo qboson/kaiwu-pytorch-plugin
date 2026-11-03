@@ -15,6 +15,7 @@ from torch import nn
 
 from .full_boltzmann_machine import BoltzmannMachine
 from ._qdiffusion_sampling import (
+    restore_candidate_context,
     stochastic_sample_from_categorical,
     stochastic_sample_from_categorical_n,
     top_k_top_p_filtering,
@@ -68,7 +69,8 @@ class QDiffusionConfig:
 
         disable_resample: Whether to disable repetition-collapse resampling.
 
-        resample_ratio: Frequency threshold that triggers resampling.
+        resample_ratio: Editable-content frequency ratio that triggers resampling
+            for tokens occurring at least twice; the comparison is strict.
 
         resample_top_p: Top-p cutoff used during resampling.
 
@@ -210,17 +212,11 @@ class QDiffusion(nn.Module):
 
     Args:
         proposal_model: Backbone used to predict proposal logits.
-
         energy_model: Energy-side model used to encode and score candidates.
-
         token_spec: Special-token metadata required by the generator.
-
         config: Optional generation/training configuration.
-
         dtype: Floating point dtype tracked by the wrapper.
-
         device: Optional target device. When omitted, infer from parameters.
-
         freeze_proposal: Whether to freeze proposal model parameters.
     """
 
@@ -234,10 +230,6 @@ class QDiffusion(nn.Module):
         device: torch.device | str | None = None,
         freeze_proposal: bool = True,
     ) -> None:
-        """
-
-
-        """
         super().__init__()
         self.proposal_model = proposal_model
         self.energy_model = energy_model
@@ -384,7 +376,12 @@ class QDiffusion(nn.Module):
         with torch.no_grad():
             logits = self.forward(noisy_tokens).detach()
 
-        negative_tokens, _ = self._sample_candidates(logits, self.config.num_candidates)
+        negative_tokens, _ = self._sample_candidates(
+            self._mask_logits(logits), self.config.num_candidates
+        )
+        negative_tokens = restore_candidate_context(
+            noisy_tokens, negative_tokens, self.get_non_special_symbol_mask(noisy_tokens)
+        )
         positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
         positive_stats = self._collect_energy_model_stats()
         negative_energy = self._score_candidates(noisy_tokens, negative_tokens).mean(
@@ -801,33 +798,46 @@ class QDiffusion(nn.Module):
             candidate_scores[batch_idx, selected_idx],
         )
 
-    def _resample(self, tokens: torch.Tensor, scores: torch.Tensor) -> None:
+    def _resample(
+        self, tokens: torch.Tensor, scores: torch.Tensor, editable_token_mask: torch.Tensor
+    ) -> None:
         """Mitigates repetition collapse by masked resampling in place.
 
         Args:
             tokens: Candidate token tensor updated in place.
             scores: Candidate score tensor updated in place.
+            editable_token_mask: Positions eligible for repetition resampling.
         """
         to_be_resampled = []
         resample_input = []
         resample_masks = []
         resample_scores = []
 
-        for batch_index, sequence in enumerate(tokens):
+        # Copy the batch once per tensor to avoid per-position device synchronization.
+        token_rows = tokens.tolist()
+        editable_rows = editable_token_mask.tolist()
+        for batch_index, (token_row, editable) in enumerate(zip(token_rows, editable_rows)):
+            threshold = sum(editable) * self.config.resample_ratio
             token_positions = {}
             max_frequency = -1
-            for position, token in enumerate(sequence):
-                token = int(token)
+            for position, token in enumerate(token_row):
+                if not editable[position]:
+                    continue
                 token_positions.setdefault(token, []).append(position)
                 max_frequency = max(max_frequency, len(token_positions[token]))
 
-            if max_frequency <= len(sequence) * self.config.resample_ratio:
+            if max_frequency < 2 or max_frequency <= threshold:
                 continue
 
+            sequence = tokens[batch_index]
             mask = torch.zeros_like(sequence).bool()
             for token, positions in token_positions.items():
-                if len(positions) > len(sequence) * self.config.resample_ratio:
+                if len(positions) >= 2 and len(positions) > threshold:
                     mask |= sequence.eq(token)
+
+            mask &= editable_token_mask[batch_index]
+            if not mask.any():
+                continue
 
             to_be_resampled.append(batch_index)
             resample_scores.append(scores[batch_index])
@@ -875,12 +885,15 @@ class QDiffusion(nn.Module):
         candidate_tokens, candidate_scores = self._sample_candidates(
             logits, self.config.num_candidates
         )
+        candidate_tokens = restore_candidate_context(
+            output_tokens, candidate_tokens, output_masks
+        )
         selected_tokens, selected_scores = self._select_candidates(
             output_tokens, candidate_tokens, candidate_scores
         )
 
         if not self.config.disable_resample:
-            self._resample(selected_tokens, selected_scores)
+            self._resample(selected_tokens, selected_scores, output_masks)
 
         output_tokens.masked_scatter_(output_masks, selected_tokens[output_masks])
         output_scores.masked_scatter_(output_masks, selected_scores[output_masks])
