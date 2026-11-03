@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 
 class FeatureExtractor:
@@ -15,10 +14,12 @@ class FeatureExtractor:
     def extract(self, dataloader, return_labels=True):
         """提取特征和标签"""
         self.model.eval()
+        parameter = next(self.model.parameters())
+        self.device = parameter.device
         features, labels = [], []
         with torch.no_grad():
             for data, label in dataloader:
-                data = data.to(self.device)
+                data = data.to(device=parameter.device, dtype=parameter.dtype)
                 _, _, q, zeta = self.model(data)  # 返回四个值
                 if self.feature_type == 'q':
                     feat = q.cpu()
@@ -41,10 +42,9 @@ class FeatureExtractor:
         返回: numpy array of shape (n_samples, latent_dim)
         """
         self.model.eval()
-        if isinstance(X, np.ndarray):
-            X_tensor = torch.FloatTensor(X).to(self.device)
-        else:
-            X_tensor = X.to(self.device)
+        parameter = next(self.model.parameters())
+        self.device = parameter.device
+        X_tensor = torch.as_tensor(X, device=parameter.device, dtype=parameter.dtype)
 
         with torch.no_grad():
             # QVAE forward 返回: (recon_x, posterior, q, zeta)
