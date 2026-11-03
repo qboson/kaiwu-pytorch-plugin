@@ -32,6 +32,20 @@ class Trainer:
     metric_keys = ("loss", "neg_elbo", "kl", "recon_loss", "bm_loss")
 
     def __init__(self, args, device):
+        # Validate training budgets only when the caller supplies them; the
+        # trainer is also used as a sampler factory with a narrower arg object.
+        val_percentage = getattr(args, "val_percentage", None)
+        if val_percentage is not None and not 0.0 < val_percentage < 1.0:
+            raise ValueError(
+                "val_percentage must be strictly between 0 and 1; "
+                "the validation loader cannot be empty"
+            )
+        batch_size = getattr(args, "batch_size", None)
+        if batch_size is not None and batch_size < 1:
+            raise ValueError("batch_size must be a positive integer")
+        epochs = getattr(args, "epochs", None)
+        if epochs is not None and epochs < 1:
+            raise ValueError("epochs must be a positive integer")
         self.args = args
         self.device = device
         self.n_batches = 0
