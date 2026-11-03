@@ -8,6 +8,28 @@ from __future__ import annotations
 import torch
 
 
+def restore_candidate_context(
+    noisy_tokens: torch.Tensor,
+    candidate_tokens: torch.Tensor,
+    editable_token_mask: torch.Tensor,
+) -> torch.Tensor:
+    """Restores structural and fixed tokens in sampled reconstructions.
+
+    Args:
+        noisy_tokens: Current tokens supplying the fixed sequence context.
+        candidate_tokens: Sampled tokens shaped as ``[batch, k, seq_len]``.
+        editable_token_mask: Positions where sampled tokens may replace context.
+
+    Returns:
+        torch.Tensor: Complete candidate sequences with fixed context preserved.
+    """
+    return torch.where(
+        editable_token_mask.unsqueeze(1),
+        candidate_tokens,
+        noisy_tokens.unsqueeze(1),
+    )
+
+
 # Skeptical-remasking helpers.
 
 def topk_masking(
