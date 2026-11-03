@@ -41,6 +41,9 @@ def select_records(
     max_length: int,
     max_records: int | None,
 ) -> list[tuple[str, str]]:
+    """Select eligible records, with a positive optional record limit."""
+    if max_records is not None and max_records <= 0:
+        raise ValueError("max_records must be positive or None")
     selected: list[tuple[str, str]] = []
     for header, sequence in records:
         if len(sequence) < min_length or len(sequence) > max_length:
