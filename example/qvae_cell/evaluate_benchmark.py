@@ -93,15 +93,19 @@ def compute_clustering_metrics(adata, label_key, cluster_key):
     Returns:
         Dictionary with ARI, AMI, NMI, Homogeneity, FMI, and cluster count.
     """
-    labels = adata.obs[label_key].astype(str)
-    clusters = adata.obs[cluster_key].astype(str)
+    valid = adata.obs[label_key].notna() & adata.obs[cluster_key].notna()
+    if not valid.any():
+        raise ValueError("No paired non-missing labels and cluster annotations to score.")
+    labels = adata.obs.loc[valid, label_key].astype(str)
+    clusters = adata.obs.loc[valid, cluster_key].astype(str)
     return {
         "ARI": metrics.adjusted_rand_score(labels, clusters),
         "AMI": metrics.adjusted_mutual_info_score(labels, clusters),
         "NMI": metrics.normalized_mutual_info_score(labels, clusters),
         "Homogeneity": metrics.homogeneity_score(labels, clusters),
         "FMI": metrics.fowlkes_mallows_score(labels, clusters),
-        "n_clusters": int(adata.obs[cluster_key].nunique()),
+        "n_clusters": int(clusters.nunique()),
+        "n_evaluated_cells": int(valid.sum()),
     }
 
 
