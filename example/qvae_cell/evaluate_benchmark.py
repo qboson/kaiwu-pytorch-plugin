@@ -289,6 +289,10 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
     y = encoder.fit_transform(labels)
 
     stratify = y if np.min(np.bincount(y)) >= 2 else None
+    if len(encoder.classes_) < 2:
+        raise ValueError(
+            f"Classification requires at least two classes in adata.obs[{label_key!r}]"
+        )
     x_train, x_test, y_train, y_test = train_test_split(
         x,
         y,
