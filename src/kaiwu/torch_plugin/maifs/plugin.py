@@ -250,6 +250,11 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the loss gradient and Hessian with respect to a soft mask.
 
+        All modules temporarily use evaluation mode. Each module's original
+        training flag, including any mixed train/eval configuration, is restored
+        even if evaluation fails. Parameter ``requires_grad`` flags and existing
+        gradients are preserved.
+
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
             loss_fn: Loss function returning a scalar tensor.
@@ -286,7 +291,7 @@ class FeatureSelectionWrapper(nn.Module):
             target_all = target_all[:max_samples]
         input_all = input_all.to(self.mask.device)
         target_all = target_all.to(self.mask.device)
-        was_training = self.training
+        original_training = [(module, module.training) for module in self.modules()]
         original_requires_grad = [p.requires_grad for p in self.model.parameters()]
         self.eval()
         for parameter in self.model.parameters():
@@ -318,7 +323,8 @@ class FeatureSelectionWrapper(nn.Module):
                 original_requires_grad,
             ):
                 parameter.requires_grad_(requires_grad)
-            self.train(was_training)
+            for module, was_training in original_training:
+                module.training = was_training
 
         hessian = 0.5 * (hessian + hessian.T)
         return (
