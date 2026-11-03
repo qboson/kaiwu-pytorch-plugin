@@ -4,7 +4,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validated_states,
+)
 
 
 class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -77,9 +80,15 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Args:
             s_visible: Visible layer tensor.
             requires_grad: Whether to allow gradient backpropagation.
+            bernoulli: Whether to draw binary states instead of probabilities.
+
+        Raises:
+            ValueError: If ``s_visible`` does not have shape
+                ``(batch, num_visible)``.
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
+            _validated_states("s_visible", s_visible, self.num_visible)
             s_all = torch.zeros(
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
@@ -98,8 +107,18 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def get_visible(
         self, s_hidden: torch.Tensor, bernoulli: bool = False
     ) -> torch.Tensor:
-        """Propagate hidden spins to the visible layer."""
+        """Propagate hidden spins to the visible layer.
+
+        Args:
+            s_hidden: Hidden layer tensor.
+            bernoulli: Whether to draw binary states instead of probabilities.
+
+        Raises:
+            ValueError: If ``s_hidden`` does not have shape
+                ``(batch, num_hidden)``.
+        """
         with torch.no_grad():
+            _validated_states("s_hidden", s_hidden, self.num_hidden)
             s_all = torch.zeros(
                 s_hidden.size(0), self.num_hidden + self.num_visible
             ).to(self.device)
@@ -124,7 +143,12 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
+
+        Raises:
+            ValueError: If ``s_all`` does not have shape (B, N) with
+                ``N == num_visible + num_hidden``.
         """
+        _validated_states("s_all", s_all, self.num_nodes)
         tmp = s_all[:, : self.num_visible].matmul(self.quadratic_coef)
         return -s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
