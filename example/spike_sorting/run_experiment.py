@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 # Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -84,7 +84,13 @@ def parse_args() -> argparse.Namespace:
         "--max-spikes",
         type=int,
         default=None,
-        help="optionally subsample spikes for quick runs",
+        help="optionally subsample the real recording for quick runs",
+    )
+    parser.add_argument(
+        "--max-sim-spikes",
+        type=int,
+        default=None,
+        help="optionally subsample every simulation for quick runs",
     )
     return parser.parse_args()
 
@@ -175,7 +181,7 @@ def main() -> None:
                 simulation,
                 args.data_dir,
                 zscore=args.zscore,
-                max_spikes=args.max_spikes,
+                max_spikes=args.max_sim_spikes,
                 seed=args.seed,
             ),
         )
@@ -231,4 +237,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
