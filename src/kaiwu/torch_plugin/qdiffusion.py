@@ -215,7 +215,7 @@ class QDiffusion(nn.Module):
         energy_model: Energy-side model used to encode and score candidates.
         token_spec: Special-token metadata required by the generator.
         config: Optional generation/training configuration.
-        dtype: Floating point dtype tracked by the wrapper.
+        dtype: Floating point dtype applied to parameters and decode score buffers.
         device: Optional target device. When omitted, infer from parameters.
         freeze_proposal: Whether to freeze proposal model parameters.
     """
@@ -257,9 +257,6 @@ class QDiffusion(nn.Module):
                 self.device = torch.device("cpu")
         else:
             self.device = torch.device(device)
-        # Apply the requested dtype in both branches: with a device it was
-        # already applied through ``to``; without one it must not be skipped,
-        # otherwise ``self.dtype`` disagrees with the submodule parameters.
         self.to(device=self.device, dtype=self.dtype)
 
     def to(self, *args: Any, **kwargs: Any) -> QDiffusion:
@@ -576,8 +573,6 @@ class QDiffusion(nn.Module):
             input_tokens, partial_masks=partial_masks
         )
         output_tokens = input_tokens.masked_fill(output_mask, self.mask_id)
-        # Score buffers follow the wrapper dtype so that converted models keep
-        # consistent score precision through reranking and resampling.
         output_scores = torch.zeros_like(output_tokens, dtype=self.dtype)
         return output_tokens, output_scores
 
