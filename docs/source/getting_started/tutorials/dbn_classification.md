@@ -155,6 +155,25 @@ $$
 
 ### 4. SupervisedDBNClassification 具体分类实现
 
+`SupervisedDBNClassification` 默认使用微调模式（`fine_tuning=True`），其完整构造参数由
+`AbstractSupervisedDBNClassifier` 显式定义；`hidden_layers_structure` 可以传入列表或元组。
+它和 `DBNPretrainer` 都支持 scikit-learn 的参数与克隆接口：
+
+```python
+from sklearn.base import clone
+
+parameters = model.get_params()
+unfitted_model = clone(model)
+model.set_params(hidden_layers_structure=[64, 32], batch_size=16, n_epochs_rbm=5)
+model.fit(X_train, y_train)
+```
+
+`clone` 保留构造配置，但不会复制已学习的 RBM、分类器、微调网络或类别标签。
+更新参数后，下一次正常 `fit` 会使用当前配置重新训练；监督模型的 `batch_size` 同时用于
+RBM 预训练和微调。单独调用 `pre_train` 也会应用当前预训练配置。
+显式调用 `fit(..., pre_train=False)` 则复用已经准备好的 RBM，只训练监督部分；
+更新网络结构或预训练参数后应执行正常 `fit` 或重新调用 `pre_train`。
+
 - **微调网络构建**：使用预训练的权重来初始化（默认两层 RBM，以及无 Dropout 层）
 
   - 网络结构：输入层 → [线性层 + 激活函数 + Dropout] × N → 输出层
