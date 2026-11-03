@@ -25,7 +25,6 @@ kpp_qvae/
 ├── trainer.py                 # 数据准备、模型构建、训练循环、表征和 energy 提取
 ├── visualization.py           # 训练曲线、UMAP 和 energy 图
 ├── train_qvae_cell.py         # 命令行入口
-├── evaluate_clustering.py      # 旧版 Leiden 聚类评估入口
 ├── evaluate_benchmark.py       # 统一评估入口
 ├── scripts/
 │   ├── train.sh               # 当前训练命令
