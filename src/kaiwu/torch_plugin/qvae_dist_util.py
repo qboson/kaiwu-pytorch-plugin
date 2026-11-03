@@ -289,17 +289,22 @@ class MixtureGeneric(FactorialBernoulliUtil):
     def log_prob_per_var(self, samples: torch.Tensor) -> torch.Tensor:
         """Compute log probability of samples under the mixture of overlapping distributions.
 
+        Use log weights and component log densities to avoid sigmoid cancellation
+        and PDF underflow in likelihood calculations.
+
         Args:
             samples (torch.Tensor): Sample matrix, shape (num_samples, num_vars).
 
         Returns:
             torch.Tensor: Log probability matrix, shape (num_samples, num_vars).
         """
-        q = torch.sigmoid(self.logit_mu)
-        pdf_0 = self.smoothing_dist.pdf(samples)
-        pdf_1 = self.smoothing_dist.pdf(1.0 - samples)
-        log_prob = torch.log(q * pdf_1 + (1 - q) * pdf_0)
-        return log_prob
+        log_component_zero = (
+            -F.softplus(self.logit_mu) + self.smoothing_dist.log_pdf(samples)
+        )
+        log_component_one = (
+            -F.softplus(-self.logit_mu) + self.smoothing_dist.log_pdf(1.0 - samples)
+        )
+        return torch.logaddexp(log_component_zero, log_component_one)
 
     def log_ratio(self, zeta: torch.Tensor) -> torch.Tensor:
         """Compute log_ratio required for KL gradient (proposed in DVAE++).
