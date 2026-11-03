@@ -69,14 +69,34 @@ RBM 是一个二部能量模型。可见层和隐层之间有连接，但同一�
 ```{literalinclude} ../../../../example/rbm_digits/rbm_classifier.py
 :pyobject: train_classifier
 ```
-### 3.2 可视化权重
+### 3.2 可视化重建
+
+`RBMRunner.plot_images(images, labels)` 显示每个输入数字对应的确定性均值场重构：
+先按原有阈值 `images > 0.5` 二值化，再通过 `get_hidden` 计算隐藏概率，最后用
+`get_visible` 计算可见概率。重构行与原始图像及其标签逐行对应，支持只显示一张图像。
+绘图不调用先验采样器，因此显示数量不受 SDK 返回的负相样本数限制。
+这是一轮条件概率传播的均值场近似，不是对所有隐藏状态积分后的精确条件期望。
+训练中的负相采样及生成新数字仍使用原有采样器。
+
+```python
+import torch
+
+# runner 为已 fit 的 RBMRunner；X_test、y_test 来自数据划分。
+runner.plot_images(torch.tensor(X_test[:5], dtype=torch.float32), y_test[:5])
+```
+
+```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
+:pyobject: RBMRunner.plot_images
+```
+
+### 3.3 可视化权重
 
 该函数将RBM模型中每个隐单元对应的权重以8×8图像形式可视化，直观展示其从数据中学到的特征模式。支持将结果保存为高分辨率PDF文件。
 
 ```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
 :pyobject: RBMRunner.plot_weights
 ```
-### 3.2 可视化混淆矩阵
+### 3.4 可视化混淆矩阵
 
 该函数使用热力图可视化模型在测试集上的混淆矩阵，清晰展示各类别之间的预测准确率与混淆情况。
 支持添加自定义标题后缀，并可将结果保存为高分辨率PDF文件。
