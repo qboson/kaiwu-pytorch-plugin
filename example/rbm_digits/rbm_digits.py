@@ -285,6 +285,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         fig, axes = plt.subplots(
             2,
             num_samples,
+            squeeze=False,
             gridspec_kw={"wspace": 0, "hspace": 0.1},
             figsize=(2 * num_samples, 4),
         )
