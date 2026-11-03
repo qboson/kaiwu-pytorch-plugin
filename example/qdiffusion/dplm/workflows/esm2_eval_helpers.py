@@ -249,11 +249,11 @@ def summarize_distances(label: str, rows: list[PairDistanceRow]) -> DistanceSumm
         mean_reference_length=float(reference_lengths.mean().item()),
         mean_candidate_length=float(candidate_lengths.mean().item()),
         mean_cosine_distance=float(cosine_values.mean().item()),
-        median_cosine_distance=float(cosine_values.median().item()),
+        median_cosine_distance=float(cosine_values.quantile(0.5).item()),
         min_cosine_distance=float(cosine_values.min().item()),
         max_cosine_distance=float(cosine_values.max().item()),
         mean_l2_distance=float(l2_values.mean().item()),
-        median_l2_distance=float(l2_values.median().item()),
+        median_l2_distance=float(l2_values.quantile(0.5).item()),
         min_l2_distance=float(l2_values.min().item()),
         max_l2_distance=float(l2_values.max().item()),
     )
