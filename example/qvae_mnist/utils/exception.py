@@ -24,7 +24,7 @@ class Error(Exception):
 
         """
 
-        super(Error, self).__init__()
+        super(Error, self).__init__(msg)
 
         logger.error("%s: %s.", cls, msg)
 
