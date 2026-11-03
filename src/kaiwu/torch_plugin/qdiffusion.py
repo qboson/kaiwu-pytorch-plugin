@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import chain
 import math
 from typing import Any
 
@@ -236,7 +237,6 @@ class QDiffusion(nn.Module):
         self.token_spec = token_spec
         self.config = config or QDiffusionConfig()
         self.dtype = dtype if dtype is not None else torch.float32
-
         if freeze_proposal:
             self.proposal_model.eval()
             for parameter in self.proposal_model.parameters():
@@ -249,7 +249,6 @@ class QDiffusion(nn.Module):
         self.eos_id = token_spec.eos_id
         self.x_id = token_spec.x_id
         self.softplus = nn.Softplus()
-
         if device is None:
             try:
                 self.device = next(self.parameters()).device
@@ -271,8 +270,9 @@ class QDiffusion(nn.Module):
         """
         module = super().to(*args, **kwargs)
         try:
-            self.device = next(self.parameters()).device
-            self.dtype = next(self.parameters()).dtype
+            self.device = next(chain(self.parameters(), self.buffers())).device
+            tensors = chain(self.proposal_model.parameters(), self.proposal_model.buffers())
+            self.dtype = next((t.dtype for t in tensors if t.is_floating_point()), self.dtype)
         except StopIteration:
             self.device = torch.device("cpu")
         return module

@@ -130,6 +130,21 @@ class TestQDiffusionConstructorDtype(unittest.TestCase):
         )
         self.assertEqual(next(model.proposal_model.parameters()).dtype, torch.float32)
         self.assertEqual(model.energy_model.scale.dtype, torch.float64)
+        self.assertEqual(model.dtype, torch.float32)
+
+    def test_buffer_only_proposal_controls_decode_score_precision(self):
+        """A parameter-free proposal's buffers take precedence over energy weights."""
+        proposal = nn.Module()
+        proposal.register_buffer("logits", torch.zeros(8, dtype=torch.float32))
+        model = QDiffusion(
+            proposal, DummyEnergy().double(),
+            SequenceTokenSpec(mask_id=0, pad_id=1, bos_id=2, eos_id=3),
+        )
+        self.assertEqual(model.energy_model.scale.dtype, torch.float64)
+        for converted in (model, model.to("cpu")):
+            self.assertEqual(converted.dtype, torch.float32)
+            state = converted.initialize_state(torch.tensor([[5, 6, 7]]))
+            self.assertEqual(state["output_scores"].dtype, torch.float32)
 
     def test_explicit_float32_converts_supplied_double_models(self):
         """An explicitly requested dtype still converts both supplied modules."""
