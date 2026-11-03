@@ -146,3 +146,12 @@ A: 您可以通过以下渠道获取帮助：
 1. **GitHub Issues**：[提交问题](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues)
 2. **开发者社区**：玻色量子开发者社区
 3. **联系邮箱**：developer@boseq.com
+
+### Q: FeatureSelectionWrapper 的 fit_weights 为什么要求可重复遍历的数据？
+
+A: 多轮训练会重复遍历数据，定期更新 mask 也会重新遍历数据计算导数。
+因此，这些调用应使用 DataLoader、列表或每次提供新遍历的自定义 Iterable。
+一次性生成器和迭代器只支持一轮且不触发 mask 更新的调用；需要重放时会在训练
+状态改变前抛出明确异常。更新调度计入已有训练轮数，因此即使本次只训练一轮，
+也可能触发 mask 更新。接口不会默认缓存整个数据流，自定义 Iterable 应自行保证
+每次遍历都能提供数据。
