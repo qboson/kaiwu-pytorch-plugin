@@ -5,6 +5,7 @@ converted the submodules, so ``self.dtype`` disagreed with the parameters and
 downstream code that trusted ``self.dtype`` (or the proposal logits) silently
 mixed precisions. The tests below pin the constructor contract: the requested
 dtype is applied whether or not a device is given.
+Omitting dtype preserves the precision of supplied backbone modules.
 """
 
 import os
@@ -105,6 +106,41 @@ class TestQDiffusionConstructorDtype(unittest.TestCase):
 
         self.assertEqual(energy.dtype, torch.float64)
         self.assertTrue(torch.isfinite(energy).all())
+
+    def test_omitted_dtype_preserves_supplied_double_models(self):
+        """Default construction and device-only moves keep supplied precision."""
+        for device in (None, "cpu"):
+            with self.subTest(device=device):
+                model = QDiffusion(
+                    DummyProposal().double(), DummyEnergy().double(),
+                    SequenceTokenSpec(mask_id=0, pad_id=1, bos_id=2, eos_id=3),
+                    device=device,
+                )
+                self._assert_module_dtypes(model, torch.float64)
+                self.assertEqual(model.dtype, torch.float64)
+                state = model.initialize_state(torch.tensor([[5, 6, 7]]))
+                self.assertEqual(state["output_scores"].dtype, torch.float64)
+
+    def test_omitted_dtype_preserves_mixed_backbone_precision(self):
+        """Independent token-based backbones may use different precisions."""
+        proposal, energy = DummyProposal(), DummyEnergy().double()
+        model = QDiffusion(
+            proposal, energy,
+            SequenceTokenSpec(mask_id=0, pad_id=1, bos_id=2, eos_id=3),
+        )
+        self.assertEqual(next(model.proposal_model.parameters()).dtype, torch.float32)
+        self.assertEqual(model.energy_model.scale.dtype, torch.float64)
+
+    def test_explicit_float32_converts_supplied_double_models(self):
+        """An explicitly requested dtype still converts both supplied modules."""
+        for device in (None, "cpu"):
+            with self.subTest(device=device):
+                model = QDiffusion(
+                    DummyProposal().double(), DummyEnergy().double(),
+                    SequenceTokenSpec(mask_id=0, pad_id=1, bos_id=2, eos_id=3),
+                    dtype=torch.float32, device=device,
+                )
+                self._assert_module_dtypes(model, torch.float32)
 
 
 if __name__ == "__main__":

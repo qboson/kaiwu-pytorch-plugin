@@ -215,7 +215,7 @@ class QDiffusion(nn.Module):
         energy_model: Energy-side model used to encode and score candidates.
         token_spec: Special-token metadata required by the generator.
         config: Optional generation/training configuration.
-        dtype: Floating point dtype applied to parameters and decode score buffers.
+        dtype: Optional floating dtype; omitted preserves supplied submodule dtypes.
         device: Optional target device. When omitted, infer from parameters.
         freeze_proposal: Whether to freeze proposal model parameters.
     """
@@ -226,7 +226,7 @@ class QDiffusion(nn.Module):
         energy_model: EnergyModel,
         token_spec: SequenceTokenSpec,
         config: QDiffusionConfig | None = None,
-        dtype: torch.dtype = torch.float32,
+        dtype: torch.dtype | None = None,
         device: torch.device | str | None = None,
         freeze_proposal: bool = True,
     ) -> None:
@@ -235,7 +235,7 @@ class QDiffusion(nn.Module):
         self.energy_model = energy_model
         self.token_spec = token_spec
         self.config = config or QDiffusionConfig()
-        self.dtype = dtype
+        self.dtype = dtype if dtype is not None else torch.float32
 
         if freeze_proposal:
             self.proposal_model.eval()
@@ -257,7 +257,7 @@ class QDiffusion(nn.Module):
                 self.device = torch.device("cpu")
         else:
             self.device = torch.device(device)
-        self.to(device=self.device, dtype=self.dtype)
+        self.to(device=self.device, dtype=dtype)
 
     def to(self, *args: Any, **kwargs: Any) -> QDiffusion:
         """Moves the module and refreshes cached device/dtype metadata.
