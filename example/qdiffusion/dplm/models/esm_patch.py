@@ -77,6 +77,7 @@ class _ModifiedEsmSelfAttention(EsmSelfAttention):
             key_layer,
             value_layer,
             attn_mask=attention_mask,
+            dropout_p=self.dropout.p if self.training else 0.0,
             scale=1.0,
         )
 

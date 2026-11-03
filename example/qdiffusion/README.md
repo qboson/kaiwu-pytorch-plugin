@@ -63,6 +63,12 @@ the larger experiment workflow.
 
 If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
 
+The patched ESM attention uses the backbone configuration's
+`attention_probs_dropout_prob` during training and disables attention dropout in
+evaluation mode, matching ESM. This is separate from `net.dropout`, which sets
+hidden-state dropout. Use `eval()` for inference; `torch.no_grad()` alone does
+not disable dropout.
+
 Its end-to-end flow is:
 
 1. read and filter FASTA records
