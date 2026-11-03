@@ -150,6 +150,27 @@ class TestQVAE(unittest.TestCase):
         torch.testing.assert_close(self.encoder.inputs[-1], x)
         self.assertGreater(self.qvae.loss(x, recon_x, posterior).item(), 0.0)
 
+    def test_loss_accepts_image_shaped_input(self):
+        """Bernoulli and MSE losses flatten image-shaped inputs like forward."""
+        self.qvae.eval()
+        x_img = torch.rand(3, 1, 2, 4)  # same elements as (3, input_dim)
+        x_flat = x_img.view(-1, self.input_dim)
+
+        torch.manual_seed(0)
+        recon_x, posterior, _, _ = self.qvae(x_flat)
+        loss_flat = self.qvae.loss(x_flat, recon_x, posterior)
+        loss_img = self.qvae.loss(x_img, recon_x, posterior)
+
+        self.assertTrue(torch.isfinite(loss_img))
+        torch.testing.assert_close(loss_img, loss_flat)
+
+        # The same holds for the MSE branch.
+        self.config.loss_type = "mse"
+        recon_x, posterior, _, _ = self.qvae(x_flat)
+        loss_flat = self.qvae.loss(x_flat, recon_x, posterior)
+        loss_img = self.qvae.loss(x_img, recon_x, posterior)
+        torch.testing.assert_close(loss_img, loss_flat)
+
     def test_unsupported_loss_type_is_rejected(self):
         """Unsupported loss types fail at the public computation boundary."""
         self.config.loss_type = "unsupported"
