@@ -24,6 +24,9 @@ Global switch
 Controlled by the environment variable ``KPP_STATS_ENABLED``
 (default ``"true"``).  The switch can also be toggled at runtime via
 ``enable_usage_stats()`` / ``disable_usage_stats()``.
+
+Kaiwu 1.4.3 does not expose ``_caller_context``. In that release this
+module leaves SDK calls unchanged; its switch does not control SDK telemetry.
 """
 
 import logging
@@ -77,7 +80,7 @@ def enable_usage_stats() -> None:
 
 
 def disable_usage_stats() -> None:
-    """Disable kpp usage statistics. No data will be reported after disabling."""
+    """Disable KPP caller attribution without changing SDK telemetry settings."""
     global _stats_enabled  # pylint: disable=global-statement
     _stats_enabled = False
     logger.info("kpp usage stats disabled")

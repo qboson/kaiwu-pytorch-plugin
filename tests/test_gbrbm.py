@@ -202,5 +202,36 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertEqual(bm.linear_bias.shape, (3,))
 
 
+    def test_constructor_honors_dtype_for_every_parameter(self):
+        """A float64 GBRBM must be usable without post-hoc .data surgery."""
+        bm = GaussianBernoulliRestrictedBoltzmannMachine(
+            num_visible=2,
+            num_hidden=3,
+            dtype=torch.float64,
+            device=torch.device("cpu"),
+        )
+        self.assertEqual(bm.quadratic_coef.dtype, torch.float64)
+        self.assertEqual(bm.linear_bias.dtype, torch.float64)
+        energy = bm.energy(torch.rand(5, bm.num_nodes, dtype=torch.float64))
+        self.assertEqual(energy.dtype, torch.float64)
+
+    def test_constructor_keeps_user_supplied_weights(self):
+        """Explicit weights must survive initialization (RBM already behaves this way)."""
+        quadratic = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+        linear = torch.tensor([0.25, -0.5, 0.75])
+        bm = GaussianBernoulliRestrictedBoltzmannMachine(
+            num_visible=2,
+            num_hidden=3,
+            quadratic_coef=quadratic,
+            linear_bias=linear,
+            dtype=torch.float64,
+            device=torch.device("cpu"),
+        )
+        torch.testing.assert_close(
+            bm.quadratic_coef.detach(), quadratic.to(torch.float64)
+        )
+        torch.testing.assert_close(bm.linear_bias.detach(), linear.to(torch.float64))
+
+
 if __name__ == "__main__":
     unittest.main()
