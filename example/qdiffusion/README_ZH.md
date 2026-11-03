@@ -87,6 +87,12 @@ factory helper 间接接入。
 
 ## 示例 ESM2 距离结果
 
+ESM2 的 `order` 评估为每个 FASTA 记录位置保留独立 embedding，重复 header 不会
+覆盖其他序列。`header` 配对要求 header 唯一，重复时明确报错。两种模式均保留配置的
+mean/BOS/EOS pooling。`embed_sequences(...)` 默认仍返回按唯一 header 索引的字典；
+评估重复 header 时，在 embedding 和 `evaluate_candidate_set(..., pair_mode="order")`
+两处同时传入 `key_mode="position"`。
+
 这个 DPLM 引导工作流提供 `dplm/eval_esm2_distances.py`，用于在 embedding
 层面比较生成序列与 reference proteome 的距离。当前一组示例评估使用了：
 

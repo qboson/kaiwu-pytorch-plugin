@@ -77,6 +77,13 @@ Its end-to-end flow is:
 
 ## Sample ESM2 Distance Result
 
+Order-based ESM2 evaluation keeps one embedding per FASTA record position,
+including when headers repeat. Header-based pairing requires unique headers and
+reports duplicates as ambiguous. Both modes retain the configured mean/BOS/EOS
+pooling. The default `embed_sequences(...)` helper still returns header-keyed
+embeddings for unique headers; use `key_mode="position"` in both embedding and
+`evaluate_candidate_set(..., pair_mode="order")` calls to evaluate repeated headers.
+
 The DPLM-guided workflow includes `dplm/eval_esm2_distances.py` for embedding-level
 comparison between generated sequences and the reference proteome. One example
 report from the current setup used:

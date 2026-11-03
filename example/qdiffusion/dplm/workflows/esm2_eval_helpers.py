@@ -137,6 +137,8 @@ def pair_records_by_header(
     reference_records: list[tuple[str, str]],
     candidate_records: list[tuple[str, str]],
 ) -> list[tuple[tuple[str, str], tuple[str, str]]]:
+    _require_unique_headers(reference_records)
+    _require_unique_headers(candidate_records)
     candidate_map = {header: (header, seq) for header, seq in candidate_records}
     pairs: list[tuple[tuple[str, str], tuple[str, str]]] = []
     for header, sequence in reference_records:
@@ -144,6 +146,18 @@ def pair_records_by_header(
         if candidate is not None:
             pairs.append(((header, sequence), candidate))
     return pairs
+
+
+def _require_unique_headers(records: list[tuple[str, str]]) -> None:
+    """Reject ambiguous header identities before a mapping can overwrite records."""
+    seen: set[str] = set()
+    for header, _ in records:
+        if header in seen:
+            raise ValueError(
+                f"Duplicate FASTA header {header!r}; use key_mode='position' "
+                "with pair_mode='order' to evaluate records by position."
+            )
+        seen.add(header)
 
 
 def chunked(
@@ -180,7 +194,18 @@ def embed_sequences(
     device: torch.device,
     batch_size: int,
     pooling: str,
-) -> dict[str, torch.Tensor]:
+    key_mode: str = "header",
+) -> dict[str | int, torch.Tensor]:
+    """Pool embeddings keyed by unique headers or zero-based record positions.
+
+    The default preserves header-keyed consumers and rejects duplicate headers.
+    ``key_mode='position'`` retains every record, including repeated headers, and
+    must be paired with order-based evaluation using the same key mode.
+    """
+    if key_mode not in {"header", "position"}:
+        raise ValueError(f"Unsupported embedding key mode: {key_mode}")
+    if key_mode == "header":
+        _require_unique_headers(records)
     if not records:
         return {}
 
@@ -190,7 +215,7 @@ def embed_sequences(
     )
     batch_converter = alphabet.get_batch_converter()
     repr_layer = model.num_layers
-    embeddings: dict[str, torch.Tensor] = {}
+    embeddings: dict[str | int, torch.Tensor] = {}
 
     with torch.no_grad():
         for batch_records in chunked(records, batch_size):
@@ -223,7 +248,9 @@ def embed_sequences(
                 else:
                     raise ValueError(f"Unsupported pooling mode: {pooling}")
 
-                embeddings[header] = pooled.detach().cpu()
+                embeddings[header if key_mode == "header" else len(embeddings)] = (
+                    pooled.detach().cpu()
+                )
 
     return embeddings
 
@@ -264,10 +291,23 @@ def evaluate_candidate_set(
     label: str,
     reference_records: list[tuple[str, str]],
     candidate_records: list[tuple[str, str]],
-    reference_embeddings: dict[str, torch.Tensor],
-    candidate_embeddings: dict[str, torch.Tensor],
+    reference_embeddings: dict[str | int, torch.Tensor],
+    candidate_embeddings: dict[str | int, torch.Tensor],
     pair_mode: str,
+    key_mode: str = "header",
 ) -> tuple[list[PairDistanceRow], DistanceSummary]:
+    """Evaluate pairs using the same embedding key mode used by ``embed_sequences``.
+
+    Header keys preserve existing callers with unique headers. Position keys
+    support repeated headers in order mode without losing any record's embedding.
+    """
+    if key_mode not in {"header", "position"}:
+        raise ValueError(f"Unsupported embedding key mode: {key_mode}")
+    if key_mode == "position" and pair_mode != "order":
+        raise ValueError("Position embedding keys require pair_mode='order'")
+    if key_mode == "header":
+        _require_unique_headers(reference_records)
+        _require_unique_headers(candidate_records)
     if pair_mode == "header":
         pairs = pair_records_by_header(reference_records, candidate_records)
     elif pair_mode == "order":
@@ -285,8 +325,8 @@ def evaluate_candidate_set(
     for index, ((ref_header, ref_seq), (cand_header, cand_seq)) in enumerate(
         pairs, start=1
     ):
-        ref_embedding = reference_embeddings[ref_header]
-        cand_embedding = candidate_embeddings[cand_header]
+        ref_embedding = reference_embeddings[ref_header if key_mode == "header" else index - 1]
+        cand_embedding = candidate_embeddings[cand_header if key_mode == "header" else index - 1]
         cosine_distance = (
             1.0
             - F.cosine_similarity(
