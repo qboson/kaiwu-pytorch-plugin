@@ -22,7 +22,7 @@ from feature_selection_datasets import (
     build_linear_regression_dataset,
 )
 from kaiwu.torch_plugin import FeatureSelectionWrapper
-from kaiwu_license import _init_kaiwu_license_from_env
+from kaiwu_license import _init_kaiwu_license_from_env, has_license_env
 
 KAIWU_PROJECT_NO = "Your PROJECT NO"
 
@@ -63,6 +63,14 @@ def main() -> None:
             "selected_features": local_search_selector.selected_indices().tolist(),
         }
     )
+
+    if not has_license_env():
+        print(
+            "Skipping the sa and kaiwu_cim solvers: both route through the"
+            " Kaiwu SDK and need a license. Set LICENSE_USER_ID and"
+            " LICENSE_SDK_CODE (see this directory README) to run them."
+        )
+        return
 
     sa_solver_kwargs = {
         "alpha": 0.99,
