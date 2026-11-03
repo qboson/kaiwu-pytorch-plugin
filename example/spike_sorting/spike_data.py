@@ -161,3 +161,127 @@ def load_spike_folder(
         )
         for number in scenarios
     }
+
+
+# ---------------------------------------------------------------------------
+# Real (``in vivo``) recording stored in the TINS "Spike Sorted Dataset" (SSD)
+# container. The archive holds a text descriptor plus binary companions:
+#
+#   ``*.ssd``   - descriptor: unit names, electrodes, spike counts per unit
+#   ``*.ssduw`` - float32 waveforms, concatenated unit after unit
+#   ``*.ssdst`` - int32 first sample of every spike
+#   ``*.ssdec`` - int32 manual-sorting decision codes
+#
+# The waveform length is inferred from the file size and the total spike
+# count (58 samples for this recording).
+# ---------------------------------------------------------------------------
+
+REAL_PEAK_INDEX = 29
+
+
+def parse_ssd_descriptor(path: str) -> dict:
+    """Parse the text companion of an SSD recording.
+
+    Args:
+        path: path to the ``*.ssd`` descriptor.
+
+    Returns:
+        Mapping with ``unit_names``, ``electrodes`` and ``spike_counts``.
+    """
+    with open(path, "r", encoding="utf-8", errors="replace") as handle:
+        lines = [line.strip() for line in handle]
+
+    def block(start_marker: str) -> list[str]:
+        start = lines.index(start_marker)
+        values: list[str] = []
+        for line in lines[start + 1:]:
+            if not line:
+                break
+            values.append(line)
+        return values
+
+    unit_names = block("List with the names of units:")
+    electrodes = block(
+        "List with the recording elements (channels, tetrodes, etc) "
+        "where each unit originates:"
+    )
+    counts = [int(value) for value in block("Number of spikes in each unit:")]
+    return {
+        "unit_names": unit_names,
+        "electrodes": electrodes,
+        "spike_counts": np.asarray(counts, dtype=np.int64),
+    }
+
+
+def load_realdata(
+    ssd_dir: str,
+    align_to_peak: bool = True,
+    zscore: bool = False,
+    max_spikes: int | None = None,
+    seed: int = 0,
+) -> SimulationSpikes:
+    """Load the TINS real recording as ``(spikes, labels)``.
+
+    The unit labels come from the manual sorting shipped with the dataset, so
+    they act as a reference partition rather than a synthetic ground truth.
+
+    Args:
+        ssd_dir: directory containing the ``*.ssd``/``*.ssduw`` files.
+        align_to_peak: align the positive peak to ``REAL_PEAK_INDEX``.
+        zscore: z-score every waveform.
+        max_spikes: optionally subsample spikes for quick runs.
+        seed: random seed used for subsampling.
+
+    Returns:
+        :class:`SimulationSpikes` with float32 waveforms and int64 labels.
+    """
+    descriptor = None
+    waveform_file = None
+    for name in os.listdir(ssd_dir):
+        if name.endswith(".ssd"):
+            descriptor = os.path.join(ssd_dir, name)
+        elif name.endswith(".ssduw"):
+            waveform_file = os.path.join(ssd_dir, name)
+    if descriptor is None or waveform_file is None:
+        raise FileNotFoundError(f"no .ssd/.ssduw pair found in {ssd_dir}")
+
+    meta = parse_ssd_descriptor(descriptor)
+    counts = meta["spike_counts"]
+    total = int(counts.sum())
+    waveforms = np.fromfile(waveform_file, dtype=np.float32)
+    if waveforms.size % total != 0:
+        raise ValueError(
+            f"waveform file has {waveforms.size} floats for {total} spikes"
+        )
+    length = waveforms.size // total
+    waveforms = waveforms.reshape(total, length)
+
+    labels = np.repeat(np.arange(len(counts), dtype=np.int64), counts)
+
+    if align_to_peak:
+        peaks = np.argmax(waveforms, axis=1)
+        aligned = np.zeros_like(waveforms)
+        for row, peak in enumerate(peaks):
+            shift = REAL_PEAK_INDEX - int(peak)
+            if shift == 0:
+                aligned[row] = waveforms[row]
+            elif shift > 0:
+                aligned[row, shift:] = waveforms[row, :-shift]
+            else:
+                aligned[row, :shift] = waveforms[row, -shift:]
+        waveforms = aligned
+
+    if zscore:
+        mean = waveforms.mean(axis=1, keepdims=True)
+        std = waveforms.std(axis=1, keepdims=True)
+        std[std == 0] = 1.0
+        waveforms = (waveforms - mean) / std
+
+    if max_spikes is not None and len(waveforms) > max_spikes:
+        rng = np.random.default_rng(seed)
+        keep = rng.choice(len(waveforms), size=max_spikes, replace=False)
+        keep.sort()
+        waveforms = waveforms[keep]
+        labels = labels[keep]
+
+    return SimulationSpikes(spikes=waveforms.astype(np.float32), labels=labels)

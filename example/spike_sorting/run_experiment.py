@@ -39,7 +39,7 @@ from models import (  # noqa: E402
     train_gaussian_vae,
     train_qbm_vae,
 )
-from spike_data import load_simulation  # noqa: E402
+from spike_data import load_realdata, load_simulation  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -74,6 +74,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--out", default="example/spike_sorting/results")
     parser.add_argument(
         "--zscore", action="store_true", help="z-score every waveform before training"
+    )
+    parser.add_argument(
+        "--realdata-dir",
+        default=None,
+        help="optional TINS .ssd directory; adds the real recording as a dataset",
+    )
+    parser.add_argument(
+        "--max-spikes",
+        type=int,
+        default=None,
+        help="optionally subsample spikes for quick runs",
     )
     return parser.parse_args()
 
@@ -151,27 +162,48 @@ def run_one(
 
 
 def main() -> None:
-    """Entry point: run every model on every requested simulation."""
+    """Entry point: run every model on every requested dataset."""
     args = parse_args()
     device = torch.device(args.device)
     os.makedirs(args.out, exist_ok=True)
     rows = []
 
-    for simulation in args.simulations:
-        data = load_simulation(
-            simulation,
-            args.data_dir,
-            zscore=args.zscore,
+    datasets = [
+        (
+            str(simulation),
+            load_simulation(
+                simulation,
+                args.data_dir,
+                zscore=args.zscore,
+                max_spikes=args.max_spikes,
+                seed=args.seed,
+            ),
         )
+        for simulation in args.simulations
+    ]
+    if args.realdata_dir:
+        datasets.append(
+            (
+                "real",
+                load_realdata(
+                    args.realdata_dir,
+                    zscore=args.zscore,
+                    max_spikes=args.max_spikes,
+                    seed=args.seed,
+                ),
+            )
+        )
+
+    for name, data in datasets:
         print(
-            f"simulation {simulation}: {data.spikes.shape[0]} spikes, "
+            f"dataset {name}: {data.spikes.shape[0]} spikes, "
             f"{len(np.unique(data.labels))} clusters"
         )
         for model_name in args.models:
             result = run_one(model_name, data.spikes, args, device)
             metrics = evaluate_clustering(result["features"], data.labels, seed=args.seed)
             row = {
-                "simulation": simulation,
+                "simulation": name,
                 "model": model_name,
                 "n_spikes": int(data.spikes.shape[0]),
                 **metrics,
@@ -199,3 +231,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

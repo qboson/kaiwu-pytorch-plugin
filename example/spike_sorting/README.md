@@ -21,8 +21,7 @@ latent, which is the plugin's core scientific contribution.
 
 ## Data
 
-The simulations come from the public Kaggle datasets published by the paper's
-first author:
+The datasets are the public Kaggle ones published by the paper's first author:
 
 * simulations: <https://www.kaggle.com/datasets/ardeleanrichard/simulationsdataset>
   (`simulation_<n>.mat`, `ground_truth.mat`)
@@ -38,6 +37,13 @@ Each `simulation_<n>.mat` stores a 24 kHz, 10-minute recording under `data`;
 positive peak to index 39 (the paper's `align_to_peak=2` mode) and optionally
 z-scores every waveform.
 
+The real recording is the TINS "Spike Sorted Dataset" (`.ssd`): a text
+descriptor holding unit names, electrodes and spike counts, plus binary
+companions. `load_realdata` reads the 58-sample float32 waveforms from
+`*.ssduw` and rebuilds the reference unit labels from the descriptor. Those
+labels come from the manual sorting shipped with the dataset, so they are a
+reference partition rather than a synthetic ground truth.
+
 ## Environment
 
 ```bash
@@ -49,10 +55,11 @@ pip install scikit-learn scipy
 ```
 
 The Kaiwu SDK needs an authorization file before it can run a sampler. On the
-first ``SimulatedAnnealingOptimizer`` call the SDK asks for the *user ID* and
-*SDK code* obtained from <https://platform.qboson.com/> and caches them in
-`license.lic`. Tests that mock the sampler keep running without a license, but
-the experiments below require one.
+first `SimulatedAnnealingOptimizer` call the SDK asks for the *user ID* and
+*SDK code* obtained from <https://platform.qboson.com/> and caches them in a
+`license.lic` file. Tests that mock the sampler keep running without a license,
+but the QBM-VAE experiments below require one; the AE/VAE baselines are plain
+PyTorch and do not.
 
 ## Usage
 
@@ -67,15 +74,17 @@ python example/spike_sorting/run_experiment.py \
 
 Useful flags:
 
-* `--latent-dim` – latent size of the VAE/QBM-VAE (default 10; the RBM prior
+* `--latent-dim` - latent size of the VAE/QBM-VAE (default 10; the RBM prior
   splits it into two halves, so keep it even),
-* `--zscore` – z-score every waveform before training,
-* `--device cuda:0` – train on a GPU,
-* `--epochs` – 100 matches the paper.
+* `--zscore` - z-score every waveform before training,
+* `--device cuda:0` - train on a GPU,
+* `--epochs` - 100 matches the paper,
+* `--realdata-dir` - add the TINS real recording as an extra dataset,
+* `--max-spikes` - subsample spikes for quick experiments.
 
 The run writes `results/metrics.csv` and `results/metrics.json` with ARI, AMI,
 V-measure (external) and Calinski-Harabasz, Davies-Bouldin, Silhouette
-(internal) scores for every (simulation, model) pair.
+(internal) scores for every (dataset, model) pair.
 
 ## Protocol
 
@@ -92,16 +101,16 @@ V-measure (external) and Calinski-Harabasz, Davies-Bouldin, Silhouette
 
 | file | purpose |
 | --- | --- |
-| `spike_data.py` | MATLAB loading, waveform extraction, peak alignment |
+| `spike_data.py` | MATLAB loading, waveform extraction, peak alignment, `.ssd` loader |
 | `models.py` | AE / Gaussian VAE baselines and the QBM-VAE wrapper |
 | `metrics.py` | k-means clustering and the six reported metrics |
 | `run_experiment.py` | CLI that trains, evaluates and writes CSV/JSON |
 
 ## Notes and limitations
 
-* The real-data (`realdata`) archive uses the TINS `.ssd` container; a loader is
-  planned as a follow-up. The simulation table is the paper's main result.
 * QBM-VAE training uses simulated annealing by default so it runs on a laptop;
   pass a CIM sampler to compare against real quantum hardware.
 * The paper reports per-variant averages over several runs; use `--seed` to
   reproduce a single run.
+* Clustering uses the ground-truth cluster count, matching the paper's protocol;
+  estimating the number of units is out of scope.
