@@ -44,8 +44,16 @@ def compute_prediction_mae(
     Evaluate property prediction Mean Absolute Error on a data loader.
 
     Returns dict: {'qed': mae_qed, 'logp': mae_logp, 'sas': mae_sas}.
+
+    Raises:
+        ValueError: If the loader yields no batches.
     """
     gcn.eval(); crbm.eval(); pred.eval()
+    if len(loader) == 0:
+        raise ValueError(
+            "prediction loader produced no batches; "
+            "check the test split and batch size"
+        )
     dev = CFG.device
 
     all_preds:  Dict[str, List[float]] = {p: [] for p in ("qed", "logp", "sas")}
