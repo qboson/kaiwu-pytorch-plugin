@@ -105,14 +105,6 @@ def stable_condition_seed(
     return int(base_seed + prop_code * 1_000_000 + band_index * 1_000 + ref_code)
 
 
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def package_version(name: str) -> str | None:
     try:
         return importlib.metadata.version(name)
@@ -163,10 +155,11 @@ def main() -> None:
 
     save_dir = Path(args.save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
-    manifest_path = Path(args.reference_manifest)
+    manifest_path = Path(args.reference_manifest).expanduser()
     if not manifest_path.is_absolute():
         manifest_path = PROJECT_ROOT / manifest_path
-    checkpoint_path = Path(args.checkpoint)
+    manifest_path = manifest_path.resolve()
+    checkpoint_path = Path(args.checkpoint).expanduser().resolve()
 
     data = load_zinc12k()
     train_df, _valid_df, test_df = split_dataset(data, seed=CFG.seed)
@@ -195,7 +188,10 @@ def main() -> None:
     if invalid_bands:
         raise ValueError(f"invalid band indices: {invalid_bands}")
 
-    checkpoint = torch.load(checkpoint_path, map_location=CFG.device, weights_only=False)
+    # Format-v3 checkpoints store two state_dicts plus primitive provenance
+    # (format_version int, feature_schema str), so weight-only unpickling
+    # loads them while refusing to execute any pickled code.
+    checkpoint = torch.load(checkpoint_path, map_location=CFG.device, weights_only=True)
     checkpoint_version = int(checkpoint.get("format_version", 1))
     if args.require_v2_checkpoint and checkpoint_version < 2:
         raise ValueError(
@@ -220,9 +216,15 @@ def main() -> None:
     exploration = {}
     exploration_hash = None
     if args.exploration_file:
-        exploration_path = Path(args.exploration_file)
+        exploration_path = Path(args.exploration_file).expanduser().resolve()
+        if not exploration_path.is_file():
+            raise FileNotFoundError(f"exploration file not found: {exploration_path}")
         exploration = json.loads(exploration_path.read_text(encoding="utf-8"))
-        exploration_hash = file_sha256(exploration_path)
+        exploration_digest = hashlib.sha256()
+        with exploration_path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                exploration_digest.update(chunk)
+        exploration_hash = exploration_digest.hexdigest()
 
     all_raw: List[Dict] = []
     all_trajectory: List[Dict] = []
@@ -253,6 +255,10 @@ def main() -> None:
         atomic_csv(table2_rows, save_dir / "table2_generation_stats.csv")
 
         quality = generation_quality_metrics(all_raw, train_smiles) if all_raw else {}
+        checkpoint_digest = hashlib.sha256()
+        with checkpoint_path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                checkpoint_digest.update(chunk)
         meta = {
             "protocol_version": 5,
             "tuning_protocol": "matched_integer_inputs_validity_selection_v1",
@@ -272,7 +278,7 @@ def main() -> None:
             } if args.solver == "kaiwu_cim" else None,
             "qubo_mode": args.qubo_mode,
             "checkpoint": str(checkpoint_path),
-            "checkpoint_sha256": file_sha256(checkpoint_path),
+            "checkpoint_sha256": checkpoint_digest.hexdigest(),
             "checkpoint_format_version": checkpoint_version,
             "legacy_checkpoint": checkpoint_version < 2,
             "reference_manifest": str(manifest_path),

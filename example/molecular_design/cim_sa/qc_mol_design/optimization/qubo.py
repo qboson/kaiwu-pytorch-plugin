@@ -42,7 +42,6 @@ from __future__ import annotations
 
 import math
 import os
-import random
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -131,6 +130,7 @@ class MoleculeQUBO:
         valency_deficit_eps: float = 0.0,     # ε for modified penalty
         ring_incentive:      float = 0.0,     # reward for triangle-closing bonds
         connectivity_incentive: float = 0.0,  # reward for additional bonds
+        seed:                Optional[int] = None,  # perturbation stream seed
     ) -> np.ndarray:
         """
         Build upper-triangular QUBO matrix Q of shape (n_vars, n_vars).
@@ -255,7 +255,10 @@ class MoleculeQUBO:
 
         # ── Random perturbation: break symmetry for exploration ──────────
         if perturbation > 0:
-            diag_noise = np.random.uniform(
+            # Dedicated generator seeded from the run's per-step seed so the
+            # perturbation stays reproducible without touching the global
+            # NumPy stream other components consume.
+            diag_noise = np.random.default_rng(seed).uniform(
                 -perturbation, perturbation, size=self.n_vars
             )
             Q[np.diag_indices_from(Q)] += diag_noise
@@ -424,6 +427,7 @@ def _solve_builtin_sa(
     num_reads:      int,
     num_sweeps:     int,
     initial_states: Optional[List[Dict[int, int]]] = None,
+    seed:           Optional[int] = None,
 ) -> List[Dict[int, int]]:
     """Fallback Metropolis SA implementation (no external dependency).
 
@@ -431,8 +435,15 @@ def _solve_builtin_sa(
       - Scaled initial temperature proportional to QUBO energy scale
       - Slower cooling schedule for more exploration
       - Warm-start from provided initial states
+
+    All draws come from a dedicated generator seeded with ``seed`` (the
+    run's per-step solver seed), mirroring the Neal backend's seeding, so
+    results stay reproducible without touching the global random stream.
     """
     n = Q.shape[0]
+    if seed is None:
+        seed = int(getattr(CFG, "seed", 0))
+    rng = np.random.default_rng(seed)
 
     def energy(x: np.ndarray) -> float:
         return float(x @ Q @ x)
@@ -447,19 +458,22 @@ def _solve_builtin_sa(
         # Warm-start: use initial state if available, else random
         if initial_states and len(initial_states) > 0:
             init = initial_states[read_idx % len(initial_states)]
-            x = np.array([float(init.get(i, 0)) for i in range(n)],
-                         dtype=np.float64)
+            x = np.array([int(init.get(i, 0)) for i in range(n)],
+                         dtype=np.int64)
         else:
-            x = np.random.randint(0, 2, n).astype(np.float64)
+            # Keep the integer dtype: the Metropolis flip below does
+            # x[flip] ^= 1, which crashes on the float64 array the old
+            # np.random.randint(...).astype(np.float64) produced.
+            x = rng.integers(0, 2, size=n)
 
         T = T_init
         e = energy(x)
         for _ in range(num_sweeps):
-            flip = random.randint(0, n - 1)
+            flip = int(rng.integers(0, n))
             x[flip] ^= 1
             new_e = energy(x)
             delta = new_e - e
-            if delta < 0 or random.random() < math.exp(-delta / max(T, 1e-10)):
+            if delta < 0 or rng.random() < math.exp(-delta / max(T, 1e-10)):
                 e = new_e
             else:
                 x[flip] ^= 1

@@ -26,7 +26,15 @@ DATA = None
 
 
 def sha(path):
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    """Hash a repo file after canonicalising its location."""
+    canonical = Path(path).expanduser().resolve()
+    if not canonical.is_file():
+        raise FileNotFoundError(f"required input missing: {canonical}")
+    digest = hashlib.sha256()
+    with canonical.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def save(path, data):

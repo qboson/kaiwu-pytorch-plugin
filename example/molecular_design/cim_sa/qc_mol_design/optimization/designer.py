@@ -829,6 +829,7 @@ class MolecularDesigner:
                 valency_deficit_eps=val_def_eps,
                 ring_incentive=ring_inc,
                 connectivity_incentive=conn_inc,
+                seed=solver_seed,
             )
             solve_started = time.perf_counter()
             prepared = None
@@ -1178,7 +1179,9 @@ class MolecularDesigner:
             val_def_eps = 5.0
 
         # Generate ring-seeded initial states for SA warm-start
-        ring_init_states = self._make_ring_initial_states(qubo, atom_symbols, n_states=5)
+        ring_init_states = self._make_ring_initial_states(
+            qubo, atom_symbols, n_states=5, seed=int(CFG.seed)
+        )
 
         # ── Inner: solve QUBO, evaluate, collect ─────────────────────────
         max_samples = getattr(CFG, 'max_samples_per_step', 50)
@@ -1213,6 +1216,7 @@ class MolecularDesigner:
                 valency_deficit_eps=val_def_eps,
                 ring_incentive=ring_inc,
                 connectivity_incentive=conn_inc,
+                seed=int(CFG.seed) + len(generated),
             )
 
             # Choose initial states: ring-seeded or default
