@@ -107,6 +107,24 @@ def stable_condition_seed(
 
 def file_sha256(path: Path) -> str:
     digest = hashlib.sha256()
+    with Path(path).expanduser().resolve().open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validated_budget_sha256() -> str:
+    """Hash QC_SQA_BUDGET_FILE after canonicalising its location.
+
+    The path arrives from the environment and is recorded in run metadata
+    (budget_file_sha256).  Resolving it here pins the audit trail to one
+    canonical absolute path and rejects missing files up front instead of
+    failing inside the first metadata flush.
+    """
+    path = Path(os.environ["QC_SQA_BUDGET_FILE"]).expanduser().resolve()
+    if not path.is_file():
+        raise FileNotFoundError(f"QC_SQA_BUDGET_FILE not found: {path}")
+    digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
@@ -130,6 +148,7 @@ def atomic_csv(rows: List[Dict], path: Path, columns: List[str] | None = None) -
 def main() -> None:
     args = parse_args()
     os.environ["QC_QUBO_SOLVER"] = args.solver
+    budget_sha256 = validated_budget_sha256()
 
     from qc_mol_design.config import CFG, ATOM_FEATURE_SCHEMA
     from qc_mol_design.data import (
@@ -297,7 +316,7 @@ def main() -> None:
                 "max_feasibility_batches": int(os.environ.get("QC_MAX_FEASIBILITY_BATCHES", "1")),
                 "adaptive_budget_policy": "Frozen per-step observed CIM candidate counts; no SQA outcome-dependent resampling",
                 "sqa_schedule": "continuous-time PIMC, Hp=geometric automatic beta endpoints, Hd=geometric(2,0.001) then 0, Gamma=1",
-                "budget_file_sha256": file_sha256(Path(os.environ["QC_SQA_BUDGET_FILE"])),
+                "budget_file_sha256": budget_sha256,
                 "spin_encoding": os.environ.get("QC_SPIN_ENCODING", "none"),
                 "candidate_selection_policy": os.environ.get("QC_CANDIDATE_SELECTION", "energy"),
                 "solver_repeats": int(os.environ.get("QC_SOLVER_REPEATS", "1")),
