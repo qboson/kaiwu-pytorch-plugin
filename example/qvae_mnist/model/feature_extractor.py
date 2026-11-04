@@ -25,9 +25,9 @@ class FeatureExtractor:
             for data, label in dataloader:
                 data = data.to(self.device)
                 _, _, q, zeta = self.model(data)  # 返回四个值
-                if self.feature_type == "q":
+                if self.feature_type == 'q':
                     feat = q.cpu()
-                elif self.feature_type == "zeta":
+                elif self.feature_type == 'zeta':
                     feat = zeta.cpu()
                 else:
                     raise ValueError("feature_type must be 'q' or 'zeta'")
@@ -54,7 +54,7 @@ class FeatureExtractor:
         with torch.no_grad():
             # QVAE forward 返回: (recon_x, posterior, q, zeta)
             _, _, q, zeta = self.model(X_tensor)
-            if self.feature_type == "q":
+            if self.feature_type == 'q':
                 feat = q.cpu().numpy()
             else:
                 feat = zeta.cpu().numpy()
