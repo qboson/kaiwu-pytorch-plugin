@@ -97,6 +97,41 @@ V-measure (external) and Calinski-Harabasz, Davies-Bouldin, Silhouette
    cluster counts as one cluster, as in the paper).
 6. Report the six clustering metrics.
 
+## Results
+
+Single-seed reference run on the paper's four simulations plus the real
+recording (100 epochs, batch size 128, latent size 10 for the VAE and the
+QBM-VAE, AE code size 2, k-means with the ground-truth cluster count). Values
+are ARI with AMI in parentheses.
+
+| dataset | units | AE | VAE | QBM-VAE |
+| --- | --- | --- | --- | --- |
+| simulation 1 | 17 | 0.508 (0.754) | **0.663 (0.857)** | 0.281 (0.553) |
+| simulation 4 | 5 | 0.587 (0.795) | **0.593 (0.806)** | 0.512 (0.751) |
+| simulation 16 | 9 | 0.515 (0.765) | **0.628 (0.832)** | 0.583 (0.752) |
+| simulation 35 | 13 | **0.707 (0.863)** | 0.636 (0.823) | 0.468 (0.699) |
+| real recording | 83 | **0.094 (0.302)** | 0.058 (0.253) | 0.053 (0.226) |
+
+Observations from this run:
+
+* The AE/VAE baselines reproduce the paper's qualitative picture: clustering
+  gets harder as the number of units grows, and the low-dimensional AE code is
+  competitive but seed-sensitive.
+* QBM-VAE is close to the baselines on simulations 4 and 16, but clearly behind
+  on simulations 1 and 35, where the Boltzmann prior dominates the latent
+  geometry.
+* Longer QBM-VAE training degrades the features: on simulation 4 the ARI drops
+  from 0.534 at 10 epochs to 0.512 at 100 epochs. Using `sigmoid(q)` instead of
+  the raw encoder logits and stopping at 30 epochs gives the best QBM-VAE
+  result (0.566), still below the VAE baseline.
+* The real recording has 83 manually sorted units (~60 spikes per unit in a
+  5000-spike subsample), so k-means ARI is low for every method; the paper also
+  evaluates selected well-isolated units rather than all 83.
+
+Improving the Boltzmann-prior branch (warm-up, early stopping, BM pretraining)
+is follow-up work; the example keeps the paper's plain 100-epoch protocol so
+the comparison stays comparable.
+
 ## Files
 
 | file | purpose |
@@ -111,6 +146,7 @@ V-measure (external) and Calinski-Harabasz, Davies-Bouldin, Silhouette
 * QBM-VAE training uses simulated annealing by default so it runs on a laptop;
   pass a CIM sampler to compare against real quantum hardware.
 * The paper reports per-variant averages over several runs; use `--seed` to
-  reproduce a single run.
+  reproduce a single run. The AE code layer is only two-dimensional and varies
+  noticeably between seeds.
 * Clustering uses the ground-truth cluster count, matching the paper's protocol;
   estimating the number of units is out of scope.
