@@ -240,6 +240,11 @@ def test_qdiffusion_split_is_deterministic_per_seed(monkeypatch, tmp_path):
         "def encode_sequence(*a, **k):\n    pass\n"
         "def seed_torch(*a, **k):\n    pass\n", encoding="utf-8")
 
+    # 前序测试可能已把真 utils 包（qvae_mnist）缓存进 sys.modules，
+    # 弹出后让桩包在本次导入中生效
+    for name in ("utils", "utils.io", "utils.metrics", "utils.runtime",
+                 "workflow_helpers"):
+        sys.modules.pop(name, None)
     monkeypatch.syspath_prepend(str(stubs_dir))
     monkeypatch.syspath_prepend(str(workflows_dir))
     try:
