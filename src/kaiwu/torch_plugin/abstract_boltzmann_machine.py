@@ -55,7 +55,11 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
         Returns:
             torch.Tensor: Hamiltonian.
+
+        Raises:
+            NotImplementedError: If not implemented in subclass.
         """
+        raise NotImplementedError("Subclasses must implement forward")
 
     def get_ising_matrix(self):
         """Converts the model to Ising format.
