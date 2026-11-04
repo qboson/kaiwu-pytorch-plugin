@@ -119,3 +119,38 @@ def test_fit_weights_updates_mask_with_solver_kwargs(monkeypatch) -> None:
     assert np.array_equal(selector.get_support().astype(int), np.array([1, 0, 1, 0]))
     assert selector.selected_indices().tolist() == [0, 2]
     assert selector.num_selected() == 2
+
+
+def test_constructor_validates_feature_count_bounds() -> None:
+    """测试构造函数按 docstring 承诺拒绝非法的特征数边界。
+
+    min_selected_features > max_selected_features 会静默违反上界
+    （投影循环先降后升），min_selected_features > feature_dim 则会在
+    update_mask 时以无意义的 ``min() iterable argument is empty`` 崩溃。
+    """
+    import pytest
+
+    with pytest.raises(ValueError):
+        FeatureSelectionWrapper(
+            nn.Identity(),
+            feature_dim=10,
+            min_selected_features=5,
+            max_selected_features=3,
+        )
+
+    with pytest.raises(ValueError):
+        FeatureSelectionWrapper(
+            nn.Identity(),
+            feature_dim=3,
+            min_selected_features=5,
+        )
+
+    with pytest.raises(ValueError):
+        FeatureSelectionWrapper(
+            nn.Identity(),
+            feature_dim=0,
+        )
+
+    # 显式 min=0 与默认参数（隐式 min/max）仍然合法。
+    FeatureSelectionWrapper(nn.Identity(), feature_dim=3, min_selected_features=0)
+    FeatureSelectionWrapper(nn.Identity(), feature_dim=3)
