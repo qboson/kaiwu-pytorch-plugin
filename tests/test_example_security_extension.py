@@ -222,30 +222,25 @@ def test_feature_selection_datasets_are_reproducible():
 
 # ── deterministic dataset splitting helper ───────────────────────────────────
 
-def test_qdiffusion_split_is_deterministic_per_seed(monkeypatch):
+def test_qdiffusion_split_is_deterministic_per_seed(monkeypatch, tmp_path):
     """split_train_val_test shuffles with a seeded generator, so the same
     seed yields the same split regardless of surrounding global state."""
     workflows_dir = ROOT / "example" / "qdiffusion" / "dplm" / "workflows"
+    stubs_dir = tmp_path / "utils_stubs"
+    (stubs_dir / "utils").mkdir(parents=True)
+    (stubs_dir / "utils" / "__init__.py").write_text("", encoding="utf-8")
+    (stubs_dir / "utils" / "io.py").write_text(
+        "def normalize_decoded_sequence(s):\n    return s\n"
+        "def save_markdown(*a, **k):\n    pass\n"
+        "def write_fasta_records(*a, **k):\n    pass\n"
+        "def write_tsv_rows(*a, **k):\n    pass\n", encoding="utf-8")
+    (stubs_dir / "utils" / "metrics.py").write_text(
+        "class QualitySummary:\n    pass\n", encoding="utf-8")
+    (stubs_dir / "utils" / "runtime.py").write_text(
+        "def encode_sequence(*a, **k):\n    pass\n"
+        "def seed_torch(*a, **k):\n    pass\n", encoding="utf-8")
 
-    stub_pkg = importlib.util.module_from_spec(
-        importlib.util.spec_from_loader("utils", None)
-    )
-    stub_pkg.__path__ = []
-    sys.modules["utils"] = stub_pkg
-    for sub, body in (
-        ("utils.io", "def normalize_decoded_sequence(s):\n    return s\n"
-         "def save_markdown(*a, **k):\n    pass\n"
-         "def write_fasta_records(*a, **k):\n    pass\n"
-         "def write_tsv_rows(*a, **k):\n    pass\n"),
-        ("utils.metrics", "class QualitySummary:\n    pass\n"),
-        ("utils.runtime", "def encode_sequence(*a, **k):\n    pass\n"
-         "def seed_torch(*a, **k):\n    pass\n"),
-    ):
-        stub = importlib.util.module_from_spec(
-            importlib.util.spec_from_loader(sub, None)
-        )
-        exec(body, stub.__dict__)
-        sys.modules[sub] = stub
+    monkeypatch.syspath_prepend(str(stubs_dir))
     monkeypatch.syspath_prepend(str(workflows_dir))
     try:
         helpers = importlib.import_module("workflow_helpers")
@@ -265,6 +260,7 @@ def test_qdiffusion_split_is_deterministic_per_seed(monkeypatch):
         merged = [h for h, _ in first[0] + first[1] + first[2]]
         assert sorted(merged) == sorted(h for h, _ in records)
     finally:
+        sys.path.remove(str(stubs_dir))
         sys.path.remove(str(workflows_dir))
         for name in ("workflow_helpers", "utils", "utils.io",
                      "utils.metrics", "utils.runtime"):
