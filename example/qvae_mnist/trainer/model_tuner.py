@@ -1,4 +1,5 @@
-import os
+from pathlib import Path
+
 import torch
 import numpy as np
 
@@ -7,6 +8,20 @@ from utils.exception import ValueError, TypeError
 
 logger = get_logger(__name__)
 logger.setLevel('WARNING')
+
+
+def _safe_outfile(outpath, filename):
+	"""Resolve an output file path and keep it inside ``outpath``.
+
+	Caller-supplied names (model or config labels) must not escape the
+	run's output directory through path separators or ``..`` segments.
+	"""
+	root = Path(outpath).expanduser().resolve()
+	target = (root / filename).resolve()
+	if target.parent != root:
+		raise ValueError("output file escapes outpath: {0}".format(filename))
+	return target
+
 
 class ModelTuner(object):
 	def __init__(self, config=None):
@@ -25,14 +40,14 @@ class ModelTuner(object):
 
 	def save_model(self,config_string='test'):
 		logger.info("Saving Model")
-		f=open(os.path.join(self.outpath,"model_{0}.pt".format(config_string)),'wb')
+		f=_safe_outfile(self.outpath,"model_{0}.pt".format(config_string)).open('wb')
 		torch.save(self._model.state_dict(),f)
 		f.close()
 		return
 	
 	def save_rbm(self,config_string='test'):
 		logger.info("Saving RBM")
-		f=open(os.path.join(self.outpath,"rbm_{0}.pt".format(config_string)),'wb')
+		f=_safe_outfile(self.outpath,"rbm_{0}.pt".format(config_string)).open('wb')
 		print(self._model.prior)
 		torch.save(self._model.prior,f)
 		f.close()

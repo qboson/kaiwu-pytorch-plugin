@@ -4,9 +4,9 @@
 Command-line entry point for training the QVAE-MLP pipeline.
 """
 
-import os
 import json
 import argparse
+from pathlib import Path
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -124,8 +124,10 @@ def main():
 
     # Optional: save results
     if config.output_dir:
+        output_root = Path(config.output_dir).expanduser().resolve()
+        output_root.mkdir(parents=True, exist_ok=True)
         results = {"test_accuracy": accuracy}
-        with open(os.path.join(config.output_dir, "results.json"), "w") as f:
+        with (output_root / "results.json").open("w") as f:
             json.dump(results, f, indent=2)
         print(f"Results saved to {config.output_dir}")
 

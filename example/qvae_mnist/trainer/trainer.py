@@ -9,6 +9,7 @@ training loop, and result saving for QVAE models.
 
 import os
 from datetime import datetime
+from pathlib import Path
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -49,7 +50,9 @@ class Trainer:
 
         # 输出目录
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.output_dir = config.output_dir or f"./output/{self.config.type}_{self.timestamp}"
+        self.output_dir = str(Path(
+            config.output_dir or f"./output/{self.config.type}_{self.timestamp}"
+        ).expanduser().resolve())
         os.makedirs(self.output_dir, exist_ok=True)
 
         # 内部组件
@@ -344,7 +347,8 @@ class Trainer:
             'test_losses': self.test_losses,
             'config': config_dict
         }
-        with open(os.path.join(self.output_dir, 'results.json'), 'w') as f:
+        results_path = Path(self.output_dir).resolve() / 'results.json'
+        with results_path.open('w') as f:
             json.dump(results, f, indent=2)
         logger.info(f"Results saved to {self.output_dir}")
 
