@@ -841,6 +841,10 @@ class QDiffusion(nn.Module):
         resample_scores = torch.stack(resample_scores, dim=0).type_as(scores)
         resample_masks = torch.stack(resample_masks, dim=0).bool()
         logits = self._mask_logits(self.forward(resample_input))
+        if logits.dtype != resample_scores.dtype:
+            # Proposal model may run in half/full precision while the
+            # score buffer is float32; align like _decode_step does.
+            logits = logits.type_as(resample_scores)
         logits = top_k_top_p_filtering(logits, top_p=self.config.resample_top_p)
         new_tokens, new_scores = stochastic_sample_from_categorical(
             logits, temperature=0.0
