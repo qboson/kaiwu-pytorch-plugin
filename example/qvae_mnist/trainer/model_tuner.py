@@ -103,7 +103,9 @@ class ModelTuner(object):
 	def load_model(self,set_eval=True):
 		logger.info("Loading Model")
 		#attention: model must be defined already
-		self._model.load_state_dict(torch.load(self.infile))
+		self._model.load_state_dict(
+			torch.load(self.infile, weights_only=True)
+		)
 		#training of model
 		if set_eval:
 			self._model.eval()

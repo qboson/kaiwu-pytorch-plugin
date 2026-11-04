@@ -105,7 +105,9 @@ def main():
     weights_path = os.path.join(args.output_dir, f"{args.dataset}_kpp_qvae_best.pth")
     if args.load_weights:
         # 只加载已训练权重时，跳过训练并直接提取表示。
-        model.load_state_dict(torch.load(weights_path, map_location=args.device_obj))
+        model.load_state_dict(
+            torch.load(weights_path, map_location=args.device_obj, weights_only=True)
+        )
         print(f"Loaded weights from {weights_path}")
     else:
         # 训练过程会保存最佳验证集权重，同时记录训练曲线用于诊断。

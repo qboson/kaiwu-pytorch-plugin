@@ -85,7 +85,9 @@ def get_net(cfg):
             # we strip their checkpoint prefixes before loading into the example
             # wrapper.
             pretrained_state_dict = torch.load(
-                pretrained_model_name_or_path, map_location="cpu"
+                pretrained_model_name_or_path,
+                map_location="cpu",
+                weights_only=True,
             )["state_dict"]
             new_pretrained_state_dict = OrderedDict()
             for key, value in pretrained_state_dict.items():
@@ -148,7 +150,9 @@ class DPLMBackbone(nn.Module):
             model = cls(cfg)
 
             pretrained_state_dict = torch.load(
-                net_name, map_location=torch.device("cpu")
+                net_name,
+                map_location=torch.device("cpu"),
+                weights_only=True,
             )["state_dict"]
             new_pretrained_state_dict = OrderedDict()
             for key, value in pretrained_state_dict.items():
