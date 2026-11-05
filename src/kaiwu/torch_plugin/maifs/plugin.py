@@ -409,11 +409,12 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If ``candidate_mask`` has the wrong shape or contains
                 non-binary values.
         """
-        projected = np.asarray(candidate_mask, dtype=int).copy()
-        if projected.shape != (self.feature_dim,):
+        candidate = np.asarray(candidate_mask)
+        if candidate.shape != (self.feature_dim,):
             raise ValueError(f"candidate_mask must have shape ({self.feature_dim},)")
-        if not np.all((projected == 0) | (projected == 1)):
+        if not np.all((candidate == 0) | (candidate == 1)):
             raise ValueError("candidate_mask must contain only binary 0/1 values")
+        projected = candidate.astype(int).copy()
 
         def objective_after_change(index: int, value: int) -> float:
             """Evaluate the QUBO objective after flipping one projected bit.
