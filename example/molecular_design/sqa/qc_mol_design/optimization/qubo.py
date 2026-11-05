@@ -304,6 +304,15 @@ def solve_qubo(
     """
     backend = os.environ.get("QC_QUBO_SOLVER", "").lower()
 
+    # An unknown explicit backend is a configuration error, not a request for
+    # the default chain: a typo must fail loudly instead of silently producing
+    # results labeled as a different solver in run_meta.json.
+    if backend and backend not in ("kaiwu", "kaiwu_cim", "neal", "sqa"):
+        raise ValueError(
+            f"Unsupported QC_QUBO_SOLVER: {backend!r} "
+            "(expected kaiwu, kaiwu_cim, neal or sqa)"
+        )
+
     # Opt-in Kaiwu backend (leaves the default SQA path untouched).
     if backend == "kaiwu":
         return _solve_kaiwu(Q, num_reads, num_sweeps, initial_states, prepared=cim_prepared)
@@ -322,10 +331,13 @@ def solve_qubo(
     if backend == "sqa":
         return _solve_sqa(Q, num_reads, num_sweeps, initial_states)
 
-    # With no explicit backend, retain the convenient fallback chain.
+    # With no explicit backend, retain the convenient fallback chain.  It
+    # exists for optional dependencies, so only ImportError may trigger it —
+    # a genuine solver failure must surface, mirroring the contract of the
+    # explicit `sqa` arm above and the Neal arm below.
     try:
         return _solve_sqa(Q, num_reads, num_sweeps, initial_states)
-    except Exception:
+    except ImportError:
         pass
 
     # Fallback to Neal SA
