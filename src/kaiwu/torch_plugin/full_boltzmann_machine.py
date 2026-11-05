@@ -5,7 +5,10 @@ import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validate_node_count,
+)
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -31,6 +34,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         device=None,
     ):
         super().__init__(device=device)
+        num_nodes = _validate_node_count("num_nodes", num_nodes)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef

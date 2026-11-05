@@ -5,9 +5,32 @@
 
 
 """Abstract base class for Boltzmann Machines."""
+from numbers import Integral
+
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
+
+
+def _validate_node_count(name, value):
+    """Validate one Boltzmann-machine dimension.
+
+    Args:
+        name: Parameter name used in the error message.
+        value: Requested node count.
+
+    Returns:
+        int: The validated count.
+
+    Raises:
+        TypeError: If ``value`` is not an integer.
+        ValueError: If ``value`` is not positive.
+    """
+    if isinstance(value, bool) or not isinstance(value, Integral):
+        raise TypeError(f"{name} must be a positive integer")
+    if value < 1:
+        raise ValueError(f"{name} must be a positive integer")
+    return int(value)
 
 
 class AbstractBoltzmannMachine(torch.nn.Module):
