@@ -194,12 +194,12 @@ class CellQVAE(QVAE):
             recon_x = recon_x + self._train_bias
         return recon_x, posterior, q, zeta
 
-    def energy(self, x, loss_type):
+    def energy(self, x, loss_type=None):
         """计算单细胞样本在 BM 潜空间中的能量。
 
         Args:
             x: 单细胞表达矩阵。
-            loss_type: 损失类型，必须与模型配置一致。
+            loss_type: 可选的损失类型；提供时必须与模型配置一致。
 
         Returns:
             每个样本对应的 BM 能量。
@@ -207,7 +207,7 @@ class CellQVAE(QVAE):
         Raises:
             ValueError: ``loss_type`` 与模型配置不一致。
         """
-        if loss_type != self.config.loss_type:
+        if loss_type is not None and loss_type != self.config.loss_type:
             raise ValueError("loss_type must match model.config.loss_type")
         q, _, _ = self._encode(x)
         return self.bm((q > 0).float())
