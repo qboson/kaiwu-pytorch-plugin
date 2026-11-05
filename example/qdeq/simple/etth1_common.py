@@ -215,7 +215,16 @@ class DEQForecaster(nn.Module):
         self.head = nn.Linear(d_model, pred_len)
 
     def forward(self, history: torch.Tensor) -> torch.Tensor:
-        """Maps a (batch, seq_len, variables) history to a (batch, pred_len, variables) forecast."""
+        """Maps a history window to a forecast.
+
+        Args:
+            history: Input window of shape ``(batch, seq_len, variables)``.
+                Each window is normalised per variable before embedding.
+
+        Returns:
+            torch.Tensor: Forecast of shape ``(batch, pred_len, variables)``
+            in the same units as ``history``.
+        """
         # Normalise each window per variable, embed each variable's series as
         # one token, solve the equilibrium over tokens and project to the horizon.
         mean = history.mean(dim=1, keepdim=True)
