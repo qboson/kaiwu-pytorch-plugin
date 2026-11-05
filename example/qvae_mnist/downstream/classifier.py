@@ -133,11 +133,18 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             self.input_dim = X.shape[1]
             logger.info(f"Auto-detected input_dim: {self.input_dim}")
         # 数据划分
+        _, class_counts = np.unique(y, return_counts=True)
+        stratify = y if int(class_counts.min()) >= 2 else None
+        if stratify is None:
+            logger.warning(
+                "At least one class has fewer than 2 samples; "
+                "falling back to an unstratified train/validation split."
+            )
         X_train, X_val, y_train, y_val = train_test_split(
             X, y, 
             test_size=validation_split, 
             random_state=self.random_state,
-            stratify=y
+            stratify=stratify
         )
         # 转为 Tensor
         X_train = torch.FloatTensor(X_train).to(self.device)
