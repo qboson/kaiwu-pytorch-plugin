@@ -122,6 +122,9 @@ def _anderson_solver(
     Returns:
         tuple: The iterate with the lowest tracked residual, and a dict with
         ``"nstep"`` and ``"residual"``.
+
+    Half-precision mixing systems are solved in float32. The fixed-point map
+    and returned iterate retain the initial guess's dtype.
     """
     # Ring buffers of the last m iterates x_i and their images f(x_i), one row
     # per sample; each sample is mixed independently.
@@ -134,20 +137,24 @@ def _anderson_solver(
     x_hist[:, 1] = f_hist[:, 0]
     f_hist[:, 1] = func(f_hist[:, 0].reshape_as(z0)).reshape(bsz, -1)
 
+    # LU solving requires at least float32; keep the fixed-point map in its own dtype.
+    solve_dtype = torch.float32 if z0.dtype in (torch.float16, torch.bfloat16) else z0.dtype
     # Bordered system whose solution gives mixing weights summing to one.
-    h_mat = torch.zeros(bsz, m + 1, m + 1, dtype=z0.dtype, device=z0.device)
+    h_mat = torch.zeros(bsz, m + 1, m + 1, dtype=solve_dtype, device=z0.device)
     h_mat[:, 0, 1:] = h_mat[:, 1:, 0] = 1
-    rhs = torch.zeros(bsz, m + 1, 1, dtype=z0.dtype, device=z0.device)
+    rhs = torch.zeros(bsz, m + 1, 1, dtype=solve_dtype, device=z0.device)
     rhs[:, 0] = 1
 
     best_z, best_res, nstep = z0, float("inf"), 0
     for k in range(2, max(threshold, 3)):
         n = min(k, m)
         # alpha = argmin ||sum_i alpha_i (f(x_i) - x_i)||^2  s.t.  sum_i alpha_i = 1.
-        g_mat = f_hist[:, :n] - x_hist[:, :n]
-        eye = torch.eye(n, dtype=z0.dtype, device=z0.device)[None]
+        g_mat = (f_hist[:, :n] - x_hist[:, :n]).to(dtype=solve_dtype)
+        eye = torch.eye(n, dtype=solve_dtype, device=z0.device)[None]
         h_mat[:, 1 : n + 1, 1 : n + 1] = g_mat @ g_mat.transpose(1, 2) + config.anderson_lam * eye
-        alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])[:, 1 : n + 1, 0]
+        alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])[
+            :, 1 : n + 1, 0
+        ].to(dtype=z0.dtype)
         # The next iterate mixes the stored images and overwrites the oldest slot.
         x_hist[:, k % m] = (alpha[:, None] @ f_hist[:, :n])[:, 0]
         f_hist[:, k % m] = func(x_hist[:, k % m].reshape_as(z0)).reshape(bsz, -1)
