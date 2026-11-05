@@ -31,6 +31,11 @@ logger = get_logger(__name__)
 # logger = logging.getLogger(__name__)
 
 
+def save_interval(num_epochs):
+    """Return how many epochs fit between two reconstruction snapshots."""
+    return max(1, int(num_epochs) // 10)
+
+
 class Trainer:
     """统一的训练器类，封装数据加载、模型创建、训练循环、结果保存"""
 
@@ -187,7 +192,7 @@ class Trainer:
 
             epoch_pbar.set_description(f"Epoch {epoch}/{self.config.num_epochs} - Train Loss: {train_loss:.2f}, Test Loss: {test_loss:.2f}")
 
-            if epoch % (self.config.num_epochs // 10) == 0 or epoch == self.config.num_epochs:
+            if epoch % save_interval(self.config.num_epochs) == 0 or epoch == self.config.num_epochs:
                 self._save_reconstruction(epoch, input_data, output_data)
                 logger.info(f"Epoch {epoch}: Train Loss={train_loss:.4f}, Test Loss={test_loss:.4f}")
 
