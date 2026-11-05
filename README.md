@@ -113,8 +113,14 @@ The diagram above shows the main code structure of the project:
 ### Requirements
 - python == 3.10
 - kaiwu >= 1.3.1, <= 1.4.3
-- torch == 2.7.0
+- torch >= 2.3, < 2.15
 - numpy == 2.2.6
+
+PyTorch compatibility covers 2.3 through 2.14, and CI checks 2.3, 2.7, and
+2.14 on Python 3.10. Both ends of that window are hard constraints rather
+than choices: torch 2.15.0 stopped shipping the cp310 wheels the kaiwu SDK
+needs, and 2.3 is the oldest minor line that pairs with the numpy 2.x wheels
+the SDK pins.
 
 Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
 1.4.2, and 1.4.3. The same model code handles the precision-reducer location
