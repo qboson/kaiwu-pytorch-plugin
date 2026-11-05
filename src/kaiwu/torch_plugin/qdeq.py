@@ -371,6 +371,22 @@ class QDEQ(nn.Module):
         self.last_jac_loss = None
         self._last_stats: dict[str, float] = {}
 
+    def _layer_device(self, x: torch.Tensor) -> torch.device:
+        """Returns the device the wrapped layer's parameters live on.
+
+        Callers may still pass ``x`` on CPU after a parent ``.to()`` moved only
+        the submodule parameters to an accelerator. Aligning ``x`` (and ``z0``)
+        here avoids mixed-device ``layer(z, x)`` calls.
+
+        Args:
+            x: Forward input used when the layer has no parameters.
+
+        Returns:
+            torch.device: Device of the first layer parameter, else ``x.device``.
+        """
+        parameter = next(self.layer.parameters(), None)
+        return parameter.device if parameter is not None else x.device
+
     def forward(self, x: torch.Tensor, z0: torch.Tensor | None = None) -> torch.Tensor:
         """Returns the layer output at its fixed point.
 
@@ -381,8 +397,11 @@ class QDEQ(nn.Module):
         Returns:
             torch.Tensor: ``layer(z*, x)``.
         """
-        z0 = torch.zeros_like(x) if z0 is None else z0
+        layer_device = self._layer_device(x)
+        x = x.to(layer_device)
+        z0 = torch.zeros_like(x) if z0 is None else z0.to(layer_device)
         cfg = self.config
+
         def func(z):
             return self.layer(z, x)
 
