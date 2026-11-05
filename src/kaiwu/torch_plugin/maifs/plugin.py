@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from math import ceil
+from numbers import Integral
 
 import numpy as np
 import torch
@@ -139,11 +140,17 @@ class FeatureSelectionWrapper(nn.Module):
             The mask reshaped and typed for broadcasting with ``input_feature``.
 
         Raises:
-            ValueError: If ``input_feature`` has no dimensions or the configured
-                feature axis does not match ``feature_dim``.
+            ValueError: If ``input_feature`` has no dimensions, the configured
+                ``input_feature_axis`` is outside the input rank, or the feature
+                axis does not match ``feature_dim``.
         """
         if input_feature.ndim == 0:
             raise ValueError("input_feature must have at least one dimension")
+        if not -input_feature.ndim <= self.input_feature_axis < input_feature.ndim:
+            raise ValueError(
+                f"input_feature_axis={self.input_feature_axis} is out of range for a "
+                f"{input_feature.ndim}-dimensional input"
+            )
         axis = self.input_feature_axis % input_feature.ndim
         axis_size = input_feature.shape[axis]
         if axis_size != self.feature_dim:
@@ -208,6 +215,10 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If ``data_loader`` yields no batches or ``loss_fn`` does
                 not return a scalar tensor.
         """
+        if isinstance(train_epochs, bool) or not isinstance(train_epochs, Integral):
+            raise TypeError("train_epochs must be a positive integer")
+        if train_epochs < 1:
+            raise ValueError("train_epochs must be a positive integer")
         train_epochs = int(train_epochs)
         self.train()
         total_loss = 0.0
