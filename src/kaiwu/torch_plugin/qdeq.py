@@ -170,6 +170,8 @@ def _ising_fixed_point_solver(
     config: QDEQConfig,
     threshold: int,
     eps: float,
+    *,
+    generator: torch.Generator | None = None,
 ) -> tuple[torch.Tensor, dict[str, float]]:
     """Finds ``z = func(z)`` with update coefficients chosen by an Ising sampler.
 
@@ -187,6 +189,7 @@ def _ising_fixed_point_solver(
         config: Supplies the Ising and stopping options.
         threshold: Maximum number of updates.
         eps: Stopping tolerance.
+        generator: Optional caller-owned stream for random search directions.
 
     Returns:
         tuple: The iterate with the lowest tracked residual, and a dict with
@@ -208,7 +211,10 @@ def _ising_fixed_point_solver(
             break
 
         # G[i] = (r(z + h v_i) - r(z)) / h approximates J v_i for each direction v_i.
-        basis = _search_directions(residual, history_r, history_dz, history_dr, config.num_basis)
+        basis = _search_directions(
+            residual, history_r, history_dz, history_dr, config.num_basis,
+            generator=generator,
+        )
         shifted = z + config.fd_eps * basis
         g_mat = torch.stack([(func(zs) - zs - residual).reshape(-1) for zs in shifted])
         g_mat = (g_mat / config.fd_eps).double()
@@ -230,7 +236,9 @@ def _ising_fixed_point_solver(
     return best_z, {"nstep": nstep, "residual": best_res, "sampler_time": sampler_time}
 
 
-def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -> torch.Tensor:
+def _search_directions(
+    residual, history_r, history_dz, history_dr, num_basis, *, generator=None
+) -> torch.Tensor:
     """Builds the unit search directions of one Ising step.
 
     Directions are taken in order from ``-r``, past residuals and pairs of
@@ -243,6 +251,7 @@ def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -
         history_dz: Past updates ``z_{k+1} - z_k``, oldest first.
         history_dr: Past residual changes ``r_{k+1} - r_k``, oldest first.
         num_basis: Number of directions to return.
+        generator: Optional stream on the same device as ``residual``.
 
     Returns:
         torch.Tensor: Directions of shape ``(num_basis, *residual.shape)``,
@@ -253,7 +262,13 @@ def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -
         directions += [dz, dr]
     directions = directions[:num_basis]
     while len(directions) < num_basis:
-        directions.append(torch.randint_like(residual, 0, 2) * 2 - 1)
+        signs = (
+            torch.randint_like(residual, 0, 2)
+            if generator is None
+            else torch.randint(0, 2, residual.shape, dtype=residual.dtype,
+                               device=residual.device, generator=generator)
+        )
+        directions.append(signs * 2 - 1)
     return torch.stack([v / (v.norm() + 1e-9) for v in directions])
 
 
@@ -352,6 +367,12 @@ class QDEQ(nn.Module):
 
         config: Solver configuration. Defaults to ``QDEQConfig()``.
 
+        generator: Optional caller-owned ``torch.Generator`` for random search
+            directions and Jacobian probes. It must match the tensor device.
+            ``None`` preserves global-RNG behavior. Save/restore its state
+            separately from ``state_dict()``; sampler and layer randomness are
+            controlled independently. Failed calls may advance this stream.
+
     Raises:
         ValueError: If ``config.stop_mode`` is not ``"rel"`` or ``"abs"``.
     """
@@ -361,11 +382,14 @@ class QDEQ(nn.Module):
         layer: nn.Module,
         sampler: Any,
         config: QDEQConfig | None = None,
+        *,
+        generator: torch.Generator | None = None,
     ) -> None:
         super().__init__()
         self.layer = layer
         self.sampler = sampler
         self.config = config or QDEQConfig()
+        self.generator = generator
         if self.config.stop_mode not in ("rel", "abs"):
             raise ValueError("stop_mode must be 'rel' or 'abs'")
         self.last_jac_loss = None
@@ -400,7 +424,12 @@ class QDEQ(nn.Module):
             z_star = z_star.detach().requires_grad_()
             new_z = self.layer(z_star, x)
         if cfg.jac_loss_vecs > 0:
-            self.last_jac_loss = self.jacobian_loss(new_z, z_star, cfg.jac_loss_vecs)
+            if self.generator is None:
+                self.last_jac_loss = self.jacobian_loss(new_z, z_star, cfg.jac_loss_vecs)
+            else:
+                self.last_jac_loss = self.jacobian_loss(
+                    new_z, z_star, cfg.jac_loss_vecs, generator=self.generator
+                )
         # 3. Replace the one-step gradient with the implicit-function gradient.
         self._attach_implicit_backward(new_z, z_star)
         return new_z
@@ -457,7 +486,10 @@ class QDEQ(nn.Module):
         if self.sampler is None:
             raise ValueError("QDEQ requires a sampler to solve the fixed point")
         cfg = self.config
-        return _ising_fixed_point_solver(func, z0, self.sampler, cfg, cfg.f_thres, cfg.f_eps)
+        return _ising_fixed_point_solver(
+            func, z0, self.sampler, cfg, cfg.f_thres, cfg.f_eps,
+            generator=self.generator,
+        )
 
     def solve_context(self) -> contextlib.AbstractContextManager:
         """Context entered around the fixed-point solve. Override to switch layer state.
@@ -476,13 +508,17 @@ class QDEQ(nn.Module):
         return contextlib.nullcontext()
 
     @staticmethod
-    def jacobian_loss(new_z: torch.Tensor, z_star: torch.Tensor, vecs: int = 1) -> torch.Tensor:
+    def jacobian_loss(
+        new_z: torch.Tensor, z_star: torch.Tensor, vecs: int = 1, *,
+        generator: torch.Generator | None = None,
+    ) -> torch.Tensor:
         """Hutchinson estimate of ``||d new_z / d z_star||_F^2 / z_star.numel()``.
 
         Args:
             new_z: Layer output at the fixed point.
             z_star: Fixed point with ``requires_grad`` set.
             vecs: Number of random probe vectors.
+            generator: Optional stream on the same device as ``z_star``.
 
         Returns:
             torch.Tensor: Differentiable scalar to add to the training loss.
@@ -490,7 +526,12 @@ class QDEQ(nn.Module):
         # E_p ||J^T p||^2 = ||J||_F^2 for standard normal probes p.
         total = 0
         for _ in range(vecs):
-            probe = torch.randn_like(z_star)
+            probe = (
+                torch.randn_like(z_star)
+                if generator is None
+                else torch.randn(z_star.shape, dtype=z_star.dtype,
+                                 device=z_star.device, generator=generator)
+            )
             vjp = torch.autograd.grad(new_z, z_star, probe, retain_graph=True, create_graph=True)[0]
             total = total + vjp.norm() ** 2
         return total / vecs / z_star.numel()
