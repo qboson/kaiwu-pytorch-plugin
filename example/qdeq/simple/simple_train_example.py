@@ -11,6 +11,7 @@ The script keeps only the smallest useful training path:
 from __future__ import annotations
 
 import argparse
+import math
 from pathlib import Path
 import time
 
@@ -27,6 +28,14 @@ from etth1_common import (
 )
 
 
+def _positive_float(text: str) -> float:
+    """Returns a finite positive float for argparse."""
+    value = float(text)
+    if not math.isfinite(value) or value <= 0:
+        raise argparse.ArgumentTypeError("must be a finite positive number")
+    return value
+
+
 def parse_args() -> argparse.Namespace:
     """Parses command-line options."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -35,7 +44,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sampler", choices=["sa", "anderson", "cim"], default="sa")
     parser.add_argument("--epochs", type=int, default=2)
     parser.add_argument("--max-train-batches", type=int, default=60)
-    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--lr", type=_positive_float, default=1e-3)
     parser.add_argument("--seed", type=int, default=0)
     return parser.parse_args()
 
