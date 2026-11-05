@@ -80,6 +80,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
+            s_visible = torch.as_tensor(
+                s_visible,
+                dtype=self.quadratic_coef.dtype,
+                device=self.device,
+            )
             s_all = torch.zeros(
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
@@ -100,6 +105,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     ) -> torch.Tensor:
         """Propagate hidden spins to the visible layer."""
         with torch.no_grad():
+            s_hidden = torch.as_tensor(
+                s_hidden,
+                dtype=self.quadratic_coef.dtype,
+                device=self.device,
+            )
             s_all = torch.zeros(
                 s_hidden.size(0), self.num_hidden + self.num_visible
             ).to(self.device)
