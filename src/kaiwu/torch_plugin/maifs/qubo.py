@@ -215,6 +215,11 @@ class PrecisionSplitExplorer:
             _get_kaiwu_precision_helpers()
         )
         precision_info = calculate_ising_matrix_bit_width(ising_matrix, precision)
+        if not isinstance(precision_info, dict):
+            raise RuntimeError(
+                "Kaiwu precision helpers cannot describe this Ising matrix; "
+                "zero or degenerate matrices have no precision metadata"
+            )
         if precision_info.get("multiplier") != float("inf"):
             adjusted_matrix = ising_matrix * precision_info.get("multiplier")
         else:
