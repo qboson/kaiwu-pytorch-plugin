@@ -181,7 +181,12 @@ def main() -> None:
         ]
     references = select_references(all_references, requested_ids)
 
-    all_bands = TABLE2_TARGETS.get(args.prop, [CFG.target_range])
+    if args.prop not in TABLE2_TARGETS:
+        raise ValueError(
+            f"no target bands defined for {args.prop!r}; "
+            f"TABLE2_TARGETS covers {sorted(TABLE2_TARGETS)}"
+        )
+    all_bands = TABLE2_TARGETS[args.prop]
     if args.bands == "all":
         band_indices = list(range(len(all_bands)))
     else:
