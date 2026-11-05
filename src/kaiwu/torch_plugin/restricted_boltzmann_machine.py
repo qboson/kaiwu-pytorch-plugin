@@ -75,8 +75,14 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Propagate visible spins to the hidden layer.
 
         Args:
-            s_visible: Visible layer tensor.
+            s_visible: Visible layer tensor, shape ``(batch, num_visible)``.
             requires_grad: Whether to allow gradient backpropagation.
+            bernoulli: Whether to sample binary hidden states (``prob > rand``)
+                instead of returning the activation probabilities.
+
+        Returns:
+            torch.Tensor: Concatenated states of shape
+            ``(batch, num_visible + num_hidden)``.
         """
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
@@ -98,7 +104,17 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     def get_visible(
         self, s_hidden: torch.Tensor, bernoulli: bool = False
     ) -> torch.Tensor:
-        """Propagate hidden spins to the visible layer."""
+        """Propagate hidden spins to the visible layer.
+
+        Args:
+            s_hidden: Hidden layer tensor, shape ``(batch, num_hidden)``.
+            bernoulli: Whether to sample binary visible states (``prob > rand``)
+                instead of returning the activation probabilities.
+
+        Returns:
+            torch.Tensor: Concatenated states of shape
+            ``(batch, num_visible + num_hidden)``.
+        """
         with torch.no_grad():
             s_all = torch.zeros(
                 s_hidden.size(0), self.num_hidden + self.num_visible
