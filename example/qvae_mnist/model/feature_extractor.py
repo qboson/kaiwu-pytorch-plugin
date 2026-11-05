@@ -7,7 +7,12 @@ class FeatureExtractor:
         Args:
             qvae_model: 训练好的 QVAE 模型
             feature_type: 'q' 或 'zeta'
+
+        Raises:
+            ValueError: feature_type 不是 'q' 或 'zeta'。
         """
+        if feature_type not in ('q', 'zeta'):
+            raise ValueError("feature_type must be 'q' or 'zeta'")
         self.model = qvae_model
         self.feature_type = feature_type
         self.device = next(qvae_model.parameters()).device
