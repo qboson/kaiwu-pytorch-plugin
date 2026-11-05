@@ -177,8 +177,30 @@ class CellQVAE(QVAE):
         posterior, zeta = self.posterior(q, self.config.dist_beta)
         return q, posterior, zeta
 
+    def _decoder_parameter_device(self, fallback):
+        """返回解码器参数当前所在的设备。
+
+        ``forward`` 在 ``_encode`` 之后把潜变量送进解码器。只搬移解码器
+        （父模块对子模块走 ``_apply``，不会调用解码器的 ``to``）时，潜变量
+        和 Bernoulli ``_train_bias`` 仍留在另一台设备上。这里读取解码器的
+        活参数设备；解码器没有参数时退回 ``fallback`` 的设备。
+
+        Args:
+            fallback: 解码器没有参数时，用它的设备作为退路。
+
+        Returns:
+            解码器第一个参数的设备，或 ``fallback.device``。
+        """
+        parameter = next(self.decoder.parameters(), None)
+        if parameter is None:
+            return fallback.device
+        return parameter.device
+
     def forward(self, x, batch_idx=None):
         """执行带可选 batch 条件的 QVAE 前向传播。
+
+        重构结果放在解码器参数当前所在的设备上。调用方传入的 ``x`` 和
+        ``_encode`` 返回的 ``zeta`` 不会被原地修改。
 
         Args:
             x: 单细胞表达矩阵。
@@ -186,12 +208,13 @@ class CellQVAE(QVAE):
 
         Returns:
             ``(recon_x, posterior, q, zeta)``，分别为重构结果、后验分布、
-            编码器 logits 和潜变量样本。
+            编码器 logits 和潜变量样本。``recon_x`` 在解码器参数设备上。
         """
         q, posterior, zeta = self._encode(x)
-        recon_x = self.decoder(self._decoder_input(zeta, batch_idx))
+        decoder_zeta = zeta.to(self._decoder_parameter_device(zeta))
+        recon_x = self.decoder(self._decoder_input(decoder_zeta, batch_idx))
         if self.config.loss_type == "bernoulli":
-            recon_x = recon_x + self._train_bias
+            recon_x = recon_x + self._train_bias.to(device=recon_x.device)
         return recon_x, posterior, q, zeta
 
     def energy(self, x, loss_type):
