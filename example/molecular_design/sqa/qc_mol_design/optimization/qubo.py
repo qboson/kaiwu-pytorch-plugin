@@ -456,13 +456,13 @@ def _solve_builtin_sa(
         e = energy(x)
         for _ in range(num_sweeps):
             flip = random.randint(0, n - 1)
-            x[flip] ^= 1
+            x[flip] = 1.0 - x[flip]
             new_e = energy(x)
             delta = new_e - e
             if delta < 0 or random.random() < math.exp(-delta / max(T, 1e-10)):
                 e = new_e
             else:
-                x[flip] ^= 1
+                x[flip] = 1.0 - x[flip]
             T *= cooling_rate
         solutions.append(({i: int(x[i]) for i in range(n)}, e))
 
