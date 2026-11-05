@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 export OUTPUT_DIR=./outputs_100ep_sa_mse_split_q_rbm3e-4
 echo $OUTPUT_DIR
 python evaluate_benchmark.py \
