@@ -10,6 +10,29 @@ import torch
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
 
 
+def _validate_sampler_solution(solution, expected_width):
+    """Validate and normalize one sampler spin matrix.
+
+    Args:
+        solution: Sampler output, expected as (n_solutions, ising_width).
+        expected_width: Number of Ising variables the sampler must score.
+
+    Returns:
+        torch.Tensor: The validated spin matrix.
+
+    Raises:
+        ValueError: If the output is not two-dimensional or its width does
+            not match the Ising matrix.
+    """
+    solution = torch.as_tensor(solution)
+    if solution.ndim != 2 or solution.shape[1] != expected_width:
+        raise ValueError(
+            "sampler must return one spin per Ising variable: "
+            f"expected (n, {expected_width}), got {tuple(solution.shape)}"
+        )
+    return solution
+
+
 class AbstractBoltzmannMachine(torch.nn.Module):
     """Abstract base class for Boltzmann Machines.
 
@@ -113,6 +136,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         with kpp_caller_context():
             solution = sampler.solve(ising_mat)
 
+        solution = _validate_sampler_solution(solution, ising_mat.shape[0])
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
         solution = torch.FloatTensor(solution)
         solution = solution.to(self.device)
