@@ -170,6 +170,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Hamiltonian of shape (B,).
 
         """
+        if s_all.ndim != 2 or s_all.shape[-1] != self.num_nodes:
+            raise ValueError(
+                f"s_all must have shape (batch, {self.num_nodes}), got {tuple(s_all.shape)}"
+            )
         with torch.set_grad_enabled(enable_grad):
             s_gaussian = s_all[:, : self.num_gaussian]
             s_bernoulli = s_all[:, self.num_gaussian :]
@@ -193,6 +197,11 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Free Hamiltonian of Gaussian nodes.
         """
+        if s_gaussian.ndim != 2 or s_gaussian.shape[-1] != self.num_gaussian:
+            raise ValueError(
+                f"s_gaussian must have shape (batch, {self.num_gaussian}), "
+                f"got {tuple(s_gaussian.shape)}"
+            )
         with torch.no_grad():
             return 0.5 * torch.sum(
                 (s_gaussian - self.mu).square() / self.var, dim=-1
