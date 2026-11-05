@@ -87,14 +87,25 @@ class AutoEncoderBase(nn.Module):
         Set nontrainable dataset statistics for encoder centering.
 
         Args:
-            mean (torch.Tensor or scalar): Mean of the training data. ``None``
-                disables centering. The mean is included in model checkpoints.
+            mean (torch.Tensor or scalar): Mean of the training data with either
+                one element or ``input_dimension`` elements. ``None`` disables
+                centering. The mean is included in model checkpoints.
+
+        Raises:
+            ValueError: If the mean is neither a scalar nor a one-dimensional
+                vector matching ``input_dimension``.
         """
-        self.register_buffer(
-            "_dataset_mean",
-            None if mean is None else torch.as_tensor(mean).detach().clone(),
-            persistent=False,
-        )
+        if mean is None:
+            self.register_buffer("_dataset_mean", None, persistent=False)
+            return
+        mean = torch.as_tensor(mean).detach().clone()
+        if mean.numel() != 1 and (
+            mean.ndim != 1 or mean.numel() != self._input_dimension
+        ):
+            raise ValueError(
+                "Dataset mean must be a scalar or match the input dimension."
+            )
+        self.register_buffer("_dataset_mean", mean, persistent=False)
 
     def get_extra_state(self):
         """Return a tensor snapshot of the optional centering mean."""
