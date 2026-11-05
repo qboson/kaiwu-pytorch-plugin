@@ -40,6 +40,9 @@ def loadMNIST(
     }
 
     # Select dataset class
+    if name not in dataset_map:
+        choices = ", ".join(sorted(dataset_map))
+        raise ValueError(f"Unsupported dataset {name!r}. Choose from: {choices}")
     dataset_class = dataset_map[name]
 
     # Define transform to normalize data
