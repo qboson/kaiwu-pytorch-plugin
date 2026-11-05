@@ -58,9 +58,9 @@ Consequently, if the network is allowed to run for a sufficiently long time (i.e
 Consequently, repeated application drives the network toward equilibrium, where configurations are sampled according to $P(\mathbf{v}, \mathbf{h})$.
 
 ## Learning Objective: Maximum Likelihood with Hidden Variables
-The goal of learning is to adjust the weights and biases so that the marginal distribution over visible units, $P(\mathbf{v})$, approximates the empirical distribution of the training data. As derived in Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) (Eq. {eq}`eq-nll-gradient-tf`), the gradient of the negative log-likelihood for a single training example $\mathbf{v}$ with respect to a weight $w_{ij}$ is:
+The goal of learning is to adjust the weights and biases so that the marginal distribution over visible units, $P(\mathbf{v})$, approximates the empirical distribution of the training data. As derived in Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) (Eq. {eq}`eq-nll-gradient-tf`), the gradient of the log-likelihood for a single training example $\mathbf{v}$ with respect to a weight $w_{ij}$ is:
 
-$$\frac{\partial \left( -\log P(\mathbf{v}) \right)}{\partial w_{ij}} = \mathbb{E}_{\mathbf{h} \mid \mathbf{v}} \left[ x_i x_j \right] - \mathbb{E}_{P(\mathbf{v}, \mathbf{h})} \left[ x_i x_j \right]$$
+$$\frac{\partial \log P(\mathbf{v})}{\partial w_{ij}} = \mathbb{E}_{\mathbf{h} \mid \mathbf{v}} \left[ x_i x_j \right] - \mathbb{E}_{P(\mathbf{v}, \mathbf{h})} \left[ x_i x_j \right]$$
 
 Here, $ x_i$ and $x_j$ denote the states of the two connected units. The first term is the expected product of their activities when the visible units are **clamped** to the training example $\mathbf{v}$ and the hidden units are allowed to fluctuate according to their conditional distribution. This is the **positive phase** or **wake phase** statistic.
 

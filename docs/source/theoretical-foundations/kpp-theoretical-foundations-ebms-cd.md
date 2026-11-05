@@ -14,7 +14,7 @@ hide_child: false
 ## The Core Insight: Truncated Markov Chains
 The key observation behind contrastive divergence, introduced by Geoffrey Hinton in 2002, is that we need not run the Markov chain all the way to equilibrium. Instead, we can initialize the chain at a **data point** and run it for only a small number of steps, often just **one,** and then treat the resulting state as an approximate sample from the model distribution.
 
-Why should this work? Consider the gradient of the negative log-likelihood (Eq. {eq}`eq-nll-gradient-tf`, Section 3.1):
+Why should this work? Consider the gradient of the log-likelihood (Eq. {eq}`eq-nll-gradient-tf`, Section 3.1):
 
 $$\nabla f(\theta) = -\mathbb{E}_{\text{data}} \left[ \frac{\partial E_\theta}{\partial \theta} \right] + \mathbb{E}_{\text{model}} \left[ \frac{\partial E_\theta}{\partial \theta} \right]$$
 

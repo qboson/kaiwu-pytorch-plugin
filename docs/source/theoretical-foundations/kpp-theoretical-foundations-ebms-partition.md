@@ -48,7 +48,7 @@ $$P_\theta(\mathbf{x}) = \frac{\exp(-E_\theta(\mathbf{x}))}{Z_\theta}$$
 Without $Z_\theta$, we have only an unnormalized score. This means we cannot directly compute likelihoods on test data, making model comparison and hyperparameter tuning difficult.
 
 2. **Learning by Gradient Descent** 
-Recall from Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) that the gradient of the negative log-likelihood (Eq. {eq}`eq-nll-gradient-tf`, Section 3.1) decomposes into a data term and a model term:
+Recall from Section [3.1 Defining the Objective: Low Energy for Real Data](kpp-theoretical-foundations-ebms-def.md) that the gradient of the log-likelihood (Eq. {eq}`eq-nll-gradient-tf`, Section 3.1) decomposes into a data term and a model term:
 
 $$\nabla f(\theta) = -\mathbb{E}_{\text{data}} \left[ \frac{\partial E_\theta}{\partial \theta} \right] + \mathbb{E}_{\text{model}} \left[ \frac{\partial E_\theta}{\partial \theta} \right]$$
 
