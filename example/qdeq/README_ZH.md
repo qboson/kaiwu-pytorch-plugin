@@ -72,6 +72,11 @@ z = deq(tokens)            # 与普通层一样调用
 deq.get_last_stats()       # 前向/反向步数、残差、sampler 耗时
 ```
 
+设置 `jac_loss_vecs > 0` 后，可将可微的雅可比正则项 `deq.last_jac_loss`
+加入训练损失。如果 `layer(z, x)` 不依赖 `z`，该正则项为零，输入和参数的
+梯度保持不变。层也可以返回不带计算图的常量；此时输出保持
+`requires_grad=False`，无需注册隐式反向传播钩子。
+
 `simple_train_example.py` 用默认参数（2 个 epoch）在 CPU 上几分钟即可跑完，
 标准化空间下的测试 MSE 约为 0.43。
 
