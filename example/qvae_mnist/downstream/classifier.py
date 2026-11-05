@@ -229,19 +229,53 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         )
         return self
 
+    def _parameter_device(self):
+        """返回当前分类网络参数所在的设备。
+
+        ``self.device`` 只记录构造时的偏好，供下一次 ``fit`` 使用。
+        父模块通过 ``_apply`` 搬走 ``self.model`` 时不会改这个属性。
+        推理每次重读第一个参数；没有参数时退回构造偏好。
+        """
+        model = self.model
+        if model is not None:
+            parameter = next(model.parameters(), None)
+            if parameter is not None:
+                return parameter.device
+        return self.device
+
+    def _features_on_parameter_device(self, features):
+        """把特征放到当前参数的设备和 dtype 上。
+
+        设备和 dtype 都已经对齐的张量原样返回，调用方存储保持不变。
+        NumPy 会复制，不和调用方缓冲区共用存储，也不原地改写。
+        没有参数时用构造偏好和 float32，与 ``_create_model`` 一致。
+        """
+        device = self._parameter_device()
+        dtype = torch.float32
+        model = self.model
+        if model is not None:
+            parameter = next(model.parameters(), None)
+            if parameter is not None:
+                dtype = parameter.dtype
+        if torch.is_tensor(features):
+            return features.to(dtype=dtype, device=device)
+        return torch.tensor(np.asarray(features), dtype=dtype, device=device)
+
     def predict(self, X):
+        """在当前参数设备上返回类别编号。"""
         self.model.eval()
-        X_tensor = torch.FloatTensor(X).to(self.device)
+        features = self._features_on_parameter_device(X)
         with torch.no_grad():
-            out = self.model(X_tensor)
+            out = self.model(features)
             _, pred = out.max(1)
         return pred.cpu().numpy()
 
     def predict_proba(self, X):
+        """在当前参数设备上返回类别概率。"""
         self.model.eval()
-        X_tensor = torch.FloatTensor(X).to(self.device)
+        features = self._features_on_parameter_device(X)
         with torch.no_grad():
-            out = self.model(X_tensor)
+            out = self.model(features)
             probs = torch.softmax(out, dim=1)
         return probs.cpu().numpy()
 
