@@ -317,7 +317,6 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Samples generated through Gibbs sampling.
         """
-        n_burnin_ = n_burnin - 1
         with torch.no_grad():
             if s_gaussian is not None:
                 n_sample = s_gaussian.shape[0]
@@ -365,8 +364,13 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                     s_all = self.infer_from_bernoulli(s_bernoulli)
                     s_gaussian = s_all[:, : self.num_gaussian]
                     s_all = self.infer_from_gaussian(s_gaussian)
-                if no_step >= n_burnin_:
+                # Step indices start at zero, so retain the first batch only after
+                # all requested burn-in steps have completed.
+                if no_step >= n_burnin:
                     samples.append(s_all)
+            # Discarding every step still returns a valid batch-shaped result.
+            if not samples:
+                return s_all.new_empty((0, self.num_nodes))
             return torch.concat(samples)
 
     def sample(self, sampler) -> torch.Tensor:

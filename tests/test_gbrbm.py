@@ -179,10 +179,41 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
             s_gaussian=torch.zeros(2, 2, dtype=torch.float64),
         )
 
-        self.assertEqual(random_sample.shape, (4, 4))
-        self.assertEqual(data_sample.shape, (4, 4))
+        self.assertEqual(random_sample.shape, (2, 4))
+        self.assertEqual(data_sample.shape, (2, 4))
         self.assertFalse(hasattr(self.bm, "conditional_gibbs_sample"))
         self.assertFalse(hasattr(self.bm, "cd_gibbs_sample"))
+
+    def test_gibbs_sampling_discards_exact_burnin_steps(self):
+        """Retained batches should start at the requested Gibbs step."""
+        from unittest.mock import patch
+
+        for n_burnin in (0, 1, 2, 3):
+            with self.subTest(n_burnin=n_burnin):
+                step = 0
+
+                def infer_from_gaussian(s_gaussian):
+                    return torch.zeros(2, 4, dtype=torch.float64)
+
+                def infer_from_bernoulli(s_bernoulli):
+                    nonlocal step
+                    step += 1
+                    return torch.full((2, 4), step, dtype=torch.float64)
+
+                with patch.object(self.bm, "infer_from_gaussian", infer_from_gaussian), patch.object(
+                    self.bm, "infer_from_bernoulli", infer_from_bernoulli
+                ):
+                    samples = self.bm.gibbs_sample(
+                        n_step=3,
+                        n_burnin=n_burnin,
+                        s_gaussian=torch.zeros(2, 2, dtype=torch.float64),
+                    )
+
+                self.assertEqual(samples.shape, (2 * (3 - n_burnin), 4))
+                self.assertEqual(samples.dtype, self.bm.dtype)
+                self.assertEqual(samples.device, self.bm.device)
+                expected = torch.arange(n_burnin + 1, 4, dtype=torch.float64)
+                torch.testing.assert_close(samples[:, 0], expected.repeat_interleave(2))
 
     def test_constructor_supports_bernoulli_visible_layout(self):
         """Non-Gaussian visible mode should still build Gaussian-first internals."""
