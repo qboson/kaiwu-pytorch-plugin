@@ -12,11 +12,11 @@ hide_child: false
 > The conceptual bridge between statistical physics and neural networks rests on a powerful analogy: neurons can be treated as tiny magnets, and their collective behavior can be described using the language of statistical mechanics. This connection, first fully exploited by John Hopfield in 1982, provides the foundational framework for understanding the Boltzmann Machine.
 
 ## The Ising Model of Magnetism
-In condensed matter physics, the Ising model describes a system of interacting magnetic spins. Each spin $s_i$ resides on a lattice site and can point either "up" $(s_i = +1 )$ or "down" $( s_i = -1)$. The energy of a particular spin configuration $\mathbf{s} = (s_1, s_2, \ldots, s_N)$is given by the Hamiltonian:
+In condensed matter physics, the Ising model describes a system of interacting magnetic spins. Each spin $s_i$ resides on a lattice site and can point either "up" $(s_i = +1 )$ or "down" $( s_i = -1)$. The energy of a particular spin configuration $\mathbf{s} = (s_1, s_2, \ldots, s_N)$ is given by the Hamiltonian:
 
 $$E(\mathbf{s}) = -\sum_{i<j} J_{ij} s_i s_j - \sum_i h_i s_i$$ (eq-ising-hamiltonian)
 
-Here, $J_{ij}$ represents the interaction strength (coupling) between spins $i$and $j$. If $J_{ij} > 0$, the interaction is **ferromagnetic**: the spins prefer to align in the same direction to lower the energy. If $J_{ij} < 0$, the interaction is **antiferromagnetic**: the spins prefer opposite alignment. The term $h_i$ represents an external magnetic field biasing individual spins.
+Here, $J_{ij}$ represents the interaction strength (coupling) between spins $i$ and $j$. If $J_{ij} > 0$, the interaction is **ferromagnetic**: the spins prefer to align in the same direction to lower the energy. If $J_{ij} < 0$, the interaction is **antiferromagnetic**: the spins prefer opposite alignment. The term $h_i$ represents an external magnetic field biasing individual spins.
 
 At thermal equilibrium with a heat bath at temperature $T$, the probability of observing a given spin configuration follows the **Boltzmann distribution**: 
 
@@ -29,7 +29,7 @@ The transition from magnetic spins to neural networks requires only a change of 
 
 | Physics (Ising Model) | Neural Network (Hopfield/Boltzmann) |
 | --- | --- |
-| Spin $s_i \in {-1, +1}$ | Neuron state $x_i \in {0, 1}$ or ${-1, +1}$ |
+| Spin $s_i \in \{-1, +1\}$ | Neuron state $x_i \in \{0, 1\}$ or $\{-1, +1\}$ |
 | Coupling strength $J_{ij}$ | Synaptic weight $w_{ij}$ |
 | External field $h_i$ | Neuron bias $b_i$ |
 | Thermal fluctuation $k_B T$ | Stochasticity (inverse temperature $\beta = 1/T$) |
