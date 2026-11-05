@@ -147,3 +147,7 @@ SA 需预先激活 Kaiwu 授权，或设置 `KAIWU_USER_ID` 和 `KAIWU_SDK_CODE`
 | `KAIWU_CIM_BIT_WIDTH` | `14`（默认值） |
 
 凭证文件通过本地私有路径提供。CIM 命令会向自己的项目提交硬件任务；该命令用于新的单次采样轨迹，历史混合预算结果见上方实验结果表。
+
+### t-SNE 可视化辅助函数
+
+`qc_mol_design.evaluation.plot_tsne` 的 `latent_generated` 与 `gen_props` 按原始行一一对应。随机抽样会对坐标和属性使用相同的行索引，保证每个生成样本的颜色仍表示它自己的属性。此契约适用于 CIM/SA 与 SQA 两份辅助实现。
