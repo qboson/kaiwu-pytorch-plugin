@@ -120,7 +120,9 @@ class UnsupervisedDBN(nn.Module):
                 Defaults to 0.
 
         Returns:
-            numpy.ndarray: The reconstructed data.
+            tuple[numpy.ndarray, numpy.ndarray]: The reconstructed visible layer and the
+            per-sample mean squared reconstruction error, as returned by
+            :meth:`reconstruct_with_rbm`.
 
         Raises:
             ValueError: If the model has no RBM layers or the layer index is out of range.
@@ -150,11 +152,12 @@ class UnsupervisedDBN(nn.Module):
             index (int): The index of the RBM layer.
 
         Returns:
-            RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise None.
+            RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise None
+            (also when the model has not been built yet).
         """
-        if index < len(self.rbm_layers):
-            return self.rbm_layers[index]
-        return None
+        if self.rbm_layers is None or index >= len(self.rbm_layers):
+            return None
+        return self.rbm_layers[index]
 
     @staticmethod
     def reconstruct_with_rbm(rbm, data_in, device=None):
@@ -204,17 +207,18 @@ class UnsupervisedDBN(nn.Module):
         """Returns the number of RBM layers.
 
         Returns:
-            int: The number of layers.
+            int: The number of layers, or ``0`` when the model has not been built yet.
         """
-        return len(self.rbm_layers)
+        return 0 if self.rbm_layers is None else len(self.rbm_layers)
 
     @property
     def output_dim(self):
         """Returns the output dimension of the DBN.
 
         Returns:
-            int: The dimension of the final hidden layer.
+            int or None: The dimension of the final hidden layer, or ``input_dim``
+            (``None``) when the model has not been built yet.
         """
-        if len(self.rbm_layers) > 0:
+        if self.rbm_layers:
             return self.rbm_layers[-1].num_hidden
         return self.input_dim
