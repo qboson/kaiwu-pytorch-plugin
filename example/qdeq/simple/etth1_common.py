@@ -64,11 +64,21 @@ def build_loaders(
 
     Strides above 1 subsample the windows to keep the example small.
     """
+    if seq_len < 1 or pred_len < 1:
+        raise ValueError("seq_len and pred_len must be positive")
+    if train_stride < 1 or eval_stride < 1:
+        raise ValueError("train_stride and eval_stride must be positive strides")
     if not data_path.exists():
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
         )
     values = pd.read_csv(data_path).drop(columns=["date"]).to_numpy(dtype=np.float32)
+    required_rows = TRAIN_ROWS + VAL_ROWS + TEST_ROWS
+    if len(values) < required_rows:
+        raise ValueError(
+            f"{data_path} has {len(values)} rows; at least {required_rows} are needed for "
+            f"the fixed {TRAIN_ROWS}/{VAL_ROWS}/{TEST_ROWS} train/val/test split"
+        )
     train = values[:TRAIN_ROWS]
     mean, std = train.mean(axis=0), train.std(axis=0) + 1e-8
     scaled = (values - mean) / std
