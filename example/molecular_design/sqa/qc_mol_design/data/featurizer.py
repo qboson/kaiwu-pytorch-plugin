@@ -64,11 +64,11 @@ def mol_to_graph(smiles: str) -> Optional[GraphTuple]:
     """
     Convert a SMILES string to graph tensors.
 
-    Returns (X, adj, deg) or None if SMILES is invalid.
+    Returns (X, adj, deg) or None if SMILES is invalid or contains no atoms.
     """
     from rdkit import Chem
     mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
+    if mol is None or mol.GetNumAtoms() == 0:
         return None
 
     n = mol.GetNumAtoms()
