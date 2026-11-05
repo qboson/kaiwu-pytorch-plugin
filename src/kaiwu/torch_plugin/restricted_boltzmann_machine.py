@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
+from ._clip_ranges import validate_clip_range
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
@@ -63,6 +64,8 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
             j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
         """
+        validate_clip_range("h_range", h_range)
+        validate_clip_range("j_range", j_range)
         self.get_parameter("linear_bias").data.clamp_(*h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*j_range)
 
