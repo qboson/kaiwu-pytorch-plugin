@@ -24,6 +24,7 @@ from __future__ import annotations
 import contextlib
 import math
 import time
+from numbers import Integral
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -66,7 +67,8 @@ class QDEQConfig:
 
         history_size: Past residuals and updates kept as search directions.
 
-        anderson_m: Number of past iterates mixed by the backward Anderson solver.
+        anderson_m: Number of past iterates mixed by the backward Anderson
+            solver, at least 2.
 
         anderson_lam: Regularisation of the backward Anderson mixing problem.
 
@@ -368,6 +370,12 @@ class QDEQ(nn.Module):
         self.config = config or QDEQConfig()
         if self.config.stop_mode not in ("rel", "abs"):
             raise ValueError("stop_mode must be 'rel' or 'abs'")
+        if (
+            isinstance(self.config.anderson_m, bool)
+            or not isinstance(self.config.anderson_m, Integral)
+            or self.config.anderson_m < 2
+        ):
+            raise ValueError("anderson_m must be at least 2")
         self.last_jac_loss = None
         self._last_stats: dict[str, float] = {}
 
