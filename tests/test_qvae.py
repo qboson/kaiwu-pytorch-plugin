@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../s
 
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.torch_plugin.qvae import QVAE
+from kaiwu.torch_plugin.qvae_dist_util import Exponential, MixtureGeneric
 
 
 class DummyEncoder(torch.nn.Module):
@@ -102,6 +103,20 @@ class TestQVAE(unittest.TestCase):
         self.assertIs(self.qvae.sampler, self.sampler)
         self.assertEqual(self.qvae.sampler_type, "sa")
 
+    def test_mixture_distribution_uses_parameter_dtype(self):
+        """Smoothing tensors inherit the dtype of the logits tensor."""
+        param = torch.zeros(2, self.latent_dim, dtype=torch.float64)
+
+        posterior = MixtureGeneric(param, 1.0)
+        sample = posterior.smoothing_dist.sample((2, self.latent_dim))
+        zeta = posterior.reparameterize(False)
+        log_prob = posterior.log_prob_per_var(zeta)
+
+        self.assertEqual(posterior.smoothing_dist.beta.dtype, param.dtype)
+        self.assertEqual(sample.dtype, param.dtype)
+        self.assertEqual(zeta.device, param.device)
+        self.assertEqual(log_prob.shape, zeta.shape)
+
     def test_forward_adds_dataset_bias(self):
         """Bernoulli forward output includes the bias derived from the mean."""
         self.qvae.eval()
@@ -149,6 +164,50 @@ class TestQVAE(unittest.TestCase):
         self.assertTrue(torch.equal(recon_x, torch.zeros_like(recon_x)))
         torch.testing.assert_close(self.encoder.inputs[-1], x)
         self.assertGreater(self.qvae.loss(x, recon_x, posterior).item(), 0.0)
+
+    @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
+    def test_exponential_accepts_cuda_input_with_cpu_beta(self):
+        """Distribution functions coerce a CPU beta to the input device."""
+        smoothing_dist = Exponential(1.0)
+        zeta = torch.rand(4, device="cuda")
+
+        for value in (
+            smoothing_dist.pdf(zeta),
+            smoothing_dist.cdf(zeta),
+            smoothing_dist.log_pdf(zeta),
+        ):
+            self.assertEqual(value.device.type, "cuda")
+
+    @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
+    def test_mixture_distribution_on_cuda(self):
+        """Mixture sampling and log-probability stay on the input device."""
+        param = torch.zeros(2, self.latent_dim, device="cuda")
+
+        posterior = MixtureGeneric(param, 1.0)
+        zeta = posterior.reparameterize(False)
+        log_prob = posterior.log_prob_per_var(zeta)
+        log_ratio = posterior.log_ratio(zeta)
+
+        self.assertEqual(posterior.smoothing_dist.beta.device.type, "cuda")
+        self.assertEqual(zeta.device.type, "cuda")
+        self.assertEqual(log_prob.device.type, "cuda")
+        self.assertEqual(log_ratio.device.type, "cuda")
+        self.assertTrue(torch.isfinite(log_prob).all().item())
+
+    @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
+    def test_forward_on_cuda(self):
+        """The full forward pass keeps posterior samples on CUDA."""
+        self.qvae.to("cuda")
+        self.qvae.eval()
+        x = torch.zeros(2, self.input_dim, device="cuda")
+
+        recon_x, posterior, q, zeta = self.qvae(x)
+
+        self.assertEqual(recon_x.device.type, "cuda")
+        self.assertEqual(q.device.type, "cuda")
+        self.assertEqual(zeta.device.type, "cuda")
+        self.assertEqual(posterior.logit_mu.device.type, "cuda")
+        self.assertEqual(posterior.smoothing_dist.beta.device.type, "cuda")
 
     def test_unsupported_loss_type_is_rejected(self):
         """Unsupported loss types fail at the public computation boundary."""
