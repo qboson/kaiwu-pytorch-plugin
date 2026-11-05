@@ -2,6 +2,20 @@
 
 本页记录 Kaiwu-PyTorch-Plugin 各版本的更新内容。
 
+## 未发布（Unreleased）
+
+> 以下改动已合入 `main`，尚未包含在任何正式版本中。
+
+### 修复
+
+- **`BoltzmannMachine._hidden_to_ising_matrix` 的叠加上界系数**：
+  `ising_bias` 中列和项的系数由 `sub_column_sums / 4` 更正为 `sub_column_sums / 8`，
+  使条件采样用的 Ising 子矩阵与完整模型的能量换算一致（#171，`f047bce`）。
+- **嵌套玻尔兹曼机的设备同步**：`AbstractBoltzmannMachine` 改为在 `_apply()` 中同步
+  `self.device`。此前父模块通过 `nn.Module.to()` 移动子模块时不会调用子类的 `to()`
+  覆写，`self.device` 会停留在旧设备，随后 `_to_ising_matrix()` 混用两个设备而报错
+  （#164，`39e0e32`）；同时新增 `tests/test_bm_device_sync.py`。
+
 ## 版本 0.3.0（2026-09-23）
 
 ### 新增
