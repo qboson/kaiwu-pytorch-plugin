@@ -115,7 +115,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """Given visible nodes, convert the model to a submatrix in Ising format.
 
         Args:
-            s_visible (torch.Tensor): State of the visible layer, shape (B, num_visible).
+            s_visible (torch.Tensor): State of one visible layer, shape (num_visible,).
 
         Returns:
             np.ndarray: Submatrix in Ising format.
