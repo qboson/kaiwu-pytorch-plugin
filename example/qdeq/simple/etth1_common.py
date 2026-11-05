@@ -38,6 +38,10 @@ class ETTh1Windows(Dataset):
     """
 
     def __init__(self, values: np.ndarray, seq_len: int, pred_len: int, stride: int = 1):
+        if seq_len < 1 or pred_len < 1:
+            raise ValueError("seq_len and pred_len must be positive")
+        if stride < 1:
+            raise ValueError("stride must be a positive step")
         self.values = torch.as_tensor(values, dtype=torch.float32)
         self.seq_len = seq_len
         self.pred_len = pred_len
