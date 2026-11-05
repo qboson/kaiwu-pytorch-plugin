@@ -71,6 +71,8 @@ class Exponential(SmoothingDist):
             beta (float or torch.Tensor): Parameter of exponential distribution.
         """
         self.beta = torch.tensor(beta, dtype=torch.float32)
+        if not torch.isfinite(self.beta).all() or (self.beta <= 0).any():
+            raise ValueError("beta must be a finite positive number")
 
     def pdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Probability density function.
