@@ -242,6 +242,15 @@ class QCTrainer:
                 X, adj, deg = (t.to(CFG.device) for t in (X, adj, deg))
                 valid_batches.append((self.gcn(X, adj, deg).cpu(), y_vec, props))
 
+        # Every epoch statistic below is a mean over these batches:
+        # an empty split would silently average to 0.0 and then win
+        # the early-stopping comparison against inf.
+        if not train_batches or not valid_batches:
+            raise ValueError(
+                f"{tag} trainer requires non-empty train and validation loaders "
+                f"(got {len(train_batches)} and {len(valid_batches)} batches)"
+            )
+
         print(f"[{tag}] Training CRBM (QC-assisted SA) for {CFG.epochs} epochs ...")
 
         best_val_difference = float("inf")
