@@ -82,7 +82,7 @@ Follows PEP 8 standards.
 
    ```{code-block} bash
 
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin
 
    ```
