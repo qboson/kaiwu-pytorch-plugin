@@ -143,3 +143,7 @@ Each forward step:
    each, converts the QUBO to an Ising matrix with one auxiliary spin through
    `kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix`, and calls `sampler.solve`
 5. decodes the best solution and updates `z ← z + V a`
+
+Custom samplers must return a spin vector or a matrix with one solution per row,
+including the auxiliary spin. Every entry must be finite and equal to `-1` or
+`1`; QDEQ raises `RuntimeError` for invalid values or shapes before decoding.
