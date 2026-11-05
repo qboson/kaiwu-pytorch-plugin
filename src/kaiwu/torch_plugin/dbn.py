@@ -8,8 +8,9 @@ This module contains the DBN class and functions for training the DBN+model
 or only the model. Training the DBN+model will save the likelihood values
 and prediction accuracy during the training process.
 """
-import numpy as np
+from numbers import Integral
 
+import numpy as np
 
 import torch
 from torch import nn
@@ -31,11 +32,29 @@ class UnsupervisedDBN(nn.Module):
 
     def __init__(self, hidden_layers_structure=None):
         super().__init__()
-        self.hidden_layers_structure = (
-            hidden_layers_structure
-            if hidden_layers_structure is not None
-            else [100, 100]
-        )
+        if hidden_layers_structure is None:
+            structure = [100, 100]
+        else:
+            try:
+                structure = list(hidden_layers_structure)
+            except TypeError as exc:
+                raise TypeError(
+                    "hidden_layers_structure must be a sequence of integers"
+                ) from exc
+        if not structure:
+            raise ValueError(
+                "hidden_layers_structure must contain at least one layer"
+            )
+        for size in structure:
+            if isinstance(size, bool) or not isinstance(size, Integral):
+                raise TypeError(
+                    "hidden_layers_structure entries must be positive integers"
+                )
+            if size < 1:
+                raise ValueError(
+                    "hidden_layers_structure entries must be positive integers"
+                )
+        self.hidden_layers_structure = structure
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -51,7 +70,15 @@ class UnsupervisedDBN(nn.Module):
 
         Returns:
             UnsupervisedDBN: The instance itself with the RBM layers created.
+
+        Raises:
+            ValueError: If ``input_dim`` is not a positive integer.
+            TypeError: If ``input_dim`` is not an integer.
         """
+        if isinstance(input_dim, bool) or not isinstance(input_dim, Integral):
+            raise TypeError("input_dim must be a positive integer")
+        if input_dim < 1:
+            raise ValueError("input_dim must be a positive integer")
         self.input_dim = input_dim
         self.rbm_layers = nn.ModuleList()
 
