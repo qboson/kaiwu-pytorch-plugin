@@ -133,7 +133,17 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 quadratic coefficients. Defaults to True.
             init_linear (bool, optional): Whether to (re-)initialize the linear
                 bias. Defaults to True.
+
+        Raises:
+            ValueError: If ``std`` is not finite and non-negative, or ``init_var``
+                or ``max_fold`` is not finite and positive.
         """
+        if not np.isfinite(std) or std < 0:
+            raise ValueError("std must be a finite non-negative number")
+        if not np.isfinite(init_var) or init_var <= 0:
+            raise ValueError("init_var must be a finite positive number")
+        if not np.isfinite(max_fold) or max_fold <= 0:
+            raise ValueError("max_fold must be a finite positive number")
         bound = max_fold * std
         init.normal_(self.mu, 0, std)
         self.get_parameter("mu").data.clip_(-bound, bound)
