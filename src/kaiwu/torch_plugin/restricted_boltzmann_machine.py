@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
+
 import torch
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
@@ -125,6 +126,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             torch.tensor: Hamiltonian of shape (B,).
         """
+        s_all = s_all.to(self._model_device())
         tmp = s_all[:, : self.num_visible].matmul(self.quadratic_coef)
         return -s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
@@ -134,7 +136,9 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Convert the Restricted Boltzmann Machine to Ising format."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
-            ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+            ising_mat = torch.zeros(
+                (num_nodes + 1, num_nodes + 1), device=self._model_device()
+            )
             # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
                 self.quadratic_coef / 8
