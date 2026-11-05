@@ -81,10 +81,15 @@ class DuvenaudConvLayer(nn.Module):
 
         # Apply degree-specific weight matrices
         H_new = torch.zeros(B, N, out_dim, device=H.device, dtype=H.dtype)
+        # Degrees above max_degree share the highest-degree matrix.
+        # Clamping the loop index below left these nodes matching no
+        # mask, so their row stayed zero and their pooled contribution
+        # collapsed to a uniform softmax, independent of the atom.
+        degree = torch.clamp(deg, max=self.max_degree)
         for d in range(self.max_degree + 1):
             # Boolean mask: which nodes have degree d
-            mask = ((deg == d) & node_mask).float().unsqueeze(-1)
-            W    = self.weights[min(d, self.max_degree)]  # (in_dim, out_dim)
+            mask = ((degree == d) & node_mask).float().unsqueeze(-1)
+            W    = self.weights[d]  # (in_dim, out_dim)
             H_new = H_new + mask * (H_agg @ W)
 
         H_new = F.relu(H_new + self.bias)              # (B, N, out_dim)
