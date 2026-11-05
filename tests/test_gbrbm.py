@@ -184,6 +184,18 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertFalse(hasattr(self.bm, "conditional_gibbs_sample"))
         self.assertFalse(hasattr(self.bm, "cd_gibbs_sample"))
 
+    def test_gibbs_sample_requires_initial_state_or_n_sample(self):
+        """Omitting every initialization argument must fail with a clear error.
+
+        The docstring marks s_gaussian/s_bernoulli/sampler/n_sample optional,
+        but with all of them missing the old implementation dereferenced
+        ``n_sample=None`` inside ``torch.randn`` and crashed with an opaque
+        TypeError instead of explaining what to provide (mirrors
+        ``BoltzmannMachine.gibbs_sample``).
+        """
+        with self.assertRaises(ValueError):
+            self.bm.gibbs_sample(n_step=3)
+
     def test_constructor_supports_bernoulli_visible_layout(self):
         """Non-Gaussian visible mode should still build Gaussian-first internals."""
         bm = GaussianBernoulliRestrictedBoltzmannMachine(
