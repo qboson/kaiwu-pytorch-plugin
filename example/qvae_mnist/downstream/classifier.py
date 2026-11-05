@@ -33,9 +33,9 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         self.hidden_dims = hidden_dims
         self.output_dim = output_dim
         self.weight_decay = weight_decay
-        self.lr = lr_mlp
-        self.batch_size = batch_size_mlp
-        self.epochs = epochs_mlp
+        self.lr_mlp = lr_mlp
+        self.batch_size_mlp = batch_size_mlp
+        self.epochs_mlp = epochs_mlp
         self.device = device
         self.random_state = random_state
         self.save_path = save_path
@@ -46,6 +46,21 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
         self.model = None
         self.classes_ = None
+
+    @property
+    def lr(self):
+        """Alias used by the training loop."""
+        return self.lr_mlp
+
+    @property
+    def batch_size(self):
+        """Alias used by the training loop."""
+        return self.batch_size_mlp
+
+    @property
+    def epochs(self):
+        """Alias used by the training loop."""
+        return self.epochs_mlp
 
     def _create_model(self):
         """创建 MLP PyTorch 模型"""
