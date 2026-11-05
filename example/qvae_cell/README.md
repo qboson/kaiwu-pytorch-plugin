@@ -149,7 +149,7 @@ python evaluate_benchmark.py \
   --root-cell-type HSPCs
 ```
 
-`bash scripts/eval.sh` is equivalent to running `--metrics clustering`.
+`bash scripts/eval.sh` is equivalent to running `--metrics all`: it evaluates clustering, classification, scib, scgraph and dpt. For a clustering-only run use `--metrics clustering` (or `bash scripts/eval_clustering.sh`).
 
 The results will be saved as corresponding CSV files and summarized into:
 
