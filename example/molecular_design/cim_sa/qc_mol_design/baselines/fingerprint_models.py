@@ -44,13 +44,20 @@ def compute_ecfp(smiles_list: List[str], radius: int = 2, nbits: int = 2048) -> 
         radius=radius, fpSize=nbits
     )
     fps = []
-    for smi in smiles_list:
+    unparsed = []
+    for index, smi in enumerate(smiles_list):
         mol = Chem.MolFromSmiles(str(smi))
         if mol is None:
-            fps.append(np.zeros(nbits, dtype=np.float32))
+            # A zero vector is a valid feature vector: substituting one
+            # silently trains and scores it as if it were a molecule.
+            unparsed.append(f"{index}:{str(smi)!r}")
         else:
             fp = morgan_gen.GetFingerprintAsNumPy(mol).astype(np.float32)
             fps.append(fp)
+    if unparsed:
+        raise ValueError(
+            "unparseable SMILES (row:smiles): " + ", ".join(unparsed[:10])
+        )
     return np.stack(fps)
 
 
@@ -66,15 +73,21 @@ def compute_maccs(smiles_list: List[str], nbits: int = 512) -> np.ndarray:
     from rdkit.Chem import MACCSkeys
 
     fps = []
-    for smi in smiles_list:
+    unparsed = []
+    for index, smi in enumerate(smiles_list):
         mol = Chem.MolFromSmiles(str(smi))
         if mol is None:
-            fps.append(np.zeros(nbits, dtype=np.float32))
+            # See compute_ecfp: a zero row is trained on and scored.
+            unparsed.append(f"{index}:{str(smi)!r}")
         else:
             fp = MACCSkeys.GenMACCSKeys(mol)
             arr = np.zeros(nbits, dtype=np.float32)
             arr[:167] = np.array(fp, dtype=np.float32)
             fps.append(arr)
+    if unparsed:
+        raise ValueError(
+            "unparseable SMILES (row:smiles): " + ", ".join(unparsed[:10])
+        )
     return np.stack(fps)
 
 
