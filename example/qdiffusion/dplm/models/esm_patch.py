@@ -21,6 +21,72 @@ from transformers.models.esm.modeling_esm import (
 )
 
 
+def _parameter_device(module: nn.Module, fallback: torch.Tensor) -> torch.device:
+    """Return the device ``module`` parameters currently live on.
+
+    A parent ``_apply`` moves embedding weights without calling ``.to``.
+    Attention masks, token ids, position ids, and fused embeddings have to
+    follow those weights. An empty module falls back to ``fallback.device``.
+    """
+    parameter = next(module.parameters(), None)
+    if parameter is None:
+        return fallback.device
+    return parameter.device
+
+
+def _on_parameter_device(
+    tensor: Optional[torch.Tensor], device: torch.device
+) -> Optional[torch.Tensor]:
+    """Return ``tensor`` on ``device`` without changing its dtype.
+
+    ``Tensor.to`` returns the same object when the device already matches, so
+    same-device callers keep their storage. A different device is a copy.
+    ``None`` stays ``None``.
+    """
+    if tensor is None:
+        return None
+    return tensor.to(device=device)
+
+
+def _align_embedding_activations(
+    embeddings: nn.Module,
+    fallback: torch.Tensor,
+    attention_mask: Optional[torch.Tensor],
+    inputs_embeds: Optional[torch.Tensor],
+    input_ids: Optional[torch.Tensor],
+    position_ids: Optional[torch.Tensor],
+    batch_size: int,
+    seq_length: int,
+    past_key_values_length: int,
+) -> tuple[
+    torch.Tensor,
+    Optional[torch.Tensor],
+    Optional[torch.Tensor],
+    Optional[torch.Tensor],
+]:
+    """Place embedding inputs on the live embedding parameter device.
+
+    ``EsmEmbeddings`` multiplies the mask into the activations and, when token
+    dropout is on, compares ``input_ids`` with those activations. Word and
+    position embeddings also index with those ids. Meta weights happen to
+    accept a foreign index and return an empty meta tensor; CUDA weights do
+    not, and token dropout fails either way. Caller tensors are not written
+    in place, and their dtypes stay put.
+    """
+    device = _parameter_device(embeddings, fallback)
+    input_ids = _on_parameter_device(input_ids, device)
+    position_ids = _on_parameter_device(position_ids, device)
+    inputs_embeds = _on_parameter_device(inputs_embeds, device)
+    if attention_mask is None:
+        attention_mask = torch.ones(
+            (batch_size, seq_length + past_key_values_length),
+            device=device,
+        )
+    else:
+        attention_mask = attention_mask.to(device=device)
+    return attention_mask, inputs_embeds, input_ids, position_ids
+
+
 class _ModifiedEsmSelfAttention(EsmSelfAttention):
     """Custom ESM attention block using scaled-dot-product attention."""
 
@@ -194,9 +260,7 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[
-        Tuple[torch.Tensor, ...], BaseModelOutputWithPoolingAndCrossAttentions
-    ]:
+    ) -> Union[Tuple[torch.Tensor, ...], BaseModelOutputWithPoolingAndCrossAttentions]:
         output_attentions = (
             output_attentions
             if output_attentions is not None
@@ -224,24 +288,37 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
             raise ValueError("You have to specify either input_ids or inputs_embeds")
 
         batch_size, seq_length = input_shape
-        device = input_ids.device if input_ids is not None else inputs_embeds.device
+        fallback = input_ids if input_ids is not None else inputs_embeds
+        device = fallback.device
 
         past_key_values_length = (
             past_key_values[0][0].shape[2] if past_key_values is not None else 0
         )
-
-        if attention_mask is None:
-            attention_mask = torch.ones(
-                ((batch_size, seq_length + past_key_values_length)),
-                device=device,
-            )
+        (
+            attention_mask,
+            inputs_embeds,
+            input_ids,
+            position_ids,
+        ) = _align_embedding_activations(
+            self.embeddings,
+            fallback,
+            attention_mask,
+            inputs_embeds,
+            input_ids,
+            position_ids,
+            batch_size,
+            seq_length,
+            past_key_values_length,
+        )
 
         extended_attention_mask = self.get_extended_attention_mask(
             attention_mask, input_shape
         )
 
         if self.config.is_decoder and encoder_hidden_states is not None:
-            encoder_batch_size, encoder_sequence_length, _ = encoder_hidden_states.size()
+            encoder_batch_size, encoder_sequence_length, _ = (
+                encoder_hidden_states.size()
+            )
             encoder_hidden_shape = (encoder_batch_size, encoder_sequence_length)
             if encoder_attention_mask is None:
                 encoder_attention_mask = torch.ones(encoder_hidden_shape, device=device)
@@ -273,7 +350,9 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
             return_dict=return_dict,
         )
         sequence_output = encoder_outputs[0]
-        pooled_output = self.pooler(sequence_output) if self.pooler is not None else None
+        pooled_output = (
+            self.pooler(sequence_output) if self.pooler is not None else None
+        )
 
         if not return_dict:
             return (sequence_output, pooled_output) + encoder_outputs[1:]
