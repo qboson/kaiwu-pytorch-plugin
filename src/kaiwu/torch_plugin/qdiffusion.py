@@ -14,6 +14,7 @@ import torch
 from torch import nn
 
 from .full_boltzmann_machine import BoltzmannMachine
+from ._qdiffusion_inputs import validate_partial_masks, validate_token_tensor
 from ._qdiffusion_sampling import (
     restore_candidate_context,
     stochastic_sample_from_categorical,
@@ -429,6 +430,8 @@ class QDiffusion(nn.Module):
         Returns:
             dict[str, Any]: A mutable state dictionary suitable for repeated ``step`` calls.
         """
+        validate_token_tensor(input_tokens, "input_tokens")
+        validate_partial_masks(partial_masks, input_tokens)
         output_tokens, output_scores = self._initialize_output_tokens(
             input_tokens, partial_masks=partial_masks
         )
@@ -462,6 +465,7 @@ class QDiffusion(nn.Module):
         partial_masks = (
             partial_masks if partial_masks is not None else state.get("partial_masks")
         )
+        validate_partial_masks(partial_masks, state["output_tokens"])
         step_outputs = self._decode_step(state, partial_masks=partial_masks)
 
         editable_token_mask = self.get_non_special_symbol_mask(
