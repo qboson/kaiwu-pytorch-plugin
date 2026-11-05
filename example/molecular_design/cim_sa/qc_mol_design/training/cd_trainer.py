@@ -171,6 +171,11 @@ class CDTrainer:
         print(f"\n[{tag}] Pre-computing fingerprints ...")
         train_batches = self.precompute_batches(train_loader)
         valid_batches = self.precompute_batches(valid_loader)
+        if not train_batches or not valid_batches:
+            raise ValueError(
+                "CD training needs non-empty train and validation loaders; "
+                "check the dataset split and batch size"
+            )
         print(f"[{tag}] Training CRBM for {CFG.epochs} epochs ...")
 
         best_val_difference = float("inf")
