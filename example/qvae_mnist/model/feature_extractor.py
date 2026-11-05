@@ -1,8 +1,9 @@
 import numpy as np
 import torch
 
+
 class FeatureExtractor:
-    def __init__(self, qvae_model, feature_type='q'):
+    def __init__(self, qvae_model, feature_type="q"):
         """
         Args:
             qvae_model: 训练好的 QVAE 模型
@@ -10,7 +11,11 @@ class FeatureExtractor:
         """
         self.model = qvae_model
         self.feature_type = feature_type
-        self.device = next(qvae_model.parameters()).device
+
+    @property
+    def device(self) -> torch.device:
+        """Device of ``qvae_model`` parameters (not a stale snapshot)."""
+        return next(self.model.parameters()).device
 
     def extract(self, dataloader, return_labels=True):
         """提取特征和标签"""
