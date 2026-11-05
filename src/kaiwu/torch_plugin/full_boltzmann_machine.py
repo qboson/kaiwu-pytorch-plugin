@@ -161,6 +161,11 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # raise error
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
+            if s_visible is not None and num_sample is not None:
+                raise ValueError(
+                    "s_visible and num_sample are mutually exclusive; "
+                    "provide only one of them"
+                )
             if s_visible is not None:
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
