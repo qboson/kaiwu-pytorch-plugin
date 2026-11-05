@@ -73,13 +73,15 @@ class UnsupervisedDBN(nn.Module):
         """Performs a forward pass to transform the input data.
 
         Args:
-            data_in (numpy.ndarray): The input data.
+            data_in: The input data as an array-like object (NumPy array, list
+                or torch tensor) with shape ``(n_samples, input_dim)``.
 
         Returns:
             numpy.ndarray: The transformed data after passing through all RBM layers.
 
         Raises:
-            ValueError: If the model has not been built or trained yet.
+            ValueError: If the model has not been built or trained yet, or
+                ``data_in`` does not have shape ``(n_samples, input_dim)``.
         """
         if self.rbm_layers is None:
             raise ValueError("Model not built yet. Call create_rbm_layer first.")
@@ -88,7 +90,12 @@ class UnsupervisedDBN(nn.Module):
                 "Model not trained yet. Call mark_as_trained() after training."
             )
 
-        data_in = data_in.astype(np.float32)
+        data_in = np.asarray(data_in, dtype=np.float32)
+        if data_in.ndim != 2 or data_in.shape[-1] != self.input_dim:
+            raise ValueError(
+                f"data_in must have shape (n_samples, {self.input_dim}), "
+                f"got {tuple(data_in.shape)}"
+            )
         for rbm in self.rbm_layers:
             with torch.no_grad():
                 hidden_output = rbm.get_hidden(
