@@ -150,9 +150,32 @@ class SimpleEncoder(Network):
         """Decode not implemented for encoder."""
         raise NotImplementedError("Decoder not implemented for encoder")
 
+    def _parameter_device(self, fallback):
+        """Return the device this encoder's parameters currently live on.
+
+        A parent ``nn.Module.to`` moves the linear weights through ``_apply``
+        and does not call a ``to`` override. The uniform sample mixed with the
+        encoded activation has to follow those weights, not a cached device.
+
+        Args:
+            fallback (torch.device): Device used when the encoder has no
+                parameters.
+
+        Returns:
+            torch.device: Device of the first parameter, otherwise ``fallback``.
+        """
+        parameter = next(self.parameters(), None)
+        if parameter is None:
+            return fallback
+        return parameter.device
+
     def hierarchical_posterior(self, x, is_training=True):
         """
         Define a hierarchical approximate posterior distribution.
+
+        ``x`` and the uniform sample ``rho`` are placed on the live parameter
+        device before ``icdf`` mixes ``rho`` with the encoded activation. The
+        caller's tensor is not modified in place.
 
         Args:
             x: Input tensor.
@@ -163,13 +186,15 @@ class SimpleEncoder(Network):
         """
         # pylint: disable=unused-argument
         logger.debug("ERROR Encoder::hierarchical_posterior")
+        device = self._parameter_device(x.device)
+        x = x.to(device)
         posterior = []
         post_samples = []
         for _ in range(self.num_latent_hierarchy_levels):
             qprime = self.encode(x)
             sigmoid = nn.Sigmoid()
             q = sigmoid(qprime)
-            rho = torch.rand(q.size())
+            rho = torch.rand(q.shape, device=device, dtype=q.dtype)
             posterior_dist = self.smoothing_distribution
             samples = posterior_dist.icdf(rho, q)
             posterior.append(posterior_dist)
