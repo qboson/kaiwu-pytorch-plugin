@@ -11,6 +11,7 @@ a QVAE with a Boltzmann machine prior.
 
 import abc
 import logging
+from numbers import Integral
 
 import torch
 from torch import nn
@@ -41,15 +42,19 @@ class AutoEncoderBase(nn.Module):
         super().__init__(**kwargs)
 
         # Validate and normalize input dimension
-        if isinstance(input_dimension, list):
-            assert (
-                len(input_dimension) > 0
-            ), "Input dimension not defined, needed for model structure"
+        if isinstance(input_dimension, (list, tuple)):
+            input_dimension = list(input_dimension)
+            if not input_dimension:
+                raise ValueError(
+                    "input_dimension must be a positive integer or a non-empty list"
+                )
         else:
-            assert (
-                input_dimension > 0
-            ), "Input dimension not defined, needed for model structure"
             input_dimension = [input_dimension]  # wrap in list for consistent handling
+        for dimension in input_dimension:
+            if isinstance(dimension, bool) or not isinstance(dimension, Integral):
+                raise TypeError("input_dimension must be a positive integer")
+            if dimension < 1:
+                raise ValueError("input_dimension must be a positive integer")
 
         assert config is not None, "Config not defined"
         assert (
