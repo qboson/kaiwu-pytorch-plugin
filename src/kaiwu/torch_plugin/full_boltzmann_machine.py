@@ -62,8 +62,18 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """Get the hidden bias.
 
         Args:
-            num_hidden (int): Number of hidden nodes.
+            num_hidden (int): Number of hidden nodes, in ``[0, num_nodes]``.
+
+        Raises:
+            TypeError: If ``num_hidden`` is not an integer.
+            ValueError: If ``num_hidden`` is outside ``[0, num_nodes]``.
         """
+        if isinstance(num_hidden, bool) or not isinstance(num_hidden, int):
+            raise TypeError("num_hidden must be an integer between 0 and num_nodes")
+        if not 0 <= num_hidden <= self.num_nodes:
+            raise ValueError(
+                f"num_hidden must be between 0 and {self.num_nodes}"
+            )
         num_visible = self.num_nodes - num_hidden
         return self.linear_bias[num_visible:]
 
@@ -71,8 +81,20 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """Get the visible bias.
 
         Args:
-            num_visible (int): Number of visible nodes.
+            num_visible (int): Number of visible nodes, in ``[0, num_nodes]``.
+
+        Raises:
+            TypeError: If ``num_visible`` is not an integer.
+            ValueError: If ``num_visible`` is outside ``[0, num_nodes]``.
         """
+        if isinstance(num_visible, bool) or not isinstance(num_visible, int):
+            raise TypeError(
+                "num_visible must be an integer between 0 and num_nodes"
+            )
+        if not 0 <= num_visible <= self.num_nodes:
+            raise ValueError(
+                f"num_visible must be between 0 and {self.num_nodes}"
+            )
         return self.linear_bias[:num_visible]
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
