@@ -21,6 +21,7 @@ import torch
 ensure_repo_src_on_path()
 
 from dplm.utils.dplm_builder import build_qdiffusion
+from dplm.utils.runtime import parameter_device
 
 # Path and sequence helpers.
 
@@ -137,7 +138,7 @@ def main() -> None:
     )
     # In the public API the caller provides a clean token sequence and
     # ``generate()`` handles the iterative noisy-state decoding internally.
-    input_tokens = encoded["input_ids"].to(generator.device)
+    input_tokens = encoded["input_ids"].to(parameter_device(generator))
 
     with torch.no_grad():
         generated_tokens = generator.generate(
