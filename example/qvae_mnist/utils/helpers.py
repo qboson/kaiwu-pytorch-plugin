@@ -83,9 +83,11 @@ def plot_training_curves(
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         save_path = f"results/mlp_training_curves_{timestamp}.png"
 
+    parent = os.path.dirname(save_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     print(f"Training curves saved to: {save_path}")
-    plt.show()
 
     if show:
         plt.show()
