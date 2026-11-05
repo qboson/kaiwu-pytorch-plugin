@@ -64,6 +64,12 @@ def build_loaders(
 
     Strides above 1 subsample the windows to keep the example small.
     """
+    if seq_len + pred_len > TRAIN_ROWS:
+        raise ValueError(
+            f"seq_len + pred_len must not exceed the {TRAIN_ROWS}-row training split"
+        )
+    if pred_len > VAL_ROWS:
+        raise ValueError(f"pred_len must not exceed the {VAL_ROWS}-row evaluation split")
     if not data_path.exists():
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
