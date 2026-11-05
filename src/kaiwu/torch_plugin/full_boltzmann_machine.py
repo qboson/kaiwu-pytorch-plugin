@@ -148,14 +148,21 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """Sample from the Boltzmann Machine.
 
         Args:
-            num_steps (int): Number of Gibbs sampling steps.
+            num_steps (int): Number of Gibbs sampling steps. Must be non-negative;
+                zero returns the initialized state without any updates.
 
             s_visible (torch.Tensor, optional): State of the visible layer,
                 shape (B, num_visible). If ``None``, randomly initialize visible layer.
 
-            num_sample (int, optional): Number of samples.
+            num_sample (int, optional): Number of samples. Must be positive when
+                ``s_visible`` is not provided.
                 If ``None``, uses batch size of s_visible.
         """
+        if num_steps < 0:
+            raise ValueError("num_steps must be non-negative.")
+        if s_visible is None and num_sample is not None and num_sample <= 0:
+            raise ValueError("num_sample must be positive.")
+
         with torch.no_grad():
             # Initialization: If neither visible unit state nor sample number is provided,
             # raise error

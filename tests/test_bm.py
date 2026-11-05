@@ -106,6 +106,24 @@ class TestBoltzmannMachine(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.bm.gibbs_sample(num_steps=5)
 
+    def test_gibbs_sample_rejects_invalid_counts(self):
+        """Reject invalid counts instead of returning unupdated or empty states."""
+        with self.assertRaisesRegex(ValueError, "num_steps must be non-negative"):
+            self.bm.gibbs_sample(num_steps=-1, num_sample=2)
+        with self.assertRaisesRegex(ValueError, "num_steps must be non-negative"):
+            self.bm.gibbs_sample(num_steps=-1, s_visible=self.ones)
+        for count in (0, -2):
+            with self.subTest(num_sample=count):
+                with self.assertRaisesRegex(ValueError, "num_sample must be positive"):
+                    self.bm.gibbs_sample(num_steps=1, num_sample=count)
+
+    def test_gibbs_sample_zero_steps_returns_initial_state(self):
+        """Zero updates remain supported for callers inspecting initialization."""
+        visible = torch.tensor([[1.0, 0.0]])
+        result = self.bm.gibbs_sample(num_steps=0, s_visible=visible)
+        self.assertEqual(result.shape, (1, self.num_nodes))
+        self.assertTrue(torch.equal(result[:, :2], visible))
+
     def test_hidden_to_ising_matrix(self):
         """测试_hidden_to_ising_matrix功能"""
         with self.subTest("输出形状与类型"):
