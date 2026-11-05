@@ -250,6 +250,9 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the loss gradient and Hessian with respect to a soft mask.
 
+        Autograd is enabled locally even when the caller uses ``torch.no_grad``.
+        The caller's gradient mode is restored on return or failure.
+
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
             loss_fn: Loss function returning a scalar tensor.
@@ -262,7 +265,8 @@ class FeatureSelectionWrapper(nn.Module):
 
         Raises:
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
-                no batches, or ``loss_fn`` does not return a scalar tensor.
+                no batches, ``loss_fn`` does not return a finite scalar tensor,
+                or the mask derivatives are nonfinite.
         """
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
@@ -293,25 +297,30 @@ class FeatureSelectionWrapper(nn.Module):
             parameter.requires_grad_(False)
 
         try:
-            continuous_mask = (
-                self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
-            )
-            loss = loss_fn(
-                self.model(self.apply_mask(input_all, continuous_mask)),
-                target_all,
-            )
-            if loss.ndim != 0:
-                raise ValueError("loss_fn must return a scalar tensor")
-            gradient = torch.autograd.grad(
-                loss,
-                continuous_mask,
-                create_graph=True,
-            )[0]
-            rows = [
-                self._hessian_row(gradient, continuous_mask, index, hessian_mode)
-                for index in range(self.feature_dim)
-            ]
-            hessian = torch.stack(rows)
+            with torch.enable_grad():
+                continuous_mask = (
+                    self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
+                )
+                loss = loss_fn(
+                    self.model(self.apply_mask(input_all, continuous_mask)),
+                    target_all,
+                )
+                if loss.ndim != 0:
+                    raise ValueError("loss_fn must return a scalar tensor")
+                if not torch.isfinite(loss):
+                    raise ValueError("loss_fn must return a finite scalar tensor")
+                gradient = torch.autograd.grad(
+                    loss,
+                    continuous_mask,
+                    create_graph=True,
+                )[0]
+                rows = [
+                    self._hessian_row(gradient, continuous_mask, index, hessian_mode)
+                    for index in range(self.feature_dim)
+                ]
+                hessian = torch.stack(rows)
+                if not (torch.isfinite(gradient).all() and torch.isfinite(hessian).all()):
+                    raise ValueError("mask gradient and Hessian must be finite")
         finally:
             for parameter, requires_grad in zip(
                 self.model.parameters(),
