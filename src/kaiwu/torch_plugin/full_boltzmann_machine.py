@@ -208,6 +208,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
         """
+        # Match the model's parameter dtype/device so mixed-precision callers
+        # and NumPy condition arrays use the same matmul path as tensor inputs.
+        s_visible = torch.as_tensor(
+            s_visible,
+            dtype=self.linear_bias.dtype,
+            device=self.device,
+        )
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
