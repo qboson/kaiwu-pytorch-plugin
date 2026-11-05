@@ -202,7 +202,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         Args:
             sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
-            s_visible: State of the visible layer.
+            s_visible: State of the visible layer, shape
+                ``(batch, num_visible)``.
+            dtype: Dtype of the returned spin tensor.
 
         Returns:
             torch.Tensor: Spins sampled from the model
