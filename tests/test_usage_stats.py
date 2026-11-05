@@ -48,7 +48,10 @@ class TestKppCallerContext(unittest.TestCase):
         us = _get_us()
         ctx = us._kpp_caller_context
         if ctx is None:
-            self.skipTest("kaiwu SDK not available")
+            self.skipTest(
+                "installed kaiwu build exposes no caller context "
+                "(_caller_context); attribution path not available"
+            )
 
         ctx.source = None
         with us.kpp_caller_context("outer"):
@@ -63,7 +66,10 @@ class TestKppCallerContext(unittest.TestCase):
         us = _get_us()
         ctx = us._kpp_caller_context
         if ctx is None:
-            self.skipTest("kaiwu SDK not available")
+            self.skipTest(
+                "installed kaiwu build exposes no caller context "
+                "(_caller_context); attribution path not available"
+            )
 
         ctx.source = None
         with us.kpp_caller_context("myframework"):
@@ -149,6 +155,32 @@ class TestStatsSwitch(unittest.TestCase):
             us = _get_us()
             us._env_stats_cache = None
             self.assertFalse(us.is_usage_stats_enabled(), f"Failed for value: {val}")
+
+class TestCallerContextAvailability(unittest.TestCase):
+    """The attribution hook is optional; its absence must be reported, not hidden."""
+
+    def test_availability_matches_the_installed_kaiwu_build(self):
+        """caller_context_available() mirrors whether the hook can be imported."""
+        us = _get_us()
+        try:
+            from kaiwu.license._track_data import _caller_context
+        except ImportError:
+            self.assertFalse(
+                us.caller_context_available(),
+                "hook import failed, so the probe must report it as unavailable",
+            )
+        else:
+            self.assertTrue(us.caller_context_available())
+            self.assertIs(us._kpp_caller_context, _caller_context)
+
+    def test_context_manager_is_a_noop_when_the_hook_is_absent(self):
+        """Without the hook the manager must still be safe to use."""
+        us = _get_us()
+        if us.caller_context_available():
+            self.skipTest("this kaiwu build exposes the hook; degradation path not applicable")
+        with us.kpp_caller_context("probe"):
+            pass
+        self.assertFalse(us.caller_context_available())
 
 
 if __name__ == "__main__":
