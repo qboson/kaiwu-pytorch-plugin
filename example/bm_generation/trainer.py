@@ -43,6 +43,13 @@ class CosineScheduleWithWarmup(LambdaLR):
         )
 
 
+def _zero_output_columns(states, num_output):
+    """Zero trailing output units; ``num_output=0`` leaves the states untouched."""
+    if num_output:
+        states[:, -num_output:] = 0.0
+    return states
+
+
 def process_solve_graph_worker(params):
     """子进程执行的具体采样逻辑。
 
@@ -60,7 +67,8 @@ def process_solve_graph_worker(params):
         state_v_chunk = bm_shared.condition_sample(sampler, s_visible_chunk).detach()
         # 输入条件采样
         state_vi_chunk = bm_shared.condition_sample(
-            sampler, s_visible_chunk[:, :-num_output]
+            sampler,
+            s_visible_chunk if num_output == 0 else s_visible_chunk[:, :-num_output],
         ).detach()
 
     return state_v_chunk, state_vi_chunk
@@ -233,10 +241,8 @@ class Trainer:
 
                 # 计算 NCL (Non-Contrastive Loss) 类似项
                 # 保持原逻辑：将输出部分置零后计算 objective
-                v_ncl = combined_v.clone()
-                vi_ncl = combined_vi.clone()
-                v_ncl[:, -self.num_output :] = 0.0
-                vi_ncl[:, -self.num_output :] = 0.0
+                v_ncl = _zero_output_columns(combined_v.clone(), self.num_output)
+                vi_ncl = _zero_output_columns(combined_vi.clone(), self.num_output)
                 ncl = self.bm_net.objective(v_ncl, vi_ncl)
 
                 # 组合目标函数
