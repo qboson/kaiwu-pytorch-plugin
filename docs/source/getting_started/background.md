@@ -113,7 +113,7 @@ $$
 \nabla_\theta \log p(x; \theta) = \nabla_\theta \log \tilde{p}(x; \theta) - \nabla_\theta \log Z
 $$
 
-The gradient of the partition function is not directly computable:
+The gradient of the partition function cannot be evaluated by enumerating every state:
 
 $$
 \begin{aligned}
@@ -139,19 +139,19 @@ $$
 Therefore,
 
 $$
-\nabla_\theta \log p(x; \theta) = \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p(x; \theta)} \nabla_\theta \log \hat{p}(x; \theta)
+\nabla_\theta \log p(x; \theta) = \nabla_\theta \log \tilde{p}(x; \theta) - \mathbb{E}_{x \sim p(x; \theta)} \nabla_\theta \log \tilde{p}(x; \theta)
 $$
 
-The second term involves the model distribution $p(x; \theta)$, while the first term is from the empirical data distribution. Thus,
+The second term is an expectation under the model distribution, while the first term still refers to the single observed example $x$. Averaging over the dataset replaces that first term with an expectation under the empirical data distribution:
 
 $$
-\nabla_\theta \log p(x; \theta) = \mathbb{E}_{x \sim p_{\text{data}}} \nabla_\theta \log \hat{p}(x; \theta) - \mathbb{E}_{x \sim p_{\text{model}}} \nabla_\theta \log \hat{p}(x; \theta)
+\nabla_\theta \mathbb{E}_{x \sim p_{\text{data}}} \log p(x; \theta) = \mathbb{E}_{x \sim p_{\text{data}}} \nabla_\theta \log \tilde{p}(x; \theta) - \mathbb{E}_{x \sim p_{\text{model}}(x; \theta)} \nabla_\theta \log \tilde{p}(x; \theta)
 $$
 
 For the Boltzmann machine energy function, we easily obtain:
 
 $$
-\nabla_W \log \hat{p}(x; W) = v h^\mathrm{T}
+\nabla_W \log \tilde{p}(x; W) = v h^\mathrm{T}
 $$
 
 Hence, the gradient can be computed by sampling $v$ and $h$ under $p_{\text{data}}$ and $p_{\text{model}}$, leading to:
