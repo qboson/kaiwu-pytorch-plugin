@@ -17,18 +17,6 @@ class Config:
             self.sampler_type = 'sa'               # 'sa' or 'cim'
             self.loss_type = 'bernoulli'           # 'bernoulli' or 'mse'
             self.weight_decay = 0.01
-        elif model_type == 'CellQVAE':
-            self.encoder_hidden_nodes = [512]
-            self.decoder_hidden_nodes = [512]
-            self.num_latent_units = 256
-            self.dist_beta = 10.0
-            self.kl_beta = 1e-5
-            self.bm_type = 'bm'
-            self.sampler_type = 'sa'
-            self.loss_type = 'bernoulli'
-            self.weight_decay = 0.01
-            self.hidden_dim = 512
-            self.normalization_method = 'layer'
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
 

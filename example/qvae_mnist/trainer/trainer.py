@@ -102,15 +102,6 @@ class Trainer:
                 activation_fct=self.config.activation_fct,
                 config=self.config
             )
-        elif self.config.type == 'CellQVAE':
-            model = CellQVAE(
-                input_dimension=input_dim,
-                activation_fct=self.config.activation_fct,
-                bm_type=self.config.bm_type,
-                sampler_type=self.config.sampler_type,
-                config=self.config,
-                n_batches=self.n_batches,
-            )
         else:
             raise ValueError(f"Unsupported model type: {self.config.type}")
 
@@ -118,7 +109,7 @@ class Trainer:
         self.model = model
         logger.info(f"Sampler created: {self.config.sampler_type}")
         logger.info(f"Model created: {self.config.type}")
-        if self.config.type in ['QVAE', 'CellQVAE']:
+        if self.config.type in ['QVAE']:
             logger.info(f"BM created: {self.config.bm_type}")
         return model
 
@@ -132,7 +123,7 @@ class Trainer:
         self.tuner.outpath = self.output_dir
 
         # 创建优化器
-        if self.config.type in ['QVAE', 'CellQVAE']:
+        if self.config.type in ['QVAE']:
             vae_params = list(self.model.encoder.parameters()) + list(self.model.decoder.parameters())
             vae_optimizer = torch.optim.Adam(vae_params, lr=self.config.lr)
             bm_optimizer = torch.optim.Adam(self.model.bm.parameters(), lr=self.config.bm_lr)
@@ -147,7 +138,7 @@ class Trainer:
             logger.info("Set dataset mean")
     
         # 设置训练偏置
-        if self.config.type in ["RBM_VAE", "QVAE", "CellQVAE"] and hasattr(self.model, 'set_train_bias'):
+        if self.config.type in ["RBM_VAE", "QVAE"] and hasattr(self.model, 'set_train_bias'):
             self.model.set_train_bias(self.dataset_mean)
             logger.info("Set train bias")
 
