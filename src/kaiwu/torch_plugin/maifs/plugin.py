@@ -139,11 +139,16 @@ class FeatureSelectionWrapper(nn.Module):
             The mask reshaped and typed for broadcasting with ``input_feature``.
 
         Raises:
-            ValueError: If ``input_feature`` has no dimensions or the configured
+            ValueError: If ``input_feature`` has no dimensions, ``mask`` is not
+                one-dimensional with ``feature_dim`` entries, or the configured
                 feature axis does not match ``feature_dim``.
         """
         if input_feature.ndim == 0:
             raise ValueError("input_feature must have at least one dimension")
+        if mask.ndim != 1 or mask.numel() != self.feature_dim:
+            raise ValueError(
+                f"mask must have shape ({self.feature_dim},), got {tuple(mask.shape)}"
+            )
         axis = self.input_feature_axis % input_feature.ndim
         axis_size = input_feature.shape[axis]
         if axis_size != self.feature_dim:
@@ -172,6 +177,8 @@ class FeatureSelectionWrapper(nn.Module):
         Returns:
             The masked input tensor.
         """
+        if mask is not None and not isinstance(mask, torch.Tensor):
+            raise TypeError("mask must be a torch.Tensor")
         resolved_mask = self.mask if mask is None else mask
         return input_feature * self._mask_view(input_feature, resolved_mask)
 
