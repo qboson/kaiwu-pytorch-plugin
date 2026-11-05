@@ -79,9 +79,14 @@ class Exponential(SmoothingDist):
             zeta (torch.Tensor): Input variable.
 
         Returns:
-            torch.Tensor: Probability density value.
+            torch.Tensor: Probability density value; zero outside ``[0, 1]``.
         """
-        return self.beta * torch.exp(-self.beta * zeta) / (1 - torch.exp(-self.beta))
+        zeta = torch.as_tensor(zeta)
+        density = self.beta * torch.exp(-self.beta * zeta) / (
+            1 - torch.exp(-self.beta)
+        )
+        inside = (zeta >= 0) & (zeta <= 1)
+        return torch.where(inside, density, torch.zeros_like(density))
 
     def cdf(self, zeta: torch.Tensor) -> torch.Tensor:
         """Cumulative distribution function.
@@ -90,9 +95,12 @@ class Exponential(SmoothingDist):
             zeta (torch.Tensor): Input variable.
 
         Returns:
-            torch.Tensor: Cumulative distribution value.
+            torch.Tensor: Cumulative distribution value, saturated to ``0``/``1``
+            outside the ``[0, 1]`` support.
         """
-        return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
+        zeta = torch.as_tensor(zeta)
+        cdf = (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
+        return torch.clamp(cdf, 0.0, 1.0)
 
     def sample(self, shape: tuple) -> torch.Tensor:
         """Sampling.
@@ -114,12 +122,18 @@ class Exponential(SmoothingDist):
             zeta (torch.Tensor): Input variable.
 
         Returns:
-            torch.Tensor: Log probability density value.
+            torch.Tensor: Log probability density value; ``-inf`` outside
+            ``[0, 1]``.
         """
-        return (
+        zeta = torch.as_tensor(zeta)
+        log_density = (
             torch.log(self.beta)
             - self.beta * zeta
             - torch.log(1 - torch.exp(-self.beta))
+        )
+        inside = (zeta >= 0) & (zeta <= 1)
+        return torch.where(
+            inside, log_density, torch.full_like(log_density, -float("inf"))
         )
 
 
