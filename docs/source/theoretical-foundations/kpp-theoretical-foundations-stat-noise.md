@@ -35,7 +35,7 @@ The Hebbian learning rule, however, is imperfect. The weight matrix $\mathbf{W}$
 Spurious minima manifest in several forms:
 
 - **Mixture states**: Linear combinations of an odd number of stored patterns (e.g., $ \text{sign}(\xi^1 + \xi^2 + \xi^3)$) often form stable attractors.
-- **Spin-reversed states**: For every stored pattern, its global negation (all spins flipped) is also an energy minimum.
+- **Spin-reversed states**: When the network has no external bias ($b_i = 0$), the global negation of every stored pattern (all spins flipped) is also an energy minimum. A non-zero bias breaks this symmetry, because the field term changes sign under the flip.
 - **Random valleys**: Even random weight matrices produce numerous local minima purely due to quenched disorder.
 
 As the number of stored patterns $P$ increases relative to the number of neurons $N$, the density of spurious minima grows catastrophically. Beyond a critical **storage capacity** of approximately $0.14 N$, the network undergoes a phase transition: the intended memories are no longer stable, and the landscape becomes dominated by spurious attractors. Retrieval fails entirely.
@@ -52,11 +52,11 @@ $$P(x_i = 1) = \sigma\left( \frac{\sum_j w_{ij} x_j + b_i}{T} \right)$$
 
 where $\sigma(z) = 1/(1+\exp(-z))$ is the sigmoid function, and $T > 0$ is the **temperature** parameter.
 
-At finite temperature, the probability of transitioning to a state with *higher* energy is non-zero. Specifically, the ratio of probabilities for two states differing only in unit $i$satisfies:
+At finite temperature, the probability of transitioning to a state with *higher* energy is non-zero. Specifically, the ratio of probabilities for two states differing only in unit $i$ satisfies:
 
 $$\frac{P(x_i = 1)}{P(x_i = 0)} = \exp\left( \frac{\Delta E_i}{T} \right)$$
 
-where $\Delta E_i = E_{x_i=0} - E_{x_i=1}$ is the energy *decrease* when unit $i$turns on. If $\Delta E_i$ is positive (turning on lowers energy), the probability ratio favors the on state. Crucially, even if $\Delta E_i$ is negative (turning on *increases* energy), the probability of turning on remains greater than zero. Thermal fluctuations occasionally push the system **uphill**.
+where $\Delta E_i = E_{x_i=0} - E_{x_i=1}$ is the energy *decrease* when unit $i$ turns on. If $\Delta E_i$ is positive (turning on lowers energy), the probability ratio favors the on state. Crucially, even if $\Delta E_i$ is negative (turning on *increases* energy), the probability of turning on remains greater than zero. Thermal fluctuations occasionally push the system **uphill**.
 
 This ability to climb energy barriers is precisely what enables escape from spurious minima. A network trapped in a shallow local minimum can, after a sequence of unfavorable thermal fluctuations, surmount the surrounding energy barrier and descend into a deeper, more favorable basin. The noise provides the **exploration** mechanism that deterministic dynamics lack.
 
@@ -73,13 +73,13 @@ $$
 Thus, the noise is **not** a heuristic; it is the physical manifestation of the system being in thermal equilibrium with its environment. The probability of moving uphill is exactly the Boltzmann factor ratio, ensuring that the system obeys detailed balance and converges to the correct equilibrium distribution.
 
 ## Simulated Annealing: From Exploration to Exploitation
-Noise alone, however, is not a panacea. If the temperature remains high, the network never settles. it wanders endlessly across the energy landscape, sampling configurations roughly uniformly. To obtain a meaningful low-energy state, we must gradually reduce the temperature over time, a process known as **simulated annealing**.
+Noise alone, however, is not a panacea. If the temperature remains high, the network never settles: it wanders endlessly across the energy landscape, sampling configurations roughly uniformly. To obtain a meaningful low-energy state, we must gradually reduce the temperature over time, a process known as **simulated annealing**.
 
 The annealing schedule typically starts with a high temperature $T_{\text{high}}$, where the system easily escapes local minima and explores the global structure of the landscape. The temperature is then slowly lowered according to a cooling schedule, often geometric:
 
 $$T_{k+1} = \alpha T_k, \quad 0 < \alpha < 1$$
 
-As $T \to 0$, the stochastic dynamics approach the deterministic Hopfield limit, and the network freezes into the nearest local minimum. If the annealing is sufficiently slow, the system converges to the **global minimum** with high probability, which is a result formally guaranteed by the theory of Markov chain Monte Carlo (MCMC).
+As $T \to 0$, the stochastic dynamics approach the deterministic Hopfield limit, and the network freezes into the nearest local minimum. With a sufficiently slow (e.g. logarithmic) cooling schedule and unlimited running time, simulated annealing converges to the **global minimum** in probability; this is the classical convergence result for inhomogeneous Markov chains. The geometric schedule shown above is a practical approximation and does not by itself carry that guarantee.
 
 In practice, true global optimization is rarely achievable for large networks due to the exponential slowdown of mixing times at low temperatures (critical slowing down). Nonetheless, simulated annealing provides a powerful heuristic for finding deep, low-energy states that correspond to likely configurations under the model's learned distribution.
 
