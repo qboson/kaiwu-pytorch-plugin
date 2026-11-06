@@ -48,6 +48,11 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         quadratic_coef = self.quadratic_coef.triu(1)
         return quadratic_coef + quadratic_coef.transpose(0, 1)
 
+    def _parameter_device(self) -> torch.device:
+        """Device of BM parameters, or ``self.device`` when none are registered."""
+        parameter = next(self.parameters(), None)
+        return parameter.device if parameter is not None else self.device
+
     def clip_parameters(self, h_range, j_range) -> None:
         """Clip linear and quadratic bias weights in-place.
 
@@ -99,7 +104,7 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             ising_mat = torch.zeros(
                 (num_nodes + 1, num_nodes + 1),
-                device=self.device,
+                device=self._parameter_device(),
                 dtype=linear_bias.dtype,
             )
             # Fill quadratic part
