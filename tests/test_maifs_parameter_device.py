@@ -145,3 +145,70 @@ def test_cpu_derivatives_stay_finite_when_devices_match() -> None:
     assert np.isfinite(gradient).all()
     assert np.isfinite(hessian).all()
     assert wrapper.mask.device.type == "cpu"
+
+
+@pytest.mark.parametrize("move_wrapper", [False, True])
+def test_stateless_forward_preserves_input_device(move_wrapper: bool) -> None:
+    """A stateless model must not copy accelerator inputs back to CPU."""
+    wrapper = FeatureSelectionWrapper(nn.Identity(), feature_dim=3)
+    if move_wrapper:
+        wrapper.to("meta")
+    features = torch.ones(4, 3, device="meta")
+
+    assert wrapper(features).device == features.device
+
+
+@pytest.mark.parametrize("operation", ["derivatives", "fit_weights"])
+def test_stateless_batches_follow_wrapper_device(operation: str) -> None:
+    """Without model state, batch placement follows the moved mask buffer."""
+    wrapper = FeatureSelectionWrapper(nn.Identity(), feature_dim=3).to("meta")
+    features = torch.ones(4, 3)
+    targets = torch.zeros_like(features)
+    seen: dict[str, torch.device] = {}
+
+    def loss_fn(prediction: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        seen["prediction"] = prediction.device
+        seen["target"] = target.device
+        raise RuntimeError("stop after checking batch devices")
+
+    with pytest.raises(RuntimeError, match="stop after checking batch devices"):
+        if operation == "derivatives":
+            wrapper.compute_mask_derivatives([(features, targets)], loss_fn)
+        else:
+            # A stateless module has no weights, but an external optimizer is
+            # enough to reach the batch-placement path before the sentinel.
+            optimizer = torch.optim.SGD([nn.Parameter(torch.ones(1))], lr=0.1)
+            wrapper.fit_weights([(features, targets)], loss_fn, optimizer)
+
+    assert seen == {"prediction": wrapper.mask.device, "target": wrapper.mask.device}
+
+
+@pytest.mark.parametrize("device", ["cpu", "cuda"])
+def test_stateless_derivatives_are_finite_on_wrapper_device(device: str) -> None:
+    """Moving an identity wrapper keeps derivative computation on that device."""
+    if device == "cuda" and not torch.cuda.is_available():
+        pytest.skip("CUDA is not available")
+    wrapper = FeatureSelectionWrapper(nn.Identity(), feature_dim=3).to(device)
+    features = torch.ones(4, 3)
+    targets = torch.zeros_like(features)
+
+    def loss_fn(prediction: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        assert prediction.device == wrapper.mask.device
+        assert target.device == wrapper.mask.device
+        return _mse(prediction, target)
+
+    gradient, hessian = wrapper.compute_mask_derivatives([(features, targets)], loss_fn)
+
+    np.testing.assert_allclose(gradient, np.full(3, 2.0 / 3.0))
+    np.testing.assert_allclose(hessian, np.eye(3) * (2.0 / 3.0))
+
+
+def test_buffer_only_model_device_takes_priority_over_fallback() -> None:
+    """A model buffer still controls placement when the model has no parameters."""
+    model = nn.Identity()
+    model.register_buffer("state", torch.ones(1))
+    wrapper = FeatureSelectionWrapper(model, feature_dim=3)
+    model.to("meta")
+
+    assert wrapper.mask.device.type == "cpu"
+    assert wrapper(torch.ones(4, 3)).device == model.state.device
