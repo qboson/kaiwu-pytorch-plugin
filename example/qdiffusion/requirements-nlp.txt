@@ -1,0 +1,6 @@
+# Dependencies for the BM-only natural-language QDiffusion example.
+torch>=2.0
+transformers==4.38.2
+flash-attn>=2.5
+einops>=0.7
+numpy>=1.24,<3
