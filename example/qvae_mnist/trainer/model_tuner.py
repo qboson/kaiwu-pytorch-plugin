@@ -1,4 +1,5 @@
 import os
+import builtins
 import torch
 import numpy as np
 
@@ -63,27 +64,73 @@ class ModelTuner(object):
 		self.test_loader=test_loader
 		return
 	
+	def _dataset_inputs(self, sample):
+		# Dataset items follow the training convention (input(s), target).
+		if isinstance(sample, (tuple, list)) and len(sample) == 2:
+			inputs = sample[0]
+		else:
+			inputs = sample
+		if torch.is_tensor(inputs):
+			return [inputs]
+		if (
+			isinstance(inputs, (tuple, list))
+			and inputs
+			and all(torch.is_tensor(item) for item in inputs)
+		):
+			return list(inputs)
+		raise builtins.TypeError(
+			"Cannot interpret the dataset sample as one or more input tensors"
+		)
+
 	def get_input_dimension(self):
 		assert self.train_loader is not None, "Trying to retrieve datapoint from empty train loader"
-		return self.train_loader.get_input_size()
+		dataset = getattr(self.train_loader, "dataset", None)
+		if dataset is not None:
+			if len(dataset) == 0:
+				raise builtins.ValueError("Cannot infer input dimension from an empty dataset")
+			return [int(item.numel()) for item in self._dataset_inputs(dataset[0])]
+		if hasattr(self.train_loader, "get_input_size"):
+			sizes = self.train_loader.get_input_size()
+			if isinstance(sizes, (tuple, list)):
+				return [int(size) for size in sizes]
+			return [int(sizes)]
+		raise builtins.TypeError(
+			"train_loader must expose a dataset or a get_input_size() method"
+		)
 	
 	def get_train_dataset_mean(self):
-		#returns mean of dataset as list
-		#multiple input datasets - multiple means
+		# Returns one [1, width] feature mean per model input.
 		assert self.train_loader is not None, "Trying to retrieve datapoint from empty train loader"
-		
-		input_dimension=self.get_input_dimension()
-		imgPerLayer={}	
-		for i in range(0,len(input_dimension)):
-			imgPerLayer[i]=[]	
-		for i, (data, _) in enumerate(self.train_loader.dataset):
-			#loop over all layers
-			for l,d in enumerate(data):	
-				imgPerLayer[l].append(d.view(-1,input_dimension[l]))
-		means=[]
-		for l, imgList in imgPerLayer.items():
-			means.append(torch.mean(torch.stack(imgList),dim=0))
-		return means
+		dataset = getattr(self.train_loader, "dataset", None)
+		if dataset is None:
+			raise builtins.TypeError("get_train_dataset_mean requires a loader with a dataset")
+		if len(dataset) == 0:
+			raise builtins.ValueError("Cannot compute the mean of an empty dataset")
+
+		first_inputs = self._dataset_inputs(dataset[0])
+		widths = [int(item.numel()) for item in first_inputs]
+		dtypes = [
+			item.dtype if item.dtype.is_floating_point else torch.float32
+			for item in first_inputs
+		]
+		sums = [
+			torch.zeros(width, dtype=torch.float64, device=item.device)
+			for width, item in zip(widths, first_inputs)
+		]
+		for index in range(len(dataset)):
+			inputs = self._dataset_inputs(dataset[index])
+			if len(inputs) != len(widths):
+				raise builtins.ValueError("Inconsistent number of model inputs in the dataset")
+			for layer, item in enumerate(inputs):
+				flat = item.detach().reshape(-1)
+				if flat.numel() != widths[layer]:
+					raise builtins.ValueError("Inconsistent input feature width in the dataset")
+				sums[layer] += flat.to(dtype=torch.float64, device=sums[layer].device)
+		count = len(dataset)
+		return [
+			(total / count).to(dtype).reshape(1, -1)
+			for total, dtype in zip(sums, dtypes)
+		]
 
 	def load_model(self,set_eval=True):
 		logger.info("Loading Model")
