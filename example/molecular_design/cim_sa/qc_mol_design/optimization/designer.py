@@ -27,7 +27,6 @@ Algorithm:
 """
 from __future__ import annotations
 
-import random
 import warnings
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
@@ -603,7 +602,8 @@ class MolecularDesigner:
         return float(fe.item())
 
     def _make_ring_initial_states(
-        self, qubo: MoleculeQUBO, atom_symbols: List[str], n_states: int = 5
+        self, qubo: MoleculeQUBO, atom_symbols: List[str], n_states: int = 5,
+        seed: Optional[int] = None,
     ) -> List[Dict[int, int]]:
         """Generate initial states with ring structures for SA warm-start.
 
@@ -614,7 +614,13 @@ class MolecularDesigner:
         Two strategies:
           1. Benzene-like 6-membered ring: select 6 C atoms, set ring bonds
           2. Random spanning tree + one extra edge: guarantees exactly 1 ring
+
+        Strategy 2 draws from a dedicated NumPy generator seeded with
+        ``seed`` (the run's condition seed), so warm-start sampling stays
+        reproducible under the run's seeding protocol without touching the
+        global ``random`` stream shared with the rest of the pipeline.
         """
+        rng = np.random.default_rng(seed)
         n = len(atom_symbols)
         initial_states = []
 
@@ -652,7 +658,7 @@ class MolecularDesigner:
         while len(initial_states) < n_states:
             state = {k: 0 for k in range(qubo.n_vars)}
             # Build random spanning tree via Prim's algorithm
-            visited = {random.randint(0, n - 1)}
+            visited = {int(rng.integers(0, n))}
             for _ in range(n - 1):
                 candidates = []
                 for v in visited:
@@ -661,7 +667,7 @@ class MolecularDesigner:
                             candidates.append((v, u))
                 if not candidates:
                     break
-                v, u = random.choice(candidates)
+                v, u = candidates[int(rng.integers(len(candidates)))]
                 visited.add(u)
                 idx = qubo.bond_idx(min(v, u), max(v, u))
                 state[idx] = 1
@@ -673,7 +679,7 @@ class MolecularDesigner:
                     if state[idx] == 0:
                         non_tree_edges.append(idx)
             if non_tree_edges:
-                extra = random.choice(non_tree_edges)
+                extra = non_tree_edges[int(rng.integers(len(non_tree_edges)))]
                 state[extra] = 1
             initial_states.append(state)
 
@@ -742,7 +748,9 @@ class MolecularDesigner:
         base_perturb = 0.0 if strict else CFG.exploration_perturbation
         ring_states = (
             None if strict
-            else self._make_ring_initial_states(qubo, atom_symbols, n_states=5)
+            else self._make_ring_initial_states(
+                qubo, atom_symbols, n_states=5, seed=condition_seed
+            )
         )
 
         bond_X: List[np.ndarray] = []
@@ -821,6 +829,7 @@ class MolecularDesigner:
                 valency_deficit_eps=val_def_eps,
                 ring_incentive=ring_inc,
                 connectivity_incentive=conn_inc,
+                seed=solver_seed,
             )
             solve_started = time.perf_counter()
             prepared = None
@@ -1170,7 +1179,9 @@ class MolecularDesigner:
             val_def_eps = 5.0
 
         # Generate ring-seeded initial states for SA warm-start
-        ring_init_states = self._make_ring_initial_states(qubo, atom_symbols, n_states=5)
+        ring_init_states = self._make_ring_initial_states(
+            qubo, atom_symbols, n_states=5, seed=int(CFG.seed)
+        )
 
         # ── Inner: solve QUBO, evaluate, collect ─────────────────────────
         max_samples = getattr(CFG, 'max_samples_per_step', 50)
@@ -1205,6 +1216,7 @@ class MolecularDesigner:
                 valency_deficit_eps=val_def_eps,
                 ring_incentive=ring_inc,
                 connectivity_incentive=conn_inc,
+                seed=int(CFG.seed) + len(generated),
             )
 
             # Choose initial states: ring-seeded or default

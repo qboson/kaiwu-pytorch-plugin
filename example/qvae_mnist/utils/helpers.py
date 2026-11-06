@@ -4,6 +4,7 @@ Unsorted helper functions
 """
 import os
 import datetime
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -29,7 +30,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 def save_list_to_txt(filename, data):
-    with open(filename, "w") as f:
+    txt_path = Path(filename).expanduser().resolve()
+    txt_path.parent.mkdir(parents=True, exist_ok=True)
+    with txt_path.open("w") as f:
         for value in data:
             f.write(f"{value:.6f}\n")
 
@@ -471,8 +474,10 @@ def evaluate_qvae_fid(trainer, fake_imgs, real_imgs, device, save_path=None, bat
         batch_size=batch_size
     )
     if save_path is not None:
-        fid_result_path = os.path.join(save_path, "fid_results.txt")
-        with open(fid_result_path, "w") as f:
+        save_root = Path(save_path).expanduser().resolve()
+        save_root.mkdir(parents=True, exist_ok=True)
+        fid_result_path = save_root / "fid_results.txt"
+        with fid_result_path.open("w") as f:
             f.write(f"FID分数: {fid_score:.4f}\n")
             f.write(f"训练轮次: {trainer.config.num_epochs}\n")
             f.write(f"潜在维度: {trainer.model._latent_dimensions}\n")

@@ -97,4 +97,12 @@ def select_references(
 
 
 def manifest_sha256(path: str | Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    """Hash a manifest after canonicalising its location."""
+    canonical = Path(path).expanduser().resolve()
+    if not canonical.is_file():
+        raise FileNotFoundError(f"reference manifest not found: {canonical}")
+    digest = hashlib.sha256()
+    with canonical.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
