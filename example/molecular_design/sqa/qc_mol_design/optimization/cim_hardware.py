@@ -38,7 +38,9 @@ def initialize_license():
         payload, code = license_utils._read_license()
         matches = (str(payload["user_id"]) == str(credentials["user_id"])
                    and code == credentials["sdk_code"])
-    except (ValueError, OSError):
+    # Any malformed/incomplete cache (missing keys, non-mapping payload)
+    # must be treated as a miss and re-initialized, not leak the exception.
+    except (ValueError, OSError, KeyError, TypeError):
         matches = False
     if not matches:
         kw.license.init(str(credentials["user_id"]), credentials["sdk_code"])
