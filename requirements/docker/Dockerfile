@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 USER jovyan
 
 # 复制 requirements.txt 并安装
-COPY ../requirements.txt requirements.txt
+# compose 以 requirements/ 为构建上下文，因此这里只能引用上下文内的路径
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 如果需要，可以在此处清理编译工具以减小镜像体积（可选）
