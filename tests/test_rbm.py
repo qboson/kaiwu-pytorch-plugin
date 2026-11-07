@@ -120,6 +120,60 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         s_all_nograd = self.bm.get_visible(s_hidden_grad)
         self.assertFalse(s_all_nograd.requires_grad)
 
+    def test_get_hidden_conditional_value(self):
+        """P(h=1|v) 必须精确等于 sigmoid(v @ W + b_h)：W=0 时即 sigmoid(b_h)。
+
+        现有测试只断言形状与 [0,1] 范围——把 linear_bias 的可见/隐藏两段
+        下标互换（形状不变、值错）时全套件仍绿，而这两个方法是 RBM/DBN
+        训练正相位的根基（dbn.py forward 与 example/dbn_digits 训练器均
+        调用）。
+        """
+        with torch.no_grad():
+            self.bm.quadratic_coef.zero_()
+            self.bm.linear_bias.copy_(
+                torch.tensor([0.1, -0.2, 0.3, -0.4])
+            )
+        s_visible = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+        s_all = self.bm.get_hidden(s_visible)
+        expected = torch.sigmoid(self.bm.linear_bias[self.num_visible :])
+        self.assertTrue(torch.allclose(s_all[:, : self.num_visible], s_visible))
+        self.assertTrue(
+            torch.allclose(s_all[:, self.num_visible :], expected.expand(2, self.num_hidden))
+        )
+
+    def test_get_visible_conditional_value(self):
+        """P(v=1|h) 必须精确等于 sigmoid(h @ W^T + b_v)：W=0 时即 sigmoid(b_v)。"""
+        with torch.no_grad():
+            self.bm.quadratic_coef.zero_()
+            self.bm.linear_bias.copy_(
+                torch.tensor([0.1, -0.2, 0.3, -0.4])
+            )
+        s_hidden = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+        s_all = self.bm.get_visible(s_hidden)
+        expected = torch.sigmoid(self.bm.linear_bias[: self.num_visible])
+        self.assertTrue(
+            torch.allclose(s_all[:, : self.num_visible], expected.expand(2, self.num_visible))
+        )
+        self.assertTrue(torch.allclose(s_all[:, self.num_visible :], s_hidden))
+
+    def test_get_hidden_coupling_direction(self):
+        """隐藏层条件由 v @ W + b_h 驱动，可见层偏置不得泄入。"""
+        with torch.no_grad():
+            self.bm.quadratic_coef.copy_(torch.tensor([[1.0, 2.0], [3.0, 4.0]]))
+            self.bm.linear_bias.copy_(torch.tensor([10.0, 20.0, 0.0, 0.0]))
+        s_visible = torch.tensor([[1.0, 0.0]])
+        s_all = self.bm.get_hidden(s_visible)
+        expected = torch.sigmoid(
+            s_visible @ self.bm.quadratic_coef + self.bm.linear_bias[self.num_visible :]
+        )
+        self.assertTrue(torch.allclose(s_all[:, self.num_visible :], expected))
+        # 可见层偏置 (10, 20) 出现在隐藏条件里即为下标错位
+        self.assertFalse(
+            torch.allclose(
+                s_all[:, self.num_visible :], torch.sigmoid(torch.tensor([[10.0, 20.0]]))
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
