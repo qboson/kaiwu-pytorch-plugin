@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 import random
 from typing import Any
@@ -60,6 +61,22 @@ def split_train_val_test(
 ) -> tuple[list[tuple[str, str]], list[tuple[str, str]], list[tuple[str, str]]]:
     if len(records) < 3:
         raise ValueError("Need at least 3 records to build train/val/test splits.")
+    for name, ratio in (("val_ratio", val_ratio), ("test_ratio", test_ratio)):
+        if (
+            isinstance(ratio, bool)
+            or not isinstance(ratio, (int, float))
+            or not math.isfinite(ratio)
+            or not 0 < ratio < 1
+        ):
+            raise ValueError(
+                f"{name} must be a finite fraction strictly between 0 and 1, "
+                f"got {ratio!r}."
+            )
+    if val_ratio + test_ratio >= 1:
+        raise ValueError(
+            "val_ratio + test_ratio must stay below 1 so the training split "
+            "remains nonempty."
+        )
 
     shuffled = list(records)
     random.Random(seed).shuffle(shuffled)
