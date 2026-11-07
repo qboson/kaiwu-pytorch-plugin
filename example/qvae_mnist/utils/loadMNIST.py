@@ -32,6 +32,15 @@ def loadMNIST(
     Returns:
         train_loader, test_loader: PyTorch DataLoader objects
     """
+    for count, param_name in (
+        (num_evts_train, "num_evts_train"),
+        (num_evts_test, "num_evts_test"),
+    ):
+        if not isinstance(count, int) or count < 1:
+            raise ValueError(
+                f"{param_name} must be a positive integer, got {count!r}"
+            )
+
     # Dataset mapping
     dataset_map = {
         "mnist": MNIST,
