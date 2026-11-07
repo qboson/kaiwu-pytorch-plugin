@@ -76,6 +76,10 @@ jobs:
             --cov="$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')" \
             --cov-report=term --cov-report=xml
 
+      - name: SVI backend smoke test
+        run: |
+          pytest tests/test_qvae_svi.py -v -k "smoke"
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7
         with:

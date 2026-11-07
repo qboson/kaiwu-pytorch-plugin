@@ -51,6 +51,7 @@ def main():
     parser.add_argument("--bm-lr", type=float, default=8e-4)
     parser.add_argument("--use-cuda", action="store_true")
     parser.add_argument("--feature-type", type=str, default="q", choices=["q", "zeta"])
+    parser.add_argument("--backend", type=str, default="legacy", choices=["legacy", "svi"], help="Training backend engine ('legacy' or 'svi')")
     parser.add_argument("--run-tsne", action="store_true")
     parser.add_argument("--compute_energy", action="store_true")
 
@@ -83,6 +84,7 @@ def main():
         num_train_samples=args.num_train_samples,
         num_test_samples=args.num_test_samples,
         output_dir=args.output_dir,
+        backend=args.backend,
         classifier_kwargs={
             "hidden_dims": args.mlp_hidden_dims,
             "output_dim": args.mlp_output_dim,

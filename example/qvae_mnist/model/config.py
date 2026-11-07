@@ -47,6 +47,7 @@ class Config:
         self.num_test_samples = kwargs.get('num_test_samples', 10000)
         self.output_dir = kwargs.get('output_dir', None)
         self.classifier_kwargs = kwargs.get('classifier_kwargs', {})
+        self.backend = kwargs.get('backend', 'legacy')
 
         # 允许通过 kwargs 覆盖任何已有属性
         for key, value in kwargs.items():
