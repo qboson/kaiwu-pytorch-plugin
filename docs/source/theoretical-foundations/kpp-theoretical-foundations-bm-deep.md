@@ -31,9 +31,9 @@ A **Deep Belief Network (DBN)** is a generative model composed of multiple layer
 
 The joint distribution factorizes as:
 
-$$P(\mathbf{v}, \mathbf{h}^{(1)}, \ldots, \mathbf{h}^{(L)}) = P(\mathbf{h}^{(L-1)}, \mathbf{h}^{(L)}) \prod_{l=1}^{L-2} P(\mathbf{h}^{(l)} \mid \mathbf{h}^{(l+1)})$$
+$$P(\mathbf{v}, \mathbf{h}^{(1)}, \ldots, \mathbf{h}^{(L)}) = P(\mathbf{h}^{(L-1)}, \mathbf{h}^{(L)}) \prod_{l=0}^{L-2} P(\mathbf{h}^{(l)} \mid \mathbf{h}^{(l+1)})$$
 
-where $P(\mathbf{h}^{(L-1)}, \mathbf{h}^{(L)})$ is the RBM distribution at the top, and the conditional distributions $P(\mathbf{h}^{(l)} \mid \mathbf{h}^{(l+1)})$ are those of a sigmoid belief network.
+where $P(\mathbf{h}^{(L-1)}, \mathbf{h}^{(L)})$ is the RBM distribution at the top, and the conditional distributions $P(\mathbf{h}^{(l)} \mid \mathbf{h}^{(l+1)})$ (the product starts at $l=0$, i.e. it includes the visible-generating factor $P(\mathbf{v} \mid \mathbf{h}^{(1)})$ through $\mathbf{h}^{(0)} = \mathbf{v}$) are those of a sigmoid belief network.
 
 The directed connections enable efficient **ancestral sampling**: to generate a sample, one first samples from the top RBM to obtain $\mathbf{h}^{(L-1)}$ and $\mathbf{h}^{(L)}$, then propagates downward through the directed layers, sampling each layer in turn.
 
