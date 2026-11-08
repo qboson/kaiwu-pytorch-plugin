@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import BatchSampler, DataLoader, RandomSampler, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
@@ -24,6 +24,27 @@ def set_seed(seed):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+class _MergeSingletonBatchSampler(BatchSampler):
+    """Merge a final singleton with its preceding batch for BatchNorm training."""
+
+    def __iter__(self):
+        pending = None
+        for batch in super().__iter__():
+            if pending is not None:
+                if len(batch) == 1:
+                    yield pending + batch
+                    pending = None
+                    continue
+                yield pending
+            pending = batch
+        if pending is not None:
+            yield pending
+
+    def __len__(self):
+        count = super().__len__()
+        return count - int(count > 1 and len(self.sampler) % self.batch_size == 1)
 
 
 class Trainer:
@@ -57,7 +78,7 @@ class Trainer:
         return batch_categories.cat.codes.to_numpy()
 
     def make_loaders(self, x, batch_indices):
-        """构造训练、验证和全量评估 DataLoader。"""
+        """构造 DataLoader；BatchNorm 训练将尾部单样本合并到前一批，保留所有细胞。"""
         # 训练/验证只划分细胞索引，保证表达矩阵和 batch 索引保持同步。
         train_idx, val_idx = train_test_split(
             np.arange(x.shape[0]),
@@ -66,12 +87,22 @@ class Trainer:
         )
         x_tensor = torch.tensor(x, dtype=torch.float32)
         batch_tensor = torch.tensor(batch_indices, dtype=torch.long)
+        train_dataset = TensorDataset(x_tensor[train_idx], batch_tensor[train_idx])
+        if self.args.normalization_method == "batch":
+            if self.args.batch_size < 2 or len(train_idx) < 2:
+                raise ValueError("BatchNorm training requires at least 2 cells and batch_size >= 2")
+            train_loader = DataLoader(
+                train_dataset,
+                batch_sampler=_MergeSingletonBatchSampler(
+                    RandomSampler(train_dataset), self.args.batch_size, drop_last=False
+                ),
+            )
+        else:
+            train_loader = DataLoader(
+                train_dataset, batch_size=self.args.batch_size, shuffle=True
+            )
         return (
-            DataLoader(
-                TensorDataset(x_tensor[train_idx], batch_tensor[train_idx]),
-                batch_size=self.args.batch_size,
-                shuffle=True,
-            ),
+            train_loader,
             DataLoader(
                 TensorDataset(x_tensor[val_idx], batch_tensor[val_idx]),
                 batch_size=self.args.batch_size,
