@@ -84,6 +84,14 @@ z = deq(tokens)            # called like any other layer
 deq.get_last_stats()       # forward/backward steps, residuals, sampler time
 ```
 
+In training mode, each backward pass uses the implicit gradient. To compute
+separate losses from the same output, use PyTorch's `retain_graph=True` on
+all but the last backward pass. This also supports the repeated first-order
+VJPs used by the default `torch.autograd.functional.jacobian`. The backward
+hook uses a separate output copy, so it remains active across these passes
+and downstream in-place activations. This costs one output-sized allocation,
+independent of the number of solver iterations.
+
 `simple_train_example.py` with default arguments (2 epochs) finishes in a few
 minutes on a CPU and reaches a test MSE of about 0.43 in the standardised space.
 
