@@ -11,6 +11,7 @@ services:
       - ../:/home/jovyan/work   # 将 KPP 根目录挂载到容器的 work 目录
       # - ./work:/home/jovyan/work
     ports:
-      - 8888:8888
+      # The token-free notebook is intended for local development only.
+      - "127.0.0.1:8888:8888"
     container_name: jupyter_notebook
     command: "start-notebook.sh --NotebookApp.token="
