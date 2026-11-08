@@ -184,92 +184,89 @@ class Trainer:
         self.saver.save_info(self.bm_net, save_path, 0, 0.0)
 
         # 预先分配 Pool 以减少重复创建开销
-        pool = mp.Pool(processes=num_processes)
+        with mp.Pool(processes=num_processes) as pool:
 
-        while step < max_steps:
-            for batch_data in self.data:
-                if step >= max_steps:
-                    break
+            while step < max_steps:
+                for batch_data in self.data:
+                    if step >= max_steps:
+                        break
 
-                optimizer.zero_grad()
-                step += 1
+                    optimizer.zero_grad()
+                    step += 1
 
-                # 1. 负相位采样 (从当前模型分布采样)
-                # 这个步骤通常对整个模型进行，直接由主进程执行
-                state_all = self.bm_net.sample(self.worker).detach()
+                    # 1. 负相位采样 (从当前模型分布采样)
+                    # 这个步骤通常对整个模型进行，直接由主进程执行
+                    state_all = self.bm_net.sample(self.worker).detach()
 
-                # 2. 多进程并行正相位采样 (共享存储模式)
-                # 将本批次数据设为共享内存
-                self._sync_gpu_to_cpu()
-                cpu_data = batch_data.cpu().share_memory_()
+                    # 2. 多进程并行正相位采样 (共享存储模式)
+                    # 将本批次数据设为共享内存
+                    self._sync_gpu_to_cpu()
+                    cpu_data = batch_data.cpu().share_memory_()
 
-                # 按进程数切分数据
-                chunks = torch.chunk(cpu_data, num_processes)
+                    # 按进程数切分数据
+                    chunks = torch.chunk(cpu_data, num_processes)
 
-                # 准备子进程参数 (传递共享的模型对象)
-                sd_args = [
-                    (self.bm_net_cpu, self.worker, chunk, self.num_output)
-                    for chunk in chunks
-                    if chunk.size(0) > 0
-                ]
+                    # 准备子进程参数 (传递共享的模型对象)
+                    sd_args = [
+                        (self.bm_net_cpu, self.worker, chunk, self.num_output)
+                        for chunk in chunks
+                        if chunk.size(0) > 0
+                    ]
 
-                # 并行执行采样
-                all_results = pool.map(process_solve_graph_worker, sd_args)
+                    # 并行执行采样
+                    all_results = pool.map(process_solve_graph_worker, sd_args)
 
-                # 3. 汇总结果并计算 Loss
-                kl_divergence = torch.tensor(0.0, device=state_all.device)
-                ncl = torch.tensor(0.0, device=state_all.device)
+                    # 3. 汇总结果并计算 Loss
+                    kl_divergence = torch.tensor(0.0, device=state_all.device)
+                    ncl = torch.tensor(0.0, device=state_all.device)
 
-                # 收集所有进程的采样状态
-                combined_v = torch.cat([res[0] for res in all_results], dim=0).to(
-                    self.bm_net.device
-                )
-                combined_vi = torch.cat([res[1] for res in all_results], dim=0).to(
-                    self.bm_net.device
-                )
+                    # 收集所有进程的采样状态
+                    combined_v = torch.cat([res[0] for res in all_results], dim=0).to(
+                        self.bm_net.device
+                    )
+                    combined_vi = torch.cat([res[1] for res in all_results], dim=0).to(
+                        self.bm_net.device
+                    )
 
-                # 计算 KL 散度项
-                kl_divergence = self.bm_net.objective(combined_v, state_all)
+                    # 计算 KL 散度项
+                    kl_divergence = self.bm_net.objective(combined_v, state_all)
 
-                # 计算 NCL (Non-Contrastive Loss) 类似项
-                # 保持原逻辑：将输出部分置零后计算 objective
-                v_ncl = combined_v.clone()
-                vi_ncl = combined_vi.clone()
-                v_ncl[:, -self.num_output :] = 0.0
-                vi_ncl[:, -self.num_output :] = 0.0
-                ncl = self.bm_net.objective(v_ncl, vi_ncl)
+                    # 计算 NCL (Non-Contrastive Loss) 类似项
+                    # 保持原逻辑：将输出部分置零后计算 objective
+                    v_ncl = combined_v.clone()
+                    vi_ncl = combined_vi.clone()
+                    v_ncl[:, -self.num_output :] = 0.0
+                    vi_ncl[:, -self.num_output :] = 0.0
+                    ncl = self.bm_net.objective(v_ncl, vi_ncl)
 
-                # 组合目标函数
-                obj = (
-                    self.cost_param["alpha"] * kl_divergence
-                    + (1 - self.cost_param["alpha"]) * ncl
-                )
+                    # 组合目标函数
+                    obj = (
+                        self.cost_param["alpha"] * kl_divergence
+                        + (1 - self.cost_param["alpha"]) * ncl
+                    )
 
-                # 4. 反向传播与优化
-                obj.backward()
+                    # 4. 反向传播与优化
+                    obj.backward()
 
-                # 可视化 (保留原逻辑)
-                if step % 10 == 0:
-                    plt.figure(figsize=(8, 4))
-                    plt.subplot(1, 2, 1)
-                    plt.imshow(self.bm_net.quadratic_coef.detach().cpu().numpy())
-                    plt.title("Weights")
-                    plt.subplot(1, 2, 2)
-                    plt.imshow(self.bm_net.quadratic_coef.grad.cpu().numpy())
-                    plt.title("Gradients")
-                    plt.show()
+                    # 可视化 (保留原逻辑)
+                    if step % 10 == 0:
+                        plt.figure(figsize=(8, 4))
+                        plt.subplot(1, 2, 1)
+                        plt.imshow(self.bm_net.quadratic_coef.detach().cpu().numpy())
+                        plt.title("Weights")
+                        plt.subplot(1, 2, 2)
+                        plt.imshow(self.bm_net.quadratic_coef.grad.cpu().numpy())
+                        plt.title("Gradients")
+                        plt.show()
 
-                optimizer.step()
-                scheduler.step()
+                    optimizer.step()
+                    scheduler.step()
 
-                # 输出与保存
-                self.saver.output_loss(
-                    step, kl_divergence.item(), ncl.item(), obj.item()
-                )
+                    # 输出与保存
+                    self.saver.output_loss(
+                        step, kl_divergence.item(), ncl.item(), obj.item()
+                    )
 
-                if step % 10 == 0:
-                    t_now = time.time()
-                    self.saver.save_info(self.bm_net, save_path, step, t_now - t_start)
-
-        pool.close()
-        pool.join()
+                    if step % 10 == 0:
+                        t_now = time.time()
+                        self.saver.save_info(self.bm_net, save_path, step, t_now - t_start)
