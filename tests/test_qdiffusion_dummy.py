@@ -116,13 +116,19 @@ class TestQDiffusionDummy(unittest.TestCase):
             config=self.config,
             freeze_proposal=False,
         )
+        # noisy 与 candidate 的 token 和必须不同:旧用例传入的是列重排
+        # (和不变),求和型打分器下期望值恒为 0,参数顺序反了也无法察觉。
+        noisy_tokens = self.targets.clone()
+        noisy_tokens[:, 1] = 7
         expected = (
             self.targets.to(torch.float32).sum(dim=1, keepdim=True)
-            - self.targets[:, [0, 1, 3, 2, 4]].to(torch.float32).sum(dim=1, keepdim=True)
+            - noisy_tokens.to(torch.float32).sum(dim=1, keepdim=True)
         )
-        energy = scorer_model.energy(self.targets[:, [0, 1, 3, 2, 4]], self.targets)
+        energy = scorer_model.energy(noisy_tokens, self.targets)
         self.assertEqual(scorer_model_energy.num_score_calls, 1)
         self.assertTrue(torch.equal(energy, expected))
+        # 非零期望值可区分参数顺序:反序应得到相反数
+        self.assertTrue(torch.any(expected != 0))
 
     def test_objective_with_scorer_does_not_require_extra_objective(self):
         scorer_model_energy = DummyEnergyModel(vocab_size=8, hidden_size=12)
