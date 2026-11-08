@@ -89,6 +89,13 @@ class QDEQConfig:
     jac_loss_vecs: int = 0
 
 
+def _norm_input(value: torch.Tensor) -> torch.Tensor:
+    """Keep norms and normalization in float32 for low-precision states."""
+    if value.dtype in (torch.float16, torch.bfloat16):
+        return value.float()
+    return value
+
+
 def _residual_norms(residual: torch.Tensor, f_value: torch.Tensor) -> tuple[float, float]:
     """Returns the absolute and relative norms of a fixed-point residual.
 
@@ -99,8 +106,8 @@ def _residual_norms(residual: torch.Tensor, f_value: torch.Tensor) -> tuple[floa
     Returns:
         tuple: ``||residual||`` and ``||residual|| / ||f_value||``.
     """
-    abs_res = residual.norm().item()
-    return abs_res, abs_res / (f_value.norm().item() + 1e-9)
+    abs_res = _norm_input(residual).norm().item()
+    return abs_res, abs_res / (_norm_input(f_value).norm().item() + 1e-9)
 
 
 def _anderson_solver(
@@ -254,7 +261,11 @@ def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -
     directions = directions[:num_basis]
     while len(directions) < num_basis:
         directions.append(torch.randint_like(residual, 0, 2) * 2 - 1)
-    return torch.stack([v / (v.norm() + 1e-9) for v in directions])
+    unit_directions = []
+    for direction in directions:
+        working = _norm_input(direction)
+        unit_directions.append((working / (working.norm() + 1e-9)).to(direction.dtype))
+    return torch.stack(unit_directions)
 
 
 def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
