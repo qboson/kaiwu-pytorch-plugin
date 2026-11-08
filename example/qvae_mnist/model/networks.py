@@ -84,7 +84,10 @@ class BasicEncoder(Network):
 
 #Implements decoder
 class BasicDecoder(Network):
-    """Decoder with linear layers and optional output activation."""
+    """Decoder with linear layers and optional activations.
+
+    A missing hidden or output activation leaves that layer's output unchanged.
+    """
 
     def __init__(self, output_activation_fct=None, weight_decay=0.0, **kwargs):
         super().__init__(**kwargs)
@@ -100,10 +103,13 @@ class BasicDecoder(Network):
         logger.debug("Decoder::decode")
         nr_layers = len(self._layers)
         for idx, layer in enumerate(self._layers):
-            if idx == nr_layers - 1 and self._output_activation_fct:
-                x = self._output_activation_fct(layer(x))
-            else:
-                x = self._activation_fct(layer(x))
+            x = layer(x)
+            activation = (
+                self._output_activation_fct
+                if idx == nr_layers - 1 else self._activation_fct
+            )
+            if activation is not None:
+                x = activation(x)
         return x
 
     def encode(self, x):
@@ -178,7 +184,10 @@ class SimpleEncoder(Network):
 
 
 class SimpleDecoder(Network):
-    """Simplified decoder with optional output activation."""
+    """Simplified decoder with optional hidden and output activations.
+
+    Missing activations are identities; an empty layer sequence is an identity.
+    """
 
     def __init__(self, output_activation_fct=None, **kwargs):
         super().__init__(**kwargs)
@@ -192,16 +201,15 @@ class SimpleDecoder(Network):
         """Decode latent representation through layers."""
         logger.debug("Decoder::decode")
         nr_layers = len(self._layers)
-        x_prime = None
         for idx, layer in enumerate(self._layers):
-            if idx == nr_layers - 1:
-                if self._output_activation_fct:
-                    x_prime = self._output_activation_fct(layer(x))
-                else:
-                    x_prime = self._activation_fct(layer(x))
-            else:
-                x = self._activation_fct(layer(x))
-        return x_prime
+            x = layer(x)
+            activation = (
+                self._output_activation_fct
+                if idx == nr_layers - 1 else self._activation_fct
+            )
+            if activation is not None:
+                x = activation(x)
+        return x
 
     def encode(self, x):
         """Encode not implemented for decoder."""
@@ -209,15 +217,7 @@ class SimpleDecoder(Network):
 
     def decode_posterior_sample(self, zeta):
         """Decode a posterior sample."""
-        logger.debug("Decoder::decode")
-        nr_layers = len(self._layers)
-        x_prime = None
-        for idx, layer in enumerate(self._layers):
-            if idx == nr_layers - 1:
-                x_prime = self._output_activation_fct(layer(zeta))
-            else:
-                zeta = self._activation_fct(layer(zeta))
-        return x_prime
+        return self.decode(zeta)
 
 
 class Decoder(BasicDecoder):
