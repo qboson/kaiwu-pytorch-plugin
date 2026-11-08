@@ -48,7 +48,7 @@ msgid "Total number of nodes in the model."
 msgstr "模型中的节点总数。"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:5 of
-msgid "quadratic coefficent,"
+msgid "quadratic coefficient,"
 msgstr "二次项系数"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:8 of
@@ -722,7 +722,7 @@ msgstr "创建受限玻尔兹曼机。"
 
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:7
 #: of
-msgid "quadratic coefficent, shape is [num_visible, num_hidden]"
+msgid "quadratic coefficient, shape is [num_visible, num_hidden]"
 msgstr "二次项系数，形状为 [num_visible, num_hidden]。"
 
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:10

@@ -15,7 +15,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
 
         num_hidden (int): Number of hidden nodes in the model.
 
-        quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,
+        quadratic_coef (torch.FloatTensor, optional): quadratic coefficient,
             shape is [num_visible, num_hidden]
 
         linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_hidden]
