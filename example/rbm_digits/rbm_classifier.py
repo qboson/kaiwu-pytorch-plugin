@@ -8,15 +8,6 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.pipeline import Pipeline
 
 seed = 17171
-# PyTorch
-torch.manual_seed(seed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(seed)  # 为当前GPU设置
-    torch.cuda.manual_seed_all(seed)  # 为所有GPU设置
-# Python
-random.seed(seed)
-# NumPy
-np.random.seed(seed)
 
 from rbm_digits import RBMRunner
 import kaiwu as kw
@@ -27,6 +18,17 @@ import kaiwu as kw
 
 
 def train_classifier(n_iter=2, use_cim=False):
+    """Train the example reproducibly; importing this module leaves RNGs alone."""
+    # PyTorch
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)  # 为当前GPU设置
+        torch.cuda.manual_seed_all(seed)  # 为所有GPU设置
+    # Python
+    random.seed(seed)
+    # NumPy
+    np.random.seed(seed)
+
     logistic = LogisticRegression(random_state=42)
 
     # 初始化RBM
