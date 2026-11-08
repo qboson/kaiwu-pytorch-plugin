@@ -8,7 +8,6 @@ GraphConv architecture (Duvenaud et al. 2015):
 """
 from __future__ import annotations
 
-import warnings
 from typing import List, Optional, Tuple
 
 import numpy as np
@@ -19,9 +18,6 @@ from tqdm import tqdm
 
 from qc_mol_design.config import CFG, NINE_HEAVY_ATOMS
 from qc_mol_design.data.loader import discretize, make_label_vector
-
-warnings.filterwarnings("ignore")
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Atom feature vector (paper Methods: nine heavy atom types)
