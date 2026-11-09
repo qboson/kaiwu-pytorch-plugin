@@ -373,14 +373,9 @@ class QDiffusion(nn.Module):
         timesteps = sample_outputs["t"]
         loss_mask = sample_outputs["loss_mask"]
 
-        # Keep the proposal graph only when the public objective can train it.
-        if any(p.requires_grad for p in self.proposal_model.parameters()):
+        trainable = any(p.requires_grad for p in self.proposal_model.parameters())
+        with torch.set_grad_enabled(trainable):  # keep graph only for trainable proposals
             logits = self.forward(noisy_tokens)
-        else:
-            with torch.no_grad():
-                logits = self.forward(noisy_tokens).detach()
-
-        # Sampling yields discrete negatives; detach so only logits carry grads.
         negative_tokens, _ = self._sample_candidates(
             self._mask_logits(logits.detach()), self.config.num_candidates
         )
