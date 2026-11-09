@@ -222,6 +222,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             (num_nodes + 1, num_nodes + 1), device=self.device, dtype=self.dtype
         )
         ising_mat[:-1, :-1] = quadratic_term * 0.125
+        # s_i * s_i == 1, so diagonal couplings only shift the Hamiltonian by a
+        # constant. Kaiwu's single-flip energy still counts them, so zero the
+        # diagonal like the RBM and BM converters do.
+        ising_mat.fill_diagonal_(0)
         ising_linear = linear_term * 0.25 + column_sums * 0.125
         ising_mat[:num_nodes, -1] = ising_linear
         ising_mat[-1, :num_nodes] = ising_linear
