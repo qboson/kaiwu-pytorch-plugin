@@ -88,16 +88,17 @@ class UnsupervisedDBN(nn.Module):
                 "Model not trained yet. Call mark_as_trained() after training."
             )
 
-        data_in = data_in.astype(np.float32)
+        # Cast once to the layer parameter dtype/device so a model migrated
+        # with .double() (or any dtype) accepts its matching NumPy input.
+        parameter = next(self.rbm_layers[0].parameters())
+        data_in = torch.as_tensor(
+            np.asarray(data_in), dtype=parameter.dtype, device=parameter.device
+        )
         for rbm in self.rbm_layers:
             with torch.no_grad():
-                hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
-                )
-                data_in = (
-                    hidden_output[:, rbm.num_visible :].cpu().numpy()
-                )  # Extract only the hidden part
-        return data_in
+                hidden_output = rbm.get_hidden(data_in)
+                data_in = hidden_output[:, rbm.num_visible :]  # Hidden part only
+        return data_in.cpu().numpy()
 
     def transform(self, data_in):
         """An sklearn-compatible transform method.
@@ -176,8 +177,14 @@ class UnsupervisedDBN(nn.Module):
         if device is None:
             device = rbm.device
 
-        # Convert to PyTorch tensor
-        data_in = torch.FloatTensor(data_in).to(device)
+        # Convert to a tensor matching the RBM parameters, so a .double()
+        # model reconstructs NumPy input of any dtype.
+        parameter = next(rbm.parameters())
+        data_in = torch.as_tensor(
+            np.asarray(data_in),
+            dtype=parameter.dtype,
+            device=parameter.device if device is None else device,
+        )
 
         with torch.no_grad():
             # Get hidden representation using RBM's get_hidden
