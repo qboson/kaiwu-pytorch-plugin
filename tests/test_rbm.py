@@ -93,6 +93,25 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertEqual(1, self.bm.objective(s1, s2).item())
         self.assertEqual(1, self.bm.objective(s1, s3))
 
+    def test_sample_preserves_model_dtype(self):
+        """A float64 model must return samples that its own forward() accepts."""
+        bm = RBM(self.num_visible, self.num_hidden, device="cpu").double()
+
+        class DummySampler:
+            def solve(self, ising_mat):
+                return np.ones((1, ising_mat.shape[0]))
+
+        samples = bm.sample(DummySampler())
+
+        self.assertEqual(samples.dtype, bm.linear_bias.dtype)
+        self.assertEqual(samples.device, bm.linear_bias.device)
+        self.assertEqual(samples.shape, (1, self.num_visible + self.num_hidden))
+        self.assertEqual(bm(samples).dtype, torch.float64)
+        s_positive = torch.ones(
+            1, self.num_visible + self.num_hidden, dtype=torch.float64
+        )
+        self.assertEqual(bm.objective(s_positive, samples).dtype, torch.float64)
+
     def test_get_hidden(self):
         # 输入可见层，输出应为(batch_size, num_visible + num_hidden)
         s_visible = torch.rand(5, self.num_visible)

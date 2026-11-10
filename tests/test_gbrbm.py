@@ -165,6 +165,21 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertEqual(sampler.ising_shape, (3, 3))
         torch.testing.assert_close(s_all, expected)
 
+    def test_double_move_syncs_dtype_and_sample(self):
+        """A dtype migration must update sampling buffers and returned states."""
+        bm = GaussianBernoulliRestrictedBoltzmannMachine(
+            num_visible=2,
+            num_hidden=2,
+            device=torch.device("cpu"),
+        )
+        bm.double()
+
+        samples = bm.sample(DummySampler())
+
+        self.assertEqual(bm.dtype, torch.float64)
+        self.assertEqual(samples.dtype, bm.linear_bias.dtype)
+        self.assertEqual(bm(samples).dtype, torch.float64)
+
     def test_gibbs_sampling_supports_random_and_data_initialization(self):
         """The single Gibbs method should support generation and CD initialization."""
         torch.manual_seed(0)
