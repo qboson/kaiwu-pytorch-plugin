@@ -138,7 +138,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Convert the Restricted Boltzmann Machine to Ising format."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
-            ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+            ising_mat = torch.zeros(
+                (num_nodes + 1, num_nodes + 1),
+                device=self.device,
+                dtype=self.linear_bias.dtype,
+            )
             # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
                 self.quadratic_coef / 8
