@@ -161,11 +161,17 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # raise error
             if s_visible is None and num_sample is None:
                 raise ValueError("Either s_visible or num_sample must be provided.")
+            # Build states in the parameter dtype so a model migrated with
+            # .double() mixes its float64 states with float64 weights.
+            state_dtype = self.linear_bias.dtype
             if s_visible is not None:
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
-                        (s_visible.size(0), self.num_nodes), 0.5, device=self.device
+                        (s_visible.size(0), self.num_nodes),
+                        0.5,
+                        device=self.device,
+                        dtype=state_dtype,
                     )
                 )
                 # Replace visible part with given visible unit state
@@ -173,7 +179,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             else:
                 # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
-                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
+                    torch.full(
+                        (num_sample, self.num_nodes),
+                        0.5,
+                        device=self.device,
+                        dtype=state_dtype,
+                    )
                 )
 
             # Number of visible units
