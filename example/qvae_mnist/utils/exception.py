@@ -4,7 +4,7 @@ Exceptions.
 """
 
 import builtins
-from .logging import get_logger  # 从 utils.logging 导入 get_logger
+from .kpp_logging import get_logger  # 从 utils.kpp_logging 导入 get_logger
 
 logger = get_logger(__name__)
 
