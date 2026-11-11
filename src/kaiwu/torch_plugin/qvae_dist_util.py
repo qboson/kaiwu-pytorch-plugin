@@ -2,6 +2,7 @@
 # Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
+# Modified to preserve exponential sampling quantiles at small rates and in the upper tail.
 """Distribution utility classes used in QVAE model"""
 import torch
 import torch.nn.functional as F
@@ -95,7 +96,7 @@ class Exponential(SmoothingDist):
         return (1.0 - torch.exp(-self.beta * zeta)) / (1 - torch.exp(-self.beta))
 
     def sample(self, shape: tuple) -> torch.Tensor:
-        """Sampling.
+        """Sample inverse-CDF quantiles without losing small-rate or upper-tail precision.
 
         Args:
             shape (tuple): Sample shape.
@@ -104,7 +105,10 @@ class Exponential(SmoothingDist):
             torch.Tensor: Sample result.
         """
         rho = torch.rand(shape)
-        zeta = -torch.log(1.0 - (1.0 - torch.exp(-self.beta)) * rho) / self.beta
+        # Use log survival for the tail, and expm1 near the uniform limit.
+        small_quantile = -torch.log1p(torch.expm1(-self.beta) * rho) / self.beta
+        log_survival = torch.logaddexp(torch.log1p(-rho), torch.log(rho) - self.beta)
+        zeta = torch.where(self.beta >= 1, -log_survival / self.beta, small_quantile)
         return zeta
 
     def log_pdf(self, zeta: torch.Tensor) -> torch.Tensor:
