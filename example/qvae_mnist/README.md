@@ -1,6 +1,7 @@
 # KPP QVAE MNIST Image Generation
 
 <!-- Modified: document the standalone offline CPU classifier entry. -->
+<!-- Modified: document original class labels and explicit output-width validation. -->
 
 This directory provides a Quantum Variational Autoencoder (Q-VAE)
 implementation for image generation on the MNIST dataset using
@@ -91,6 +92,12 @@ classifier.fit(features, labels, validation_split=0.25)
 predictions = classifier.predict(features)
 probabilities = classifier.predict_proba(features)
 ```
+
+Labels may be strings or nonconsecutive integers. `predict` returns the original
+labels, and column `i` of `predict_proba` corresponds to `classifier.classes_[i]`.
+Set `output_dim` to the number of distinct training labels. Its default remains
+10; `fit` now raises `ValueError` before training if that width does not match
+the observed class count.
 
 `fit` writes a model checkpoint and a training-curve PNG to `save_path`.
 Import `MLPClassifier` explicitly for this workflow. Requesting
