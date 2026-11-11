@@ -48,3 +48,6 @@ namespaces = true
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements/requirements.txt"] }
 version = { attr = "kaiwu.torch_plugin.__version__" }
+
+[tool.coverage.paths]
+plugin = ["src/kaiwu/torch_plugin", "*/site-packages/kaiwu/torch_plugin"]

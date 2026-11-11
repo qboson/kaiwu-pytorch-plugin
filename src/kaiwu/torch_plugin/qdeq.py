@@ -31,7 +31,7 @@ import numpy as np
 import torch
 from torch import nn
 
-import kaiwu as kw
+from ._kaiwu_compat import qubo_matrix_to_ising_matrix
 
 from .usage_stats import kpp_caller_context
 
@@ -277,7 +277,7 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     Each coefficient is encoded by ``config.coeff_bits`` binary variables on a
     uniform grid over ``[-s, s]``, ``s = coeff_range * residual_norm /
     sqrt(num_basis)``. The QUBO is converted to an Ising matrix with
-    ``kaiwu.conversion.qubo_matrix_to_ising_matrix`` and passed to
+    the installed SDK's QUBO-to-Ising helper and passed to
     ``sampler.solve``; every returned row is decoded and the best one kept.
 
     Args:
@@ -311,7 +311,7 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     # Q = E^T H E / 2 + diag(E^T (H offset + g)), since x_i^2 = x_i for binary x.
     qubo_mat = enc.T @ hess @ enc / 2 + np.diag(enc.T @ (hess @ offset + grad))
     # Minimising x^T Q x is maximising s^T J s, which is what Kaiwu optimizers do.
-    ising_mat, _ = kw.conversion.qubo_matrix_to_ising_matrix(qubo_mat)
+    ising_mat, _ = qubo_matrix_to_ising_matrix(qubo_mat)
     ising_mat = ising_mat / max(float(np.abs(ising_mat).max()), 1e-12)
 
     with kpp_caller_context():

@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
-from kaiwu.preprocess import PrecisionReducer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer, normalize_task_mode
 from kaiwu.torch_plugin import BoltzmannMachine
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder
@@ -110,13 +110,15 @@ class Trainer:
 
         # CIM 任务会产生中间文件，统一放到 tmp_dir，避免污染当前目录。
         kw.common.CheckpointManager.save_dir = self.args.tmp_dir
-        sampler = CIMOptimizer(
-            task_name=self.args.task_name,
-            project_no=self.args.project_no,
-            wait=True,
-            task_mode=self.args.task_mode,
-            sample_number=self.args.sample_number,
-        )
+        sampler_kwargs = {
+            "task_name": self.args.task_name,
+            "project_no": self.args.project_no,
+            "wait": True,
+            "sample_number": self.args.sample_number,
+        }
+        if self.args.task_mode is not None:
+            sampler_kwargs["task_mode"] = normalize_task_mode(self.args.task_mode)
+        sampler = CIMOptimizer(**sampler_kwargs)
         return PrecisionReducer(
             sampler,
             precision=self.args.precision,

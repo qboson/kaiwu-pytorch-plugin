@@ -247,7 +247,8 @@ from kaiwu.classical import SimulatedAnnealingOptimizer
 sampler = SimulatedAnnealingOptimizer()
 
 # Quantum CIM (real QPU)
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 sampler = CIMOptimizer(task_name="test_rbm", wait=True)
 sampler = PrecisionReducer(
     sampler,
