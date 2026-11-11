@@ -1,3 +1,5 @@
+<!-- Modified to remove unintended indentation from the Python example. -->
+
 ```{role} raw-html(raw)
 :format: html
 
@@ -141,40 +143,40 @@ Below is a simple example of calling RBM. This example demonstrates how to use t
 
 ```{code-block} python
 
- import torch
- from torch.optim import SGD
- from kaiwu.torch_plugin import RestrictedBoltzmannMachine
- from kaiwu.classical import SimulatedAnnealingOptimizer
+import torch
+from torch.optim import SGD
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+from kaiwu.classical import SimulatedAnnealingOptimizer
 
- if __name__ == "__main__":
-     SAMPLE_SIZE = 17
-     sampler = SimulatedAnnealingOptimizer()
-     num_nodes = 50
-     num_visible = 20
-     x = 1 - 2.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
+if __name__ == "__main__":
+    SAMPLE_SIZE = 17
+    sampler = SimulatedAnnealingOptimizer()
+    num_nodes = 50
+    num_visible = 20
+    x = 1 - 2.0 * torch.randint(0, 2, (SAMPLE_SIZE, num_visible))
 
-     # Instantiate the model
-     rbm = RestrictedBoltzmannMachine(
-         num_visible,
-         num_nodes-num_visible,
-     )
-     # Instantiate the optimizer
-     opt_rbm = SGD(rbm.parameters())
+    # Instantiate the model
+    rbm = RestrictedBoltzmannMachine(
+        num_visible,
+        num_nodes-num_visible,
+    )
+    # Instantiate the optimizer
+    opt_rbm = SGD(rbm.parameters())
 
-     # Example of one iteration in a training loop
-     # Generate a sample set from the model
-     x = rbm.get_hidden(x)
-     s = rbm.sample(sampler)
+    # Example of one iteration in a training loop
+    # Generate a sample set from the model
+    x = rbm.get_hidden(x)
+    s = rbm.sample(sampler)
 
-     opt_rbm.zero_grad()
-     # Compute the objective---this objective yields the same gradient as the negative
-     # log likelihood of the model
-     objective = rbm.objective(x, s)
-     # Backpropagate gradients
-     objective.backward()
-     # Update model weights with a step of stochastic gradient descent
-     opt_rbm.step()
-     print(objective)
+    opt_rbm.zero_grad()
+    # Compute the objective---this objective yields the same gradient as the negative
+    # log likelihood of the model
+    objective = rbm.objective(x, s)
+    # Backpropagate gradients
+    objective.backward()
+    # Update model weights with a step of stochastic gradient descent
+    opt_rbm.step()
+    print(objective)
 
 ```
 # Classification Task: Handwritten Digit Recognition
