@@ -24,7 +24,7 @@ from .model_tuner import ModelTuner
 
 from utils.loadMNIST import loadMNIST
 from utils.helpers import plot_MNIST_output, t_SNE, create_tsne_animation#, save_list_to_txt
-from utils.logging import get_logger
+from utils.kpp_logging import get_logger
 from utils.exception import ValueError, BuildError
 
 logger = get_logger(__name__)

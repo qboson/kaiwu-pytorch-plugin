@@ -2,7 +2,7 @@ import os
 import torch
 import numpy as np
 
-from utils.logging import get_logger
+from utils.kpp_logging import get_logger
 from utils.exception import ValueError, TypeError
 
 logger = get_logger(__name__)

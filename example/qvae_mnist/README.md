@@ -41,7 +41,7 @@ qvae_mnist/
 ├── utils/
 │   ├── loadMNIST.py               # MNIST / Fashion-MNIST / KMNIST loaders
 │   ├── helpers.py                 # generation, t-SNE and FID evaluation helpers
-│   ├── logging.py
+│   ├── kpp_logging.py
 │   └── exception.py
 ├── downstream/
 │   ├── classifier.py              # MLPClassifier on Q-VAE features
@@ -51,6 +51,12 @@ qvae_mnist/
 ├── run_pipeline.py                # Command-line entry: QVAE + MLP pipeline
 └── run_pipeline.sh                # Example CLI invocation
 ```
+
+The logging helper was renamed from `utils.logging` to `utils.kpp_logging`
+to avoid shadowing Python's standard-library `logging` package. Update any
+external example imports to `from utils.kpp_logging import get_logger`;
+the helper functions and their behavior are unchanged. The old module path
+is no longer available.
 
 ## Datasets
 
