@@ -1,5 +1,7 @@
 # KPP RBM Handwritten Digit Recognition
 
+<!-- Modified: document standalone NumPy sample image layout. -->
+
 This directory provides an RBM-based feature-learning and classification
 example on the scikit-learn Digits dataset (8x8 handwritten digits) using
 `kaiwu-pytorch-plugin`. A Restricted Boltzmann Machine (RBM) is trained in an
@@ -24,10 +26,34 @@ pip install -r requirements/requirements_example.txt
 rbm_digits/
 ├── rbm_digits.py            # RBMRunner: data loading/augmentation, RBM
 │                            #   training, feature extraction, visualization
+├── digit_images.py          # NumPy-only horizontal sample image layout
 ├── rbm_classifier.py        # train_classifier(): RBM features + logistic
 │                            #   regression vs raw-pixel baseline
 └── rbm_digits.ipynb         # Walkthrough: theory recap, training, evaluation
 ```
+
+## Arrange Existing Sample Images
+
+`digit_images.make_digit_strip` arranges flattened square images without
+loading the training stack. It requires only NumPy. From this directory:
+
+```python
+import numpy as np
+from digit_images import make_digit_strip
+
+samples = np.arange(2 * 8 * 8).reshape(2, 8 * 8)
+image = make_digit_strip(samples, size=8)  # shape: (8, 16)
+```
+
+Samples appear left to right, preserving their pixel values and dtype.
+The image count is inferred from the input, so shorter batches work and
+twenty 8x8 samples still produce the same 8x160 image. The utility returns
+an array and does not change plotting settings. To display it with
+Matplotlib, use `plt.imshow(image, cmap="gray")`.
+
+`RBMRunner.gen_digits_image(X, size=8)` delegates layout to this utility and
+retains its existing grayscale setting. Training and sampler dependencies
+are unchanged.
 
 ## Data
 
