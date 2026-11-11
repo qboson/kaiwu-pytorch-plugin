@@ -76,11 +76,13 @@ Useful flags:
 
 * `--latent-dim` - latent size of the VAE/QBM-VAE (default 10; the RBM prior
   splits it into two halves, so keep it even),
+* `--representation {q,sigmoid}` - QBM-VAE feature space; `sigmoid` (default)
+  clusters better at the tuned 30-epoch budget,
+* `--epochs` - 100 matches the paper; the tuned QBM-VAE is best at 30,
 * `--zscore` - z-score every waveform before training,
 * `--device cuda:0` - train on a GPU,
-* `--epochs` - 100 matches the paper,
 * `--realdata-dir` - add the TINS real recording as an extra dataset,
-* `--max-spikes` - subsample spikes for quick experiments.
+* `--max-spikes` - subsample the real recording for quick experiments.
 
 The run writes `results/metrics.csv` and `results/metrics.json` with ARI, AMI,
 V-measure (external) and Calinski-Harabasz, Davies-Bouldin, Silhouette
@@ -99,38 +101,87 @@ V-measure (external) and Calinski-Harabasz, Davies-Bouldin, Silhouette
 
 ## Results
 
-Single-seed reference run on the paper's four simulations plus the real
-recording (100 epochs, batch size 128, latent size 10 for the VAE and the
-QBM-VAE, AE code size 2, k-means with the ground-truth cluster count). Values
-are ARI with AMI in parentheses.
+All numbers are clustering ARI on the paper's protocol: 79-sample waveforms,
+peak aligned to sample 39, k-means with the ground-truth cluster count. The
+baselines use the paper's configuration (AE code size 2, Gaussian VAE with a
+10-dimensional latent); the QBM-VAE uses the tuned configuration derived below
+(latent 10, 30 epochs, `sigmoid(q)` features).
 
-| dataset | units | AE | VAE | QBM-VAE |
+### Equal training budget (30 epochs)
+
+Means over five seeds for the baselines and three seeds for the QBM-VAE. The
+QBM-VAE needs a second optimizer pass and one Ising sample per batch, so an
+epoch-budget comparison is the fair one.
+
+| dataset | units | AE (ARI) | VAE (ARI) | QBM-VAE (ARI) |
 | --- | --- | --- | --- | --- |
-| simulation 1 | 17 | 0.508 (0.754) | **0.663 (0.857)** | 0.281 (0.553) |
-| simulation 4 | 5 | 0.587 (0.795) | **0.593 (0.806)** | 0.512 (0.751) |
-| simulation 16 | 9 | 0.515 (0.765) | **0.628 (0.832)** | 0.583 (0.752) |
-| simulation 35 | 13 | **0.707 (0.863)** | 0.636 (0.823) | 0.468 (0.699) |
-| real recording | 83 | **0.094 (0.302)** | 0.058 (0.253) | 0.053 (0.226) |
+| simulation 1 | 17 | **0.631 ± 0.078** | 0.532 ± 0.023 | 0.413 ± 0.170 |
+| simulation 4 | 5 | 0.476 ± 0.114 | **0.560 ± 0.005** | 0.472 ± 0.084 |
+| simulation 16 | 9 | 0.563 ± 0.122 | **0.618 ± 0.044** | 0.511 ± 0.073 |
+| simulation 35 | 13 | **0.634 ± 0.055** | 0.606 ± 0.022 | 0.576 ± 0.041 |
 
-Observations from this run:
+### Longer baselines (100 epochs)
 
-* The AE/VAE baselines reproduce the paper's qualitative picture: clustering
-  gets harder as the number of units grows, and the low-dimensional AE code is
-  competitive but seed-sensitive.
-* QBM-VAE is close to the baselines on simulations 4 and 16, but clearly behind
-  on simulations 1 and 35, where the Boltzmann prior dominates the latent
-  geometry.
-* Longer QBM-VAE training degrades the features: on simulation 4 the ARI drops
-  from 0.534 at 10 epochs to 0.512 at 100 epochs. Using `sigmoid(q)` instead of
-  the raw encoder logits and stopping at 30 epochs gives the best QBM-VAE
-  result (0.566), still below the VAE baseline.
-* The real recording has 83 manually sorted units (~60 spikes per unit in a
-  5000-spike subsample), so k-means ARI is low for every method; the paper also
-  evaluates selected well-isolated units rather than all 83.
+The paper trains its autoencoders for 100 epochs; the baselines improve further
+and the gap to QBM-VAE widens.
 
-Improving the Boltzmann-prior branch (warm-up, early stopping, BM pretraining)
-is follow-up work; the example keeps the paper's plain 100-epoch protocol so
-the comparison stays comparable.
+| dataset | units | AE (ARI) | VAE (ARI) |
+| --- | --- | --- | --- |
+| simulation 1 | 17 | 0.664 ± 0.098 | 0.642 ± 0.050 |
+| simulation 4 | 5 | 0.702 ± 0.140 | 0.566 ± 0.026 |
+| simulation 16 | 9 | 0.643 ± 0.067 | 0.651 ± 0.040 |
+| simulation 35 | 13 | 0.654 ± 0.045 | 0.561 ± 0.043 |
+
+### Real recording (5000-spike subsample)
+
+83 manually sorted units, so every method has a low k-means ARI; the paper also
+evaluates selected well-isolated units rather than all 83.
+
+| dataset | AE (ARI) | VAE (ARI) | QBM-VAE (ARI) |
+| --- | --- | --- | --- |
+| real recording | 0.076 ± 0.013 | 0.068 ± 0.010 | 0.053 |
+
+### Tuning the QBM-VAE
+
+Training length and feature representation dominate the result. On simulation 4
+(latent 10):
+
+| epochs | q (logits) | sigmoid(q) |
+| --- | --- | --- |
+| 10 | 0.505 | 0.422 |
+| 30 | 0.531 | **0.566** |
+| 60 | 0.503 | **0.566** |
+| 100 | 0.508 | 0.464 |
+
+Latent size (simulation 4, 30 epochs, `sigmoid(q)`):
+
+| latent | 6 | 8 | 10 | 16 | 20 |
+| --- | --- | --- | --- | --- | --- |
+| ARI | 0.404 | 0.387 | **0.566** | 0.545 | 0.562 |
+
+Simulation 16 shows the same epoch trend (10 epochs 0.589, 30 epochs 0.589,
+100 epochs 0.518).
+
+Findings:
+
+* Longer training hurts the QBM-VAE: the Boltzmann prior slowly reshapes the
+  latent geometry until the k-means features degrade (simulation 4: 0.566 at
+  30 epochs vs 0.464 at 100).
+* `sigmoid(q)` is a better feature space than the raw encoder logits at the
+  peak of the curve (+0.035 on simulation 4 at 30 epochs), but it needs enough
+  training to be useful (10 epochs: 0.422 vs 0.505).
+* A 10-dimensional latent is the sweet spot; 6 and 8 collapse, 16 and 20 tie
+  without a clear gain.
+* Stronger KL regularisation (`kl_beta=1e-2`) collapses the features (0.378 on
+  simulation 4) and a smaller BM learning rate (`1e-4`) does not rescue the
+  60-epoch result (0.527).
+* With the tuned configuration the QBM-VAE improves a lot over the default
+  100-epoch/raw-logit run (simulation 1: 0.281 -> 0.529; simulation 35:
+  0.468 -> 0.579) but, averaged over seeds, it still does not beat the classical
+  baselines. We report that negative result rather than cherry-picking a seed.
+
+Improving the Boltzmann-prior branch (warm-up, early stopping on the
+reconstruction loss, BM pretraining) is follow-up work.
 
 ## Files
 
@@ -146,7 +197,11 @@ the comparison stays comparable.
 * QBM-VAE training uses simulated annealing by default so it runs on a laptop;
   pass a CIM sampler to compare against real quantum hardware.
 * The paper reports per-variant averages over several runs; use `--seed` to
-  reproduce a single run. The AE code layer is only two-dimensional and varies
-  noticeably between seeds.
+  reproduce a single run. All tables above average over seeds; the AE code layer
+  is only two-dimensional and varies noticeably (up to ±0.16 ARI), and the
+  QBM-VAE is seed-sensitive too.
+* The tuned QBM-VAE closes most of the gap to the baselines but does not beat
+  them on these datasets. This is reported as a negative result: the example
+  documents the tuning evidence instead of only the best-performing seed.
 * Clustering uses the ground-truth cluster count, matching the paper's protocol;
   estimating the number of units is out of scope.

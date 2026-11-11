@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -262,6 +262,7 @@ def extract_features(
     model_type: str,
     device: str | torch.device = "cpu",
     batch_size: int = 512,
+    representation: str = "sigmoid",
 ) -> "torch.Tensor":
     """Return latent codes for every waveform.
 
@@ -271,6 +272,10 @@ def extract_features(
         model_type: ``"ae"``, ``"vae"`` or ``"qbmvae"``.
         device: torch device.
         batch_size: inference batch size.
+        representation: for ``"qbmvae"``, whether to use the raw encoder logits
+            (``"q"``) or their Bernoulli probabilities (``"sigmoid"``). The
+            paper's baselines use the code layer directly, but the tuned
+            QBM-VAE clusters better on ``sigmoid(q)``.
 
     Returns:
         CPU tensor of shape ``(n_spikes, latent_dim)``.
@@ -287,6 +292,10 @@ def extract_features(
             code = mu
         elif model_type == "qbmvae":
             code = model.encoder(batch)
+            if representation == "sigmoid":
+                code = torch.sigmoid(code)
+            elif representation != "q":
+                raise ValueError(f"Unsupported representation: {representation}")
         else:
             raise ValueError(f"Unsupported model type: {model_type}")
         features.append(code.cpu())

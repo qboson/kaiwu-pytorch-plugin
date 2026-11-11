@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
@@ -68,6 +68,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--latent-dim", type=int, default=10)
+    parser.add_argument(
+        "--representation",
+        default="sigmoid",
+        choices=["q", "sigmoid"],
+        help="QBM-VAE feature space: raw encoder logits (q) or sigmoid(q)",
+    )
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--device", default="cpu")
@@ -118,6 +124,9 @@ def run_one(
 ) -> dict:
     """Train one model and evaluate its clustering quality."""
     tensor = torch.from_numpy(spikes)
+    # Seed before the model is created so initialisation is reproducible too.
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
     started = time.time()
     if model_name == "ae":
         model = Autoencoder(input_dim=spikes.shape[1], latent_dim=2)
@@ -159,7 +168,9 @@ def run_one(
     else:
         raise ValueError(model_name)
 
-    features = extract_features(model, tensor, model_name, device=device).numpy()
+    features = extract_features(
+        model, tensor, model_name, device=device, representation=args.representation
+    ).numpy()
     return {
         "model": model_name,
         "features": features,
@@ -237,5 +248,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
 
 

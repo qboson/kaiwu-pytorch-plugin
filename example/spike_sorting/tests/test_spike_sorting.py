@@ -146,3 +146,18 @@ def test_qbm_vae_trains_with_offline_sampler():
     features = extract_features(model, spikes, "qbmvae")
     assert features.shape == (64, 10)
     assert torch.isfinite(features).all()
+
+
+def test_qbm_vae_feature_representations():
+    """``sigmoid`` features are the probabilities of the raw logits."""
+    torch.manual_seed(0)
+    model = DummyQBMVAE(79, torch.tanh, qbm_config(10))
+    spikes = torch.randn(32, 79)
+    logits = extract_features(model, spikes, "qbmvae", representation="q")
+    probabilities = extract_features(model, spikes, "qbmvae", representation="sigmoid")
+    assert probabilities.shape == logits.shape
+    assert torch.allclose(probabilities, torch.sigmoid(logits), atol=1e-6)
+    assert not torch.allclose(logits, probabilities)
+
+    with pytest.raises(ValueError):
+        extract_features(model, spikes, "qbmvae", representation="unknown")
