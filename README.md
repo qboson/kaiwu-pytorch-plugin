@@ -97,7 +97,7 @@ The diagram above shows the main code structure of the project:
 ### Main Features
 - Quantum Support: Inherits from Kaiwu SDK, supports calling photonic quantum computers
 - Native PyTorch Support: Seamless integration with the PyTorch ecosystem, supports GPU acceleration
-- Flexible Architecture: Supports custom visible and hidden layer dimensions
+- Flexible Architecture: Supports custom visible and hidden layer dimensions, including full-covariance Gaussian units in the GBRBM
 - Extensibility: Modular design makes it easy to add new energy functions or sampling methods
 - Q-Diffusion Support: Includes a public `QDiffusion` module for energy-guided
   discrete generation with DPLM backbones

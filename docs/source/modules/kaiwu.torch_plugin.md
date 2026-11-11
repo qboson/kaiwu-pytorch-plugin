@@ -26,3 +26,16 @@ energy updates. CIM receives this conversion before precision adaptation and
 variable splitting, so splitting penalties retain their intended sign.
 Precision settings still control quantization; the conversion does not make a
 heuristic solver exact.
+
+## GBRBM full-covariance convention
+
+Passing the optional `covariance` argument to
+`GaussianBernoulliRestrictedBoltzmannMachine` models the Gaussian units with
+the full covariance `cov_chol @ diag(var) @ cov_chol.T`. The fixed
+`cov_chol` buffer equals `chol(covariance) / sqrt(diag(covariance))`, so the
+trainable diagonal `var` (from `log_var`) reproduces the supplied covariance
+at construction and diagonal inputs reduce to the historical
+independent-unit behaviour. The energy, the Bernoulli-side Ising conversion
+and both inference paths then use the full precision `inv(covariance)`
+through the shared precision helpers; the Gaussian conditional means stay
+`mu + W @ s_bernoulli` and Gibbs noise is Cholesky-correlated accordingly.
