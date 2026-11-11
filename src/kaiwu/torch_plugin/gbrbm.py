@@ -31,6 +31,14 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             Defaults to 1e-8.
         dtype (torch.dtype, optional): Data type for tensor construction.
             Defaults to torch.float32.
+        covariance (array_like, optional): Positive-definite covariance matrix
+            of shape ``(num_gaussian, num_gaussian)`` describing the
+            correlations among the Gaussian units. When given, the Gaussian
+            units are modeled with the full covariance
+            ``cov_chol @ diag(var) @ cov_chol.T`` where ``cov_chol`` is a
+            fixed buffer derived from the supplied matrix and the diagonal
+            ``var`` (from ``log_var``) stays trainable. Defaults to None,
+            which keeps the historical independent (diagonal) Gaussian units.
         device (torch.device, optional): Device to construct tensors.
     """
 
@@ -43,6 +51,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         dtype: torch.dtype = torch.float32,
         linear_bias=None,
         quadratic_coef=None,
+        covariance=None,
         device=None,
     ):
         """Initialize the Restricted Gaussian-Bernoulli Boltzmann Machine."""
@@ -86,11 +95,43 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             ).to(dtype=self.dtype, device=self.device)
         )
 
+        # Full covariance support: the Gaussian covariance is factorized as
+        # cov_chol @ diag(var) @ cov_chol.T with a fixed cov_chol derived
+        # from the supplied matrix, so the diagonal var stays trainable.
+        cov_chol = None
+        cov_chol_inv = None
+        init_var = 1
+        if covariance is not None:
+            cov_t = torch.as_tensor(covariance, dtype=self.dtype, device=self.device)
+            if cov_t.shape != (self.num_gaussian, self.num_gaussian):
+                raise ValueError(
+                    "covariance must have shape "
+                    f"({self.num_gaussian}, {self.num_gaussian}), "
+                    f"got {tuple(cov_t.shape)}"
+                )
+            if not torch.allclose(cov_t, cov_t.t(), rtol=1e-5, atol=1e-8):
+                raise ValueError("covariance must be symmetric")
+            try:
+                base_chol = torch.linalg.cholesky(cov_t)
+            except RuntimeError as err:
+                raise ValueError(
+                    "covariance must be positive definite"
+                ) from err
+            var0 = torch.diagonal(cov_t)
+            # cov_chol = chol(covariance) / sqrt(diag(covariance)) so that
+            # cov_chol @ diag(diag(covariance)) @ cov_chol.T equals the
+            # supplied covariance and diagonal inputs reduce to the identity.
+            cov_chol = base_chol / var0.sqrt().unsqueeze(0)
+            cov_chol_inv = torch.linalg.inv(cov_chol)
+            init_var = var0
+        self.register_buffer("cov_chol", cov_chol)
+        self.register_buffer("cov_chol_inv", cov_chol_inv)
+
         # Only parameters the caller did not supply are (re-)initialized, so an
         # explicitly weighted model survives construction (as in the RBM).
         self.init_parameter(
             std=0.01,
-            init_var=1,
+            init_var=init_var,
             init_quadratic=quadratic_coef is None,
             init_linear=linear_bias is None,
         )
@@ -112,9 +153,47 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """torch.tensor: Diagonal precision matrix (inverse variance)."""
         return torch.diag(1 / self.var)
 
+    def _precision_scaled(self, s_gaussian: torch.Tensor) -> torch.Tensor:
+        """Map Gaussian states through the precision of the Gaussian units.
+
+        With diagonal covariance this returns ``s_gaussian / var``. With a
+        full covariance ``cov_chol`` it returns
+        ``s_gaussian @ inv(covariance)`` computed as
+        ``(s_gaussian @ cov_chol_inv.T / var) @ cov_chol_inv``.
+        """
+        if self.cov_chol_inv is None:
+            return s_gaussian / self.var
+        return (
+            (s_gaussian @ self.cov_chol_inv.t()) / self.var
+        ) @ self.cov_chol_inv
+
+    def _gaussian_prior_energy(self, s_gaussian: torch.Tensor) -> torch.Tensor:
+        """Quadratic-form energy of the Gaussian prior.
+
+        With diagonal covariance this returns
+        ``0.5 * sum((s_gaussian - mu)^2 / var)``. With a full covariance it
+        returns ``0.5 * sum(((s_gaussian - mu) @ cov_chol_inv.T / std)^2)``.
+        """
+        centered = s_gaussian - self.mu
+        if self.cov_chol_inv is None:
+            return 0.5 * torch.sum(centered.square() / self.var, dim=-1)
+        white = (centered @ self.cov_chol_inv.t()) / self.std
+        return 0.5 * white.square().sum(dim=-1)
+
+    def _std_correlated_noise(self, eps: torch.Tensor) -> torch.Tensor:
+        """Correlate standard-normal noise with the Gaussian covariance.
+
+        With diagonal covariance this returns ``eps * std``. With a full
+        covariance it returns ``(eps * std) @ cov_chol.T``, whose covariance
+        is ``cov_chol @ diag(var) @ cov_chol.T``.
+        """
+        if self.cov_chol is None:
+            return eps * self.std
+        return (eps * self.std) @ self.cov_chol.t()
+
     def init_parameter(
         self,
-        init_var: float = 1,
+        init_var=1,
         std: float = 0.01,
         max_fold: float = 16,
         init_quadratic: bool = True,
@@ -123,8 +202,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Initialize model parameters with normal distribution.
 
         Args:
-            init_var (float, optional): Initial variance for Gaussian units.
-                Defaults to 1.
+            init_var (float or torch.Tensor, optional): Initial variance for
+                the Gaussian units, either a scalar or a per-unit tensor of
+                shape ``(num_gaussian,)``. Defaults to 1.
             std (float, optional): Standard deviation for parameter initialization.
                 Defaults to 0.01.
             max_fold (float, optional): Maximum factor for clipping parameters.
@@ -137,7 +217,15 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         bound = max_fold * std
         init.normal_(self.mu, 0, std)
         self.get_parameter("mu").data.clip_(-bound, bound)
-        init.constant_(self.log_var, np.log(init_var))
+        if isinstance(init_var, torch.Tensor):
+            if init_var.shape != self.log_var.shape:
+                raise ValueError(
+                    "init_var must be a scalar or a tensor of shape "
+                    f"{tuple(self.log_var.shape)}"
+                )
+            self.log_var.data.copy_(init_var.log())
+        else:
+            init.constant_(self.log_var, np.log(init_var))
         if init_quadratic:
             init.normal_(self.quadratic_coef, 0, std)
             self.quadratic_coef.data.clip_(-bound, bound)
@@ -174,9 +262,12 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             s_gaussian = s_all[:, : self.num_gaussian]
             s_bernoulli = s_all[:, self.num_gaussian :]
             return (
-                0.5 * torch.sum((s_gaussian - self.mu).square() / self.var, dim=-1)
+                self._gaussian_prior_energy(s_gaussian)
                 - torch.sum(
-                    (s_gaussian / self.var) @ self.quadratic_coef * s_bernoulli, dim=-1
+                    self._precision_scaled(s_gaussian)
+                    @ self.quadratic_coef
+                    * s_bernoulli,
+                    dim=-1,
                 )
                 - s_bernoulli @ self.linear_bias
             )
@@ -194,11 +285,10 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             torch.tensor: Free Hamiltonian of Gaussian nodes.
         """
         with torch.no_grad():
-            return 0.5 * torch.sum(
-                (s_gaussian - self.mu).square() / self.var, dim=-1
-            ) - torch.sum(
+            return self._gaussian_prior_energy(s_gaussian) - torch.sum(
                 F.softplus(
-                    (s_gaussian / self.var) @ self.quadratic_coef + self.linear_bias
+                    self._precision_scaled(s_gaussian) @ self.quadratic_coef
+                    + self.linear_bias
                 ),
                 dim=-1,
             )
@@ -212,10 +302,13 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         Returns:
             numpy.ndarray: Ising matrix representation of the Bernoulli part.
         """
-        linear_term = self.quadratic_coef.t() @ (self.mu / self.var) + self.linear_bias
-        quadratic_term = (
-            self.quadratic_coef.t() @ self.diag_precision @ self.quadratic_coef
+        linear_term = (
+            self.quadratic_coef.t() @ self._precision_scaled(self.mu)
+            + self.linear_bias
         )
+        quadratic_term = self.quadratic_coef.t() @ self._precision_scaled(
+            self.quadratic_coef.t()
+        ).t()
         column_sums = torch.sum(quadratic_term, dim=0)
         num_nodes = self.num_bernoulli
         ising_mat = torch.zeros(
@@ -253,7 +346,8 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             )
             s_all[:, : self.num_gaussian] = s_gaussian
             prob = torch.sigmoid(
-                (s_gaussian / self.var) @ self.quadratic_coef + self.linear_bias
+                self._precision_scaled(s_gaussian) @ self.quadratic_coef
+                + self.linear_bias
             )
             if not binarize:
                 s_all[:, self.num_gaussian :] = prob
@@ -291,7 +385,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             if no_random:
                 s_all[:, : self.num_gaussian] = mu
             else:
-                s_all[:, : self.num_gaussian] = mu + torch.randn_like(mu) * self.std
+                s_all[:, : self.num_gaussian] = mu + self._std_correlated_noise(
+                    torch.randn_like(mu)
+                )
             return s_all
 
     def gibbs_sample(
@@ -401,9 +497,11 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         ]
         with torch.set_grad_enabled(enable_grad):
             return (
-                0.5 * torch.sum((s_gaussian - self.mu).square() / self.var, dim=-1)
+                self._gaussian_prior_energy(s_gaussian)
                 - torch.sum(
-                    (s_gaussian / self.var) @ self.quadratic_coef * prob_bernoulli,
+                    self._precision_scaled(s_gaussian)
+                    @ self.quadratic_coef
+                    * prob_bernoulli,
                     dim=-1,
                 )
                 - prob_bernoulli @ self.linear_bias
