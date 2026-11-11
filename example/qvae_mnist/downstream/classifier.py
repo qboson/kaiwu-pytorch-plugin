@@ -1,4 +1,5 @@
 # Modified: encode class labels and require an explicit matching output width.
+# Modified: raise NotFittedError when prediction is requested before fitting.
 import os
 from tqdm import tqdm
 import logging
@@ -7,6 +8,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
@@ -240,6 +242,8 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return self
 
     def predict(self, X):
+        if self.model is None:
+            raise NotFittedError("MLPClassifier is not fitted. Call fit before using predict.")
         self.model.eval()
         X_tensor = torch.FloatTensor(X).to(self.device)
         with torch.no_grad():
@@ -248,6 +252,8 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return self.classes_[pred.cpu().numpy()]
 
     def predict_proba(self, X):
+        if self.model is None:
+            raise NotFittedError("MLPClassifier is not fitted. Call fit before using predict_proba.")
         self.model.eval()
         X_tensor = torch.FloatTensor(X).to(self.device)
         with torch.no_grad():
