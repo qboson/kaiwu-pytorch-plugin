@@ -39,6 +39,25 @@ class _FakeSimulatedAnnealingOptimizer:
         return np.ones((1, len(ising_matrix)))
 
 
+class _FakeCIMOptimizer:
+    """Kaiwu 1.4.x-shaped CIM optimizer that returns a valid spin pool."""
+
+    def __init__(
+        self,
+        task_name,
+        wait=False,
+        interval=1,
+        project_no=None,
+        task_mode='optimization',
+        sample_number=10,
+    ):
+        self.task_name = task_name
+
+    def solve(self, ising_matrix=None, negtail_flip=True, sort_solutions=False):
+        del negtail_flip, sort_solutions
+        return np.ones((1, len(ising_matrix)))
+
+
 class TestMolecularKaiwuBackend(unittest.TestCase):
     """The documented ``QC_QUBO_SOLVER=kaiwu`` arm must run on Kaiwu 1.4.x."""
 
@@ -114,6 +133,36 @@ class TestMolecularKaiwuBackend(unittest.TestCase):
                         with mock.patch('kaiwu.license.init') as init:
                             cim_hardware.initialize_license()
         init.assert_called_once_with('user', 'code')
+
+    def test_cim_solver_construction_omits_removed_option(self):
+        """Kaiwu 1.4.x rejects ``sample_sort_mode`` in the constructor."""
+        matrix = np.array([[1.0, 0.5], [0.0, -2.0]])
+        with tempfile.TemporaryDirectory() as directory:
+            environment = {
+                'KAIWU_CIM_PROJECT_NO': 'project',
+                'KAIWU_CIM_RUN_ID': 'run',
+                'KAIWU_CIM_TASK_CONTEXT': 'context',
+                'KAIWU_CIM_CACHE_DIR': directory,
+            }
+            with mock.patch.dict(os.environ, environment):
+                with mock.patch.object(
+                    cim_hardware,
+                    'initialize_license',
+                    lambda: kw,
+                ):
+                    with mock.patch.object(
+                        kw.cim,
+                        'CIMOptimizer',
+                        _FakeCIMOptimizer,
+                    ):
+                        solutions = cim_hardware.solve_hardware(
+                            matrix,
+                            num_reads=10,
+                        )
+
+        self.assertIsInstance(solutions, list)
+        self.assertEqual(len(solutions), 1)
+        self.assertEqual(set(solutions[0]), {0, 1})
 
 
 if __name__ == '__main__':
