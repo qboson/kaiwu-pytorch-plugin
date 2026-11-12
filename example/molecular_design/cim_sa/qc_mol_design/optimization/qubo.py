@@ -40,6 +40,7 @@ Modifications vs. paper (to compensate for classical SA vs. quantum annealer):
 """
 from __future__ import annotations
 
+import inspect
 import math
 import os
 import random
@@ -604,7 +605,17 @@ def _solve_kaiwu(
         init_solution = np.concatenate([2.0 * x0 - 1.0, [1.0]])   # s_aux = +1
 
     # 2. Solve → spin-solution pool, shape (k, n+1) ──────────────────────────
-    raw = np.asarray(optimizer.solve(ising_mat, init_solution=init_solution))
+    # Kaiwu 1.4.x dropped the init_solution keyword from the local SA
+    # solver, so only pass it when the installed solver actually declares it.
+    if init_solution is None:
+        raw = np.asarray(optimizer.solve(ising_mat))
+    else:
+        if "init_solution" not in inspect.signature(optimizer.solve).parameters:
+            raise RuntimeError(
+                "The installed Kaiwu SA solver does not support warm starts; "
+                "run this backend without initial_states."
+            )
+        raw = np.asarray(optimizer.solve(ising_mat, init_solution=init_solution))
     if raw.ndim == 1:
         raw = raw[None, :]
     if prepared is not None:
