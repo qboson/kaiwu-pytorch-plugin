@@ -48,6 +48,7 @@ def test_workflow_releases_models_between_stages_and_evaluates_inference(tmp_pat
     monkeypatch.setattr(train, "save_checkpoint", lambda output, name, **kwargs: output / name)
     monkeypatch.setattr(train, "load_trained_energy_weights", lambda *args: None)
     monkeypatch.setattr(train, "run_generation_over_records", generate)
+    monkeypatch.setattr(train, "write_markdown_report", lambda *args, **kwargs: None)
 
     train.main()
 
