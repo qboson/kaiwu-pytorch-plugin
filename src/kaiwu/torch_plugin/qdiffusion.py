@@ -775,6 +775,7 @@ class QDiffusion(nn.Module):
         noisy_tokens: torch.Tensor,
         candidate_tokens: torch.Tensor,
         candidate_scores: torch.Tensor,
+        update_mask: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Selects one candidate per batch element by energy-based reranking.
 
@@ -782,12 +783,14 @@ class QDiffusion(nn.Module):
             noisy_tokens: Current noisy token tensor.
             candidate_tokens: Candidate reconstructions.
             candidate_scores: Proposal-side candidate scores.
+            update_mask: Positions that can receive a candidate token in this step.
 
         Returns:
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
             for the selected candidate per sample.
         """
-        energies = self._score_candidates(noisy_tokens, candidate_tokens)
+        scored_tokens = restore_candidate_context(noisy_tokens, candidate_tokens, update_mask)
+        energies = self._score_candidates(noisy_tokens, scored_tokens)
         neg_energies = -energies
         neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
         weights = torch.softmax(neg_energies / self.config.energy_temperature, dim=-1)
@@ -889,7 +892,7 @@ class QDiffusion(nn.Module):
             output_tokens, candidate_tokens, output_masks
         )
         selected_tokens, selected_scores = self._select_candidates(
-            output_tokens, candidate_tokens, candidate_scores
+            output_tokens, candidate_tokens, candidate_scores, state["output_masks"] & output_masks
         )
 
         if not self.config.disable_resample:
