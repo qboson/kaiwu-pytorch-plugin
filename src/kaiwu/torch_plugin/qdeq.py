@@ -380,11 +380,24 @@ class QDEQ(nn.Module):
 
         Returns:
             torch.Tensor: ``layer(z*, x)``.
+
+        Raises:
+            TypeError: If the layer returns something other than a tensor.
+            ValueError: If the layer changes the shape of the fixed-point state.
         """
         z0 = torch.zeros_like(x) if z0 is None else z0
         cfg = self.config
+
         def func(z):
-            return self.layer(z, x)
+            value = self.layer(z, x)
+            if not isinstance(value, torch.Tensor):
+                raise TypeError("QDEQ layer must return a tensor")
+            if value.shape != z.shape:
+                raise ValueError(
+                    f"QDEQ layer must preserve state shape {tuple(z.shape)}, "
+                    f"got {tuple(value.shape)}"
+                )
+            return value
 
         # 1. Solve for z* without building an autograd graph.
         with self.solve_context(), torch.no_grad():
@@ -396,9 +409,9 @@ class QDEQ(nn.Module):
         # layer's parameters and to x.
         with self.reattach_context():
             if not (self.training and torch.is_grad_enabled()):
-                return self.layer(z_star, x)
+                return func(z_star)
             z_star = z_star.detach().requires_grad_()
-            new_z = self.layer(z_star, x)
+            new_z = func(z_star)
         if cfg.jac_loss_vecs > 0:
             self.last_jac_loss = self.jacobian_loss(new_z, z_star, cfg.jac_loss_vecs)
         # 3. Replace the one-step gradient with the implicit-function gradient.
