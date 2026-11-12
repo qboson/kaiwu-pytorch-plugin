@@ -700,6 +700,11 @@ class RBMVisualizer:
             img_size = int(np.sqrt(n_features))
             if img_size * img_size == n_features:
                 img_shape = (img_size, img_size)
+            else:
+                # Modified 2026-11-12: include every feature in a rectangular layout.
+                while n_features % img_size:
+                    img_size -= 1
+                img_shape = (img_size, n_features // img_size)
 
         # 创建图形
         fig, axes = plt.subplots(2, n_images, figsize=(2 * n_images, 4))
