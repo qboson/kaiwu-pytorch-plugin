@@ -66,7 +66,9 @@ If you want to read the actual implementation chain, start from `dplm/workflows/
 Its end-to-end flow is:
 
 1. read and filter FASTA records
-2. split them into train/validation/test sets
+2. split them into train/validation/test sets by distinct sequence, keeping records
+   that differ only in headers, whitespace, or case together. Split ratios apply
+   to sequence groups.
 3. build a `Q-Diffusion` generator with a DPLM proposal model and one conditioned energy reranker
 4. tokenize sequences into `targets`
 5. call `generator.objective({"targets": ...})` inside the epoch loop
