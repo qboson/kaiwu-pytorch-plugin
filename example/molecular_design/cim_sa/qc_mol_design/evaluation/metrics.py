@@ -210,7 +210,7 @@ def generation_quality_metrics(
     generated: List[Dict],
     train_smiles: Set[str],
 ) -> Dict[str, float]:
-    """Validity/uniqueness/novelty over raw reads without dropping failures."""
+    """Report quality over raw reads, honoring recorded chemistry failures."""
     from rdkit import Chem
 
     canonical_train = set()
@@ -221,6 +221,8 @@ def generation_quality_metrics(
 
     valid_smiles: List[str] = []
     for row in generated:
+        if not row.get("valid", True):
+            continue
         smiles = str(row.get("smiles", "") or "")
         if not smiles:
             continue
