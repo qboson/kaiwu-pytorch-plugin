@@ -298,7 +298,7 @@ def main() -> None:
         config,
         device=device,
         num_candidates=1,
-    )
+    ).eval()
     # Before spending time on training, verify that one real sequence can pass
     # through both ``objective`` and ``generate`` without shape/wiring issues.
     validation_summary = run_structural_validation(
@@ -308,6 +308,7 @@ def main() -> None:
         steps=config.train.validation_steps,
     )
     save_json(output_dir / "validation_summary.json", validation_summary)
+    del validation_generator
 
     # Stage 3: build the actual trainable generator and dataloaders. In the
     # default setup, proposal weights stay frozen and the energy side is tuned.
@@ -438,6 +439,12 @@ def main() -> None:
     )
     print(f"Best checkpoint: {best_checkpoint_path}")
     print(f"Final checkpoint: {final_checkpoint_path}")
+    if best_checkpoint_path is None:
+        raise RuntimeError("Training did not produce a best checkpoint.")
+
+    # The loaders retain the generator through their collate functions, and
+    # the optimizer and scheduler retain its parameters and optimizer state.
+    del train_loader, val_loader, scheduler, optimizer, train_generator
 
     # Stage 5: compare a proposal-only baseline against a guided generator that
     # reloads the best learned energy weights from training.
@@ -445,7 +452,7 @@ def main() -> None:
         config,
         device=device,
         num_candidates=1,
-    )
+    ).eval()
     # The baseline branch keeps the proposal path only; it gives us a direct
     # comparison point for how much the learned BM reranker helps.
     baseline_records, _ = run_generation_over_records(
@@ -456,6 +463,7 @@ def main() -> None:
         output_dir=output_dir / "baseline",
         label="proposal_only",
     )
+    del baseline_generator
 
     guided_generator = build_generator_from_config(
         config,
@@ -467,9 +475,7 @@ def main() -> None:
         disable_resample=config.generate.disable_resample,
         resample_ratio=config.generate.resample_ratio,
         resample_top_p=config.generate.resample_top_p,
-    )
-    if best_checkpoint_path is None:
-        raise RuntimeError("Training did not produce a best checkpoint.")
+    ).eval()
     # Guided generation reloads only the trained energy-side weights onto a
     # fresh generator instance so inference mirrors rerun/eval behavior.
     load_trained_energy_weights(guided_generator, str(best_checkpoint_path), device)
