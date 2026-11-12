@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Modified: collect only the requested real-image batch prefixes.
 """
 Unsorted helper functions
 """
@@ -318,12 +319,26 @@ def generate_qvae_images(model, save_path, grid_size=8):
 
 
 def get_real_images(dataloader, n_images=10000):
+    """Collect up to a positive integer number of images in source order."""
+    if (
+        isinstance(n_images, (bool, np.bool_))
+        or not isinstance(n_images, (int, np.integer))
+        or n_images <= 0
+    ):
+        raise ValueError("n_images must be a positive integer")
+    n_images = int(n_images)
     images = []
+    count = 0
     for batch_imgs, _ in dataloader:
-        images.append(batch_imgs)
-        if sum(img.shape[0] for img in images) >= n_images:
+        take = min(batch_imgs.shape[0], n_images - count)
+        if take:
+            images.append(batch_imgs[:take])
+            count += take
+        if count == n_images:
             break
-    return torch.cat(images, dim=0)[:n_images]
+    if not images:
+        raise ValueError("No images are available from the dataloader")
+    return torch.cat(images, dim=0)
 
 
 def generate_qvae_samples(model, dist_beta, n_images=10000, batch_size=64):
