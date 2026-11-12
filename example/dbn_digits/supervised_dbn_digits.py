@@ -20,7 +20,6 @@ import torch
 import torch.nn as nn
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
-from dbn_trainer import DBNPretrainer
 
 
 def translate_image(image, direction):
@@ -109,6 +108,9 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         dropout_p=0.0,  # Dropout概率
         use_cim=False,
     ):
+        # Modified 2026-11-12: load training dependencies when constructing a DBN.
+        from dbn_trainer import DBNPretrainer
+
         # 无监督网络配置
         self.hidden_layers_structure = hidden_layers_structure
         self.learning_rate_rbm = learning_rate_rbm
@@ -741,7 +743,8 @@ class RBMVisualizer:
         # 保存结果
         if save_pdf:
             plt.savefig(
-                f"results/reconstructed_images_{title_suffix}.pdf",
+                # Modified 2026-11-12: honor the visualizer's output directory.
+                os.path.join(self.result_dir, f"reconstructed_images_{title_suffix}.pdf"),
                 dpi=300,
                 bbox_inches="tight",
                 format="pdf",
