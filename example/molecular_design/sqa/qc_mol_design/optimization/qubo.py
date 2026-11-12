@@ -48,6 +48,7 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 
 from qc_mol_design.config import CFG, ATOM_VALENCY
+from kaiwu.torch_plugin._kaiwu_compat import qubo_matrix_to_ising_matrix
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -556,10 +557,9 @@ def _solve_kaiwu(
     # Kaiwu 1.1 exposes matrix conversion under ``kw.qubo``.  Older internal
     # builds placed it under ``kw.core``; prefer the public 1.1 API while
     # retaining compatibility with those builds.
-    converter = getattr(kw.qubo, "qubo_matrix_to_ising_matrix", None)
-    if converter is None:
-        converter = kw.core.qubo_matrix_to_ising_matrix
-    ising_mat, _offset = converter(Q)
+    # The plugin compatibility helper resolves the SDK location
+    # (kw.qubo on 1.1, kw.core/kw.conversion on 1.3.1+).
+    ising_mat, _offset = qubo_matrix_to_ising_matrix(Q)
     ising_mat = np.asarray(ising_mat, dtype=np.float64)
     if prepared is not None:
         from .spin_encoding import physical_matrix

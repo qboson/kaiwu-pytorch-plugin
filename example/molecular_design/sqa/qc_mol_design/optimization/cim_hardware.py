@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 from .spin_encoding import physical_matrix, logical_spins
+from kaiwu.torch_plugin._kaiwu_compat import qubo_matrix_to_ising_matrix
 
 LAST_CALL = {}
 _LICENSE_READY = False
@@ -94,10 +95,7 @@ def solve_hardware(Q, num_reads=50, prepared=None, context_override=None, return
     Q = np.ascontiguousarray(Q, dtype=np.float64)
     if Q.ndim != 2 or Q.shape[0] != Q.shape[1] or not np.isfinite(Q).all():
         raise ValueError("QUBO must be finite and square")
-    converter = getattr(kw.qubo, "qubo_matrix_to_ising_matrix", None)
-    if converter is None:
-        converter = kw.core.qubo_matrix_to_ising_matrix
-    ising, offset = converter(Q)
+    ising, offset = qubo_matrix_to_ising_matrix(Q)
     if prepared is None:
         submitted, precision = quantize_ising(ising, bits)
     else:
