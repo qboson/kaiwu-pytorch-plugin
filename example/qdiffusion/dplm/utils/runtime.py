@@ -48,11 +48,26 @@ def _energy_backend_state(generator) -> dict[str, Any]:
     }
 
 
+def _json_compatible(value: Any) -> Any:
+    """Converts checkpoint metadata to types accepted by safe torch loading."""
+    if value is None or isinstance(value, (bool, int, float, str)):
+        return value
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, dict):
+        return {str(key): _json_compatible(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_compatible(item) for item in value]
+    return str(value)
+
+
 def _energy_backend_metadata(generator) -> dict[str, Any]:
     """Collects lightweight metadata required to rebuild the BM backend."""
     return {
         "bm_sampler_type": getattr(generator.energy_model, "sampler_type", None),
-        "bm_sampler_kwargs": getattr(generator.energy_model, "sampler_kwargs", {}),
+        "bm_sampler_kwargs": _json_compatible(
+            getattr(generator.energy_model, "sampler_kwargs", {})
+        ),
     }
 
 
