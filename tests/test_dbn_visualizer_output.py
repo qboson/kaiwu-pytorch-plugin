@@ -1,9 +1,10 @@
-"""Exercise reconstruction layouts and PDF placement with real CPU rendering."""
+"""Exercise weight/reconstruction layouts and PDF placement with CPU rendering."""
 import importlib.util
 import math
 import os
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 
 for dependency in ("matplotlib", "seaborn"):
@@ -173,6 +174,57 @@ class TestReconstructionImageShape(unittest.TestCase):
 
     def test_explicit_rectangular_shape_takes_precedence(self):
         self._check_layout(12, (2, 6))
+
+
+class TestWeightImageWidth(unittest.TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory()
+        self.workdir = Path(self.tempdir.name)
+
+    def tearDown(self):
+        plt.close("all")
+        self.tempdir.cleanup()
+
+    def _plot(self, width, **kwargs):
+        # Plotting consumes tensor attributes; this input is not an SDK model.
+        weights = torch.tensor(
+            [[float((row * 7 + column * 3) % 19 - 9) for column in range(4)]
+             for row in range(width)],
+            dtype=torch.float32,
+        )
+        plot_input = SimpleNamespace(quadratic_coef=weights, num_hidden=4)
+        RBMVisualizer(self.workdir).plot_weights(
+            plot_input, grid_shape=(2, 2), figsize=(6, 5),
+            save_as="weights", save_pdf=True, **kwargs,
+        )
+        return weights
+
+    def _assert_render(self, width, side, **kwargs):
+        weights = self._plot(width, **kwargs)
+        figure = plt.gcf()
+        self.assertEqual(len(figure.axes), 4)
+        for component, axis in enumerate(figure.axes):
+            self.assertEqual(len(axis.images), 1)
+            image = np.asarray(axis.images[0].get_array())
+            self.assertEqual(image.shape, (side, side))
+            np.testing.assert_array_equal(image.ravel(), weights[:, component].numpy())
+        figure.canvas.draw()
+        pdf = (self.workdir / "weights.pdf").read_bytes()
+        self.assertTrue(pdf.startswith(b"%PDF-"))
+        self.assertTrue(pdf.rstrip().endswith(b"%%EOF"))
+
+    def test_infers_sixteen_visible_units(self):
+        self._assert_render(16, 4)
+
+    def test_preserves_sixty_four_visible_units(self):
+        self._assert_render(64, 8)
+
+    def test_accepts_explicit_visible_width(self):
+        self._assert_render(16, 4, n_visible=16)
+
+    def test_explicit_width_is_not_silently_ignored(self):
+        with self.assertRaisesRegex(ValueError, "cannot reshape"):
+            self._plot(16, n_visible=64)
 
 
 if __name__ == "__main__":

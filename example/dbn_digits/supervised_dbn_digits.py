@@ -577,7 +577,7 @@ class RBMVisualizer:
     def plot_weights(
         self,
         rbm,
-        n_visible=64,
+        n_visible=None,
         grid_shape=(8, 16),
         figsize=(16, 7),
         title_suffix="RBM Weights",
@@ -588,7 +588,7 @@ class RBMVisualizer:
 
         Args:
             rbm: RBM模型
-            n_visible (int): 可见单元数量
+            n_visible (int, optional): 可见单元数量，默认从权重矩阵推断
             grid_shape (tuple): 网格形状 (rows, cols)
             figsize (tuple): 图形大小
             title_suffix (str): 标题后缀
@@ -596,6 +596,9 @@ class RBMVisualizer:
             save_pdf (bool): 是否保存为PDF
         """
         weights = rbm.quadratic_coef.detach().cpu().numpy()
+        # Modified 2026-11-12: infer the visible width only when it is omitted.
+        if n_visible is None:
+            n_visible = weights.shape[0]
 
         fig, axes = plt.subplots(
             grid_shape[0],
