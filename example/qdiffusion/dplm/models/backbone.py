@@ -154,7 +154,15 @@ class DPLMBackbone(nn.Module):
             for key, value in pretrained_state_dict.items():
                 new_pretrained_state_dict[key[6:]] = value
 
-            model.load_state_dict(new_pretrained_state_dict, strict=False)
+            loaded = model.load_state_dict(new_pretrained_state_dict, strict=False)
+            parameter_names = {name for name, _ in model.named_parameters()}
+            missing_parameters = sorted(parameter_names.intersection(loaded.missing_keys))
+            if missing_parameters:
+                missing = ", ".join(missing_parameters[:5])
+                raise ValueError(
+                    f"DPLM checkpoint {net_name!s} is missing "
+                    f"{len(missing_parameters)} model parameter(s), including {missing}"
+                )
             return model
 
         dplm_type = AutoConfig.from_pretrained(net_name).dplm_type
