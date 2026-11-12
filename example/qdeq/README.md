@@ -44,6 +44,9 @@ example/qdeq/data/ETTh1.csv
 ```
 
 Use `--data-path` for another location.
+The CSV needs a `date` column and at least one numeric observation column.
+The first 14,400 data rows must contain finite observations for the standard
+train, validation and test splits.
 
 ## Quick start
 
