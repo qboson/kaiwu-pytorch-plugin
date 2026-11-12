@@ -31,10 +31,16 @@ def initialize_license():
     private = Path(os.environ["KAIWU_CREDENTIALS_FILE"])
     credentials = json.loads(private.read_text())
     import kaiwu.license._license_utils as license_utils
-    import kaiwu.cim._optimizer_adapter as adapter
+    try:
+        import kaiwu.cim._optimizer_adapter as adapter
+    except ImportError:
+        # Kaiwu 1.4.x no longer ships this private adapter; the shared
+        # license-utils path is the one the compiled optimizer reads.
+        adapter = None
     license_path = private.with_name("cim_license.lic")
     license_utils.LICENSE_FILE_PATH = str(license_path)
-    adapter.LICENSE_FILE_PATH = str(license_path)
+    if adapter is not None:
+        adapter.LICENSE_FILE_PATH = str(license_path)
     try:
         payload, code = license_utils._read_license()
         matches = (str(payload["user_id"]) == str(credentials["user_id"])
