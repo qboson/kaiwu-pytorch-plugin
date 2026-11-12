@@ -81,7 +81,7 @@ factory helper 间接接入。
 4. 将蛋白质序列 tokenize 为 `targets`
 5. 在 epoch 循环中调用 `generator.objective({"targets": ...})`
 6. 优化 `energy_objective.mean()`，主要训练 energy reranking 分支
-7. 保存轻量 checkpoint，包括 `energy_encoder`、`feature_projector`、energy backend 权重、`energy_head` 和 `vocab_proj`
+7. 保存轻量 checkpoint，包括 `energy_encoder`、`feature_projector` 和 `energy_bm`
 8. 重建 baseline 与 guided 两套生成器用于测试时生成
 9. 对 baseline 和 guided 的输出进行对比并生成报告
 
