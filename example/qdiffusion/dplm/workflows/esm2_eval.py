@@ -544,6 +544,7 @@ def main() -> None:
 
     print("Starting ESM2 evaluation stage...")
     model, alphabet = load_esm2_model(config.esm2_model, device)
+    sequence_cache: dict[str, torch.Tensor] = {}
 
     reference_embeddings = embed_sequences(
         reference_records,
@@ -552,6 +553,7 @@ def main() -> None:
         device=device,
         batch_size=config.batch_size,
         pooling=config.pooling,
+        sequence_cache=sequence_cache,
     )
 
     summaries: list[DistanceSummary] = []
@@ -562,6 +564,7 @@ def main() -> None:
         device=device,
         batch_size=config.batch_size,
         pooling=config.pooling,
+        sequence_cache=sequence_cache,
     )
     baseline_rows, baseline_summary = evaluate_candidate_set(
         label="baseline",
@@ -582,6 +585,7 @@ def main() -> None:
         device=device,
         batch_size=config.batch_size,
         pooling=config.pooling,
+        sequence_cache=sequence_cache,
     )
     guided_rows, guided_summary = evaluate_candidate_set(
         label="guided",

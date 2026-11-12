@@ -180,32 +180,41 @@ def embed_sequences(
     device: torch.device,
     batch_size: int,
     pooling: str,
+    sequence_cache: dict[str, torch.Tensor] | None = None,
 ) -> dict[str, torch.Tensor]:
+    """Embed distinct normalized sequences and map them back to record headers.
+
+    Reuse an optional sequence cache across sets with the same eval-mode model,
+    alphabet, and pooling mode.
+    """
     if not records:
         return {}
+    if pooling not in {"mean", "cls", "bos", "eos"}:
+        raise ValueError(f"Unsupported pooling mode: {pooling}")
 
+    pooled_by_sequence = {} if sequence_cache is None else sequence_cache
+    normalized_records = [(header, normalize_sequence(sequence)) for header, sequence in records]
+    pending = {}
+    for header, sequence in normalized_records:
+        if sequence not in pooled_by_sequence:
+            pending.setdefault(sequence, header)
+    unique_records = [(header, sequence) for sequence, header in pending.items()]
     print(
-        f"Embedding {len(records)} sequences with batch_size={batch_size} "
+        f"Embedding {len(unique_records)} new sequences with batch_size={batch_size} "
         f"and pooling={pooling}"
     )
     batch_converter = alphabet.get_batch_converter()
     repr_layer = model.num_layers
-    embeddings: dict[str, torch.Tensor] = {}
-
     with torch.no_grad():
-        for batch_records in chunked(records, batch_size):
-            normalized_batch = [
-                (header, normalize_sequence(sequence))
-                for header, sequence in batch_records
-            ]
-            _, _, tokens = batch_converter(normalized_batch)
+        for batch_records in chunked(unique_records, batch_size):
+            _, _, tokens = batch_converter(batch_records)
             tokens = tokens.to(device)
 
             outputs = model(tokens, repr_layers=[repr_layer], return_contacts=False)
             token_representations = outputs["representations"][repr_layer]
             lengths = (tokens != alphabet.padding_idx).sum(dim=1)
 
-            for row_index, (header, sequence) in enumerate(normalized_batch):
+            for row_index, (header, sequence) in enumerate(batch_records):
                 seq_len = len(sequence)
                 if seq_len == 0:
                     raise ValueError(
@@ -217,15 +226,13 @@ def embed_sequences(
                     pooled = residue_repr.mean(dim=0)
                 elif pooling in {"cls", "bos"}:
                     pooled = token_representations[row_index, 0]
-                elif pooling == "eos":
+                else:  # eos
                     eos_index = int(lengths[row_index].item()) - 1
                     pooled = token_representations[row_index, eos_index]
-                else:
-                    raise ValueError(f"Unsupported pooling mode: {pooling}")
 
-                embeddings[header] = pooled.detach().cpu()
+                pooled_by_sequence[sequence] = pooled.detach().cpu()
 
-    return embeddings
+    return {header: pooled_by_sequence[sequence] for header, sequence in normalized_records}
 
 
 def summarize_distances(label: str, rows: list[PairDistanceRow]) -> DistanceSummary:
