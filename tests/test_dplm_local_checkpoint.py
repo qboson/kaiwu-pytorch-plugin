@@ -19,11 +19,14 @@ def checkpoint_path(tmp_path, monkeypatch):
         def __init__(self):
             super().__init__()
             self.projection = nn.Linear(2, 2)
+            self.tied_weight = self.projection.weight
 
     monkeypatch.setattr(backbone, "get_net", lambda config: TinyNet())
     hydra = tmp_path / ".hydra"
     hydra.mkdir()
-    (hydra / "config.yaml").write_text("model:\n  _target_: local.DPLM\n", encoding="utf-8")
+    (hydra / "config.yaml").write_text(
+        "model:\n  _target_: local.DPLM\n  net: {}\n", encoding="utf-8"
+    )
     checkpoints = tmp_path / "checkpoints"
     checkpoints.mkdir()
     return checkpoints / "local.ckpt"
@@ -48,3 +51,4 @@ def test_complete_local_checkpoint_allows_extra_training_state(checkpoint_path):
 
     torch.testing.assert_close(model.net.projection.weight, torch.eye(2))
     torch.testing.assert_close(model.net.projection.bias, bias)
+    assert model.net.tied_weight is model.net.projection.weight

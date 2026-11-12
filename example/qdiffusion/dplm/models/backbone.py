@@ -155,8 +155,16 @@ class DPLMBackbone(nn.Module):
                 new_pretrained_state_dict[key[6:]] = value
 
             loaded = model.load_state_dict(new_pretrained_state_dict, strict=False)
-            parameter_names = {name for name, _ in model.named_parameters()}
-            missing_parameters = sorted(parameter_names.intersection(loaded.missing_keys))
+            missing_keys = set(loaded.missing_keys)
+            restored_parameters = {
+                id(parameter)
+                for name, parameter in model.named_parameters(remove_duplicate=False)
+                if name not in missing_keys
+            }
+            missing_parameters = sorted(
+                name for name, parameter in model.named_parameters()
+                if id(parameter) not in restored_parameters
+            )
             if missing_parameters:
                 missing = ", ".join(missing_parameters[:5])
                 raise ValueError(
