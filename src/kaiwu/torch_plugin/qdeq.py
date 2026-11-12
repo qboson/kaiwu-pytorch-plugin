@@ -394,7 +394,8 @@ class QDEQ(nn.Module):
                 raise TypeError("QDEQ layer must return a tensor")
             if value.shape != z.shape:
                 raise ValueError(
-                    f"QDEQ layer must preserve state shape {tuple(z.shape)}, got {tuple(value.shape)}"
+                    f"QDEQ layer must preserve state shape {tuple(z.shape)}, "
+                    f"got {tuple(value.shape)}"
                 )
             return value
 
