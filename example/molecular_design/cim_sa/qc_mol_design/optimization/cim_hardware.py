@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import os
 import time
@@ -188,11 +189,16 @@ def solve_hardware(Q, num_reads=50, prepared=None, context_override=None, return
             raw = np.load(raw_path, allow_pickle=False)
             cached = True
         else:
-            optimizer = ObservedCIM(
+            cim_kwargs = dict(
                 task_name=task_name, project_no=project, task_mode=mode,
-                sample_number=num_reads, sample_sort_mode=2,
-                wait=False, interval=10,
+                sample_number=num_reads, wait=False, interval=10,
             )
+            # Kaiwu 1.4.x dropped the sample_sort_mode constructor option.
+            if "sample_sort_mode" in inspect.signature(
+                kw.cim.CIMOptimizer.__init__
+            ).parameters:
+                cim_kwargs["sample_sort_mode"] = 2
+            optimizer = ObservedCIM(**cim_kwargs)
             deadline = time.monotonic() + float(os.environ.get("KAIWU_CIM_TIMEOUT", "86400"))
             network_failures = 0
             while True:
