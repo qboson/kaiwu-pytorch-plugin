@@ -1,4 +1,4 @@
-"""Behavioral coverage for the DPLM example's standard-library report writers."""
+"""Behavioral coverage for the DPLM example's I/O and sequence helpers."""
 import csv
 import importlib.util
 import json
@@ -120,6 +120,26 @@ class TestReportWriters(unittest.TestCase):
         _IO.save_markdown(path, [])
 
         self.assertEqual(path.read_bytes(), b"")
+
+
+class TestSequenceNormalization(unittest.TestCase):
+    def test_helpers_remove_internal_literal_spaces(self):
+        for helper in (_IO.normalize_sequence, _IO.normalize_decoded_sequence):
+            for text, expected in (("A C D E", "ACDE"), ("A  C   D", "ACD")):
+                with self.subTest(helper=helper.__name__, text=text):
+                    self.assertEqual(helper(text), expected)
+
+    def test_helpers_trim_endpoint_whitespace(self):
+        for helper in (_IO.normalize_sequence, _IO.normalize_decoded_sequence):
+            for text, expected in (("\tAC\n", "AC"), ("\r\nACDE\t", "ACDE")):
+                with self.subTest(helper=helper.__name__, text=text):
+                    self.assertEqual(helper(text), expected)
+
+    def test_alias_and_normalizer_match_explicit_combined_outputs(self):
+        for text, expected in (("  A C D E \n", "ACDE"), ("ACDE", "ACDE")):
+            with self.subTest(text=text):
+                self.assertEqual(_IO.normalize_sequence(text), expected)
+                self.assertEqual(_IO.normalize_decoded_sequence(text), expected)
 
 
 if __name__ == "__main__":
