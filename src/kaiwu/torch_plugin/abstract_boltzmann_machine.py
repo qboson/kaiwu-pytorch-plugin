@@ -61,9 +61,17 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Converts the model to Ising format.
 
         Returns:
-            torch.Tensor: Ising matrix.
+            numpy.ndarray: CPU Ising matrix. A bfloat16 matrix is exported as float32.
         """
         return self._to_ising_matrix()
+
+    @staticmethod
+    def _ising_numpy(matrix: torch.Tensor):
+        """Convert an Ising tensor to NumPy, which cannot represent bfloat16."""
+        matrix = matrix.detach().cpu()
+        if matrix.dtype == torch.bfloat16:
+            matrix = matrix.float()
+        return matrix.numpy()
 
     def _to_ising_matrix(self):
         """Converts the model to Ising format.

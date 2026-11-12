@@ -145,4 +145,4 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             ising_bias = self.linear_bias / 4 + ising_mat.sum(dim=0)[:-1]
             ising_mat[:num_nodes, -1] = ising_bias
             ising_mat[-1, :num_nodes] = ising_bias
-            return ising_mat.detach().cpu().numpy()
+            return self._ising_numpy(ising_mat)
