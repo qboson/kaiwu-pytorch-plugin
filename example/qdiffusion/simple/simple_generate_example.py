@@ -1,5 +1,6 @@
 # Copyright (c) 2024 Bytedance Ltd. and/or its affiliates
 # SPDX-License-Identifier: Apache-2.0
+# Modified: defer the model-builder import to main().
 
 """Minimal generation example for ``QDiffusion``.
 
@@ -20,7 +21,6 @@ import torch
 
 ensure_repo_src_on_path()
 
-from dplm.utils.dplm_builder import build_qdiffusion
 
 # Path and sequence helpers.
 
@@ -112,6 +112,8 @@ def main() -> None:
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
+
+    from dplm.utils.dplm_builder import build_qdiffusion
 
     generator = build_qdiffusion(
         proposal_ckpt=proposal_ckpt,
