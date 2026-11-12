@@ -1,8 +1,11 @@
-"""Regression tests for the molecular-design Kaiwu SA backend."""
+"""Regression tests for the molecular-design Kaiwu backend on SDK 1.4.x."""
 
+import json
 import os
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 from unittest import mock
 
 import numpy as np
@@ -15,6 +18,7 @@ sys.path.insert(
 )
 
 import kaiwu as kw  # noqa: E402  pylint: disable=wrong-import-position
+from qc_mol_design.optimization import cim_hardware  # noqa: E402
 from qc_mol_design.optimization import qubo as molecular_qubo  # noqa: E402
 
 
@@ -86,6 +90,30 @@ class TestMolecularKaiwuBackend(unittest.TestCase):
                             num_sweeps=10,
                             initial_states=[{0: 1, 1: 0}],
                         )
+
+    def test_cim_license_initialization_survives_missing_private_adapter(self):
+        """Kaiwu 1.4.x has no ``kaiwu.cim._optimizer_adapter`` module."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            credentials = root / 'credentials.json'
+            credentials.write_text(
+                json.dumps({'user_id': 'user', 'sdk_code': 'code'}),
+                encoding='utf-8',
+            )
+            license_path = root / 'cim_license.lic'
+            license_path.write_text('placeholder', encoding='utf-8')
+            with mock.patch.dict(
+                os.environ,
+                {'KAIWU_CREDENTIALS_FILE': str(credentials)},
+            ):
+                with mock.patch.object(cim_hardware, '_LICENSE_READY', False):
+                    with mock.patch(
+                        'kaiwu.license._license_utils._read_license',
+                        side_effect=OSError('missing'),
+                    ):
+                        with mock.patch('kaiwu.license.init') as init:
+                            cim_hardware.initialize_license()
+        init.assert_called_once_with('user', 'code')
 
 
 if __name__ == '__main__':
