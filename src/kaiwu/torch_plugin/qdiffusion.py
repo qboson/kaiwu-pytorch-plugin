@@ -777,17 +777,10 @@ class QDiffusion(nn.Module):
         candidate_scores: torch.Tensor,
         update_mask: torch.Tensor,
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Selects one candidate per batch element by energy-based reranking.
+        """Selects candidate tokens and scores by reranking possible updates.
 
-        Args:
-            noisy_tokens: Current noisy token tensor.
-            candidate_tokens: Candidate reconstructions.
-            candidate_scores: Proposal-side candidate scores.
-            update_mask: Positions that can receive a candidate token in this step.
-
-        Returns:
-            tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
-            for the selected candidate per sample.
+        ``update_mask`` identifies positions that can receive a candidate token.
+        Reranking uses the current tokens elsewhere.
         """
         scored_tokens = restore_candidate_context(noisy_tokens, candidate_tokens, update_mask)
         energies = self._score_candidates(noisy_tokens, scored_tokens)
