@@ -6,6 +6,10 @@
 
 有关 Kaiwu-PyTorch-Plugin 的使用说明，请参考[**项目文档**](https://kaiwu-pytorch-plugin.readthedocs.io/zh-cn/latest/)。
 
+**第一次给 KPP 做贡献？** 建议先去[开物量子开发者社区](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)的「开源贡献社区」了解参与渠道，再从文档或示例里的一个小改动做起。
+
+如果 KPP 对你的开发有帮助，欢迎在 [GitHub 上点个 Star](https://github.com/qboson/kaiwu-pytorch-plugin)。
+
 ## 项目概览
 
 `Kaiwu-PyTorch-Plugin` 是一个基于 PyTorch 和 Kaiwu SDK 的量子计算编程套件。它支持在相干光量子计算平台上训练和评估 Restricted Boltzmann Machine（RBM）与 Boltzmann Machine（BM）。插件提供了易于使用的接口，便于研究人员和开发者快速实现能量模型的训练、验证与应用。
@@ -13,45 +17,68 @@
 Restricted Boltzmann Machine 是一种基于能量函数的无监督学习模型，由可见层和隐藏层组成，层间全连接、层内无连接。它通过建模数据分布来学习输入的隐含特征，常用于特征提取、降维和协同过滤，也是更复杂模型的基础。Boltzmann Machine 则是全连接的随机神经网络，可见层与隐藏层内部也允许连接；其传统采样成本较高，而量子计算为这一类模型提供了新的求解路径。
 
 ```mermaid
-flowchart TD
-    torch[PyTorch tensors, modules, autograd]
-    kaiwu[Kaiwu SDK samplers<br/>SA / CIM backend]
+graph TD
+    %% 定义子图样式（可选）
+    classDef subGraph fill:#f8f9fa,stroke:#ddd,stroke-width:1px,rx:5,ry:5;
 
-    subgraph plugin["src/kaiwu/torch_plugin"]
-        abm["abstract_boltzmann_machine.py<br/>AbstractBoltzmannMachine"]
-        bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
-        rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
-        qvae["qvae.py<br/>QVAE"]
-        qdiff["qdiffusion.py<br/>QDiffusion"]
-        dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
-        dbn["dbn.py<br/>UnsupervisedDBN"]
+    subgraph Classical_Framework ["Classical Framework"]
+        PyTorch["PyTorch<br>(Autograd/Tensors)"]:::node
     end
 
-    torch --> abm
-    kaiwu --> abm
-    abm --> bm
-    abm --> rbm
-    abm --> qvae
-    abm --> qdiff
-    dist --> qvae
-    rbm --> dbn
-
-    subgraph examples["example"]
-        rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
-        dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
-        bm_generation["bm_generation<br/>BM distribution learning and sampling"]
-        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
-        qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
-        qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
+    %% 1. 右上模块名字只需要保留 Kaiwu SDK
+    subgraph Kaiwu_SDK ["Kaiwu SDK"]
+        SA["SimulatedAnnealingOptimizer"]:::node
+        CIM["CIMOptimizer"]:::node
     end
 
-    rbm --> rbm_digits
-    dbn --> dbn_digits
-    bm --> bm_generation
-    qdiff --> qdiffusion
-    qvae --> qvae_mnist
-    qvae --> qvae_cell
-    bm --> qvae_cell
+    %% 2. 中间模块名字显示完整：Kaiwu Torch Plugin
+    subgraph Torch_Plugin ["Kaiwu Torch Plugin"]
+        Abstract["abstract_boltzmann_machine.py"]:::node
+        RBM["restricted_boltzmann_machine.py"]:::node
+        GBRBM["gbrbm.py<br>GaussianBernoulliRestricte"]:::node
+        FullBM["full_boltzmann_machine.py<br>BoltzmannMachine"]:::node
+        QDiff["qdiffusion.py<br>QDDiffusion"]:::node
+        QVAE["qvae.py<br>QVAE"]:::node
+        
+        %% 3. dbn.py 作为 RBM 的下链，且保持在 Kaiwu Torch Plugin 层中
+        DBN["dbn.py<br>UnsupervisedDBN"]:::node
+    end
+
+    %% 4. 最下面模块名字为 Examples，不需要 "[]"
+    subgraph Examples
+        rbm_digits["rbm_digits"]:::node
+        dbn_digits["dbn_digits"]:::node
+        bm_generation["bm_generation"]:::node
+        qdiffusion["qdiffusion"]:::node
+        qvae_mnist["qvae_mnist"]:::node
+        qvae_cell["qvae_cell"]:::node
+    end
+
+    %% -------- 连线逻辑 --------
+    %% 上层框架指向插件
+    PyTorch --> Abstract
+    SA -.-> Abstract
+    CIM -.-> Abstract
+
+    %% 插件层内部的继承/实现关系
+    Abstract --> RBM
+    Abstract --> GBRBM
+    Abstract --> FullBM
+    Abstract --> QDiff
+    Abstract --> QVAE
+
+    RBM --> DBN
+
+    %% 插件层指向示例层
+    RBM --> rbm_digits
+    DBN --> dbn_digits
+    FullBM --> bm_generation
+    QDiff --> qdiffusion
+    QVAE --> qvae_mnist
+    QVAE --> qvae_cell
+
+    %% 应用子图背景样式
+    class Classical_Framework,Kaiwu_SDK,Torch_Plugin,Examples subGraph;
 ```
 
 上图展示了项目的主要代码结构：
@@ -202,6 +229,20 @@ SDK Token: <your-sdk-token>
 
 如果希望体验真实量子计算，请先在 [QBoson Platform](https://platform.qboson.com/) 注册账户，并根据文档中的联系方式联系官方人员申请真机配额。
 
+## 社区科研激励计划
+
+> 适用于对量子真机算力有需求的AI 开发者、科研人员。
+
+Kaiwu‑PyTorch‑Plugin(KPP) 面向量子原生AI、能量神经网络方向的科研与工程开发。
+
+我们推出**科研算力激励计划**：使用KPP和Kaiwu SDK进行开发、科研时，可享受**算力5折优惠计划（买N送N形式兑现）**。
+
+[查看申请条件并填写问卷](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)（问卷在页面底部）。
+
+申请简要条件：科研成果中引用或致谢 KPP 或Kaiwu SDK，填写问卷提交申请，通过后3个工作日内完成对接。
+
+联系邮箱：[developer@boseq.com](mailto:developer@boseq.com)
+
 ## 示例案例
 
 ### 简单示例
@@ -252,7 +293,7 @@ if __name__ == "__main__":
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
     objective = rbm.objective(x, s)
-    # Backpropgate gradients
+    # Backpropagate gradients
     objective.backward()
     # Update model weights with a step of stochastic gradient descent
     opt_rbm.step()

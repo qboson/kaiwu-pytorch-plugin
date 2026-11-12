@@ -7,12 +7,15 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:
 - `simple/`: minimal train and generate scripts
 - `dplm/`: protein-case workflow utilities and adapter code
 
+For details, see `example/qdiffusion/README.md`。
 ### QDEQ
 
 `example/qdeq/simple/` trains a small iTransformer-style forecaster on ETTh1
@@ -36,12 +39,14 @@ This section provides two complementary approaches for handwritten digit recogni
 
 This example demonstrates how to use a Restricted Boltzmann Machine (RBM) for feature learning and classification on the handwritten digits dataset (Digits). It is intended for beginners to understand the application workflow of RBMs in image feature extraction and classification, and can serve as a foundation for more advanced experiments and extensions. The main contents include:
 
-* **Data augmentation and preprocessing**: Expanding the dataset of original 8x8 handwritten digit images by shifting them up, down, left, and right, followed by feature normalization using MinMaxScaler;
+* **Data augmentation and preprocessing**: Splitting original 8x8 handwritten digit images before augmentation, shifting training images up, down, left, and right, and fitting MinMaxScaler on the augmented training set. Test images stay unaugmented and use the training scaling parameters;
 * **RBM model training**: Implementing the `RBMRunner` class to encapsulate the RBM training process, with support for visualizing generated samples and weight matrices during training;
 * **Feature extraction and classification**: After training, using the hidden-layer representations from the RBM as features for classification with logistic regression;
 * **Visualization and analysis**: Supporting sample generation and weight visualization during training to help observe and evaluate the learning effects of the model.
 
 Run the example via `example/rbm_digits/rbm_digits.ipynb`.
+
+For details, see `example/rbm_digits/README.md`.
 
 #### DBN-Based Classification
 
@@ -55,6 +60,10 @@ Building upon the RBM approach, this example demonstrates a complete Deep Belief
 * **Advanced Architecture**: PyTorch-based implementation with scikit-learn compatibility through `AbstractSupervisedDBN` base classes.
 
 Run the example via `example/dbn_digits/supervised_dbn_digits.ipynb`.
+
+Both digits examples hold out 20% of original images with `random_state=42` before augmenting the training set. The bundled Digits dataset yields 7,185 training rows and 360 original test images; translated siblings of training images cannot enter the test split.
+
+For details, see `example/dbn_digits/README.md`.
 
 **Dependencies**
 
@@ -101,6 +110,8 @@ This example demonstrates how to train and evaluate a Quantum Variational Autoen
 
 Run the example via `example/qvae_mnist/train_qvae.ipynb`.
 
+For details, see `example/qvae_mnist/README.md`.
+
 **Dependencies**
 
 ```
@@ -117,11 +128,32 @@ This extended example demonstrates how pre-trained Q-VAE representations can be 
 * **Unsupervised Feature Learning**: Q-VAE encoder learns meaningful features without label supervision;
 * **Transfer Learning**: Pre-trained representations enable efficient downstream task adaptation;
 * **Multi-task Capability**: Same representations support both generation and classification;
-* **Model Interpretability**: t-SNE visualization renables qualitative assessment of latent space structure, provides insights into class separation and cluster formation during training.
+* **Model Interpretability**: t-SNE visualization enables qualitative assessment of latent space structure, provides insights into class separation and cluster formation during training.
 
 Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
+
+For details, see `example/qvae_mnist/README.md`.
 
 **Dependencies**
 ```
 torchvision==0.22.0
+```
+
+---
+
+### Representation Learning: Q-VAE for Single-Cell Data
+
+This example demonstrates QVAE-based single-cell representation learning. The workflow reads a single-cell expression matrix, trains a Q-VAE, extracts low-dimensional representations, computes UMAP, analyzes the energy distribution, and evaluates clustering quality against cell-type labels. Multiple downstream evaluations are supported (Leiden clustering, classification, scIB, scGraph, DPT).
+
+Run the training via `example/qvae_cell/scripts/train.sh` (or `train_qvae_cell.py` with CLI options), and evaluation via `example/qvae_cell/evaluate_benchmark.py --metrics clustering,classification,scib,scgraph`.
+
+For details, see `example/qvae_cell/README.md`.
+
+**Dependencies**
+```
+anndata
+scanpy
+leidenalg
+scib_metrics
+scgraph
 ```
