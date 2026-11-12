@@ -16,6 +16,11 @@ from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
 from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
+if __package__:
+    from .checkpoint_io import load_checkpoint
+else:
+    from checkpoint_io import load_checkpoint
+
 EXAMPLE_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_PATH = EXAMPLE_ROOT / "data" / "ETTh1.csv"
 DEFAULT_CHECKPOINT = EXAMPLE_ROOT / "checkpoints" / "simple_etth1.pt"
