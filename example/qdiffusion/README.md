@@ -52,6 +52,10 @@ the larger experiment workflow.
 
 ## dplm
 
+For single-candidate proposal-only decoding, pass `energy_model=None` to
+`QDiffusion`. The ESM2 evaluation baseline uses this mode and loads only the
+proposal checkpoint. Energy-guided reranking and training require an energy model.
+
 `dplm/` contains the protein-case adapter layer and larger workflows:
 
 - `dplm/utils/dplm_builder.py`: protein-case `Q-Diffusion` assembly helper
