@@ -63,7 +63,7 @@ def _build_energy_model(
 
 def build_qdiffusion(
     proposal_ckpt: str,
-    energy_ckpt: str,
+    energy_ckpt: str | None,
     *,
     bm_num_visible: int = 256,
     bm_num_hidden: int = 128,
@@ -86,27 +86,29 @@ def build_qdiffusion(
     dtype: torch.dtype = torch.float32,
     device: torch.device | str | None = None,
 ) -> QDiffusion:
-    """Builds one generic ``QDiffusion`` instance for the protein example case."""
+    """Builds a protein generator. ``energy_ckpt=None`` builds only the proposal."""
     proposal_model = load_dplm_backbone(
         proposal_ckpt,
         cfg_override=proposal_cfg_override,
         net_override=proposal_net_override,
         from_huggingface=from_huggingface,
     )
-    energy_backbone = load_dplm_backbone(
-        energy_ckpt,
-        cfg_override=energy_cfg_override,
-        net_override=energy_net_override,
-        from_huggingface=from_huggingface,
-    )
-    energy_model = _build_energy_model(
-        energy_backbone=energy_backbone,
-        bm_num_visible=bm_num_visible,
-        bm_num_hidden=bm_num_hidden,
-        bm_sampler=bm_sampler,
-        bm_sampler_type=bm_sampler_type,
-        bm_sampler_kwargs=bm_sampler_kwargs,
-    )
+    energy_model = None
+    if energy_ckpt is not None:
+        energy_backbone = load_dplm_backbone(
+            energy_ckpt,
+            cfg_override=energy_cfg_override,
+            net_override=energy_net_override,
+            from_huggingface=from_huggingface,
+        )
+        energy_model = _build_energy_model(
+            energy_backbone=energy_backbone,
+            bm_num_visible=bm_num_visible,
+            bm_num_hidden=bm_num_hidden,
+            bm_sampler=bm_sampler,
+            bm_sampler_type=bm_sampler_type,
+            bm_sampler_kwargs=bm_sampler_kwargs,
+        )
 
     config = QDiffusionConfig(
         num_candidates=num_candidates,
