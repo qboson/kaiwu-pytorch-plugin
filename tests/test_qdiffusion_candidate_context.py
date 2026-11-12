@@ -169,6 +169,33 @@ def test_generate_scoring_handles_uneven_padded_batches():
     torch.testing.assert_close(implicit_energy, explicit_energy)
 
 
+def test_reranking_uses_tokens_already_committed_by_an_earlier_step(monkeypatch):
+    """The last step cannot substitute a token already accepted by remasking."""
+    generator, _, energy = make_generator(num_candidates=2, energy_temperature=1e-6)
+    inputs = torch.tensor([[1, 6, 6, 2]])
+    proposals = iter((
+        (torch.tensor([[[6, 5, 6, 6], [6, 5, 6, 6]]]),
+         torch.tensor([[[0., -9., -0.1, 0.], [0., -9., -0.1, 0.]]])),
+        (torch.tensor([[[6, 5, 5, 6], [6, 7, 6, 6]]]), torch.zeros(1, 2, 4)),
+    ))
+    monkeypatch.setattr(generator, "_sample_candidates", lambda logits, count: next(proposals))
+    record = energy.score_conditioned
+
+    def score(noisy_tokens, candidate_tokens, attention_mask):
+        record(noisy_tokens, candidate_tokens, attention_mask)
+        first, second = candidate_tokens[:, 1:2], candidate_tokens[:, 2:3]
+        return torch.where(second.ne(6), 0., torch.where(first.eq(7), 1., 10.))
+
+    monkeypatch.setattr(energy, "score_conditioned", score)
+
+    state = generator.step(generator.initialize_state(inputs, max_steps=2))
+    torch.testing.assert_close(state["output_tokens"], torch.tensor([[1, 3, 6, 2]]))
+    output = generator.step(state)["output_tokens"]
+
+    torch.testing.assert_close(energy.calls[-1][1], torch.tensor([[1, 5, 6, 2], [1, 7, 6, 2]]))
+    torch.testing.assert_close(output, torch.tensor([[1, 7, 6, 2]]))
+
+
 def test_repetition_resampling_keeps_fixed_proposal_context(monkeypatch):
     """Resampling must retain structural tokens and fixed repeated ordinary tokens."""
     generator, proposal, energy = make_generator(num_candidates=1, resample_ratio=0.25)
