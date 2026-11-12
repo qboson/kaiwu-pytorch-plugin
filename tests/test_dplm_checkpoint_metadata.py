@@ -30,6 +30,7 @@ class _EnergyModel(nn.Module):
         self.sampler_kwargs = {
             "tmp_dir": Path("/tmp/cim-cache"),
             "nested": {"checkpoint": Path("/tmp/cim.lic")},
+            "paths": [Path("/tmp/cim-a"), {"nested": Path("/tmp/cim-b")}],
             "reads": 10,
         }
 
@@ -58,6 +59,10 @@ class TestCheckpointMetadata(unittest.TestCase):
             self.assertEqual(sampler_kwargs["tmp_dir"], "/tmp/cim-cache")
             self.assertEqual(
                 sampler_kwargs["nested"]["checkpoint"], "/tmp/cim.lic"
+            )
+            self.assertEqual(
+                sampler_kwargs["paths"],
+                ["/tmp/cim-a", {"nested": "/tmp/cim-b"}],
             )
             self.assertEqual(sampler_kwargs["reads"], 10)
 
