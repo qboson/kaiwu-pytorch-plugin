@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify the published CIM/SQA/SA selected-step results without solver dependencies."""
 from collections import Counter
+import argparse
 import csv
 import gzip
 import hashlib
@@ -24,11 +25,12 @@ def truth(value):
     return value.lower() == "true"
 
 
-def verify():
-    result_dir = ROOT / "results"
+def verify(artifact_root=ROOT):
+    """Recompute the published summary from the artifact root's results directory."""
+    result_dir = artifact_root / "results"
     provenance = json.loads((result_dir / "provenance.json").read_text())
     for name, expected in provenance["published_sha256"].items():
-        require(sha(ROOT / name) == expected, "Published file changed: " + name)
+        require(sha(artifact_root / name) == expected, "Published file changed: " + name)
     groups, conditions, matched = {}, {}, {}
     with gzip.open(result_dir / "selected_steps.csv.gz", "rt", newline="") as handle:
         for row in csv.DictReader(handle):
@@ -95,5 +97,19 @@ def verify():
             "scope": "Selected CSV records and summary statistics; no re-sampling or chemistry recomputation."}
 
 
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--artifact-root", type=Path, default=ROOT,
+        help="Directory containing the published results/ folder (default: example directory)",
+    )
+    args = parser.parse_args()
+    try:
+        summary = verify(args.artifact_root.resolve())
+    except FileNotFoundError as error:
+        parser.error(f"Required experiment artifact missing: {error.filename}")
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
 if __name__ == "__main__":
-    print(json.dumps(verify(), ensure_ascii=False, indent=2))
+    main()
