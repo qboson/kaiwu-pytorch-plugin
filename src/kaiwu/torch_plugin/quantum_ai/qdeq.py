@@ -31,9 +31,9 @@ import numpy as np
 import torch
 from torch import nn
 
-from ._kaiwu_compat import qubo_matrix_to_ising_matrix
+from .._kaiwu_compat import qubo_matrix_to_ising_matrix
 
-from .usage_stats import kpp_caller_context
+from ..usage_stats import kpp_caller_context
 
 __all__ = ["QDEQ", "QDEQConfig"]
 

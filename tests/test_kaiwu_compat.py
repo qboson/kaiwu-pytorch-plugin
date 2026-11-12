@@ -169,3 +169,22 @@ def test_cell_cim_sampler(monkeypatch, tmp_path, task_mode, modern_mode, legacy_
     assert isinstance(sampler, PrecisionReducer)
     expected_mode = modern_mode if hasattr(kw.cim, "TaskMode") else legacy_mode
     assert sampler._component.task_mode == expected_mode  # pylint: disable=protected-access
+
+
+@pytest.mark.parametrize(
+    "module_name, class_name",
+    [
+        ("full_boltzmann_machine", "BoltzmannMachine"),
+        ("maifs.plugin", "FeatureSelectionWrapper"),
+    ],
+)
+def test_legacy_checkpoint_allowlist(module_name, class_name, monkeypatch, tmp_path):
+    """Old model files remain loadable with the same explicit allowlist."""
+    legacy_name = f"kaiwu.torch_plugin.{module_name}"
+    model_class = getattr(importlib.import_module(legacy_name), class_name)
+    checkpoint = tmp_path / "legacy.pt"
+    with monkeypatch.context() as patch:
+        patch.setattr(model_class, "__module__", legacy_name)
+        torch.save(model_class, checkpoint)
+    with torch.serialization.safe_globals([model_class]):
+        assert torch.load(checkpoint, weights_only=True) is model_class
