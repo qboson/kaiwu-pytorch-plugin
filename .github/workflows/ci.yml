@@ -88,6 +88,6 @@ jobs:
           KPP_STATS_ENABLED: "false"
           OMP_NUM_THREADS: "2"
         run: |
-          python -m pip install pandas==2.2.3 dwave-samplers==1.8.0 dimod==0.12.22 dwave-neal==0.6.0
+          python -m pip install dwave-samplers==1.8.0 dimod==0.12.22 dwave-neal==0.6.0
           python -m unittest discover -s example/molecular_design/tests -v
           QC_MODEL_SOURCE=cim_sa python -m unittest discover -s example/molecular_design/tests -p test_kpp_crbm.py -v
