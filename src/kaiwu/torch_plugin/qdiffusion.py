@@ -373,11 +373,11 @@ class QDiffusion(nn.Module):
         timesteps = sample_outputs["t"]
         loss_mask = sample_outputs["loss_mask"]
 
-        with torch.no_grad():
-            logits = self.forward(noisy_tokens).detach()
-
+        trainable = any(p.requires_grad for p in self.proposal_model.parameters())
+        with torch.set_grad_enabled(trainable):  # keep graph only for trainable proposals
+            logits = self.forward(noisy_tokens)
         negative_tokens, _ = self._sample_candidates(
-            self._mask_logits(logits), self.config.num_candidates
+            self._mask_logits(logits.detach()), self.config.num_candidates
         )
         negative_tokens = restore_candidate_context(
             noisy_tokens, negative_tokens, self.get_non_special_symbol_mask(noisy_tokens)
