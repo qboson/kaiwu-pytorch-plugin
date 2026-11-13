@@ -252,6 +252,11 @@ class MixtureGeneric(FactorialBernoulliUtil):
         This function does not implement gradients of samples with respect to beta or other
         parameters of the smoothing transformation.
 
+        The zero-forward gradient carrier preserves representable derivatives
+        when finite positive logits round sigmoid to one. The remaining
+        low-precision PDF/CDF arithmetic is unchanged; this does not guarantee
+        accurate gradients for every low-precision tail sample.
+
         Args:
             is_training (bool): Whether in training mode.
 
@@ -279,7 +284,9 @@ class MixtureGeneric(FactorialBernoulliUtil):
         # Compute gradient
         grad_q = (cdf_0 - cdf_1) / (q * pdf_1 + (1 - q) * pdf_0)
         grad_q = grad_q.detach()
-        grad_term = grad_q * q
+        # Keep representable sigmoid-tail gradients when q rounds to one.
+        differentiable_q = torch.exp(-F.softplus(-self.logit_mu.to(q)))
+        grad_term = grad_q * differentiable_q
         grad_term = grad_term - grad_term.detach()
         # Only let the gradient flow to q, not zeta itself
         zeta = zeta.detach() + grad_term
