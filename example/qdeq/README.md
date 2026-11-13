@@ -87,6 +87,13 @@ deq.get_last_stats()       # forward/backward steps, residuals, sampler time
 `simple_train_example.py` with default arguments (2 epochs) finishes in a few
 minutes on a CPU and reaches a test MSE of about 0.43 in the standardised space.
 
+When training with `QDEQConfig(jac_loss_vecs=1)`, add `deq.last_jac_loss`
+(with a chosen weight) to the training loss. The final differentiable layer
+call uses mathematical scaled dot-product attention because the Jacobian
+regulariser needs higher-order gradients that fused kernels may not support.
+This can increase time or memory for that call; the no-grad fixed-point solve,
+evaluation and training with `jac_loss_vecs=0` keep the caller's backend selection.
+
 ## Results: Kaiwu CIM vs Anderson
 
 To check the Ising solver on physical hardware, the same trained QDEQ
