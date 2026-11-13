@@ -38,6 +38,10 @@ class UnsupervisedDBN(nn.Module):
         )
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # A buffer tracks moves even before the first RBM has been created.
+        self.register_buffer(
+            "_device_anchor", torch.empty(0, device=self.device), persistent=False
+        )
 
         self.rbm_layers = None
         self.input_dim = None
@@ -60,9 +64,7 @@ class UnsupervisedDBN(nn.Module):
             rbm = RestrictedBoltzmannMachine(
                 num_visible=current_dim,  # Number of visible units (feature dimension)
                 num_hidden=n_hidden,  # Number of hidden units
-            ).to(
-                self.device
-            )  # Move model to specified device (CPU/GPU)
+            ).to(self._device_anchor.device)
             self.rbm_layers.append(rbm)
             current_dim = n_hidden
 
@@ -92,7 +94,7 @@ class UnsupervisedDBN(nn.Module):
         for rbm in self.rbm_layers:
             with torch.no_grad():
                 hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
+                    torch.FloatTensor(data_in).to(rbm.quadratic_coef.device)
                 )
                 data_in = (
                     hidden_output[:, rbm.num_visible :].cpu().numpy()
@@ -132,7 +134,7 @@ class UnsupervisedDBN(nn.Module):
             raise ValueError(f"Layer index {layer_index} out of range.")
 
         rbm = self.rbm_layers[layer_index]
-        return self.reconstruct_with_rbm(rbm, data_in, self.device)
+        return self.reconstruct_with_rbm(rbm, data_in, rbm.quadratic_coef.device)
 
     def mark_as_trained(self):
         """Marks the model as trained.
@@ -174,7 +176,7 @@ class UnsupervisedDBN(nn.Module):
                 - The reconstruction error for each sample.
         """
         if device is None:
-            device = rbm.device
+            device = rbm.quadratic_coef.device
 
         # Convert to PyTorch tensor
         data_in = torch.FloatTensor(data_in).to(device)
