@@ -145,6 +145,10 @@ class DPLMBackbone(nn.Module):
             cfg = load_yaml_config(str(cfg_path)).model
             cfg.net.pretrain = False
             cfg.pop("_target_")
+            # Local training artifacts deserve the same runtime
+            # overrides as Hub checkpoints; merge them in before
+            # constructing the wrapper.
+            cfg = OmegaConf.merge(cfg, cfg_override)
             model = cls(cfg)
 
             pretrained_state_dict = torch.load(
