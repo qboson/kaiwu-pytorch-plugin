@@ -487,16 +487,19 @@ def compute_rdkit_props(smiles: str) -> Optional[Dict[str, float]]:
     from rdkit import Chem, RDLogger
     from rdkit.Chem.QED import qed as rdkit_qed
     from rdkit.Chem.Crippen import MolLogP
+    try:
+        from rdkit.Contrib.SA_Score import sascorer
+    except ImportError as exc:
+        raise ImportError(
+            "SAS scoring requires RDKit Contrib SA_Score; "
+            "install RDKit with SA_Score support."
+        ) from exc
     RDLogger.logger().setLevel(RDLogger.ERROR)
     try:
         mol = Chem.MolFromSmiles(smiles)
         if mol is None:
             return None
-        try:
-            from rdkit.Contrib.SA_Score import sascorer
-            sas = float(sascorer.calculateScore(mol))
-        except Exception:
-            sas = float(mol.GetNumHeavyAtoms()) / 10.0 + 1.0
+        sas = float(sascorer.calculateScore(mol))
         return {
             "qed":  float(rdkit_qed(mol)),
             "logp": float(MolLogP(mol)),
