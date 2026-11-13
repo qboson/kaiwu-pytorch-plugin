@@ -41,3 +41,11 @@ span.math {
   margin-right: auto;
   justify-content: center;
 }
+
+/* 增强 Sphinx 默认 <hr class="docutils"> 的可视化分隔。 */
+hr.docutils {
+  border: none;
+  border-top: 2px solid #cfd8e3;    /* 浅灰蓝，醒目但不刺眼 */
+  margin: 2.5rem 0;                 /* 上下留白，形成章节"呼吸感" */
+  opacity: 1;                       /* 覆盖 pydata-sphinx-theme/Bootstrap 的默认透明度 */
+}
