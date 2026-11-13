@@ -180,11 +180,13 @@ def evaluate_scib(adata, rep_key, batch_key, label_key, n_jobs):
     except ImportError as exc:
         raise RuntimeError("scib_metrics is not installed") from exc
 
+    # Reuse supplied PCA so scIB does not overwrite a requested X_pca embedding.
     benchmarker = Benchmarker(
-        adata,
+        adata.copy(),
         batch_key=batch_key,
         label_key=label_key,
         embedding_obsm_keys=[rep_key],
+        pre_integrated_embedding_obsm_key="X_pca" if "X_pca" in adata.obsm else None,
         batch_correction_metrics=BatchCorrection(),
         bio_conservation_metrics=BioConservation(),
         n_jobs=n_jobs,

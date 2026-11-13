@@ -155,6 +155,8 @@ class Trainer:
 
     def train(self, run_tsne=False, compute_energy=False, tsne_interval=10, generate_animation=False):
         """执行完整训练流程"""
+        self.train_losses = []
+        self.test_losses = []
         logger.info(f"Start training {self.config.type}")
         self._setup_data()
         self._create_model()
@@ -317,14 +319,16 @@ class Trainer:
         os.makedirs(frame_dir, exist_ok=True)
         frame_path = os.path.join(frame_dir, f"tsne_epoch_{epoch:03d}.png")
 
-        # 调用 t_SNE 生成帧（不显示）
-        _, _, _ = t_SNE(
-            test_loader=self.test_loader,
-            qvae_model=self.model,
-            epochs=epoch,
-            save_path=frame_path,
-            show=False
-        )
+        # Diagnostic sampling must not change subsequent training randomness.
+        device = next(self.model.parameters()).device
+        with torch.random.fork_rng(devices=[device] if device.type == "cuda" else []):
+            _, _, _ = t_SNE(
+                test_loader=self.test_loader,
+                qvae_model=self.model,
+                epochs=epoch,
+                save_path=frame_path,
+                show=False
+            )
         return frame_path
 
     def save_results(self):

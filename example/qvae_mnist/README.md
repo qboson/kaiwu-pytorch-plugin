@@ -62,6 +62,11 @@ is downloaded automatically to `data_path` on first use.
 Run the notebooks from inside `example/qvae_mnist/` (they import the local
 `model`, `trainer`, `utils`, and `downstream` packages).
 
+Each `Trainer.train()` call starts a fresh model and loss history; histories
+returned by earlier calls remain unchanged. Optional t-SNE animation frames
+preserve the CPU and model CUDA device RNG states, so enabling animation
+does not change subsequent training randomness.
+
 ### Option A: Notebook
 
 1. **Train the Q-VAE** — open `train_qvae.ipynb` and run the cells. This

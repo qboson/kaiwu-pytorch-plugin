@@ -107,6 +107,8 @@ The unified evaluation entry point is `evaluate_benchmark.py`. Use `--metrics` t
 | dpt               | DPT pseudotime and trajectory consistency, assessing whether the representation can produce a reasonable ordering of cell development or state transitions.             |
 | all               | Run all of the above evaluation items.                                                                                                                                  |
 
+scIB evaluates a private copy of the data. If `X_pca` is present, it uses that embedding as the unintegrated baseline and preserves it for subsequent DPT evaluation, including when `--rep-key X_pca` is selected. Otherwise, scIB computes its PCA baseline on the copy.
+
 Run clustering evaluation only:
 
 ```bash
