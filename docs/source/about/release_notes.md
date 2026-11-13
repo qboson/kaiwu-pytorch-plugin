@@ -2,6 +2,24 @@
 
 本页记录 Kaiwu-PyTorch-Plugin 各版本的更新内容。
 
+## 未发布（Unreleased）
+
+### 改造
+
+- **PyTorch 支持范围拓宽为 2.3 – 2.14**：依赖声明由 `torch==2.7.0` 调整为
+  `torch>=2.3,<2.15`。两端均为硬约束：torch 2.15.0 起不再发布 Python 3.10
+  （cp310）wheel，而 Kaiwu SDK 仅提供 Python 3.10 安装包；下界由 NumPy 2.x
+  wheel 配对决定（torch 2.3.1 起兼容）。示例依赖 `torchvision` 同步放宽为
+  `>=0.18,<0.24`（torchvision minor 与 torch minor 一一配对）。
+- **`torch.load` 显式传入 `weights_only`**：示例代码中的 `torch.load` 调用
+  全部显式声明 `weights_only` 参数——纯 state_dict 处传 `True`，
+  molecular_design 中还原完整 pickle 对象处保持 `False`。torch 2.6 将默认值
+  翻转为 `True`，显式声明后加载行为在整个支持范围内保持一致。
+- **CI 新增 torch 版本矩阵**：在原有 Kaiwu SDK 矩阵（1.3.1 / 1.4.0 / 1.4.3）
+  基础上增加 torch 2.3 / 2.7 / 2.14 三个版本维度，并新增
+  `tests/test_torch_compat.py`，覆盖支持范围内的模型前向计算、checkpoint
+  往返与 `weights_only` 行为回归。
+
 ## 版本 0.3.0（2026-09-23）
 
 ### 新增
