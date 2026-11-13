@@ -75,6 +75,11 @@ deq.get_last_stats()       # 前向/反向步数、残差、sampler 耗时
 `simple_train_example.py` 用默认参数（2 个 epoch）在 CPU 上几分钟即可跑完，
 标准化空间下的测试 MSE 约为 0.43。
 
+训练时若设置 `QDEQConfig(jac_loss_vecs=1)`，需将 `deq.last_jac_loss`
+按选定权重加入训练损失。最后一次带梯度的层调用会使用数学实现的缩放点积注意力，
+因为 Jacobian 正则需要融合内核可能不支持的高阶梯度。这可能增加该次调用的时间或内存；
+不建图的不动点求解、评估和 `jac_loss_vecs=0` 的训练保留调用方的后端选择。
+
 ## 结果：Kaiwu CIM 与 Anderson 对比
 
 为了在物理硬件上检验 Ising 求解器，用同一个训练好的 QDEQ checkpoint，分别以
