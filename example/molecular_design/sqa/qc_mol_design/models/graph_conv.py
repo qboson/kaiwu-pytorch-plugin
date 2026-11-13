@@ -83,7 +83,7 @@ class DuvenaudConvLayer(nn.Module):
         H_new = torch.zeros(B, N, out_dim, device=H.device, dtype=H.dtype)
         for d in range(self.max_degree + 1):
             # Boolean mask: which nodes have degree d
-            mask = ((deg == d) & node_mask).float().unsqueeze(-1)
+            mask = ((deg == d) & node_mask).to(H.dtype).unsqueeze(-1)
             W    = self.weights[min(d, self.max_degree)]  # (in_dim, out_dim)
             H_new = H_new + mask * (H_agg @ W)
 
@@ -164,10 +164,14 @@ class NeuralFingerprint(nn.Module):
         """Convenience: encode a single molecule → numpy fingerprint."""
         self.eval()
         dev = self.device
-        X_t   = torch.FloatTensor(X[None]).to(dev)
-        adj_t = torch.FloatTensor(adj[None]).to(dev)
-        deg_t = torch.LongTensor(deg[None]).to(dev)
-        return self.forward(X_t, adj_t, deg_t).cpu().numpy()[0]
+        dtype = self.proj.dtype
+        X_t = torch.as_tensor(X[None], dtype=dtype, device=dev)
+        adj_t = torch.as_tensor(adj[None], dtype=dtype, device=dev)
+        deg_t = torch.as_tensor(deg[None], dtype=torch.long, device=dev)
+        fingerprint = self.forward(X_t, adj_t, deg_t)[0].cpu()
+        if fingerprint.dtype == torch.bfloat16:
+            fingerprint = fingerprint.float()
+        return fingerprint.numpy()
 
 
 def build_fingerprint_model() -> NeuralFingerprint:
