@@ -1,3 +1,4 @@
+import itertools
 import os
 import sys
 import unittest
@@ -231,6 +232,43 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
             bm.quadratic_coef.detach(), quadratic.to(torch.float64)
         )
         torch.testing.assert_close(bm.linear_bias.detach(), linear.to(torch.float64))
+
+    def test_ising_matrix_matches_bernoulli_marginal_energy(self):
+        """Ising energies should equal the Gaussian-marginalized Bernoulli energy."""
+        ising_mat = self.bm.get_ising_matrix()
+        weights = self.bm.quadratic_coef.detach()
+        precision = 1.0 / self.bm.var.detach()
+        linear = weights.t() @ (self.bm.mu.detach() * precision)
+        linear = linear + self.bm.linear_bias.detach()
+        quadratic = weights.t() @ torch.diag(precision) @ weights
+        states = torch.tensor(
+            list(itertools.product((0.0, 1.0), repeat=2)), dtype=torch.float64
+        )
+        expected = -(states @ linear) - 0.5 * ((states @ quadratic) * states).sum(-1)
+        spins = np.column_stack((2 * states.numpy() - 1, np.ones(len(states))))
+        energies = kaiwu.common.hamiltonian(ising_mat, spins)
+
+        np.testing.assert_allclose(
+            energies - energies[0], (expected - expected[0]).numpy(), atol=1e-12
+        )
+
+    def test_sdk_flip_energy_matches_hamiltonian_change(self):
+        """Kaiwu's single-flip energy should match the submitted Hamiltonian."""
+        ising_mat = self.bm.get_ising_matrix()
+        optimizer = kaiwu.classical.SimulatedAnnealingOptimizer(size_limit=1)
+        optimizer.set_matrix(ising_mat)
+
+        np.testing.assert_array_equal(np.diag(ising_mat), 0.0)
+        for state in itertools.product((-1.0, 1.0), repeat=len(ising_mat)):
+            spins = np.array(state)
+            before = kaiwu.common.hamiltonian(ising_mat, spins[None])[0]
+            for index in range(len(spins)):
+                flipped = spins.copy()
+                flipped[index] *= -1
+                after = kaiwu.common.hamiltonian(ising_mat, flipped[None])[0]
+                self.assertAlmostEqual(
+                    optimizer._dlt_h_single_flip(spins, index), after - before
+                )
 
 
 if __name__ == "__main__":
