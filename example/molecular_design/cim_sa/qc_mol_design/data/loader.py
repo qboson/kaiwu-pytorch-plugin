@@ -91,12 +91,14 @@ def load_zinc12k(path: Optional[str] = None) -> pd.DataFrame:
     if "type" in df.columns:
         df = df[df["type"] == "train"].reset_index(drop=True)
 
-    # Ensure SMILES column exists
-    smiles_col = next(
-        (c for c in df.columns if "smile" in c.lower()), df.columns[0]
-    )
-    if smiles_col != "smiles":
-        df = df.rename(columns={smiles_col: "smiles"})
+    # Prefer the documented column even when a CSV also carries alternate SMILES.
+    if list(df.columns).count("smiles") > 1:
+        raise ValueError("CSV has multiple columns named 'smiles' after normalization")
+    if "smiles" not in df.columns:
+        aliases = [column for column in df.columns if "smile" in column]
+        if len(aliases) != 1:
+            raise ValueError("CSV must have a 'smiles' column or one unambiguous SMILES alias")
+        df = df.rename(columns={aliases[0]: "smiles"})
 
     # Strip trailing whitespace / newlines from SMILES
     df["smiles"] = df["smiles"].astype(str).str.strip()
