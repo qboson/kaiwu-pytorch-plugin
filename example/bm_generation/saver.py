@@ -23,6 +23,10 @@ class Saver:
             interation_path (str): 二次项系数的路径
             t_run (float): 计算运行时间
         """
+        # The tutorial passes a fresh relative path such as "./test"; create it
+        # before torch.save so the first checkpoint does not fail.
+        if save_path:
+            os.makedirs(save_path, exist_ok=True)
         save_path = os.path.join(save_path, f"rbm_model{output_i}.pth")
         print(f"time: {time}, save_path: {save_path}")
         torch.save(model, save_path)
