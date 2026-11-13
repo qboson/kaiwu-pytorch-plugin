@@ -4,6 +4,7 @@ import os
 import sys
 
 import numpy as np
+import pytest
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
@@ -119,3 +120,28 @@ def test_fit_weights_updates_mask_with_solver_kwargs(monkeypatch) -> None:
     assert np.array_equal(selector.get_support().astype(int), np.array([1, 0, 1, 0]))
     assert selector.selected_indices().tolist() == [0, 2]
     assert selector.num_selected() == 2
+
+
+@pytest.mark.parametrize("train_epochs", [1, 3])
+def test_fit_weights_reuses_generator_for_mask_updates(monkeypatch, train_epochs) -> None:
+    updates = []
+
+    def fake_solve_qubo(quadratic_matrix, linear_vector, initial_state, solver, **kwargs):
+        updates.append(initial_state.copy())
+        return initial_state
+
+    monkeypatch.setattr(plugin, "solve_qubo", fake_solve_qubo)
+    selector = FeatureSelectionWrapper(
+        nn.Linear(2, 1, bias=False), feature_dim=2, mask_update_epochs=1
+    )
+    batches = (
+        (torch.tensor([[1.0, 2.0]]), torch.tensor([[1.0]]))
+        for _ in range(1)
+    )
+    optimizer = torch.optim.SGD(selector.model.parameters(), lr=0.01)
+
+    loss = selector.fit_weights(batches, nn.MSELoss(), optimizer, train_epochs)
+
+    assert isinstance(loss, float)
+    assert selector._trained_epochs == train_epochs
+    assert len(updates) == train_epochs
