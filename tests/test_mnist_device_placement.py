@@ -26,16 +26,22 @@ import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-src_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../src"))
-sys.path.insert(0, src_root)
+# Check optional example dependencies before touching import state. A collection
+# skip must not leave fake SDK modules behind for unrelated tests.
+for _module in (
+    "imageio",
+    "torchvision",
+    "torchmetrics",
+    "pandas",
+    "seaborn",
+    "tqdm",
+):
+    pytest.importorskip(_module)
 
-import kaiwu  # noqa: E402
 
-kaiwu_src_path = os.path.join(src_root, "kaiwu")
-if kaiwu_src_path not in kaiwu.__path__:
-    kaiwu.__path__ = [kaiwu_src_path] + list(kaiwu.__path__)
+import matplotlib  # noqa: E402
 
-_kaiwu_classical = types.ModuleType("kaiwu.classical")
+matplotlib.use("Agg")
 
 
 class _StubSimulatedAnnealingOptimizer:
@@ -48,48 +54,50 @@ class _StubSimulatedAnnealingOptimizer:
         return rng.choice([-1.0, 1.0], size=(16, num_spins + 1))
 
 
-_kaiwu_classical.SimulatedAnnealingOptimizer = _StubSimulatedAnnealingOptimizer
-sys.modules["kaiwu.classical"] = _kaiwu_classical
+def _load_example_classes():
+    """Import the example with local stand-ins, restoring shared import state."""
+    src_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../src"))
+    example_root = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../example/qvae_mnist")
+    )
+    with pytest.MonkeyPatch.context() as patcher:
+        patcher.syspath_prepend(src_root)
+        import kaiwu
 
-_kaiwu_cim = types.ModuleType("kaiwu.cim")
-_kaiwu_cim.CIMOptimizer = _StubSimulatedAnnealingOptimizer
-_kaiwu_cim.PrecisionReducer = lambda optimizer, **kwargs: optimizer
-sys.modules["kaiwu.cim"] = _kaiwu_cim
+        kaiwu_src_path = os.path.join(src_root, "kaiwu")
+        patcher.setattr(kaiwu, "__path__", [kaiwu_src_path] + list(kaiwu.__path__))
+        # Load the real plugin before temporary SDK stand-ins. Otherwise its
+        # cached compatibility helpers could retain fake SDK classes.
+        import kaiwu.torch_plugin  # pylint: disable=unused-import
 
-_kaiwu_common = types.ModuleType("kaiwu.common")
-_kaiwu_common.CheckpointManager = types.SimpleNamespace(save_dir=".")
-sys.modules["kaiwu.common"] = _kaiwu_common
+        classical = types.ModuleType("kaiwu.classical")
+        classical.SimulatedAnnealingOptimizer = _StubSimulatedAnnealingOptimizer
+        cim = types.ModuleType("kaiwu.cim")
+        cim.CIMOptimizer = _StubSimulatedAnnealingOptimizer
+        cim.PrecisionReducer = lambda optimizer, **kwargs: optimizer
+        common = types.ModuleType("kaiwu.common")
+        common.CheckpointManager = types.SimpleNamespace(save_dir=".")
+        gif = types.ModuleType("gif")
+        gif.frame = lambda fn: fn
+        gif.save = lambda *args, **kwargs: None
+        for name, module in (
+            ("kaiwu.classical", classical),
+            ("kaiwu.cim", cim),
+            ("kaiwu.common", common),
+            ("gif", gif),
+        ):
+            patcher.setitem(sys.modules, name, module)
 
-_gif_stub = types.ModuleType("gif")
-_gif_stub.frame = lambda fn: fn
-_gif_stub.save = lambda *args, **kwargs: None
-sys.modules["gif"] = _gif_stub
+        patcher.syspath_prepend(example_root)
+        from model.config import Config as config
+        from model.model import MnistQVAE as model
+        from trainer.model_tuner import ModelTuner as tuner
+        from trainer.trainer import Trainer as trainer
 
-for _module in (
-    "imageio",
-    "torchvision",
-    "torchmetrics",
-    "pandas",
-    "seaborn",
-    "tqdm",
-):
-    pytest.importorskip(_module)
+    return config, model, tuner, trainer
 
-import matplotlib  # noqa: E402
 
-matplotlib.use("Agg")
-
-_example_root = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../example/qvae_mnist")
-)
-sys.path.insert(0, _example_root)
-
-from model.config import Config  # noqa: E402  pylint: disable=wrong-import-position
-from model.model import MnistQVAE  # noqa: E402  pylint: disable=wrong-import-position
-from trainer.model_tuner import (
-    ModelTuner,
-)  # noqa: E402  pylint: disable=wrong-import-position
-from trainer.trainer import Trainer  # noqa: E402  pylint: disable=wrong-import-position
+Config, MnistQVAE, ModelTuner, Trainer = _load_example_classes()
 
 
 def _tiny_features(rows: int = 8, cols: int = 4) -> tuple[np.ndarray, np.ndarray]:
