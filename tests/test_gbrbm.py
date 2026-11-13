@@ -179,10 +179,27 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
             s_gaussian=torch.zeros(2, 2, dtype=torch.float64),
         )
 
-        self.assertEqual(random_sample.shape, (4, 4))
-        self.assertEqual(data_sample.shape, (4, 4))
+        # Burn-in discards the first 2 of 3 steps, keeping one step of 2 samples.
+        self.assertEqual(random_sample.shape, (2, 4))
+        self.assertEqual(data_sample.shape, (2, 4))
         self.assertFalse(hasattr(self.bm, "conditional_gibbs_sample"))
         self.assertFalse(hasattr(self.bm, "cd_gibbs_sample"))
+
+    def test_gibbs_sampling_discards_exactly_n_burnin_steps(self):
+        """Each burn-in step should remove one step of samples from the output."""
+        for n_burnin in range(4):
+            with self.subTest(n_burnin=n_burnin):
+                samples = self.bm.gibbs_sample(n_step=4, n_burnin=n_burnin, n_sample=3)
+                self.assertEqual(samples.shape, ((4 - n_burnin) * 3, 4))
+
+    def test_gibbs_sampling_rejects_invalid_arguments(self):
+        """Invalid burn-in or a missing initialization should raise ValueError."""
+        for n_burnin in (-1, 3, 4):
+            with self.subTest(n_burnin=n_burnin):
+                with self.assertRaises(ValueError):
+                    self.bm.gibbs_sample(n_step=3, n_burnin=n_burnin, n_sample=2)
+        with self.assertRaises(ValueError):
+            self.bm.gibbs_sample(n_step=3)
 
     def test_constructor_supports_bernoulli_visible_layout(self):
         """Non-Gaussian visible mode should still build Gaussian-first internals."""
