@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import time
 
 import torch
@@ -38,6 +39,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=0)
     return parser.parse_args()
+
+
+def save_checkpoint(checkpoint: Path, payload: dict) -> None:
+    """Publish a complete checkpoint after serialization succeeds."""
+    checkpoint = checkpoint.resolve()
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=checkpoint.parent, prefix=".qdeq-checkpoint-") as staging:
+        staged = Path(staging) / checkpoint.name
+        torch.save(payload, staged)
+        staged.replace(checkpoint)
 
 
 def main() -> None:
@@ -73,8 +84,7 @@ def main() -> None:
         f"test mse {test['mse']:.4f} mae {test['mae']:.4f} "
         f"(mean forward steps {test['steps']:.1f})"
     )
-    args.checkpoint.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({"state_dict": model.state_dict(), "sampler": args.sampler}, args.checkpoint)
+    save_checkpoint(args.checkpoint, {"state_dict": model.state_dict(), "sampler": args.sampler})
     print(f"saved {args.checkpoint}")
 
 
