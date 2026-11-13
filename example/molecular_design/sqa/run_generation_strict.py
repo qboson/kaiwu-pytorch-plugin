@@ -129,6 +129,17 @@ def atomic_csv(rows: List[Dict], path: Path, columns: List[str] | None = None) -
 
 def main() -> None:
     args = parse_args()
+    budget_hash = None
+    if args.solver == "sqa":
+        budget_file = os.environ.get("QC_SQA_BUDGET_FILE")
+        if not budget_file:
+            raise ValueError("--solver sqa requires QC_SQA_BUDGET_FILE")
+        try:
+            budget_hash = file_sha256(Path(budget_file))
+        except OSError as exc:
+            raise ValueError(
+                f"Cannot read QC_SQA_BUDGET_FILE '{budget_file}': {exc}"
+            ) from exc
     os.environ["QC_QUBO_SOLVER"] = args.solver
 
     from qc_mol_design.config import CFG, ATOM_FEATURE_SCHEMA
@@ -254,8 +265,9 @@ def main() -> None:
 
         quality = generation_quality_metrics(all_raw, train_smiles) if all_raw else {}
         meta = {
-            "protocol_version": 6,
-            "tuning_protocol": "sqa_cim_matched_observed_budget_v1",
+            "protocol_version": 6 if args.solver == "sqa" else 5,
+            "tuning_protocol": ("sqa_cim_matched_observed_budget_v1" if args.solver == "sqa"
+                                else "matched_integer_inputs_validity_selection_v1"),
             "hardware_adapted_objective": args.lambda_mode == "cim_precision",
             "property": args.prop,
             "solver": args.solver,
@@ -295,9 +307,16 @@ def main() -> None:
             "exploration_file_sha256": exploration_hash,
             "params": {
                 "max_feasibility_batches": int(os.environ.get("QC_MAX_FEASIBILITY_BATCHES", "1")),
-                "adaptive_budget_policy": "Frozen per-step observed CIM candidate counts; no SQA outcome-dependent resampling",
-                "sqa_schedule": "continuous-time PIMC, Hp=geometric automatic beta endpoints, Hd=geometric(2,0.001) then 0, Gamma=1",
-                "budget_file_sha256": file_sha256(Path(os.environ["QC_SQA_BUDGET_FILE"])),
+                "adaptive_budget_policy": (
+                    "Frozen per-step observed CIM candidate counts; no SQA outcome-dependent resampling"
+                    if args.solver == "sqa" else
+                    "Only acquire another batch when all candidates so far are invalid; record actual reads"
+                ),
+                "sqa_schedule": (
+                    "continuous-time PIMC, Hp=geometric automatic beta endpoints, Hd=geometric(2,0.001) then 0, Gamma=1"
+                    if args.solver == "sqa" else None
+                ),
+                "budget_file_sha256": budget_hash,
                 "spin_encoding": os.environ.get("QC_SPIN_ENCODING", "none"),
                 "candidate_selection_policy": os.environ.get("QC_CANDIDATE_SELECTION", "energy"),
                 "solver_repeats": int(os.environ.get("QC_SOLVER_REPEATS", "1")),
