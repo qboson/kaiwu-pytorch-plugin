@@ -111,6 +111,8 @@ QC_MODEL_SOURCE=cim_sa KPP_STATS_ENABLED=false \
   python -m unittest discover -s tests -p test_kpp_crbm.py -v
 ```
 
+在线性质计算使用 RDKit Contrib 的 `SA_Score.sascorer` 计算真实 SAS，包括以 QED／LogP 为目标的生成流程。若无法导入该模块，会抛出明确的 `ImportError`；请安装包含 `SA_Score` 的 RDKit。单个分子评分异常时，数据加载器将该行作为缺失性质丢弃，生成端性质计算返回 `None` 并排除命中统计，不使用重原子数近似分数。已有完整 `qed`、`logp`、`sas` 列的 CSV 可以直接加载，无需重新评分；后续生成仍需要 `SA_Score`。
+
 KPP 测试默认使用 `sqa` 源码，第二条测试命令单独验证 `cim_sa`；每套包含 8 项测试，另有 3 项 SQA 测试。CUDA 检查在无 GPU 时跳过。上述测试不初始化 Kaiwu 授权、不调用 CIM，也不需要原实验数据或模型。
 
 下列完整生成命令需要先准备表中对应的外部输入；SQA 控制器会按外部 `inputs.json` 检查数据、模型及参考分子的哈希。准备完成后，使用 SQA 重新生成全部轨迹：
