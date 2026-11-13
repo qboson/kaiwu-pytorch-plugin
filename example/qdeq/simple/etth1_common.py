@@ -68,7 +68,17 @@ def build_loaders(
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
         )
-    values = pd.read_csv(data_path).drop(columns=["date"]).to_numpy(dtype=np.float32)
+    frame = pd.read_csv(data_path)
+    dates = frame.pop("date")
+    if pd.api.types.is_numeric_dtype(dates):
+        # Synthetic fixtures can label each hour with a consecutive index.
+        step = 1
+    else:
+        dates = pd.to_datetime(dates, errors="coerce", utc=True)
+        step = pd.Timedelta(hours=1)
+    if dates.isna().any() or not dates.diff().iloc[1:].eq(step).all():
+        raise ValueError(f"{data_path}: date must contain consecutive hourly observations")
+    values = frame.to_numpy(dtype=np.float32)
     train = values[:TRAIN_ROWS]
     mean, std = train.mean(axis=0), train.std(axis=0) + 1e-8
     scaled = (values - mean) / std
