@@ -148,10 +148,12 @@ class EnergyModel(nn.Module):
         batched_states = []
         split_sizes = []
         for sample_index in range(visible_state.size(0)):
+            # Let the BM choose the work dtype and cast the conditioning state
+            # to it. Forcing the visible-state dtype here made a float32
+            # proposal fail when the energy BM had been migrated to float64.
             sampled_states = self.energy_bm.condition_sample(
                 self.sampler,
                 visible_state[sample_index : sample_index + 1],
-                dtype=visible_state.dtype,
             )
             batched_states.append(sampled_states)
             split_sizes.append(sampled_states.size(0))

@@ -88,6 +88,24 @@ class TestEnergyModel(unittest.TestCase):
         self.assertIsNotNone(visible_logits.grad)
         self.assertTrue(torch.all(visible_logits.grad > 0))
 
+    def test_sample_hidden_state_supports_float64_model(self):
+        """Condition states must follow the BM dtype, not the proposal dtype."""
+        model = EnergyModel(
+            bm_num_visible=2,
+            bm_num_hidden=2,
+            sampler=DummySampler(num_solutions=2),
+        ).double()
+        visible_state = torch.tensor([[0.25, 0.75]], dtype=torch.float32)
+
+        full_states, _ = model.sample_hidden_state(visible_state)
+
+        self.assertEqual(full_states.dtype, torch.float64)
+        torch.testing.assert_close(
+            full_states[:, :2],
+            visible_state.to(torch.float64).expand(2, -1),
+        )
+        self.assertEqual(model.energy_bm(full_states).dtype, torch.float64)
+
 
 if __name__ == "__main__":
     unittest.main()
