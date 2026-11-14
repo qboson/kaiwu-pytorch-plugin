@@ -45,6 +45,21 @@ def test_fine_tuning_without_hidden_layers():
     assert first_layer.in_features == x.shape[1]
 
 
+def test_verbose_fine_tuning_without_hidden_layers(capsys):
+    x, y = _data()
+    model = SupervisedDBNClassification(
+        hidden_layers_structure=[],
+        fine_tuning=True,
+        n_iter_backprop=1,
+        verbose=True,
+    )
+
+    model.fit(x, y)  # must not raise or call get_rbm_layer(0) on an empty stack
+
+    captured = capsys.readouterr().out
+    assert f"Input size: {x.shape[1]}" in captured
+
+
 def test_classifier_mode_without_hidden_layers_still_works():
     x, y = _data()
     model = SupervisedDBNClassification(
