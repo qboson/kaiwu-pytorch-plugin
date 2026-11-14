@@ -76,6 +76,14 @@ $$
 编码器将高维输入映射到低维潜在空间，而解码器尝试从潜在表示重构原始输入。
 每个模块提供 `get_weight_decay` 方法，用于在训练损失中显式加入权重正则项，以提升模型泛化能力并防止过拟合。
 
+`MnistQVAE` 将两个网络的正则项加入 VAE 损失：重建项和 KL 项按样本平均，
+网络正则项为 `weight_decay * (sum(W_encoder**2) + sum(W_decoder**2))`，
+覆盖所有线性层的权重，不包含网络偏置，也不再除以批大小。
+基类的 BM 正则项仍为 `weight_decay * (sum(W_bm**2) + 0.5 * sum(b_bm**2))`。
+两阶段训练中，VAE 优化器只更新编码器和解码器；BM 参数在独立的 `bm_loss` 阶段更新，
+该阶段不加入网络正则项。
+
+
 ### 2.1 编码器
 
 ```{literalinclude} ../../../../example/qvae_mnist/model/networks.py
