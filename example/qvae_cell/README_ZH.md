@@ -94,6 +94,8 @@ qvae_energy_by_celltype.png       # cell type energy 分布
 
 统一评估入口为 `evaluate_benchmark.py`，通过 `--metrics` 选择要运行的评估项：
 
+scIB 在数据副本上运行。如果已有 `X_pca`，则将其用作未整合的基线，并保留原始矩阵供后续 DPT 评估使用；选择 `--rep-key X_pca` 时也会评估该已有矩阵。如果没有 `X_pca`，scIB 会在副本上计算 PCA 基线。
+
 |评估方法|作用|
 |----|----|
 |clustering   |     Leiden 聚类指标：ARI, AMI, NMI, Homogeneity, FMI（越高越好）|
