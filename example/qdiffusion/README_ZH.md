@@ -73,6 +73,13 @@ factory helper 间接接入。
 
 如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
+`DPLMBackbone.from_pretrained(...)` 也支持标准 Hugging Face
+`EsmForMaskedLM.save_pretrained()` 重新导出的 safetensors 格式 DPLM ESM
+checkpoint（`dplm_type="dplm_esm"`）。当 `tie_word_embeddings=True` 且导出文件
+省略了共享的 LM decoder 权重时，加载器会从输入 embedding 恢复该权重。
+显式保存的 decoder 权重会被保留，包括配置仍带有 tie 标志的旧版原生 checkpoint。
+Hugging Face 可能在恢复前打印 decoder 未初始化的警告；返回的模型已使用恢复后的共享权重。
+
 它的端到端流程如下：
 
 1. 读取并过滤 FASTA 记录
