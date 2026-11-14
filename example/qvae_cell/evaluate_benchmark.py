@@ -11,6 +11,7 @@ Metric groups:
     DPT: Computes pseudotime and optional trajectory agreement with PCA.
 """
 
+# Modified: exclude non-finite pseudotimes from DPT counts and trajectory metrics.
 import argparse
 import os
 import tempfile
@@ -394,7 +395,7 @@ def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors):
         "rep_key": rep_key,
         "label_key": label_key,
         "root_cell_type": root_cell_type,
-        "n_cells_with_dpt": int(integrated_pt.notna().sum()),
+        "n_cells_with_dpt": int(np.isfinite(integrated_pt).sum()),
     }
 
     if "X_pca" in adata.obsm:
@@ -410,7 +411,7 @@ def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors):
         common = integrated.obs_names.intersection(baseline.obs_names)
         left = integrated_pt.loc[common]
         right = baseline_pt.loc[common]
-        valid = left.notna() & right.notna()
+        valid = np.isfinite(left) & np.isfinite(right)
         if valid.sum() >= 2:
             tau, _ = kendalltau(left[valid], right[valid])
             row["kendall_tau_vs_X_pca"] = tau
