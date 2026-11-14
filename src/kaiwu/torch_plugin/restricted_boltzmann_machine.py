@@ -84,6 +84,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
                 device=self.device,
+                dtype=self.quadratic_coef.dtype,
             )
             s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
@@ -101,8 +102,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Propagate hidden spins to the visible layer."""
         with torch.no_grad():
             s_all = torch.zeros(
-                s_hidden.size(0), self.num_hidden + self.num_visible
-            ).to(self.device)
+                s_hidden.size(0),
+                self.num_hidden + self.num_visible,
+                device=self.device,
+                dtype=self.quadratic_coef.dtype,
+            )
             s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
                 s_hidden @ self.quadratic_coef.t()
