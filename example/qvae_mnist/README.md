@@ -1,5 +1,8 @@
 # KPP QVAE MNIST Image Generation
 
+<!-- Modified: document the standalone offline CPU classifier entry. -->
+<!-- Modified: document original class labels and explicit output-width validation. -->
+
 This directory provides a Quantum Variational Autoencoder (Q-VAE)
 implementation for image generation on the MNIST dataset using
 `kaiwu-pytorch-plugin`. The workflow covers training a Q-VAE whose latent
@@ -51,6 +54,56 @@ qvae_mnist/
 ├── run_pipeline.py                # Command-line entry: QVAE + MLP pipeline
 └── run_pipeline.sh                # Example CLI invocation
 ```
+
+## Classify existing features without the quantum SDK
+
+The downstream MLP also accepts feature arrays that you already have. This
+classifier-only workflow does not import the quantum SDK or construct a QVAE.
+It still uses the example's plotting and image-helper dependencies:
+
+```bash
+python -m pip install torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install numpy scikit-learn tqdm matplotlib pandas gif imageio pillow 'torchmetrics[image]'
+cd example/qvae_mnist
+```
+
+For example, this small CPU workflow uses synthetic feature arrays and an
+existing output directory. Select a noninteractive backend before importing
+the classifier when no display is available:
+
+```python
+import os
+from pathlib import Path
+
+os.environ["MPLBACKEND"] = "Agg"
+import numpy as np
+from downstream import MLPClassifier
+
+features = np.array([[-1.0, -0.5]] * 12 + [[1.0, 0.5]] * 12, dtype=np.float32)
+labels = np.array([0] * 12 + [1] * 12, dtype=np.int64)
+output = Path("classifier_output")
+output.mkdir(exist_ok=True)
+classifier = MLPClassifier(
+    input_dim=2, hidden_dims=[4], output_dim=2, device="cpu",
+    epochs_mlp=2, batch_size_mlp=8, lr_mlp=0.01, random_state=7,
+    save_path=str(output),
+)
+classifier.fit(features, labels, validation_split=0.25)
+predictions = classifier.predict(features)
+probabilities = classifier.predict_proba(features)
+```
+
+Labels may be strings or nonconsecutive integers. `predict` returns the original
+labels, and column `i` of `predict_proba` corresponds to `classifier.classes_[i]`.
+Set `output_dim` to the number of distinct training labels. Its default remains
+10; `fit` now raises `ValueError` before training if that width does not match
+the observed class count.
+
+`fit` writes a model checkpoint and a training-curve PNG to `save_path`.
+Import `MLPClassifier` explicitly for this workflow. Requesting
+`get_full_pipeline` (including through `from downstream import *`) loads the
+real QVAE pipeline and still requires its quantum SDK dependencies. Sampler
+creation through `init_qvae_sampler` likewise retains the genuine SDK requirements.
 
 ## Datasets
 
