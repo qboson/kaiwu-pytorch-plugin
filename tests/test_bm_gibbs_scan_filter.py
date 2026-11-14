@@ -33,7 +33,7 @@ def reference(machine, sweeps, visible, batch=4):
 
 
 @pytest.mark.parametrize("sweeps", [0, 3])
-@pytest.mark.parametrize("clamped", [None, 3, 7])
+@pytest.mark.parametrize("clamped", [None, 0, 3, 7])
 def test_scan_filter_preserves_reference_samples_and_rng(sweeps, clamped):
     machine = model()
     torch.manual_seed(44)
