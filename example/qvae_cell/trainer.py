@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
+from scipy import sparse
 from torch.utils.data import DataLoader, TensorDataset
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
@@ -15,6 +16,19 @@ from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer, normalize_task_mo
 from kaiwu.torch_plugin import BoltzmannMachine
 
 from models import CellQVAE, QVAEDecoder, QVAEEncoder
+
+
+class _SparseBatchCollator:
+    """Materialize just the CSR rows requested by one DataLoader batch."""
+
+    def __init__(self, expression):
+        self.expression = expression
+
+    def __call__(self, samples):
+        row_ids, batch_ids = zip(*samples)
+        rows = torch.stack(row_ids).numpy()
+        values = np.asarray(self.expression[rows].toarray(), dtype=np.float32)
+        return torch.from_numpy(values), torch.stack(batch_ids)
 
 
 def set_seed(seed):
@@ -37,7 +51,9 @@ class Trainer:
         self.n_batches = 0
 
     def adata_to_array(self, adata):
-        """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
+        """准备表达矩阵；MSE 稀疏输入在取 batch 时转为 float32。"""
+        if self.args.loss_type == "mse" and sparse.issparse(adata.X):
+            return adata.X.tocsr()
         x = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
         x = np.asarray(x, dtype=np.float32)
         if self.args.loss_type == "mse":
@@ -64,22 +80,30 @@ class Trainer:
             test_size=self.args.val_percentage,
             random_state=self.args.seed,
         )
-        x_tensor = torch.tensor(x, dtype=torch.float32)
+        collate_fn = None
+        if sparse.issparse(x):
+            x_tensor = torch.arange(x.shape[0])
+            collate_fn = _SparseBatchCollator(x.tocsr())
+        else:
+            x_tensor = torch.tensor(x, dtype=torch.float32)
         batch_tensor = torch.tensor(batch_indices, dtype=torch.long)
         return (
             DataLoader(
                 TensorDataset(x_tensor[train_idx], batch_tensor[train_idx]),
                 batch_size=self.args.batch_size,
+                collate_fn=collate_fn,
                 shuffle=True,
             ),
             DataLoader(
                 TensorDataset(x_tensor[val_idx], batch_tensor[val_idx]),
                 batch_size=self.args.batch_size,
+                collate_fn=collate_fn,
                 shuffle=False,
             ),
             DataLoader(
                 TensorDataset(x_tensor, batch_tensor),
                 batch_size=self.args.batch_size,
+                collate_fn=collate_fn,
                 shuffle=False,
             ),
         )
