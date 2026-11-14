@@ -88,7 +88,9 @@ class TestBoltzmannMachine(unittest.TestCase):
                 # 测试在GPU上的计算
                 test_input = self.ones.to(device)
                 energy = self.bm(test_input)
-                self.assertEqual(energy.device, device)
+                # torch.device('cuda') satisfies neither == nor != against the
+                # resolved cuda:0 that tensors actually live on, so compare types.
+                self.assertEqual(energy.device.type, device.type)
 
     def test_gibbs_sample(self):
         """测试gibbs_sample采样功能"""
