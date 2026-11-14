@@ -77,9 +77,9 @@
    最终优化目标为加权组合：
 
   $$
-   \mathcal{L} = \alpha \cdot \text{KL\_divergence} + (1 - \alpha) \cdot \text{NCL}
+   \mathcal{L} = \alpha \cdot \text{KL\_divergence} + \beta \cdot \text{NCL}
   $$
-   其中 $\alpha$ 由 `cost_param["alpha"]` 控制，平衡生成能力与条件一致性。
+   其中 $\alpha$ 由 `cost_param["alpha"]` 控制，$\beta$ 由 `cost_param["beta"]` 控制，二者共同平衡生成能力与条件一致性。
 
 4. **多进程加速**  
    将一个 batch 的数据按进程数切分，每个子进程独立调用 `process_solve_graph` 执行正相采样与概率估计，结果合并后用于梯度计算。
