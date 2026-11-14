@@ -63,6 +63,15 @@ the larger experiment workflow.
 
 If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
 
+`DPLMBackbone.from_pretrained(...)` also accepts DPLM ESM checkpoints
+(`dplm_type="dplm_esm"`) re-exported with the standard Hugging Face
+`EsmForMaskedLM.save_pretrained()` safetensors format. If `tie_word_embeddings=True`
+and the export omits the shared LM decoder weight, the loader restores it from
+the input embedding. Explicitly saved decoder weights are preserved, including
+older native checkpoints whose config still has the tie flag set. Hugging Face
+may print a missing-decoder initialization warning before this restoration;
+the returned model uses the restored shared weight.
+
 Its end-to-end flow is:
 
 1. read and filter FASTA records

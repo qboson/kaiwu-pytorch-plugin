@@ -291,6 +291,29 @@ class _ModifiedEsmModel(EsmPreTrainedModel):
 class _EsmForDPLM(EsmPreTrainedModel):
     """Private masked-LM wrapper used by the example-side DPLM runtime."""
 
+    _tied_weights_keys = ["lm_head.decoder.weight"]
+
+    @classmethod
+    def from_pretrained(cls, *model_args, **kwargs):
+        """Restore an omitted shared projection without changing explicit weights.
+
+        Some safetensors exports omit the LM projection when it shares the input
+        embedding. Historical DPLM exports can instead contain two independent
+        weights while retaining the default ``tie_word_embeddings=True`` flag.
+        Keep any explicit projection; reconstruct only an absent shared weight.
+        """
+        return_loading_info = kwargs.pop("output_loading_info", False)
+        model, loading_info = super().from_pretrained(
+            *model_args, output_loading_info=True, **kwargs
+        )
+        decoder_key = "lm_head.decoder.weight"
+        if model.config.tie_word_embeddings and decoder_key in loading_info["missing_keys"]:
+            model.lm_head.decoder.weight = model.get_input_embeddings().weight
+            loading_info["missing_keys"].remove(decoder_key)
+        if return_loading_info:
+            return model, loading_info
+        return model
+
     def __init__(self, config, dropout=0.1):
         super().__init__(config)
         tokenizer = AutoTokenizer.from_pretrained(config._name_or_path)
