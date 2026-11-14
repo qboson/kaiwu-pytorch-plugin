@@ -80,4 +80,6 @@ def train_classifier(n_iter=2, use_cim=False):
         % (classification_report(y_test, log_pred))
     )
     print(f"Test Accuracy: {log_acc:.4f}")
-    return rbm, y_test, log_pred
+    # Return the RBM-feature pipeline predictions (the notebook labels the
+    # confusion matrix built from this value as "RBM Features").
+    return rbm, y_test, pip_pred
