@@ -4,7 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validated_parameter,
+    _validated_size,
+)
 
 
 class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -18,9 +22,16 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,
             shape is [num_visible, num_hidden]
 
-        linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_hidden]
+        linear_bias (torch.FloatTensor, optional): linear bias, shape is
+            [num_visible + num_hidden]
 
         device (torch.device, optional): Device to construct tensors.
+
+    Raises:
+        ValueError: If ``num_visible`` or ``num_hidden`` is not an integer
+            or not positive, or if a supplied parameter tensor has the
+            wrong shape.
+        TypeError: If a supplied parameter is not a ``torch.Tensor``.
     """
 
     def __init__(
@@ -32,6 +43,14 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         device=None,
     ):
         super().__init__(device=device)
+        num_visible = _validated_size("num_visible", num_visible)
+        num_hidden = _validated_size("num_hidden", num_hidden)
+        _validated_parameter(
+            "quadratic_coef", quadratic_coef, (num_visible, num_hidden)
+        )
+        _validated_parameter(
+            "linear_bias", linear_bias, (num_visible + num_hidden,)
+        )
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
