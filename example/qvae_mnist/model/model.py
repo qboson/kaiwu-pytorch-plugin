@@ -84,6 +84,15 @@ class MnistQVAE(QVAE):
             weight_decay=self.weight_decay
         )  # 输出 logits
 
+    def _weight_decay_loss(self):
+        """Add the MNIST networks' explicit L2 terms to the BM regularizer."""
+        loss = super()._weight_decay_loss()
+        for network in (self.encoder, self.decoder):
+            get_weight_decay = getattr(network, "get_weight_decay", None)
+            if callable(get_weight_decay):
+                loss = loss + get_weight_decay()
+        return loss
+
     def _create_bm(self):
         """
         Create RBM with visible and hidden units split from latent dimension.
