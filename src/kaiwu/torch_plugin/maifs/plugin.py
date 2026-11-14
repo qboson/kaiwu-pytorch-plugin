@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+from contextlib import nullcontext
 from math import ceil
 from threading import RLock
 
@@ -258,7 +259,10 @@ class FeatureSelectionWrapper(nn.Module):
         ``fit_weights`` does not itself change attention backends. PyTorch backend
         flags are process-global: these derivative calls serialize one another,
         but other concurrent PyTorch work can observe the temporary mathematical
-        backend. Unrelated backend contexts require caller coordination.
+        backend. CUDA models with registered recurrent modules also temporarily
+        disable cuDNN, whose recurrent kernels do not support these derivatives.
+        Other cuDNN settings are preserved. Unrelated backend contexts require
+        caller coordination.
 
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
@@ -304,7 +308,18 @@ class FeatureSelectionWrapper(nn.Module):
                 parameter.requires_grad_(False)
 
             try:
-                with sdpa_kernel(SDPBackend.MATH):
+                recurrent_backend = nullcontext()
+                if input_all.is_cuda and any(
+                    isinstance(module, nn.RNNBase) for module in self.model.modules()
+                ):
+                    recurrent_backend = torch.backends.cudnn.flags(
+                        enabled=False,
+                        benchmark=torch.backends.cudnn.benchmark,
+                        benchmark_limit=torch.backends.cudnn.benchmark_limit,
+                        deterministic=torch.backends.cudnn.deterministic,
+                        allow_tf32=torch.backends.cudnn.allow_tf32,
+                    )
+                with sdpa_kernel(SDPBackend.MATH), recurrent_backend:
                     continuous_mask = (
                         self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
                     )
