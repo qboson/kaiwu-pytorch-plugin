@@ -148,14 +148,14 @@ class CellQVAE(QVAE):
         )
         return torch.cat([zeta, batch_one_hot], dim=-1)
 
-    def _encode(self, x):
-        """按照配置的重构损失编码输入。
+    def _encode_logits(self, x):
+        """按照配置的重构损失编码输入，不采样后验分布。
 
         Args:
             x: 单细胞表达矩阵。
 
         Returns:
-            ``(q, posterior, zeta)``，分别为编码器 logits、后验分布和潜变量样本。
+            编码器 logits。
 
         Raises:
             ValueError: 配置了不支持的损失类型。
@@ -173,7 +173,11 @@ class CellQVAE(QVAE):
                 )
         else:
             raise ValueError(f"Unsupported loss type: {self.config.loss_type}")
-        q = self.encoder(encoder_x)
+        return self.encoder(encoder_x)
+
+    def _encode(self, x):
+        """Encode logits and sample the posterior for reconstruction."""
+        q = self._encode_logits(x)
         posterior, zeta = self.posterior(q, self.config.dist_beta)
         return q, posterior, zeta
 
@@ -195,7 +199,7 @@ class CellQVAE(QVAE):
         return recon_x, posterior, q, zeta
 
     def energy(self, x, loss_type):
-        """计算单细胞样本在 BM 潜空间中的能量。
+        """计算单细胞样本在 BM 潜空间中的能量，不采样平滑后验。
 
         Args:
             x: 单细胞表达矩阵。
@@ -209,5 +213,5 @@ class CellQVAE(QVAE):
         """
         if loss_type != self.config.loss_type:
             raise ValueError("loss_type must match model.config.loss_type")
-        q, _, _ = self._encode(x)
+        q = self._encode_logits(x)
         return self.bm((q > 0).float())
