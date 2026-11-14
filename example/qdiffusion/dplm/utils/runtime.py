@@ -88,10 +88,15 @@ def save_checkpoint(
 def load_trained_energy_weights(
     generator, checkpoint_path: str, device: str
 ) -> dict[str, Any]:
-    """Loads a compact energy-side checkpoint into one generator."""
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    """Restore existing energy modules from a CPU-staged checkpoint.
+
+    ``device`` remains accepted for compatibility; modules keep their devices.
+    Checkpoint tensors, including tensor-valued metadata, are loaded on CPU.
+    """
+    # Modified 2026-11-12: stage checkpoint tensors on CPU before copying state.
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
     state_dict = checkpoint["state_dict"]
-    # Rebuild exactly the energy-side modules we saved during training so rerun
+    # Restore the existing energy-side modules we saved during training so rerun
     # and evaluation use the same scorer weights as the best checkpoint.
     generator.energy_model.encoder.backbone.load_state_dict(state_dict["energy_encoder"])
     generator.energy_model.feature_projector.load_state_dict(
