@@ -107,6 +107,10 @@ $$
 模型结合了经典神经网络编码器/解码器与 RBM 或 BM 先验，通过最小化带权重衰减的负 ELBO 损失进行优化，并引入 KL 散度控制潜在分布与先验的对齐程度。实际运行时可通过 `--sampler-type sa` 或 `--sampler-type cim` 选择采样器。
 训练过程中记录各项损失指标并定期保存至文件。
 
+通过 `ModelTuner.load_model()` 加载权重时，先用 `register_model(model)` 注册已构建的模型，
+并将 `infile` 设为权重文件路径。权重会映射到该模型当前所在的设备，因此可以在 CPU
+上加载由 GPU 保存的权重。默认加载后切换到评估模式；`set_eval=False` 保留模型原有模式。
+
 命令行入口是 `example/qvae_mnist/run_pipeline.py`，它先调用 `loadMNIST` 展平数据，再由 `get_full_pipeline` 组装 QVAE 和 MLP 分类器：
 
 ```{code-block} bash
