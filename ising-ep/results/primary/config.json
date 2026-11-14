@@ -1,0 +1,1 @@
+{"anneal":{"alpha":0.95,"candidate_count":8,"cutoff_temperature":0.001,"initial_temperature":1.25,"iterations_per_t":10},"created_at_utc":"2026-09-30T14:20:14Z","model":{"n_classes":10,"n_hidden":64,"n_in":784,"n_output":40,"spins_per_class":4},"seeds":[0,1,2],"training":{"batch_size":10,"beta":1.0,"epochs":5,"lr":0.01}}

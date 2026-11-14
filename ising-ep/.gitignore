@@ -1,0 +1,49 @@
+# Virtual environments
+.venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Build and install artifacts
+*.egg-info/
+build/
+dist/
+
+# Test and tool caches
+.pytest_cache/
+
+# Experiment output and downloaded data
+runs/
+data/
+evidence/
+checkpoints/
+kaiwu-checkpoints/
+
+# Credentials and licenses: never commit these
+.env
+*.lic
+
+# Kaiwu wheels are licensed and stay local
+vendor/*.whl
+
+# Local workspace material that is not part of the package
+delivery/
+upstream/
+archive/ising-ep-kaiwu-delivery/
+archive/runs-alignment-h64-e5/
+.devin/
+
+# Kept locally. The submitted tree is src, tests, examples and the JSON results.
+docs/
+tools/
+records/
+.kiro/
+
+# Parameter snapshots and per-sample logs stay in local runs.
+results/**/*.npz
+results/**/dynamics.json
+results/**/predictions.json
+
+*.log
+.DS_Store
