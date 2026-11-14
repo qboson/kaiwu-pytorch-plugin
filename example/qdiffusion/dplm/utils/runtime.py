@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Any
 
 import torch
@@ -64,24 +65,29 @@ def save_checkpoint(
     epoch: int,
     metric: float,
 ) -> Path:
-    """Saves a compact checkpoint containing only energy-side weights."""
+    """Atomically saves a compact checkpoint containing only energy-side weights."""
     output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = output_dir / name
-    torch.save(
-        {
-            "epoch": epoch,
-            "metric": metric,
-            "metadata": _energy_backend_metadata(generator),
-            "state_dict": {
-                # Proposal weights are intentionally omitted because the current
-                # example treats proposal DPLM as a frozen upstream component.
-                "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
-                "feature_projector": generator.energy_model.feature_projector.state_dict(),
-                **_energy_backend_state(generator),
-            },
+    payload = {
+        "epoch": epoch,
+        "metric": metric,
+        "metadata": _energy_backend_metadata(generator),
+        "state_dict": {
+            # Proposal weights are intentionally omitted because the current
+            # example treats proposal DPLM as a frozen upstream component.
+            "energy_encoder": generator.energy_model.encoder.backbone.state_dict(),
+            "feature_projector": generator.energy_model.feature_projector.state_dict(),
+            **_energy_backend_state(generator),
         },
-        checkpoint_path,
-    )
+    }
+    temporary = NamedTemporaryFile(dir=checkpoint_path.parent, delete=False)
+    temporary_path = Path(temporary.name)
+    try:
+        with temporary:
+            torch.save(payload, temporary)
+        temporary_path.replace(checkpoint_path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
     return checkpoint_path
 
 
