@@ -421,7 +421,7 @@ class QDiffusion(nn.Module):
         """Creates the initial decoding state for an external generation loop.
 
         Args:
-            input_tokens: Initial token tensor.
+            input_tokens: Initial int32 or int64 token tensor; decoding preserves its dtype.
             partial_masks: Optional boolean mask of fixed positions.
             max_steps: Planned number of decode iterations.
             temperature: Sampling temperature stored in the state payload.
@@ -503,7 +503,7 @@ class QDiffusion(nn.Module):
         """Runs a complete iterative decoding loop inside the core class.
 
         Args:
-            input_tokens: Initial token tensor.
+            input_tokens: Initial int32 or int64 token tensor; decoding preserves its dtype.
             max_steps: Number of decode iterations to run.
             partial_masks: Optional boolean mask of fixed positions.
             temperature: Sampling temperature stored in the decode state.
@@ -562,7 +562,7 @@ class QDiffusion(nn.Module):
         """Builds the initial fully masked token state for decoding.
 
         Args:
-            input_tokens: Initial token tensor.
+            input_tokens: Initial int32 or int64 token tensor; decoding preserves its dtype.
             partial_masks: Optional boolean mask of fixed positions.
 
         Returns:
@@ -895,7 +895,7 @@ class QDiffusion(nn.Module):
         if not self.config.disable_resample:
             self._resample(selected_tokens, selected_scores, output_masks)
 
-        output_tokens.masked_scatter_(output_masks, selected_tokens[output_masks])
+        output_tokens.masked_scatter_(output_masks, selected_tokens[output_masks].to(output_tokens))
         output_scores.masked_scatter_(output_masks, selected_scores[output_masks])
 
         history = list(state["history"])
