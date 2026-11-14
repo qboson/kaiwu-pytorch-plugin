@@ -6,7 +6,6 @@ This module provides the Trainer class that handles data loading, model creation
 training loop, and result saving for QVAE models.
 """
 
-
 import os
 from datetime import datetime
 import torch
@@ -23,7 +22,11 @@ from model import Config, FeatureExtractor, MnistQVAE as QVAE
 from .model_tuner import ModelTuner
 
 from utils.loadMNIST import loadMNIST
-from utils.helpers import plot_MNIST_output, t_SNE, create_tsne_animation#, save_list_to_txt
+from utils.helpers import (
+    plot_MNIST_output,
+    t_SNE,
+    create_tsne_animation,
+)  # , save_list_to_txt
 from utils.logging import get_logger
 from utils.exception import ValueError, BuildError
 
@@ -47,9 +50,16 @@ class Trainer:
         self.custom_train_data = custom_train_data
         self.custom_test_data = custom_test_data
 
+        # 训练设备：由 config.use_cuda 决定，且必须与模型/数据保持一致
+        self.device = torch.device(
+            "cuda" if config.use_cuda and torch.cuda.is_available() else "cpu"
+        )
+
         # 输出目录
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.output_dir = config.output_dir or f"./output/{self.config.type}_{self.timestamp}"
+        self.output_dir = (
+            config.output_dir or f"./output/{self.config.type}_{self.timestamp}"
+        )
         os.makedirs(self.output_dir, exist_ok=True)
 
         # 内部组件
@@ -96,13 +106,13 @@ class Trainer:
         input_dim = self.train_loader.dataset[0][0].numel()
         logger.info(f"Input dimension: {input_dim}")
 
-        if self.config.type == 'QVAE':
+        if self.config.type == "QVAE":
             model = QVAE(
                 input_dimension=input_dim,
                 activation_fct=self.config.activation_fct,
-                config=self.config
+                config=self.config,
             )
-        elif self.config.type == 'CellQVAE':
+        elif self.config.type == "CellQVAE":
             model = CellQVAE(
                 input_dimension=input_dim,
                 activation_fct=self.config.activation_fct,
@@ -115,10 +125,11 @@ class Trainer:
             raise ValueError(f"Unsupported model type: {self.config.type}")
 
         model.create_networks()
+        model.to(self.device)
         self.model = model
         logger.info(f"Sampler created: {self.config.sampler_type}")
         logger.info(f"Model created: {self.config.type}")
-        if self.config.type in ['QVAE', 'CellQVAE']:
+        if self.config.type in ["QVAE", "CellQVAE"]:
             logger.info(f"BM created: {self.config.bm_type}")
         return model
 
@@ -220,18 +231,19 @@ class Trainer:
     def _save_reconstruction(self, epoch, input_data, output_data):
         """保存重建图像"""
         if isinstance(input_data, list):
-            x_true = input_data[0][:10].detach().numpy()
+            x_true = input_data[0][:10].detach().cpu().numpy()
         else:
-            x_true = input_data[:10].detach().numpy()
+            x_true = input_data[:10].detach().cpu().numpy()
 
         if isinstance(output_data, list):
-            x_recon = output_data[0][:10].detach().numpy()
+            x_recon = output_data[0][:10].detach().cpu().numpy()
         else:
-            x_recon = output_data[:10].detach().numpy()
+            x_recon = output_data[:10].detach().cpu().numpy()
 
         plot_MNIST_output(
-            x_true, x_recon,
-            output=os.path.join(self.output_dir, f"reconstruction_epoch_{epoch}.png")
+            x_true,
+            x_recon,
+            output=os.path.join(self.output_dir, f"reconstruction_epoch_{epoch}.png"),
         )
 
     def _plot_training_curve(self):

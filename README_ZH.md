@@ -6,6 +6,10 @@
 
 有关 Kaiwu-PyTorch-Plugin 的使用说明，请参考[**项目文档**](https://kaiwu-pytorch-plugin.readthedocs.io/zh-cn/latest/)。
 
+**第一次给 KPP 做贡献？** 建议先去[开物量子开发者社区](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)的「开源贡献社区」了解参与渠道，再从文档或示例里的一个小改动做起。
+
+如果 KPP 对你的开发有帮助，欢迎在 [GitHub 上点个 Star](https://github.com/qboson/kaiwu-pytorch-plugin)。
+
 ## 项目概览
 
 `Kaiwu-PyTorch-Plugin` 是一个基于 PyTorch 和 Kaiwu SDK 的量子计算编程套件。它支持在相干光量子计算平台上训练和评估 Restricted Boltzmann Machine（RBM）与 Boltzmann Machine（BM）。插件提供了易于使用的接口，便于研究人员和开发者快速实现能量模型的训练、验证与应用。
@@ -224,6 +228,20 @@ SDK Token: <your-sdk-token>
 ### 获取真机调用资格
 
 如果希望体验真实量子计算，请先在 [QBoson Platform](https://platform.qboson.com/) 注册账户，并根据文档中的联系方式联系官方人员申请真机配额。
+
+## 社区科研激励计划
+
+> 适用于对量子真机算力有需求的AI 开发者、科研人员。
+
+Kaiwu‑PyTorch‑Plugin(KPP) 面向量子原生AI、能量神经网络方向的科研与工程开发。
+
+我们推出**科研算力激励计划**：使用KPP和Kaiwu SDK进行开发、科研时，可享受**算力5折优惠计划（买N送N形式兑现）**。
+
+[查看申请条件并填写问卷](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)（问卷在页面底部）。
+
+申请简要条件：科研成果中引用或致谢 KPP 或Kaiwu SDK，填写问卷提交申请，通过后3个工作日内完成对接。
+
+联系邮箱：[developer@boseq.com](mailto:developer@boseq.com)
 
 ## 示例案例
 
