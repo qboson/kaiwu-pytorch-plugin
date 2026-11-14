@@ -150,3 +150,21 @@ scgraph
 ```
 pandas
 ```
+
+---
+
+### 表征学习：基于 QBM-VAE 的 Spike Sorting 特征提取
+
+该示例复现 Ardelean 等人（2023，PLOS ONE）的 spike sorting 特征提取研究，并将插件中的 QBM-VAE 与普通 AutoEncoder、Gaussian VAE 进行对比。数据包含论文使用的仿真数据集（79 点波形，峰值对齐到第 39 点）和 TINS 真实录制数据（`.ssd` 容器）；模型只使用波形训练，提取特征后用 k-means 聚类并计算论文中的六项聚类指标。
+
+运行 `python example/spike_sorting/run_experiment.py --data-dir <仿真数据目录> --simulations 1 4 16 35 --models ae vae qbmvae --epochs 100`。
+
+详细说明请参见 `example/spike_sorting/README.md`。
+
+**依赖项**
+
+```
+scikit-learn
+scipy
+```
+

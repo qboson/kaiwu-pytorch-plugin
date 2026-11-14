@@ -157,3 +157,25 @@ leidenalg
 scib_metrics
 scgraph
 ```
+
+---
+
+### Spike Sorting: Autoencoder Feature Extraction with QBM-VAE
+
+This example reproduces the spike-sorting feature-extraction study of Ardelean
+et al. (2023, PLOS ONE) and compares plain autoencoders and Gaussian VAEs with
+the plugin's QBM-VAE. It loads the paper's simulations (79-sample waveforms,
+peak aligned to sample 39) and the TINS real recording (`.ssd` container),
+trains each model on waveforms only, clusters the extracted features with
+k-means and reports the paper's six clustering metrics.
+
+Run `python example/spike_sorting/run_experiment.py --data-dir <simulations> --simulations 1 4 16 35 --models ae vae qbmvae --epochs 100`.
+
+For details, see `example/spike_sorting/README.md`.
+
+**Dependencies**
+```
+scikit-learn
+scipy
+```
+
