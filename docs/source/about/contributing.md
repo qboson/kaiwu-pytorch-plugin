@@ -2,6 +2,14 @@
 
 感谢你对 Kaiwu-PyTorch-Plugin 的关注。欢迎提交代码、文档、示例、测试和问题反馈。提交前，请先搜索现有的 [Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) 和 Pull Requests，避免重复工作。
 
+第一次参与开源贡献？欢迎查看[开物量子开发者社区](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)的「开源贡献社区」栏目，了解社区活动、开源项目和参与方式。
+
+## 科研算力激励
+
+使用 KPP 和 Kaiwu SDK 做开发或科研，需要量子真机算力的开发者和科研人员可申请 **算力五折优惠（买 N 送 N）**。
+
+申请者需在科研成果中引用或致谢 KPP 或 Kaiwu SDK，并通过[社区页面](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)底部的问卷提交申请。审核通过后，团队会在 3 个工作日内对接。如有疑问，请联系 [developer@boseq.com](mailto:developer@boseq.com)。
+
 ## 报告问题与提出建议
 
 请通过 [GitHub Issues](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues) 报告可复现的问题或提出功能建议。请提供所用的 Python、PyTorch、Kaiwu SDK 和 Kaiwu-PyTorch-Plugin 版本，以及最小复现步骤、实际结果和完整报错信息。

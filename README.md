@@ -6,6 +6,10 @@
 
 For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/).
 
+**First contribution to KPP?** Start with the [Kaiwu developer community](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community) to explore its open-source programs, then pick a small change to the documentation or an example.
+
+If KPP helps with your development work, consider giving it a [Star on GitHub](https://github.com/qboson/kaiwu-pytorch-plugin).
+
 ## Project Overview
 
 `Kaiwu-PyTorch-Plugin` is a quantum computing programming suite based on PyTorch and the Kaiwu SDK. It enables the training and evaluation of Restricted Boltzmann Machines (RBMs) and Boltzmann Machines (BMs) on coherent photonic quantum computers. The plugin provides easy-to-use interfaces, allowing researchers and developers to quickly implement the training and validation of energy-based neural network models and apply them to various machine learning development tasks.
@@ -219,6 +223,20 @@ The download and installation steps for other versions of the Kaiwu SDK are as f
 ### Obtain Real Quantum Machine Access
 
 To experience real quantum computing, please register an account on the [Qboson Platform](https://platform.qboson.com/) and contact the official staff via the contact information provided in the documentation to obtain a real-machine quota.  
+
+## Community Research Incentive Program
+
+> For AI developers and researchers who need computing resources on real quantum hardware.
+
+Kaiwu-PyTorch-Plugin (KPP) supports research and engineering in quantum-native AI and energy-based neural networks.
+
+Our **Research Computing Incentive Program** offers a **50% discount on computing resources (provided as a buy-N-get-N-free offer)** when using KPP and Kaiwu SDK for development and research.
+
+[View eligibility requirements and fill out the application form](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community) (the questionnaire is at the bottom of the page).
+
+Eligibility in brief: cite or acknowledge KPP or Kaiwu SDK in your research outputs and submit an application through the questionnaire. Coordination will be completed within 3 business days after approval.
+
+Contact: [developer@boseq.com](mailto:developer@boseq.com)
 
 ## Example Cases
 
