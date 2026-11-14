@@ -692,12 +692,15 @@ class RBMVisualizer:
         # 重构图像
         X_recon, recon_errors = rbm.reconstruct(X_sample, layer_index)
 
-        # 推断图像形状
+        # 推断图像形状：优先方形，无法整除时退化为接近方形的矩形
         if img_shape is None:
             n_features = X_sample.shape[1]
-            img_size = int(np.sqrt(n_features))
-            if img_size * img_size == n_features:
-                img_shape = (img_size, img_size)
+            if n_features <= 0:
+                raise ValueError("Cannot infer an image layout for zero features.")
+            rows = int(np.sqrt(n_features))
+            while rows > 1 and n_features % rows:
+                rows -= 1
+            img_shape = (rows, n_features // rows)
 
         # 创建图形
         fig, axes = plt.subplots(2, n_images, figsize=(2 * n_images, 4))
