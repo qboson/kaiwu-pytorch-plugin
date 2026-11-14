@@ -6,9 +6,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-import random
 from typing import Any
 
+import numpy as np
 import torch
 from torch.optim import AdamW
 from torch.utils.data import DataLoader, Dataset
@@ -62,7 +62,7 @@ def split_train_val_test(
         raise ValueError("Need at least 3 records to build train/val/test splits.")
 
     shuffled = list(records)
-    random.Random(seed).shuffle(shuffled)
+    np.random.default_rng(seed).shuffle(shuffled)
 
     val_size = max(1, int(len(shuffled) * val_ratio))
     test_size = max(1, int(len(shuffled) * test_ratio))
