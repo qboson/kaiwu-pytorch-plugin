@@ -28,11 +28,11 @@ def build_bm_sampler(
         return SimulatedAnnealingOptimizer(**default_kwargs)
 
     if sampler_type == "cim":
-        tmp_dir = sampler_kwargs.get("tmp_dir")
-        if tmp_dir:
-            # Some CIM runtimes require a checkpoint/cache directory before the
-            # optimizer can submit or resume remote jobs.
-            kw.common.CheckpointManager.save_dir = tmp_dir
+        # The CIM runtime requires a checkpoint/cache directory before the
+        # optimizer can be constructed, so fall back to the ``./tmp`` directory
+        # the other examples use when the caller does not provide one.
+        tmp_dir = sampler_kwargs.get("tmp_dir") or "./tmp"
+        kw.common.CheckpointManager.save_dir = tmp_dir
 
         task_mode = normalize_task_mode(sampler_kwargs.get("task_mode"))
 
