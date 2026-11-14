@@ -459,6 +459,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         else:
             # 没有预训练层时直接从输入维度接输出层（分类器模式已支持该配置）
             input_size = self.unsupervised_dbn.input_dim
+        network_input_size = input_size
 
         # 构建隐藏层（使用预训练权重初始化）
         for i in range(self.unsupervised_dbn._n_layers):  # 使用新的接口方法遍历层
@@ -483,7 +484,7 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
 
         if self.verbose:
             print(f"Built fine-tuning network with {len(layers)} layers")
-            print(f"Input size: {self.unsupervised_dbn.get_rbm_layer(0).num_visible}")
+            print(f"Input size: {network_input_size}")
             print(f"Output size: {len(self.classes_)}")
 
     def _train_fine_tune_network(self, X_tensor, y_tensor):
