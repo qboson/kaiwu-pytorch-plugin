@@ -1,6 +1,7 @@
 # Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
+# Modified: delegate sample image layout to the standalone NumPy utility.
 """
 Restricted Boltzmann Machine
 包含RBM的类  以及训练RBM+model/仅训练model的函数 训练RBM+model会保存训练过程中的似然值和预测准确率
@@ -25,6 +26,11 @@ from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.cim import CIMOptimizer
 from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
+
+if __package__:
+    from .digit_images import make_digit_strip
+else:
+    from digit_images import make_digit_strip
 
 
 def _ensure_result_dir():
@@ -85,17 +91,13 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         """
         生成图片
         Args:
-            X: 形状为 (20, size * size) 的数组
+            X: 形状为 (n_samples, size * size) 的数组
         Returns：
-            拼接后的大图像，形状为 (8, 20 * size)
+            拼接后的大图像，形状为 (size, n_samples * size)
         """
 
         plt.rcParams["image.cmap"] = "gray"
-        # 先将每个数字的特征向量还原为8x8图像
-        digits = X.reshape(20, size, size)  # 形状：(20, 8, 8)
-        # 将20个8x8的图片横向拼接
-        image = np.hstack(digits)  # 形状：(8, 160)
-        return image
+        return make_digit_strip(X, size)
 
     def fit(self, X, y=None):  # 修改接口以符合scikit-learn约定
         """
