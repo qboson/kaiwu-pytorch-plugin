@@ -155,9 +155,6 @@ examples/mnist_kaiwu/    The MNIST/100 experiment
 examples/digits_kaiwu/   sklearn Digits experiment and a backprop baseline
 tests/unit/              No SDK or credentials needed
 tests/integration/       Skipped automatically without the licensed SDK
-results/digits/          Digits main experiment: reference and tuned runs
-results/primary/         MNIST/100 three-seed run (read-only evidence)
-results/tuned/           MNIST/100 tuned runs
 ```
 
 Only `kaiwu_solver.py` touches the SDK, and it imports it lazily, so everything
@@ -325,10 +322,9 @@ layer first. The archived run predates this layout and uses the single-hidden
 names: `W`, `V`, `b_h`, `b_o` correspond to `weights.0`, `weights.1`, `biases.0`,
 `biases.1`, with identical values.
 
-What is committed under `results/` is `config.json`, `summary.json`, each seed's
-`status.json` and `test/metrics.json`, plus `epochs/<e>/validation.json` when a
-run used a validation split. Parameter snapshots, flip rates and per-sample
-predictions stay in the local `runs/` directory.
+Datasets and result files stay on the machine that produced them and are not part
+of the repository. A run still writes them under `results/` or the directory given
+to `--output`.
 
 Everything random derives from the seed, so a given `(seed, configuration)` pair
 reproduces bit for bit: initialization, the per-epoch shuffle, each sample's

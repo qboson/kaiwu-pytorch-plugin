@@ -109,9 +109,6 @@ examples/mnist_kaiwu/    MNIST/100 实验
 examples/digits_kaiwu/   sklearn Digits 实验与反向传播对照
 tests/unit/              不需要 SDK，也不需要凭证
 tests/integration/       没有授权 SDK 时自动跳过
-results/digits/          Digits 主实验：参考运行与调参运行
-results/primary/         MNIST/100 的三次种子运行（只读证据）
-results/tuned/           MNIST/100 的调参运行
 ```
 
 只有 `kaiwu_solver.py` 接触 SDK，而且是懒导入，所以其余部分在没有企业版 wheel 时也能导入和测试。
@@ -241,7 +238,7 @@ MNIST/100 是第二个实验。冒烟运行（一个种子，小网络，几分�
 
 `.npz` 文件保存 `weights.0 … weights.K` 和 `biases.0 … biases.K`，输入层在前。归档运行早于这个布局，用的是单隐层的旧名字：`W`、`V`、`b_h`、`b_o` 分别对应 `weights.0`、`weights.1`、`biases.0`、`biases.1`，数值相同。
 
-提交进 `results/` 的只有 `config.json`、`summary.json`、各种子的 `status.json` 和 `test/metrics.json`，以及带验证集的运行里每个 epoch 的 `validation.json`。参数快照、翻转率和逐样本预测留在本地的 `runs/`。
+数据和结果文件只留在本地，不进入仓库。一次运行仍会写到 `results/` 或 `--output` 指向的目录。
 
 所有随机量都从种子派生，因此给定的 `(种子, 配置)` 逐位复现：初始化、每个 epoch 的打乱、每个样本成对退火的种子，以及评估种子。
 

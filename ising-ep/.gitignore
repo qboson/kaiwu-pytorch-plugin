@@ -40,10 +40,8 @@ tools/
 records/
 .kiro/
 
-# Parameter snapshots and per-sample logs stay in local runs.
-results/**/*.npz
-results/**/dynamics.json
-results/**/predictions.json
+# Datasets and experiment results stay on the machine that produced them.
+results/
 
 *.log
 .DS_Store
