@@ -136,7 +136,7 @@ Clone the project from GitHub to your local machine:
 - Use JupyterLab Terminal for command-line work
 
 ```bash
-/home/jovyan/work
+cd /home/jovyan/work
 # All project files are already here; edit, run, and version them directly.
 ```
 This mounts your local repository into the container, so any changes you make locally will be reflected immediately inside Jupyter.
