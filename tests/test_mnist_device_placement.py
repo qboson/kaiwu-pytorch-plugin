@@ -129,6 +129,15 @@ def _trainer(
     )
 
 
+def test_trainer_rejects_empty_test_dataset_during_setup(tmp_path):
+    trainer = _trainer(tmp_path, use_cuda=False)
+    features, labels = _tiny_features(rows=0)
+    trainer.custom_test_data = features, labels
+
+    with pytest.raises(ValueError):
+        trainer._setup_data()  # pylint: disable=protected-access
+
+
 class TestTrainerDeviceResolution(unittest.TestCase):
     """Device flag resolution (runs on every machine)."""
 
