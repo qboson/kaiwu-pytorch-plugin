@@ -91,6 +91,9 @@ class Trainer:
                 num_evts_test=self.config.num_test_samples,
                 use_cuda=self.config.use_cuda
             )
+        if not self.test_loader:
+            raise ValueError("QVAE training requires at least one test sample")
+
         # 计算数据集均值
         total_sum = 0
         total_count = 0
