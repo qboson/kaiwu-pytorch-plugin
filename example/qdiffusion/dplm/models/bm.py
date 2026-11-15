@@ -13,6 +13,18 @@ from .common import DPLMFeatureEncoder, masked_mean_pool
 from .sampler import build_bm_sampler
 
 
+def _parameter_device(module: nn.Module, fallback: torch.Tensor) -> torch.device:
+    """Return the device of ``module``'s first parameter.
+
+    The device is reread on every call. A parameter-free module falls back to
+    ``fallback.device`` so an empty encoder does not raise ``StopIteration``.
+    """
+    parameter = next(module.parameters(), None)
+    if parameter is None:
+        return fallback.device
+    return parameter.device
+
+
 class BMConditionedEnergyModel(EnergyModel):
     """Conditioned BM reranker backed by one DPLM feature encoder."""
 
@@ -45,9 +57,16 @@ class BMConditionedEnergyModel(EnergyModel):
         candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
-        # Keep this helper explicit because it is the semantic bridge between
-        # sequence modeling and BM scoring: everything after this point operates
-        # on BM-space states rather than protein tokens.
+        """Pool noisy and candidate tokens into one BM-space feature.
+
+        Parent ``_apply`` moves the encoder without consulting
+        ``energy_bm.device``. Tokens and the mask follow the live encoder
+        parameters. Callers are not updated in place, and dtypes stay put.
+        """
+        encoder_device = _parameter_device(self.encoder, noisy_tokens)
+        noisy_tokens = noisy_tokens.to(device=encoder_device)
+        candidate_tokens = candidate_tokens.to(device=encoder_device)
+        attention_mask = attention_mask.to(device=encoder_device)
         noisy_hidden = self.encoder.encode_tokens(
             noisy_tokens,
             attention_mask=attention_mask,
@@ -66,13 +85,21 @@ class BMConditionedEnergyModel(EnergyModel):
         candidate_tokens: torch.Tensor,
         attention_mask: torch.Tensor,
     ) -> torch.Tensor:
-        # The projector turns one concatenated sequence feature into the visible
-        # part of the BM state before discretization/sampling steps.
+        """Project pooled features on the projector parameter device.
+
+        The projector can sit on a different device from the encoder, so the
+        pooled features are aligned here rather than to a cached device.
+        """
         conditioned_features = self.build_conditioned_features(
             noisy_tokens=noisy_tokens,
             candidate_tokens=candidate_tokens,
             attention_mask=attention_mask,
         )
+        projector_device = _parameter_device(
+            self.feature_projector,
+            conditioned_features,
+        )
+        conditioned_features = conditioned_features.to(device=projector_device)
         return self.feature_projector(conditioned_features)
 
     def score_conditioned(
