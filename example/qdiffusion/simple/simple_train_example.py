@@ -23,6 +23,7 @@ from torch.optim import AdamW
 ensure_repo_src_on_path()
 
 from dplm.utils.dplm_builder import build_qdiffusion
+from dplm.utils.runtime import parameter_device
 
 # Path and data helpers.
 
@@ -141,7 +142,7 @@ def main() -> None:
     )
     # ``targets`` is the only tensor the outer loop needs; ``objective(...)``
     # will create noisy states, sample candidates, and build the energy loss.
-    targets = encoded["input_ids"].to(generator.device)
+    targets = encoded["input_ids"].to(parameter_device(generator))
 
     optimizer = AdamW(
         [parameter for parameter in generator.parameters() if parameter.requires_grad],

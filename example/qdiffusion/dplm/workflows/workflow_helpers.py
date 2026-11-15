@@ -22,7 +22,7 @@ try:
         write_tsv_rows,
     )
     from ..utils.metrics import QualitySummary
-    from ..utils.runtime import encode_sequence, seed_torch
+    from ..utils.runtime import encode_sequence, parameter_device, seed_torch
 except ImportError:  # pragma: no cover - direct script-path compatibility
     from utils.io import (
         normalize_decoded_sequence,
@@ -31,7 +31,7 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         write_tsv_rows,
     )
     from utils.metrics import QualitySummary
-    from utils.runtime import encode_sequence, seed_torch
+    from utils.runtime import encode_sequence, parameter_device, seed_torch
 
 
 def select_records(
@@ -101,7 +101,7 @@ def build_data_loader_from_records(
         )
         return {
             "headers": headers,
-            "targets": encoded["input_ids"].to(generator.device),
+            "targets": encoded["input_ids"].to(parameter_device(generator)),
         }
 
     return DataLoader(
