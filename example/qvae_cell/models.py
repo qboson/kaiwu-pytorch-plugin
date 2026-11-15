@@ -148,8 +148,28 @@ class CellQVAE(QVAE):
         )
         return torch.cat([zeta, batch_one_hot], dim=-1)
 
+    def _encoder_parameter_device(self, fallback):
+        """返回编码器参数当前所在的设备。
+
+        父模块通过 ``_apply`` 搬移参数时不会调用 ``CellQVAE.to``。编码入口
+        读取活参数设备，而不是缓存的设备属性。编码器没有参数时退回
+        ``fallback`` 的设备。
+
+        Args:
+            fallback: 编码器没有参数时，用它的设备作为退路。
+
+        Returns:
+            编码器第一个参数的设备，或 ``fallback.device``。
+        """
+        parameter = next(self.encoder.parameters(), None)
+        if parameter is None:
+            return fallback.device
+        return parameter.device
+
     def _encode(self, x):
         """按照配置的重构损失编码输入。
+
+        输入会先对齐到编码器参数设备。调用方张量不会被原地修改。
 
         Args:
             x: 单细胞表达矩阵。
@@ -161,6 +181,7 @@ class CellQVAE(QVAE):
             ValueError: 配置了不支持的损失类型。
         """
         x = x.view(-1, self._input_dimension)
+        x = x.to(self._encoder_parameter_device(x))
         if self.config.loss_type == "mse":
             encoder_x = x
         elif self.config.loss_type == "bernoulli":
