@@ -70,7 +70,7 @@ def load_zinc12k(path: Optional[str] = None) -> pd.DataFrame:
     Load and validate the ZINC-12k molecular dataset.
 
     Returns a DataFrame with columns: smiles, qed, logp, sas.
-    Rows with invalid SMILES or NaN properties are dropped.
+    Rows with invalid or zero-atom SMILES, or NaN properties, are dropped.
     """
     from rdkit import Chem
 
@@ -111,9 +111,11 @@ def load_zinc12k(path: Optional[str] = None) -> pd.DataFrame:
         data = pd.concat([df[["smiles"]], prop_df], axis=1)
 
     # Validate SMILES and drop bad rows
-    valid_mask = data["smiles"].apply(
-        lambda s: Chem.MolFromSmiles(str(s)) is not None
-    )
+    def has_atoms(smiles):
+        mol = Chem.MolFromSmiles(str(smiles))
+        return mol is not None and mol.GetNumAtoms() > 0
+
+    valid_mask = data["smiles"].apply(has_atoms)
     data = data.loc[valid_mask].dropna(subset=["qed", "logp", "sas"])
     data = data.reset_index(drop=True)
     print(f"[LOADER] {len(data)} valid molecules loaded.")
