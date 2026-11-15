@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ising-ep-kaiwu"
+version = "2.0.0"
+description = "PyTorch equilibrium propagation on an Ising machine via the Kaiwu SDK"
+readme = "README.md"
+requires-python = "==3.10.*"
+dependencies = [
+  "numpy==2.2.6",
+  "scikit-learn==1.7.2",
+  "torch==2.7.0",
+]
+
+[project.optional-dependencies]
+# The wheel is distributed by the Kaiwu platform, not PyPI, so this extra only
+# resolves where that wheel is already installed or on a private index.
+# The integration tests have run on 1.3.1 and 1.4.1; 1.4.2 and 1.4.3 have not.
+kaiwu = ["kaiwu>=1.3.1,<=1.4.3"]
+dev = [
+  "pytest==8.3.5",
+  "pylint==3.3.7",
+  "pydocstyle[toml]==6.3.0",
+]
+
+# The importable package is src/ising_ep, so `src` itself is not a package.
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+# Makes `ising_ep`, `examples` and `tests` importable from a clean checkout, so
+# the suite runs before `pip install -e .` as well as after it.
+pythonpath = [".", "src"]
+markers = [
+  "integration: tests that require the licensed Kaiwu SDK",
+]
+
+[tool.pydocstyle]
+convention = "google"
+add_select = ["D213"]
+add_ignore = ["D202", "D203"]
+
+[tool.pylint.master]
+# docparams turns missing Args/Returns/Raises sections into errors instead of
+# letting a one-line summary pass as documentation.
+load-plugins = ["pylint.extensions.docparams"]
+ignore-paths = [".venv", "runs", "dist", "build"]
+extension-pkg-allow-list = ["torch"]
+
+[tool.pylint.parameter_documentation]
+accept-no-param-doc = false
+accept-no-return-doc = false
+accept-no-raise-doc = false
+accept-no-yields-doc = false
+default-docstring-type = "google"
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.basic]
+# Physics notation: Q is the QUBO matrix, W/V the couplings, H_h/H_o the fields.
+good-names = ["Q", "V", "W", "H_h", "H_o", "b_h", "b_o", "i", "j", "kw", "n", "x", "y", "_"]
+
+[tool.pylint.messages_control]
+disable = [
+  # The Kaiwu wheel is private, so its imports cannot be resolved statically.
+  "import-error",
+  "no-name-in-module",
+  # Kaiwu is imported lazily inside functions so the package works without it.
+  "import-outside-toplevel",
+  # Physics-style signatures genuinely carry many parameters, and a network spec
+  # genuinely carries many attributes.
+  "too-many-arguments",
+  "too-many-positional-arguments",
+  "too-many-locals",
+  "too-many-instance-attributes",
+  # A solver or a test double with one meaningful method is not a design smell.
+  "too-few-public-methods",
+]

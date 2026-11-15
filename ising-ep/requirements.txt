@@ -1,0 +1,12 @@
+# Python 3.10 only (Kaiwu SDK requirement).
+# Public runtime and development dependencies, pinned to the same versions as
+# pyproject.toml. The Kaiwu enterprise wheel is not on public PyPI; install the
+# downloaded cp310 wheel separately. Versions 1.3.1 through 1.4.3 are supported,
+# for example:
+#   .venv\Scripts\python.exe -m pip install vendor\kaiwu-1.4.1-cp310-none-win_amd64.whl
+numpy==2.2.6
+scikit-learn==1.7.2
+torch==2.7.0
+pytest==8.3.5
+pylint==3.3.7
+pydocstyle[toml]==6.3.0
