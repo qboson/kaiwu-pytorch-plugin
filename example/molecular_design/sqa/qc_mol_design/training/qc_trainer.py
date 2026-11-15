@@ -244,6 +244,7 @@ class QCTrainer:
 
         print(f"[{tag}] Training CRBM (QC-assisted SA) for {CFG.epochs} epochs ...")
 
+        n_validation = sum(len(batch[0]) for batch in valid_batches)
         best_val_difference = float("inf")
         best_state = None
         patience_counter = 0
@@ -278,10 +279,10 @@ class QCTrainer:
                     f = fp_batch.to(CFG.device)
                     y = y_batch.to(CFG.device)
                     val_differences.append(
-                        _reconstruction_free_energy_difference(self.crbm, y, f)
+                        _reconstruction_free_energy_difference(self.crbm, y, f) * len(y)
                     )
                 val_difference = float(
-                    sum(val_differences) / max(len(val_differences), 1)
+                    sum(val_differences) / max(n_validation, 1)
                 )
             epoch_info["val_free_energy_difference"] = val_difference
 
