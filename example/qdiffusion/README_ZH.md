@@ -73,6 +73,11 @@ factory helper 间接接入。
 
 如果你想看真正的实现链路，建议从 `dplm/workflows/train.py` 开始读。
 
+ESM 注意力补丁在训练时使用骨干配置中的 `attention_probs_dropout_prob`，
+在评估模式下关闭注意力 dropout，与 ESM 保持一致。该配置与控制隐藏状态
+dropout 的 `net.dropout` 不同。推理时应调用 `eval()`；仅使用
+`torch.no_grad()` 不会关闭 dropout。
+
 它的端到端流程如下：
 
 1. 读取并过滤 FASTA 记录
