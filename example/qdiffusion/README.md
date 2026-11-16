@@ -63,6 +63,11 @@ the larger experiment workflow.
 
 If you want to read the actual implementation chain, start from `dplm/workflows/train.py`.
 
+The DPLM network honors an explicit `attention_mask`, including when using
+conditioned `inputs_embeds`. If omitted, the mask is inferred from non-padding
+token IDs. Pass a mask with `1` for visible positions and `0` for positions to
+exclude from attention.
+
 Its end-to-end flow is:
 
 1. read and filter FASTA records
