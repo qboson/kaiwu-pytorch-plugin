@@ -402,10 +402,9 @@ class QDEQ(nn.Module):
         if cfg.jac_loss_vecs > 0:
             self.last_jac_loss = self.jacobian_loss(new_z, z_star, cfg.jac_loss_vecs)
         # 3. Replace the one-step gradient with the implicit-function gradient.
-        self._attach_implicit_backward(new_z, z_star)
-        return new_z
+        return self._attach_implicit_backward(new_z, z_star)
 
-    def _attach_implicit_backward(self, new_z: torch.Tensor, z_star: torch.Tensor) -> None:
+    def _attach_implicit_backward(self, new_z: torch.Tensor, z_star: torch.Tensor) -> torch.Tensor:
         """Replaces the gradient ``g`` reaching ``new_z`` by the solution of ``y = J^T y + g``.
 
         ``J = d new_z / d z_star``; this is the implicit function theorem
@@ -415,13 +414,13 @@ class QDEQ(nn.Module):
         Args:
             new_z: Layer output at the fixed point.
             z_star: Fixed point with ``requires_grad`` set.
+
+        Returns:
+            torch.Tensor: A copy of ``new_z`` carrying the implicit backward rule.
         """
         cfg = self.config
 
         def backward_hook(grad):
-            # The solver's vector-Jacobian products start at new_z again.
-            handle.remove()
-
             # y -> J^T y + g, evaluated with one vector-Jacobian product per call.
             def backward_map(y):
                 vjp = torch.autograd.grad(new_z, z_star, y, retain_graph=True, allow_unused=True)[0]
@@ -434,7 +433,13 @@ class QDEQ(nn.Module):
             # Autograd continues from new_z with the solved gradient.
             return solution
 
-        handle = new_z.register_hook(backward_hook)
+        # Internal VJPs start at new_z, before this separate node, so they do
+        # not re-enter the hook. Keep the hook for every external backward,
+        # without capturing its own output tensor in the closure. A clone also
+        # preserves the hook when a downstream operation modifies output in place.
+        output = new_z.clone()
+        output.register_hook(backward_hook)
+        return output
 
     def solve_fixed_point(
         self, func: Callable[[torch.Tensor], torch.Tensor], z0: torch.Tensor
