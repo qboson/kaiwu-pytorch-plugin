@@ -45,28 +45,37 @@ def reuse_exploration(Q, prepared, context):
 
 
 def previous_batch(Q, prepared, context, repeats, encoding, seed):
-    """Resume a whole matching batch under its original IDs, including pending calls."""
+    """Resume a batch only if one run ID covers all matching repeat inputs."""
     root = os.environ.get("QC_FIRST_BATCH_REUSE_DIR")
     if not root:
         return None
     records = {}
     for path in (Path(root) / "calls").glob("*/metadata.json"):
         meta = json.loads(path.read_text())
-        records[meta["context"]] = (path, meta)
-    namespaces = set()
+        records.setdefault(meta["context"], []).append((path, meta["run_id"]))
+    matching_repeats = []
     for repeat in range(repeats):
         key = context + f"_rep{repeat}"
         if key not in records:
             return None
-        path, meta = records[key]
-        old = np.load(path.with_name("input.npz"))
         encoded = encode_prepared(prepared, encoding, seed + repeat * 100000)
-        if not (np.array_equal(old["qubo"], Q) and
-                np.array_equal(old["ising"], physical_matrix(encoded["ising"], encoded))):
+        submitted = physical_matrix(encoded["ising"], encoded)
+        matching_runs = set()
+        for path, run_id in records[key]:
+            with np.load(path.with_name("input.npz"), allow_pickle=False) as old:
+                if np.array_equal(old["qubo"], Q) and np.array_equal(old["ising"], submitted):
+                    matching_runs.add(run_id)
+        if not matching_runs:
             return None
-        namespaces.add(meta["run_id"])
-    if len(namespaces) != 1:
+        matching_repeats.append(matching_runs)
+    namespaces = set.intersection(*matching_repeats) if matching_repeats else set()
+    if not namespaces:
         raise RuntimeError("Mixed run IDs in reusable batch")
+    if len(namespaces) > 1:
+        raise RuntimeError(
+            "Multiple matching run IDs in reusable batch. "
+            "Set QC_FIRST_BATCH_REUSE_DIR to a cache containing a single matching run."
+        )
     return root, namespaces.pop()
 
 
