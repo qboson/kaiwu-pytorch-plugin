@@ -135,14 +135,31 @@ def evaluate_fingerprint_predictor(
     model:       DirectPropertyMLP,
     test_fps:    np.ndarray,
     test_props:  np.ndarray,
+    *,
+    batch_size:  int | None = None,
 ) -> float:
-    """Return MAE on test set."""
-    device = CFG.device
+    """Return sample-weighted test MAE using bounded batches on the model device."""
+    targets = np.asarray(test_props)
+    if targets.ndim == 2 and targets.shape[1] == 1:
+        targets = targets[:, 0]
+    row_count = len(test_fps)
+    if row_count == 0 or targets.shape != (row_count,):
+        raise ValueError("test_props must contain one value per nonempty test fingerprint row")
+    batch_size = CFG.batch_size if batch_size is None else batch_size
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
+    parameter = next(model.parameters())
     model.eval()
-    fps_t  = torch.FloatTensor(test_fps).to(device)
+    absolute_error = 0.0
     with torch.no_grad():
-        preds = model(fps_t).cpu().numpy()
-    return float(np.abs(preds - test_props).mean())
+        for start in range(0, row_count, batch_size):
+            stop = start + batch_size
+            fingerprints = torch.as_tensor(
+                test_fps[start:stop], device=parameter.device, dtype=parameter.dtype
+            )
+            predictions = model(fingerprints).to(device="cpu", dtype=torch.float64).numpy()
+            absolute_error += np.abs(predictions - targets[start:stop]).sum()
+    return float(absolute_error / row_count)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
