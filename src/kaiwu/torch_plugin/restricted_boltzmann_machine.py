@@ -18,7 +18,13 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,
             shape is [num_visible, num_hidden]
 
-        linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_hidden]
+        linear_bias (torch.FloatTensor, optional): linear bias,
+            shape is [num_visible + num_hidden]. The first ``num_visible``
+            entries act on the visible layer and the remaining ones on the
+            hidden layer.
+
+        dtype (torch.dtype, optional): Data type for tensor construction.
+            Defaults to torch.float32.
 
         device (torch.device, optional): Device to construct tensors.
     """
@@ -29,21 +35,26 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         num_hidden: int,
         quadratic_coef: torch.FloatTensor = None,
         linear_bias: torch.FloatTensor = None,
+        dtype: torch.dtype = torch.float32,
         device=None,
     ):
-        super().__init__(device=device)
+        super().__init__(device=device, dtype=dtype)
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
         self.quadratic_coef = torch.nn.Parameter(
-            quadratic_coef
-            if quadratic_coef is not None
-            else torch.randn((num_visible, num_hidden)).to(self.device) * 0.01
+            (
+                quadratic_coef
+                if quadratic_coef is not None
+                else torch.randn((num_visible, num_hidden)) * 0.01
+            ).to(dtype=self.dtype, device=self.device)
         )
         self.linear_bias = torch.nn.Parameter(
-            linear_bias
-            if linear_bias is not None
-            else torch.zeros(num_hidden + num_visible).to(self.device)
+            (
+                linear_bias
+                if linear_bias is not None
+                else torch.zeros(num_hidden + num_visible)
+            ).to(dtype=self.dtype, device=self.device)
         )
 
     @property
@@ -84,13 +95,16 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
                 device=self.device,
+                dtype=self.dtype,
             )
             s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
                 s_visible @ self.quadratic_coef + self.linear_bias[self.num_visible :]
             )
             if bernoulli:
-                s_all[:, self.num_visible :] = (prob > torch.rand_like(prob)).float()
+                s_all[:, self.num_visible :] = (prob > torch.rand_like(prob)).to(
+                    self.dtype
+                )
             else:
                 s_all[:, self.num_visible :] = prob
             return s_all
@@ -101,8 +115,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Propagate hidden spins to the visible layer."""
         with torch.no_grad():
             s_all = torch.zeros(
-                s_hidden.size(0), self.num_hidden + self.num_visible
-            ).to(self.device)
+                s_hidden.size(0),
+                self.num_hidden + self.num_visible,
+                device=self.device,
+                dtype=self.dtype,
+            )
             s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
                 s_hidden @ self.quadratic_coef.t()
@@ -110,7 +127,9 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             )
 
             if bernoulli:
-                s_all[:, : self.num_visible] = (prob > torch.rand_like(prob)).float()
+                s_all[:, : self.num_visible] = (prob > torch.rand_like(prob)).to(
+                    self.dtype
+                )
             else:
                 s_all[:, : self.num_visible] = prob
             return s_all
@@ -134,7 +153,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Convert the Restricted Boltzmann Machine to Ising format."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
-            ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+            ising_mat = torch.zeros(
+                (num_nodes + 1, num_nodes + 1),
+                device=self.device,
+                dtype=self.dtype,
+            )
             # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
                 self.quadratic_coef / 8
