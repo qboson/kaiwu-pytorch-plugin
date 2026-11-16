@@ -238,10 +238,14 @@ def run_generation_over_records(
 
     for index, (header, sequence) in enumerate(records, start=1):
         target_tokens = encode_sequence(generator, sequence, max_length=None)
-        seed_torch(seed_base + index)
+        seed = seed_base + index
+        seed_torch(seed)
 
         with torch.no_grad():
             objective_outputs = generator.objective({"targets": target_tokens})
+            # Keep decode randomness independent of the diagnostic objective's
+            # corruption and candidate draws (which differ across model arms).
+            seed_torch(seed)
             generated_tokens = generator.generate(target_tokens, max_steps=max_steps)
 
         decoded_output = generator.tokenizer.batch_decode(
