@@ -101,8 +101,9 @@ python run_pipeline.py \
 
 ## Outputs
 
-Results are written under `--output-dir` (or
-`./output/<TYPE>_<timestamp>` by default):
+The command-line pipeline writes to `--output-dir` or to
+`./output/pipeline_<timestamp>` when the option is omitted. A notebook that
+calls `Trainer` directly defaults to `./output/<TYPE>_<timestamp>`.
 
 ```text
 qvae_training_curve.png          # Train/test loss curves
