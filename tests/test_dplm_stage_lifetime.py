@@ -26,7 +26,7 @@ def test_workflow_releases_models_between_stages_and_evaluates_inference(tmp_pat
 
     def build(*args, **kwargs):
         retained_counts.append(sum(ref() is not None for ref in references))
-        model = nn.Linear(2, 2)
+        model = nn.Linear(2, 2).eval()
         references.extend((weakref.ref(model), weakref.ref(model.weight)))
         return model
 

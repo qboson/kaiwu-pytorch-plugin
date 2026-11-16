@@ -298,7 +298,7 @@ def main() -> None:
         config,
         device=device,
         num_candidates=1,
-    ).eval()
+    )
     # Before spending time on training, verify that one real sequence can pass
     # through both ``objective`` and ``generate`` without shape/wiring issues.
     validation_summary = run_structural_validation(
@@ -452,7 +452,7 @@ def main() -> None:
         config,
         device=device,
         num_candidates=1,
-    ).eval()
+    )
     # The baseline branch keeps the proposal path only; it gives us a direct
     # comparison point for how much the learned BM reranker helps.
     baseline_records, _ = run_generation_over_records(
@@ -475,7 +475,7 @@ def main() -> None:
         disable_resample=config.generate.disable_resample,
         resample_ratio=config.generate.resample_ratio,
         resample_top_p=config.generate.resample_top_p,
-    ).eval()
+    )
     # Guided generation reloads only the trained energy-side weights onto a
     # fresh generator instance so inference mirrors rerun/eval behavior.
     load_trained_energy_weights(guided_generator, str(best_checkpoint_path), device)
