@@ -7,3 +7,8 @@ Single-cell representation learning with a quantum variational autoencoder (QVAE
 **Example**: `example/qvae_cell/train_qvae_cell.ipynb` · `example/qvae_cell/evaluate_benchmark.py`
 
 **Data**: [Kaggle immune-data](https://www.kaggle.com/datasets/redwoodz/immune-data)
+
+
+## Batch-condition precision
+
+The cell decoder casts batch one-hot conditions to the latent tensor dtype and device before concatenation. This avoids promoting half or bfloat16 latent inputs to float32. This does not change the separate QVAE posterior or BM sampling precision behavior.
