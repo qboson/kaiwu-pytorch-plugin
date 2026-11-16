@@ -127,8 +127,8 @@ class Trainer:
             only_feasible_solution=False,
         )
 
-    def create_model(self, input_dim, train_loader):
-        """根据数据维度和命令行参数创建 CellQVAE 及两个优化器。"""
+    def create_model(self, input_dim, train_loader, *, inference=False):
+        """创建 CellQVAE。仅推理时跳过采样器和优化器的初始化。"""
         if self.args.latent_dim != self.args.num_visible + self.args.num_hidden:
             raise ValueError("latent_dim must equal num_visible + num_hidden")
 
@@ -160,12 +160,14 @@ class Trainer:
             encoder=encoder,
             decoder=decoder,
             bm=BoltzmannMachine(self.args.latent_dim, device=self.device),
-            sampler=self.create_sampler(),
+            sampler=None if inference else self.create_sampler(),
             n_batches=self.n_batches,
         ).to(self.device)
         mean_x = self.compute_mean_x(train_loader)
         model.set_dataset_mean(mean_x)
         model.set_train_bias(mean_x)
+        if inference:
+            return model.eval(), None, None
         # VAE 部分和 BM 部分分开优化，便于使用不同学习率和更新目标。
         vae_optimizer = torch.optim.Adam(
             list(model.encoder.parameters()) + list(model.decoder.parameters()),
