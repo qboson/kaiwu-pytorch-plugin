@@ -102,8 +102,13 @@ def main():
     packages = {name: importlib.metadata.version(name)
                 for name in ("dwave-samplers", "dimod", "numpy", "torch", "rdkit")}
     inputs = json.loads((ROOT / "inputs.json").read_text())
+    dataset_path = ROOT / "zinc250k.csv"
     for item in ("dataset", "checkpoint", "references"):
         path = ROOT / inputs[item]["path"]
+        if item == "dataset" and path.resolve() != dataset_path.resolve():
+            raise ValueError(
+                f"Dataset path in inputs.json must resolve to {dataset_path}, got {path}"
+            )
         if not path.is_file():
             raise FileNotFoundError(f"Required input missing: {path}; see README.md")
         if sha(path) != inputs[item]["sha256"]:
@@ -111,7 +116,7 @@ def main():
     manifest = {"config": config, "scope": args.scope, "n_explore": 10, "n_optimize": n_opt,
                 "conditions": conditions, "checkpoint_sha256": sha(ROOT / config["checkpoint"]),
                 "references_sha256": sha(ROOT / config["reference_manifest"]),
-                "dataset_sha256": sha(ROOT / "zinc250k.csv"),
+                "dataset_sha256": sha(dataset_path),
                 "files_sha256": {str(p.relative_to(ROOT)): sha(p) for p in paths},
                 "data_loading": "Validate once in parent, fork read-only frame; same loader and split per child",
                 "no_cim_calls": True, "no_sa_execution": True, "package_versions": packages}
@@ -147,7 +152,7 @@ def main():
     from qc_mol_design.data import load_zinc12k
     save(base / "progress.json", {"status": "loading_inputs", "pid": os.getpid(),
                                  "completed_conditions": len(done), "total_conditions": len(conditions)})
-    DATA = load_zinc12k(path=str(ROOT / "zinc250k.csv"))
+    DATA = load_zinc12k(path=str(dataset_path))
     started = time.time()
     failures, active = [], {}
     with ProcessPoolExecutor(max_workers=min(args.workers, len(pending)),
