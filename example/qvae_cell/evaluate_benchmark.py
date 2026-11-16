@@ -22,7 +22,7 @@ import scanpy as sc
 from scipy.stats import kendalltau
 from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit, train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 VALID_METRICS = ("clustering", "classification", "scib", "scgraph", "dpt")
@@ -264,7 +264,9 @@ def evaluate_scgraph(
     return result.reset_index(drop=True)
 
 
-def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_iter):
+def evaluate_classifier(
+    adata, rep_key, label_key, test_size, random_state, max_iter, *, group_key=None
+):
     """Train a downstream classifier on the embedding.
 
     This metric group answers: are known cell-type labels linearly recoverable
@@ -275,9 +277,10 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
         adata: AnnData object with an embedding in ``adata.obsm``.
         rep_key: Embedding key, such as ``X_qvae``.
         label_key: ``adata.obs`` column with cell-type labels.
-        test_size: Fraction of cells held out for testing.
+        test_size: Fraction of cells held out, or fraction of groups if group_key is given.
         random_state: Random seed for splitting and classifier fitting.
         max_iter: Maximum iterations for logistic regression.
+        group_key: Optional ``adata.obs`` column whose groups must stay in one split.
 
     Returns:
         One-row DataFrame with accuracy, weighted precision, weighted recall,
@@ -288,14 +291,27 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
     encoder = LabelEncoder()
     y = encoder.fit_transform(labels)
 
-    stratify = y if np.min(np.bincount(y)) >= 2 else None
-    x_train, x_test, y_train, y_test = train_test_split(
-        x,
-        y,
-        test_size=test_size,
-        random_state=random_state,
-        stratify=stratify,
-    )
+    group_summary = {}
+    if group_key is None:
+        stratify = y if np.min(np.bincount(y)) >= 2 else None
+        x_train, x_test, y_train, y_test = train_test_split(
+            x, y, test_size=test_size, random_state=random_state, stratify=stratify
+        )
+    else:
+        require_key(adata.obs, group_key, "adata.obs")
+        groups, unique_groups = pd.factorize(adata.obs[group_key])
+        if (groups < 0).any() or len(unique_groups) < 2:
+            raise ValueError(f"{group_key!r} needs at least two groups and no missing values")
+        splitter = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=random_state)
+        train, test = next(splitter.split(x, y, groups=groups))
+        x_train, x_test, y_train, y_test = x[train], x[test], y[train], y[test]
+        if np.unique(y_train).size < 2:
+            raise ValueError("Group holdout training split contains fewer than two cell types")
+        group_summary = {
+            "group_key": group_key,
+            "n_train_groups": len(np.unique(groups[train])),
+            "n_test_groups": len(np.unique(groups[test])),
+        }
     scaler = StandardScaler()
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
@@ -317,6 +333,7 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
                 "label_key": label_key,
                 "classifier": "logistic_regression",
                 "test_size": test_size,
+                **group_summary,
                 "accuracy": metrics.accuracy_score(y_test, y_pred),
                 "precision_weighted": metrics.precision_score(
                     y_test, y_pred, average="weighted", zero_division=0
@@ -450,6 +467,8 @@ def make_long_summary(results, label_key):
 
     summary = summary.rename(columns={"metric_group": "task"})
     id_columns = ["task", "rep_key", "label_key", "resolution", "classifier"]
+    if "group_key" in summary:
+        id_columns.append("group_key")
     for column in id_columns:
         if column not in summary:
             summary[column] = np.nan
@@ -508,6 +527,10 @@ def main():
     )
     parser.add_argument("--root-cell-type", default=None)
     parser.add_argument("--classifier-test-size", type=float, default=0.2)
+    parser.add_argument(
+        "--classifier-group-key",
+        help="Keep all cells from one obs group (e.g. donor) in one classifier split",
+    )
     parser.add_argument("--classifier-max-iter", type=int, default=1000)
     parser.add_argument("--scib-n-jobs", type=int, default=6)
     parser.add_argument("--scgraph-trim-rate", type=float, default=0.05)
@@ -554,6 +577,7 @@ def main():
             args.classifier_test_size,
             args.random_state,
             args.classifier_max_iter,
+            group_key=args.classifier_group_key,
         )
         save_result(
             classifier_df,
