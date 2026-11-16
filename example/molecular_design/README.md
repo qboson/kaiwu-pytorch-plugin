@@ -94,6 +94,9 @@ CIM 与 SQA 的逐步候选数一致；SA 使用更高预算。SQA 预先采用 
 python scripts/verify_results.py
 ```
 
+如果原始文件保存在仓库以外，可用 `python scripts/verify_results.py --artifact-root /path/to/artifacts`，
+其中指定目录包含 `results/` 子目录。
+
 核验包含三方法各 25,000 步、CIM／SQA 的逐步候选数、命中标签及全量／分段统计；不执行采样或重新计算分子性质。
 
 原实验版本为 Python 3.10.20、PyTorch 2.6.0、RDKit 2026.3.2、Kaiwu 1.0.33a0、dwave-samplers 1.8.0。本次在该环境中加载上述真实 KPP 源码，验证模型与本地采样接口。KPP 当前声明的依赖为 PyTorch 2.7.0、NumPy 2.2.6、Kaiwu 1.3.1；本次未验证该完整依赖组合及其 CIM 硬件接口。
