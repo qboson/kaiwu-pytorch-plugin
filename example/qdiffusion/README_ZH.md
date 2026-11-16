@@ -62,6 +62,10 @@ factory helper 间接接入。
 
 ## dplm
 
+每条序列只生成一个候选时，可以向 `QDiffusion` 传入 `energy_model=None`，
+仅运行提议模型。ESM2 评估的基线使用此模式，只加载提议模型的权重。
+能量重排和训练仍需要能量模型。
+
 `dplm/` 目录包含蛋白案例相关的适配层和完整工作流：
 
 - `dplm/utils/dplm_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具

@@ -147,12 +147,13 @@ def build_generator_for_eval(
     disable_resample: bool = False,
     resample_ratio: float = 0.25,
     resample_top_p: float = 0.95,
+    proposal_only: bool = False,
 ):
     """Builds one generator for baseline or guided ESM2 evaluation."""
     return (
         build_qdiffusion(
             proposal_ckpt=config.proposal_ckpt,
-            energy_ckpt=config.energy_ckpt,
+            energy_ckpt=None if proposal_only else config.energy_ckpt,
             num_candidates=num_candidates,
             proposal_temperature=proposal_temperature,
             proposal_noise_scale=proposal_noise_scale,
@@ -428,6 +429,7 @@ def generate_candidate_fastas(
         config,
         device=device,
         num_candidates=1,
+        proposal_only=True,
     )
     run_generation_over_records(
         baseline_generator,
