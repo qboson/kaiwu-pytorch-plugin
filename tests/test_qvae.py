@@ -40,10 +40,12 @@ class DummyDecoder(torch.nn.Module):
 
 
 class DummySampler:
-    """Return a deterministic set of binary BM samples."""
+    """Return legal Ising spins that decode to deterministic zero BM samples."""
 
     def solve(self, ising_matrix):
-        return np.zeros((2, ising_matrix.shape[0]), dtype=np.float32)
+        spins = -np.ones((2, ising_matrix.shape[0]), dtype=np.float32)
+        spins[:, -1] = 1
+        return spins
 
 
 class DummyQVAE(QVAE):
