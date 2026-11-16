@@ -71,10 +71,11 @@ scipy
 通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
 **依赖**
 ```
-kaiwu==1.3.0
 pandas
 matplotlib
 ```
+
+请按照[安装指南](../docs/source/getting_started/installation.md)安装插件及其 Kaiwu SDK 依赖。
 
 ---
 

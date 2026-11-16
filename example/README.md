@@ -92,10 +92,11 @@ Run the training script via `example/bm_generation/train_bm.ipynb`, and execute 
 
 **Dependencies**:
 ```text
-kaiwu==1.3.0
 pandas
 matplotlib
 ```
+
+Install the plugin and its Kaiwu SDK dependency using the [Installation Guide](../docs/source/getting_started/installation.md).
 
 ---
 
