@@ -75,8 +75,8 @@ graph TB
 **Mapping Walkthrough:**
 
 1. **Model Logic:** BM/RBM holds `quadratic_coef` (W) and `linear_bias` (b,c)
-2. **Ising Conversion:** `_to_ising_matrix()` converts W,b,c into Ising J (coupling) and h (field) matrix
-3. **Sampling Interface:** `model.sample(sampler)` passes J,h to the sampler's `solve()` method
+2. **Ising Conversion:** `_to_ising_matrix()` combines the couplings and fields in a single augmented Ising matrix. The fields occupy the last row and column.
+3. **Sampling Interface:** `model.sample(sampler)` passes that matrix as the sole argument to `sampler.solve(ising_mat)`.
 4. **SDK Backend:**
     - Classical: `SimulatedAnnealingOptimizer`
     - Quantum: `CIMOptimizer`
