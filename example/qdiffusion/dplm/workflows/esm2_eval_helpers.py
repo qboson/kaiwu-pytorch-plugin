@@ -67,14 +67,6 @@ class DistanceSummary:
     max_l2_distance: float
 
 
-def maybe_limit_records(
-    records: list[tuple[str, str]], max_records: int | None
-) -> list[tuple[str, str]]:
-    if max_records is None:
-        return records
-    return records[:max_records]
-
-
 def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
     masked_sequence = "".join(["<mask>"] * sequence_length)
     encoded = generator.tokenizer.batch_encode_plus(

@@ -47,7 +47,6 @@ try:
         embed_sequences,
         evaluate_candidate_set,
         load_esm2_model,
-        maybe_limit_records,
         run_generation_over_records,
         write_report,
         write_rows_csv,
@@ -68,7 +67,6 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         embed_sequences,
         evaluate_candidate_set,
         load_esm2_model,
-        maybe_limit_records,
         run_generation_over_records,
         write_report,
         write_rows_csv,
@@ -521,9 +519,10 @@ def main() -> None:
 
     reference_records = [
         (header, normalize_sequence(sequence))
-        for header, sequence in read_fasta_records(config.reference_fasta)
+        for header, sequence in read_fasta_records(
+            config.reference_fasta, max_records=config.max_records
+        )
     ]
-    reference_records = maybe_limit_records(reference_records, config.max_records)
     print(
         f"Loaded {len(reference_records)} reference sequences from: {config.reference_fasta}"
     )
