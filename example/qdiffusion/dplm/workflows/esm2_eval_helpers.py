@@ -189,6 +189,12 @@ def embed_sequences(
         f"and pooling={pooling}"
     )
     batch_converter = alphabet.get_batch_converter()
+    residue_start = int(alphabet.prepend_bos)
+    residue_end = -1 if alphabet.append_eos else None
+    if pooling in {"cls", "bos"} and not alphabet.prepend_bos:
+        raise ValueError("BOS pooling requires an alphabet that prepends a BOS token")
+    if pooling == "eos" and not alphabet.append_eos:
+        raise ValueError("EOS pooling requires an alphabet that appends an EOS token")
     repr_layer = model.num_layers
     embeddings: dict[str, torch.Tensor] = {}
 
@@ -199,27 +205,26 @@ def embed_sequences(
                 for header, sequence in batch_records
             ]
             _, _, tokens = batch_converter(normalized_batch)
+            non_padding = tokens.ne(alphabet.padding_idx)
             tokens = tokens.to(device)
 
             outputs = model(tokens, repr_layers=[repr_layer], return_contacts=False)
             token_representations = outputs["representations"][repr_layer]
-            lengths = (tokens != alphabet.padding_idx).sum(dim=1)
-
-            for row_index, (header, sequence) in enumerate(normalized_batch):
-                seq_len = len(sequence)
-                if seq_len == 0:
+            for row_index, (header, _) in enumerate(normalized_batch):
+                token_positions = non_padding[row_index].nonzero(as_tuple=True)[0]
+                residue_positions = token_positions[residue_start:residue_end]
+                if residue_positions.numel() == 0:
                     raise ValueError(
                         f"Encountered empty sequence for header '{header}'."
                     )
 
-                residue_repr = token_representations[row_index, 1 : seq_len + 1]
+                row_representations = token_representations[row_index]
                 if pooling == "mean":
-                    pooled = residue_repr.mean(dim=0)
+                    pooled = row_representations[residue_positions].mean(dim=0)
                 elif pooling in {"cls", "bos"}:
-                    pooled = token_representations[row_index, 0]
+                    pooled = row_representations[0]
                 elif pooling == "eos":
-                    eos_index = int(lengths[row_index].item()) - 1
-                    pooled = token_representations[row_index, eos_index]
+                    pooled = row_representations[int(token_positions[-1])]
                 else:
                     raise ValueError(f"Unsupported pooling mode: {pooling}")
 
