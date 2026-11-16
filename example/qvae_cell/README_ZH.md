@@ -74,6 +74,10 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+使用与训练一致的模型参数、数据集和输出目录，添加 `--load-weights` 即可加载
+`immune_kpp_qvae_best.pth`，导出细胞表征和能量。此模式使用指定的 PyTorch
+设备，无需初始化采样器或取得 CIM 授权。
+
 ## 输出
 
 训练脚本会在 `--output-dir` 下生成：
