@@ -35,6 +35,18 @@ TABLE2_TARGETS = {
 }
 
 
+def parse_selection(value, convert=str):
+    """Parse a list of distinct conditions, or None to select every condition."""
+    if value == "all":
+        return None
+    selections = [convert(item.strip()) for item in value.split(",") if item.strip()]
+    if not selections:
+        raise argparse.ArgumentTypeError("selection must contain at least one value")
+    if len(set(selections)) != len(selections):
+        raise argparse.ArgumentTypeError("selection must not contain duplicate values")
+    return selections
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Strict 25-reference checkpoint-reuse generation"
@@ -53,11 +65,11 @@ def parse_args() -> argparse.Namespace:
         help="Immutable 25-reference JSON manifest",
     )
     parser.add_argument(
-        "--reference-ids", default="all",
+        "--reference-ids", default="all", type=parse_selection,
         help="'all' or comma-separated stable IDs such as R00,R01",
     )
     parser.add_argument(
-        "--bands", default="all",
+        "--bands", default="all", type=lambda value: parse_selection(value, int),
         help="'all' or comma-separated zero-based target-band indices",
     )
     parser.add_argument("--qubo-mode", default="strict",
@@ -173,21 +185,10 @@ def main() -> None:
     all_references = load_reference_manifest(
         manifest_path, test_df=test_df, expected_count=25
     )
-    requested_ids = None
-    if args.reference_ids != "all":
-        requested_ids = [
-            value.strip() for value in args.reference_ids.split(",")
-            if value.strip()
-        ]
-    references = select_references(all_references, requested_ids)
+    references = select_references(all_references, args.reference_ids)
 
     all_bands = TABLE2_TARGETS.get(args.prop, [CFG.target_range])
-    if args.bands == "all":
-        band_indices = list(range(len(all_bands)))
-    else:
-        band_indices = [
-            int(value) for value in args.bands.split(",") if value.strip()
-        ]
+    band_indices = list(range(len(all_bands))) if args.bands is None else args.bands
     invalid_bands = [
         index for index in band_indices
         if index < 0 or index >= len(all_bands)
