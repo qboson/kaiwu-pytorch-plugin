@@ -121,5 +121,60 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         self.assertFalse(s_all_nograd.requires_grad)
 
 
+
+
+class TestRBMConstructorContract(unittest.TestCase):
+    """构造期形状校验：文档中的 linear_bias 布局与代码约定必须一致。"""
+
+    def test_rejects_linear_bias_with_documented_but_wrong_shape(self):
+        # 回归：旧文档声称 linear_bias 形状为 [num_hidden]，按文档传参会
+        # 静默构造出首次 get_hidden/forward/_to_ising_matrix 即崩溃的模型。
+        with self.assertRaises(ValueError):
+            RBM(num_visible=6, num_hidden=4, linear_bias=torch.zeros(4))
+
+    def test_rejects_linear_bias_with_wrong_total_length(self):
+        with self.assertRaises(ValueError):
+            RBM(num_visible=6, num_hidden=4, linear_bias=torch.zeros(11))
+
+    def test_rejects_quadratic_coef_with_wrong_shape(self):
+        with self.assertRaises(ValueError):
+            RBM(num_visible=6, num_hidden=4, quadratic_coef=torch.zeros(6, 5))
+
+    def test_accepts_concatenated_linear_bias_layout(self):
+        visible_bias = torch.full((6,), -0.25)
+        hidden_bias = torch.full((4,), 0.5)
+        bm = RBM(num_visible=6, num_hidden=4,
+                 linear_bias=torch.cat([visible_bias, hidden_bias]))
+        s_visible = torch.rand(3, 6)
+        hidden_probs = bm.get_hidden(s_visible)[:, 6:]
+        expected = torch.sigmoid(s_visible @ bm.quadratic_coef + hidden_bias)
+        torch.testing.assert_close(hidden_probs, expected)
+
+    def test_ising_objective_optimum_matches_brute_force_energy(self):
+        import itertools
+        torch.manual_seed(0)
+        bm = RBM(num_visible=3, num_hidden=4)
+        with torch.no_grad():
+            bm.quadratic_coef.copy_(torch.randn(3, 4))
+            bm.linear_bias.copy_(torch.randn(7) * 0.5)
+        states = torch.tensor(
+            list(itertools.product([0.0, 1.0], repeat=7)), dtype=torch.float32)
+        with torch.no_grad():
+            energies = bm(states)
+        ising = torch.tensor(bm.get_ising_matrix(), dtype=torch.float64)
+        bits = torch.tensor(
+            list(itertools.product([0.0, 1.0], repeat=7)), dtype=torch.float64)
+        # 翻转全部自旋（含辅助自旋）不改变二次目标，固定 aux=+1 枚举即可，
+        # 解码必须遵循 AbstractBoltzmannMachine.sample 的 aux-spin 约定。
+        spins = torch.cat(
+            [2 * bits - 1, torch.ones(bits.shape[0], 1, dtype=torch.float64)], dim=1)
+        objective = torch.einsum("bi,ij,bj->b", spins, ising, spins)
+        solved_bits = bits[objective.argmax()]
+        solved_energy = bm(solved_bits.float().unsqueeze(0)).item()
+        self.assertAlmostEqual(
+            solved_energy, energies.min().item(), places=4,
+            msg="Ising 最优解能量应等于暴力枚举的模型能量最小值")
+
+
 if __name__ == "__main__":
     unittest.main()

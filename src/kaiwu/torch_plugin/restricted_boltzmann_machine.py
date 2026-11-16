@@ -18,7 +18,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         quadratic_coef (torch.FloatTensor, optional): quadratic coefficent,
             shape is [num_visible, num_hidden]
 
-        linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_hidden]
+        linear_bias (torch.FloatTensor, optional): linear bias laid out as
+            ``[visible bias; hidden bias]`` with shape
+            ``[num_visible + num_hidden]``; ``get_visible`` reads the visible
+            part from the head of this vector and ``get_hidden`` reads the
+            hidden part from the tail.
 
         device (torch.device, optional): Device to construct tensors.
     """
@@ -35,6 +39,20 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         self.num_visible = num_visible
         self.num_hidden = num_hidden
         self.num_nodes = num_visible + num_hidden
+        if quadratic_coef is not None and tuple(quadratic_coef.shape) != (
+            num_visible,
+            num_hidden,
+        ):
+            raise ValueError(
+                f"quadratic_coef must have shape ({num_visible}, {num_hidden}), "
+                f"got {tuple(quadratic_coef.shape)}."
+            )
+        if linear_bias is not None and tuple(linear_bias.shape) != (self.num_nodes,):
+            raise ValueError(
+                f"linear_bias must have shape ({self.num_nodes},) laid out as "
+                "[visible bias; hidden bias], "
+                f"got {tuple(linear_bias.shape)}."
+            )
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef
             if quadratic_coef is not None
