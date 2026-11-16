@@ -43,17 +43,19 @@ class CosineScheduleWithWarmup(LambdaLR):
         )
 
 
-def process_solve_graph_worker(params):
+def process_solve_graph_worker(params, *, suppress_logs=True):
     """子进程执行的具体采样逻辑。
 
     Args:
         params (tuple): 包含共享模型、采样器、可见层数据分片、输出维度、起始索引的元组。
+        suppress_logs (bool): 是否在采样进程中降低 SDK 日志级别。
 
     Returns:
         tuple: (state_v_chunk, state_vi_chunk) 采样后的张量结果。
     """
     bm_shared, sampler, s_visible_chunk, num_output = params
-    kw.common.set_log_level("ERROR")
+    if suppress_logs:
+        kw.common.set_log_level("ERROR")
     # 在不计算梯度的情况下进行采样
     with torch.no_grad():
         # 正相位采样 (Condition Sample)
@@ -165,7 +167,7 @@ class Trainer:
         Args:
             max_steps (int): 最大训练步数。
             save_path (str): 模型和日志的保存路径。
-            num_processes (int): 并行采样的进程数。默认为 1。
+            num_processes (int): 采样进程数。默认为 1，在当前进程中直接采样。
         """
         optimizer = torch.optim.Adam(
             self.bm_net.parameters(),
@@ -184,7 +186,7 @@ class Trainer:
         self.saver.save_info(self.bm_net, save_path, 0, 0.0)
 
         # 预先分配 Pool 以减少重复创建开销
-        pool = mp.Pool(processes=num_processes)
+        pool = None if num_processes == 1 else mp.Pool(processes=num_processes)
 
         while step < max_steps:
             for batch_data in self.data:
@@ -201,7 +203,9 @@ class Trainer:
                 # 2. 多进程并行正相位采样 (共享存储模式)
                 # 将本批次数据设为共享内存
                 self._sync_gpu_to_cpu()
-                cpu_data = batch_data.cpu().share_memory_()
+                cpu_data = batch_data.cpu()
+                if pool is not None:
+                    cpu_data.share_memory_()
 
                 # 按进程数切分数据
                 chunks = torch.chunk(cpu_data, num_processes)
@@ -214,7 +218,13 @@ class Trainer:
                 ]
 
                 # 并行执行采样
-                all_results = pool.map(process_solve_graph_worker, sd_args)
+                if pool is None:
+                    all_results = [
+                        process_solve_graph_worker(args, suppress_logs=False)
+                        for args in sd_args
+                    ]
+                else:
+                    all_results = pool.map(process_solve_graph_worker, sd_args)
 
                 # 3. 汇总结果并计算 Loss
                 kl_divergence = torch.tensor(0.0, device=state_all.device)
@@ -271,5 +281,6 @@ class Trainer:
                     t_now = time.time()
                     self.saver.save_info(self.bm_net, save_path, step, t_now - t_start)
 
-        pool.close()
-        pool.join()
+        if pool is not None:
+            pool.close()
+            pool.join()
