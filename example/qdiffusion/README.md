@@ -71,7 +71,7 @@ Its end-to-end flow is:
 4. tokenize sequences into `targets`
 5. call `generator.objective({"targets": ...})` inside the epoch loop
 6. optimize `energy_objective.mean()`, mainly training the energy reranking path
-7. save compact checkpoints containing `energy_encoder`, `feature_projector`, energy backend weights, `energy_head`, and `vocab_proj`
+7. save compact checkpoints containing `energy_encoder`, `feature_projector`, and `energy_bm`
 8. rebuild baseline and guided generators for test-time generation
 9. compare baseline vs guided outputs and write reports
 
