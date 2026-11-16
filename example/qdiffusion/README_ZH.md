@@ -76,7 +76,8 @@ factory helper 间接接入。
 它的端到端流程如下：
 
 1. 读取并过滤 FASTA 记录
-2. 将数据划分为 train / validation / test
+2. 按不同的序列划分训练集、验证集和测试集。仅在标题、空白或大小写上有差异的
+   记录留在同一组，划分比例按序列组计算。
 3. 构建一个 `Q-Diffusion` 生成器，proposal 侧使用 DPLM，energy 侧使用条件能量重排模块
 4. 将蛋白质序列 tokenize 为 `targets`
 5. 在 epoch 循环中调用 `generator.objective({"targets": ...})`

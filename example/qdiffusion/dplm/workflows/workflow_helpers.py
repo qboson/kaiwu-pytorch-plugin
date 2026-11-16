@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from itertools import chain
 from pathlib import Path
 import random
 from typing import Any
@@ -58,20 +59,25 @@ def split_train_val_test(
     test_ratio: float,
     seed: int,
 ) -> tuple[list[tuple[str, str]], list[tuple[str, str]], list[tuple[str, str]]]:
-    if len(records) < 3:
-        raise ValueError("Need at least 3 records to build train/val/test splits.")
+    """Partition sequence groups, keeping every record of a sequence together."""
+    groups: dict[str, list[tuple[str, str]]] = {}
+    for header, sequence in records:
+        key = "".join(sequence.split()).upper()
+        groups.setdefault(key, []).append((header, sequence))
+    if len(groups) < 3:
+        raise ValueError("Need at least 3 distinct sequences to build train/val/test splits.")
 
-    shuffled = list(records)
+    shuffled = list(groups.values())
     random.Random(seed).shuffle(shuffled)
 
     val_size = max(1, int(len(shuffled) * val_ratio))
     test_size = max(1, int(len(shuffled) * test_ratio))
     if val_size + test_size >= len(shuffled):
-        raise ValueError("Validation and test splits consumed every record.")
+        raise ValueError("Validation and test splits consumed every sequence group.")
 
-    val_records = shuffled[:val_size]
-    test_records = shuffled[val_size : val_size + test_size]
-    train_records = shuffled[val_size + test_size :]
+    val_records = list(chain.from_iterable(shuffled[:val_size]))
+    test_records = list(chain.from_iterable(shuffled[val_size : val_size + test_size]))
+    train_records = list(chain.from_iterable(shuffled[val_size + test_size :]))
     return train_records, val_records, test_records
 
 
