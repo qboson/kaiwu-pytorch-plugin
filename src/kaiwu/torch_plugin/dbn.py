@@ -88,11 +88,15 @@ class UnsupervisedDBN(nn.Module):
                 "Model not trained yet. Call mark_as_trained() after training."
             )
 
-        data_in = data_in.astype(np.float32)
+        data_in = np.asarray(data_in)
         for rbm in self.rbm_layers:
             with torch.no_grad():
                 hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
+                    torch.as_tensor(
+                        data_in,
+                        device=self.device,
+                        dtype=rbm.linear_bias.dtype,
+                    )
                 )
                 data_in = (
                     hidden_output[:, rbm.num_visible :].cpu().numpy()
@@ -177,7 +181,9 @@ class UnsupervisedDBN(nn.Module):
             device = rbm.device
 
         # Convert to PyTorch tensor
-        data_in = torch.FloatTensor(data_in).to(device)
+        data_in = torch.as_tensor(
+            data_in, device=device, dtype=rbm.linear_bias.dtype
+        )
 
         with torch.no_grad():
             # Get hidden representation using RBM's get_hidden
