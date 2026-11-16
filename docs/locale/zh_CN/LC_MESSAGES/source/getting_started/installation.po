@@ -321,9 +321,13 @@ msgid ""
 "SDK wheel from the QBoson platform:"
 msgstr "如果您需要特定版本或有网络限制，请从 QBoson 平台下载 SDK wheel："
 
-#: ../../source/getting_started/installation.md:190
-msgid "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
-msgstr "访问 QBoson 平台上的 <u>Kaiwu SDK 下载页面</u>"
+#: ../../source/getting_started/installation.md:210
+msgid ""
+"Visit the [Kaiwu SDK download page]"
+"(https://platform.qboson.com/sdkDownload) on the QBoson platform"
+msgstr ""
+"访问 QBoson 平台上的 [Kaiwu SDK 下载页面]"
+"(https://platform.qboson.com/sdkDownload)"
 
 #: ../../source/getting_started/installation.md:191
 msgid ""

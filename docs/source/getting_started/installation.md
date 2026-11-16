@@ -207,7 +207,7 @@ kaiwu==1.3.1
 
 If you need a specific version or have network restrictions, download the SDK wheel from the QBoson platform:
 
-> 1. Visit the <u>Kaiwu SDK download page</u> on the QBoson platform
+> 1. Visit the [Kaiwu SDK download page](https://platform.qboson.com/sdkDownload) on the QBoson platform
 > 2. Download the wheel package suitable for your system (e.g., `kaiwu-1.3.1-py3-none-any.whl`)
 > 3. Install the wheel:
 
