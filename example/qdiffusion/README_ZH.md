@@ -47,6 +47,10 @@ python example/qdiffusion/simple/simple_generate_example.py
 4. builder 组装出一个通用的 `Q-Diffusion(...)`
 5. 脚本通过 `objective(...)` 执行训练，或通过 `generate(...)` 执行推理
 
+能量模型逐行独立评分时，可通过 `QDiffusionConfig(energy_batch_size=...)`
+限制解码阶段单次能量计算处理的候选序列数。例如，4 条序列各有 8 个候选且
+上限为 8 时，每个解码步骤分 4 次计算能量。
+
 ## Simple
 
 `simple/` 是最小可运行入口：

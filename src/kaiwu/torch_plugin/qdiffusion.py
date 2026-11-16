@@ -55,26 +55,19 @@ class QDiffusionConfig:
 
         num_diffusion_timesteps: Number of discrete noising steps used by the
             training objective.
-
         use_coupled_sampling: Whether to use the coupled corruption variant.
-
         num_candidates: Number of proposal candidates sampled at each decode step.
-
         proposal_temperature: Temperature used for proposal-side sampling.
-
         proposal_noise_scale: Gumbel noise scale used during proposal sampling.
-
         energy_temperature: Temperature used when converting energies into
             reranking weights.
-
         disable_resample: Whether to disable repetition-collapse resampling.
-
         resample_ratio: Editable-content frequency ratio that triggers resampling
             for tokens occurring at least twice; the comparison is strict.
-
         resample_top_p: Top-p cutoff used during resampling.
-
         decoding_strategy: Skeptical-remasking strategy string.
+        energy_batch_size: Maximum flattened candidates per energy forward
+            during decoding. The default scores the full batch at once.
     """
 
     num_diffusion_timesteps: int = 500
@@ -87,6 +80,7 @@ class QDiffusionConfig:
     resample_ratio: float = 0.25
     resample_top_p: float = 0.95
     decoding_strategy: str = "reparam-uncond-deterministic-linear"
+    energy_batch_size: int | None = None
 
 
 class EnergyModel(nn.Module):
@@ -743,18 +737,10 @@ class QDiffusion(nn.Module):
         )
 
     def _score_candidates(
-        self, noisy_tokens: torch.Tensor, candidate_tokens: torch.Tensor
+        self, noisy_tokens: torch.Tensor, candidate_tokens: torch.Tensor, *,
+        energy_batch_size: int | None = None,
     ) -> torch.Tensor:
-        """Scores a batch of candidate reconstructions with the energy model.
-
-        Args:
-            noisy_tokens: Current noisy token tensor.
-            candidate_tokens: Candidate reconstructions shaped as
-                ``[batch, num_candidates, seq_len]``.
-
-        Returns:
-            torch.Tensor: Candidate energies shaped as ``[batch, num_candidates]``.
-        """
+        """Scores flattened candidate rows in order and restores the batch shape."""
         batch_size, num_candidates, seq_len = candidate_tokens.shape
         flat_noisy_tokens = (
             noisy_tokens.unsqueeze(1)
@@ -764,10 +750,21 @@ class QDiffusion(nn.Module):
         flat_candidate_tokens = candidate_tokens.reshape(
             batch_size * num_candidates, seq_len
         )
-        flat_attention_mask = flat_candidate_tokens.ne(self.pad_id)
-        energy = self.energy(
-            flat_noisy_tokens, flat_candidate_tokens, flat_attention_mask
-        )
+        if energy_batch_size is None:
+            energy = self.energy(
+                flat_noisy_tokens, flat_candidate_tokens, flat_candidate_tokens.ne(self.pad_id)
+            )
+        else:
+            if (not isinstance(energy_batch_size, int)
+                    or isinstance(energy_batch_size, bool) or energy_batch_size < 1):
+                raise ValueError("energy_batch_size must be a positive integer or None")
+            energy = torch.cat([
+                self.energy(noisy, candidates, candidates.ne(self.pad_id))
+                for noisy, candidates in zip(
+                    flat_noisy_tokens.split(energy_batch_size),
+                    flat_candidate_tokens.split(energy_batch_size),
+                )
+            ])
         return energy.view(batch_size, num_candidates)
 
     def _select_candidates(
@@ -787,7 +784,9 @@ class QDiffusion(nn.Module):
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
             for the selected candidate per sample.
         """
-        energies = self._score_candidates(noisy_tokens, candidate_tokens)
+        energies = self._score_candidates(
+            noisy_tokens, candidate_tokens, energy_batch_size=self.config.energy_batch_size
+        )
         neg_energies = -energies
         neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
         weights = torch.softmax(neg_energies / self.config.energy_temperature, dim=-1)
