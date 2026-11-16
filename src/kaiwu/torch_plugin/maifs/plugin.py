@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from .qubo import solve_qubo
+from .qubo import QUBOSolver, solve_qubo
 
 Batch = tuple[torch.Tensor, torch.Tensor]
 LossFunction = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
@@ -45,7 +45,10 @@ class FeatureSelectionWrapper(nn.Module):
         cardinality_k: Optional target number of selected features.
         min_selected_features: Optional lower bound for selected features.
         max_selected_features: Optional upper bound for selected features.
-        solver: Built-in solver name, such as ``"local_search","sa","kaiwu_cim"``.
+        solver: Built-in name (``"local_search"``, ``"sa"``, ``"kaiwu_cim"``) or a
+            callable ``solver(Q, linear, initial_state, **solver_kwargs)`` that
+            minimizes ``0.5 * x.T @ Q @ x + linear @ x`` and returns one 0/1
+            vector. The wrapper applies any configured feature-count bounds.
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
@@ -88,7 +91,7 @@ class FeatureSelectionWrapper(nn.Module):
         cardinality_k: int | None = None,
         min_selected_features: int | None = None,
         max_selected_features: int | None = None,
-        solver: str = "local_search",
+        solver: str | QUBOSolver = "local_search",
         mask_update_epochs: int | None = None,
         input_feature_axis: int = -1,
         solver_kwargs: dict[str, object] | None = None,
@@ -114,7 +117,7 @@ class FeatureSelectionWrapper(nn.Module):
         self.cardinality_k = cardinality_k
         self.min_selected_features = min_selected_features
         self.max_selected_features = max_selected_features
-        self.solver = str(solver)
+        self.solver = solver if callable(solver) else str(solver)
         self.solver_kwargs = {} if solver_kwargs is None else dict(solver_kwargs)
         self.mask_update_epochs = (
             None if mask_update_epochs is None else int(mask_update_epochs)
