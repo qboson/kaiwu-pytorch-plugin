@@ -103,7 +103,19 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         Args:
             X: 训练数据，形状为 (n_samples, n_features)
             y: 忽略，为兼容scikit-learn接口
+
+        Raises:
+            ValueError: 若 X 不是二维、任一轴为空，或包含 NaN/Inf。
         """
+        # 在构造 RBM / SGD 之前先校验输入，避免非法数据一路进入采样与梯度更新。
+        X = np.asarray(X)
+        if X.ndim != 2 or X.shape[0] == 0 or X.shape[1] == 0:
+            raise ValueError(
+                "X must be a 2-D array with at least one sample and one feature"
+            )
+        if not np.isfinite(X).all():
+            raise ValueError("X must contain only finite values")
+
         # 初始化受限玻尔兹曼机（RBM）模型
         rbm = RestrictedBoltzmannMachine(
             X.shape[1],  # 可见层单元数（特征维度）
