@@ -79,6 +79,8 @@ factory helper 间接接入。
 2. 将数据划分为 train / validation / test
 3. 构建一个 `Q-Diffusion` 生成器，proposal 侧使用 DPLM，energy 侧使用条件能量重排模块
 4. 将蛋白质序列 tokenize 为 `targets`
+   - 设置 `TrainConfig.length_bucket_batches` 后，训练按指定批次数构成随机窗口，
+     在窗口内对长度相近的序列分批。每轮仍使用全部记录，并减少填充。
 5. 在 epoch 循环中调用 `generator.objective({"targets": ...})`
 6. 优化 `energy_objective.mean()`，主要训练 energy reranking 分支
 7. 保存轻量 checkpoint，包括 `energy_encoder`、`feature_projector`、energy backend 权重、`energy_head` 和 `vocab_proj`

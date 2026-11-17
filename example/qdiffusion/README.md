@@ -69,6 +69,9 @@ Its end-to-end flow is:
 2. split them into train/validation/test sets
 3. build a `Q-Diffusion` generator with a DPLM proposal model and one conditioned energy reranker
 4. tokenize sequences into `targets`
+   - Set `TrainConfig.length_bucket_batches` to group training sequences by
+     length inside shuffled windows of that many batches. This reduces padding
+     for mixed-length inputs while keeping every record in each epoch.
 5. call `generator.objective({"targets": ...})` inside the epoch loop
 6. optimize `energy_objective.mean()`, mainly training the energy reranking path
 7. save compact checkpoints containing `energy_encoder`, `feature_projector`, energy backend weights, `energy_head`, and `vocab_proj`
