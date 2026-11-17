@@ -78,6 +78,10 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+Pass `--input-layer log1p` to use `adata.layers["log1p"]` for both training and
+inference. Use the same source when loading weights. The exported H5AD records
+the expression source in `adata.uns["qvae_input"]` and retains the input matrices.
+
 ## Outputs
 
 The training script will generate the following files under `--output-dir`:

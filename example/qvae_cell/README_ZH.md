@@ -74,6 +74,10 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+通过 `--input-layer log1p` 可使用 `adata.layers["log1p"]` 进行训练和推理。
+加载权重时请使用和训练一致的表达矩阵。输出 H5AD 保留输入矩阵，并在
+`adata.uns["qvae_input"]` 记录所用数据来源。
+
 ## 输出
 
 训练脚本会在 `--output-dir` 下生成：
