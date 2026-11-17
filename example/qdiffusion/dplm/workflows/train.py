@@ -47,6 +47,7 @@ try:
         save_checkpoint,
         seed_torch,
         summarize_trainable_parameters,
+        validation_rng,
     )
     from .workflow_helpers import (
         build_data_loader_from_records,
@@ -76,6 +77,7 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         save_checkpoint,
         seed_torch,
         summarize_trainable_parameters,
+        validation_rng,
     )
     from workflow_helpers import (
         build_data_loader_from_records,
@@ -177,6 +179,7 @@ class TrainConfig:
     scheduler_patience: int = 1
     early_stop_patience: int = 4
     require_cuda: bool = True
+    validation_seed: int | None = None
 
 
 @dataclass
@@ -370,13 +373,14 @@ def main() -> None:
             grad_clip_norm=config.train.grad_clip_norm,
             description=f"train-{epoch}",
         )
-        val_metrics = run_epoch(
-            train_generator,
-            val_loader,
-            optimizer=None,
-            grad_clip_norm=config.train.grad_clip_norm,
-            description=f"val-{epoch}",
-        )
+        with validation_rng(config.train.validation_seed, device):
+            val_metrics = run_epoch(
+                train_generator,
+                val_loader,
+                optimizer=None,
+                grad_clip_norm=config.train.grad_clip_norm,
+                description=f"val-{epoch}",
+            )
 
         epoch_summary = {
             "epoch": epoch,

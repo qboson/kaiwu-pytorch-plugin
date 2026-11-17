@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,22 @@ def seed_torch(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+@contextmanager
+def validation_rng(seed: int | None, device: str | torch.device):
+    """Use repeatable Torch draws during validation and restore the training RNGs."""
+    if seed is None:
+        yield
+        return
+    device = torch.device(device)
+    cuda_devices = [device] if device.type == "cuda" else []
+    with torch.random.fork_rng(devices=cuda_devices):
+        torch.default_generator.manual_seed(seed)
+        if cuda_devices:
+            with torch.cuda.device(device):
+                torch.cuda.manual_seed(seed)
+        yield
 
 
 def encode_sequence(
