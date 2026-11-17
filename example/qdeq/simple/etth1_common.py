@@ -181,6 +181,18 @@ class AndersonDEQ(QDEQ):
         return best_z, {"nstep": nstep, "residual": best_res}
 
 
+class PersistenceForecaster(nn.Module):
+    """Repeat each variable's most recent observation over the forecast horizon."""
+
+    def __init__(self, pred_len: int):
+        super().__init__()
+        self.pred_len = pred_len
+
+    def forward(self, history: torch.Tensor) -> torch.Tensor:
+        """Map a (batch, history, variables) tensor to the forecast horizon."""
+        return history[:, -1:, :].expand(-1, self.pred_len, -1)
+
+
 class DEQForecaster(nn.Module):
     """Small iTransformer-style forecaster whose encoder is a single ``QDEQ`` layer.
 
@@ -272,14 +284,20 @@ def build_config() -> QDEQConfig:
 
 
 @torch.no_grad()
-def evaluate(model: DEQForecaster, loader: DataLoader) -> dict[str, float]:
+def evaluate(model: nn.Module, loader: DataLoader) -> dict[str, float]:
     """Returns scaled-space MSE and MAE plus the mean forward solver steps."""
     model.eval()
+    deq = getattr(model, "deq", None)
     squared, absolute, count, steps = 0.0, 0.0, 0, []
     for history, target in loader:
         forecast = model(history)
         squared += torch.sum((forecast - target) ** 2).item()
         absolute += torch.sum(torch.abs(forecast - target)).item()
         count += target.numel()
-        steps.append(model.deq.get_last_stats()["forward_nstep"])
-    return {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}
+        if deq is not None:
+            steps.append(deq.get_last_stats()["forward_nstep"])
+    return {
+        "mse": squared / count,
+        "mae": absolute / count,
+        "steps": float(np.mean(steps)) if steps else 0.0,
+    }

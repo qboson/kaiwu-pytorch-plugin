@@ -54,6 +54,11 @@ python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
 ```
 
+Run a persistence baseline on the same test windows with
+`python example/qdeq/simple/simple_forecast_example.py --persistence`.
+The baseline repeats the last observed value of each variable at every horizon
+step and requires no trained checkpoint or sampler.
+
 `--sampler` accepts:
 
 - `sa`: Kaiwu simulated annealing (`kaiwu.classical.SimulatedAnnealingOptimizer`), runs locally
