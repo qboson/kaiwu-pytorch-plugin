@@ -143,7 +143,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             return ising_mat.cpu().numpy()
 
     def gibbs_sample(
-        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None
+        self, num_steps: int = 100, s_visible: torch.Tensor = None, num_sample=None,
+        *, initial_state: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """Sample from the Boltzmann Machine.
 
@@ -155,13 +156,30 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             num_sample (int, optional): Number of samples.
                 If ``None``, uses batch size of s_visible.
+            initial_state: Complete binary chains of shape ``(B, num_nodes)``
+                to continue without clamping any units. Provide this by itself
+                or use one of the random initialization options above.
+
+        Returns:
+            Final state for each Gibbs chain.
+
+        Raises:
+            ValueError: If the initialization arguments or starting chains are invalid.
         """
         with torch.no_grad():
-            # Initialization: If neither visible unit state nor sample number is provided,
-            # raise error
-            if s_visible is None and num_sample is None:
-                raise ValueError("Either s_visible or num_sample must be provided.")
-            if s_visible is not None:
+            if initial_state is not None:
+                if s_visible is not None or num_sample is not None:
+                    raise ValueError(
+                        "initial_state cannot be combined with s_visible or num_sample"
+                    )
+                if initial_state.ndim != 2 or initial_state.shape[1] != self.num_nodes:
+                    raise ValueError("initial_state must have shape (B, num_nodes)")
+                if initial_state.is_complex() or not (
+                    (initial_state == 0) | (initial_state == 1)
+                ).all():
+                    raise ValueError("initial_state must contain binary 0/1 values")
+                s_all = initial_state.to(self.quadratic_coef).clone()
+            elif s_visible is not None:
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
@@ -170,11 +188,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 )
                 # Replace visible part with given visible unit state
                 s_all[:, : s_visible.size(1)] = s_visible.clone()
-            else:
+            elif num_sample is not None:
                 # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
                     torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
                 )
+            else:
+                raise ValueError("Provide s_visible, num_sample, or initial_state.")
 
             # Number of visible units
             n_vis = s_visible.shape[-1] if s_visible is not None else 0
