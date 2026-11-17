@@ -29,8 +29,8 @@ pandas
 ### Equilibrium Propagation
 
 `example/ep_digits/` trains a 64-32-10 equilibrium-propagation network on
-`sklearn.datasets.load_digits`. Each unit is one bit. The K-bit QUBO is relaxed
-by Kaiwu 1.3.1 simulated annealing. See
+`sklearn.datasets.load_digits`. Every unit is a ±1 spin, and the model's Ising
+matrix is relaxed by Kaiwu simulated annealing. See
 [example/ep_digits/README.md](ep_digits/README.md).
 
 **Dependencies**
