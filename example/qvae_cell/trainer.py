@@ -37,8 +37,12 @@ class Trainer:
         self.n_batches = 0
 
     def adata_to_array(self, adata):
-        """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
-        x = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
+        """选取表达矩阵并转为 float32，再按损失函数准备输入范围。"""
+        layer = getattr(self.args, "input_layer", None)
+        if layer is not None and layer not in adata.layers:
+            raise ValueError(f"Expression layer {layer!r} is missing from adata.layers")
+        source = adata.X if layer is None else adata.layers[layer]
+        x = source.toarray() if hasattr(source, "toarray") else source
         x = np.asarray(x, dtype=np.float32)
         if self.args.loss_type == "mse":
             return x
