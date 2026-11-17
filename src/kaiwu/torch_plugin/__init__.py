@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """Kaiwu-PyTorch-Plugin public API."""
 
+from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine
+from .gbrbm import GaussianBernoulliRestrictedBoltzmannMachine
 from .maifs import FeatureSelectionWrapper, QuadraticLinearSolver
 from .qdeq import QDEQ, QDEQConfig
 from .qdiffusion import EnergyModel, QDiffusion, QDiffusionConfig
@@ -18,8 +20,10 @@ from .usage_stats import (
 __version__ = "0.3.0"
 
 __all__ = [
+    "AbstractBoltzmannMachine",
     "RestrictedBoltzmannMachine",
     "BoltzmannMachine",
+    "GaussianBernoulliRestrictedBoltzmannMachine",
     "EnergyModel",
     "QVAE",
     "UnsupervisedDBN",
