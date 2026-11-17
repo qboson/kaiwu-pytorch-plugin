@@ -7,7 +7,7 @@ up-front contract and the unchanged happy path.
 
 ``seaborn`` is only used for plotting (``plot_confusion_matrix``); the ``fit``
 path never needs it, so the import helper below substitutes an empty module for
-the duration of the import only and always restores ``sys.modules``.
+the duration of the import and removes only that stand-in afterwards.
 """
 
 import importlib.util
@@ -32,14 +32,15 @@ FINITE_MSG = "X must contain only finite values"
 @pytest.fixture(scope="module")
 def rbm_digits():
     """Import the example without requiring the optional ``seaborn`` extra."""
-    saved = sys.modules.get("seaborn")
-    if saved is None:
+    injected = False
+    if sys.modules.get("seaborn") is None:
         try:
             import seaborn  # noqa: F401  pylint: disable=unused-import
         except ModuleNotFoundError:
             # ``seaborn`` is declared in requirements/requirements_example.txt and is
             # only used by ``plot_confusion_matrix``; ``fit`` never touches it.
             sys.modules["seaborn"] = types.ModuleType("seaborn")
+            injected = True
     try:
         spec = importlib.util.spec_from_file_location(
             "rbm_digits_under_test", MODULE_PATH
@@ -47,7 +48,10 @@ def rbm_digits():
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
     finally:
-        if saved is None:
+        # Undo only the stand-in we installed. A real seaborn that this fixture happened
+        # to import first stays imported, which is the state the package would be in
+        # anyway; removing it would be a gratuitous mutation of ``sys.modules``.
+        if injected:
             sys.modules.pop("seaborn", None)
     return module
 

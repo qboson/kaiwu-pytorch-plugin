@@ -107,6 +107,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         Raises:
             ValueError: 若 X 不是二维、任一轴为空，或包含 NaN/Inf。
         """
+        # 初始化受限玻尔兹曼机（RBM）模型
         # 在构造 RBM / SGD 之前先校验输入，避免非法数据一路进入采样与梯度更新。
         X = np.asarray(X)
         if X.ndim != 2 or X.shape[0] == 0 or X.shape[1] == 0:
@@ -115,8 +116,6 @@ class RBMRunner(TransformerMixin, BaseEstimator):
             )
         if not np.isfinite(X).all():
             raise ValueError("X must contain only finite values")
-
-        # 初始化受限玻尔兹曼机（RBM）模型
         rbm = RestrictedBoltzmannMachine(
             X.shape[1],  # 可见层单元数（特征维度）
             self.n_components,  # 隐层单元数
