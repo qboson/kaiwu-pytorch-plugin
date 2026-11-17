@@ -12,10 +12,15 @@ from .qubo import _decode_cim_pool
 from .spin_encoding import encode_prepared, logical_spins, physical_matrix
 
 
-@lru_cache(maxsize=1)
 def history():
+    """Select the frozen manifest currently configured for this replay."""
     path = os.environ.get("QC_HISTORY_PREFIX_FILE")
-    return json.loads(Path(path).read_text()) if path else None
+    return _read_history(Path(path).resolve()) if path else None
+
+
+@lru_cache(maxsize=1)
+def _read_history(path):
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def replay(Q, prepared, context, seed, encoding):
