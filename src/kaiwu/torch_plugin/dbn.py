@@ -17,6 +17,20 @@ from torch import nn
 from .restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
 
+def _as_numpy_float32(data_in):
+    """Convert numpy arrays, lists, and torch tensors to float32 numpy arrays.
+
+    Args:
+        data_in (numpy.ndarray | torch.Tensor | list): Input data.
+
+    Returns:
+        numpy.ndarray: The data as a float32 numpy array.
+    """
+    if isinstance(data_in, torch.Tensor):
+        return data_in.detach().cpu().numpy().astype(np.float32)
+    return np.asarray(data_in, dtype=np.float32)
+
+
 # =================== Unsupervised DBN General Model =====================
 class UnsupervisedDBN(nn.Module):
     """A general unsupervised Deep Belief Network (DBN) architecture.
@@ -73,7 +87,9 @@ class UnsupervisedDBN(nn.Module):
         """Performs a forward pass to transform the input data.
 
         Args:
-            data_in (numpy.ndarray): The input data.
+            data_in (numpy.ndarray or torch.Tensor): The input data. Tensors
+                of any floating or integer dtype are accepted and converted
+                internally.
 
         Returns:
             numpy.ndarray: The transformed data after passing through all RBM layers.
@@ -88,7 +104,7 @@ class UnsupervisedDBN(nn.Module):
                 "Model not trained yet. Call mark_as_trained() after training."
             )
 
-        data_in = data_in.astype(np.float32)
+        data_in = _as_numpy_float32(data_in)
         for rbm in self.rbm_layers:
             with torch.no_grad():
                 hidden_output = rbm.get_hidden(
@@ -103,7 +119,7 @@ class UnsupervisedDBN(nn.Module):
         """An sklearn-compatible transform method.
 
         Args:
-            data_in (numpy.ndarray): The input data.
+            data_in (numpy.ndarray or torch.Tensor): The input data.
 
         Returns:
             numpy.ndarray: The transformed data.
@@ -163,7 +179,7 @@ class UnsupervisedDBN(nn.Module):
         Args:
             rbm (RestrictedBoltzmannMachine): The trained RBM model.
 
-            data_in (numpy.ndarray): The input data.
+            data_in (numpy.ndarray or torch.Tensor): The input data.
 
             device (torch.device, optional): The device to perform computation on.
                 If None, uses the RBM's device. Defaults to None.
@@ -176,8 +192,10 @@ class UnsupervisedDBN(nn.Module):
         if device is None:
             device = rbm.device
 
-        # Convert to PyTorch tensor
-        data_in = torch.FloatTensor(data_in).to(device)
+        # Convert to PyTorch tensor; accepts numpy arrays, lists, and tensors
+        data_in = torch.as_tensor(
+            data_in, dtype=torch.float32
+        ).to(device)
 
         with torch.no_grad():
             # Get hidden representation using RBM's get_hidden
