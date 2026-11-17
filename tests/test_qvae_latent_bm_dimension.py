@@ -10,6 +10,8 @@ the constructor and only blew up much later inside
 
 from pathlib import Path
 from types import SimpleNamespace
+import inspect
+import logging
 import sys
 
 import pytest
@@ -33,6 +35,9 @@ from kaiwu.torch_plugin.qvae import QVAE
 from kaiwu.torch_plugin.restricted_boltzmann_machine import RestrictedBoltzmannMachine
 
 
+QVae_logger = logging.getLogger("kaiwu.torch_plugin.qvae")
+
+
 INPUT_DIMENSION = 4
 MESSAGE = "does not match the latent dimension"
 
@@ -51,6 +56,18 @@ class OpaqueBoltzmannMachine(nn.Module):
     def forward(self, state):
         """Act as the identity so the module is usable."""
         return state
+
+
+class RecordingHandler(logging.Handler):
+    """Attach to the QVAE logger so the assertions do not depend on the root setup."""
+
+    def __init__(self):
+        super().__init__(level=logging.DEBUG)
+        self.records = []
+
+    def emit(self, record):
+        """Keep the record for the assertion that follows."""
+        self.records.append(record)
 
 
 def make_config(latent_units):
@@ -177,19 +194,45 @@ def test_non_positive_latent_units_keep_the_original_error():
 
 
 def test_injected_bm_without_num_nodes_is_skipped():
-    """Custom Boltzmann machines that expose no ``num_nodes`` still build."""
-    model = build_qvae(8, OpaqueBoltzmannMachine())
+    """Custom Boltzmann machines that expose no ``num_nodes`` still build.
+
+    The check cannot judge such a machine, so it is skipped - but the skip is
+    logged, because this is the one case where a typo in ``num_latent_units``
+    survives construction.
+    """
+    handler = RecordingHandler()
+    previous_level = QVae_logger.level
+    QVae_logger.addHandler(handler)
+    QVae_logger.setLevel(logging.DEBUG)
+    try:
+        model = build_qvae(8, OpaqueBoltzmannMachine())
+    finally:
+        QVae_logger.removeHandler(handler)
+        QVae_logger.setLevel(previous_level)
 
     assert isinstance(model.bm, OpaqueBoltzmannMachine)
+    skipped = [record for record in handler.records if "no num_nodes" in record.getMessage()]
+    assert len(skipped) == 1
+    assert skipped[0].levelno == logging.DEBUG
+    assert "OpaqueBoltzmannMachine" in skipped[0].getMessage()
 
 
 def test_loss_docstring_documents_the_real_signature():
-    """``QVAE.loss`` documents ``x``/``recon_x``/``posterior`` only."""
+    """``QVAE.loss`` documents exactly the parameters it accepts."""
     docstring = QVAE.loss.__doc__ or ""
     args_block = docstring.split("Args:", 1)[1].split("Returns:", 1)[0]
 
+    documented = [
+        line.strip().split(" ", 1)[0]
+        for line in args_block.strip().splitlines()
+        if "(torch.Tensor)" in line or "(MixtureGeneric)" in line
+    ]
+    assert documented == ["x", "recon_x", "posterior"]
+    assert list(inspect.signature(QVAE.loss).parameters) == ["self", "x", "recon_x", "posterior"]
+
     assert "q (torch.Tensor)" not in args_block
     assert "zeta (torch.Tensor)" not in args_block
+    assert "zeta" not in docstring
     assert "x (torch.Tensor)" in args_block
     assert "recon_x (torch.Tensor)" in args_block
     assert "posterior (MixtureGeneric)" in args_block
