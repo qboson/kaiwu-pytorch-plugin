@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from math import ceil
+from numbers import Integral
 
 import numpy as np
 import torch
@@ -33,6 +34,16 @@ def _tensor_to_numpy(
     if dtype is not None:
         return array.astype(dtype)
     return array
+
+
+def _validate_mask_derivative_options(hessian_mode: str, max_samples: int | None) -> None:
+    """Validate options shared by manual and scheduled mask updates."""
+    if hessian_mode not in {"full", "diagonal"}:
+        raise ValueError("hessian_mode must be 'full' or 'diagonal'")
+    if max_samples is not None and (
+        isinstance(max_samples, bool) or not isinstance(max_samples, Integral) or max_samples < 1
+    ):
+        raise ValueError("max_samples must be a positive integer or None")
 
 
 class FeatureSelectionWrapper(nn.Module):
@@ -192,6 +203,9 @@ class FeatureSelectionWrapper(nn.Module):
         loss_fn: LossFunction,
         optimizer: torch.optim.Optimizer,
         train_epochs: int = 1,
+        *,
+        hessian_mode: str = "full",
+        max_samples: int | None = 1000,
     ) -> float:
         """Train wrapped-model weights and optionally refresh the feature mask.
 
@@ -200,14 +214,18 @@ class FeatureSelectionWrapper(nn.Module):
             loss_fn: Loss function returning a scalar tensor.
             optimizer: Optimizer for the wrapped model parameters.
             train_epochs: Number of training epochs to run.
+            hessian_mode: Hessian mode for scheduled mask updates.
+            max_samples: Maximum samples per scheduled mask update. Use
+                ``None`` to include all samples.
 
         Returns:
             Mean loss over all processed batches.
 
         Raises:
-            ValueError: If ``data_loader`` yields no batches or ``loss_fn`` does
-                not return a scalar tensor.
+            ValueError: If the mask-update options are invalid, ``data_loader``
+                yields no batches, or ``loss_fn`` does not return a scalar tensor.
         """
+        _validate_mask_derivative_options(hessian_mode, max_samples)
         train_epochs = int(train_epochs)
         self.train()
         total_loss = 0.0
@@ -235,7 +253,9 @@ class FeatureSelectionWrapper(nn.Module):
                 and self.mask_update_epochs > 0
                 and self._trained_epochs % self.mask_update_epochs == 0
             ):
-                self.update_mask(data_loader, loss_fn)
+                self.update_mask(
+                    data_loader, loss_fn, hessian_mode=hessian_mode, max_samples=max_samples
+                )
 
         if batch_count == 0:
             raise ValueError("data_loader produced no batches")
@@ -264,8 +284,7 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
                 no batches, or ``loss_fn`` does not return a scalar tensor.
         """
-        if hessian_mode not in {"full", "diagonal"}:
-            raise ValueError("hessian_mode must be 'full' or 'diagonal'")
+        _validate_mask_derivative_options(hessian_mode, max_samples)
 
         input_batches: list[torch.Tensor] = []
         target_batches: list[torch.Tensor] = []
