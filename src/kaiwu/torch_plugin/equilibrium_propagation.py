@@ -1,336 +1,322 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
+# Copyright (C) 2022-2026 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
-"""Equilibrium propagation energy and deterministic relaxations.
+"""Equilibrium propagation on layered ``+-1`` spins solved by Kaiwu optimizers.
 
-The free energy of a layered network with states in ``[0, 1]`` is
+Every non-input unit is a spin in ``{-1, +1}``. Layer ``l`` drives its spins
+from the previous layer (the clamped input for the first layer) through a
+linear map ``D_l``, so the free energy is
 
-``E = 1/2 sum_l ||s^l||^2 - sum_l (s^l)^T W^l s^{l+1} - sum_l (b^l)^T s^l``.
+``E = -sum_l (s^l)^T (D_l(s^{l-1}) + b^l)``.
 
-The nudged objective adds ``beta * 1/2 ||s^L - y||^2``. This module builds the
-matching K-bit QUBO. The default relaxation sends that QUBO through Kaiwu 1.3.1
-simulated annealing. Exhaustive and continuous backends remain for exact checks.
+The nudged phase minimises ``E + beta * 1/2 ||s^L - y||^2`` with ``y`` in
+``{-1, +1}``. For spins that cost equals ``n_out - y^T s^L``, so both phases
+are Ising problems. The model writes the Ising matrix directly and hands it to
+a caller-supplied Kaiwu optimizer, as the Boltzmann machines do.
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+import math
 
 import numpy as np
 import torch
 from torch import nn
+from torch.nn import functional as F
 
-from ._ep_dynamics import ContinuousDynamics
-from ._ep_qubo import build_qubo, decode_bits, encode_states, logical_bit_count
-from ._ep_solver import ExhaustiveBackend, SimulatedAnnealingBackend
-from ._ep_training import predict as run_predict
-from ._ep_training import train_batch as run_train_batch
+from .usage_stats import kpp_caller_context
 
 
-@dataclass(frozen=True)
-class EPConfig:
-    """Configuration shared by the energy, the QUBO, and both relaxations.
+class EPLinear(nn.Module):
+    """Fully connected layer: ``D(s) = s @ weight``.
 
     Args:
-        layer_sizes (tuple[int, ...]): Widths from the clamped input through
-            the output. At least two positive widths are required.
-        state_bits (int): Bits used to encode each non-input unit.
-        beta (float): Default nudging coefficient.
-        exhaustive_max_bits (int): Largest QUBO the exhaustive backend enumerates.
-        step_size (float): Initial step of the continuous relaxation.
-        max_steps (int): Maximum accepted continuous updates.
-        seed (int): Seed of the parameter initialisation and the default anneal.
-        initial_temperature (float): Kaiwu annealing start temperature.
-        alpha (float): Kaiwu geometric cooling factor.
-        cutoff_temperature (float): Kaiwu annealing stop temperature.
-        iterations_per_t (int): Kaiwu sweeps at each temperature.
-        candidate_count (int): Kaiwu candidate pool size.
+        in_features (int): Width of the previous layer.
+        out_features (int): Number of spins in this layer.
+        device (torch.device, optional): Parameter device. Defaults to CPU.
+        dtype (torch.dtype): Parameter dtype.
     """
 
-    layer_sizes: tuple
-    state_bits: int = 1
-    beta: float = 0.0
-    exhaustive_max_bits: int = 16
-    step_size: float = 0.05
-    max_steps: int = 40
-    seed: int = 0
-    initial_temperature: float = 1.25
-    alpha: float = 0.95
-    cutoff_temperature: float = 0.001
-    iterations_per_t: int = 10
-    candidate_count: int = 8
+    def __init__(self, in_features, out_features, device=None, dtype=torch.float32):
+        super().__init__()
+        self.in_features = int(in_features)
+        self.out_features = int(out_features)
+        limit = 1.0 / math.sqrt(self.in_features)
+        self.weight = nn.Parameter(
+            torch.empty(self.in_features, self.out_features, dtype=dtype, device=device)
+            .uniform_(-limit, limit)
+        )
+        self.bias = nn.Parameter(torch.zeros(self.out_features, dtype=dtype, device=device))
 
-    def __post_init__(self):
-        sizes = tuple(int(size) for size in self.layer_sizes)
-        object.__setattr__(self, "layer_sizes", sizes)
-        object.__setattr__(self, "state_bits", int(self.state_bits))
-        if len(sizes) < 2 or any(size <= 0 for size in sizes):
-            raise ValueError(
-                f"layer_sizes must contain at least two positive widths, got {sizes}"
-            )
-        if self.state_bits < 1:
-            raise ValueError(f"state_bits must be positive, got {self.state_bits}")
-        if int(self.exhaustive_max_bits) < 1:
-            raise ValueError("exhaustive_max_bits must be positive")
+    def drive(self, previous):
+        """Return ``previous @ weight`` for rows of shape ``(B, in_features)``."""
+        return previous @ self.weight
 
-    def to_dict(self):
-        """Return a JSON-friendly copy of this configuration."""
-        payload = asdict(self)
-        payload["layer_sizes"] = list(self.layer_sizes)
-        return payload
+    def forward(self, previous):
+        """Compute the drive. Same as :meth:`drive`."""
+        return self.drive(previous)
 
-    @classmethod
-    def from_dict(cls, payload):
-        """Rebuild a configuration from :meth:`to_dict`."""
-        data = dict(payload)
-        data["layer_sizes"] = tuple(data["layer_sizes"])
-        return cls(**data)
+    def coupling(self):
+        """Return the ``(in_features, out_features)`` matrix of :meth:`drive`."""
+        return self.weight
+
+    def bias_vector(self):
+        """Return the bias of every spin in this layer."""
+        return self.bias
+
+
+class EPConv2d(nn.Module):
+    """Convolutional layer over a ``(channels, height, width)`` previous layer.
+
+    Spins are laid out like the flattened output of ``F.conv2d``. Each output
+    channel has one bias shared by all of its positions.
+
+    Args:
+        in_shape (tuple[int, int, int]): ``(channels, height, width)`` of the
+            previous layer.
+        out_channels (int): Number of output channels.
+        kernel_size (int): Side of the square kernel.
+        stride (int): Convolution stride.
+        padding (int): Zero padding on each side.
+        device (torch.device, optional): Parameter device. Defaults to CPU.
+        dtype (torch.dtype): Parameter dtype.
+
+    Raises:
+        ValueError: If the kernel does not fit the padded input.
+    """
+
+    def __init__(
+        self,
+        in_shape,
+        out_channels,
+        kernel_size,
+        stride=1,
+        padding=0,
+        device=None,
+        dtype=torch.float32,
+    ):
+        super().__init__()
+        self.in_shape = tuple(int(size) for size in in_shape)
+        self.stride = int(stride)
+        self.padding = int(padding)
+        channels, height, width = self.in_shape
+        out_height = (height + 2 * self.padding - int(kernel_size)) // self.stride + 1
+        out_width = (width + 2 * self.padding - int(kernel_size)) // self.stride + 1
+        if out_height <= 0 or out_width <= 0:
+            raise ValueError(f"kernel {kernel_size} does not fit input {self.in_shape}")
+        self.out_shape = (int(out_channels), out_height, out_width)
+        self.in_features = channels * height * width
+        self.out_features = int(out_channels) * out_height * out_width
+        limit = 1.0 / math.sqrt(channels * int(kernel_size) ** 2)
+        self.weight = nn.Parameter(
+            torch.empty(
+                int(out_channels),
+                channels,
+                int(kernel_size),
+                int(kernel_size),
+                dtype=dtype,
+                device=device,
+            ).uniform_(-limit, limit)
+        )
+        self.bias = nn.Parameter(torch.zeros(int(out_channels), dtype=dtype, device=device))
+
+    def drive(self, previous):
+        """Convolve rows of shape ``(B, in_features)`` and flatten the result."""
+        images = previous.reshape(-1, *self.in_shape)
+        output = F.conv2d(images, self.weight, stride=self.stride, padding=self.padding)
+        return output.reshape(images.shape[0], self.out_features)
+
+    def forward(self, previous):
+        """Compute the drive. Same as :meth:`drive`."""
+        return self.drive(previous)
+
+    def coupling(self):
+        """Return the ``(in_features, out_features)`` matrix of :meth:`drive`.
+
+        The convolution is linear, so applying it to the identity basis gives
+        its dense matrix.
+        """
+        basis = torch.eye(self.in_features, dtype=self.weight.dtype, device=self.weight.device)
+        return self.drive(basis)
+
+    def bias_vector(self):
+        """Return the bias of every spin, one value per output position."""
+        positions = self.out_shape[1] * self.out_shape[2]
+        return self.bias.repeat_interleave(positions)
 
 
 class EquilibriumPropagation(nn.Module):
-    """Layered equilibrium-propagation energy with a K-bit QUBO mapping.
-
-    ``weights[l]`` has shape ``(n_l, n_{l+1})`` and ``biases[l]`` has shape
-    ``(n_{l+1},)``. The input layer is clamped, so it has no bias.
+    """Equilibrium-propagation network built from a stack of layers.
 
     Args:
-        config (EPConfig): Network widths and relaxation settings.
-        dtype (torch.dtype): Parameter dtype. ``float64`` keeps the QUBO
-            identity inside ``1e-9``.
-        device (torch.device, optional): Parameter device. Defaults to CPU.
+        layers (Sequence[nn.Module], optional): :class:`EPLinear` or
+            :class:`EPConv2d` layers from the input through the output.
+        layer_sizes (Sequence[int], optional): Widths from the input through the
+            output. Builds one :class:`EPLinear` per pair when ``layers`` is not
+            given.
+        device (torch.device, optional): Device of layers built from
+            ``layer_sizes``.
+        dtype (torch.dtype): Dtype of layers built from ``layer_sizes``.
+
+    Raises:
+        ValueError: If neither or both of ``layers`` and ``layer_sizes`` are
+            given, or if adjacent layers disagree on their width.
     """
 
-    def __init__(self, config, dtype=torch.float64, device=None):
+    def __init__(self, layers=None, *, layer_sizes=None, device=None, dtype=torch.float32):
         super().__init__()
-        self.config = config
-        self.dtype = dtype
-        self.layer_sizes = config.layer_sizes
-        generator = torch.Generator()
-        generator.manual_seed(int(config.seed))
-        self.weights = nn.ParameterList()
-        self.biases = nn.ParameterList()
-        for fan_in, fan_out in zip(config.layer_sizes[:-1], config.layer_sizes[1:]):
-            weight = torch.randn((fan_in, fan_out), generator=generator, dtype=dtype)
-            self.weights.append(nn.Parameter(weight * 0.01))
-            self.biases.append(nn.Parameter(torch.zeros(fan_out, dtype=dtype)))
-        if device is not None:
-            self.to(device)
+        if (layers is None) == (layer_sizes is None):
+            raise ValueError("pass exactly one of layers and layer_sizes")
+        if layers is None:
+            sizes = tuple(int(size) for size in layer_sizes)
+            if len(sizes) < 2 or any(size <= 0 for size in sizes):
+                raise ValueError(f"layer_sizes needs at least two positive widths, got {sizes}")
+            layers = [
+                EPLinear(fan_in, fan_out, device=device, dtype=dtype)
+                for fan_in, fan_out in zip(sizes[:-1], sizes[1:])
+            ]
+        self.layers = nn.ModuleList(layers)
+        if len(self.layers) == 0:
+            raise ValueError("the network needs at least one layer")
+        for index in range(1, len(self.layers)):
+            if self.layers[index].in_features != self.layers[index - 1].out_features:
+                raise ValueError(
+                    f"layer {index} expects {self.layers[index].in_features} inputs, "
+                    f"but layer {index - 1} has {self.layers[index - 1].out_features} spins"
+                )
+        self.layer_sizes = (self.layers[0].in_features,) + tuple(
+            layer.out_features for layer in self.layers
+        )
 
     def energy(self, inputs, states):
-        """Return ``E`` for one clamped input and its non-input states.
+        """Return ``E`` for each row.
 
         Args:
-            inputs (torch.Tensor): Clamped input of shape ``(n_in,)``.
-            states (Sequence[torch.Tensor]): One state vector per non-input
-                layer, output last.
+            inputs (torch.Tensor): Clamped inputs of shape ``(B, n_in)``.
+            states (Sequence[torch.Tensor]): One ``(B, n_l)`` tensor of ``+-1``
+                spins per layer, output last.
 
         Returns:
-            torch.Tensor: Scalar free energy.
+            torch.Tensor: Energies of shape ``(B,)``.
         """
-        total = inputs.new_zeros(())
+        total = inputs.new_zeros(inputs.shape[0])
         previous = inputs
-        for index, state in enumerate(states):
-            total = total + 0.5 * torch.dot(state, state)
-            total = total - torch.dot(self.biases[index], state)
-            total = total - torch.dot(previous, self.weights[index] @ state)
+        for layer, state in zip(self.layers, states):
+            total = total - (state * (layer.drive(previous) + layer.bias_vector())).sum(-1)
             previous = state
         return total
 
-    def cost(self, output, target):
-        """Return ``1/2 ||output - target||^2``."""
-        delta = output - target
-        return 0.5 * torch.dot(delta, delta)
-
-    def total_energy(self, inputs, states, target, beta):
-        """Return ``E + beta * C``. ``beta == 0`` ignores the target."""
-        value = self.energy(inputs, states)
-        if float(beta) != 0.0:
-            value = value + float(beta) * self.cost(states[-1], target)
-        return value
-
     def forward(self, inputs, states):
-        """Compute the free energy. Matches :meth:`energy`."""
+        """Compute the free energy. Same as :meth:`energy`."""
         return self.energy(inputs, states)
 
-    def qubo(self, inputs, target, beta):
-        """Return ``(Q, offset)`` for one sample.
+    def ising_matrix(self, inputs, target=None, beta=0.0):
+        """Return the Ising matrix of one sample, auxiliary spin last.
+
+        For spins ``s`` and ``z = [s, 1]``, ``-z^T J z`` equals
+        ``E + beta * 1/2 ||s^L - y||^2`` up to a constant that does not depend
+        on ``s``.
 
         Args:
-            inputs (torch.Tensor): Clamped input.
-            target (torch.Tensor): Output target. Ignored when ``beta`` is 0,
-                but still required so the matrix width stays fixed.
+            inputs (torch.Tensor): One clamped input of shape ``(n_in,)``.
+            target (torch.Tensor, optional): ``+-1`` output target of shape
+                ``(n_out,)``. Required when ``beta > 0``.
             beta (float): Nudging coefficient.
 
         Returns:
-            tuple[torch.Tensor, torch.Tensor]: Upper-triangular ``Q`` and the
-            scalar ``beta/2 ||target||^2``. For a decoded state ``s(q)``,
-            ``q^T Q q + offset`` equals :meth:`total_energy`.
-        """
-        beta = float(beta)
-        fields, coefs, couplings = self._qubo_terms(inputs, target, beta)
-        matrix = build_qubo(fields, coefs, couplings, self.config.state_bits)
-        offset = 0.5 * beta * torch.dot(target, target)
-        return matrix, offset
-
-    def equilibrate(
-        self,
-        inputs,
-        target=None,
-        beta=0.0,
-        backend="sa",
-        init_solution=None,
-        seed=None,
-    ):
-        """Relax one sample. The default backend is Kaiwu simulated annealing.
-
-        Args:
-            inputs (torch.Tensor): Clamped input.
-            target (torch.Tensor, optional): Required when ``beta > 0``.
-            beta (float): Nudging coefficient.
-            backend (str): ``sa``, ``exhaustive``, or ``continuous``.
-            init_solution (np.ndarray, optional): Warm start for ``sa`` only,
-                length ``n_bits + 1``, entries ``-1`` or ``+1``.
-            seed (int, optional): Anneal seed. Defaults to ``config.seed``.
-
-        Returns:
-            dict: ``states``, recomputed ``energy``, ``energy_trace``,
-            ``stop_reason``, ``n_bits``, and ``init_solution``.
+            np.ndarray: Symmetric ``float64`` matrix of shape ``(n + 1, n + 1)``,
+            ``n`` the number of spins.
 
         Raises:
-            ValueError: If a positive nudge has no target, or the backend name
-                is unknown.
+            ValueError: If ``beta > 0`` and ``target`` is missing.
         """
         beta = float(beta)
         if beta > 0.0 and target is None:
             raise ValueError("the nudged phase requires a target")
-        features = self._as_vector(inputs, self.layer_sizes[0])
-        labels = self._target_or_zeros(target)
-        anneal_seed = self.config.seed if seed is None else int(seed)
-        if backend == "sa":
-            return self._equilibrate_sa(features, labels, beta, init_solution, anneal_seed)
-        if backend == "exhaustive":
-            return self._equilibrate_exhaustive(features, labels, beta)
-        if backend == "continuous":
-            return self._equilibrate_continuous(features, labels, beta)
-        raise ValueError(f"unknown backend {backend!r}")
+        widths = self.layer_sizes[1:]
+        starts = np.cumsum((0,) + widths).tolist()
+        size = starts[-1]
+        with torch.no_grad():
+            matrix = torch.zeros((size + 1, size + 1), dtype=torch.float64)
+            last = len(self.layers) - 1
+            for index, layer in enumerate(self.layers):
+                field = layer.bias_vector().detach().to(torch.float64)
+                if index == 0:
+                    drive = layer.drive(inputs.reshape(1, -1).to(layer.weight.dtype))
+                    field = field + drive.reshape(-1).to(torch.float64)
+                else:
+                    block = 0.5 * layer.coupling().detach().to(torch.float64).cpu()
+                    rows = slice(starts[index - 1], starts[index])
+                    cols = slice(starts[index], starts[index + 1])
+                    matrix[rows, cols] = block
+                    matrix[cols, rows] = block.T
+                if index == last and beta > 0.0:
+                    field = field + beta * target.detach().to(torch.float64).reshape(-1)
+                cols = slice(starts[index], starts[index + 1])
+                matrix[cols, size] = 0.5 * field.cpu()
+                matrix[size, cols] = 0.5 * field.cpu()
+        return matrix.numpy()
 
-    def train_batch(self, inputs, targets, optimizer, **kwargs):
-        """Solve a paired batch and take one optimizer step.
-
-        Args:
-            inputs (torch.Tensor): Batch of clamped inputs, shape ``(batch, n_in)``.
-            targets (torch.Tensor): One-hot targets in ``[0, 1]``, shape
-                ``(batch, n_out)``.
-            optimizer (torch.optim.Optimizer): Minimizer that consumes ``.grad``.
-            **kwargs: Forwarded to :func:`kaiwu.torch_plugin._ep_training.train_batch`.
-
-        Returns:
-            dict: Batch size, loss, free-phase cost, accuracy, zero-update rate
-            and solver-call count.
-        """
-        return run_train_batch(self, inputs, targets, optimizer, **kwargs)
-
-    def predict(self, inputs, backend="sa", seed=None):
-        """Classify a batch from the free-phase output state.
+    def equilibrate(self, inputs, sampler, target=None, beta=0.0):
+        """Relax each row with ``sampler`` and return the lowest-energy spins.
 
         Args:
-            inputs (torch.Tensor): Batch of clamped inputs.
-            backend (str): Relaxation backend.
-            seed (int, optional): Base seed. Defaults to ``config.seed``.
+            inputs (torch.Tensor): Clamped inputs of shape ``(B, n_in)``.
+            sampler: Kaiwu optimizer whose ``solve(ising_mat)`` returns ``+-1``
+                rows with the auxiliary spin last.
+            target (torch.Tensor, optional): ``+-1`` targets of shape
+                ``(B, n_out)``. Required when ``beta > 0``.
+            beta (float): Nudging coefficient.
 
         Returns:
-            torch.Tensor: Class indices of shape ``(batch,)`` and dtype ``long``.
+            list[torch.Tensor]: One ``(B, n_l)`` tensor of ``+-1`` spins per
+            layer, output last.
+
+        Raises:
+            ValueError: If ``beta > 0`` and ``target`` is missing.
+            RuntimeError: If ``sampler.solve`` does not return spin rows of the
+                Ising matrix size.
         """
-        return run_predict(self, inputs, backend=backend, seed=seed)
+        rows = []
+        for index in range(inputs.shape[0]):
+            row_target = None if target is None else target[index]
+            ising_mat = self.ising_matrix(inputs[index], row_target, beta)
+            with kpp_caller_context():
+                solution = sampler.solve(ising_mat)
+            spins = np.atleast_2d(np.asarray(solution, dtype=np.float64))
+            if spins.shape[0] == 0 or spins.shape[1] != ising_mat.shape[0]:
+                raise RuntimeError(
+                    f"sampler must return spin rows of length {ising_mat.shape[0]}, "
+                    f"got shape {spins.shape}"
+                )
+            spins = spins * spins[:, -1:]
+            hamiltonian = -np.einsum("bi,ij,bj->b", spins, ising_mat, spins)
+            rows.append(spins[int(np.argmin(hamiltonian)), :-1])
+        parameter = self.layers[0].weight
+        states = torch.as_tensor(np.stack(rows), dtype=parameter.dtype, device=parameter.device)
+        return list(torch.split(states, list(self.layer_sizes[1:]), dim=1))
 
-    def _equilibrate_sa(self, features, labels, beta, init_solution, anneal_seed):
-        """Anneal the K-bit QUBO with Kaiwu and decode the best bits."""
-        matrix, offset = self.qubo(features, labels, beta)
-        backend = SimulatedAnnealingBackend(
-            initial_temperature=self.config.initial_temperature,
-            alpha=self.config.alpha,
-            cutoff_temperature=self.config.cutoff_temperature,
-            iterations_per_t=self.config.iterations_per_t,
-            candidate_count=self.config.candidate_count,
-            seed=int(anneal_seed),
-        )
-        bits, objective = backend.minimize(matrix, init_solution)
-        states = decode_bits(bits, self.layer_sizes, self.config.state_bits)
-        energy = self.total_energy(features, states, labels, beta)
-        return self._finish(
-            states,
-            energy,
-            objective + offset,
-            [float(energy.detach())],
-            "budget_exhausted",
-        )
+    def objective(self, inputs, free_states, nudged_states, beta):
+        """Return the EP loss ``mean((E_nudged - E_free) / beta)``.
 
-    def _equilibrate_exhaustive(self, features, labels, beta):
-        """Pick an exact QUBO minimiser and decode it."""
-        matrix, offset = self.qubo(features, labels, beta)
-        backend = ExhaustiveBackend(self.config.exhaustive_max_bits)
-        bits, objective = backend.minimize(matrix)
-        states = decode_bits(bits, self.layer_sizes, self.config.state_bits)
-        energy = self.total_energy(features, states, labels, beta)
-        return self._finish(
-            states, energy, objective + offset, [float(energy.detach())], "exhaustive"
-        )
+        Its gradient is the free-minus-nudged correlation difference, so
+        minimising it with any PyTorch optimizer applies the EP update.
 
-    def _equilibrate_continuous(self, features, labels, beta):
-        """Relax ``F_beta`` with projected gradient descent."""
-        dynamics = ContinuousDynamics(self.config.step_size, self.config.max_steps)
+        Args:
+            inputs (torch.Tensor): Clamped inputs of shape ``(B, n_in)``.
+            free_states (Sequence[torch.Tensor]): States from ``beta == 0``.
+            nudged_states (Sequence[torch.Tensor]): States from ``beta``.
+            beta (float): Strictly positive nudging coefficient.
 
-        def energy_fn(states):
-            return self.total_energy(features, states, labels, beta)
+        Returns:
+            torch.Tensor: Scalar loss.
 
-        states, trace, stop_reason = dynamics.relax(
-            energy_fn, self.layer_sizes[1:], self.dtype, features.device
-        )
-        return self._finish(states, energy_fn(states).detach(), None, trace, stop_reason)
-
-    def _finish(self, states, energy, qubo_objective, trace, stop_reason):
-        """Attach the gauge-fixed spin row a nudged phase can warm-start from."""
-        return {
-            "states": states,
-            "energy": energy,
-            "qubo_objective": qubo_objective,
-            "energy_trace": trace,
-            "stop_reason": stop_reason,
-            "n_bits": logical_bit_count(self.layer_sizes, self.config.state_bits),
-            "init_solution": self._spin_row(states),
-        }
-
-    def _spin_row(self, states):
-        """Encode states as ``2q - 1`` followed by an auxiliary spin of ``+1``."""
-        bits = encode_states(states, self.config.state_bits).detach().cpu().numpy()
-        spins = 2.0 * np.asarray(bits, dtype=np.float64) - 1.0
-        return np.concatenate([spins, np.ones(1, dtype=np.float64)])
-
-    def _qubo_terms(self, inputs, target, beta):
-        """Fold the clamped input and the nudge into per-layer QUBO fields."""
-        fields = []
-        coefs = []
-        last = len(self.biases) - 1
-        for index, bias in enumerate(self.biases):
-            field = bias + (self.weights[0].transpose(0, 1) @ inputs if index == 0 else 0.0)
-            coef = torch.ones_like(bias)
-            if index == last:
-                field = field + beta * target
-                coef = coef + beta
-            fields.append(field)
-            coefs.append(coef)
-        return fields, coefs, list(self.weights[1:])
-
-    def _as_vector(self, value, width):
-        """Convert one sample to a flat parameter-dtype vector."""
-        vector = torch.as_tensor(value, dtype=self.dtype, device=self.biases[0].device)
-        return vector.reshape(int(width))
-
-    def _target_or_zeros(self, target):
-        """Return the target vector, or zeros when the phase is free."""
-        if target is None:
-            return torch.zeros(
-                self.layer_sizes[-1], dtype=self.dtype, device=self.biases[0].device
-            )
-        return self._as_vector(target, self.layer_sizes[-1])
+        Raises:
+            ValueError: If ``beta`` is not strictly positive.
+        """
+        if float(beta) <= 0.0:
+            raise ValueError("objective requires a strictly positive beta")
+        free = [state.detach() for state in free_states]
+        nudged = [state.detach() for state in nudged_states]
+        return ((self.energy(inputs, nudged) - self.energy(inputs, free)) / float(beta)).mean()
