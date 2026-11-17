@@ -57,7 +57,21 @@ class DBNTrainer:
                 Defaults to None.
             dbn_ref (UnsupervisedDBN, optional): A reference to the DBN model.
                 Defaults to None.
+
+        Raises:
+            ValueError: If `n_epochs_rbm` is negative, or if `learning_rate_rbm`
+                is not a positive finite number.
         """
+        if n_epochs_rbm < 0:
+            raise ValueError(
+                "n_epochs_rbm must be >= 0; 0 means initialization only, "
+                f"got {n_epochs_rbm!r}"
+            )
+        if not np.isfinite(learning_rate_rbm) or learning_rate_rbm <= 0:
+            raise ValueError(
+                "learning_rate_rbm must be a positive finite number, "
+                f"got {learning_rate_rbm!r}"
+            )
         self.learning_rate_rbm = learning_rate_rbm
         self.n_epochs_rbm = n_epochs_rbm
         self.batch_size = batch_size
@@ -155,6 +169,11 @@ class DBNTrainer:
 
         Returns:
             numpy.ndarray: The output of the trained RBM layer (hidden activations).
+
+        Raises:
+            ValueError: If training is requested but the DataLoader yields no
+                batches, which happens when `drop_last=True` discards every
+                sample because there are fewer samples than `batch_size`.
         """
         optimizer = SGD(rbm.parameters(), lr=self.learning_rate_rbm)
 
@@ -168,6 +187,17 @@ class DBNTrainer:
             shuffle=self.shuffle,
             drop_last=self.drop_last,
         )
+
+        # With n_epochs_rbm > 0 the epoch loop below assumes at least one batch:
+        # `avg_loss` is only assigned inside it. Bail out with a diagnosable error
+        # instead of an UnboundLocalError (or a silent no-op when verbose=False).
+        # n_epochs_rbm == 0 stays a pure initialization path and skips training.
+        if self.n_epochs_rbm > 0 and len(loader) == 0:
+            raise ValueError(
+                "training loader produced no batches: "
+                f"n_samples={data_in.shape[0]}, batch_size={self.batch_size}, "
+                f"drop_last={self.drop_last}; reduce batch_size or set drop_last=False"
+            )
 
         if self.verbose:
             print("[DBN] Pre-training start:")
