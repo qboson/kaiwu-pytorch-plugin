@@ -35,7 +35,7 @@ def test_cli_exports_layer_representation_and_source_metadata(cli, monkeypatch, 
         "train_qvae_cell.py", "--data-path", str(source), "--output-dir", str(tmp_path),
         "--input-layer", "log1p", "--device", "cpu",
     ])
-    monkeypatch.setattr(cli.Trainer, "create_model", lambda *args: (None, None, None))
+    monkeypatch.setattr(cli.Trainer, "create_model", lambda *args, **kwargs: (None, None, None))
     monkeypatch.setattr(cli.Trainer, "train", lambda *args: {})
     # Inspect the real evaluation DataLoader independently of the latent model.
     monkeypatch.setattr(cli.Trainer, "extract_representation", lambda self, model, loader: torch.cat(
