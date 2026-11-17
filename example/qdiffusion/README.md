@@ -75,6 +75,10 @@ Its end-to-end flow is:
 8. rebuild baseline and guided generators for test-time generation
 9. compare baseline vs guided outputs and write reports
 
+Set `TrainConfig.validation_seed` to repeat the validation objective's PyTorch
+corruption and candidate draws each epoch. Training continues from the RNG
+state it had before validation.
+
 ## Sample ESM2 Distance Result
 
 The DPLM-guided workflow includes `dplm/eval_esm2_distances.py` for embedding-level

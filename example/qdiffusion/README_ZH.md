@@ -85,6 +85,9 @@ factory helper 间接接入。
 8. 重建 baseline 与 guided 两套生成器用于测试时生成
 9. 对 baseline 和 guided 的输出进行对比并生成报告
 
+设置 `TrainConfig.validation_seed` 后，各轮验证会使用相同的 PyTorch 噪声和候选
+采样起始状态。验证结束后恢复训练随机状态。
+
 ## 示例 ESM2 距离结果
 
 这个 DPLM 引导工作流提供 `dplm/eval_esm2_distances.py`，用于在 embedding
