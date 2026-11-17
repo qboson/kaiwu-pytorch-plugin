@@ -1,11 +1,10 @@
 # Copyright (C) 2022-2025 Beijing QBoson Quantum Technology Co., Ltd.
 #
 # SPDX-License-Identifier: Apache-2.0
-"""Digits classification with equilibrium propagation and a backprop baseline.
+"""Digits classification with equilibrium propagation.
 
 Pixels are scaled to ``[0, 1]`` by dividing by 16. The EP network is 64-32-10
-with one bit per unit, relaxed by Kaiwu simulated annealing. The baseline is an
-MLP of the same widths trained with cross-entropy.
+with one bit per unit, relaxed by Kaiwu simulated annealing.
 """
 
 import argparse
@@ -16,7 +15,6 @@ import numpy as np
 import torch
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
-from torch import nn
 
 from kaiwu.torch_plugin import EPConfig, EquilibriumPropagation
 
@@ -80,31 +78,9 @@ def _train_ep(train_x, train_y, test_x, test_y, epochs, batch_size, lr, seed):
     return float((predicted.numpy() == test_y).mean())
 
 
-def _train_bp(train_x, train_y, test_x, test_y, epochs, batch_size, lr, seed):
-    """Train a same-shaped MLP and return its test accuracy."""
-    torch.manual_seed(int(seed))
-    network = nn.Sequential(nn.Linear(64, 32), nn.ReLU(), nn.Linear(32, 10))
-    optimizer = torch.optim.SGD(network.parameters(), lr=float(lr))
-    loss_fn = nn.CrossEntropyLoss()
-    features = torch.tensor(train_x, dtype=torch.float32)
-    labels = torch.tensor(train_y, dtype=torch.long)
-    order = np.arange(len(train_x))
-    for epoch in range(int(epochs)):
-        rng = np.random.default_rng(seed + epoch)
-        rng.shuffle(order)
-        for start in range(0, len(order), int(batch_size)):
-            batch = order[start : start + int(batch_size)]
-            optimizer.zero_grad(set_to_none=True)
-            loss_fn(network(features[batch]), labels[batch]).backward()
-            optimizer.step()
-    with torch.no_grad():
-        predicted = network(torch.tensor(test_x, dtype=torch.float32)).argmax(dim=1).numpy()
-    return float((predicted == test_y).mean())
-
-
 def main():
-    """Run the EP and BP Digits comparison and write a small JSON summary."""
-    parser = argparse.ArgumentParser(description="EP vs BP on sklearn Digits")
+    """Train EP on Digits and write a small JSON summary."""
+    parser = argparse.ArgumentParser(description="Equilibrium propagation on sklearn Digits")
     parser.add_argument("--smoke", action="store_true", help="100/100 samples, 6 epochs")
     parser.add_argument("--epochs", type=int, default=6)
     parser.add_argument("--batch-size", type=int, default=10)
@@ -120,16 +96,12 @@ def main():
     ep_accuracy = _train_ep(
         train_x, train_y, test_x, test_y, epochs, args.batch_size, args.lr, args.seed
     )
-    bp_accuracy = _train_bp(
-        train_x, train_y, test_x, test_y, epochs, args.batch_size, args.lr, args.seed
-    )
     summary = {
         "smoke": bool(args.smoke),
         "epochs": int(epochs),
         "n_train": int(len(train_x)),
         "n_test": int(len(test_x)),
         "ep_accuracy": ep_accuracy,
-        "bp_accuracy": bp_accuracy,
     }
     out_dir = os.path.join(os.path.dirname(__file__), "results")
     os.makedirs(out_dir, exist_ok=True)
@@ -137,7 +109,7 @@ def main():
     with open(path, "w", encoding="utf-8") as handle:
         json.dump(summary, handle, indent=2, sort_keys=True)
         handle.write("\n")
-    print(f"ep_accuracy={ep_accuracy:.4f} bp_accuracy={bp_accuracy:.4f}")
+    print(f"ep_accuracy={ep_accuracy:.4f}")
     print("wrote", path)
 
 

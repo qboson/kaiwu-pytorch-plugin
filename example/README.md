@@ -30,8 +30,8 @@ pandas
 
 `example/ep_digits/` trains a 64-32-10 equilibrium-propagation network on
 `sklearn.datasets.load_digits`. Each unit is one bit. The K-bit QUBO is relaxed
-by Kaiwu 1.3.1 simulated annealing, and a same-shaped backprop MLP is the
-baseline. See [example/ep_digits/README.md](ep_digits/README.md).
+by Kaiwu 1.3.1 simulated annealing. See
+[example/ep_digits/README.md](ep_digits/README.md).
 
 **Dependencies**
 

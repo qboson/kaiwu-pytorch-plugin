@@ -1,7 +1,7 @@
 # Equilibrium propagation on Digits
 
 Trains a 64-32-10 equilibrium-propagation network with Kaiwu 1.3.1 simulated
-annealing and a same-shaped backprop MLP on `sklearn.datasets.load_digits`.
+annealing on `sklearn.datasets.load_digits`.
 Pixels are divided by 16. Each unit uses one bit.
 
 A 1-bit unit stays off until its field exceeds 1/2, so the first-layer weights
@@ -16,7 +16,7 @@ Smoke run (100 training images, 100 test images, 6 epochs):
 python example/ep_digits/train_digits.py --smoke
 ```
 
-Smoke test accuracy: EP 0.4800, backprop 0.6300.
+Smoke test accuracy: 0.4800.
 
 The default command uses the stratified 75/25 split (`random_state=0`), the
 same 6 epochs and the same learning rate:
@@ -25,6 +25,6 @@ same 6 epochs and the same learning rate:
 python example/ep_digits/train_digits.py
 ```
 
-Full-split test accuracy (1347 train, 450 test): EP 0.8222, backprop 0.9667.
+Full-split test accuracy (1347 train, 450 test): 0.8222.
 
 Both runs write `example/ep_digits/results/summary.json`, which is gitignored.
