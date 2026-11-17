@@ -69,6 +69,7 @@ class QDEQConfig:
         anderson_m: Number of past iterates mixed by the backward Anderson solver.
 
         anderson_lam: Regularisation of the backward Anderson mixing problem.
+            Singular sample histories take a plain fixed-point step.
 
         jac_loss_vecs: Probe vectors for the Jacobian regulariser stored in
             ``QDEQ.last_jac_loss``; ``0`` disables it.
@@ -147,9 +148,13 @@ def _anderson_solver(
         g_mat = f_hist[:, :n] - x_hist[:, :n]
         eye = torch.eye(n, dtype=z0.dtype, device=z0.device)[None]
         h_mat[:, 1 : n + 1, 1 : n + 1] = g_mat @ g_mat.transpose(1, 2) + config.anderson_lam * eye
-        alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])[:, 1 : n + 1, 0]
+        weights, info = torch.linalg.solve_ex(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])
+        alpha = weights[:, 1 : n + 1, 0]
         # The next iterate mixes the stored images and overwrites the oldest slot.
-        x_hist[:, k % m] = (alpha[:, None] @ f_hist[:, :n])[:, 0]
+        mixed = (alpha[:, None] @ f_hist[:, :n])[:, 0]
+        usable = (info == 0) & torch.isfinite(mixed).all(dim=1)
+        # One rank-deficient sample must not abort acceleration of the entire batch.
+        x_hist[:, k % m] = torch.where(usable[:, None], mixed, f_hist[:, (k - 1) % m])
         f_hist[:, k % m] = func(x_hist[:, k % m].reshape_as(z0)).reshape(bsz, -1)
 
         nstep = k - 1
