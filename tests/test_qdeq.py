@@ -114,7 +114,7 @@ class TestCoefficientEncoding(unittest.TestCase):
         hess = (g_mat @ g_mat.T).numpy()
         grad = (g_mat @ residual).numpy()
 
-        for coeff_bits in (1, 3):
+        for coeff_bits, winning_bits in ((1, [0, 0]), (3, [1, 1, 0, 0, 1, 0])):
             with self.subTest(coeff_bits=coeff_bits):
                 config = QDEQConfig(num_basis=2, coeff_bits=coeff_bits)
                 scale = config.coeff_range * residual.norm().item() / np.sqrt(2)
@@ -129,7 +129,7 @@ class TestCoefficientEncoding(unittest.TestCase):
                 bits = np.array([
                     [0] * coeff_bits + [1] * coeff_bits,
                     [1] * (2 * coeff_bits),
-                    [0] * (2 * coeff_bits),
+                    winning_bits,
                 ])
                 spins = np.column_stack((2 * bits - 1, np.ones(len(bits))))
                 spins[2] *= -1  # Same binary state with the auxiliary spin flipped.
