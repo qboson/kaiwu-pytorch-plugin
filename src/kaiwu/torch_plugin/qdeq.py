@@ -321,7 +321,7 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     with kpp_caller_context():
         solution = sampler.solve(ising_mat)
     spins = np.atleast_2d(np.asarray(solution, dtype=np.float64))
-    if spins.shape[0] == 0 or spins.shape[1] != num_bits + 1:
+    if spins.ndim != 2 or spins.shape[0] == 0 or spins.shape[1] != num_bits + 1:
         raise RuntimeError(
             f"sampler must return spin rows of length {num_bits + 1}, "
             f"got shape {spins.shape}"

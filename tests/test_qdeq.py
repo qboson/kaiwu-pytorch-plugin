@@ -148,6 +148,29 @@ class TestCoefficientEncoding(unittest.TestCase):
                 np.testing.assert_allclose(coefficients, candidates[np.argmin(scores)])
 
 
+    def test_rejects_three_dimensional_sampler_output(self):
+        """Reshaping cannot turn malformed spin batches into valid rows."""
+        config = QDEQConfig(num_basis=2, coeff_bits=3)
+        sampler = Mock()
+        sampler.solve.return_value = np.ones((1, 7, 1))
+        g_mat = torch.eye(2, dtype=torch.float64)
+        residual = torch.ones(2, dtype=torch.float64)
+        with self.assertRaisesRegex(RuntimeError, "spin rows of length 7"):
+            _sample_coefficients(g_mat, residual, residual.norm().item(), sampler, config)
+
+    def test_accepts_a_single_spin_vector(self):
+        """Samplers can return a single solution as a one-dimensional array."""
+        config = QDEQConfig(num_basis=2, coeff_bits=2, coeff_range=1.0)
+        sampler = Mock()
+        sampler.solve.return_value = np.array([1, -1, -1, 1, 1])
+        g_mat = torch.eye(2, dtype=torch.float64)
+        residual = torch.ones(2, dtype=torch.float64)
+        coefficients = _sample_coefficients(
+            g_mat, residual, residual.norm().item(), sampler, config,
+        )
+        np.testing.assert_allclose(coefficients, [-1.0 / 3, 1.0 / 3])
+
+
 class TestImplicitGradient(unittest.TestCase):
     """Gradients equal the implicit-function-theorem gradient (I - W^T)^-1 g."""
 
