@@ -38,7 +38,11 @@ def load_reference_manifest(
     test_df: Optional[pd.DataFrame] = None,
     expected_count: int = 25,
 ) -> List[ReferenceMolecule]:
-    """Load and fully validate the immutable reference set."""
+    """Validate molecular metadata and, when supplied, fixed-split positions.
+
+    ``test_position`` is a zero-based row position, independent of DataFrame
+    index labels. Formal charge must match the parsed reference molecule.
+    """
     manifest_path = Path(path)
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
     raw_refs = payload.get("references", payload)
@@ -71,12 +75,21 @@ def load_reference_manifest(
             raise ValueError(f"{ref.reference_id} heavy-atom count mismatch")
         if n_atoms * (n_atoms - 1) // 2 != ref.n_qubo_vars:
             raise ValueError(f"{ref.reference_id} QUBO-variable count mismatch")
+        if Chem.GetFormalCharge(mol) != ref.formal_charge:
+            raise ValueError(f"{ref.reference_id} formal-charge mismatch")
 
     if test_df is not None:
-        test_canonical = {_canonical_smiles(str(s)) for s in test_df["smiles"]}
-        missing = [r.reference_id for r in refs if r.canonical_smiles not in test_canonical]
+        test_canonical = [_canonical_smiles(str(s)) for s in test_df["smiles"]]
+        test_members = set(test_canonical)
+        missing = [r.reference_id for r in refs if r.canonical_smiles not in test_members]
         if missing:
             raise ValueError(f"references absent from fixed test split: {missing}")
+        for ref in refs:
+            position = ref.test_position
+            if type(position) is not int or not 0 <= position < len(test_canonical):
+                raise ValueError(f"{ref.reference_id} test_position outside fixed test split")
+            if test_canonical[position] != ref.canonical_smiles:
+                raise ValueError(f"{ref.reference_id} test_position molecule mismatch")
 
     return refs
 
