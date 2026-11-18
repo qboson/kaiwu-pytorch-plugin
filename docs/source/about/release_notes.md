@@ -41,7 +41,7 @@
 
 ### RISC-V 64 安装
 
-要求：RISC-V 64 + Python 3.10 + glibc ≥ 2.31。
+要求：RISC-V 64 + Python 3.10 + glibc ≥ 2.39。`torch` wheel 的标签是 `manylinux_2_39`，因此实际最低 glibc 为 2.39；其余 wheel 的 `manylinux_2_31`/`2_39` 标签均可在该环境下安装。
 
 ```bash
 pip install --upgrade pip
