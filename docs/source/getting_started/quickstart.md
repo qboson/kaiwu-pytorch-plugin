@@ -243,5 +243,5 @@ Congratulations on completing the quick start! For the next step:
 
 ### Official Resources
 - **KPP GitHub:** [https://github.com/QBoson/Kaiwu-pytorch-plugin](https://github.com/QBoson/Kaiwu-pytorch-plugin)
-- **KPP Docs:** [https://kaiwu-pytorch-plugin-docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)
+- **KPP Docs:** [Documentation home](../../index.md)
 - **SDK Docs:** [https://kaiwu-community.readthedocs.io](https://kaiwu-community.readthedocs.io/)
