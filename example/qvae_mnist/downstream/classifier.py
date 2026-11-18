@@ -84,14 +84,14 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             loss.backward()
             optimizer.step()
 
-            train_loss += loss.item()
+            train_loss += loss.item() * batch_y.size(0)
             _, predicted = torch.max(outputs.data, 1)
             train_total += batch_y.size(0)
             train_correct += (predicted == batch_y).sum().item()
 
         # 计算训练集准确率
         train_acc = 100 * train_correct / train_total
-        avg_train_loss = train_loss / len(data_loader)
+        avg_train_loss = train_loss / train_total
 
         return train_acc, avg_train_loss
 
@@ -115,7 +115,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
                 outputs = model(batch_x)
                 loss = criterion(outputs, batch_y)  # 计算验证损失
-                val_loss += loss.item()
+                val_loss += loss.item() * batch_y.size(0)
 
                 _, predicted = torch.max(outputs.data, 1)
                 val_total += batch_y.size(0)
@@ -123,7 +123,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
 
             # 计算测试集准确率
             val_acc = 100 * val_correct / val_total
-            avg_val_loss = val_loss / len(data_loader)
+            avg_val_loss = val_loss / val_total
 
         return val_acc, avg_val_loss
 
