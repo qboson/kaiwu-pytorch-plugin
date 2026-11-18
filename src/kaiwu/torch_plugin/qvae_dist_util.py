@@ -159,6 +159,31 @@ def sigmoid_cross_entropy_with_logits(logits, labels):
     return logits - logits * labels + F.softplus(-logits)
 
 
+def _validate_log_prob_samples(samples, expected_width):
+    """Validate the sample matrix accepted by ``log_prob_per_var``.
+
+    Args:
+        samples: Candidate sample tensor.
+        expected_width: Number of variables the distribution models.
+
+    Returns:
+        torch.Tensor: The validated sample tensor.
+
+    Raises:
+        TypeError: If ``samples`` is not a torch tensor.
+        ValueError: If ``samples`` is not two-dimensional or its last dimension
+            differs from ``expected_width``.
+    """
+    if not isinstance(samples, torch.Tensor):
+        raise TypeError("samples must be a torch.Tensor")
+    if samples.ndim != 2 or samples.shape[-1] != expected_width:
+        raise ValueError(
+            f"samples must have shape (num_samples, {expected_width}), "
+            f"got {tuple(samples.shape)}"
+        )
+    return samples
+
+
 class FactorialBernoulliUtil(DistUtil):
     """Factorial Bernoulli distribution utility class.
 
@@ -218,6 +243,7 @@ class FactorialBernoulliUtil(DistUtil):
         Returns:
             torch.Tensor: Log probability matrix, shape (num_samples, num_vars).
         """
+        samples = _validate_log_prob_samples(samples, self.logit_mu.shape[-1])
         log_prob = -sigmoid_cross_entropy_with_logits(
             logits=self.logit_mu, labels=samples
         )
@@ -295,6 +321,7 @@ class MixtureGeneric(FactorialBernoulliUtil):
         Returns:
             torch.Tensor: Log probability matrix, shape (num_samples, num_vars).
         """
+        samples = _validate_log_prob_samples(samples, self.logit_mu.shape[-1])
         q = torch.sigmoid(self.logit_mu)
         pdf_0 = self.smoothing_dist.pdf(samples)
         pdf_1 = self.smoothing_dist.pdf(1.0 - samples)
