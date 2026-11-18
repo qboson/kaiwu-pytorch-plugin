@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from math import ceil
+from numbers import Integral
 
 import numpy as np
 import torch
@@ -55,8 +56,8 @@ class FeatureSelectionWrapper(nn.Module):
 
     Raises:
         TypeError: If ``model`` is not an ``nn.Module``.
-        ValueError: If feature counts, feature-count bounds, or solver names are
-            invalid.
+        ValueError: If feature counts, feature-count bounds, the mask-update
+            interval, or solver names are invalid.
 
     Examples:
         >>> import torch
@@ -116,6 +117,13 @@ class FeatureSelectionWrapper(nn.Module):
         self.max_selected_features = max_selected_features
         self.solver = str(solver)
         self.solver_kwargs = {} if solver_kwargs is None else dict(solver_kwargs)
+        if mask_update_epochs is not None:
+            if isinstance(mask_update_epochs, bool) or not isinstance(
+                mask_update_epochs, Integral
+            ):
+                raise TypeError("mask_update_epochs must be a positive integer")
+            if mask_update_epochs < 1:
+                raise ValueError("mask_update_epochs must be a positive integer")
         self.mask_update_epochs = (
             None if mask_update_epochs is None else int(mask_update_epochs)
         )
