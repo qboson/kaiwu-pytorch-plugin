@@ -9,6 +9,24 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 ---
 
+### Conditional sampling for binary imputation
+
+`bm_conditional_imputation.py` fills in the bottom row of a 2×2 binary image
+from its observed top row. It clamps the observed pixels with
+`BoltzmannMachine.gibbs_sample`, estimates the missing pixels' probabilities,
+and compares them with probabilities from exact enumeration. Each missing
+pixel is filled with 1 when its estimated probability is at least 0.5.
+
+After installing the plugin with `pip install .`, run from the repository root:
+
+```bash
+python example/bm_conditional_imputation.py
+```
+
+This example runs on CPU with no extra packages, dataset, or hardware credentials.
+
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:

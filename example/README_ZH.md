@@ -9,6 +9,22 @@
 
 ---
 
+### 条件采样：填补缺失的二值像素
+
+`bm_conditional_imputation.py` 根据 2×2 二值图像的已知上排填补缺失的下排。
+示例使用 `BoltzmannMachine.gibbs_sample` 固定已知像素，估计各缺失像素为 1
+的概率，并与枚举得到的精确概率比较。估计概率达到 0.5 时，填补值取 1。
+
+使用 `pip install .` 安装插件后，在仓库根目录运行：
+
+```bash
+python example/bm_conditional_imputation.py
+```
+
+示例在 CPU 上运行，无需额外依赖、数据集或真机授权。
+
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` 现在分为：
