@@ -80,6 +80,8 @@ class MoleculeQUBO:
                 k += 1
         self.n_bonds = k
         self.n_vars  = k  # No slack variables — paper Eq.(2)
+        # Reuse the row-major upper-triangle layout for every solver candidate.
+        self._bond_rows, self._bond_cols = np.triu_indices(self.n, k=1)
 
         # ── Precompute triangle index triples for ring incentive ─────────
         # For each triple (i, j, k) with i < j < k, store the three
@@ -106,17 +108,19 @@ class MoleculeQUBO:
 
     def bond_vector(self, adj: np.ndarray) -> np.ndarray:
         """Flatten upper-triangular adjacency → bond feature vector (n_bonds,)."""
-        vec = np.zeros(self.n_bonds, dtype=np.float32)
-        for k, (i, j) in enumerate(self.bond_pairs):
-            vec[k] = adj[i, j]
-        return vec
+        return np.asarray(adj)[self._bond_rows, self._bond_cols].astype(
+            np.float32, copy=False
+        )
 
     def decode_sample(self, sample: Dict[int, int]) -> np.ndarray:
         """Decode a QUBO sample → adjacency matrix (n×n)."""
         adj = np.zeros((self.n, self.n), dtype=np.int32)
-        for k, (i, j) in enumerate(self.bond_pairs):
-            v = int(sample.get(k, 0))
-            adj[i, j] = adj[j, i] = v
+        values = np.fromiter(
+            (int(sample.get(k, 0)) for k in range(self.n_bonds)),
+            dtype=np.int32, count=self.n_bonds,
+        )
+        adj[self._bond_rows, self._bond_cols] = values
+        adj[self._bond_cols, self._bond_rows] = values
         return adj
 
     # ── QUBO matrix construction ──────────────────────────────────────────
