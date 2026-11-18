@@ -201,13 +201,18 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
-            sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
-            s_visible: State of the visible layer.
+            sampler: Ising optimizer for sampling unobserved nodes.
+            s_visible (torch.Tensor): Observed prefix of shape (batch, num_visible).
+            dtype (torch.dtype): Data type used to decode the hidden samples.
 
         Returns:
-            torch.Tensor: Spins sampled from the model
-                (shape determined by ``sampler`` and ``sample_params``).
+            torch.Tensor: One full state per sample returned by the optimizer
+                for each observation. If all nodes are observed, returns a copy
+                of ``s_visible`` without calling the optimizer.
         """
+        if s_visible.ndim == 2 and s_visible.shape[1] == self.num_nodes:
+            return s_visible.clone()
+
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])

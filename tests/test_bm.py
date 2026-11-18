@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 import torch
 import numpy as np
 
@@ -115,6 +116,19 @@ class TestBoltzmannMachine(unittest.TestCase):
             # 隐含层数量为2，输出应为(3, 3)
             self.assertEqual(ising_submat.shape, (3, 3))
             self.assertIsInstance(ising_submat, np.ndarray)
+
+    def test_condition_sample_with_all_nodes_observed(self):
+        """A complete observation is the sole possible state for its row."""
+        model = BM(4, device="cpu")
+        observed = torch.tensor([[1.0, 0.0, 1.0, 0.0], [0.0, 1.0, 0.0, 1.0]])
+        sampler = Mock()
+        sampler.solve.side_effect = AssertionError("no hidden nodes to sample")
+
+        result = model.condition_sample(sampler, observed)
+
+        torch.testing.assert_close(result, observed)
+        sampler.solve.assert_not_called()
+        self.assertNotEqual(result.data_ptr(), observed.data_ptr())
 
     def test_condition_sample(self):
         """测试condition_sample功能"""
