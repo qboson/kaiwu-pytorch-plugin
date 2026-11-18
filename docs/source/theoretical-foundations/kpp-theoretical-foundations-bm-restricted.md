@@ -134,6 +134,65 @@ $$\mathbf{v}^{(0)} \xrightarrow{P(\mathbf{h} \mid \mathbf{v}^{(0)})} \mathbf{h}^
 
 Each half-step updates an entire layer in parallel, making the RBM vastly more efficient than the classic Boltzmann machine, where each unit update requires computing inputs from all other units.
 
+### Local PyTorch sampling and training
+
+`RestrictedBoltzmannMachine.gibbs_sample` runs these block updates locally with
+PyTorch, without an external solver or SDK credentials. `n_step` counts complete
+two-layer transitions per chain, and `n_burnin` discards that many initial
+transitions. Both must be nonnegative integers; Boolean counts are rejected.
+Returned rows are grouped by
+retained transition; columns contain visible units followed by hidden units.
+With `B` chains, the shape is `(max(n_step - n_burnin, 0) * B, num_nodes)`.
+Zero steps or fully discarded chains return an empty batch, while still performing
+the selected initialization and all requested transitions. Discarding samples
+does not change the random stream or the trajectory of the chain.
+
+Supply either `s_visible` of shape `(B, num_visible)` or `s_hidden` of shape
+`(B, num_hidden)`, using exact binary 0/1 states. Each row initializes a separate
+chain. Visible initializers update hidden then visible units; hidden initializers
+update visible then hidden units. These states are initial conditions, not
+clamped observations: both layers change on every transition. With no initializer,
+`n_sample` specifies a positive number of chains whose visible states start from
+Bernoulli(0.5). An explicitly supplied `n_sample` alongside an initializer must
+match its batch size. The caller's tensor is preserved, and states are converted
+to the current model parameter dtype and device.
+
+An optional `torch.Generator` on the parameter device controls initialization and
+all conditional draws. A separate generator makes repeated calls reproducible
+without changing the default Torch RNG; without one, the sampler uses that default
+RNG. Sampling always disables autograd. The resulting detached joint states can
+be supplied directly to the existing `objective` as the negative phase:
+
+```python
+import torch
+from kaiwu.torch_plugin import RestrictedBoltzmannMachine
+
+rbm = RestrictedBoltzmannMachine(3, 2, device="cpu")
+optimizer = torch.optim.SGD(rbm.parameters(), lr=0.05)
+generator = torch.Generator(device="cpu").manual_seed(42)
+observed = torch.tensor([[1., 0., 1.], [0., 1., 0.], [1., 1., 0.]])
+
+for _ in range(3):
+    # Detached conditional hidden means provide positive-phase energy moments.
+    positive = rbm.get_hidden(observed)
+    negative = rbm.gibbs_sample(
+        n_step=6, n_burnin=3, n_sample=8, generator=generator,
+    )
+    assert negative.shape == (24, 5)
+    optimizer.zero_grad()
+    loss = rbm.objective(positive, negative)
+    loss.backward()
+    optimizer.step()
+```
+
+Finite-length Gibbs chains are MCMC approximations. Consecutive states from each
+chain are correlated, and burn-in does not guarantee that a chain has mixed.
+The sampler does not promise independent Boltzmann samples or a likelihood
+improvement from any particular stochastic training step. Choose chain length
+and burn-in according to the model and assess convergence for the intended use.
+The external-solver `sample(sampler)` API and the existing conditional propagation
+methods remain available.
+
 ## Learning the RBM: Contrastive Divergence Revisited
 The RBM is trained using the **contrastive divergence (CD)** algorithm introduced in Section [3.3 Contrastive Divergence](kpp-theoretical-foundations-ebms-cd.md). The gradient of the log-likelihood retains the same contrastive form:
 
