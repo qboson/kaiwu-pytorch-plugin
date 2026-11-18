@@ -221,6 +221,16 @@ msgid ""
 "make locally will be reflected immediately inside Jupyter."
 msgstr "这会将您的本地仓库挂载到容器中，因此您在本地所做的任何更改都会立即反映在 Jupyter 中。"
 
+#: ../../source/getting_started/installation.md:144
+msgid "Install the plugin"
+msgstr "安装插件"
+
+#: ../../source/getting_started/installation.md:146
+msgid ""
+"In JupyterLab Terminal, run the command below before opening the examples."
+" The mounted checkout must be writable to build the plugin."
+msgstr "打开示例前，请在 JupyterLab 终端运行以下命令。构建插件需要对挂载的仓库有写权限。"
+
 #: ../../source/getting_started/installation.md:124
 msgid "Stop the Server"
 msgstr "停止服务器"

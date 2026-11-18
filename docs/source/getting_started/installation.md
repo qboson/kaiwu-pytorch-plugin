@@ -141,6 +141,14 @@ Clone the project from GitHub to your local machine:
 ```
 This mounts your local repository into the container, so any changes you make locally will be reflected immediately inside Jupyter.
 
+#### Install the plugin
+
+In JupyterLab Terminal, run the command below before opening the examples. The mounted checkout must be writable to build the plugin.
+
+```bash
+python -m pip install /home/jovyan/work
+```
+
 #### Stop the Server
 
 Press `Ctrl+C`, then run:
