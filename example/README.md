@@ -1,5 +1,21 @@
 **Language Versions**: [中文](README_ZH.md) | [English](README.md)
 
+### Sensor channel selection
+
+[Select sensor channels](feature_selection/sensor_channels.py) fits a regressor
+to synthetic six-channel time series and selects two sensors with MAIFS local
+search. Each mask entry applies across all 12 time steps of a sensor.
+After installing the plugin, run this command from the repository root:
+
+```sh
+python example/feature_selection/sensor_channels.py
+```
+
+Channels 1 and 4 (zero-based) drive the target. The script reports test-set
+mean squared error for the full model, the selected channels, and a constant
+predictor fitted on the training set. It runs on CPU with the plugin's standard
+Python 3.10 dependencies and generates the data locally.
+
 ### Examples of BoltzmannMachine and RestrictedBoltzmannMachine
 
 * `run_bm.py`: Demonstrates how to use the `BoltzmannMachine` class for model instantiation, sampling, objective function calculation, and parameter optimization. This is suitable for understanding the basic training workflow of a Boltzmann Machine, including sampling and gradient backpropagation.
