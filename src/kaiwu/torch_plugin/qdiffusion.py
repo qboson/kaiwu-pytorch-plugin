@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import chain
 import math
 from typing import Any
 
@@ -215,7 +216,7 @@ class QDiffusion(nn.Module):
         energy_model: Energy-side model used to encode and score candidates.
         token_spec: Special-token metadata required by the generator.
         config: Optional generation/training configuration.
-        dtype: Floating point dtype tracked by the wrapper.
+        dtype: Optional floating dtype; omitted preserves supplied submodule dtypes.
         device: Optional target device. When omitted, infer from parameters.
         freeze_proposal: Whether to freeze proposal model parameters.
     """
@@ -226,7 +227,7 @@ class QDiffusion(nn.Module):
         energy_model: EnergyModel,
         token_spec: SequenceTokenSpec,
         config: QDiffusionConfig | None = None,
-        dtype: torch.dtype = torch.float32,
+        dtype: torch.dtype | None = None,
         device: torch.device | str | None = None,
         freeze_proposal: bool = True,
     ) -> None:
@@ -235,8 +236,7 @@ class QDiffusion(nn.Module):
         self.energy_model = energy_model
         self.token_spec = token_spec
         self.config = config or QDiffusionConfig()
-        self.dtype = dtype
-
+        self.dtype = dtype if dtype is not None else torch.float32
         if freeze_proposal:
             self.proposal_model.eval()
             for parameter in self.proposal_model.parameters():
@@ -249,7 +249,6 @@ class QDiffusion(nn.Module):
         self.eos_id = token_spec.eos_id
         self.x_id = token_spec.x_id
         self.softplus = nn.Softplus()
-
         if device is None:
             try:
                 self.device = next(self.parameters()).device
@@ -257,7 +256,7 @@ class QDiffusion(nn.Module):
                 self.device = torch.device("cpu")
         else:
             self.device = torch.device(device)
-            self.to(device=self.device, dtype=self.dtype)
+        self.to(device=self.device, dtype=dtype)
 
     def to(self, *args: Any, **kwargs: Any) -> QDiffusion:
         """Moves the module and refreshes cached device/dtype metadata.
@@ -271,8 +270,9 @@ class QDiffusion(nn.Module):
         """
         module = super().to(*args, **kwargs)
         try:
-            self.device = next(self.parameters()).device
-            self.dtype = next(self.parameters()).dtype
+            self.device = next(chain(self.parameters(), self.buffers())).device
+            tensors = chain(self.proposal_model.parameters(), self.proposal_model.buffers())
+            self.dtype = next((t.dtype for t in tensors if t.is_floating_point()), self.dtype)
         except StopIteration:
             self.device = torch.device("cpu")
         return module
@@ -573,7 +573,7 @@ class QDiffusion(nn.Module):
             input_tokens, partial_masks=partial_masks
         )
         output_tokens = input_tokens.masked_fill(output_mask, self.mask_id)
-        output_scores = torch.zeros_like(output_tokens, dtype=torch.float)
+        output_scores = torch.zeros_like(output_tokens, dtype=self.dtype)
         return output_tokens, output_scores
 
     def _sample(
