@@ -38,13 +38,16 @@ class TestBoltzmannMachine(unittest.TestCase):
     def test_forward(self):
         """测试前向传播计算能量"""
         with self.subTest("测试手动计算的能量值"):
-            # 测试不同输入的能量计算
-            energy_ones = self.bm(self.ones).item()
-            energy_mones = self.bm(self.mones).item()
+            # E(s) = -s·b - 0.5·sᵀ·sym(Q)·s,其中 sym(Q) 取严格上三角及其转置。
+            # 按 setUp 权重手工计算:ones=15, mones=27, pmones=-5, mpones=-9
+            self.assertEqual(15.0, self.bm(self.ones).item())
+            self.assertEqual(27.0, self.bm(self.mones).item())
+            self.assertEqual(-5.0, self.bm(self.pmones).item())
+            self.assertEqual(-9.0, self.bm(self.mpones).item())
 
-            # 验证能量计算的正确性
-            self.assertIsInstance(energy_ones, float)
-            self.assertIsInstance(energy_mones, float)
+        with self.subTest("测试批量输入能量逐样本对应"):
+            batch = torch.vstack([self.ones, self.mones, self.pmones, self.mpones])
+            self.assertListEqual(self.bm(batch).tolist(), [15.0, 27.0, -5.0, -9.0])
 
     def test_get_ising_matrix(self):
         """测试Ising模型转换"""
@@ -60,12 +63,15 @@ class TestBoltzmannMachine(unittest.TestCase):
     def test_objective(self):
         """测试目标函数计算"""
         with self.subTest("测试目标函数"):
-            s1 = self.ones
-            s2 = self.mones
+            # objective = E[s_positive].mean() - E[s_negative].mean()
+            # ones/mones 能量为 15/27,差为 -12
+            objective = self.bm.objective(self.ones, self.mones)
+            self.assertEqual(-12.0, objective.item())
 
-            # 计算目标函数
-            objective = self.bm.objective(s1, s2)
-            self.assertIsInstance(objective.item(), float)
+        with self.subTest("测试批量目标函数"):
+            s1 = torch.vstack([self.ones, self.pmones])  # 均值 (15 + (-5)) / 2 = 5
+            s2 = torch.vstack([self.mones, self.mpones])  # 均值 (27 + (-9)) / 2 = 9
+            self.assertEqual(-4.0, self.bm.objective(s1, s2).item())
 
     def test_parameter_shapes(self):
         """测试参数形状"""
@@ -92,11 +98,23 @@ class TestBoltzmannMachine(unittest.TestCase):
 
     def test_gibbs_sample(self):
         """测试gibbs_sample采样功能"""
-        with self.subTest("采样输出形状与类型"):
-            samples = self.bm.gibbs_sample(num_steps=10, s_visible=self.ones)
-            self.assertEqual(samples.shape, self.ones.shape)
+        with self.subTest("条件采样保持可见层并重采样隐层"):
+            # 旧用例把全部 4 个节点都作为可见层传入,导致 Gibbs 循环内
+            # 所有单元都被跳过、从未真正采样。这里可见层只覆盖前 2 个节点,
+            # 并用极端偏置把隐层单元的条件概率固定为 1 和 0,使结果确定:
+            # 可见层 [1, 0] 保持不变,隐层被重采样为 [1, 0]。
+            bm = BM(self.num_nodes)
+            bm.linear_bias.data = torch.FloatTensor([0.0, 0.0, 50.0, -50.0])
+            bm.quadratic_coef.data = torch.zeros(self.num_nodes, self.num_nodes)
+            s_visible = torch.tensor([[1.0, 0.0]])
+            samples = bm.gibbs_sample(num_steps=5, s_visible=s_visible)
+            self.assertEqual(samples.shape, (1, self.num_nodes))
+            torch.testing.assert_close(
+                samples, torch.tensor([[1.0, 0.0, 1.0, 0.0]])
+            )
+            # 输入的可见层不应被采样过程覆写
+            torch.testing.assert_close(s_visible, torch.tensor([[1.0, 0.0]]))
             self.assertTrue(torch.all((samples == 0) | (samples == 1)))
-            self.assertIsInstance(samples, torch.Tensor)
 
         with self.subTest("采样无s_visible参数"):
             samples = self.bm.gibbs_sample(num_steps=5, num_sample=2)
