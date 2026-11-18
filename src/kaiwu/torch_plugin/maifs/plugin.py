@@ -263,9 +263,18 @@ class FeatureSelectionWrapper(nn.Module):
         Raises:
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
                 no batches, or ``loss_fn`` does not return a scalar tensor.
+            RuntimeError: If PyTorch gradient recording is disabled or inference
+                mode is active.
+
+        A loss independent of the mask has zero gradient and Hessian. Gradient
+        recording must be enabled so nonconstant losses can be distinguished
+        from constant losses. Inference mode must also be disabled.
+        Models and losses must preserve autograd for mask-dependent operations.
         """
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
+        if not torch.is_grad_enabled() or torch.is_inference_mode_enabled():
+            raise RuntimeError("compute_mask_derivatives requires gradient recording")
 
         input_batches: list[torch.Tensor] = []
         target_batches: list[torch.Tensor] = []
@@ -302,11 +311,16 @@ class FeatureSelectionWrapper(nn.Module):
             )
             if loss.ndim != 0:
                 raise ValueError("loss_fn must return a scalar tensor")
-            gradient = torch.autograd.grad(
-                loss,
-                continuous_mask,
-                create_graph=True,
-            )[0]
+            gradient = None
+            if loss.requires_grad:
+                gradient = torch.autograd.grad(
+                    loss,
+                    continuous_mask,
+                    create_graph=True,
+                    allow_unused=True,
+                )[0]
+            if gradient is None:
+                gradient = torch.zeros_like(continuous_mask)
             rows = [
                 self._hessian_row(gradient, continuous_mask, index, hessian_mode)
                 for index in range(self.feature_dim)
