@@ -32,9 +32,11 @@ rbm_digits/
 ## Data
 
 The example uses `sklearn.datasets.load_digits` (8x8 images, 10 classes).
-Each image is expanded by shifting it up / down / left / right (5x total
-samples), normalized with `MinMaxScaler`, and split into 80% train / 20%
-test (`random_state=42`).
+It splits the original images into 80% training and 20% test sets
+(`random_state=42`). Only training images are expanded with four shifts
+(up, down, left, and right), yielding five samples per training image.
+`MinMaxScaler` is fitted on the augmented training set and applied to both
+sets. The test set contains only original images.
 
 ## Training
 

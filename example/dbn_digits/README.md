@@ -16,7 +16,12 @@ dbn_digits/
 
 ## Data
 
-Same pipeline as `rbm_digits`: `sklearn.datasets.load_digits` (8x8), four-direction shift augmentation (5x), `MinMaxScaler` normalization, 80% / 20% split (`random_state=42`).
+Like `rbm_digits`, this example uses `sklearn.datasets.load_digits` (8x8 images).
+It splits the original images into 80% training and 20% test sets
+(`random_state=42`). Only training images are expanded with four shifts
+(up, down, left, and right), yielding five samples per training image.
+`MinMaxScaler` is fitted on the augmented training set and applied to both
+sets. The test set contains only original images.
 
 ## Training
 
