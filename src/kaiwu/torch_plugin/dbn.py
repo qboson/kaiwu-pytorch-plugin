@@ -147,12 +147,15 @@ class UnsupervisedDBN(nn.Module):
         """Gets the RBM layer at the specified index.
 
         Args:
-            index (int): The index of the RBM layer.
+            index (int): The index of the RBM layer. Negative indices count
+                backwards from the last layer, as in a Python sequence.
 
         Returns:
-            RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise None.
+            RestrictedBoltzmannMachine or None: The RBM layer if found, otherwise None,
+                including before layers are created or when the index is out of range.
         """
-        if index < len(self.rbm_layers):
+        num_layers = self.num_layers
+        if -num_layers <= index < num_layers:
             return self.rbm_layers[index]
         return None
 
@@ -204,17 +207,21 @@ class UnsupervisedDBN(nn.Module):
         """Returns the number of RBM layers.
 
         Returns:
-            int: The number of layers.
+            int: The number of created layers, or 0 before layers are created.
         """
-        return len(self.rbm_layers)
+        return 0 if self.rbm_layers is None else len(self.rbm_layers)
 
     @property
     def output_dim(self):
         """Returns the output dimension of the DBN.
 
         Returns:
-            int: The dimension of the final hidden layer.
+            int or None: The dimension of the final hidden layer, or the input
+                dimension for a built model with no layers. Returns None before
+                layers are created.
         """
+        if self.rbm_layers is None:
+            return None
         if len(self.rbm_layers) > 0:
             return self.rbm_layers[-1].num_hidden
         return self.input_dim
