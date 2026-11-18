@@ -10,6 +10,35 @@ import torch
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
 
 
+def _validated_states(name, states, expected_width):
+    """Validate a batch of model states against the expected width.
+
+    Args:
+        name (str): Argument name used in error messages.
+        states: Candidate state tensor of shape (batch, expected_width).
+        expected_width (int): Number of state variables the model expects.
+
+    Returns:
+        torch.Tensor: The validated state tensor.
+
+    Raises:
+        TypeError: If ``states`` is not a ``torch.Tensor``.
+        ValueError: If it is not 2-D or its last dimension differs from
+            ``expected_width``.
+    """
+    if not isinstance(states, torch.Tensor):
+        raise TypeError(
+            f"{name} must be a torch.Tensor of states, "
+            f"got {type(states).__name__}"
+        )
+    if states.ndim != 2 or states.shape[1] != expected_width:
+        raise ValueError(
+            f"{name} must have shape (batch, {expected_width}), "
+            f"got {tuple(states.shape)}"
+        )
+    return states
+
+
 class AbstractBoltzmannMachine(torch.nn.Module):
     """Abstract base class for Boltzmann Machines.
 
