@@ -305,11 +305,15 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     scale = config.coeff_range * residual_norm / math.sqrt(config.num_basis)
     offset = np.full(config.num_basis, -scale)
     weights = 2.0 * scale / (2**config.coeff_bits - 1) * 2.0 ** np.arange(config.coeff_bits)
-    enc = np.kron(np.eye(config.num_basis), weights)
+    num_bits = config.num_basis * config.coeff_bits
 
-    # min_a a^T H a / 2 + g^T a  ==  min_x x^T Q x  with
-    # Q = E^T H E / 2 + diag(E^T (H offset + g)), since x_i^2 = x_i for binary x.
-    qubo_mat = enc.T @ hess @ enc / 2 + np.diag(enc.T @ (hess @ offset + grad))
+    # Each block of E^T H E is H[i, j] times the outer product of the
+    # bit weights. Build it directly instead of multiplying a sparse encoder.
+    blocks = hess[:, None, :, None] * weights[None, :, None, None]
+    qubo_mat = (blocks * weights).reshape(num_bits, num_bits)
+    qubo_mat *= 0.5
+    linear = (hess @ offset + grad)[:, None] * weights
+    qubo_mat.flat[::num_bits + 1] += linear.ravel()
     # Minimising x^T Q x is maximising s^T J s, which is what Kaiwu optimizers do.
     ising_mat, _ = qubo_matrix_to_ising_matrix(qubo_mat)
     ising_mat = ising_mat / max(float(np.abs(ising_mat).max()), 1e-12)
@@ -317,14 +321,15 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
     with kpp_caller_context():
         solution = sampler.solve(ising_mat)
     spins = np.atleast_2d(np.asarray(solution, dtype=np.float64))
-    if spins.shape[0] == 0 or spins.shape[1] != enc.shape[1] + 1:
+    if spins.shape[0] == 0 or spins.shape[1] != num_bits + 1:
         raise RuntimeError(
-            f"sampler must return spin rows of length {enc.shape[1] + 1}, "
+            f"sampler must return spin rows of length {num_bits + 1}, "
             f"got shape {spins.shape}"
         )
     # The last spin is the auxiliary spin; x_i = (s_i s_aux + 1) / 2 is invariant
     # to flipping every spin. Every returned row is decoded and the best kept.
-    coeffs = offset + ((spins[:, :-1] * spins[:, -1:] + 1) / 2) @ enc.T
+    binary = (spins[:, :-1] * spins[:, -1:] + 1) / 2
+    coeffs = offset + binary.reshape(-1, config.num_basis, config.coeff_bits) @ weights
     objective = 0.5 * np.einsum("bi,ij,bj->b", coeffs, hess, coeffs) + coeffs @ grad
     return coeffs[int(np.argmin(objective))]
 
