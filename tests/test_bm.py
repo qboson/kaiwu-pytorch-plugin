@@ -124,11 +124,18 @@ class TestBoltzmannMachine(unittest.TestCase):
         sampler = Mock()
         sampler.solve.side_effect = AssertionError("no hidden nodes to sample")
 
-        result = model.condition_sample(sampler, observed)
+        dtype_cases = (
+            (torch.float32, torch.float32),
+            (torch.float64, torch.float64),
+            (None, torch.float32),
+        )
+        for dtype, expected_dtype in dtype_cases:
+            with self.subTest(dtype=dtype):
+                result = model.condition_sample(sampler, observed, dtype=dtype)
 
-        torch.testing.assert_close(result, observed)
-        sampler.solve.assert_not_called()
-        self.assertNotEqual(result.data_ptr(), observed.data_ptr())
+                torch.testing.assert_close(result, observed.to(expected_dtype))
+                sampler.solve.assert_not_called()
+                self.assertNotEqual(result.data_ptr(), observed.data_ptr())
 
     def test_condition_sample(self):
         """测试condition_sample功能"""
