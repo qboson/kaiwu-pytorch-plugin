@@ -778,12 +778,39 @@ def solve_qubo(
         Binary state returned by the selected optimization backend.
 
     Raises:
-        ValueError: If inputs or the solver name are invalid.
+        ValueError: If inputs, the solver name, or the solver options are invalid.
         ImportError: If ``solver="kaiwu_cim"`` is requested without Kaiwu.
         RuntimeError: If solver execution fails or returns an invalid solution.
     """
     initial_state = np.asarray(initial_state, dtype=int)
     solver_name = str(solver)
+
+    supported_options = {
+        "local_search": frozenset({"max_iter"}),
+        "kaiwu_cim": frozenset(
+            {
+                "max_bits",
+                "target_precision",
+                "max_precision",
+                "precision_step",
+                "sample_number",
+                "save_dir",
+                "cleanup_records",
+                "project_no",
+                "task_mode",
+                "interval",
+            }
+        ),
+    }
+    allowed_options = supported_options.get(solver_name)
+    if allowed_options is not None:
+        unsupported = sorted(set(solver_kwargs) - allowed_options)
+        if unsupported:
+            raise ValueError(
+                f"Unsupported option(s) for solver {solver_name!r}: "
+                f"{', '.join(unsupported)}. Supported options: "
+                f"{', '.join(sorted(allowed_options))}"
+            )
 
     try:
         ising_matrix = QuadraticLinearSolver().solve(
