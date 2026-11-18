@@ -33,6 +33,11 @@ pandas
 matrix is relaxed by Kaiwu simulated annealing. See
 [example/ep_digits/README.md](ep_digits/README.md).
 
+`example/ep_mnist/` trains the same kind of network on the full original MNIST,
+with a convolutional variant whose first layer is an `EPConv2d`. See
+[example/ep_mnist/README.md](ep_mnist/README.md) for commands, results, and run
+time.
+
 **Dependencies**
 
 ```

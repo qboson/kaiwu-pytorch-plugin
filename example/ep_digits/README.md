@@ -3,7 +3,7 @@
 Trains a 64-32-10 equilibrium-propagation network on
 `sklearn.datasets.load_digits`. Pixels are divided by 16. Every unit is a ±1
 spin, and the Ising matrices of the free and nudged phases are relaxed by Kaiwu
-simulated annealing. The script runs on Kaiwu 1.3.1 and 1.4.1.
+1.3.1 simulated annealing.
 
 The test split is the stratified 25% of `random_state=0`. A further stratified
 20% of the remaining images is held out for validation, and hyperparameters were
