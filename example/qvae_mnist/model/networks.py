@@ -102,8 +102,10 @@ class BasicDecoder(Network):
         for idx, layer in enumerate(self._layers):
             if idx == nr_layers - 1 and self._output_activation_fct:
                 x = self._output_activation_fct(layer(x))
-            else:
+            elif self._activation_fct:
                 x = self._activation_fct(layer(x))
+            else:
+                x = layer(x)
         return x
 
     def encode(self, x):
