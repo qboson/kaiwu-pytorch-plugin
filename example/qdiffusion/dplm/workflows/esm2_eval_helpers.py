@@ -181,6 +181,7 @@ def embed_sequences(
     batch_size: int,
     pooling: str,
 ) -> dict[str, torch.Tensor]:
+    """Pool into independently owned CPU vectors without retaining token batches."""
     if not records:
         return {}
 
@@ -223,7 +224,7 @@ def embed_sequences(
                 else:
                     raise ValueError(f"Unsupported pooling mode: {pooling}")
 
-                embeddings[header] = pooled.detach().cpu()
+                embeddings[header] = pooled.detach().to(device="cpu", copy=True)
 
     return embeddings
 
