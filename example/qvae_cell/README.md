@@ -39,11 +39,16 @@ kpp_qvae/
 
 ## Training
 
-The default data file is:
+Run the training commands from `example/qvae_cell`. Move the prepared
+AnnData file next to `train_qvae_cell.py` and name it `immune_processed.h5ad`.
+The default data path is:
 
 ```text
-../immune_processed.h5ad
+./immune_processed.h5ad
 ```
+
+If you keep the file elsewhere or use a different name, pass the path with
+`--data-path` when running `python train_qvae_cell.py` directly, as shown below.
 
 The default observation fields are:
 
