@@ -1,12 +1,15 @@
 """QDEQ public interface, solver and gradient tests."""
 
 import unittest
+from unittest.mock import Mock
 
 import numpy as np
 import torch
 
 import kaiwu.torch_plugin as plugin
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
+from kaiwu.torch_plugin._kaiwu_compat import qubo_matrix_to_ising_matrix
+from kaiwu.torch_plugin.qdeq import _sample_coefficients
 
 
 class LocalSearchSampler:
@@ -99,6 +102,73 @@ class TestIsingForward(unittest.TestCase):
         torch.testing.assert_close(out, self.exact, rtol=1e-5, atol=1e-5)
         self.assertLess(stats["forward_residual"], 1e-6)
         self.assertGreater(stats["forward_sampler_time"], 0.0)
+
+
+class TestCoefficientEncoding(unittest.TestCase):
+    """The block QUBO matches the dense encoding and decodes solver rows."""
+
+    def test_matches_dense_encoding(self):
+        """Compare the submitted Ising matrix and winning coefficients."""
+        g_mat = torch.tensor([[1.0, 2.0, -1.0], [0.0, -1.0, 1.0]], dtype=torch.float64)
+        residual = torch.tensor([1.0, 0.5, 2.0], dtype=torch.float64)
+        hess = (g_mat @ g_mat.T).numpy()
+        grad = (g_mat @ residual).numpy()
+
+        for coeff_bits, winning_bits in ((1, [0, 0]), (3, [1, 1, 0, 0, 1, 0])):
+            with self.subTest(coeff_bits=coeff_bits):
+                config = QDEQConfig(num_basis=2, coeff_bits=coeff_bits)
+                scale = config.coeff_range * residual.norm().item() / np.sqrt(2)
+                offset = np.full(2, -scale)
+                weights = 2 * scale / (2**coeff_bits - 1) * 2.0 ** np.arange(coeff_bits)
+                encoder = np.kron(np.eye(2), weights)
+                qubo = encoder.T @ hess @ encoder / 2
+                qubo += np.diag(encoder.T @ (hess @ offset + grad))
+                ising, _ = qubo_matrix_to_ising_matrix(qubo)
+                ising /= np.abs(ising).max()
+
+                bits = np.array([
+                    [0] * coeff_bits + [1] * coeff_bits,
+                    [1] * (2 * coeff_bits),
+                    winning_bits,
+                ])
+                spins = np.column_stack((2 * bits - 1, np.ones(len(bits))))
+                spins[2] *= -1  # Same binary state with the auxiliary spin flipped.
+                sampler = Mock()
+                sampler.solve.return_value = spins
+                coefficients = _sample_coefficients(
+                    g_mat, residual, residual.norm().item(), sampler, config,
+                )
+
+                np.testing.assert_allclose(
+                    sampler.solve.call_args.args[0], ising, atol=1e-12, rtol=1e-12,
+                )
+                candidates = offset + bits @ encoder.T
+                scores = np.linalg.norm(residual.numpy() + candidates @ g_mat.numpy(), axis=1)
+                self.assertEqual(int(np.argmin(scores)), 2)
+                np.testing.assert_allclose(coefficients, candidates[np.argmin(scores)])
+
+
+    def test_rejects_three_dimensional_sampler_output(self):
+        """Reshaping cannot turn malformed spin batches into valid rows."""
+        config = QDEQConfig(num_basis=2, coeff_bits=3)
+        sampler = Mock()
+        sampler.solve.return_value = np.ones((1, 7, 1))
+        g_mat = torch.eye(2, dtype=torch.float64)
+        residual = torch.ones(2, dtype=torch.float64)
+        with self.assertRaisesRegex(RuntimeError, "spin rows of length 7"):
+            _sample_coefficients(g_mat, residual, residual.norm().item(), sampler, config)
+
+    def test_accepts_a_single_spin_vector(self):
+        """Samplers can return a single solution as a one-dimensional array."""
+        config = QDEQConfig(num_basis=2, coeff_bits=2, coeff_range=1.0)
+        sampler = Mock()
+        sampler.solve.return_value = np.array([1, -1, -1, 1, 1])
+        g_mat = torch.eye(2, dtype=torch.float64)
+        residual = torch.ones(2, dtype=torch.float64)
+        coefficients = _sample_coefficients(
+            g_mat, residual, residual.norm().item(), sampler, config,
+        )
+        np.testing.assert_allclose(coefficients, [-1.0 / 3, 1.0 / 3])
 
 
 class TestImplicitGradient(unittest.TestCase):
