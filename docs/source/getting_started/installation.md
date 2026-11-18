@@ -72,7 +72,7 @@ conda activate quantum_env
 2. **Clone the Repository**
 Clone the project from GitHub to your local machine:
 ```bash
-git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
 cd kaiwu-pytorch-plugin
 ```
 
@@ -115,7 +115,7 @@ requirements/
 1. **Clone the repository**
 Clone the project from GitHub to your local machine:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
