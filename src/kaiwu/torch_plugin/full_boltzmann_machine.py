@@ -202,7 +202,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         Args:
             sampler: Ising optimizer for sampling unobserved nodes.
-            s_visible (torch.Tensor): Observed prefix of shape (batch, num_visible).
+            s_visible (torch.Tensor): Observed prefix of shape (batch, num_visible)
+                on the model device.
             dtype (torch.dtype, optional): Data type used to decode hidden samples.
 
         Returns:
@@ -212,6 +213,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 dtype of ``s_visible`` and ``dtype``, or the input dtype if ``None``.
         """
         if s_visible.ndim == 2 and s_visible.shape[1] == self.num_nodes:
+            if s_visible.device != self.linear_bias.device:
+                raise ValueError("s_visible must be on the same device as the model")
             if dtype is not None:
                 dtype = torch.promote_types(s_visible.dtype, dtype)
             return s_visible.to(dtype=dtype, copy=True)

@@ -137,6 +137,14 @@ class TestBoltzmannMachine(unittest.TestCase):
                 sampler.solve.assert_not_called()
                 self.assertNotEqual(result.data_ptr(), observed.data_ptr())
 
+    def test_fully_observed_condition_rejects_device_mismatch(self):
+        """Clamping all nodes still requires an observation on the model device."""
+        observed = torch.ones(1, self.num_nodes, device="meta")
+        sampler = Mock()
+        with self.assertRaisesRegex(ValueError, "same device"):
+            self.bm.condition_sample(sampler, observed)
+        sampler.solve.assert_not_called()
+
     def test_condition_sample(self):
         """测试condition_sample功能"""
 
