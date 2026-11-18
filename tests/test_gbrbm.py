@@ -179,8 +179,8 @@ class TestGaussianBernoulliRestrictedBoltzmannMachine(unittest.TestCase):
             s_gaussian=torch.zeros(2, 2, dtype=torch.float64),
         )
 
-        self.assertEqual(random_sample.shape, (4, 4))
-        self.assertEqual(data_sample.shape, (4, 4))
+        self.assertEqual(random_sample.shape, (2, 4))
+        self.assertEqual(data_sample.shape, (2, 4))
         self.assertFalse(hasattr(self.bm, "conditional_gibbs_sample"))
         self.assertFalse(hasattr(self.bm, "cd_gibbs_sample"))
 
