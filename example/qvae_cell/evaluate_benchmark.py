@@ -516,6 +516,8 @@ def main():
     parser.add_argument("--scgraph-only-umap", action="store_true")
     args = parser.parse_args()
     selected_metrics = parse_metrics(args.metrics)
+    if "dpt" in selected_metrics and args.root_cell_type is None:
+        raise ValueError("--root-cell-type is required when --metrics includes dpt")
 
     output_dir = args.output_dir or os.path.dirname(args.h5ad) or "."
     os.makedirs(output_dir, exist_ok=True)
@@ -605,8 +607,6 @@ def main():
             print(f"Skipping scGraph: {exc}")
 
     if "dpt" in selected_metrics:
-        if args.root_cell_type is None:
-            raise ValueError("--root-cell-type is required when --metrics includes dpt")
         dpt_df = evaluate_dpt(
             adata,
             args.rep_key,
