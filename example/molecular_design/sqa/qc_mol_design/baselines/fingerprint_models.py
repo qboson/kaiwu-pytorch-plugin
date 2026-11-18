@@ -82,16 +82,26 @@ def compute_maccs(smiles_list: List[str], nbits: int = 512) -> np.ndarray:
 # Fingerprint Dataset
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _property_vector(props: np.ndarray, n_samples: int) -> np.ndarray:
+    """Normalize one property per sample without accidental pairwise broadcast."""
+    values = np.asarray(props)
+    if values.ndim == 2 and values.shape[1] == 1:
+        values = values[:, 0]
+    if values.ndim != 1 or len(values) != n_samples:
+        raise ValueError("properties must have shape (N,) or (N, 1), matching fingerprints")
+    return values
+
+
 class FingerprintDataset(torch.utils.data.Dataset):
     """Dataset of (fingerprint, property) pairs for a single property target."""
 
     def __init__(
         self,
         fps:   np.ndarray,      # (N, fp_dim)
-        props: np.ndarray,      # (N,) continuous property values
+        props: np.ndarray,      # (N,) or (N, 1) continuous property values
     ) -> None:
         self.fps   = torch.FloatTensor(fps)
-        self.props = torch.FloatTensor(props)
+        self.props = torch.FloatTensor(_property_vector(props, len(self.fps)))
 
     def __len__(self) -> int:
         return len(self.fps)
@@ -136,7 +146,8 @@ def evaluate_fingerprint_predictor(
     test_fps:    np.ndarray,
     test_props:  np.ndarray,
 ) -> float:
-    """Return MAE on test set."""
+    """Return elementwise MAE; targets may have shape (N,) or (N, 1)."""
+    test_props = _property_vector(test_props, len(test_fps))
     device = CFG.device
     model.eval()
     fps_t  = torch.FloatTensor(test_fps).to(device)
