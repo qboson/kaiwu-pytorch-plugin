@@ -70,7 +70,7 @@ $$\nabla f(\theta) = \mathbb{E}_{\text{data}}[\nabla \log P_\theta(\mathbf{X})] 
 
 The gradient of $\log Z_\theta$ is:
 
-$$\nabla \log Z_\theta = \frac{1}{Z_\theta} \sum_{\tilde{\mathbf{x}}} \exp(-E_\theta(\tilde{\mathbf{x}})) \nabla E_\theta(\tilde{\mathbf{x}}) = \mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$
+$$\nabla \log Z_\theta = \frac{1}{Z_\theta} \sum_{\tilde{\mathbf{x}}} \exp(-E_\theta(\tilde{\mathbf{x}})) \left( -\nabla E_\theta(\tilde{\mathbf{x}}) \right) = -\mathbb{E}_\theta[\nabla E_\theta(\mathbf{X})]$$
 
 Thus, the gradient of the log-likelihood becomes:
 
