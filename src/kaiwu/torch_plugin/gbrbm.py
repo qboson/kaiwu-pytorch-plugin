@@ -12,7 +12,10 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn import init
 
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validate_node_count,
+)
 
 
 class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
@@ -47,6 +50,8 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     ):
         """Initialize the Restricted Gaussian-Bernoulli Boltzmann Machine."""
         super().__init__(device=device)
+        num_visible = _validate_node_count("num_visible", num_visible)
+        num_hidden = _validate_node_count("num_hidden", num_hidden)
         self.dtype = dtype
         self.num_visible = num_visible
         self.num_hidden = num_hidden
