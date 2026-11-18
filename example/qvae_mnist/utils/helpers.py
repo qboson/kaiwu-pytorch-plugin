@@ -28,6 +28,14 @@ from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 import logging
 logger = logging.getLogger(__name__)
 
+
+def _prepare_plot_parent(filename):
+    """Create PNG output parents while accepting current-directory filenames."""
+    parent = os.path.dirname(os.fspath(filename))
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+
+
 def save_list_to_txt(filename, data):
     with open(filename, "w") as f:
         for value in data:
@@ -83,6 +91,7 @@ def plot_training_curves(
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         save_path = f"results/mlp_training_curves_{timestamp}.png"
 
+    _prepare_plot_parent(save_path)
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     print(f"Training curves saved to: {save_path}")
     plt.show()
@@ -181,6 +190,7 @@ def t_SNE(
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         save_path = f"results/t-SNE_QVAE_{training_status}_{timestamp}.png"
 
+    _prepare_plot_parent(save_path)
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     logger.info(f"t-SNE plot saved to: {save_path}")
     plt.show()
@@ -261,7 +271,7 @@ def plot_flattened_images_grid(
     plt.tight_layout()
 
     if save_path:
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        _prepare_plot_parent(save_path)
         plt.savefig(save_path, dpi=300, bbox_inches="tight")
         print(f"Saved flattened images grid to: {save_path}")
         plt.close()
@@ -776,6 +786,7 @@ def plot_MNIST_output(x_true, x_recon, n_samples=5, output="./output/testVAE.png
         ax.get_yaxis().set_visible(False)
     fig = plt.gcf()
   #  plt.show()
+    _prepare_plot_parent(output)
     fig.savefig(output)
 
 #@title Helper Functions
@@ -885,6 +896,7 @@ def plot_generative_output(x_true, n_samples=100, output="./output/testVAE.png")
         current_ax .get_yaxis().set_visible(False)
     fig = plt.gcf()
     # fig.tight_layout()
+    _prepare_plot_parent(output)
     fig.savefig(output, bbox_inches='tight')
 #         ax = plt.subplot(, n_samples, i + 1)
 #         plt.imshow(x_true[i].reshape((28, 28)))
