@@ -321,10 +321,12 @@ class CRBM(nn.Module):
                 CFG.prop_offsets[group] + combos[:, col],
             ] = 1.0
 
-        batch = f.shape[0]
-        y_all = y.unsqueeze(0).expand(batch, -1, -1).reshape(-1, CFG.n_vis)
-        f_all = f.unsqueeze(1).expand(-1, n_combo, -1).reshape(-1, CFG.fp_dim)
-        energies = self.free_energy(y_all, f_all).reshape(batch, n_combo)
+        # Fingerprint-conditioned biases do not depend on the label combination.
+        # Project each fingerprint once instead of materialising B*n_combo copies.
+        b_eff, c_eff = self.effective_biases(f)
+        vis_term = -(b_eff @ y.T)
+        h_input = c_eff.unsqueeze(1) + (y @ self.W).unsqueeze(0)
+        energies = vis_term - F.softplus(h_input).sum(-1)
         return -torch.logsumexp(-energies, dim=1)
 
     # ──────────────────────────────────────────────────────────────────────
