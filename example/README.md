@@ -14,8 +14,8 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 `bm_conditional_imputation.py` fills in the bottom row of a 2×2 binary image
 from its observed top row. It clamps the observed pixels with
 `BoltzmannMachine.gibbs_sample`, estimates the missing pixels' probabilities,
-and checks them against exact enumeration. The imputed value for each pixel
-is 1 when its estimated probability is at least 0.5.
+and compares them with probabilities from exact enumeration. Each missing
+pixel is filled with 1 when its estimated probability is at least 0.5.
 
 After installing the plugin with `pip install .`, run from the repository root:
 

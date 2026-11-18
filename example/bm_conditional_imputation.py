@@ -31,7 +31,7 @@ def main() -> None:
     )
 
     # Gibbs sampling holds a prefix of the units fixed in each chain.
-    # Start several independent chains for each observed row.
+    # Start several chains for each observed row.
     num_chains = 2048
     clamped = observed.repeat_interleave(num_chains, dim=0)
     samples = model.gibbs_sample(num_steps=30, s_visible=clamped)
