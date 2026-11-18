@@ -6,6 +6,10 @@ isort>=5.10.0
 pip-licenses==5.5.0
 pylint==3.3.7
 
+# Import the complete DPLM example in ESM2 report regressions (no model downloads).
+-r ../example/qdiffusion/requirements.txt
+fair-esm==2.0.0
+
 # 文档相关依赖
 sphinx==8.1.3
 pydata-sphinx-theme==0.15.4

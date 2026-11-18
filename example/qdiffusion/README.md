@@ -77,6 +77,11 @@ Its end-to-end flow is:
 
 ## Sample ESM2 Distance Result
 
+Distance summaries use the conventional median: for an even number of pairs,
+the two central distances are averaged. The historical table below is retained
+as originally reported and has not been recomputed with this definition;
+rerun evaluation to obtain corrected medians. Mean calculations are unaffected.
+
 The DPLM-guided workflow includes `dplm/eval_esm2_distances.py` for embedding-level
 comparison between generated sequences and the reference proteome. One example
 report from the current setup used:
