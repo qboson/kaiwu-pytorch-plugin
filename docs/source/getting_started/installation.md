@@ -105,7 +105,6 @@ The Docker setup builds a pre‑configured Jupyter notebook environment with all
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
