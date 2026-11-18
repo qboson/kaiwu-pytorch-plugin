@@ -929,8 +929,8 @@ class QDiffusion(nn.Module):
             decoding_strategy: Skeptical-remasking strategy string.
             still_noisy_mask: Boolean mask tracking which positions remain noisy.
             editable_token_mask: Editable non-special-token mask.
-            t: Current decode step index, starting from ``1``.
-            max_step: Total decode step count.
+            t: Decode step index (from 1), clamped to the terminal rate after max_step.
+            max_step: Total step count; non-positive counts use the terminal rate.
             noise: Mask token id or per-position noise tensor.
 
         Returns:
@@ -939,11 +939,11 @@ class QDiffusion(nn.Module):
             state.
         """
         _, condition, topk_mode, schedule = decoding_strategy.split("-")
-
+        progress = 1.0 if max_step <= 0 else min(max(t, 0), max_step) / max_step
         if schedule == "linear":
-            rate = 1 - t / max_step
+            rate = 1 - progress
         elif schedule == "cosine":
-            rate = np.cos(t / max_step * np.pi * 0.5)
+            rate = float(np.cos(progress * np.pi * 0.5))
         else:
             raise NotImplementedError(f"Unknown schedule: {schedule}")
 
