@@ -82,10 +82,10 @@ class DuvenaudConvLayer(nn.Module):
         # Apply degree-specific weight matrices
         H_new = torch.zeros(B, N, out_dim, device=H.device, dtype=H.dtype)
         for d in range(self.max_degree + 1):
-            # Boolean mask: which nodes have degree d
-            mask = ((deg == d) & node_mask).float().unsqueeze(-1)
-            W    = self.weights[min(d, self.max_degree)]  # (in_dim, out_dim)
-            H_new = H_new + mask * (H_agg @ W)
+            # Project only real nodes of this degree. Multiplying every node
+            # by every degree's matrix repeats work that is masked away.
+            mask = (deg == d) & node_mask
+            H_new[mask] = H_agg[mask] @ self.weights[d]
 
         H_new = F.relu(H_new + self.bias)              # (B, N, out_dim)
 
