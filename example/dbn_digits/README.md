@@ -63,3 +63,21 @@ dropout_p                 Dropout probability (default: 0.0)
 use_cim                   Use the CIM quantum sampler (requires QPU quota)
 classifier_type           logistic / svm / random_forest (classifier mode)
 ```
+
+`DBNPretrainer` / `DBNTrainer` (defaults):
+
+```text
+drop_last                 Whether to drop the last incomplete batch (default:
+                          False). The walkthrough supervised_dbn_digits.ipynb
+                          documents the same option in Chinese as
+                          「是否丢弃最后不足batch的样本（默认False）」. With
+                          drop_last=True and fewer samples than batch_size the
+                          loader yields no batches at all; with n_epochs_rbm > 0
+                          that raises a ValueError ("training loader produced no
+                          batches: n_samples=8, batch_size=100, drop_last=True;
+                          reduce batch_size or set drop_last=False") instead of
+                          an UnboundLocalError in the verbose path, or a model
+                          that is only marked as trained while no batch was
+                          processed when verbose=False. n_epochs_rbm=0 stays
+                          initialization-only and never trips the check.
+```
