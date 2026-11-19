@@ -54,6 +54,10 @@ def parse_args():
     parser.add_argument("--rbm-lr", type=float, default=1e-3)
     parser.add_argument("--bm-weight-decay", type=float, default=0.0)
     parser.add_argument("--loss-type", default="mse", choices=["mse", "bernoulli"])
+    parser.add_argument(
+        "--fit-bernoulli-on-train", action="store_true",
+        help="Fit Bernoulli expression scaling on training cells",
+    )
     parser.add_argument("--representation", default="q", choices=["zeta", "q"])
     parser.add_argument("--load-weights", action="store_true")
     parser.add_argument("--sampler-type", default="sa", choices=["sa", "cim"])

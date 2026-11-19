@@ -40,12 +40,15 @@ class Trainer:
         """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
         x = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
         x = np.asarray(x, dtype=np.float32)
-        if self.args.loss_type == "mse":
+        if self.args.loss_type == "mse" or getattr(self.args, "fit_bernoulli_on_train", False):
             return x
+        return self._scale_bernoulli(x, x)
 
-        # Bernoulli 重构要求输入接近概率值；若原始数据超出 [0, 1]，先做 min-max 归一化。
-        x_min = float(np.nanmin(x))
-        x_max = float(np.nanmax(x))
+    @staticmethod
+    def _scale_bernoulli(x, fit_values):
+        """使用拟合细胞的范围，将表达值映射到 [0, 1]。"""
+        x_min = float(np.nanmin(fit_values))
+        x_max = float(np.nanmax(fit_values))
         if x_min < 0.0 or x_max > 1.0:
             x = (x - x_min) / (x_max - x_min + 1e-8)
         return np.clip(x, 0.0, 1.0).astype(np.float32, copy=False)
@@ -64,6 +67,8 @@ class Trainer:
             test_size=self.args.val_percentage,
             random_state=self.args.seed,
         )
+        if self.args.loss_type == "bernoulli" and getattr(self.args, "fit_bernoulli_on_train", False):
+            x = self._scale_bernoulli(x, x[train_idx])
         x_tensor = torch.tensor(x, dtype=torch.float32)
         batch_tensor = torch.tensor(batch_indices, dtype=torch.long)
         return (
