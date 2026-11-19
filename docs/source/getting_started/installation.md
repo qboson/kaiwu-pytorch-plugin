@@ -33,6 +33,9 @@ installation command as the plugin, for example:
 python -m pip install "kaiwu==1.3.1" .
 ```
 
+This SDK compatibility range applies when installing the plugin from this checkout.
+A plugin release installed from PyPI uses the dependency metadata published with that release.
+
 Use an isolated environment for each SDK version. Use regular installation
 rather than `pip install -e .` for SDK 1.3.1: its regular `kaiwu` package
 otherwise hides the editable plugin. The shared compatibility module handles
