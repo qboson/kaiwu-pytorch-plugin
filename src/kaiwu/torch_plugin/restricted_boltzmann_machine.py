@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
 import torch
+from torch.nn.functional import softplus
+
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 
@@ -129,6 +131,22 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         return -s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
         )
+
+    def free_energy(self, s_visible: torch.Tensor) -> torch.Tensor:
+        """Compute the visible free energy by summing out the hidden units.
+
+        Args:
+            s_visible: Visible states with ``num_visible`` entries on the last axis.
+
+        Returns:
+            One value per visible state, equal to ``-log(sum_h exp(-E(v, h)))``.
+            The computation supports gradients with respect to model parameters.
+        """
+        if s_visible.ndim == 0 or s_visible.shape[-1] != self.num_visible:
+            raise ValueError("s_visible must have num_visible entries on its last axis")
+        visible = s_visible.to(self.quadratic_coef)
+        hidden_logits = visible @ self.quadratic_coef + self.hidden_bias
+        return -(visible @ self.visible_bias) - softplus(hidden_logits).sum(dim=-1)
 
     def _to_ising_matrix(self):
         """Convert the Restricted Boltzmann Machine to Ising format."""
