@@ -105,7 +105,11 @@ def plot_kde(
             (generated_df, "Generated", "tomato"),
         ]:
             vals = df[prop].dropna().values
+            vals = vals[np.isfinite(vals)]
             if len(vals) < 5:
+                continue
+            if np.all(vals == vals[0]):
+                ax.axvline(vals[0], color=color, label=name)
                 continue
             kde  = gaussian_kde(vals)
             xmin, xmax = vals.min(), vals.max()
@@ -133,7 +137,9 @@ def plot_violin_sas(
     if not generated_by_target:
         return
 
-    labels = list(generated_by_target.keys())
+    labels = [label for label, values in generated_by_target.items() if len(values)]
+    if not labels:
+        return
     data   = [generated_by_target[k] for k in labels]
 
     fig, ax = plt.subplots(figsize=(max(8, len(labels) * 1.5), 6))
