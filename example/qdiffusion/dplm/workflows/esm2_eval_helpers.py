@@ -259,6 +259,9 @@ def summarize_distances(label: str, rows: list[PairDistanceRow]) -> DistanceSumm
     )
 
 
+_DISTANCE_BATCH_SIZE = 256
+
+
 def evaluate_candidate_set(
     *,
     label: str,
@@ -282,30 +285,27 @@ def evaluate_candidate_set(
         )
 
     rows: list[PairDistanceRow] = []
-    for index, ((ref_header, ref_seq), (cand_header, cand_seq)) in enumerate(
-        pairs, start=1
-    ):
-        ref_embedding = reference_embeddings[ref_header]
-        cand_embedding = candidate_embeddings[cand_header]
-        cosine_distance = (
-            1.0
-            - F.cosine_similarity(
-                ref_embedding.unsqueeze(0), cand_embedding.unsqueeze(0), dim=-1
-            ).item()
-        )
-        l2_distance = torch.norm(ref_embedding - cand_embedding, p=2).item()
-
-        rows.append(
-            PairDistanceRow(
-                index=index,
-                reference_header=ref_header,
-                candidate_header=cand_header,
-                reference_length=len(normalize_sequence(ref_seq)),
-                candidate_length=len(normalize_sequence(cand_seq)),
-                cosine_distance=float(cosine_distance),
-                l2_distance=float(l2_distance),
+    for start in range(0, len(pairs), _DISTANCE_BATCH_SIZE):
+        batch = pairs[start : start + _DISTANCE_BATCH_SIZE]
+        reference = torch.stack([reference_embeddings[ref[0]] for ref, _ in batch])
+        candidate = torch.stack([candidate_embeddings[cand[0]] for _, cand in batch])
+        similarities = F.cosine_similarity(reference, candidate, dim=-1).tolist()
+        distances = torch.linalg.vector_norm(reference - candidate, dim=-1).tolist()
+        for index, (pair, similarity, distance) in enumerate(
+            zip(batch, similarities, distances), start=start + 1
+        ):
+            (ref_header, ref_seq), (cand_header, cand_seq) = pair
+            rows.append(
+                PairDistanceRow(
+                    index=index,
+                    reference_header=ref_header,
+                    candidate_header=cand_header,
+                    reference_length=len(normalize_sequence(ref_seq)),
+                    candidate_length=len(normalize_sequence(cand_seq)),
+                    cosine_distance=1.0 - similarity,
+                    l2_distance=distance,
+                )
             )
-        )
 
     return rows, summarize_distances(label, rows)
 

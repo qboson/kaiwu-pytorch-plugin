@@ -77,6 +77,9 @@ Its end-to-end flow is:
 
 ## Sample ESM2 Distance Result
 
+The evaluator computes embedding distances in bounded batches while keeping
+the same aligned FASTA pair order in the report.
+
 The DPLM-guided workflow includes `dplm/eval_esm2_distances.py` for embedding-level
 comparison between generated sequences and the reference proteome. One example
 report from the current setup used:

@@ -87,6 +87,8 @@ factory helper 间接接入。
 
 ## 示例 ESM2 距离结果
 
+评估器分批计算嵌入距离，报告沿用 FASTA 记录匹配后的顺序。
+
 这个 DPLM 引导工作流提供 `dplm/eval_esm2_distances.py`，用于在 embedding
 层面比较生成序列与 reference proteome 的距离。当前一组示例评估使用了：
 
