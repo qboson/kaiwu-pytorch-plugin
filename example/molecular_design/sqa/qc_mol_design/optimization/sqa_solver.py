@@ -21,7 +21,8 @@ def energy_model(matrix):
     if not (matrix.ndim == 2 and matrix.shape[0] == matrix.shape[1]
             and np.array_equal(matrix, matrix.T)
             and np.all(np.diag(matrix) == 0)
-            and np.all(matrix == np.rint(matrix)) and abs(matrix).max() <= 8191):
+            and np.all(matrix == np.rint(matrix))
+            and np.all(matrix >= -8191) and np.all(matrix <= 8191)):
         raise ValueError("Expected the symmetric zero-diagonal 14-bit CIM matrix")
     h = {i: 0.0 for i in range(len(matrix))}
     J = {(i, j): -2.0 * float(matrix[i, j])
