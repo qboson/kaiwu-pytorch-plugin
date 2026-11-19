@@ -48,6 +48,9 @@ local modules):
   which builds a `Pipeline([("rbm", RBMRunner), ("logistic", ...)])`, trains it,
   and also trains a raw-pixel logistic regression baseline.
 
+`RBMRunner.batch_size` controls how many images are sent to the RBM at once
+during feature extraction as well as training.
+
 `use_cim=True` switches the sampler from `SimulatedAnnealingOptimizer` to a
 `CIMOptimizer` (+ `PrecisionReducer`) and requires real-machine access — see
 the repository-level README for obtaining a QPU quota.
