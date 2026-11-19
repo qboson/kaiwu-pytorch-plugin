@@ -4,7 +4,7 @@
 
 **语言版本**: [中文](README_ZH.md) | [English](README.md)
 
-有关 Kaiwu-PyTorch-Plugin 的使用说明，请参考[**项目文档**](https://kaiwu-pytorch-plugin.readthedocs.io/zh-cn/latest/)。
+有关 Kaiwu-PyTorch-Plugin 的使用说明，请参考[**项目文档**](https://kaiwu-pytorch-plugin-docs.readthedocs.io/zh-cn/latest/)。
 
 **第一次给 KPP 做贡献？** 建议先去[开物量子开发者社区](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)的「开源贡献社区」了解参与渠道，再从文档或示例里的一个小改动做起。
 
