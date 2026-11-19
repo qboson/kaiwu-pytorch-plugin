@@ -175,5 +175,5 @@ API 文档通过 `sphinx.ext.autodoc` 自动生成，只需在 Markdown 文件�
 ## 注意事项
 
 1. 文档构建时可能会出现一些警告，这些主要是内容相关的问题，不影响框架本身
-2. 图片路径需要相对于文档根目录
+2. 图片的相对路径以当前 Markdown 文件所在目录为起点。例如，`docs/source/getting_started/` 中的页面可用 `../../_static/sdk-logo.png` 引用项目 Logo，也可用 `/_static/sdk-logo.png` 从文档根目录 `docs/` 引用。
 3. 建议使用 MyST Markdown 格式编写文档，以获得更好的 Sphinx 支持
