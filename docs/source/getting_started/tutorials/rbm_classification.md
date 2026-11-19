@@ -19,7 +19,7 @@
 
 ```{code-block} bash
 
- pip install scikit-learn matplotlib scipy
+ pip install scikit-learn matplotlib scipy seaborn
 
 ```
 ## 1. 数据准备
