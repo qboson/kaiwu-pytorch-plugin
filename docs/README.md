@@ -60,6 +60,8 @@ docs/
 
 ### 0. 克隆仓库并创建虚拟环境
 
+本地构建 HTML 文档需要 Node.js 来预渲染 KaTeX 公式。Read the Docs 使用 Node.js 20。请单独安装 Node.js（不包含在 `requirements/devel.txt` 中），并在构建所用的终端运行 `node --version` 确认可用。
+
 本文档使用 Sphinx 构建，建议在独立的 Python 虚拟环境中执行所有构建命令。首先克隆仓库并创建虚拟环境（以下两种方式任选其一）：
 
 ```bash
