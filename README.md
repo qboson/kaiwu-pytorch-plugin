@@ -180,9 +180,8 @@ requirements/
    cd kaiwu-pytorch-plugin/requirements
    ```
 
-2. **Enter the requirements directory and build the image**  
+2. **Build the Docker image**
    ```bash
-   cd kaiwu-pytorch-plugin/requirements
    docker compose build
    ```
 
