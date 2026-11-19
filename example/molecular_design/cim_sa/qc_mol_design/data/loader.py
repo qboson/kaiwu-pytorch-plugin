@@ -57,7 +57,7 @@ def _compute_properties(smiles_series: pd.Series) -> pd.DataFrame:
             records.append(None)
 
     df = pd.DataFrame([r if r else {"qed": np.nan, "logp": np.nan, "sas": np.nan}
-                       for r in records])
+                       for r in records], columns=["qed", "logp", "sas"])
     return df
 
 

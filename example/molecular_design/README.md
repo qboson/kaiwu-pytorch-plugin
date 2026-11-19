@@ -147,3 +147,5 @@ SA 需预先激活 Kaiwu 授权，或设置 `KAIWU_USER_ID` 和 `KAIWU_SDK_CODE`
 | `KAIWU_CIM_BIT_WIDTH` | `14`（默认值） |
 
 凭证文件通过本地私有路径提供。CIM 命令会向自己的项目提交硬件任务；该命令用于新的单次采样轨迹，历史混合预算结果见上方实验结果表。
+
+CSV 无记录或筛选训练行后为空时，加载器返回保留 smiles、qed、logp、sas 列的空表。
