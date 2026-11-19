@@ -35,12 +35,19 @@ class ETTh1Windows(Dataset):
         seq_len: Look-back length.
         pred_len: Forecast horizon.
         stride: Step between consecutive window starts.
+        variable_names: Optional names in the same order as the scaled columns.
+        scale: Optional training standard deviations for original-unit reporting.
     """
 
-    def __init__(self, values: np.ndarray, seq_len: int, pred_len: int, stride: int = 1):
+    def __init__(
+        self, values: np.ndarray, seq_len: int, pred_len: int, stride: int = 1,
+        *, variable_names: tuple[str, ...] = (), scale: np.ndarray | None = None,
+    ):
         self.values = torch.as_tensor(values, dtype=torch.float32)
         self.seq_len = seq_len
         self.pred_len = pred_len
+        self.variable_names = variable_names
+        self.scale = scale
         self.starts = list(range(0, len(values) - seq_len - pred_len + 1, stride))
 
     def __len__(self) -> int:
@@ -68,7 +75,8 @@ def build_loaders(
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
         )
-    values = pd.read_csv(data_path).drop(columns=["date"]).to_numpy(dtype=np.float32)
+    frame = pd.read_csv(data_path).drop(columns=["date"])
+    values = frame.to_numpy(dtype=np.float32)
     train = values[:TRAIN_ROWS]
     mean, std = train.mean(axis=0), train.std(axis=0) + 1e-8
     scaled = (values - mean) / std
@@ -83,7 +91,10 @@ def build_loaders(
     loaders = {}
     for split, (begin, end) in bounds.items():
         stride = train_stride if split == "train" else eval_stride
-        windows = ETTh1Windows(scaled[begin:end], seq_len, pred_len, stride)
+        windows = ETTh1Windows(
+            scaled[begin:end], seq_len, pred_len, stride,
+            variable_names=tuple(frame.columns), scale=std,
+        )
         loaders[split] = DataLoader(windows, batch_size=batch_size, shuffle=split == "train")
     return loaders
 
@@ -272,14 +283,38 @@ def build_config() -> QDEQConfig:
 
 
 @torch.no_grad()
-def evaluate(model: DEQForecaster, loader: DataLoader) -> dict[str, float]:
-    """Returns scaled-space MSE and MAE plus the mean forward solver steps."""
+def evaluate(
+    model: DEQForecaster, loader: DataLoader, *, original_units: bool = False,
+) -> dict[str, float | dict[str, dict[str, float]]]:
+    """Return scaled errors, solver steps, and optional per-variable original units."""
     model.eval()
     squared, absolute, count, steps = 0.0, 0.0, 0, []
+    if original_units:
+        names = getattr(loader.dataset, "variable_names", ())
+        scale = getattr(loader.dataset, "scale", None)
+        if not names or scale is None:
+            raise ValueError("Original-unit metrics require variable names and training scales")
+        per_squared = torch.zeros(len(names), dtype=torch.float64)
+        per_absolute = torch.zeros_like(per_squared)
     for history, target in loader:
-        forecast = model(history)
-        squared += torch.sum((forecast - target) ** 2).item()
-        absolute += torch.sum(torch.abs(forecast - target)).item()
+        error = model(history) - target
+        squared_error = error.square()
+        absolute_error = error.abs()
+        squared += squared_error.sum().item()
+        absolute += absolute_error.sum().item()
         count += target.numel()
         steps.append(model.deq.get_last_stats()["forward_nstep"])
-    return {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}
+        if original_units:
+            per_squared += squared_error.sum(dim=(0, 1), dtype=torch.float64).cpu()
+            per_absolute += absolute_error.sum(dim=(0, 1), dtype=torch.float64).cpu()
+    result = {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}
+    if original_units:
+        points = count // len(names)
+        result["original_units"] = {
+            name: {
+                "mse": float(per_squared[index]) * float(scale[index]) ** 2 / points,
+                "mae": float(per_absolute[index]) * float(scale[index]) / points,
+            }
+            for index, name in enumerate(names)
+        }
+    return result
