@@ -103,11 +103,13 @@ qvae_energy_by_celltype.png       # cell type energy 分布
 |dpt  |             DPT 伪时序和轨迹一致性，即是否能产生合理的细胞发育/状态变化顺序 |
 |all |              运行以上所有评估项 |
 
+以下命令使用快速检查生成的文件。若训练时用了其他输出目录，请用 `--h5ad` 指向该目录下生成的文件。
+
 只跑聚类评估：
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --metrics clustering
@@ -117,7 +119,7 @@ python evaluate_benchmark.py \
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --metrics classification
@@ -127,7 +129,7 @@ python evaluate_benchmark.py \
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --batch-key batch \
@@ -138,7 +140,7 @@ python evaluate_benchmark.py \
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --metrics dpt \
