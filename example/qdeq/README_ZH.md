@@ -36,19 +36,23 @@ example/qdeq/data/ETTh1.csv
 
 ## 快速开始
 
+安装 Kaiwu SDK 后，可先用 Anderson 对照组在 CPU 上完成训练和预测，无需激活许可证。
+
 ```bash
 pip install -e .        # 在仓库根目录安装插件
 pip install -r example/qdeq/requirements.txt
-python example/qdeq/simple/simple_train_example.py --sampler sa
-python example/qdeq/simple/simple_forecast_example.py --sampler sa
+python example/qdeq/simple/simple_train_example.py --sampler anderson
+python example/qdeq/simple/simple_forecast_example.py --sampler anderson
 ```
 
 `--sampler` 可选：
 
-- `sa`：Kaiwu 模拟退火（`kaiwu.classical.SimulatedAnnealingOptimizer`），本地运行
-- `cim`：Kaiwu CIM（`CIMOptimizer` + `PrecisionReducer`），需要已授权的 Kaiwu 账号
+- `sa`：默认求解器，使用 `kaiwu.classical.SimulatedAnnealingOptimizer` 在本地运行
+- `cim`：Kaiwu CIM（`CIMOptimizer` + `PrecisionReducer`）
 - `anderson`：经典对照组，即 `etth1_common.py` 中的 `AndersonDEQ`，它继承 `QDEQ`
   并用 Anderson 加速重写 `solve_fixed_point`
+
+使用 `sa` 或 `cim` 前，请按 [SDK 安装说明](https://kaiwu-sdk-docs.qboson.com/zh/latest/source/getting_started/sdk_installation_instructions.html)激活许可证。
 
 ## Simple
 
