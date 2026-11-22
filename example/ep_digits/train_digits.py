@@ -9,8 +9,8 @@ with ``+-1`` spins, and both phases are relaxed by Kaiwu simulated annealing.
 
 import argparse
 import json
-import os
 import time
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -56,7 +56,7 @@ def _accuracy(model, sampler, features, labels):
     return float((scores.argmax(dim=1).numpy() == labels).mean())
 
 
-def main():
+def main() -> None:
     """Train EP on Digits and write a small JSON summary."""
     parser = argparse.ArgumentParser(description="Equilibrium propagation on sklearn Digits")
     parser.add_argument("--smoke", action="store_true", help="100 train / 100 eval images")
@@ -69,6 +69,12 @@ def main():
         "--input-scale", type=float, default=4.0, help="multiplier on the first-layer init"
     )
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(__file__).resolve().parent / "results",
+        help="directory for the run summary",
+    )
     args = parser.parse_args()
 
     (train_x, train_y), (val_x, val_y), (test_x, test_y) = _load_splits(args.seed)
@@ -128,10 +134,9 @@ def main():
         "history": history,
         "test_accuracy": test_accuracy,
     }
-    out_dir = os.path.join(os.path.dirname(__file__), "results")
-    os.makedirs(out_dir, exist_ok=True)
-    path = os.path.join(out_dir, "summary.json")
-    with open(path, "w", encoding="utf-8") as handle:
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    path = args.output_dir / "summary.json"
+    with path.open("w", encoding="utf-8") as handle:
         json.dump(summary, handle, indent=2, sort_keys=True)
         handle.write("\n")
     print(f"test_accuracy={test_accuracy:.4f}")

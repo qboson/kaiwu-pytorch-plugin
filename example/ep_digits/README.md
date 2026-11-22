@@ -1,5 +1,8 @@
 # Equilibrium propagation on Digits
 
+This example is a quick check of the EP training path. See the
+[MNIST example](../ep_mnist/README.md) for the full-data experiment.
+
 Trains a 64-32-10 equilibrium-propagation network on
 `sklearn.datasets.load_digits`. Pixels are divided by 16. Every unit is a ±1
 spin, and the Ising matrices of the free and nudged phases are relaxed by Kaiwu
@@ -21,7 +24,7 @@ chosen on validation accuracy only:
 Smoke run (100 training, 100 validation, 100 test images):
 
 ```powershell
-python example/ep_digits/train_digits.py --smoke
+python example/ep_digits/train_digits.py --smoke --output-dir runs/ep-digits-smoke
 ```
 
 Smoke test accuracy: 0.4700.
@@ -35,4 +38,5 @@ python example/ep_digits/train_digits.py
 Validation accuracy: 0.8407. Test accuracy: 0.8156. One epoch takes about
 80 seconds in a single process.
 
-Both runs write `example/ep_digits/results/summary.json`, which is gitignored.
+The script writes `summary.json` in `--output-dir`. By default it uses
+`example/ep_digits/results/`. Use a separate directory for smoke runs.

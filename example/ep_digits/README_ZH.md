@@ -1,5 +1,7 @@
 # Digits 上的均衡传播
 
+本示例用于快速检查 EP 训练流程。完整数据集实验见 [MNIST 示例](../ep_mnist/README_ZH.md)。
+
 在 `sklearn.datasets.load_digits` 上训练 64-32-10 的均衡传播网络。像素除以 16。每个单元都是 ±1 自旋，自由相和微扰相的 Ising 矩阵都由 Kaiwu 1.3.1 模拟退火求解。
 
 测试集是 `random_state=0` 的分层 25%。剩下的图片里再分层留出 20% 作验证集，超参数只按验证准确率选择：
@@ -11,7 +13,7 @@
 冒烟（100 张训练、100 张验证、100 张测试）：
 
 ```powershell
-python example/ep_digits/train_digits.py --smoke
+python example/ep_digits/train_digits.py --smoke --output-dir runs/ep-digits-smoke
 ```
 
 冒烟测试准确率：0.4700。
@@ -24,4 +26,4 @@ python example/ep_digits/train_digits.py
 
 验证准确率：0.8407；测试准确率：0.8156。单进程每个 epoch 约 80 秒。
 
-两次运行都把结果写到 `example/ep_digits/results/summary.json`，该目录已加入 `.gitignore`。
+脚本将 `summary.json` 写入 `--output-dir`，默认目录是 `example/ep_digits/results/`。冒烟验证请使用独立目录。

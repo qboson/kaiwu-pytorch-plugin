@@ -13,6 +13,7 @@ import argparse
 import json
 import os
 import time
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -68,7 +69,7 @@ def _accuracy(model, sampler, features, labels):
     return float((scores.argmax(dim=1).numpy() == labels).mean())
 
 
-def _parse_args():
+def _parse_args() -> argparse.Namespace:
     """Parse the command line."""
     parser = argparse.ArgumentParser(description="Equilibrium propagation on MNIST")
     parser.add_argument("--data-dir", default=os.path.join(os.path.dirname(__file__), "data"))
@@ -89,10 +90,16 @@ def _parse_args():
         "--sa-iterations", type=int, default=50, help="annealing iterations per temperature"
     )
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(__file__).resolve().parent / "results",
+        help="directory for the run summary",
+    )
     return parser.parse_args()
 
 
-def main():
+def main() -> None:
     """Train EP on MNIST and write a small JSON summary."""
     args = _parse_args()
     (train_x, train_y), (val_x, val_y), (test_x, test_y) = _load_splits(
@@ -158,11 +165,10 @@ def main():
         "history": history,
         "test_accuracy": test_accuracy,
     }
-    out_dir = os.path.join(os.path.dirname(__file__), "results")
-    os.makedirs(out_dir, exist_ok=True)
+    args.output_dir.mkdir(parents=True, exist_ok=True)
     name = "summary_conv.json" if args.conv else "summary.json"
-    path = os.path.join(out_dir, name)
-    with open(path, "w", encoding="utf-8") as handle:
+    path = args.output_dir / name
+    with path.open("w", encoding="utf-8") as handle:
         json.dump(summary, handle, indent=2, sort_keys=True)
         handle.write("\n")
     print(f"test_accuracy={test_accuracy:.4f}")

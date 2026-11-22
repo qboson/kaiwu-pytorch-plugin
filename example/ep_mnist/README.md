@@ -1,5 +1,8 @@
 # Equilibrium propagation on MNIST
 
+This is the full-data EP experiment. The [Digits example](../ep_digits/README.md)
+provides a quicker check of the same training path.
+
 Trains equilibrium-propagation networks on the full original MNIST, read with
 `torchvision.datasets.MNIST`. Pixels are divided by 255. Every unit is a ±1
 spin, and the Ising matrices of the free and nudged phases are relaxed by Kaiwu
@@ -21,7 +24,7 @@ python example/ep_mnist/train_mnist.py
 ```
 
 The first run downloads MNIST to `example/ep_mnist/data/`. Pass `--data-dir` to
-use an existing copy. Results after one epoch:
+use an existing copy. Recorded results after one epoch with seed 0:
 
 Validation accuracy: 0.8788. Test accuracy: 0.8872.
 
@@ -36,7 +39,7 @@ scaled by 4.
 python example/ep_mnist/train_mnist.py --conv --input-scale 4 --sa-iterations 100
 ```
 
-Results after one epoch:
+Recorded results after one epoch with seed 0:
 
 Validation accuracy: 0.6966. Test accuracy: 0.7155.
 
@@ -48,6 +51,13 @@ network takes about 31 ms per solve, about one hour per epoch. The two results
 above were run in parallel and measured about 72 and 174 ms per solve. Before a
 full run, `--limit-train 2000 --limit-eval 1000` shows the speed on your machine.
 
-Results are written to `example/ep_mnist/results/` (`summary.json` for the
-fully connected network, `summary_conv.json` for the convolutional one). That
-directory and the data directory are gitignored.
+Use Python 3.10, Kaiwu 1.3.1, PyTorch 2.7.0 and torchvision 0.22.0.
+Initialize the local SDK license before running if your installation requires it.
+
+The default output directory is `example/ep_mnist/results/`. The fully connected
+run writes `summary.json` and the convolutional run writes `summary_conv.json`.
+Use `--output-dir` for a separate run, for example:
+
+```powershell
+python example/ep_mnist/train_mnist.py --limit-train 20 --limit-eval 20 --output-dir runs/ep-mnist-smoke
+```
