@@ -213,6 +213,21 @@ class TestEquilibriumPropagation(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             model.equilibrate(inputs, ShortSampler())
 
+    def test_equilibrate_rejects_a_three_dimensional_candidate_pool(self):
+        """A sampler must return rows, not an extra batch dimension."""
+        class BatchedSampler:  # pylint: disable=too-few-public-methods
+            """Returns a spin pool with an extra leading axis."""
+
+            def solve(self, ising_mat):
+                """Return a (1, n, n) array whose second axis looks like the row width."""
+                width = ising_mat.shape[0]
+                return np.ones((1, width, width))
+
+        model = linear_model()
+        inputs = torch.zeros((1, 3), dtype=torch.float64)
+        with self.assertRaisesRegex(RuntimeError, "sampler must return spin rows"):
+            model.equilibrate(inputs, BatchedSampler())
+
     def test_public_exports(self):
         """The layers and the network are exported at the top level."""
         for name in ("EquilibriumPropagation", "EPLinear", "EPConv2d"):
