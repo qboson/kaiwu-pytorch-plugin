@@ -17,12 +17,11 @@
 - `train_qvae.ipynb`: 训练 Q-VAE 模型
 - `train_qvae_classifier.ipynb`: 表征学习与分类
 
-**依赖项**（在项目根目录安装，清单会按 Python 版本选择依赖）:
+在项目根目录先安装 KPP，再安装本示例的额外依赖。有指定的 PyTorch 版本时，先安装与之匹配的 TorchVision。
 
 ```{code-block} bash
-
- pip install -r requirements/requirements_example.txt
-
+python -m pip install .
+python -m pip install -r requirements/requirements_example.txt
 ```
 ## 1. QVAE 原理概括
 

@@ -1,5 +1,4 @@
--r requirements.txt
-
+# Extra dependencies for the QVAE MNIST example.
 scikit-learn
 matplotlib
 scipy

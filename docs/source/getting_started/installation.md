@@ -83,13 +83,13 @@ Install the project dependencies:
 pip install -r requirements/requirements.txt
 ```
 
-See the [examples index](https://github.com/QBoson/kaiwu-pytorch-plugin/tree/main/example)
-for dependencies specific to each example.
-
 4. **Install the Plugin**
 ```bash
 pip install .
 ```
+
+After installing KPP, see the [examples index](https://github.com/QBoson/kaiwu-pytorch-plugin/tree/main/example)
+for the extra dependencies of the example you want to run.
 
 #### Checkpoint
 

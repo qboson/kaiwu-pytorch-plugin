@@ -9,13 +9,11 @@ on raw pixels.
 
 ## Dependencies
 
-```bash
-# Core dependencies (run from the repository root)
-pip install -r requirements/requirements.txt   # kaiwu==1.3.1, torch==2.7.0, numpy==2.2.6
-pip install .                                  # install the plugin
+From the repository root, install KPP and then the extra dependencies for this example.
 
-# Example-side dependencies (scikit-learn, scipy, matplotlib, seaborn)
-pip install -r requirements/requirements_example.txt
+```bash
+python -m pip install .
+python -m pip install scikit-learn scipy matplotlib seaborn
 ```
 
 ## File Structure

@@ -13,7 +13,8 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 From the repository root, install KPP and the dependencies for this example.
 
 ```bash
-pip install . anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
+python -m pip install .
+python -m pip install anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
 ```
 
 On Apple Silicon macOS, run `export NUMBA_THREADING_LAYER=workqueue` before starting the example.
