@@ -58,24 +58,36 @@ docs/
 
 ## 如何构建文档
 
-### 0. 激活 Python 虚拟环境
+### 0. 克隆仓库并创建虚拟环境
 
-本项目使用 Python Virtual Environment，所有构建命令必须在虚拟环境中执行：
+本文档使用 Sphinx 构建，建议在独立的 Python 虚拟环境中执行所有构建命令。首先克隆仓库并创建虚拟环境（以下两种方式任选其一）：
 
 ```bash
-cd /Users/chang137/GitHub
-source myenv/bin/activate
+git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+cd Kaiwu-pytorch-plugin
+
+# 方式 A（推荐）：conda
+conda create -n kpp-docs python=3.10
+conda activate kpp-docs
+
+# 方式 B：venv
+python3.10 -m venv .venv
+source .venv/bin/activate
 ```
 
-激活后命令行前缀显示 `(myenv)`。虚拟环境中已预装 Sphinx 8.1.3、sphinx-intl、myst-parser、pydata-sphinx-theme 等所有构建依赖。
+激活后命令行前缀显示 `(kpp-docs)` 或 `(.venv)`，后续构建命令均在该环境中执行。
 
-### 1. 安装依赖（如虚拟环境未配置）
+### 1. 安装依赖
+
+在虚拟环境中安装 Sphinx 及文档构建所需的全部依赖（首次构建时执行；`requirements/devel.txt` 已包含 Sphinx 8.1.3、pydata-sphinx-theme、myst-parser、sphinx-intl 等）：
 
 ```bash
 pip install -r requirements/devel.txt
 ```
 
 ### 2. 构建 HTML 文档
+
+在仓库根目录执行：
 
 ```bash
 cd docs
@@ -89,6 +101,8 @@ make html
 在浏览器中打开 `docs/_build/html/index.html` 文件即可查看文档。
 
 ### 4. 清理构建文件
+
+在仓库根目录执行：
 
 ```bash
 cd docs
@@ -145,7 +159,8 @@ API 文档通过 `sphinx.ext.autodoc` 自动生成，只需在 Markdown 文件�
    - [ ] proof-reading 中文翻译
 
 3. **新手教程 (Tutorial for Beginners)**
-   - [ ] 完善量子采样教程 (quantum_sampling_*.md)
+   - [x] 完善量子采样教程 (quantum_sampling_*.md)
+   - [x] 完善模拟退火教程 (simulated_annealing.md)
    - [ ] 添加具体动手实践教程 (hands_on_tutorial_*.md)
 
 4. **进阶案例 (Advanced Examples)**
@@ -155,7 +170,7 @@ API 文档通过 `sphinx.ext.autodoc` 自动生成，只需在 Markdown 文件�
    - [ ] 补充常见问题解答 (faq.md)
 
 6. **关于 (About)**
-   - [ ] 更新发行说明 (release_notes.md)
+   - [x] 更新发行说明 (release_notes.md)
 
 ## 注意事项
 
