@@ -45,6 +45,7 @@ class Config:
         self.compute_energy = kwargs.get('compute_energy', False)
         self.num_train_samples = kwargs.get('num_train_samples', 60000)
         self.num_test_samples = kwargs.get('num_test_samples', 10000)
+        self.subset_seed = kwargs.get('subset_seed')
         self.output_dir = kwargs.get('output_dir', None)
         self.classifier_kwargs = kwargs.get('classifier_kwargs', {})
 

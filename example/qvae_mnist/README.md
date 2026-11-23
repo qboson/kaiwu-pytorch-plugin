@@ -54,6 +54,11 @@ qvae_mnist/
 
 ## Datasets
 
+When using fewer than the full dataset, set `--subset-seed` in
+`run_pipeline.py` or `subset_seed` in `Config` to reuse the same sampled
+records. Train and test subsets use separate streams, so changing the training
+sample count does not affect membership in the test subset.
+
 `name` supports `mnist` (default), `fashion-mnist`, and `kmnist`; the data
 is downloaded automatically to `data_path` on first use.
 

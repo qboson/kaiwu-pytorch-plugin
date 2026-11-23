@@ -89,6 +89,7 @@ class Trainer:
                 batch_size=self.config.batch_size,
                 num_evts_train=self.config.num_train_samples,
                 num_evts_test=self.config.num_test_samples,
+                subset_seed=getattr(self.config, "subset_seed", None),
                 use_cuda=self.config.use_cuda
             )
         # 计算数据集均值

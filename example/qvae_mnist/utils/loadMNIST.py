@@ -16,7 +16,9 @@ def loadMNIST(
     batch_size=100, 
     num_evts_train=60000, 
     num_evts_test=10000,
-    use_cuda=False
+    use_cuda=False,
+    *,
+    subset_seed=None,
 ):
     """
     Load MNIST dataset with configurable parameters
@@ -28,6 +30,7 @@ def loadMNIST(
         num_evts_train: number of training samples to use
         num_evts_test: number of test samples to use  
         use_cuda: whether to use CUDA (affects DataLoader settings)
+        subset_seed: optional seed for selecting train and test subsets
     
     Returns:
         train_loader, test_loader: PyTorch DataLoader objects
@@ -68,14 +71,27 @@ def loadMNIST(
     # DataLoader configuration
     kwargs = {"num_workers": 0, "pin_memory": True} if use_cuda else {"num_workers": 0}
 
+    train_subset_rng = test_subset_rng = None
+    if subset_seed is not None:
+        rng = torch.Generator(device="cpu").manual_seed(subset_seed)
+        train_seed, test_seed = torch.randint(
+            0, 2**63 - 1, (2,), device="cpu", generator=rng
+        ).tolist()
+        train_subset_rng = torch.Generator(device="cpu").manual_seed(train_seed)
+        test_subset_rng = torch.Generator(device="cpu").manual_seed(test_seed)
+
     # Limit dataset size if specified
     if num_evts_train < len(train_data):
-        indices = torch.randperm(len(train_data))[:num_evts_train]
+        indices = torch.randperm(
+            len(train_data), device="cpu", generator=train_subset_rng
+        )[:num_evts_train]
         train_data = Subset(train_data, indices)
         logger.info(f"Using subset of {num_evts_train} training samples")
     
     if num_evts_test < len(test_data):
-        indices = torch.randperm(len(test_data))[:num_evts_test]  
+        indices = torch.randperm(
+            len(test_data), device="cpu", generator=test_subset_rng
+        )[:num_evts_test]
         test_data = Subset(test_data, indices)
         logger.info(f"Using subset of {num_evts_test} test samples")
     
@@ -102,11 +118,15 @@ def loadMNIST(
 class MNISTDataLoader:
     """Alternative class-based MNIST data loader"""
     
-    def __init__(self, batch_size=100, num_evts_train=60000, num_evts_test=10000, data_path="./data"):
+    def __init__(
+        self, batch_size=100, num_evts_train=60000, num_evts_test=10000,
+        data_path="./data", *, subset_seed=None,
+    ):
         self.batch_size = batch_size
         self.num_evts_train = num_evts_train
         self.num_evts_test = num_evts_test
         self.data_path = data_path
+        self.subset_seed = subset_seed
         
         self.train_loader = None
         self.test_loader = None
@@ -117,7 +137,8 @@ class MNISTDataLoader:
             batch_size=self.batch_size,
             num_evts_train=self.num_evts_train, 
             num_evts_test=self.num_evts_test,
-            data_path=self.data_path
+            data_path=self.data_path,
+            subset_seed=self.subset_seed,
         )
         return self.train_loader, self.test_loader
     
