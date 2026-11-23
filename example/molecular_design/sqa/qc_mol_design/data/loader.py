@@ -126,16 +126,31 @@ def split_dataset(
     n_valid: Optional[int] = None,
     n_test:  Optional[int] = None,
     seed:    int = 42,
+    *,
+    deduplicate_smiles: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Randomly shuffle and split into train / valid / test.
     Uses CFG defaults when sizes are not specified.
+    For new experiments, ``deduplicate_smiles=True`` keeps the first record
+    for each canonical isomeric SMILES before shuffling.
     """
     n_tr = n_train or CFG.n_train
     n_vl = n_valid or CFG.n_valid
     n_te = n_test  or CFG.n_test
 
     total = n_tr + n_vl + n_te
+    if deduplicate_smiles:
+        from rdkit import Chem
+
+        def canonical_smiles(smiles):
+            molecule = Chem.MolFromSmiles(smiles)
+            if molecule is None or molecule.GetNumAtoms() == 0:
+                raise ValueError(f"Cannot deduplicate invalid SMILES: {smiles!r}")
+            return Chem.MolToSmiles(molecule, canonical=True, isomericSmiles=True)
+
+        canonical = data["smiles"].map(canonical_smiles)
+        data = data.loc[~canonical.duplicated()]
     if len(data) < total:
         raise ValueError(
             f"Dataset has {len(data)} molecules but {total} requested. "
