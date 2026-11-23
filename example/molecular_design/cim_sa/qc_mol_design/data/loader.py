@@ -159,9 +159,12 @@ def discretize(values: np.ndarray, prop: str) -> np.ndarray:
     """
     Map continuous property values to bin indices in [0, n_bins-1].
 
-    Uses the bin edges defined in PROP_BINS[prop].
+    Uses the bin edges defined in PROP_BINS[prop]. Values must be finite.
     """
     edges = PROP_BINS[prop]
+    values = np.asarray(values)
+    if not np.isfinite(values).all():
+        raise ValueError(f"{prop} values must be finite before discretization")
     # digitize returns 0 for below first edge, len(edges) for above last
     indices = np.digitize(values, edges[1:-1])  # interior edges only
     return indices.clip(0, N_BINS_PER_PROP[prop] - 1)

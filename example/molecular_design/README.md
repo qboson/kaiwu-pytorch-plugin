@@ -50,6 +50,9 @@ QC 训练从直接 QUBO 采样改为 KPP BM 的 Ising 采样，二者能量等�
 
 ## 实验设置
 
+直接调用 `discretize` 或 `make_label_vector` 时，QED、LogP 和 SAS 必须为有限数值。
+有限值超出边界时仍归入最靠近的边界区间。
+
 - 25 个参考分子 × QED／LogP 两种性质 × 每种 5 个区间，共 250 条轨迹；每条 10 步探索 + 90 步优化，基础种子 42。
 - 三方法使用相同 checkpoint、参考清单、目标区间、14-bit 编码和惩罚系数规则；先选择有效候选，再按原 QUBO 能量排序，实际命中标签不参与选择。
 - CIM 使用 Kaiwu `CIMOptimizer`，优化模式 `quota`，每次返回 10 个候选。
