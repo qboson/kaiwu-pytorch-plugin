@@ -165,7 +165,6 @@ Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有�
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # 已包含 Kaiwu SDK
-├── kaiwu-1.3.1-py3-none-any.whl   # 或从 Qboson 平台下载
 └── docker/
     └── Dockerfile
 ```
@@ -197,11 +196,11 @@ requirements/
    docker compose down
    ```
 
-### Kaiwu SDK 安装说明（必需）
+### Kaiwu SDK 安装与授权
 
-现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装
+运行 `pip install .` 安装 KPP 时会自动安装兼容的 Kaiwu SDK。Python 3.12 和 3.14 使用 Kaiwu 1.4.4。Python 3.10 如需使用旧版 Kaiwu 1.3.1，可以运行 `pip install "kaiwu==1.3.1" .`。
 
-其他版本的Kaiwu SDK 的下载和安装步骤如下：
+如需下载 SDK 安装包或配置授权，请参考以下步骤。
 
 ![](imgs/image.png)
 

@@ -189,21 +189,21 @@ Kaiwu-pytorch-plugin/
 
 ## Kaiwu SDK Configuration & License
 
-Kaiwu-PyTorch-Plugin depends on the **Kaiwu SDK** to provide quantum computing capabilities. The Kaiwu SDK is a proprietary backend that provides both classical simulation (SA) and quantum execution (CIM), and must be installed separately.
+Kaiwu-PyTorch-Plugin uses the **Kaiwu SDK** for classical simulation (SA) and quantum execution (CIM). Installing KPP also installs a compatible SDK.
 
 ### Step 1: Obtain & Install SDK
-#### Option A: Install from PyPI (Recommended)
+#### Option A: Install KPP with its SDK (Recommended)
 
-The Kaiwu SDK is available on PyPI. You can install it directly:
+From the KPP repository root, install the plugin and its SDK dependency:
 
 ```bash
-pip install kaiwu==1.3.1
+python -m pip install .
 ```
 
-Alternatively, add the following line to your `requirements.txt`:
+Python 3.12 and 3.14 use Kaiwu 1.4.4. On Python 3.10, you can select Kaiwu 1.3.1 for a legacy environment:
 
-```text
-kaiwu==1.3.1
+```bash
+python -m pip install "kaiwu==1.3.1" .
 ```
 
 #### Option B: Install from Official Wheel
@@ -211,11 +211,11 @@ kaiwu==1.3.1
 If you need a specific version or have network restrictions, download the SDK wheel from the QBoson platform:
 
 > 1. Visit the <u>Kaiwu SDK download page</u> on the QBoson platform
-> 2. Download the wheel package suitable for your system (e.g., `kaiwu-1.3.1-py3-none-any.whl`)
-> 3. Install the wheel:
+> 2. Download a supported SDK wheel that matches your Python version, operating system, and architecture.
+> 3. Install the wheel alongside KPP. This example uses Python 3.12 on Linux x86_64:
 
 ```bash
-pip install kaiwu-1.3.1-py3-none-any.whl
+python -m pip install ./kaiwu-1.4.4-cp312-none-manylinux1_x86_64.whl .
 ```
 
 ### Step 2: Set Environment Variables

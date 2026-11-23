@@ -166,7 +166,6 @@ Project structure required:
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
@@ -198,11 +197,11 @@ Press `Ctrl+C`, then run:
    docker compose down
    ```
 
-### Kaiwu SDK Installation Instructions (Required)
+### Kaiwu SDK Installation and Authorization
 
-Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+Installing KPP with `pip install .` also installs a compatible Kaiwu SDK. On Python 3.12 and 3.14, this is Kaiwu 1.4.4. To use the legacy Kaiwu 1.3.1 on Python 3.10, run `pip install "kaiwu==1.3.1" .`.
 
-The download and installation steps for other versions of the Kaiwu SDK are as follows:
+If you need to download an SDK wheel or configure authorization, follow these steps:
 ![](imgs/image.png)
 
 1. **Get the SDK**:
