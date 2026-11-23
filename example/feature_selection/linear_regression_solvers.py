@@ -1,5 +1,8 @@
+"""Compare the masks produced by three solvers on a shared linear objective."""
+
 from __future__ import annotations
 
+from copy import deepcopy
 import sys
 from pathlib import Path
 
@@ -31,15 +34,18 @@ def main() -> None:
     _init_kaiwu_license_from_env()
     dataset = build_linear_regression_dataset()
     loss_fn = nn.MSELoss()
+    # Compare solvers on the same trained weights at the first mask update.
+    initial_model = nn.Linear(dataset.feature_dim, 1, bias=False)
+    train_epochs = 20
 
     local_search_solver_kwargs = {"max_iter": 1000}
     local_search_selector = FeatureSelectionWrapper(
-        nn.Linear(dataset.feature_dim, 1, bias=False),
+        deepcopy(initial_model),
         feature_dim=dataset.feature_dim,
         cardinality_k=len(dataset.signal_features),
         solver="local_search",
         solver_kwargs=local_search_solver_kwargs,
-        mask_update_epochs=20,
+        mask_update_epochs=train_epochs,
     )
     local_search_optimizer = torch.optim.SGD(
         local_search_selector.model.parameters(),
@@ -49,7 +55,7 @@ def main() -> None:
         dataset.loader,
         loss_fn,
         local_search_optimizer,
-        train_epochs=20,
+        train_epochs=train_epochs,
     )
     local_search_loss = float(
         loss_fn(local_search_selector(dataset.inputs), dataset.targets).detach()
@@ -70,19 +76,19 @@ def main() -> None:
         "rand_seed": 0,
     }
     sa_selector = FeatureSelectionWrapper(
-        nn.Linear(dataset.feature_dim, 1, bias=False),
+        deepcopy(initial_model),
         feature_dim=dataset.feature_dim,
         cardinality_k=len(dataset.signal_features),
         solver="sa",
         solver_kwargs=sa_solver_kwargs,
-        mask_update_epochs=20,
+        mask_update_epochs=train_epochs,
     )
     sa_optimizer = torch.optim.SGD(sa_selector.model.parameters(), lr=0.05)
     sa_selector.fit_weights(
         dataset.loader,
         loss_fn,
         sa_optimizer,
-        train_epochs=20,
+        train_epochs=train_epochs,
     )
     sa_loss = float(loss_fn(sa_selector(dataset.inputs), dataset.targets).detach())
     print(
@@ -106,12 +112,12 @@ def main() -> None:
         "project_no": KAIWU_PROJECT_NO,
     }
     kaiwu_cim_selector = FeatureSelectionWrapper(
-        nn.Linear(dataset.feature_dim, 1, bias=False),
+        deepcopy(initial_model),
         feature_dim=dataset.feature_dim,
         cardinality_k=len(dataset.signal_features),
         solver="kaiwu_cim",
         solver_kwargs=kaiwu_cim_solver_kwargs,
-        mask_update_epochs=5,
+        mask_update_epochs=train_epochs,
     )
     kaiwu_cim_optimizer = torch.optim.SGD(
         kaiwu_cim_selector.model.parameters(),
@@ -121,7 +127,7 @@ def main() -> None:
         dataset.loader,
         loss_fn,
         kaiwu_cim_optimizer,
-        train_epochs=10,
+        train_epochs=train_epochs,
     )
     kaiwu_cim_loss = float(
         loss_fn(kaiwu_cim_selector(dataset.inputs), dataset.targets).detach()
