@@ -105,28 +105,19 @@ graph TD
 
 ### 环境要求
 
-- Python：3.10、3.12 或 3.14
-- kaiwu >= 1.3.1, <= 1.4.3
-- Python 3.10 / 3.12：torch == 2.7.0，numpy == 2.2.6
-- Python 3.14：torch == 2.10.0，numpy == 2.3.3
+| Python | Kaiwu SDK | NumPy | PyTorch |
+| --- | --- | --- | --- |
+| 3.10 | 1.3.1–1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
-不支持 Python 3.11 和 3.13。Python 3.12 和 3.14 的安装还需要 Kaiwu
-提供对应版本支持；在此之前，尚不能通过正式发布的依赖完成安装。
+上表是安装约束。实际能组合安装的版本还取决于各依赖提供的安装包和它们各自的依赖约束。
+CI 运行的具体组合见[兼容性矩阵](.github/compatibility-matrix.json)，安装步骤见
+[安装说明](docs/source/getting_started/installation.md)。
 
-示例依赖在 `requirements/requirements_example.txt` 中按 Python 版本固定，QDiffusion 使用 `example/qdiffusion/requirements.txt`。开发环境安装清单已包含这两组依赖。
-
-Apple Silicon Mac 用户运行单细胞示例或完整测试前，需要设置 `NUMBA_THREADING_LAYER=workqueue`，具体见[安装说明](docs/source/getting_started/installation.md)。
-
-Kaiwu 兼容范围包括已发布的 1.3.1、1.4.0、1.4.1、1.4.2、1.4.3。
-同一套模型代码兼容降精度工具的位置变化，并按所装 SDK 转换计算模式；
-旧写法 `quota` / `sample` 和新写法 `optimization` / `sampling` 均可使用，
-不区分大小写。这些正式 SDK 安装包仅提供 Python 3.10 版本。
-
-SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口变化前后
-及最新支持版本。手动运行 CI 时开启 `all-kaiwu-versions` 可检查全部五版。
-检查使用本地求解和云端求解器构造，不会提交云端任务。
-跨 SDK 检查使用普通的 `pip install .`；1.3.1 的包结构不能通过可编辑安装
-自动发现插件。
+示例依赖见 `requirements/requirements_example.txt` 和
+`example/qdiffusion/requirements.txt`。Apple Silicon Mac 用户运行单细胞示例或
+对应测试前，需要设置 `NUMBA_THREADING_LAYER=workqueue`。
 
 ### 代码风格
 
@@ -159,7 +150,7 @@ SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口�
    pip install -r requirements/requirements.txt
    ```
 
-   依赖中已包含 Kaiwu SDK，支持 1.3.1 至 1.4.3。
+   安装会自动拉取 Kaiwu SDK。Python 3.10 可以按需指定旧版 SDK。
 
 4. **安装插件**
 

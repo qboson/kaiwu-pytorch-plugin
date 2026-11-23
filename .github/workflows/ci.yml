@@ -3,8 +3,16 @@ name: CI
 on:
   workflow_dispatch:
     inputs:
+      scope:
+        description: Test scope (each scope also runs the baseline combinations)
+        type: choice
+        options: [default, numpy, pytorch, kaiwu, platforms, examples, all]
+        default: default
+      combination:
+        description: Exact combination ID shown as the CI job name
+        type: string
       all-kaiwu-versions:
-        description: Test every supported Kaiwu release
+        description: Include every supported Kaiwu release
         type: boolean
         default: false
   push:
@@ -13,77 +21,132 @@ on:
     branches: [main]
 
 jobs:
+  matrix:
+    runs-on: ubuntu-24.04
+    outputs:
+      include: ${{ steps.select.outputs.include }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Select compatibility combinations
+        id: select
+        env:
+          SCOPE: ${{ inputs.scope || 'default' }}
+          COMBINATION: ${{ inputs.combination }}
+          ALL_KAIWU: ${{ inputs.all-kaiwu-versions }}
+        run: |
+          include=$(jq -ce --arg scope "$SCOPE" --arg id "$COMBINATION" --arg all_kaiwu "$ALL_KAIWU" '
+            map_values(map(.id = "py\(.python)-\(.runner)-kaiwu\(.kaiwu)-np\(.numpy)-torch\(.torch)" +
+              (if .torchvision then "-examples" else "" end))) |
+            . as $matrix |
+            if $id != "" then
+              [ .[][] | select(.id == $id) ] |
+              if length == 1 then . else error("Unknown combination ID: " + $id) end
+            elif $scope == "all" then
+              add
+            else
+              .default
+              + (if $scope == "default" then [] else $matrix[$scope] end)
+              + (if $all_kaiwu == "true" and $scope != "kaiwu" then .kaiwu else [] end)
+            end
+          ' .github/compatibility-matrix.json)
+          echo "include=$include" >> "$GITHUB_OUTPUT"
+
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.id }}
+    needs: matrix
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10"]
-        kaiwu-version: ${{ fromJSON(inputs.all-kaiwu-versions && '["1.3.1", "1.4.0", "1.4.1", "1.4.2", "1.4.3"]' || '["1.3.1", "1.4.0", "1.4.3"]') }}
-
-        include:
-          - python-version: "3.12"
-            kaiwu-version: "1.4.3"
-          - python-version: "3.14"
-            kaiwu-version: "1.4.3"
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
 
       - name: Cache pip dependencies
         uses: actions/cache@v6
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}-pip-${{ hashFiles('requirements/*.txt', 'example/**/requirements.txt', 'pyproject.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}-pip-
+          path: ${{ env.PIP_CACHE_DIR }}
+          key: ${{ matrix.id }}-pip-${{ hashFiles('requirements/*.txt', 'example/**/requirements.txt', 'pyproject.toml') }}
+        env:
+          PIP_CACHE_DIR: ${{ runner.os == 'Windows' && '~/AppData/Local/pip/Cache' || runner.os == 'macOS' && '~/Library/Caches/pip' || '~/.cache/pip' }}
 
       - name: Install dependencies
+        env:
+          KAIWU_VERSION: ${{ matrix.kaiwu }}
+          NUMPY_VERSION: ${{ matrix.numpy }}
+          TORCH_VERSION: ${{ matrix.torch }}
+          TORCHVISION_VERSION: ${{ matrix.torchvision }}
+          SCIPY_VERSION: ${{ matrix.python == '3.10' && '1.14.1' || '1.16.3' }}
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "torch==${{ matrix.python-version == '3.14' && '2.10.0' || '2.7.0' }}" "torchvision==${{ matrix.python-version == '3.14' && '0.25.0' || '0.22.0' }}" --index-url https://download.pytorch.org/whl/cpu
-          pip install -r requirements/devel.txt "kaiwu==${{ matrix.kaiwu-version }}"
-          pip install .
-          python -m pip check
-          python -I -c "import sys; import kaiwu.torch_plugin as p; assert p.__file__.startswith(sys.prefix), p.__file__"
+          torch_packages=("torch==$TORCH_VERSION")
+          if [[ -n "$TORCHVISION_VERSION" ]]; then
+            torch_packages+=("torchvision==$TORCHVISION_VERSION")
+          fi
+          python -m pip install "${torch_packages[@]}" --index-url https://download.pytorch.org/whl/cpu
 
-      # 新增：依赖许可证检查步骤（核心）
+          if [[ -n "$TORCHVISION_VERSION" ]]; then
+            python -m pip install . -r requirements/devel.txt "numpy==$NUMPY_VERSION" "kaiwu==$KAIWU_VERSION"
+          else
+            python -m pip install . "numpy==$NUMPY_VERSION" "kaiwu==$KAIWU_VERSION" "scipy==$SCIPY_VERSION" \
+              scikit-learn==1.7.2 seaborn==0.13.2 tqdm==4.67.1 \
+              pytest==9.1.1 pytest-cov==7.1.0 pip-licenses==5.5.0 pylint==4.1.3
+          fi
+          python -m pip check
+          python -I - <<'PY'
+          import os
+          import sys
+          from importlib.metadata import version
+          from pathlib import Path
+
+          import kaiwu.torch_plugin as plugin
+
+          assert Path(plugin.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          assert version("kaiwu") == os.environ["KAIWU_VERSION"]
+          assert version("numpy") == os.environ["NUMPY_VERSION"]
+          assert version("torch").split("+", 1)[0] == os.environ["TORCH_VERSION"]
+          PY
+
       - name: Check dependency licenses
         run: |
-          pip-licenses \
-            -p numpy torch \
-            --from=mixed \
-            --format=json \
-            --with-authors \
-            --with-urls \
-            --allow-only "MIT;LGPL;BSD;MPL;Apache;Unlicense;PSF" \
-            --partial-match \
-            --output-file dependency-licenses-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}.json  # 按 Python 和 Kaiwu 版本保存结果
+          pip-licenses -p numpy torch --from=mixed --format=json --with-authors --with-urls \
+            --allow-only "MIT;LGPL;BSD;MPL;Apache;Unlicense;PSF" --partial-match \
+            --output-file dependency-licenses.json
 
-      # 可选：上传许可证检查结果（便于归档查看）
       - name: Upload license report
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-licenses-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}
-          path: dependency-licenses-py${{ matrix.python-version }}-kaiwu${{ matrix.kaiwu-version }}.json
-          retention-days: 7 # 结果保留 7 天（可调整）
+          name: dependency-licenses-${{ matrix.id }}
+          path: dependency-licenses.json
+          retention-days: 7
 
       - name: Lint with pylint
-        run: |
-          python -m pylint src/
+        if: matrix.lint
+        run: python -m pylint src/
 
       - name: Test with pytest
+        env:
+          TORCHVISION_VERSION: ${{ matrix.torchvision }}
         run: |
-          python -m pytest tests/ -v --cov=src \
+          pytest_args=()
+          if [[ -z "$TORCHVISION_VERSION" ]]; then
+            pytest_args+=(--ignore=tests/test_example_dependencies.py)
+          fi
+          python -I -m pytest tests/ -v "${pytest_args[@]}" --cov=src \
             --cov="$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')" \
             --cov-report=term --cov-report=xml
 
       - name: Upload coverage to Codecov
+        if: github.event_name != 'workflow_dispatch' && matrix.runner == 'ubuntu-24.04'
         uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml

@@ -12,41 +12,36 @@ hide: false
 
 ## System Requirements
 
-Before installation, ensure your system meets the following requirements:
+Use one of the following Python versions:
 
-| Dependency | Required Version | Role |
-|------------|-----------------|------|
-| Python | 3.10, 3.12, 3.14 | Supported even minor versions |
-| PyTorch | 2.7.0 / 2.10.0 | Use 2.10.0 on Python 3.14 |
-| NumPy | 2.2.6 / 2.3.3 | Use 2.3.3 on Python 3.14 |
-| Kaiwu SDK | 1.3.1–1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
+| Python | Kaiwu SDK | NumPy | PyTorch |
+| --- | --- | --- | --- |
+| 3.10 | 1.3.1–1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
-> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK releases 1.3.1 through 1.4.3 are supported; a fresh installation selects 1.4.3.
-
-Python 3.11 and 3.13 are excluded from the supported versions. Installation on
-Python 3.12 and 3.14 depends on corresponding Kaiwu support. Until Kaiwu provides
-that support, installation from published dependencies and the corresponding CI
-jobs cannot pass. Kaiwu packaging is maintained separately from this plugin.
+These are installation constraints. The SDK and other dependencies can
+narrow the available versions. For instance, Kaiwu 1.4.3 pins NumPy to 2.2.6
+and its published wheels require Python 3.10.
 
 ### Kaiwu SDK compatibility
 
-The supported published SDK releases are 1.3.1, 1.4.0, 1.4.1, 1.4.2, and
-1.4.3. Their official wheels require Python 3.10. Select one in the same
-installation command as the plugin, for example:
+On Python 3.10, install a specific SDK version in the same command as the plugin:
 
 ```bash
 python -m pip install "kaiwu==1.3.1" .
 ```
 
 Use an isolated environment for each SDK version. Use regular installation
-rather than `pip install -e .` for SDK 1.3.1: its regular `kaiwu` package
-otherwise hides the editable plugin. The shared compatibility module handles
-the `PrecisionReducer` move from `kaiwu.cim` to `kaiwu.preprocess` and translates
-both old and new CIM mode names. Model algorithms are shared across versions.
+for SDK 1.3.1 because its regular `kaiwu` package hides the editable plugin.
+KPP handles the `PrecisionReducer` move from `kaiwu.cim` to
+`kaiwu.preprocess` and translates old and new CIM mode names.
 
-Regular SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10. The manual
-`all-kaiwu-versions` CI option also checks 1.4.1 and 1.4.2. These interface
-checks do not submit licensed or cloud tasks.
+CI runs Linux combinations for Kaiwu 1.4.4 and selected older releases on pushes and pull requests.
+Run CI manually to select NumPy, PyTorch, Kaiwu, platform, or example coverage.
+The exact cases are listed in
+[the compatibility matrix](https://github.com/QBoson/kaiwu-pytorch-plugin/blob/main/.github/compatibility-matrix.json).
+Use the `combination` input with the exact CI job name to rerun one case. The Linux matrix tests on CPU.
 
 Check the Python version:
 ```bash

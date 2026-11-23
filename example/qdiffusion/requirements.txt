@@ -1,4 +1,4 @@
-# Install a CUDA build matching the pinned PyTorch version first when needed.
+# For CUDA, install the PyTorch build that matches your CUDA version first.
 # The same version without a CUDA suffix can use the default package index.
 -r ../../requirements/requirements.txt
 

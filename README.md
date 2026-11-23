@@ -111,31 +111,23 @@ The diagram above shows the main code structure of the project:
 ## Quick Start
 
 ### Requirements
-- Python: 3.10, 3.12, or 3.14
-- kaiwu >= 1.3.1, <= 1.4.3
-- Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
-- Python 3.14: torch == 2.10.0, numpy == 2.3.3
 
-Python 3.11 and 3.13 are not supported. Installation on Python 3.12 and 3.14
-depends on corresponding Kaiwu support. These environments are not ready for
-installation from published packages until Kaiwu provides that support.
+| Python | Kaiwu SDK | NumPy | PyTorch |
+| --- | --- | --- | --- |
+| 3.10 | 1.3.1–1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
-Example dependencies are pinned by Python version in `requirements/requirements_example.txt`; QDiffusion uses `example/qdiffusion/requirements.txt`. The development requirements include both sets.
+These are the installation constraints. The dependencies' available wheels and
+their own constraints determine which versions can be installed together.
+See the [compatibility matrix](.github/compatibility-matrix.json) for the exact
+combinations exercised by CI and the [installation guide](docs/source/getting_started/installation.md)
+for details.
 
-On Apple Silicon macOS, set `NUMBA_THREADING_LAYER=workqueue` before running single-cell examples or the full test suite; see the [installation guide](docs/source/getting_started/installation.md).
-
-Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
-1.4.2, and 1.4.3. The same model code handles the precision-reducer location
-change and translates CIM mode names (`quota` / `sample` and
-`optimization` / `sampling`, case-insensitive) for the installed SDK.
-The published SDK wheels in this range require Python 3.10.
-
-SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10, covering the interface
-change and the newest supported release. Run CI manually with
-`all-kaiwu-versions` enabled to include 1.4.1 and 1.4.2. These jobs test local
-solving and CIM construction without submitting cloud tasks. Use a regular
-`pip install .` for cross-SDK checks: SDK 1.3.1 uses a regular package whose
-namespace does not discover the plugin through an editable installation.
+Example dependencies are listed in `requirements/requirements_example.txt`
+and `example/qdiffusion/requirements.txt`. On Apple Silicon macOS, set
+`NUMBA_THREADING_LAYER=workqueue` before running the single-cell examples or
+their tests.
 
 ### Code Style
 
@@ -162,7 +154,7 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    ```bash
    pip install -r requirements/requirements.txt
    ```
-   Kaiwu SDK 1.3.1 through 1.4.3 is supported; install a specific version with `pip install "kaiwu==1.3.1" .`.
+   On Python 3.10, select an older SDK with `pip install "kaiwu==1.3.1" .`.
 
 4. **Install the plugin**:
    ```bash

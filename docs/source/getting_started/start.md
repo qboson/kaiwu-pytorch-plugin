@@ -58,13 +58,8 @@ The above diagram shows the project file structure:
 
 # Requirements
 
-- Python: 3.10, 3.12, or 3.14
-- kaiwu >= 1.3.1, <= 1.4.3
-- Python 3.10 / 3.12: torch == 2.7.0, numpy == 2.2.6
-- Python 3.14: torch == 2.10.0, numpy == 2.3.3
-
-Installation on Python 3.12 and 3.14 requires corresponding Kaiwu support.
-Until it is available, installation from published dependencies remains pending.
+Use Python 3.10, 3.12, or 3.14. See the [installation guide](installation.md)
+for the Kaiwu SDK, NumPy, and PyTorch requirements for each Python version.
 
 # Code Style
 
