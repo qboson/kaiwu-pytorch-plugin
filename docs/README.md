@@ -96,6 +96,15 @@ make html
 
 构建完成后，文档会生成在 `docs/_build/html/` 目录中。
 
+未指定语言时，本地构建默认使用简体中文。若要分别预览英文和简体中文，在 docs/ 目录运行对应的命令：
+
+```bash
+python -m sphinx -M html . _build/en -D language=en
+python -m sphinx -M html . _build/zh -D language=zh_CN
+```
+
+分别打开 `docs/_build/en/html/index.html` 和 `docs/_build/zh/html/index.html`。两个输出目录彼此独立，预览不会更新 PO 翻译源文件。
+
 ### 3. 查看文档
 
 在浏览器中打开 `docs/_build/html/index.html` 文件即可查看文档。
