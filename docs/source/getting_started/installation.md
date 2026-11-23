@@ -148,6 +148,7 @@ Press `Ctrl+C`, then run:
 docker compose down
 ```
 
+(install-from-pypi)=
 ### Option 3: Install from PyPI
 
 To install a published release, activate an isolated Python 3.10 environment and run:
