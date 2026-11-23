@@ -122,10 +122,8 @@ msgid "Install Kaiwu-PyTorch-Plugin"
 msgstr "安装 Kaiwu-PyTorch-Plugin"
 
 #: ../../source/getting_started/installation.md:37
-msgid ""
-"You can choose either local setup (conda/pip) or Docker setup (recommended "
-"for reproducibility and isolation)."
-msgstr "您可以选择本地安装（conda/pip）或 Docker 安装（推荐用于可复现性和隔离性）。"
+msgid "Choose a source checkout, Docker, or a published PyPI release."
+msgstr "可选择从源码安装、使用 Docker，或从 PyPI 安装已发布的版本。"
 
 #: ../../source/getting_started/installation.md:38
 msgid "Option 1: Local Setup (conda/pip)"
@@ -511,3 +509,15 @@ msgstr "代码风格检查："
 
 #~ msgid "A: Navigate to the project directory and pull the latest code:"
 #~ msgstr "答：进入项目目录并拉取最新代码："
+
+#: ../../source/getting_started/installation.md:151
+msgid "Option 3: Install from PyPI"
+msgstr "方案三：从 PyPI 安装"
+
+#: ../../source/getting_started/installation.md:153
+msgid "To install a published release, activate an isolated Python 3.10 environment and run:"
+msgstr "要安装已发布的版本，请激活独立的 Python 3.10 环境并运行："
+
+#: ../../source/getting_started/installation.md:159
+msgid "pip installs the dependencies specified by the published release."
+msgstr "pip 会安装该发行版指定的依赖。"
