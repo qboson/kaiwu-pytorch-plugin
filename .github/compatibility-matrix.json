@@ -14,8 +14,7 @@
     {"python": "3.14"}
   ],
   "kaiwu": [
-    {"python": "3.10", "kaiwu": "1.4.1"},
-    {"python": "3.10", "kaiwu": "1.4.2"}
+    {"python": "3.10", "kaiwu": "1.4.1"}
   ],
   "pytorch": [
     {"python": "3.10", "torch": "2.8.0"},
