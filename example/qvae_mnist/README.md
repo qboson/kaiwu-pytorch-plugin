@@ -9,14 +9,22 @@ using the learned latent representations for downstream classification.
 
 ## Dependencies
 
-From the repository root, install KPP and then the extra dependencies for this example.
-
 ```bash
-python -m pip install .
-python -m pip install -r requirements/requirements_example.txt
+# Core dependencies (run from the repository root)
+pip install -r requirements/requirements.txt   # kaiwu==1.3.1, torch==2.7.0, numpy==2.2.6
+pip install .                                  # install the plugin
+
+# Example-side dependencies
+pip install -r requirements/requirements_example.txt
 ```
 
-For a specific PyTorch build, install its matching TorchVision build before running the second command.
+The notebooks additionally use `pandas`, `tqdm`, `pillow`, `imageio`, and
+`gif` (the latter only for the training-evolution animation). Install them
+if they are missing:
+
+```bash
+pip install pandas tqdm pillow imageio gif
+```
 
 ## File Structure
 

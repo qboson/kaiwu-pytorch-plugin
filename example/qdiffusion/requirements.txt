@@ -1,4 +1,6 @@
-# Extra dependencies for QDiffusion.
+# Install a PyTorch build matching your CUDA version when needed.
+-r ../../requirements/requirements.txt
+
 omegaconf>=2.3,<3
 tqdm>=4.66,<5
 fair-esm

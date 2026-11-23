@@ -10,14 +10,16 @@ Examples and workflow scripts for the public `Q-Diffusion` module.
 
 ## Quick Start
 
-Run these commands from the repository root.
-
 ```bash
-python -m pip install .
-python -m pip install -r example/qdiffusion/requirements.txt
+pip install -r example/qdiffusion/requirements.txt
 python example/qdiffusion/simple/simple_train_example.py
 python example/qdiffusion/simple/simple_generate_example.py
 ```
+
+These commands work in both common local modes:
+
+- development checkout: run directly from the repo root
+- installed package: `pip install -e .` and then run the same commands
 
 ## How It Fits Together
 

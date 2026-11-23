@@ -10,8 +10,7 @@
 在项目根目录安装当前 KPP 和本示例的依赖。
 
 ```bash
-python -m pip install .
-python -m pip install anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
+pip install . anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
 ```
 
 Apple Silicon Mac 用户运行示例前，请先执行 `export NUMBA_THREADING_LAYER=workqueue`。

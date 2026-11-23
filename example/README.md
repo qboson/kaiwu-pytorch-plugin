@@ -1,7 +1,5 @@
 **Language Versions**: [中文](README_ZH.md) | [English](README.md)
 
-From the repository root, run `python -m pip install .` first. Then install the extra dependencies listed for the example you want to run.
-
 ### Examples of BoltzmannMachine and RestrictedBoltzmannMachine
 
 * `run_bm.py`: Demonstrates how to use the `BoltzmannMachine` class for model instantiation, sampling, objective function calculation, and parameter optimization. This is suitable for understanding the basic training workflow of a Boltzmann Machine, including sampling and gradient backpropagation.
