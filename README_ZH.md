@@ -164,6 +164,8 @@ SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口�
 
 Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有依赖（包括 Kaiwu SDK）均已安装。
 
+此 Compose 服务使用 `linux/amd64`。在 ARM64 或其他非 amd64 主机上，Docker 需要支持 amd64 模拟，才能构建并运行该服务。
+
 **所需项目结构**：
 ```text
 requirements/

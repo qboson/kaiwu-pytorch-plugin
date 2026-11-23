@@ -99,6 +99,8 @@ to confirm PyTorch is installed.
 
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
 
+The Compose service targets `linux/amd64`. On an ARM64 or other non-amd64 host, Docker must be able to emulate amd64 to build and run this service.
+
 #### Required Project Structure
 
 ```bash
