@@ -16,7 +16,7 @@ import numpy as np
 
 import kaiwu as kw
 
-from .._kaiwu_compat import normalize_task_mode
+from ..._kaiwu_compat import normalize_task_mode
 
 AVAILABLE_SOLVERS = (
     "local_search",

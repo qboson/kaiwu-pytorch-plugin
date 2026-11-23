@@ -13,7 +13,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from .full_boltzmann_machine import BoltzmannMachine
+from ..bm.full_boltzmann_machine import BoltzmannMachine
 from ._qdiffusion_sampling import (
     restore_candidate_context,
     stochastic_sample_from_categorical,

@@ -4,7 +4,7 @@
 import numpy as np
 import torch
 
-from kaiwu.torch_plugin.usage_stats import kpp_caller_context
+from ..usage_stats import kpp_caller_context
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
 

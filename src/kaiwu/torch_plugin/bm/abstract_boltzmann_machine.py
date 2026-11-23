@@ -7,7 +7,7 @@
 """Abstract base class for Boltzmann Machines."""
 import torch
 
-from kaiwu.torch_plugin.usage_stats import kpp_caller_context
+from ..usage_stats import kpp_caller_context
 
 
 class AbstractBoltzmannMachine(torch.nn.Module):
