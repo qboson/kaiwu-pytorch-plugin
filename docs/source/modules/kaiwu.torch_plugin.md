@@ -11,6 +11,11 @@
 
 ## MAIFS QUBO and SDK energy conventions
 
+Pass `required_feature_indices=(0, 3)` to `FeatureSelectionWrapper` to keep
+those columns present in every mask update. Required features count toward
+the requested cardinality and the maximum number of selected features.
+Their contributions are folded into the free variables' QUBO before solving.
+
 `QuadraticLinearSolver.solve(Q, l)` represents the binary objective
 `0.5 * x.T @ Q @ x + l @ x`. Its public
 `qubo_matrix_to_ising_matrix(U)` helper takes an upper-triangular QUBO coefficient
