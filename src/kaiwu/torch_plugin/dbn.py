@@ -81,6 +81,10 @@ class UnsupervisedDBN(nn.Module):
         Raises:
             ValueError: If the model has not been built or trained yet.
         """
+        return self._transform_features(data_in, collect_layers=False)
+
+    def _transform_features(self, data_in, collect_layers):
+        """Compute a single pass through the trained RBM stack."""
         if self.rbm_layers is None:
             raise ValueError("Model not built yet. Call create_rbm_layer first.")
         if not self._is_trained:
@@ -88,16 +92,30 @@ class UnsupervisedDBN(nn.Module):
                 "Model not trained yet. Call mark_as_trained() after training."
             )
 
-        data_in = data_in.astype(np.float32)
-        for rbm in self.rbm_layers:
-            with torch.no_grad():
-                hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
-                )
-                data_in = (
-                    hidden_output[:, rbm.num_visible :].cpu().numpy()
-                )  # Extract only the hidden part
-        return data_in
+        features = torch.as_tensor(data_in.astype(np.float32), device=self.device)
+        layer_outputs = []
+        with torch.no_grad():
+            for rbm in self.rbm_layers:
+                hidden_output = rbm.get_hidden(features)
+                features = hidden_output[:, rbm.num_visible :]
+                if collect_layers:
+                    layer_outputs.append(features.cpu().numpy())
+        return tuple(layer_outputs) if collect_layers else features.cpu().numpy()
+
+    def transform_layers(self, data_in):
+        """Return one hidden-probability array per trained RBM layer.
+
+        Args:
+            data_in (numpy.ndarray): Input samples in the original feature space.
+
+        Returns:
+            tuple[numpy.ndarray, ...]: Hidden representations in layer order.
+                An empty trained stack returns an empty tuple.
+
+        Raises:
+            ValueError: If the RBM stack has not been built or trained.
+        """
+        return self._transform_features(data_in, collect_layers=True)
 
     def transform(self, data_in):
         """An sklearn-compatible transform method.

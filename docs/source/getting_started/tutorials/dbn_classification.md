@@ -170,6 +170,9 @@ $$
 
 ### 5. 其他内容
 
+对已训练的 `UnsupervisedDBN` 调用 `transform_layers(X)`，可以在一次前向中按顺序取得
+所有 RBM 隐藏层的概率表示。最后一层的数组与 `transform(X)` 的输出相同。
+
 - **数据加载（`load_data` 方法）**
 
   - 数据集：使用 `sklearn.datasets.load_digits` （8×8 手写数字图像）。
