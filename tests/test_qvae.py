@@ -159,6 +159,30 @@ class TestQVAE(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.qvae.energy(x)
 
+    def test_loss_updates_detached_statistics(self):
+        """Training logs receive current loss values without retaining gradients."""
+        x = torch.ones(2, self.input_dim)
+        _, posterior, _, _ = self.qvae(x)
+        cases = (
+            ("mse", 0.0, 8.0),
+            ("mse", 0.5, 2.0),
+            ("bernoulli", 0.0, 5.54517744),
+            ("bernoulli", 1.09861229, 2.30145658),
+        )
+        for loss_type, logit, expected in cases:
+            with self.subTest(loss_type=loss_type, logit=logit):
+                self.config.loss_type = loss_type
+                reconstruction = torch.full_like(x, logit, requires_grad=True)
+                loss = self.qvae.loss(x, reconstruction, posterior)
+                self.assertIsNotNone(self.qvae.last_recon_loss)
+                self.assertIsNotNone(self.qvae.last_kl_loss)
+                self.assertAlmostEqual(self.qvae.last_recon_loss.item(), expected, places=5)
+                self.assertTrue(torch.isfinite(self.qvae.last_kl_loss))
+                self.assertFalse(self.qvae.last_recon_loss.requires_grad)
+                self.assertFalse(self.qvae.last_kl_loss.requires_grad)
+                loss.backward()
+                self.assertIsNotNone(reconstruction.grad)
+
 
 if __name__ == "__main__":
     unittest.main()
