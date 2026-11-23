@@ -4,9 +4,8 @@ A quick and easy setup for running Jupyter notebooks in a Dockerized environment
 
 ## Features
 
-- GitHub Template repository for easy reuse.
 - Dockerized Jupyter environment for consistent, reproducible notebook runs.
-- Simplified sharing of notebooks using the `work` directory.
+- Save notebooks in `/home/jovyan/work` in Jupyter. This directory is a bind mount of the repository root, so notebook files are saved in the host checkout.
 - Compatibility with GitHub Code Spaces for seamless remote development.
 
 ## Getting Started
