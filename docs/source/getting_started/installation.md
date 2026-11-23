@@ -54,7 +54,7 @@ If you need to install Python 3.10, please visit the <u>Python 3.10 download pag
 
 ## Install Kaiwu-PyTorch-Plugin
 
-> You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
+> Choose a source checkout, Docker, or a published PyPI release.
 ### Option 1: Local Setup (conda/pip)
 
 #### Step-by-Step Guide
@@ -147,6 +147,17 @@ Press `Ctrl+C`, then run:
 ```bash
 docker compose down
 ```
+
+(install-from-pypi)=
+### Option 3: Install from PyPI
+
+To install a published release, activate an isolated Python 3.10 environment and run:
+
+```bash
+python -m pip install kaiwu-torch-plugin
+```
+
+pip installs the dependencies specified by the published release.
 
 ## Project Structure & Package Layout
 

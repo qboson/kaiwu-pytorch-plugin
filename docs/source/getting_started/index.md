@@ -46,12 +46,13 @@ Read the [Overview](introduction.md) to learn:
 
 ## Installation Guide
 
-System requirements, local (conda/pip) and Docker setup, Kaiwu SDK configuration, and installation verification.  
+System requirements, setup from source, Docker and PyPI, Kaiwu SDK configuration, and installation verification.\
 See the [Installation Guide](installation.md) for:
 
 - System Requirements
 - Option 1: Local Setup
 - Option 2: Docker Setup
+- {ref}`Option 3: Install from PyPI <install-from-pypi>`
 - Kaiwu SDK Configuration & License
 - Installation Verification
 

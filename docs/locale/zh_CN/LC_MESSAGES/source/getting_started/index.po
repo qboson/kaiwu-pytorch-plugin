@@ -92,13 +92,8 @@ msgid "Installation Guide"
 msgstr "安装指南"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:49
-msgid ""
-"System requirements, local (conda/pip) and Docker setup, Kaiwu SDK "
-"configuration, and installation verification.   See the [Installation "
-"Guide](installation.md) for:"
-msgstr ""
-"系统要求、本地（conda/pip）与 Docker 安装、Kaiwu SDK "
-"配置及安装验证。请参阅[安装指南](installation.md)了解："
+msgid "System requirements, setup from source, Docker and PyPI, Kaiwu SDK configuration, and installation verification.\\ See the [Installation Guide](installation.md) for:"
+msgstr "系统要求、从源码安装、Docker 和 PyPI 安装、Kaiwu SDK 配置及安装验证。请参阅[安装指南](installation.md)了解："
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:52
 msgid "System Requirements"
@@ -111,6 +106,10 @@ msgstr "方案一：本地安装"
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:54
 msgid "Option 2: Docker Setup"
 msgstr "方案二：Docker 安装"
+
+#: ../../source/getting_started/index.md:55
+msgid "{ref}`Option 3: Install from PyPI <install-from-pypi>`"
+msgstr "{ref}`方案三：从 PyPI 安装 <install-from-pypi>`"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/index.md:55
 msgid "Kaiwu SDK Configuration & License"
