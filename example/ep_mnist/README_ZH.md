@@ -1,6 +1,6 @@
 # MNIST 上的均衡传播
 
-这是完整数据集上的 EP 实验。快速验证训练流程可用 [Digits 示例](../ep_digits/README_ZH.md)。
+本示例支持完整数据集训练和 MNIST 小样本验证。快速验证时使用 `--limit-train 20 --limit-eval 20`，并用 `--output-dir` 指定独立输出目录，完整命令见下文。
 
 在完整的原版 MNIST 上训练均衡传播网络。数据通过 `torchvision.datasets.MNIST` 读取，像素除以 255。每个单元都是 ±1 自旋，自由相和微扰相的 Ising 矩阵都由 Kaiwu 1.3.1 模拟退火求解。
 

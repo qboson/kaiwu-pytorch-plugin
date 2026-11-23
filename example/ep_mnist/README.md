@@ -1,7 +1,8 @@
 # Equilibrium propagation on MNIST
 
-This is the full-data EP experiment. The [Digits example](../ep_digits/README.md)
-provides a quicker check of the same training path.
+This example supports full-data training and a quick check on a small MNIST
+subset. Use `--limit-train 20 --limit-eval 20` with a separate `--output-dir`
+for the quick check; see the command below.
 
 Trains equilibrium-propagation networks on the full original MNIST, read with
 `torchvision.datasets.MNIST`. Pixels are divided by 255. Every unit is a ±1

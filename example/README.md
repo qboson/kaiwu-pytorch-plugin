@@ -28,20 +28,18 @@ pandas
 
 ### Equilibrium Propagation
 
-`example/ep_digits/` trains a 64-32-10 equilibrium-propagation network on
-`sklearn.datasets.load_digits`. Every unit is a ±1 spin, and the model's Ising
-matrix is relaxed by Kaiwu simulated annealing. See
-[example/ep_digits/README.md](ep_digits/README.md).
-
-`example/ep_mnist/` trains the same kind of network on the full original MNIST,
-with a convolutional variant whose first layer is an `EPConv2d`. See
+`example/ep_mnist/` trains a 784-128-10 equilibrium-propagation network on the
+full original MNIST, with a convolutional variant whose first layer is an
+`EPConv2d`. Every unit is a ±1 spin, and the model's Ising matrix is relaxed by
+Kaiwu simulated annealing. For a quick check, use `--limit-train 20
+--limit-eval 20` with a separate `--output-dir`. See
 [example/ep_mnist/README.md](ep_mnist/README.md) for commands, results, and run
 time.
 
 **Dependencies**
 
 ```
-scikit-learn
+torchvision
 ```
 
 ---
