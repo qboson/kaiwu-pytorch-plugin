@@ -42,6 +42,7 @@ Run CI manually to select NumPy, PyTorch, Kaiwu, or platform coverage.
 The exact cases are listed in
 [the compatibility matrix](https://github.com/QBoson/kaiwu-pytorch-plugin/blob/main/.github/compatibility-matrix.json).
 Use the `combination` input with the exact CI job name to rerun one case. The Linux matrix tests on CPU.
+Pushing a release tag runs the full matrix before publishing to PyPI.
 
 Check the Python version:
 ```bash
