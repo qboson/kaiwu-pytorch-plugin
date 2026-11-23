@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -27,6 +28,24 @@ TRAIN_ROWS, VAL_ROWS, TEST_ROWS = 12 * 30 * 24, 4 * 30 * 24, 4 * 30 * 24
 # Data.
 
 
+@dataclass(frozen=True)
+class ETTh1Scaling:
+    """Training column order and scaling tensors shared by every data split."""
+
+    columns: tuple[str, ...]
+    mean: torch.Tensor
+    std: torch.Tensor
+
+    def __post_init__(self):
+        expected = (len(self.columns),)
+        if self.mean.shape != expected or self.std.shape != expected:
+            raise ValueError("ETTh1 scaling must have one mean and standard deviation per column")
+        if not torch.isfinite(self.mean).all() or not torch.isfinite(self.std).all():
+            raise ValueError("ETTh1 scaling must be finite")
+        if (self.std <= 0).any():
+            raise ValueError("ETTh1 standard deviations must be positive")
+
+
 class ETTh1Windows(Dataset):
     """Sliding windows over one split of ETTh1, scaled with training statistics.
 
@@ -35,12 +54,17 @@ class ETTh1Windows(Dataset):
         seq_len: Look-back length.
         pred_len: Forecast horizon.
         stride: Step between consecutive window starts.
+        scaling: Training statistics used to produce the scaled values.
     """
 
-    def __init__(self, values: np.ndarray, seq_len: int, pred_len: int, stride: int = 1):
+    def __init__(
+        self, values: np.ndarray, seq_len: int, pred_len: int, stride: int = 1,
+        *, scaling: ETTh1Scaling | None = None,
+    ):
         self.values = torch.as_tensor(values, dtype=torch.float32)
         self.seq_len = seq_len
         self.pred_len = pred_len
+        self.scaling = scaling
         self.starts = list(range(0, len(values) - seq_len - pred_len + 1, stride))
 
     def __len__(self) -> int:
@@ -59,19 +83,32 @@ def build_loaders(
     batch_size: int = 32,
     train_stride: int = 4,
     eval_stride: int = 8,
+    *,
+    scaling: ETTh1Scaling | None = None,
 ) -> dict[str, DataLoader]:
     """Builds train / val / test loaders for the standard ETTh1 split.
 
-    Strides above 1 subsample the windows to keep the example small.
+    Strides above 1 subsample the windows to keep the example small. With
+    ``scaling``, reuse checkpoint statistics and restore its column order.
     """
     if not data_path.exists():
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
         )
-    values = pd.read_csv(data_path).drop(columns=["date"]).to_numpy(dtype=np.float32)
-    train = values[:TRAIN_ROWS]
-    mean, std = train.mean(axis=0), train.std(axis=0) + 1e-8
-    scaled = (values - mean) / std
+    frame = pd.read_csv(data_path).drop(columns=["date"])
+    if scaling is not None:
+        if set(frame.columns) != set(scaling.columns):
+            raise ValueError("ETTh1 columns do not match the training checkpoint")
+        frame = frame.loc[:, list(scaling.columns)]
+    values = frame.to_numpy(dtype=np.float32)
+    if scaling is None:
+        train = values[:TRAIN_ROWS]
+        scaling = ETTh1Scaling(
+            tuple(frame.columns),
+            torch.from_numpy(train.mean(axis=0)),
+            torch.from_numpy(train.std(axis=0) + 1e-8),
+        )
+    scaled = (values - scaling.mean.numpy()) / scaling.std.numpy()
 
     # Validation and test windows start seq_len rows early so their first
     # forecast begins exactly at the split boundary.
@@ -83,7 +120,7 @@ def build_loaders(
     loaders = {}
     for split, (begin, end) in bounds.items():
         stride = train_stride if split == "train" else eval_stride
-        windows = ETTh1Windows(scaled[begin:end], seq_len, pred_len, stride)
+        windows = ETTh1Windows(scaled[begin:end], seq_len, pred_len, stride, scaling=scaling)
         loaders[split] = DataLoader(windows, batch_size=batch_size, shuffle=split == "train")
     return loaders
 

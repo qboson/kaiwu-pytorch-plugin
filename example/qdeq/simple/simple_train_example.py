@@ -11,6 +11,7 @@ The script keeps only the smallest useful training path:
 from __future__ import annotations
 
 import argparse
+from dataclasses import asdict
 from pathlib import Path
 import time
 
@@ -74,7 +75,14 @@ def main() -> None:
         f"(mean forward steps {test['steps']:.1f})"
     )
     args.checkpoint.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({"state_dict": model.state_dict(), "sampler": args.sampler}, args.checkpoint)
+    torch.save(
+        {
+            "state_dict": model.state_dict(),
+            "sampler": args.sampler,
+            "scaling": asdict(loaders["train"].dataset.scaling),
+        },
+        args.checkpoint,
+    )
     print(f"saved {args.checkpoint}")
 
 
