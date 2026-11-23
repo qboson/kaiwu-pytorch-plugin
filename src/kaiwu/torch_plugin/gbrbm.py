@@ -6,6 +6,8 @@ This module implements a restricted Boltzmann machine with one Gaussian
 partition and one Bernoulli partition.
 """
 
+import math
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -226,6 +228,45 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         ising_mat[:num_nodes, -1] = ising_linear
         ising_mat[-1, :num_nodes] = ising_linear
         return ising_mat.detach().cpu().numpy()
+
+    @torch.no_grad()
+    def log_partition(self) -> torch.Tensor:
+        """Compute the exact joint log normalizer for a small model.
+
+        The Gaussian variables are integrated analytically. The remaining
+        sum enumerates the Bernoulli configurations in bounded-size batches.
+        This evaluation routine supports up to 16 Bernoulli units.
+        """
+        if self.num_bernoulli > 16:
+            raise ValueError("Exact normalization supports at most 16 Bernoulli units")
+
+        variance = self.var
+        bit_indices = torch.arange(self.num_bernoulli, device=self.mu.device)
+        log_total = self.mu.new_full((), -torch.inf)
+        num_states = 1 << self.num_bernoulli
+        for start in range(0, num_states, 1024):
+            state_ids = torch.arange(start, min(start + 1024, num_states), device=self.mu.device)
+            bernoulli = ((state_ids[:, None] >> bit_indices) & 1).to(self.mu.dtype)
+            offsets = bernoulli @ self.quadratic_coef.T
+            integrated_logits = bernoulli @ self.linear_bias + (
+                offsets * (self.mu + 0.5 * offsets) / variance
+            ).sum(dim=-1)
+            log_total = torch.logaddexp(log_total, torch.logsumexp(integrated_logits, dim=0))
+
+        return log_total + 0.5 * (variance.log() + math.log(2.0 * math.pi)).sum()
+
+    @torch.no_grad()
+    def gaussian_log_prob(self, s_gaussian: torch.Tensor) -> torch.Tensor:
+        """Return the normalized marginal log density for each Gaussian row.
+
+        Args:
+            s_gaussian: Gaussian states shaped ``(batch_size, num_gaussian)``,
+                including when the Gaussian side is the hidden partition.
+        """
+        s_gaussian = torch.as_tensor(s_gaussian, dtype=self.mu.dtype, device=self.mu.device)
+        if s_gaussian.ndim != 2 or s_gaussian.size(1) != self.num_gaussian:
+            raise ValueError("Expected Gaussian states of shape (batch_size, num_gaussian)")
+        return -self.marginal_energy(s_gaussian) - self.log_partition()
 
     def infer_from_gaussian(
         self,
