@@ -1,12 +1,13 @@
 @ECHO OFF
 
-pushd %~dp0
+setlocal
+set "ERRORLEVEL="
+pushd "%~dp0" || exit /b 1
 
 REM Command file for Sphinx documentation
 
-if "%SPHINXBUILD%" == "" (
-	set SPHINXBUILD=sphinx-build
-)
+if not defined SPHINXBUILD set "SPHINXBUILD=sphinx-build"
+if exist "%SPHINXBUILD:"=%" set SPHINXBUILD="%SPHINXBUILD:"=%"
 set SOURCEDIR=.
 set BUILDDIR=_build
 
@@ -20,6 +21,7 @@ if errorlevel 9009 (
 	echo.
 	echo.If you don't have Sphinx installed, grab it from
 	echo.https://www.sphinx-doc.org/
+	popd
 	exit /b 1
 )
 
@@ -32,4 +34,6 @@ goto end
 %SPHINXBUILD% -M help %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 
 :end
+set "SPHINX_STATUS=%errorlevel%"
 popd
+exit /b %SPHINX_STATUS%
