@@ -2,7 +2,7 @@
 
 # Kaiwu-PyTorch-Plugin
 
-**Language Versions**: [Chinese](README_ZH.md) | [English](README.md)
+**Language Versions**: [Chinese](https://github.com/qboson/kaiwu-pytorch-plugin/blob/main/README_ZH.md) | [English](https://github.com/qboson/kaiwu-pytorch-plugin/blob/main/README.md)
 
 For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/).
 
