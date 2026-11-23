@@ -6,7 +6,7 @@ on:
       scope:
         description: Test scope (each scope also runs the baseline combinations)
         type: choice
-        options: [default, numpy, pytorch, kaiwu, platforms, examples, all]
+        options: [default, numpy, pytorch, kaiwu, platforms, all]
         default: default
       combination:
         description: Exact combination ID shown as the CI job name
@@ -40,8 +40,7 @@ jobs:
               .value.numpy_versions[] | {python: $py, numpy: .}] |
             map_values(map(
               $defaults + ($python[.python] | del(.numpy_versions)) + . |
-              .id = "py\(.python)-\(.runner)-kaiwu\(.kaiwu)-np\(.numpy)-torch\(.torch)" +
-                (if .torchvision then "-examples" else "" end)
+              .id = "py\(.python)-\(.runner)-kaiwu\(.kaiwu)-np\(.numpy)-torch\(.torch)"
             )) |
             if $id != "" then
               [.[][] | select(.id == $id)] | if length == 1 then . else error("Expected one combination for: " + $id) end
@@ -83,18 +82,12 @@ jobs:
           KAIWU_VERSION: ${{ matrix.kaiwu }}
           NUMPY_VERSION: ${{ matrix.numpy }}
           TORCH_VERSION: ${{ matrix.torch }}
-          TORCHVISION_VERSION: ${{ matrix.torchvision }}
           SCIPY_VERSION: ${{ matrix.scipy }}
         run: |
-          torch_packages=("torch==$TORCH_VERSION")
-          requirements=("scipy==$SCIPY_VERSION" scikit-learn==1.7.2 seaborn==0.13.2 tqdm==4.67.1
-                        pytest==9.1.1 pytest-cov==7.1.0 pip-licenses==5.5.0 pylint==4.1.3)
-          if [[ -n "$TORCHVISION_VERSION" ]]; then
-            torch_packages+=("torchvision==$TORCHVISION_VERSION")
-            requirements=(-r requirements/devel.txt)
-          fi
-          python -m pip install "${torch_packages[@]}" --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install . "numpy==$NUMPY_VERSION" "kaiwu==$KAIWU_VERSION" "${requirements[@]}"
+          python -m pip install "torch==$TORCH_VERSION" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install . "numpy==$NUMPY_VERSION" "kaiwu==$KAIWU_VERSION" "scipy==$SCIPY_VERSION" \
+            scikit-learn==1.7.2 seaborn==0.13.2 tqdm==4.67.1 \
+            pytest==9.1.1 pytest-cov==7.1.0 pip-licenses==5.5.0 pylint==4.1.3
           python -m pip check
           python -I - <<'PY'
           import os
@@ -129,7 +122,7 @@ jobs:
       - name: Test with pytest
         run: |
           installed=$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')
-          python -I -m pytest tests/ -v ${{ !matrix.torchvision && '--ignore=tests/test_example_dependencies.py' || '' }} \
+          python -I -m pytest tests/ -v \
             --cov=src --cov="$installed" --cov-report=term --cov-report=xml
 
       - name: Upload coverage to Codecov

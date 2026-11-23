@@ -115,9 +115,7 @@ graph TD
 CI 运行的具体组合见[兼容性矩阵](.github/compatibility-matrix.json)，安装步骤见
 [安装说明](docs/source/getting_started/installation.md)。
 
-示例依赖见 `requirements/requirements_example.txt` 和
-`example/qdiffusion/requirements.txt`。Apple Silicon Mac 用户运行单细胞示例或
-对应测试前，需要设置 `NUMBA_THREADING_LAYER=workqueue`。
+示例依赖见[示例索引](example/README_ZH.md)。
 
 ### 代码风格
 

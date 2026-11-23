@@ -32,10 +32,5 @@
   "platforms": [
     {"python": "3.10", "runner": "windows-2022"},
     {"python": "3.10", "runner": "macos-15"}
-  ],
-  "examples": [
-    {"python": "3.10", "torchvision": "0.22.0"},
-    {"python": "3.12", "torchvision": "0.22.0"},
-    {"python": "3.14", "torchvision": "0.25.0"}
   ]
 }

@@ -38,7 +38,7 @@ KPP handles the `PrecisionReducer` move from `kaiwu.cim` to
 `kaiwu.preprocess` and translates old and new CIM mode names.
 
 CI runs Linux combinations for Kaiwu 1.4.4 and selected older releases on pushes and pull requests.
-Run CI manually to select NumPy, PyTorch, Kaiwu, platform, or example coverage.
+Run CI manually to select NumPy, PyTorch, Kaiwu, or platform coverage.
 The exact cases are listed in
 [the compatibility matrix](https://github.com/QBoson/kaiwu-pytorch-plugin/blob/main/.github/compatibility-matrix.json).
 Use the `combination` input with the exact CI job name to rerun one case. The Linux matrix tests on CPU.
@@ -82,32 +82,8 @@ Install the project dependencies:
 pip install -r requirements/requirements.txt
 ```
 
-On Linux, install matching PyTorch and TorchVision builds from the same CPU
-or CUDA package index before the example or development dependencies. Use
-the versions selected for your Python version in the requirements files.
-
-For all examples, including image and single-cell workflows, install:
-
-```bash
-pip install -r requirements/requirements_example.txt
-```
-
-QDiffusion has an additional dependency list:
-
-```bash
-pip install -r example/qdiffusion/requirements.txt
-```
-
-Both lists select versions for the active Python environment. For development,
-`pip install -r requirements/devel.txt` installs both lists and the test/documentation tools.
-
-On Apple Silicon macOS, set the following before running single-cell examples or
-the full test suite. It avoids a conflict between Numba and PyTorch's OpenMP
-libraries.
-
-```bash
-export NUMBA_THREADING_LAYER=workqueue
-```
+See the [examples index](https://github.com/QBoson/kaiwu-pytorch-plugin/tree/main/example)
+for dependencies specific to each example.
 
 4. **Install the Plugin**
 ```bash

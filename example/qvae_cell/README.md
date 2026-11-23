@@ -10,24 +10,13 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 
 ## Dependencies
 
-Install the plugin from the repository root with `pip install .`.
-
-Install the example dependencies from the repository root:
+From the repository root, install KPP and the dependencies for this example.
 
 ```bash
-pip install -r requirements/requirements_example.txt
+pip install . anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
 ```
 
-The requirements select fixed versions for Python 3.10, 3.12, and 3.14,
-including AnnData, Scanpy, Leiden, scIB metrics, and `scgraph-eval`.
-The latter provides the `scgraph` module used by the evaluation script.
-
-On Apple Silicon macOS, run this in the same terminal before starting the example
-to avoid a Numba/PyTorch OpenMP conflict:
-
-```bash
-export NUMBA_THREADING_LAYER=workqueue
-```
+On Apple Silicon macOS, run `export NUMBA_THREADING_LAYER=workqueue` before starting the example.
 
 ## File Structure
 

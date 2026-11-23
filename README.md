@@ -124,10 +124,7 @@ See the [compatibility matrix](.github/compatibility-matrix.json) for the exact
 combinations exercised by CI and the [installation guide](docs/source/getting_started/installation.md)
 for details.
 
-Example dependencies are listed in `requirements/requirements_example.txt`
-and `example/qdiffusion/requirements.txt`. On Apple Silicon macOS, set
-`NUMBA_THREADING_LAYER=workqueue` before running the single-cell examples or
-their tests.
+See the [examples index](example/README.md) for example dependencies.
 
 ### Code Style
 
