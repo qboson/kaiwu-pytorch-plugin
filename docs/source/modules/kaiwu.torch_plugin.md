@@ -9,6 +9,14 @@
    :show-inheritance:
 ```
 
+## MAIFS feature-count settings
+
+`FeatureSelectionWrapper` starts with every feature selected. The wrapper applies the feature-count bounds when it updates the mask. An update can be triggered with `update_mask()` or scheduled during `fit_weights()`.
+
+`cardinality_k` is a soft target in the QUBO objective, so an updated mask may contain a different number of features. To require exactly `k` features after each mask update, set both `min_selected_features` and `max_selected_features` to `k`.
+
+An explicit minimum applies to every updated mask. If the minimum is omitted, the wrapper uses its default minimum only when the mask is empty after applying the upper bound.
+
 ## MAIFS QUBO and SDK energy conventions
 
 `QuadraticLinearSolver.solve(Q, l)` represents the binary objective
