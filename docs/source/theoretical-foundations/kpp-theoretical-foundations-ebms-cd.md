@@ -108,7 +108,7 @@ where $\mathbf{v}^{(m)}_k, \mathbf{h}^{(m)}_k$ are the final states after $k$ Gi
 - The CD-k algorithm alternates between a **positive phase** (clamped to data) and a **negative phase** (brief free-running reconstruction).
 - Geometrically, CD deepens the energy basin at data points while raising energy in their immediate MCMC-accessible neighborhood.
 - CD-k uses a partial derivative of a **difference of KL divergences**, holding the $k$-step distribution fixed during differentiation.
-- Limitations include **bias**, the lack of a fixed objective in general, and potential **mode collapse**.
+- Limitations include **bias**, a potentially nonconservative update, and potential **mode collapse**.
 - **Persistent contrastive divergence (PCD)** improves sampling quality by maintaining persistent Markov chains across updates.
 - **Mini-batch training** and **vectorization** are key practical considerations for efficient implementation.
 - CD enabled the practical training of RBMs and deep belief networks, playing a pivotal role in the deep learning renaissance of the 2000s.

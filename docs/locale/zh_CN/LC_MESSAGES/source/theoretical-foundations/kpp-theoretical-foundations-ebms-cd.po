@@ -513,9 +513,9 @@ msgstr "CD-k 对 **KL 散度之差** 求偏导时，将 $k$ 步采样分布视�
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:111
 msgid ""
-"Limitations include **bias**, the lack of a fixed objective in general, "
-"and potential **mode collapse**."
-msgstr "局限包括 **偏差**、一般情况下缺少固定的目标函数，以及潜在的 **模态塌缩**。"
+"Limitations include **bias**, a potentially nonconservative update, and "
+"potential **mode collapse**."
+msgstr "局限包括 **偏差**、更新方向可能形成非保守向量场，以及潜在的 **模态塌缩**。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:112
 msgid ""

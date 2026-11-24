@@ -617,11 +617,11 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:111
 msgid ""
-"Limitations include **bias**, the lack of a fixed objective in general, "
-"and potential **mode collapse**."
+"Limitations include **bias**, a potentially nonconservative update, and "
+"potential **mode collapse**."
 msgstr ""
-"Limitations include **bias**, the lack of a fixed objective in general, "
-"and potential **mode collapse**."
+"Limitations include **bias**, a potentially nonconservative update, and "
+"potential **mode collapse**."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:112
 msgid ""
