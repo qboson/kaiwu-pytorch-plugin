@@ -72,7 +72,7 @@ Hopfield's original network employed deterministic, asynchronous updates:
 
 $$x_i \leftarrow \text{sign}\left( \sum_{j} w_{ij} x_j + b_i \right)$$ (eq-sign-update)
 
-This dynamics is equivalent to moving strictly downhill in the energy landscape. The network will converge to the nearest local minimum, but it may get stuck in a spurious state rather than the intended memory.
+With symmetric weights and no self-connections, each step updates one spin with state $-1$ or $+1$. When its local field is zero, the spin keeps its current state. Every flip strictly lowers the energy. With repeated sweeps over all units, the finite network reaches a state in which no single-spin flip lowers the energy. This fixed point can be a spurious state.
 
 The **Boltzmann Machine** introduces a crucial modification: updates become **stochastic**. At a finite temperature $T$, a neuron $i$ is set to state $1$ with probability:
 

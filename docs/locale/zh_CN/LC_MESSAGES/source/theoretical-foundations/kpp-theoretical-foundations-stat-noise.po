@@ -74,14 +74,14 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:23
 msgid ""
-"If the sign of the input matches the new state, the energy decreases; if it "
-"matches the old state, the energy remains unchanged. The dynamics therefore "
-"implements a strict **gradient descent** on the energy landscape: the "
-"network state slides inexorably downhill toward the nearest local minimum, "
-"where it remains indefinitely."
+"When the local field is zero, keep the current spin. A spin aligned with a "
+"nonzero field also stays put. A flip occurs only when the field opposes "
+"the spin, giving $\\Delta E < 0$. With repeated sweeps over all units, only "
+"finitely many flips can occur. A full sweep with no flips identifies a "
+"fixed point."
 msgstr ""
-"如果输入符号与新状态一致，能量会下降；如果与旧状态一致，能量保持不变。因此，该动力学在能量景观上实现了严格的 "
-"**梯度下降**：网络状态不可逆地向最近的局部极小值滑落，并会无限期停留在那里。"
+"局部场为零时，自旋保持当前状态。自旋与非零局部场同向时也保持不动。只有当局部场与自旋反向时才会翻转，此时 $\\Delta E < "
+"0$。反复扫过所有单元时，翻转只能发生有限次。如果一轮扫描中没有发生翻转，网络就已达到固定点。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:25
 msgid "Memories as Energy Minima"
