@@ -1,0 +1,74 @@
+{
+  "bp": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "probe": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "ep-full": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-50_seed-0": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-50_seed-1": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-50_seed-2": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-1_sa-50_seed-0": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-1_sa-50_seed-1": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-1_sa-50_seed-2": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-4_sa-50_seed-0": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-4_sa-50_seed-1": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-4_sa-50_seed-2": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-20_seed-0": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-20_seed-1": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-20_seed-2": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-100_seed-0": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-100_seed-1": {
+    "state": "passed",
+    "returncode": 0
+  },
+  "beta-2_sa-100_seed-2": {
+    "state": "passed",
+    "returncode": 0
+  }
+}

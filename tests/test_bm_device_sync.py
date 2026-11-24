@@ -20,6 +20,8 @@ import numpy as np
 import torch
 from torch import nn
 
+import pytest
+
 from kaiwu.torch_plugin import BoltzmannMachine, EnergyModel
 
 
@@ -86,6 +88,7 @@ class TestDeviceBookkeeping(unittest.TestCase):
         self.assertEqual(bm.device, torch.device("cpu"))
 
 
+@pytest.mark.integration
 @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")
 class TestDeviceSyncAcrossAccelerators(unittest.TestCase):
     """End-to-end coverage of the construct-on-CUDA / move-to-CPU path."""
@@ -105,7 +108,8 @@ class TestDeviceSyncAcrossAccelerators(unittest.TestCase):
 
         energy.to("cpu")
 
-        self.assertEqual(energy.energy_bm.quadratic_coef.device.type, "cpu")
+        for tensor in (*energy.energy_bm.parameters(), *energy.energy_bm.buffers()):
+            self.assertEqual(tensor.device, torch.device("cpu"))
         self.assertEqual(energy.energy_bm.device, torch.device("cpu"))
 
     def test_score_visible_logits_after_parent_move(self):
@@ -120,6 +124,8 @@ class TestDeviceSyncAcrossAccelerators(unittest.TestCase):
         scores = energy.score_visible_logits(torch.zeros(2, 4))
 
         self.assertEqual(scores.shape, (2, 1))
+        self.assertEqual(scores.device, torch.device("cpu"))
+        self.assertTrue(torch.isfinite(scores).all().item())
 
 
 if __name__ == "__main__":

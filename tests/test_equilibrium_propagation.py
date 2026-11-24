@@ -3,10 +3,13 @@
 import itertools
 import os
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 import torch
+from torch.utils.data import DataLoader, TensorDataset
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 import kaiwu.torch_plugin as plugin  # pylint: disable=wrong-import-position
@@ -82,8 +85,50 @@ def brute_force_minimum(model, inputs, target, beta):
     )
 
 
+def predictions(model, sampler, inputs):
+    """Read classes from free-phase output fields, as in the MNIST example."""
+    with torch.no_grad():
+        states = model.equilibrate(inputs, sampler)
+        output = model.layers[-1]
+        return (output.drive(states[-2]) + output.bias_vector()).argmax(dim=1), states
+
+
 class TestEquilibriumPropagation(unittest.TestCase):
     """Energy, Ising mapping and the EP objective."""
+
+    def test_zero_beta_ignores_labels(self):
+        """A target at beta zero changes neither the Ising matrix nor its solution."""
+        model = linear_model()
+        inputs = torch.tensor([[0.3, -0.7, 0.5]], dtype=torch.float64)
+        target = torch.tensor([[1.0, -1.0]], dtype=torch.float64)
+        np.testing.assert_array_equal(
+            model.ising_matrix(inputs[0]), model.ising_matrix(inputs[0], target[0], beta=0.0)
+        )
+        left = model.equilibrate(inputs, EnumerateSampler())
+        right = model.equilibrate(inputs, EnumerateSampler(), target, beta=0.0)
+        for free, zero_beta in zip(left, right):
+            torch.testing.assert_close(free, zero_beta, rtol=0, atol=0)
+
+    def test_state_dict_round_trip(self):
+        """Restore linear and convolutional predictions from a disk checkpoint."""
+        for factory, width in ((linear_model, 3), (conv_model, 2)):
+            with self.subTest(model=factory.__name__), tempfile.TemporaryDirectory() as folder:
+                model = factory()
+                path = Path(folder) / "checkpoint.pt"
+                torch.save(model.state_dict(), path)
+                restored = factory()
+                randomize(restored, seed=17)
+                restored.load_state_dict(torch.load(path, map_location="cpu", weights_only=True))
+                for name, value in model.state_dict().items():
+                    torch.testing.assert_close(value, restored.state_dict()[name], rtol=0, atol=0)
+                inputs = torch.linspace(-0.7, 0.9, 2 * width, dtype=torch.float64).reshape(2, width)
+                labels, states = predictions(model, EnumerateSampler(), inputs)
+                loaded_labels, loaded_states = predictions(restored, EnumerateSampler(), inputs)
+                torch.testing.assert_close(labels, loaded_labels, rtol=0, atol=0)
+                torch.testing.assert_close(
+                    model.energy(inputs, states), restored.energy(inputs, loaded_states),
+                    rtol=0, atol=0,
+                )
 
     def assert_ising_matches_energy(self, model, inputs, target, beta):
         """``-z^T J z`` equals the nudged energy up to one constant."""
@@ -174,6 +219,8 @@ class TestEquilibriumPropagation(unittest.TestCase):
         optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
         inputs = torch.tensor([[0.3, -0.7, 0.5], [0.9, 0.1, -0.4]], dtype=torch.float64)
         target = torch.tensor([[1.0, -1.0], [-1.0, 1.0]], dtype=torch.float64)
+        loader = DataLoader(TensorDataset(inputs, target), batch_size=2)
+        inputs, target = next(iter(loader))
         before = [parameter.detach().clone() for parameter in model.parameters()]
         free = model.equilibrate(inputs, EnumerateSampler())
         nudged = model.equilibrate(inputs, EnumerateSampler(), target, beta=4.0)
@@ -245,9 +292,57 @@ def _has_kaiwu_annealer():
     return True
 
 
+def annealing_traces():
+    """Run both phases from one initial state and save the actual SDK trajectories."""
+    from kaiwu.classical import SimulatedAnnealingOptimizer  # pylint: disable=import-outside-toplevel
+
+    model = linear_model()
+    inputs = torch.tensor([[0.3, -0.7, 0.5]], dtype=torch.float64)
+    target = torch.tensor([[1.0, -1.0]], dtype=torch.float64)
+    records = []
+    for beta, label in ((0.0, None), (0.0, target[0]), (1.0, target[0])):
+        matrix = model.ising_matrix(inputs[0], label, beta)
+        grid = EnumerateSampler().solve(matrix)
+        energies = -np.einsum("bi,ij,bj->b", grid, matrix, grid)
+        start = grid[int(np.argmax(energies))]
+        sampler = SimulatedAnnealingOptimizer(
+            initial_temperature=5.0, alpha=0.9, cutoff_temperature=0.01,
+            iterations_per_t=20, size_limit=8, flag_evolution_history=True,
+            rand_seed=7, process_num=1,
+        )
+        candidates = np.atleast_2d(sampler.solve(matrix, init_solution=start.copy()))
+        candidates = candidates * candidates[:, -1:]
+        candidate_energy = -np.einsum("bi,ij,bj->b", candidates, matrix, candidates)
+        sample = int(np.argmin(candidate_energy))
+        times, raw = zip(*sorted(sampler.get_ha_history().items()))
+        best = np.minimum.accumulate(raw)
+        records.append({
+            "beta": beta, "has_target": label is not None,
+            "initial_spins": start.tolist(), "solution": candidates[sample].tolist(),
+            "time_seconds": list(times), "energy": list(raw), "best_energy": best.tolist(),
+            "exact_energy": float(energies.min()),
+            "solution_energy": float(candidate_energy[sample]),
+        })
+    return records
+
+
 @unittest.skipUnless(_has_kaiwu_annealer(), "Kaiwu simulated annealing is not installed")
 class TestKaiwuAnnealer(unittest.TestCase):
     """The real SDK annealer on a problem small enough to check exactly."""
+
+    def test_two_phase_energy_history(self):
+        """Both phases reach the exact energy and maintain a stable best value."""
+        records = annealing_traces()
+        free, zero_beta, nudged = records[0], records[1], records[2]
+        self.assertEqual(free["initial_spins"], zero_beta["initial_spins"])
+        self.assertEqual(free["solution"], zero_beta["solution"])
+        for record in (free, nudged):
+            with self.subTest(beta=record["beta"]):
+                best = record["best_energy"]
+                self.assertGreaterEqual(len(best), 10)
+                self.assertGreater(best[0], best[-1])
+                self.assertAlmostEqual(record["solution_energy"], record["exact_energy"], places=8)
+                np.testing.assert_allclose(best[-10:], record["exact_energy"], rtol=0, atol=1e-8)
 
     def test_annealer_finds_the_minimum(self):
         """Kaiwu SA reaches the brute-force minimiser of both phases."""

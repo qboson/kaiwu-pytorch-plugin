@@ -11,37 +11,43 @@ simulated annealing.
 
 import argparse
 import json
+import math
 import os
 import time
 from pathlib import Path
 
 import numpy as np
 import torch
+from torch.utils.data import DataLoader, TensorDataset
 from torchvision.datasets import MNIST
 
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin import EPConv2d, EPLinear, EquilibriumPropagation
 
 
-def _load_splits(data_dir, n_val, seed):
+def _load_splits(data_dir, n_val, seed, include_test=True):
     """Return MNIST train, validation and test arrays.
 
     The official 10000 test images are the test split. ``n_val`` images drawn
     at random from the 60000 training images are held out for validation.
     """
     train = MNIST(data_dir, train=True, download=True)
-    test = MNIST(data_dir, train=False, download=True)
+    if not 0 < n_val < len(train):
+        raise ValueError("validation size must be smaller than the training set")
     features = train.data.reshape(len(train.data), -1).numpy().astype(np.float32) / 255.0
     labels = train.targets.numpy()
     order = np.random.default_rng(seed).permutation(len(features))
     val, fit = order[:n_val], order[n_val:]
-    test_x = test.data.reshape(len(test.data), -1).numpy().astype(np.float32) / 255.0
-    test_y = test.targets.numpy()
-    return (features[fit], labels[fit]), (features[val], labels[val]), (test_x, test_y)
+    test_split = None
+    if include_test:
+        test = MNIST(data_dir, train=False, download=True)
+        test_x = test.data.reshape(len(test.data), -1).numpy().astype(np.float32) / 255.0
+        test_split = (test_x, test.targets.numpy())
+    return (features[fit], labels[fit]), (features[val], labels[val]), test_split
 
 
 def _build_model(args):
-    """Build the MLP or the convolutional EP network."""
+    """Build the fully connected or convolutional EP network."""
     if args.conv:
         conv = EPConv2d((1, 28, 28), out_channels=args.channels, kernel_size=7, stride=3)
         layers = [conv, EPLinear(conv.out_features, 10)]
@@ -53,126 +59,227 @@ def _build_model(args):
     return model
 
 
-def _spin_targets(labels, n_classes=10):
-    """Encode integer labels as ``+1`` for the class and ``-1`` elsewhere."""
-    coded = -np.ones((len(labels), n_classes), dtype=np.float32)
-    coded[np.arange(len(labels)), labels] = 1.0
-    return torch.from_numpy(coded)
+def _dataset(split, limit):
+    """Convert a split to a dataset, optionally retaining its first rows."""
+    features, labels = split
+    return TensorDataset(torch.from_numpy(features[:limit]), torch.from_numpy(labels[:limit]))
 
 
-def _accuracy(model, sampler, features, labels):
-    """Classify by the output field of the free-phase hidden spins."""
-    states = model.equilibrate(torch.from_numpy(features), sampler)
+def _spin_targets(labels):
+    """Encode integer labels as +1 for their class and -1 elsewhere."""
+    return 2.0 * torch.nn.functional.one_hot(labels, 10).float() - 1.0
+
+
+def _readout(model, states):
+    """Return class predictions from the free-phase output fields."""
+    output = model.layers[-1]
+    return (output.drive(states[-2]) + output.bias_vector()).argmax(dim=1)
+
+
+def _sampler_config(iterations, seed):
+    """Return the Kaiwu annealing settings for a run."""
+    return {
+        "initial_temperature": 10.0,
+        "alpha": 0.9,
+        "cutoff_temperature": 0.01,
+        "iterations_per_t": iterations,
+        "size_limit": 4,
+        "rand_seed": seed,
+        "process_num": 1,
+    }
+
+
+def _accuracy(model, settings, loader):
+    """Predict with a fresh, fixed-seed sampler for each evaluation."""
+    sampler = SimulatedAnnealingOptimizer(**settings)
+    correct = 0
     with torch.no_grad():
-        readout = model.layers[-1]
-        scores = readout.drive(states[-2]) + readout.bias_vector()
-    return float((scores.argmax(dim=1).numpy() == labels).mean())
+        for inputs, labels in loader:
+            states = model.equilibrate(inputs, sampler)
+            correct += int((_readout(model, states) == labels).sum())
+    return correct / len(loader.dataset)
+
+
+def _positive_int(value):
+    """Parse a strictly positive integer."""
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError("expected a positive integer")
+    return number
 
 
 def _parse_args() -> argparse.Namespace:
-    """Parse the command line."""
+    """Parse training or checkpoint evaluation arguments."""
     parser = argparse.ArgumentParser(description="Equilibrium propagation on MNIST")
     parser.add_argument("--data-dir", default=os.path.join(os.path.dirname(__file__), "data"))
-    parser.add_argument("--limit-train", type=int, default=None, help="first N training images")
-    parser.add_argument("--limit-eval", type=int, default=None, help="first N val/test images")
-    parser.add_argument("--n-val", type=int, default=5000)
-    parser.add_argument("--epochs", type=int, default=1)
-    parser.add_argument("--batch-size", type=int, default=20)
+    parser.add_argument("--limit-train", type=_positive_int, help="first N training images")
+    parser.add_argument("--limit-eval", type=_positive_int, help="first N val/test images")
+    parser.add_argument("--n-val", type=_positive_int, default=5000)
+    parser.add_argument("--epochs", type=_positive_int, default=1)
+    parser.add_argument("--batch-size", type=_positive_int, default=20)
     parser.add_argument("--lr", type=float, default=0.05)
     parser.add_argument("--beta", type=float, default=2.0)
-    parser.add_argument("--hidden", type=int, default=128)
+    parser.add_argument("--hidden", type=_positive_int, default=128)
     parser.add_argument("--conv", action="store_true", help="strided EPConv2d first layer")
-    parser.add_argument("--channels", type=int, default=4, help="output channels with --conv")
-    parser.add_argument(
-        "--input-scale", type=float, default=2.0, help="multiplier on the first-layer init"
-    )
-    parser.add_argument(
-        "--sa-iterations", type=int, default=50, help="annealing iterations per temperature"
-    )
+    parser.add_argument("--channels", type=_positive_int, default=4)
+    parser.add_argument("--input-scale", type=float, default=2.0)
+    parser.add_argument("--sa-iterations", type=_positive_int, default=50,
+                        help="annealing iterations per temperature")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument(
-        "--output-dir",
-        type=Path,
-        default=Path(__file__).resolve().parent / "results",
-        help="directory for the run summary",
+    parser.add_argument("--split-seed", type=int, default=0)
+    parser.add_argument("--validation-only", action="store_true", help="skip the MNIST test set")
+    parser.add_argument("--evaluate", type=Path, help="evaluate a saved checkpoint")
+    parser.add_argument("--output-dir", type=Path, help="new directory for this run")
+    args = parser.parse_args()
+    for name in ("lr", "beta", "input_scale"):
+        value = getattr(args, name)
+        if not math.isfinite(value) or value <= 0:
+            parser.error(f"--{name.replace('_', '-')} must be finite and positive")
+    if args.seed < 0 or args.split_seed < 0:
+        parser.error("seeds must be nonnegative")
+    return args
+
+
+def _write_json(path, payload):
+    """Replace a JSON file only after its new contents are written."""
+    pending = path.with_suffix(".tmp")
+    pending.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    pending.replace(path)
+
+
+def _train_epoch(model, sampler, optimizer, loader, beta):
+    """Apply EP updates and return the sample-weighted mean objective."""
+    total = 0.0
+    for inputs, labels in loader:
+        free = model.equilibrate(inputs, sampler)
+        nudged = model.equilibrate(inputs, sampler, _spin_targets(labels), beta)
+        optimizer.zero_grad()
+        loss = model.objective(inputs, free, nudged, beta)
+        if not torch.isfinite(loss):
+            raise RuntimeError("non-finite EP objective")
+        loss.backward()
+        optimizer.step()
+        total += float(loss.detach()) * len(inputs)
+    return total / len(loader.dataset)
+
+
+def _loaders(config, data_dir, include_test):
+    """Build evaluation loaders with consistent split and subset limits."""
+    train, val, test = _load_splits(
+        data_dir, config.n_val, config.split_seed, include_test=include_test
     )
-    return parser.parse_args()
+    train = _dataset(train, config.limit_train)
+    val = _dataset(val, config.limit_eval)
+    test_loader = None if test is None else DataLoader(
+        _dataset(test, config.limit_eval), batch_size=config.batch_size
+    )
+    return (
+        DataLoader(train, batch_size=config.batch_size),
+        DataLoader(val, batch_size=config.batch_size),
+        test_loader,
+    )
+
+
+def _metrics(model, settings, train, val):
+    """Measure train and validation classification accuracy and error."""
+    started = time.perf_counter()
+    train_accuracy = _accuracy(model, settings, train)
+    val_accuracy = _accuracy(model, settings, val)
+    return {
+        "train_accuracy": train_accuracy,
+        "train_error": 1.0 - train_accuracy,
+        "val_accuracy": val_accuracy,
+        "val_error": 1.0 - val_accuracy,
+        "eval_seconds": time.perf_counter() - started,
+    }
+
+
+def _evaluate(args, checkpoint, output_dir):
+    """Restore the saved model and evaluate the saved data configuration."""
+    config = argparse.Namespace(**checkpoint["config"])
+    model = _build_model(config)
+    model.load_state_dict(checkpoint["state_dict"])
+    settings = checkpoint["eval_sampler"]
+    train, val, test = _loaders(
+        config, args.data_dir, not (args.validation_only or checkpoint["config"]["validation_only"])
+    )
+    result = {
+        "checkpoint": str(args.evaluate),
+        "epoch": checkpoint["epoch"],
+        **_metrics(model, settings, train, val),
+    }
+    if test is not None:
+        result["test_accuracy"] = _accuracy(model, settings, test)
+    _write_json(output_dir / "evaluation.json", result)
+    print(json.dumps(result), flush=True)
+
+
+def _train(args, output_dir):
+    """Train the model, saving a checkpoint and metrics after each epoch."""
+    train, val, test = _loaders(args, args.data_dir, not args.validation_only)
+    torch.manual_seed(args.seed)
+    model = _build_model(args)
+    settings = _sampler_config(args.sa_iterations, args.seed)
+    eval_settings = _sampler_config(args.sa_iterations, 0)
+    sampler = SimulatedAnnealingOptimizer(**settings)
+    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
+    order = np.arange(len(train.dataset))
+    rng = np.random.default_rng(args.seed)
+    batches = DataLoader(train.dataset, batch_size=args.batch_size, sampler=order)
+    config = {key: value for key, value in vars(args).items()
+              if key not in ("data_dir", "output_dir", "evaluate")}
+    summary = {
+        **config,
+        "layer_sizes": list(model.layer_sizes),
+        "n_train": len(train.dataset),
+        "n_val": len(val.dataset),
+        "n_test": 0 if test is None else len(test.dataset),
+        "train_sampler": settings,
+        "eval_sampler": eval_settings,
+        "history": [],
+    }
+    summary_path = output_dir / ("summary_conv.json" if args.conv else "summary.json")
+    for epoch in range(1, args.epochs + 1):
+        rng.shuffle(order)
+        started = time.perf_counter()
+        objective = _train_epoch(model, sampler, optimizer, batches, args.beta)
+        row = {"epoch": epoch, "ep_objective": objective,
+               "train_seconds": time.perf_counter() - started}
+        row.update(_metrics(model, eval_settings, train, val))
+        summary["history"].append(row)
+        torch.save(
+            {"config": config, "epoch": epoch, "state_dict": model.state_dict(),
+             "train_sampler": settings, "eval_sampler": eval_settings},
+            output_dir / "checkpoint.tmp",
+        )
+        (output_dir / "checkpoint.tmp").replace(output_dir / "checkpoint.pt")
+        _write_json(summary_path, summary)
+        print(json.dumps(row), flush=True)
+
+    if test is not None:
+        started = time.perf_counter()
+        summary["test_accuracy"] = _accuracy(model, eval_settings, test)
+        summary["test_seconds"] = time.perf_counter() - started
+        _write_json(summary_path, summary)
+    print(f"wrote {summary_path}", flush=True)
 
 
 def main() -> None:
-    """Train EP on MNIST and write a small JSON summary."""
+    """Train or evaluate MNIST EP in a new output directory."""
     args = _parse_args()
-    (train_x, train_y), (val_x, val_y), (test_x, test_y) = _load_splits(
-        args.data_dir, args.n_val, args.seed
-    )
-    train_x, train_y = train_x[: args.limit_train], train_y[: args.limit_train]
-    val_x, val_y = val_x[: args.limit_eval], val_y[: args.limit_eval]
-    test_x, test_y = test_x[: args.limit_eval], test_y[: args.limit_eval]
-
-    torch.manual_seed(args.seed)
-    model = _build_model(args)
-    sampler = SimulatedAnnealingOptimizer(
-        initial_temperature=10.0,
-        alpha=0.9,
-        cutoff_temperature=0.01,
-        iterations_per_t=args.sa_iterations,
-        size_limit=4,
-        rand_seed=args.seed,
-        process_num=1,
-    )
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.lr)
-    targets = _spin_targets(train_y)
-    order = np.arange(len(train_x))
-    rng = np.random.default_rng(args.seed)
-    history = []
-    for epoch in range(args.epochs):
-        started = time.perf_counter()
-        rng.shuffle(order)
-        for start in range(0, len(order), args.batch_size):
-            batch = order[start : start + args.batch_size]
-            inputs = torch.from_numpy(train_x[batch])
-            free = model.equilibrate(inputs, sampler)
-            nudged = model.equilibrate(inputs, sampler, targets[batch], args.beta)
-            optimizer.zero_grad()
-            loss = model.objective(inputs, free, nudged, args.beta)
-            loss.backward()
-            optimizer.step()
-        train_seconds = time.perf_counter() - started
-        val_accuracy = _accuracy(model, sampler, val_x, val_y)
-        history.append(
-            {"epoch": epoch + 1, "val_accuracy": val_accuracy, "train_seconds": train_seconds}
-        )
-        print(
-            f"epoch {epoch + 1}: val_accuracy={val_accuracy:.4f} "
-            f"(train {train_seconds:.1f}s, {1000 * train_seconds / (2 * len(order)):.1f} ms/solve)",
-            flush=True,
-        )
-
-    test_accuracy = _accuracy(model, sampler, test_x, test_y)
-    summary = {
-        "conv": args.conv,
-        "layer_sizes": list(model.layer_sizes),
-        "epochs": args.epochs,
-        "batch_size": args.batch_size,
-        "lr": args.lr,
-        "beta": args.beta,
-        "input_scale": args.input_scale,
-        "sa_iterations": args.sa_iterations,
-        "seed": args.seed,
-        "n_train": len(train_x),
-        "n_val": len(val_x),
-        "n_test": len(test_x),
-        "history": history,
-        "test_accuracy": test_accuracy,
-    }
-    args.output_dir.mkdir(parents=True, exist_ok=True)
-    name = "summary_conv.json" if args.conv else "summary.json"
-    path = args.output_dir / name
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(summary, handle, indent=2, sort_keys=True)
-        handle.write("\n")
-    print(f"test_accuracy={test_accuracy:.4f}")
-    print("wrote", path)
+    checkpoint = None
+    if args.evaluate is not None:
+        checkpoint = torch.load(args.evaluate, map_location="cpu", weights_only=True)
+    if checkpoint is not None:
+        default_name = "evaluation"
+    else:
+        default_name = "conv" if args.conv else "linear"
+    output_dir = args.output_dir or Path(__file__).resolve().parent / "results" / default_name
+    output_dir.mkdir(parents=True, exist_ok=False)
+    if checkpoint is None:
+        _train(args, output_dir)
+    else:
+        _evaluate(args, checkpoint, output_dir)
 
 
 if __name__ == "__main__":

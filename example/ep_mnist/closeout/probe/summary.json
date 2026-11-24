@@ -1,0 +1,54 @@
+{
+  "limit_train": 200,
+  "limit_eval": 100,
+  "n_val": 100,
+  "epochs": 1,
+  "batch_size": 20,
+  "lr": 0.05,
+  "beta": 2.0,
+  "hidden": 128,
+  "conv": false,
+  "channels": 4,
+  "input_scale": 2.0,
+  "sa_iterations": 50,
+  "seed": 0,
+  "split_seed": 0,
+  "validation_only": true,
+  "layer_sizes": [
+    784,
+    128,
+    10
+  ],
+  "n_train": 200,
+  "n_test": 0,
+  "train_sampler": {
+    "initial_temperature": 10.0,
+    "alpha": 0.9,
+    "cutoff_temperature": 0.01,
+    "iterations_per_t": 50,
+    "size_limit": 4,
+    "rand_seed": 0,
+    "process_num": 1
+  },
+  "eval_sampler": {
+    "initial_temperature": 10.0,
+    "alpha": 0.9,
+    "cutoff_temperature": 0.01,
+    "iterations_per_t": 50,
+    "size_limit": 4,
+    "rand_seed": 0,
+    "process_num": 1
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "ep_objective": 0.7838921815156936,
+      "train_seconds": 39.872073900012765,
+      "train_accuracy": 0.16,
+      "train_error": 0.84,
+      "val_accuracy": 0.12,
+      "val_error": 0.88,
+      "eval_seconds": 29.898629000002984
+    }
+  ]
+}
