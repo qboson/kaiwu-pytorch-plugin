@@ -33,11 +33,12 @@ graph TD
 
     %% 2. 中间模块名字显示完整：Kaiwu Torch Plugin
     subgraph Torch_Plugin ["Kaiwu Torch Plugin"]
-        Abstract["abstract_boltzmann_machine.py"]:::node
-        RBM["restricted_boltzmann_machine.py"]:::node
-        GBRBM["gbrbm.py<br>GaussianBernoulliRestricte"]:::node
+        Abstract["abstract_boltzmann_machine.py<br>AbstractBoltzmannMachine"]:::node
+        RBM["restricted_boltzmann_machine.py<br>RestrictedBoltzmannMachine"]:::node
+        GBRBM["gbrbm.py<br>GaussianBernoulliRestrictedBoltzmannMachine"]:::node
         FullBM["full_boltzmann_machine.py<br>BoltzmannMachine"]:::node
-        QDiff["qdiffusion.py<br>QDDiffusion"]:::node
+        QDiff["qdiffusion.py<br>QDiffusion"]:::node
+        AutoEncoder["qvae.py<br>AutoEncoderBase"]:::node
         QVAE["qvae.py<br>QVAE"]:::node
         
         %% 3. dbn.py 作为 RBM 的下链，且保持在 Kaiwu Torch Plugin 层中
@@ -57,17 +58,19 @@ graph TD
     %% -------- 连线逻辑 --------
     %% 上层框架指向插件
     PyTorch --> Abstract
+    PyTorch --> QDiff
+    PyTorch --> AutoEncoder
+    PyTorch --> DBN
     SA -.-> Abstract
     CIM -.-> Abstract
 
-    %% 插件层内部的继承/实现关系
+    %% 插件类之间的继承关系
     Abstract --> RBM
     Abstract --> GBRBM
     Abstract --> FullBM
-    Abstract --> QDiff
-    Abstract --> QVAE
+    AutoEncoder --> QVAE
 
-    RBM --> DBN
+    DBN -. uses .-> RBM
 
     %% 插件层指向示例层
     RBM --> rbm_digits
