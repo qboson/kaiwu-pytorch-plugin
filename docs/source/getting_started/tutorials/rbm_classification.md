@@ -55,6 +55,21 @@ RBM 是一个二部能量模型。可见层和隐层之间有连接，但同一�
 ```{literalinclude} ../../../../example/rbm_digits/rbm_digits.py
 :pyobject: RBMRunner.fit
 ```
+
+如果希望在自定义重建损失中更新 RBM，可以在两个方向上显式启用梯度。
+以下路径使用概率值，可同时对输入、共享权重和偏置求导。
+
+```python
+n_visible = rbm.num_visible
+hidden = rbm.get_hidden(inputs, requires_grad=True)[:, n_visible:]
+reconstructed = rbm.get_visible(hidden, requires_grad=True)[:, :n_visible]
+loss = (reconstructed - inputs.detach()).square().mean()
+loss.backward()
+```
+
+`get_visible` 默认关闭梯度。若设置 `bernoulli=True`，可见层返回离散采样值，
+这部分结果无法对采样概率求导。这里的重建损失适用于自定义训练目标。
+
 ## 3. 特征提取与分类
 
 ### 3.1 训练分类器

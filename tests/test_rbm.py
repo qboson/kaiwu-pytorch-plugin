@@ -120,6 +120,28 @@ class TestRestrictedBoltzmannMachine(unittest.TestCase):
         s_all_nograd = self.bm.get_visible(s_hidden_grad)
         self.assertFalse(s_all_nograd.requires_grad)
 
+    def test_differentiable_reconstruction_matches_tied_weight_reference(self):
+        """Both probability passes can participate in one reconstruction loss."""
+        rbm = self.bm.cpu()
+        data = torch.tensor([[0.2, 0.9], [0.7, 0.1]], requires_grad=True)
+        target = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+        weights = rbm.quadratic_coef.detach().clone().requires_grad_()
+        bias = rbm.linear_bias.detach().clone().requires_grad_()
+        reference_input = data.detach().clone().requires_grad_()
+        reference_hidden = torch.sigmoid(reference_input @ weights + bias[2:])
+        reference = torch.sigmoid(reference_hidden @ weights.T + bias[:2])
+        reference_loss = (reference - target).square().mean()
+
+        hidden = rbm.get_hidden(data, requires_grad=True)[:, 2:]
+        actual = rbm.get_visible(hidden, requires_grad=True)[:, :2]
+        torch.testing.assert_close(actual, reference)
+        actual_loss = (actual - target).square().mean()
+        for actual_grad, reference_grad in zip(
+            torch.autograd.grad(actual_loss, (data, rbm.quadratic_coef, rbm.linear_bias)),
+            torch.autograd.grad(reference_loss, (reference_input, weights, bias)),
+        ):
+            torch.testing.assert_close(actual_grad, reference_grad)
+
 
 if __name__ == "__main__":
     unittest.main()
