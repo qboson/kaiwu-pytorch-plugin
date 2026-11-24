@@ -103,9 +103,11 @@ the classical Anderson solver. Setting:
 | Anderson | 0.28730 | 0.35111 |
 | Kaiwu CIM | 0.28728 | 0.35110 |
 
-The two solvers give the same forecasts to within 0.01% in MSE, so the fixed
-points found through CIM match the classical solver. The iTransformer example
-used here will be added in a follow-up.
+Based on the rounded table values, CIM's aggregate test MSE is 0.00002 lower
+and its MAE is 0.00001 lower than Anderson's. These metrics summarize each
+solver's errors against the test targets. Forecast agreement is measured by
+comparing paired predictions, and fixed-point agreement by comparing paired
+solver states. The iTransformer example used here will be added in a follow-up.
 
 ## Use with quantized models
 
