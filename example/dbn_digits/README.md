@@ -22,7 +22,7 @@ Same pipeline as `rbm_digits`: `sklearn.datasets.load_digits` (8x8), four-direct
 
 Run from inside `example/dbn_digits/`. The notebook (`supervised_dbn_digits.ipynb`) demonstrates both modes through `demonstrate_both_modes()`:
 
-1. **Fine-tuning mode** (`fine_tuning=True`): pre-train each RBM layer greedily with `DBNPretrainer`, initialize a feed-forward network with the pre-trained weights, then train it end-to-end with backpropagation (`CrossEntropyLoss`, SGD, optional dropout).
+1. **Fine-tuning mode** (`fine_tuning=True`): pre-train each RBM layer greedily with `DBNPretrainer`, copy its weights into a feed-forward network, then train that network end-to-end with backpropagation (`CrossEntropyLoss`, SGD, optional dropout). The pre-trained RBMs remain available for feature extraction and separate export.
 2. **Classifier mode** (`fine_tuning=False`): extract features from the pre-trained DBN and train a traditional classifier (`classifier_type`: `logistic`, `svm`, or `random_forest`).
 
 The DBN pretraining uses `UnsupervisedDBN` from `kaiwu.torch_plugin.dbn` with a `SimulatedAnnealingOptimizer` (or `CIMOptimizer` when `use_cim=True`, requiring real-machine access).
