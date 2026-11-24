@@ -145,6 +145,8 @@ scgraph
 
 数据准备与运行命令见 `example/qdeq/README_ZH.md`，入口为 `example/qdeq/simple/simple_train_example.py`。
 
+[标量不动点示例](qdeq/scalar_equilibrium.py) 使用本地精确求解器，在 CPU 上验证 QDEQ 的前向结果和训练梯度。
+
 **依赖项**
 
 ```
