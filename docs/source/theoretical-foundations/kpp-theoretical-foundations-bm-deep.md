@@ -64,7 +64,7 @@ After this unsupervised pre-training, the stacked RBMs can be converted into a D
 ## Why Greedy Layer-Wise Training Works
 The effectiveness of greedy layer-wise training can be understood from several perspectives:
 
-1. **Variational Lower Bound**: Adding a new hidden layer and training it as an RBM on the inferred features of the previous layer can be shown to improve a variational lower bound on the log-likelihood of the data under the expanded model. Each additional layer tightens the bond.
+1. **Variational Lower Bound.** Keep the recognition distribution and lower generative weights fixed. A new prior raises the lower bound when it assigns a higher mean log prior probability to hidden states drawn from the recognition distribution. The [original guarantee](https://www.stats.ox.ac.uk/~teh/research/unsup/nc2006.pdf) gives a nondecreasing expected data log probability when the initial bound is tight and each stage uses full maximum-likelihood training. In practice, contrastive divergence approximates that training.
 2. **Feature Abstraction**: Each RBM learns to model the distribution of features produced by the layer below. Since these features are already somewhat abstract and decorrelated, the next RBM can focus on capturing higher-order dependencies among them.
 3. **Avoiding Local Minima**: Deep supervised networks trained from random initializations often get stuck in poor local minima due to the complex, non-convex loss landscape. Pre-training initializes the weights in a region of parameter space that corresponds to a sensible generative model of the data, providing a far better starting point for subsequent discriminative fine-tuning.
 

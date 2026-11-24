@@ -274,12 +274,18 @@ msgstr "贪婪逐层训练的有效性可以从多个角度理解："
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-deep.md:67
 msgid ""
-"**Variational Lower Bound**: Adding a new hidden layer and training it as an"
-" RBM on the inferred features of the previous layer can be shown to improve "
-"a variational lower bound on the log-likelihood of the data under the "
-"expanded model. Each additional layer tightens the bond."
+"**Variational Lower Bound.** Keep the recognition distribution and lower "
+"generative weights fixed. A new prior raises the lower bound when it "
+"assigns a higher mean log prior probability to hidden states drawn from "
+"the recognition distribution. The [original "
+"guarantee](https://www.stats.ox.ac.uk/~teh/research/unsup/nc2006.pdf) "
+"gives a nondecreasing expected data log probability when the initial bound "
+"is tight and each stage uses full maximum-likelihood training. In "
+"practice, contrastive divergence approximates that training."
 msgstr ""
-"**变分下界**：添加新隐藏层，并在上一层推断出的特征上把它训练为 RBM，可以证明会改善扩展模型下数据对数似然的变分下界。每增加一层都会收紧这个下界。"
+"**变分下界。** "
+"固定识别分布和下层生成权重。如果新先验对从识别分布抽取的隐藏状态赋予更高的平均对数先验概率，变分下界就会提高。初始下界取等且各阶段采用完整的最大似然训练时，[原论文](https://www.stats.ox.ac.uk/~teh/research/unsup/nc2006.pdf) "
+"保证数据对数概率在期望上单调不减。实际训练通常用对比散度作近似。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-bm-deep.md:68
 msgid ""
