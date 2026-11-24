@@ -116,6 +116,10 @@ fid_results.txt                  # FID evaluation result (notebook)
 results.json                     # Config + losses, or test accuracy (CLI)
 ```
 
+The final QVAE and best MLP checkpoints replace an existing file after the
+new weights have been written successfully. A failed save leaves the
+preceding checkpoint available.
+
 ## Evaluation
 
 - **Generation quality (FID)**: `train_qvae.ipynb` computes the FID score
