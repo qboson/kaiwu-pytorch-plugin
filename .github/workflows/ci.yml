@@ -9,17 +9,10 @@ on:
   workflow_dispatch:
     inputs:
       scope:
-        description: Test scope (each scope also runs the baseline combinations)
+        description: Run the baseline or full compatibility matrix
         type: choice
-        options: [default, numpy, pytorch, kaiwu, platforms, all]
+        options: [default, all]
         default: default
-      combination:
-        description: Exact combination ID shown as the CI job name
-        type: string
-      all-kaiwu-versions:
-        description: Include every supported Kaiwu release
-        type: boolean
-        default: false
   push:
     branches: [main, develop, kaiwu-sdk-compat, python-dependency-compat]
   pull_request:
@@ -36,24 +29,16 @@ jobs:
         id: select
         env:
           SCOPE: ${{ inputs.scope || 'default' }}
-          COMBINATION: ${{ inputs.combination }}
-          ALL_KAIWU: ${{ inputs.all-kaiwu-versions }}
         run: |
-          include=$(jq -ce --arg scope "$SCOPE" --arg id "$COMBINATION" --arg all_kaiwu "$ALL_KAIWU" '
+          include=$(jq -ce --arg scope "$SCOPE" '
             .defaults as $defaults | .python as $python | del(.defaults, .python) |
             .numpy = [$python | to_entries[] | .key as $py |
               .value.numpy_versions[] | {python: $py, numpy: .}] |
-            map_values(map(
+            (if $scope == "all" then add else .default end) |
+            map(
               $defaults + ($python[.python] | del(.numpy_versions)) + . |
               .id = "py\(.python)-\(.runner)-kaiwu\(.kaiwu)-np\(.numpy)-torch\(.torch)"
-            )) |
-            if $id != "" then
-              [.[][] | select(.id == $id)] | if length == 1 then . else error("Expected one combination for: " + $id) end
-            elif $scope == "all" then add
-            else
-              .default + (if $scope == "default" then [] else .[$scope] end) +
-              (if $all_kaiwu == "true" and $scope != "kaiwu" then .kaiwu else [] end)
-            end
+            )
           ' .github/compatibility-matrix.json)
           echo "include=$include" >> "$GITHUB_OUTPUT"
 
@@ -65,6 +50,8 @@ jobs:
       fail-fast: false
       matrix:
         include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    env:
+      REPORT_COVERAGE: ${{ github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/') && matrix.runner == 'ubuntu-24.04' && 'true' || 'false' }}
     defaults:
       run:
         shell: bash
@@ -128,12 +115,15 @@ jobs:
 
       - name: Test with pytest
         run: |
-          installed=$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')
-          python -I -m pytest tests/ -v \
-            --cov=src --cov="$installed" --cov-report=term --cov-report=xml
+          args=(tests/ -v)
+          if [[ "$REPORT_COVERAGE" == 'true' ]]; then
+            installed=$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')
+            args+=(--cov=src --cov="$installed" --cov-report=term --cov-report=xml)
+          fi
+          python -I -m pytest "${args[@]}"
 
       - name: Upload coverage to Codecov
-        if: github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/') && matrix.runner == 'ubuntu-24.04'
+        if: env.REPORT_COVERAGE == 'true'
         uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
