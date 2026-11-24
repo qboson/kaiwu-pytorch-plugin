@@ -5,7 +5,15 @@
 
 该示例先使用 `load_data` 读取 sklearn 的 8×8 手写数字数据，划分原始图像的训练集和测试集，再仅对训练图像进行平移增强，并使用训练集拟合的参数归一化两组数据；随后由 `DBNPretrainer.fit` 逐层训练 RBM，使用 `transform` 得到下一层输入，最后由 `SupervisedDBNClassification` 完成分类训练和评估。
 
-## 目标
+## 运行示例
+
+先按[安装指南](../installation.md)安装插件，再在同一个 Python 环境中安装示例依赖：
+
+```bash
+python -m pip install scikit-learn matplotlib scipy seaborn
+```
+
+在 Jupyter 中打开 `example/dbn_digits/supervised_dbn_digits.ipynb`，并确认内核的工作目录是 `example/dbn_digits/`。这样 notebook 就能找到同目录中的 `supervised_dbn_digits.py` 和 `dbn_trainer.py`。
 
 ## 一、RBM 原理概述
 
