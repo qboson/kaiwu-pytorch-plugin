@@ -114,13 +114,7 @@ This example demonstrates how to train and evaluate a Quantum Variational Autoen
 
 Run the example via `example/qvae_mnist/train_qvae.ipynb`.
 
-For details, see `example/qvae_mnist/README.md`.
-
-**Dependencies**
-
-```bash
-pip install -r requirements/requirements_example.txt
-```
+See the [MNIST example](qvae_mnist/README.md#dependencies) for installation.
 
 ---
 
@@ -135,12 +129,7 @@ This extended example demonstrates how pre-trained Q-VAE representations can be 
 
 Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 
-For details, see `example/qvae_mnist/README.md`.
-
-**Dependencies**
-```bash
-pip install -r requirements/requirements_example.txt
-```
+See the [MNIST example](qvae_mnist/README.md#dependencies) for installation.
 
 ---
 

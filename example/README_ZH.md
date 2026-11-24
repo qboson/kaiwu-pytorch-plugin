@@ -93,13 +93,7 @@ matplotlib
 
 请通过 `example/qvae_mnist/train_qvae.ipynb` 运行该示例。
 
-详细说明请参见 `example/qvae_mnist/README.md`。
-
-**依赖项**
-
-```bash
-pip install -r requirements/requirements_example.txt
-```
+安装步骤见 [MNIST 示例](qvae_mnist/README.md#dependencies)。
 
 ---
 
@@ -114,13 +108,7 @@ pip install -r requirements/requirements_example.txt
 
 请通过 `example/qvae_mnist/train_qvae_classifier.ipynb` 运行该示例。
 
-详细说明请参见 `example/qvae_mnist/README.md`。
-
-**依赖项**
-
-```bash
-pip install -r requirements/requirements_example.txt
-```
+安装步骤见 [MNIST 示例](qvae_mnist/README.md#dependencies)。
 ---
 
 ### 表征学习：基于 QVAE 的单细胞数据

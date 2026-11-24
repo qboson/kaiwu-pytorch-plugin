@@ -3,7 +3,7 @@
 scikit-learn
 matplotlib
 scipy
-torchvision>=0.22
+torchvision>=0.21
 torchmetrics[image]
 seaborn
 gif

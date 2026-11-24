@@ -16,8 +16,8 @@ Use one of the following Python versions:
 
 | Python | Kaiwu SDK | NumPy | PyTorch |
 | --- | --- | --- | --- |
-| 3.10 | 1.3.1–1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
-| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.10 | 1.3.1–1.4.4 (excluding 1.4.2) | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.6, <2.16 |
 | 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
 These are installation constraints. The SDK and other dependencies can
@@ -38,10 +38,10 @@ KPP handles the `PrecisionReducer` move from `kaiwu.cim` to
 `kaiwu.preprocess` and translates old and new CIM mode names.
 
 CI runs Linux combinations for Kaiwu 1.4.4 and selected older releases on pushes and pull requests.
-Run CI manually to select NumPy, PyTorch, Kaiwu, or platform coverage.
+Choose `default` or `all` when running CI manually.
 The exact cases are listed in
 [the compatibility matrix](https://github.com/QBoson/kaiwu-pytorch-plugin/blob/main/.github/compatibility-matrix.json).
-Use the `combination` input with the exact CI job name to rerun one case. The Linux matrix tests on CPU.
+The Linux matrix tests on CPU.
 Pushing a release tag runs the full matrix before publishing to PyPI.
 
 Check the Python version:

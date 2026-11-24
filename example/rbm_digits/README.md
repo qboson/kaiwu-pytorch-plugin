@@ -9,14 +9,19 @@ on raw pixels.
 
 ## Dependencies
 
-Run the install commands from the repository root. If you already have a compatible version of KPP, skip the first command.
+To install KPP from this checkout with the example dependencies, run this command from the repository root.
 
 ```bash
-python -m pip install .
-
-# Example-side dependencies (scikit-learn, scipy, matplotlib, seaborn)
-pip install -r requirements/requirements_example.txt
+python -m pip install . -r requirements/requirements_example.txt
 ```
+
+If you already have a compatible KPP installation, include your installed PyTorch version in the command to keep pip from upgrading it. This example keeps PyTorch 2.7.0.
+
+```bash
+python -m pip install -r requirements/requirements_example.txt "torch==2.7.0"
+```
+
+For a custom CPU or CUDA build, install the matching TorchVision build from the same PyTorch index first. PyTorch 2.6.0 pairs with TorchVision 0.21.0.
 
 ## File Structure
 

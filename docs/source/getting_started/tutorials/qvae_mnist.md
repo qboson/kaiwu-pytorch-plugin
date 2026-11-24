@@ -17,13 +17,8 @@
 - `train_qvae.ipynb`: 训练 Q-VAE 模型
 - `train_qvae_classifier.ipynb`: 表征学习与分类
 
-**依赖项**（在项目根目录安装，清单会按 Python 版本选择依赖）:
+安装步骤见 [MNIST 示例的依赖说明](https://github.com/qboson/kaiwu-pytorch-plugin/tree/main/example/qvae_mnist#dependencies)。
 
-```{code-block} bash
-
- pip install -r requirements/requirements_example.txt
-
-```
 ## 1. QVAE 原理概括
 
 QVAE（Quantum Variational Autoencoder）是一种将 **量子生成模型** 引入 **变分自编码器 (VAE)** 潜空间的生成模型。其核心思想是：

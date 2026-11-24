@@ -114,8 +114,8 @@ The diagram above shows the main code structure of the project:
 
 | Python | Kaiwu SDK | NumPy | PyTorch |
 | --- | --- | --- | --- |
-| 3.10 | 1.3.1–1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
-| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.7, <2.16 |
+| 3.10 | 1.3.1–1.4.4 (excluding 1.4.2) | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.6, <2.16 |
 | 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
 These are the installation constraints. The dependencies' available wheels and
