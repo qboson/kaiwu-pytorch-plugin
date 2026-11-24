@@ -343,7 +343,8 @@ class QVAE(AutoEncoderBase):
 
         Args:
             q (torch.Tensor): Encoder output logits (batch_size, latent_dim).
-                Must be detached to prevent gradients flowing to encoder.
+                This method detaches the logits before computing positive-phase
+                probabilities, blocking gradients through ``q`` to the encoder.
 
             bm_weight_decay (float, optional): L2 regularization coefficient for BM parameters.
 
