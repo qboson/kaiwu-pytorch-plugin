@@ -91,17 +91,20 @@ A: 请按以下步骤操作：
 
 A: `SimulatedAnnealingOptimizer` 的主要参数：
 
-- `alpha`：退火系数（0.9-0.999），越接近 1 收敛越慢但结果越优
-- `size_limit`：每次采样返回的样本数
+- `alpha`：降温系数。初始温度和截止温度相同时，`alpha` 越接近 1，降温越慢。
+- `iterations_per_t`：每个温度下的迭代次数。
+- `size_limit`：输出解的个数。
+
+模拟退火的结果具有随机性。可用下面两组配置作为起点，在实际问题上比较耗时和解的质量。
 
 ```{code-block} python
 
  from kaiwu.classical import SimulatedAnnealingOptimizer
 
- # Fast sampling (lower quality)
+ # Faster cooling, fewer output solutions
  sampler = SimulatedAnnealingOptimizer(alpha=0.9, size_limit=5)
 
- # High-quality sampling (slower)
+ # Slower cooling, more output solutions
  sampler = SimulatedAnnealingOptimizer(alpha=0.995, size_limit=100)
 
 ```
@@ -113,7 +116,7 @@ A: 几种加速方法：
 
 1. **增大批大小**：在 GPU 内存允许的情况下增大 batch_size
 
-2. **减少采样次数**：可以适当减少采样的部署（如调整SimulatedAnnealingOptimizer的alpha参数等）
+2. **调整退火计算量**：用 `alpha` 调整降温速度，用 `iterations_per_t` 调整每个温度的迭代次数。
 
 ### Q: 显存不足怎么办？
 
