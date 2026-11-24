@@ -377,6 +377,8 @@ class QDEQ(nn.Module):
         Args:
             x: Input injected into every layer call.
             z0: Initial guess for the fixed point. Defaults to zeros shaped like ``x``.
+                The initial guess is detached from autograd before solving.
+                During training, gradients pass through the final layer call.
 
         Returns:
             torch.Tensor: ``layer(z*, x)``.
