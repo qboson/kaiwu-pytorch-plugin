@@ -108,7 +108,7 @@ requirements/
 1. **Clone the repository**
 Clone the project from GitHub to your local machine:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
@@ -306,7 +306,7 @@ If no error occurs, your environment is ready. You can now build models and vali
 To develop KPP, clone the repository and install the source package and development dependencies:
 
 ```bash
-git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
 cd kaiwu-pytorch-plugin
 python -m pip install . -r requirements/devel.txt
 ```

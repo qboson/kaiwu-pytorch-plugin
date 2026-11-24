@@ -11,15 +11,13 @@ Examples and workflow scripts for the public `Q-Diffusion` module.
 ## Quick Start
 
 ```bash
-pip install -r example/qdiffusion/requirements.txt
+python -m pip install kaiwu-torch-plugin
+python -m pip install -r example/qdiffusion/requirements.txt
 python example/qdiffusion/simple/simple_train_example.py
 python example/qdiffusion/simple/simple_generate_example.py
 ```
 
-These commands work in both common local modes:
-
-- development checkout: run directly from the repo root
-- installed package: `pip install -e .` and then run the same commands
+Run the example commands from the repository root.
 
 ## How It Fits Together
 

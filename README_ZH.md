@@ -123,7 +123,7 @@ CI 运行的具体组合见[兼容性矩阵](.github/compatibility-matrix.json)�
 
 ### 安装步骤
 
-你可以选择 **本地环境配置（conda/pip）** 或 **Docker 配置**（推荐用于可复现性和隔离环境）。
+日常使用可以直接从 PyPI 安装 KPP。如需 Jupyter 环境，请参考 Docker 配置。
 
 #### 方式一：本地环境配置（conda/pip）
 
@@ -135,26 +135,13 @@ CI 运行的具体组合见[兼容性矩阵](.github/compatibility-matrix.json)�
    conda activate quantum_env
    ```
 
-2. **克隆仓库**
+2. **从 PyPI 安装 KPP**
 
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
+   python -m pip install kaiwu-torch-plugin
    ```
 
-3. **安装依赖**
-
-   ```bash
-   pip install -r requirements/requirements.txt
-   ```
-
-   安装会自动拉取 Kaiwu SDK。Python 3.10 可以按需指定旧版 SDK。
-
-4. **安装插件**
-
-   ```bash
-   pip install .
-   ```
+   pip 会同时安装兼容的 Kaiwu SDK。Python 3.12 和 3.14 需要 KPP 0.4.0 或更新版本。
 
 #### 方式二：Docker 配置（无需本地配适环境）
 
@@ -171,7 +158,7 @@ requirements/
 
 1. **克隆仓库**  
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
@@ -198,7 +185,7 @@ requirements/
 
 ### Kaiwu SDK 安装与授权
 
-运行 `pip install .` 安装 KPP 时会自动安装兼容的 Kaiwu SDK。Python 3.12 和 3.14 使用 Kaiwu 1.4.4。Python 3.10 如需使用旧版 Kaiwu 1.3.1，可以运行 `pip install "kaiwu==1.3.1" .`。
+pip 会随 KPP 安装兼容的 Kaiwu SDK。KPP 0.4.0 在 Python 3.12 和 3.14 上使用 Kaiwu 1.4.4。Python 3.10 如需选装 Kaiwu 1.3.1，可以运行 `python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin`。
 
 如需下载 SDK 安装包或配置授权，请参考以下步骤。
 

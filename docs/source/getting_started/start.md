@@ -76,33 +76,17 @@ Follows PEP 8 standards.
    conda activate quantum_env
 
    ```
-2. **Clone this repository locally**:
+2. **Install KPP from PyPI**
 
    ```{code-block} bash
-
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
-
+   python -m pip install kaiwu-torch-plugin
    ```
-3. **Install dependencies**:
 
-   ```{code-block} bash
+   Pip installs a compatible Kaiwu SDK. Python 3.12 and 3.14 require KPP 0.4.0 or later.
 
-   pip install -r requirements/requirements.txt
+# Kaiwu SDK Configuration
 
-   ```
-   Kaiwu SDK needs to be installed separately, see the installation instructions below.
-
-4. **Install the plugin**:
-
-   ```{code-block} bash
-
-   pip install .
-
-   ```
-# Kaiwu SDK Installation Instructions (Required)
-
-Download link and installation steps for Kaiwu SDK:
+See the SDK download page for manual installation and authorization.
 
 ```{image} ../../../imgs/image.png
 :alt: Kaiwu SDK Download Page

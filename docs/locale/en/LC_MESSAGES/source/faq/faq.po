@@ -38,10 +38,8 @@ msgid "Q: 安装时提示 Python 版本不兼容？"
 msgstr "Q: Installation fails with an incompatible Python version error?"
 
 #: ../../source/faq/faq.md:9
-msgid "A: Kaiwu-PyTorch-Plugin 目前仅支持 **Python 3.10**。请使用 conda 创建对应版本的环境："
-msgstr ""
-"A: Kaiwu-PyTorch-Plugin currently supports **Python 3.10 only**. Create "
-"an environment with conda:"
+msgid "A: KPP 0.4.0 支持 Python 3.10、3.12 和 3.14。可以用 conda 创建对应版本的环境，下面以 Python 3.10 为例。"
+msgstr "A: KPP 0.4.0 supports Python 3.10, 3.12 and 3.14. Use conda to create an environment for your Python version. This example uses Python 3.10."
 
 #: ../../source/faq/faq.md:17
 msgid "Q: 无法导入 kaiwu.torch_plugin 模块？"
@@ -52,8 +50,8 @@ msgid "A: 请检查以下几点："
 msgstr "A: Please check the following:"
 
 #: ../../source/faq/faq.md:21
-msgid "确认已安装 Kaiwu-PyTorch-Plugin：`pip install .`"
-msgstr "Ensure Kaiwu-PyTorch-Plugin is installed: ``pip install .``"
+msgid "运行 `python -m pip show kaiwu-torch-plugin` 检查当前环境中的 KPP。"
+msgstr "Run ``python -m pip show kaiwu-torch-plugin`` to check the KPP installation in the current environment."
 
 #: ../../source/faq/faq.md:22
 msgid "确认当前环境已激活：`conda activate quantum_env`"
@@ -72,8 +70,8 @@ msgid "Q: Kaiwu SDK 安装失败？"
 msgstr "Q: Kaiwu SDK installation fails?"
 
 #: ../../source/faq/faq.md:35
-msgid "A: Kaiwu SDK 需要单独安装。请："
-msgstr "A: Kaiwu SDK must be installed separately. Please:"
+msgid "A: pip 会随 KPP 安装兼容的 Kaiwu SDK。如果安装失败，请按安装指南检查 Python 版本和平台。需要手动安装时，按以下步骤操作。"
+msgstr "A: Pip installs a compatible Kaiwu SDK with KPP. If installation fails, check your Python version and platform against the installation guide. If you need to install the SDK manually, follow these steps."
 
 #: ../../source/faq/faq.md:37
 msgid "访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)"

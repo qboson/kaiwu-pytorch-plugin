@@ -131,7 +131,7 @@ See the [examples index](example/README.md) for example dependencies.
 - Follows PEP 8 standards
 
 ### Installation Steps
-You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
+Install KPP from PyPI for regular use. The Docker option provides a Jupyter environment.
 
 #### Option 1: Local Setup (conda/pip)
 1. **Create and activate an environment**:
@@ -141,22 +141,12 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    conda activate quantum_env
    ```
 
-2. **Clone this repository locally**:
+2. **Install KPP from PyPI**
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
+   python -m pip install kaiwu-torch-plugin
    ```
 
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements/requirements.txt
-   ```
-   On Python 3.10, select an older SDK with `pip install "kaiwu==1.3.1" .`.
-
-4. **Install the plugin**:
-   ```bash
-   pip install .
-   ```
+   Pip installs a compatible Kaiwu SDK. Python 3.12 and 3.14 require KPP 0.4.0 or later.
 
 #### Option 2: Docker Setup (no local environment required)
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
@@ -172,7 +162,7 @@ requirements/
 
 1. **Clone the repository:**:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
@@ -199,7 +189,7 @@ Press `Ctrl+C`, then run:
 
 ### Kaiwu SDK Installation and Authorization
 
-Installing KPP with `pip install .` also installs a compatible Kaiwu SDK. On Python 3.12 and 3.14, this is Kaiwu 1.4.4. To use the legacy Kaiwu 1.3.1 on Python 3.10, run `pip install "kaiwu==1.3.1" .`.
+Pip selects a compatible Kaiwu SDK when you install KPP. KPP 0.4.0 uses Kaiwu 1.4.4 on Python 3.12 and 3.14. To select Kaiwu 1.3.1 on Python 3.10, run `python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin`.
 
 If you need to download an SDK wheel or configure authorization, follow these steps:
 ![](imgs/image.png)

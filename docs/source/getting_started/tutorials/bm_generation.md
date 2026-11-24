@@ -21,7 +21,7 @@
 
 ```{code-block} bash
 
- pip install kaiwu==1.3.0 pandas matplotlib
+ python -m pip install kaiwu-torch-plugin pandas matplotlib
 
 ```
 ## 1. 全连接玻尔兹曼机简介

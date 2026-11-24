@@ -10,9 +10,8 @@ using the learned latent representations for downstream classification.
 ## Dependencies
 
 ```bash
-# Core dependencies (run from the repository root)
-pip install -r requirements/requirements.txt   # kaiwu==1.3.1, torch==2.7.0, numpy==2.2.6
-pip install .                                  # install the plugin
+# Install KPP and its runtime dependencies from PyPI
+python -m pip install kaiwu-torch-plugin
 
 # Example-side dependencies
 pip install -r requirements/requirements_example.txt

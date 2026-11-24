@@ -21,15 +21,13 @@ example/qdiffusion/data/UP000005640_9606.fasta
 ## 快速开始
 
 ```bash
-pip install -r example/qdiffusion/requirements.txt
+python -m pip install kaiwu-torch-plugin
+python -m pip install -r example/qdiffusion/requirements.txt
 python example/qdiffusion/simple/simple_train_example.py
 python example/qdiffusion/simple/simple_generate_example.py
 ```
 
-以上命令适用于两种常见使用方式：
-
-- 开发态源码运行：直接在仓库根目录执行
-- 安装态运行：先执行 `pip install -e .`，再运行相同命令
+示例命令从项目根目录运行。
 
 ## 目录结构与整体关系
 

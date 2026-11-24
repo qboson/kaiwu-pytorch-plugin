@@ -37,7 +37,7 @@ example/qdeq/data/ETTh1.csv
 ## 快速开始
 
 ```bash
-pip install -e .        # 在仓库根目录安装插件
+python -m pip install kaiwu-torch-plugin
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa

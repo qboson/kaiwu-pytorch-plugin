@@ -48,7 +48,7 @@ Use `--data-path` for another location.
 ## Quick start
 
 ```bash
-pip install -e .        # install the plugin from the repository root
+python -m pip install kaiwu-torch-plugin
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
