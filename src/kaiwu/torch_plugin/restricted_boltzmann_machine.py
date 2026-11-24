@@ -96,10 +96,25 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             return s_all
 
     def get_visible(
-        self, s_hidden: torch.Tensor, bernoulli: bool = False
+        self,
+        s_hidden: torch.Tensor,
+        bernoulli: bool = False,
+        *,
+        requires_grad: bool = False,
     ) -> torch.Tensor:
-        """Propagate hidden spins to the visible layer."""
-        with torch.no_grad():
+        """Propagate hidden spins to the visible layer.
+
+        Args:
+            s_hidden: Hidden layer tensor.
+            bernoulli: Whether to return discrete Bernoulli samples. The
+                default returns probabilities.
+            requires_grad: Enable autograd for probability-based reconstruction.
+                Sampled visible states are discrete.
+        Returns:
+            Visible states or probabilities followed by the supplied hidden states.
+        """
+        context = torch.enable_grad if requires_grad else torch.no_grad
+        with context():
             s_all = torch.zeros(
                 s_hidden.size(0), self.num_hidden + self.num_visible
             ).to(self.device)
