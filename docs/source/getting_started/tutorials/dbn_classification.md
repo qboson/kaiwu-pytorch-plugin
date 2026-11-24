@@ -62,7 +62,7 @@ $$
 \mathcal{L} = -\sum_{\mathbf{v}} \log P(\mathbf{v})
 
 $$
-采用对比散度（CD）算法近似梯度，更新规则为：
+作为背景，常规对比散度（CD）用重构样本近似梯度，权重更新规则如下。
 
 $$
 
@@ -119,8 +119,8 @@ $$
   - **单层训练过程**
 
     1. **正相（Positive Phase）**：计算隐层激活概率 $P(\mathbf{h}|\mathbf{v})$。
-    2. **负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。
-    3. **目标函数**：最小化能量函数加权重衰减（L2 正则化）。
+    2. **负相（Negative Phase）**：调用 `rbm.sample(self.sampler)`，为当前 RBM 生成无条件的可见层与隐层联合状态样本。
+    3. **目标函数**：最小化正相平均能量减去负相平均能量，再加上权重和偏置的 L2 正则项。
     4. **反向传播**：更新权重和偏置。
 
   `DBNTrainer` 的单层训练会初始化优化器并通过 DataLoader 处理批量数据；`DBNPretrainer` 只暴露逐层预训练和特征变换接口。

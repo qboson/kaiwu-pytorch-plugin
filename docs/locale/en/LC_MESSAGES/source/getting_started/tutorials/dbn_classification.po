@@ -191,10 +191,8 @@ msgid ""
 msgstr "\\mathcal{L} = -\\sum_{\\mathbf{v}} \\log P(\\mathbf{v})"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:65
-msgid "采用对比散度（CD）算法近似梯度，更新规则为："
-msgstr ""
-"Contrastive Divergence (CD) is used to approximate gradients.  The update "
-"rule is:"
+msgid "作为背景，常规对比散度（CD）用重构样本近似梯度，权重更新规则如下。"
+msgstr "For background, conventional contrastive divergence (CD) uses reconstruction samples to approximate the gradient. Its weight update is shown below."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:67
 msgid ""
@@ -356,14 +354,12 @@ msgstr ""
 "$P(\\mathbf{h}|\\mathbf{v})$."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:122
-msgid "**负相（Negative Phase）**：通过模拟退火采样器（`SimulatedAnnealingOptimizer`）生成重构样本。"
-msgstr ""
-"**Negative phase**: generate reconstructed samples via the "
-"``SimulatedAnnealingOptimizer`` sampler."
+msgid "**负相（Negative Phase）**：调用 `rbm.sample(self.sampler)`，为当前 RBM 生成无条件的可见层与隐层联合状态样本。"
+msgstr "**Negative phase**: call `rbm.sample(self.sampler)` to obtain unconditional joint visible and hidden states for the current RBM."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:123
-msgid "**目标函数**：最小化能量函数加权重衰减（L2 正则化）。"
-msgstr "**Objective**: minimize energy plus weight decay (L2 regularization)."
+msgid "**目标函数**：最小化正相平均能量减去负相平均能量，再加上权重和偏置的 L2 正则项。"
+msgstr "**Objective**: minimize the mean positive-phase energy minus the mean negative-phase energy, plus L2 penalties on weights and biases."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:124
 msgid "**反向传播**：更新权重和偏置。"
