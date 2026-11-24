@@ -108,7 +108,9 @@ class QuantizedQDEQ(QDEQ):
         return self.layer.quantized()   # 开启伪量化的上下文管理器
 ```
 
-这样权重只需按 8 位存储。在我们用 iTransformer 做的五个预测数据集实验中，DEQ 共享层
+这个钩子在最后一次层调用中模拟 W8A8 数值行为，权重仍以浮点格式保存。要生成以 8 位格式保存权重的检查点，需要另行转换或导出量化权重。
+
+在我们用 iTransformer 做的五个预测数据集实验中，DEQ 共享层
 加上 W8A8 后，静态权重存储比显式多层模型减少 4.3×–12.8×。带 W8A8 量化的
 iTransformer 示例会在后续补充。
 

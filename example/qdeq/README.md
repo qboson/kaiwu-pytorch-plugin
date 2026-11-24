@@ -126,7 +126,11 @@ class QuantizedQDEQ(QDEQ):
         return self.layer.quantized()   # a context manager that enables fake quantization
 ```
 
-Weights then only need to be stored in 8 bits. In our iTransformer experiments
+This hook simulates W8A8 numerics during the final layer call while retaining
+the floating-point weights. Saving a checkpoint with 8-bit weights requires
+a separate conversion or export that stores quantized weights.
+
+In our iTransformer experiments
 on five forecasting datasets, combining the shared DEQ layer with W8A8 reduced
 static weight storage by 4.3×–12.8× compared with the explicit multi-layer
 model. An iTransformer example with W8A8 quantization will be added in a
