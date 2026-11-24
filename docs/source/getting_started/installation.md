@@ -29,7 +29,7 @@ and its published wheels require Python 3.10.
 On Python 3.10, install a specific SDK version in the same command as the plugin:
 
 ```bash
-python -m pip install "kaiwu==1.3.1" .
+python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin
 ```
 
 Use an isolated environment for each SDK version. Use regular installation
@@ -55,7 +55,8 @@ If you need to install Python 3.10, please visit the <u>Python 3.10 download pag
 
 ## Install Kaiwu-PyTorch-Plugin
 
-> You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
+Install KPP from PyPI for regular use. The Docker setup provides a Jupyter environment.
+
 ### Option 1: Local Setup (conda/pip)
 
 #### Step-by-Step Guide
@@ -70,34 +71,23 @@ conda create -n quantum_env python=3.10
 conda activate quantum_env
 ```
 
-2. **Clone the Repository**
-Clone the project from GitHub to your local machine:
+2. **Install KPP from PyPI**
 ```bash
-git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-cd kaiwu-pytorch-plugin
+python -m pip install kaiwu-torch-plugin
 ```
 
-3. **Install Dependencies**
-Install the project dependencies:
-```bash
-pip install -r requirements/requirements.txt
-```
+Pip installs a compatible Kaiwu SDK along with KPP. Python 3.12 and 3.14
+require KPP 0.4.0 or later.
 
 See the [examples index](https://github.com/QBoson/kaiwu-pytorch-plugin/tree/main/example)
 for dependencies specific to each example.
 
-4. **Install the Plugin**
-```bash
-pip install .
-```
-
 #### Checkpoint
 
-Run 
+Check that KPP imports and reports its version.
 ```bash
-python -c "import torch; print(torch.__version__)"
+python -c "import kaiwu.torch_plugin as kpp; print(kpp.__version__)"
 ```
-to confirm PyTorch is installed.
 
 ### Option 2: Docker Setup (no local environment required)
 
@@ -194,28 +184,19 @@ Kaiwu-PyTorch-Plugin uses the **Kaiwu SDK** for classical simulation (SA) and qu
 ### Step 1: Obtain & Install SDK
 #### Option A: Install KPP with its SDK (Recommended)
 
-From the KPP repository root, install the plugin and its SDK dependency:
-
-```bash
-python -m pip install .
-```
-
-Python 3.12 and 3.14 use Kaiwu 1.4.4. On Python 3.10, you can select Kaiwu 1.3.1 for a legacy environment:
-
-```bash
-python -m pip install "kaiwu==1.3.1" .
-```
+Use the PyPI installation command in **Local Setup** above.
+Python 3.12 and 3.14 use Kaiwu 1.4.4 with KPP 0.4.0.
 
 #### Option B: Install from Official Wheel
 
-If you need a specific version or have network restrictions, download the SDK wheel from the QBoson platform:
+If you have a local SDK wheel, you can install it together with KPP:
 
 > 1. Visit the <u>Kaiwu SDK download page</u> on the QBoson platform
 > 2. Download a supported SDK wheel that matches your Python version, operating system, and architecture.
 > 3. Install the wheel alongside KPP. This example uses Python 3.12 on Linux x86_64:
 
 ```bash
-python -m pip install ./kaiwu-1.4.4-cp312-none-manylinux1_x86_64.whl .
+python -m pip install ./kaiwu-1.4.4-cp312-none-manylinux1_x86_64.whl kaiwu-torch-plugin
 ```
 
 ### Step 2: Set Environment Variables
@@ -322,10 +303,12 @@ If no error occurs, your environment is ready. You can now build models and vali
 
 ## Development Environment Setup (Optional)
 
-If you plan to participate in the development of the plugin, you can install the development dependencies:
+To develop KPP, clone the repository and install the source package and development dependencies:
 
 ```bash
-pip install -r requirements/devel.txt
+git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+cd kaiwu-pytorch-plugin
+python -m pip install . -r requirements/devel.txt
 ```
 
 ### Run tests:
