@@ -1,6 +1,6 @@
 # Simulated Annealing for Ising Models
 
-> [Why Quantum? Revisiting the Sampling Bottleneck](quantum_sampling_bottleneck.md) motivated the need for efficient sampling from Boltzmann distributions. This chapter introduces **simulated annealing (SA)**, the local CPU/GPU-only sampling baseline in KPP, which is also a natural reference point against which [quantum sampling](quantum_sampling_pytorch.md) is compared in the next chapter.
+> [Why Quantum? Revisiting the Sampling Bottleneck](quantum_sampling_bottleneck.md) motivated the need for efficient sampling from Boltzmann distributions. This chapter introduces **simulated annealing (SA)**, the local classical sampling baseline in KPP, which is also a natural reference point against which [quantum sampling](quantum_sampling_pytorch.md) is compared in the next chapter.
 
 ## The Ising Model at a Glance
 
@@ -65,7 +65,7 @@ sampler = SimulatedAnnealingOptimizer()
 samples = rbm.sample(sampler)
 ```
 
-Here, `samples` is the state tensor returned by the model; KPP calls `sampler.solve(ising_mat)` internally, rather than `sampler.sample(hamiltonian)`.
+For an RBM on either CPU or GPU, KPP passes the Ising matrix as a CPU NumPy array to `sampler.solve(ising_mat)` and returns the `samples` tensor on the model device.
 
 ## Relationship to Quantum Sampling
 
