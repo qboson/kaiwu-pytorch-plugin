@@ -19,8 +19,8 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_nodes]
 
-        device (torch.device, optional): Device for tensor construction; uses
-            CPU when ``None``.
+        device (torch.device, optional): Device for tensor construction.
+            When ``None``, selects CUDA if available and CPU otherwise.
     """
 
     def __init__(
