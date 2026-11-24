@@ -1,5 +1,9 @@
 **Language Versions**: [中文](README_ZH.md) | [English](README.md)
 
+### Setup
+
+From the repository root, run `python -m pip install .` to use the KPP version that ships with these examples. If you already have a compatible KPP version, keep it and follow the individual example’s instructions for any extra dependencies.
+
 ### Examples of BoltzmannMachine and RestrictedBoltzmannMachine
 
 * `run_bm.py`: Demonstrates how to use the `BoltzmannMachine` class for model instantiation, sampling, objective function calculation, and parameter optimization. This is suitable for understanding the basic training workflow of a Boltzmann Machine, including sampling and gradient backpropagation.

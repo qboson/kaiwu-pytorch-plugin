@@ -20,14 +20,14 @@ example/qdiffusion/data/UP000005640_9606.fasta
 
 ## 快速开始
 
+请在仓库根目录运行以下命令。如果已安装与示例兼容的 KPP，可以跳过第一条命令。
+
 ```bash
-python -m pip install kaiwu-torch-plugin
+python -m pip install .
 python -m pip install -r example/qdiffusion/requirements.txt
 python example/qdiffusion/simple/simple_train_example.py
 python example/qdiffusion/simple/simple_generate_example.py
 ```
-
-示例命令从项目根目录运行。
 
 ## 目录结构与整体关系
 

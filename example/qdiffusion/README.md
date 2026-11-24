@@ -10,14 +10,14 @@ Examples and workflow scripts for the public `Q-Diffusion` module.
 
 ## Quick Start
 
+Run these commands from the repository root. If you already have a compatible version of KPP, skip the first command.
+
 ```bash
-python -m pip install kaiwu-torch-plugin
+python -m pip install .
 python -m pip install -r example/qdiffusion/requirements.txt
 python example/qdiffusion/simple/simple_train_example.py
 python example/qdiffusion/simple/simple_generate_example.py
 ```
-
-Run the example commands from the repository root.
 
 ## How It Fits Together
 

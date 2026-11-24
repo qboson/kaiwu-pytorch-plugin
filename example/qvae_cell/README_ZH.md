@@ -7,10 +7,11 @@
 
 ## 依赖
 
-从 PyPI 安装 KPP 和本示例所需的依赖。
+请在仓库根目录运行安装命令。如果已安装与示例兼容的 KPP，可以跳过第一条命令。
 
 ```bash
-python -m pip install kaiwu-torch-plugin anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
+python -m pip install .
+python -m pip install anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
 ```
 
 Apple Silicon Mac 用户运行示例前，请先执行 `export NUMBA_THREADING_LAYER=workqueue`。

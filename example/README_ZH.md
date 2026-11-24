@@ -1,5 +1,9 @@
 **语言版本**：[中文](README_ZH.md) | [English](README.md)
 
+### 环境准备
+
+在仓库根目录运行 `python -m pip install .`，即可安装与这份示例配套的 KPP。如果已安装兼容版本，按各示例的说明补装额外依赖即可。
+
 ### BoltzmannMachine 与 RestrictedBoltzmannMachine 的使用示例
 
 * `run_bm.py`：演示如何使用 `BoltzmannMachine` 类进行模型实例化、采样、目标函数计算和参数优化。适用于理解玻尔兹曼机（Boltzmann Machine）的基本训练流程，包括采样和梯度反向传播。

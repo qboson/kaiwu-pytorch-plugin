@@ -10,10 +10,11 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 
 ## Dependencies
 
-Install KPP from PyPI together with the dependencies for this example.
+Run the install commands from the repository root. If you already have a compatible version of KPP, skip the first command.
 
 ```bash
-python -m pip install kaiwu-torch-plugin anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
+python -m pip install .
+python -m pip install anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
 ```
 
 On Apple Silicon macOS, run `export NUMBA_THREADING_LAYER=workqueue` before starting the example.

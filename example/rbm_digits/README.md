@@ -9,9 +9,10 @@ on raw pixels.
 
 ## Dependencies
 
+Run the install commands from the repository root. If you already have a compatible version of KPP, skip the first command.
+
 ```bash
-# Install KPP and its runtime dependencies from PyPI
-python -m pip install kaiwu-torch-plugin
+python -m pip install .
 
 # Example-side dependencies (scikit-learn, scipy, matplotlib, seaborn)
 pip install -r requirements/requirements_example.txt
