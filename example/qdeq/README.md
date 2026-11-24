@@ -107,6 +107,21 @@ The two solvers give the same forecasts to within 0.01% in MSE, so the fixed
 points found through CIM match the classical solver. The iTransformer example
 used here will be added in a follow-up.
 
+## Design the shared layer
+
+The forward solver evaluates `layer(z, x)` repeatedly at the same or nearby
+states to estimate changes in the residual. Use a shared layer whose output
+depends consistently on those inputs throughout one solve. Training-mode
+dropout draws a different mask on each call, so the finite difference can
+measure a change in the mask instead of a change in `z`.
+
+The solve runs under `torch.no_grad()`, while the shared layer retains its
+training mode. With BatchNorm in the shared layer, one outer forward call can
+update the running statistics several times for the same batch, including at
+trial iterates. The ETTh1 example uses LayerNorm, which has no running
+statistics. Place ordinary dropout outside the shared layer, for example on
+the input before calling QDEQ, so every solver evaluation sees the same input.
+
 ## Use with quantized models
 
 `QDEQ` provides two hooks that a subclass can override to switch the state of
