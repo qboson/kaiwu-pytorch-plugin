@@ -26,3 +26,14 @@ energy updates. CIM receives this conversion before precision adaptation and
 variable splitting, so splitting penalties retain their intended sign.
 Precision settings still control quantization; the conversion does not make a
 heuristic solver exact.
+
+## MAIFS training checkpoints
+
+`FeatureSelectionWrapper.state_dict()` includes the number of completed
+`fit_weights` epochs. Reconstruct the wrapper with the same
+`mask_update_epochs` and load its state to continue the periodic feature-mask
+schedule. For example, a checkpoint after epoch two with an interval of three
+updates the mask after the first resumed epoch, rather than waiting three more.
+Optimizer state and the wrapper configuration must still be saved separately.
+Legacy checkpoints without the epoch count load normally and start a fresh
+schedule at zero.
