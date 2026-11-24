@@ -202,10 +202,10 @@ class FeatureSelectionWrapper(nn.Module):
             train_epochs: Number of training epochs to run.
 
         Returns:
-            Mean loss over all processed batches.
+            Mean loss over all non-empty processed batches.
 
         Raises:
-            ValueError: If ``data_loader`` yields no batches or ``loss_fn`` does
+            ValueError: If an epoch has no samples or ``loss_fn`` does
                 not return a scalar tensor.
         """
         train_epochs = int(train_epochs)
@@ -216,6 +216,8 @@ class FeatureSelectionWrapper(nn.Module):
         for _ in range(train_epochs):
             epoch_batches = 0
             for input_batch, target_batch in data_loader:
+                if input_batch.size(0) == 0:
+                    continue
                 input_batch = input_batch.to(self.mask.device)
                 target_batch = target_batch.to(self.mask.device)
                 optimizer.zero_grad(set_to_none=True)
@@ -228,7 +230,7 @@ class FeatureSelectionWrapper(nn.Module):
                 batch_count += 1
                 epoch_batches += 1
             if epoch_batches == 0:
-                raise ValueError("data_loader produced no batches")
+                raise ValueError("data_loader produced no batches with samples")
             self._trained_epochs += 1
             if (
                 self.mask_update_epochs is not None
@@ -238,7 +240,7 @@ class FeatureSelectionWrapper(nn.Module):
                 self.update_mask(data_loader, loss_fn)
 
         if batch_count == 0:
-            raise ValueError("data_loader produced no batches")
+            raise ValueError("data_loader produced no batches with samples")
         return total_loss / batch_count
 
     def compute_mask_derivatives(
@@ -262,7 +264,7 @@ class FeatureSelectionWrapper(nn.Module):
 
         Raises:
             ValueError: If ``hessian_mode`` is unsupported, ``data_loader`` yields
-                no batches, or ``loss_fn`` does not return a scalar tensor.
+                no samples, or ``loss_fn`` does not return a scalar tensor.
         """
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
@@ -271,14 +273,17 @@ class FeatureSelectionWrapper(nn.Module):
         target_batches: list[torch.Tensor] = []
         count = 0
         for input_batch, target_batch in data_loader:
+            batch_size = len(input_batch)
+            if batch_size == 0:
+                continue
             input_batches.append(input_batch)
             target_batches.append(target_batch)
-            count += len(input_batch)
+            count += batch_size
             if max_samples is not None and count >= max_samples:
                 break
 
         if not input_batches:
-            raise ValueError("data_loader produced no batches")
+            raise ValueError("data_loader produced no batches with samples")
         input_all = torch.cat(input_batches, dim=0)
         target_all = torch.cat(target_batches, dim=0)
         if max_samples is not None:
