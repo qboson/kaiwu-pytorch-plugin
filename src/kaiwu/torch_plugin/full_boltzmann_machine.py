@@ -14,8 +14,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
     Args:
         num_nodes (int): Total number of nodes in the model.
 
-        quadratic_coef (torch.FloatTensor, optional): Quadratic coefficient
-            with shape ``[num_nodes, num_nodes]``.
+        quadratic_coef (torch.FloatTensor, optional): Square matrix with shape
+            ``[num_nodes, num_nodes]``. Store each pairwise coupling in the
+            strict upper triangle (above the diagonal). These entries define
+            the pairwise terms in the model's energies and Ising matrix.
 
         linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_nodes]
 
