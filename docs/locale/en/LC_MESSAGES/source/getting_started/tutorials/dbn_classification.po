@@ -54,8 +54,14 @@ msgstr ""
 " classification training and evaluation."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:8
-msgid "目标"
-msgstr "Objectives"
+msgid "运行示例"
+msgstr "Run the example"
+
+msgid "先按[安装指南](../installation.md)安装插件，再在同一个 Python 环境中安装示例依赖："
+msgstr "Install the plugin using the [installation guide](../installation.md), then install the example dependencies in the same Python environment:"
+
+msgid "在 Jupyter 中打开 `example/dbn_digits/supervised_dbn_digits.ipynb`，并确认内核的工作目录是 `example/dbn_digits/`。这样 notebook 就能找到同目录中的 `supervised_dbn_digits.py` 和 `dbn_trainer.py`。"
+msgstr "Open `example/dbn_digits/supervised_dbn_digits.ipynb` in Jupyter and confirm the kernel working directory is `example/dbn_digits/`. The notebook can then find `supervised_dbn_digits.py` and `dbn_trainer.py` in that directory."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:10
 msgid "一、RBM 原理概述"
