@@ -6,10 +6,15 @@
 示例使用数据可以在https://www.kaggle.com/datasets/redwoodz/immune-data下载
 
 ## 依赖
+在仓库根目录安装当前检出的插件代码。安装时会同时处理当前版本声明的 PyTorch 和 Kaiwu SDK 依赖。
+
+```bash
+python -m pip install .
 ```
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
-torch==2.7.0
+
+示例还需要下列依赖。后续示例命令请在 `example/qvae_cell/` 目录下执行。
+
+```text
 anndata
 scanpy
 leidenalg

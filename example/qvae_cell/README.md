@@ -10,10 +10,15 @@ https://www.kaggle.com/datasets/redwoodz/immune-data
 
 ## Dependencies
 
+From the repository root, install the plugin from the same checkout as this example. This also installs the PyTorch and Kaiwu SDK dependencies declared by the checkout.
+
 ```bash
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
-torch==2.7.0
+python -m pip install .
+```
+
+The example also uses these packages. Run the example commands below from `example/qvae_cell/`.
+
+```text
 anndata
 scanpy
 leidenalg
