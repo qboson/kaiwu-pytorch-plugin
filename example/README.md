@@ -157,3 +157,28 @@ leidenalg
 scib_metrics
 scgraph
 ```
+
+---
+### Anomaly Detection: Unsupervised Continuous-Feature Detection with GBRBM
+
+This example trains a Gaussian-Bernoulli Restricted Boltzmann Machine (GBRBM) on normal
+samples only, using the Breast Cancer Wisconsin dataset (569 rows, 30 continuous features),
+and wraps two anomaly scores — exact free energy and a deterministic reconstruction error —
+on top of the existing public API (`marginal_energy` / `infer_from_gaussian` /
+`infer_from_bernoulli`). Both are compared with `IsolationForest` on the same split and the
+same threshold protocol.
+
+* **Zero core changes**: nothing under `src/kaiwu/torch_plugin/` is modified; all logic lives in `example/gbrbm_anomaly_detection/`;
+* **Leakage-free pipeline**: split first, then fit `StandardScaler` on the normal training rows only;
+* **Two sampler entry points**: local `SimulatedAnnealingOptimizer` by default, plus a `CIMOptimizer` entry point compatible with Kaiwu 1.3.1-1.4.3;
+* **Non-blocking plots**: `FigureCanvasAgg` only, saving the score histogram and the ROC comparison curve.
+
+Entry point: `example/gbrbm_anomaly_detection/run_anomaly_detection.py` (`--quick` finishes in seconds).
+See `example/gbrbm_anomaly_detection/README.md` for details and reference metrics.
+
+**Dependencies**
+
+```
+scikit-learn
+matplotlib
+```
