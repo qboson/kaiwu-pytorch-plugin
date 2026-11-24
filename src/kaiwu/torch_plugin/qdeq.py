@@ -381,14 +381,14 @@ class QDEQ(nn.Module):
         Returns:
             torch.Tensor: ``layer(z*, x)``.
         """
-        z0 = torch.zeros_like(x) if z0 is None else z0
+        initial_state = torch.zeros_like(x) if z0 is None else z0.detach().clone()
         cfg = self.config
         def func(z):
             return self.layer(z, x)
 
         # 1. Solve for z* without building an autograd graph.
         with self.solve_context(), torch.no_grad():
-            z_star, stats = self.solve_fixed_point(func, z0.detach())
+            z_star, stats = self.solve_fixed_point(func, initial_state)
         self._last_stats = {f"forward_{key}": value for key, value in stats.items()}
         self.last_jac_loss = None
 
@@ -441,7 +441,8 @@ class QDEQ(nn.Module):
     ) -> tuple[torch.Tensor, dict[str, float]]:
         """Finds ``z = func(z)`` with the Ising solver. Override to use another solver.
 
-        Called under ``torch.no_grad()`` and ``solve_context``.
+        Called under ``torch.no_grad()`` and ``solve_context``. The initial
+        state has independent storage so an override can reuse it as a buffer.
 
         Args:
             func: Fixed-point map ``z -> layer(z, x)``.
