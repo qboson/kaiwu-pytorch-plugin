@@ -43,6 +43,8 @@ Regular SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10. The manual
 `all-kaiwu-versions` CI option also checks 1.4.1 and 1.4.2. These interface
 checks do not submit licensed or cloud tasks.
 
+> **PyPI wheel platforms:** The listed versions of PyTorch and NumPy, together with Kaiwu SDK 1.3.1 or 1.4.3, have matching CPython 3.10 wheels for Linux x86-64 with glibc 2.28 or later, Windows x86-64, and macOS 12 or later on Apple silicon.
+
 Check the Python version:
 ```bash
 python --version
