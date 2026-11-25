@@ -272,14 +272,38 @@ def build_config() -> QDEQConfig:
 
 
 @torch.no_grad()
-def evaluate(model: DEQForecaster, loader: DataLoader) -> dict[str, float]:
-    """Returns scaled-space MSE and MAE plus the mean forward solver steps."""
+def evaluate(
+    model: DEQForecaster, loader: DataLoader, *, by_horizon: bool = False,
+) -> dict[str, float | list[float]]:
+    """Return aggregate errors and optionally one error per forecast lead."""
     model.eval()
     squared, absolute, count, steps = 0.0, 0.0, 0, []
+    horizon_squared = horizon_absolute = None
+    count_per_horizon = 0
     for history, target in loader:
         forecast = model(history)
-        squared += torch.sum((forecast - target) ** 2).item()
-        absolute += torch.sum(torch.abs(forecast - target)).item()
+        if by_horizon and (target.ndim != 3 or forecast.shape != target.shape):
+            raise ValueError("Expected matching (batch, horizon, variables) forecasts and targets")
+        error = forecast - target
+        squared_error, absolute_error = error.square(), error.abs()
+        squared += squared_error.sum().item()
+        absolute += absolute_error.sum().item()
         count += target.numel()
         steps.append(model.deq.get_last_stats()["forward_nstep"])
-    return {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}
+        if by_horizon:
+            accumulation_dtype = torch.promote_types(error.dtype, torch.float32)
+            batch_squared = squared_error.sum(dim=(0, 2), dtype=accumulation_dtype).to(device="cpu", dtype=torch.float64)
+            batch_absolute = absolute_error.sum(dim=(0, 2), dtype=accumulation_dtype).to(device="cpu", dtype=torch.float64)
+            if horizon_squared is None:
+                horizon_squared, horizon_absolute = batch_squared, batch_absolute
+            else:
+                horizon_squared += batch_squared
+                horizon_absolute += batch_absolute
+            count_per_horizon += target.shape[0] * target.shape[2]
+    if count == 0:
+        raise ValueError("ETTh1 evaluation requires at least one forecast target")
+    metrics = {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}
+    if by_horizon:
+        metrics["mse_by_horizon"] = (horizon_squared / count_per_horizon).tolist()
+        metrics["mae_by_horizon"] = (horizon_absolute / count_per_horizon).tolist()
+    return metrics
