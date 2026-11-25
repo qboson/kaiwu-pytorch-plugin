@@ -1,0 +1,54 @@
+{
+  "base_commit": "93a536bef8afd9f64d4657dea89eceae8c0c7b3d",
+  "code_state": "base commit plus local changes; not a clean commit",
+  "training_script": "example/ep_mnist/train_mnist.py",
+  "training_script_sha256": "efbd6c159096a6e018b683d78d214ce9f45453d9a051547d4382d86da805317b",
+  "artifacts_sha256": {
+    "docs/_static/ep-mnist/sweep_beta.pdf": "b5a8e5d878ab4d031146f66afae365351ac4339d0a2e4f9276e6df215695daef",
+    "docs/_static/ep-mnist/sweep_beta.png": "dc140f736f1ac52d1eb1657b92e30f938d247932e10fed27461920bf5eb7b62f",
+    "docs/_static/ep-mnist/sweep_budget.pdf": "67d3251c789d492975c3b7e1c0216e4747dd005ea1f9f36b5ec64a0b7074822b",
+    "docs/_static/ep-mnist/sweep_budget.png": "a3acd45d3377987b80114d17fe72d556037f3d6cfcc1f87ee0ffa96472e3d172",
+    "docs/_static/ep-mnist/sweep_seeds.csv": "06bfb7db4de056e09a0bef9e7715702dcd52107a35d2508cbbbe3406df4f51e7",
+    "docs/_static/ep-mnist/sweep_summary.csv": "acc19cb7800c26292c0c364ccf4b72c283c6f24e082cc3b77e7f5962b70a6cac",
+    "docs/_static/ep-mnist/training_curves.csv": "df0fd885d760725e4aad3c12db042aa79d5ff6ed76e25128abf95fbb16c033aa",
+    "docs/_static/ep-mnist/training_curves.pdf": "fda2cb834f051bfb162d410ae8801c433983ace693a4a697b5c364258ee7bc7e",
+    "docs/_static/ep-mnist/training_curves.png": "22bbd752c77470b77535d34b34a2c852adecc1cff57865653b7652de1516871a",
+    "example/ep_mnist/closeout/beta-1_sa-50_seed-0/summary.json": "23e65faa25cded9c0b061b4d781ce2ec8aa6c9f388d097e5cb732e8786571d27",
+    "example/ep_mnist/closeout/beta-1_sa-50_seed-1/summary.json": "b97d8350d034680ad5f6cfc9f5409edef663991af879af40f4469d737203b2ac",
+    "example/ep_mnist/closeout/beta-1_sa-50_seed-2/summary.json": "9ef863049bcb48be1f073ed097f83b1e3990ed1069b9e414609e473a0b1fa07c",
+    "example/ep_mnist/closeout/beta-2_sa-100_seed-0/summary.json": "87887a9c58daf4bdc0393d52ebcd2c38421256bcac1006ec08d2ff6ea7066f29",
+    "example/ep_mnist/closeout/beta-2_sa-100_seed-1/summary.json": "76b90a2f96130fe876afdc491a8bd2f0bed47625ca14b5995df3b6e5569b43f7",
+    "example/ep_mnist/closeout/beta-2_sa-100_seed-2/summary.json": "908b92b518abda4e54bffd02f8237e458469076e03da4e7fcefbd6c7e5c8fddd",
+    "example/ep_mnist/closeout/beta-2_sa-20_seed-0/summary.json": "8e76bbc056e9d66a5b4815803941d4f1cf5ca5fca30550b633cbbc0b517a57fc",
+    "example/ep_mnist/closeout/beta-2_sa-20_seed-1/summary.json": "dc8d4714eebc43094d9f1f6a5c1f6b4e768a2395bf19c8a0e9e5f9f0603d2d91",
+    "example/ep_mnist/closeout/beta-2_sa-20_seed-2/summary.json": "e90a1a389c98ec803ea13c40dc82b75e7c16a16f1ffda785ac2aa83ab43fe5cd",
+    "example/ep_mnist/closeout/beta-2_sa-50_seed-0/summary.json": "07b0967f6aa6d77cc23a5dac8d776b8b4e4d560631322c8a8e2666ebb51a487f",
+    "example/ep_mnist/closeout/beta-2_sa-50_seed-1/summary.json": "256fc171100ee2b0cb45923601d671230bb48330d6ca4808c7b95ef70852de17",
+    "example/ep_mnist/closeout/beta-2_sa-50_seed-2/summary.json": "e2bcaf4ed9d38aadb0bd4ef9d0d93881b5f98c997d1831e7dda4da8daa7ab38d",
+    "example/ep_mnist/closeout/beta-4_sa-50_seed-0/summary.json": "dc6948a030794d1f0a753d96895ca129afae728d34a0602cc26cc783b94e7b87",
+    "example/ep_mnist/closeout/beta-4_sa-50_seed-1/summary.json": "c658569d6cb94648453abff949142b9df4bdfc03e4e0e79ebb958cc97aad91ea",
+    "example/ep_mnist/closeout/beta-4_sa-50_seed-2/summary.json": "092a780b75defd06a1a63fab440d32a57363eed57ab7fba42fda279df9a74656",
+    "example/ep_mnist/closeout/bp/summary.json": "973f18b55de2029edac52113c54865a5a465ecf19253af2129916c1546133a8b",
+    "example/ep_mnist/closeout/environment.json": "3240dab6875c8d67193b7fa1cf450a8651b8c44ea1106731fa86534e9c958010",
+    "example/ep_mnist/closeout/ep-full/summary.json": "fac63071dddf3f831d1740b1dc4974ff7446fc22e2f204cbc9b224fd517e9e16",
+    "example/ep_mnist/closeout/probe/summary.json": "866f5aab5920c9ceaadc49afda6bcd2c4df54b545add8195746a330eec3a7fb5",
+    "example/ep_mnist/closeout/status.json": "ddfbed4fd87fc3a0c0b986a003fa48c97771b1995126d1d2127da703238aee57",
+    "example/ep_mnist/closeout/summarize.py": "b11f68240316d549f656a2464dc1fdba9add42ca991e366cda3ac8283779f9bd",
+    "example/ep_mnist/closeout/bp_mnist.py": "0a3199868598531ac3b470d19a591e53d6cf3a1dfb260a75b62d32583e773ac4",
+    "example/ep_mnist/closeout/run_experiments.py": "e73eff43468928abf9bf4dd58bc87cd33a134e44700dc10e2b0e16f014c478d6"
+  },
+  "reproduction_sources": {
+    "bp_mnist.py": {
+      "historical_sha256": "4a12a4ed2b1f8ca53451ae4806cf0961f5697d051a289b586ac1d1d654ceaca6",
+      "adaptation": "Repository-relative paths and reproduction CLI; BP numerical computation unchanged."
+    },
+    "run_experiments.py": {
+      "historical_sha256": "d2c8dff1767e67d2b79769072358eef59362ec80c6ddd6847d843bd17ec52294",
+      "adaptation": "Repository-relative paths and reproduction CLI; BP numerical computation unchanged."
+    },
+    "summarize.py": {
+      "historical_sha256": "5fa8d19ca7b2c6b23448cd0207318aa4cb0ea201e7c3637866df2fa91b2fe4b6",
+      "adaptation": "Repository-relative paths and reproduction CLI; BP numerical computation unchanged."
+    }
+  }
+}

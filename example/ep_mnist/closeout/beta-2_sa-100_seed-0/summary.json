@@ -1,0 +1,74 @@
+{
+  "limit_train": 2000,
+  "limit_eval": 1000,
+  "n_val": 1000,
+  "epochs": 3,
+  "batch_size": 20,
+  "lr": 0.05,
+  "beta": 2.0,
+  "hidden": 128,
+  "conv": false,
+  "channels": 4,
+  "input_scale": 2.0,
+  "sa_iterations": 100,
+  "seed": 0,
+  "split_seed": 0,
+  "validation_only": true,
+  "layer_sizes": [
+    784,
+    128,
+    10
+  ],
+  "n_train": 2000,
+  "n_test": 0,
+  "train_sampler": {
+    "initial_temperature": 10.0,
+    "alpha": 0.9,
+    "cutoff_temperature": 0.01,
+    "iterations_per_t": 100,
+    "size_limit": 4,
+    "rand_seed": 0,
+    "process_num": 1
+  },
+  "eval_sampler": {
+    "initial_temperature": 10.0,
+    "alpha": 0.9,
+    "cutoff_temperature": 0.01,
+    "iterations_per_t": 100,
+    "size_limit": 4,
+    "rand_seed": 0,
+    "process_num": 1
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "ep_objective": 0.3871279567386955,
+      "train_seconds": 323.79274200001964,
+      "train_accuracy": 0.7165,
+      "train_error": 0.2835,
+      "val_accuracy": 0.721,
+      "val_error": 0.279,
+      "eval_seconds": 220.65386369999032
+    },
+    {
+      "epoch": 2,
+      "ep_objective": 0.12673607072443702,
+      "train_seconds": 714.100925100036,
+      "train_accuracy": 0.7595,
+      "train_error": 0.24050000000000005,
+      "val_accuracy": 0.755,
+      "val_error": 0.245,
+      "eval_seconds": 572.1436968999915
+    },
+    {
+      "epoch": 3,
+      "ep_objective": 0.10721791454358026,
+      "train_seconds": 490.5566573999822,
+      "train_accuracy": 0.8465,
+      "train_error": 0.15349999999999997,
+      "val_accuracy": 0.834,
+      "val_error": 0.16600000000000004,
+      "eval_seconds": 354.28172079997603
+    }
+  ]
+}
