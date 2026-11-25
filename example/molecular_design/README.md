@@ -96,6 +96,11 @@ python scripts/verify_results.py
 
 核验包含三方法各 25,000 步、CIM／SQA 的逐步候选数、命中标签及全量／分段统计；不执行采样或重新计算分子性质。
 
+运行 `python scripts/paired_result_intervals.py --property qed` 可以查看已记录的
+CIM 与 SQA 配对结果。程序按条件和步骤配对，校验两侧的候选预算，再按参考分子对整组步骤
+做配对 bootstrap。输出包含有效率和命中率的百分点差及 95% 区间。区间描述固定种子下这批
+参考分子之间的差异。可用 `--regime single_call` 只分析单次采样阶段。
+
 原实验版本为 Python 3.10.20、PyTorch 2.6.0、RDKit 2026.3.2、Kaiwu 1.0.33a0、dwave-samplers 1.8.0。本次在该环境中加载上述真实 KPP 源码，验证模型与本地采样接口。KPP 当前声明的依赖为 PyTorch 2.7.0、NumPy 2.2.6、Kaiwu 1.3.1；本次未验证该完整依赖组合及其 CIM 硬件接口。
 
 在 KPP 仓库的 `example/molecular_design/` 目录内，按仓库依赖安装插件及示例依赖，然后运行方法测试：
