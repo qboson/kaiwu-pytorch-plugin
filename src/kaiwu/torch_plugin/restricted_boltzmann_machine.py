@@ -74,6 +74,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
     ) -> torch.Tensor:
         """Propagate visible spins to the hidden layer.
 
+        With ``requires_grad=True``, the returned visible slice keeps any
+        gradient path to ``s_visible``. The hidden slice passes gradients
+        through activation probabilities (``bernoulli=False``). Sampling binary
+        states (``bernoulli=True``) blocks the hidden gradient path.
+
         Args:
             s_visible: Visible layer tensor.
             requires_grad: Whether to allow gradient backpropagation.
