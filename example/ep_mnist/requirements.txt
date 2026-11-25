@@ -1,0 +1,3 @@
+# Install the plugin separately; these dependencies are only for this example.
+torchvision==0.22.0
+matplotlib==3.10.3
