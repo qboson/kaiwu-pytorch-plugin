@@ -149,6 +149,11 @@ python evaluate_benchmark.py \
   --root-cell-type HSPCs
 ```
 
+Use `--root-cell <obs_name>` to select one exact AnnData observation as the
+DPT root. When both root options are provided, the observation must have the
+specified cell type. The DPT results record the observation name so runs
+across different embeddings can be compared using the same root.
+
 `bash scripts/eval.sh` is equivalent to running `--metrics clustering`.
 
 The results will be saved as corresponding CSV files and summarized into:
