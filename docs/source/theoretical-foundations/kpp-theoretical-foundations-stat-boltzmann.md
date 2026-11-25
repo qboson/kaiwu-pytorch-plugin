@@ -67,13 +67,13 @@ $$\sum_{\tilde{\mathbf{x}}} P(\tilde{\mathbf{x}}) = \frac{1}{Z} \sum_{\tilde{\ma
 While mathematically simple in definition, the partition function is computationally formidable. For a system of $N$binary units, the sum runs over $2^N$ distinct configurations. This exponential growth is already severe at modest sizes: For even modest $N$(say, $N=100$, this number exceeds the estimated number of stars in the observable universe. The intractability of **exact** partition-function computation is the central computational challenge that shapes every aspect of Boltzmann machine learning, from training algorithms to architectural constraints.
 
 ## The Thermodynamic Limit and Ensemble Equivalence
-For a macroscopic system (large $N$), the canonical and microcanonical ensembles become equivalent. This is because the energy fluctuations in the canonical ensemble scale as:
+In the canonical ensemble, the energy variance is set by the temperature $T$ and the heat capacity $C_V$ at constant volume.
 
-$$\frac{\Delta E}{\langle E \rangle} \propto \frac{1}{\sqrt{N}}$$
+$$\mathrm{Var}(E) = k_B T^2 C_V, \qquad \mathrm{sd}(E/N) = \frac{\sqrt{k_B T^2 C_V}}{N}$$
 
-which becomes negligible as $N \to \infty$. This is the **thermodynamic limit**. In this limit, the energy of the system is essentially fixed, and the canonical ensemble gives the same results as the microcanonical ensemble.
+At fixed temperature, if $C_V$ grows proportionally to $N$, the standard deviation of the energy per unit decreases as $1/\sqrt{N}$. Equivalence with the microcanonical ensemble also depends on the thermodynamic properties of the system.
 
-This property is important for Boltzmann machines: when the number of units is large, the model's equilibrium distribution is sharply peaked around the mean energy, and the system behaves as if it were isolated with a fixed energy.
+For a Boltzmann machine with this scaling, the energy per unit concentrates as the model grows. The total energy and the sampled configurations can still fluctuate.
 
 ## The Boltzmann Distribution in Neural Networks
 Translating the physical expression into the language of neural networks requires only a redefinition of variables. For a Boltzmann machine with binary units $\mathbf{x} \in \{0,1\}^N$ (or equivalently $\{-1,+1\}^N$), we absorb the Boltzmann constant into the temperature parameter and define the **energy function** $E_\theta(\mathbf{x})$ parameterized by biases $\mathbf{b}$ and symmetric weights $\mathbf{W}$:
