@@ -408,8 +408,8 @@ msgid "`learning_rate`：微调学习率（默认 0.1）"
 msgstr "``learning_rate``: fine-tuning learning rate (default 0.1)"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:143
-msgid "`n_iter_backprop`：反向传播迭代次数（默认 100）"
-msgstr "``n_iter_backprop``: back-prop iterations (default 100)"
+msgid "`n_iter_backprop`：微调训练轮数（默认 100），每轮遍历一次微调训练集。"
+msgstr "`n_iter_backprop` sets the number of fine-tuning epochs (default 100), with one pass over the training set per epoch."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:144
 msgid "`l2_regularization`：L2 正则化（默认 1e-4）"
