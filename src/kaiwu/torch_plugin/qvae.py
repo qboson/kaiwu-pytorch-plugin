@@ -267,8 +267,11 @@ class QVAE(AutoEncoderBase):
             x (torch.Tensor): Input tensor of shape (batch_size, input_dim).
 
         Returns:
-            tuple: Reconstructed logits, posterior distribution, encoder logits,
-                and reparameterized latent sample.
+            tuple: Reconstruction tensor, posterior distribution, encoder
+                logits, and reparameterized latent sample. With Bernoulli
+                loss, the reconstruction contains decoder logits plus the
+                training bias. With MSE loss, it contains the raw decoder
+                output.
         """
         x = x.view(-1, self._input_dimension)
 
