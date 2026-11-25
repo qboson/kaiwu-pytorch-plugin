@@ -44,10 +44,6 @@ extensions = [
     'sphinxcontrib.mermaid',  # 启用 Mermaid 扩展
     "sphinxcontrib.bibtex",   # 启用 BibTeX 支持
 ]
-# Render Attributes sections as field lists; autodoc owns the attribute indexes.
-# This avoids indexing dataclass fields twice while retaining descriptions.
-napoleon_use_ivar = True
-
 myst_enable_extensions = [
     "dollarmath",
     "amsmath",

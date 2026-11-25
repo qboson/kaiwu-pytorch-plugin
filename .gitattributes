@@ -1,7 +1,1 @@
 imgs/* filter=lfs diff=lfs merge=lfs -text
-
-# Keep bytes covered by the EP closeout SHA-256 manifest portable across checkouts.
-docs/_static/ep-mnist/*.csv -text
-example/ep_mnist/closeout/**/*.json -text
-example/ep_mnist/closeout/*.py -text
-example/ep_mnist/train_mnist.py eol=lf
