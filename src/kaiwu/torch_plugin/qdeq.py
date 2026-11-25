@@ -57,7 +57,10 @@ class QDEQConfig:
 
         num_basis: Search directions per Ising step.
 
-        coeff_bits: Binary variables encoding each direction's coefficient.
+        coeff_bits: Bits per search-direction coefficient. With ``b`` bits,
+            the grid over ``[-s, s]`` has ``2**b`` levels spaced by
+            ``2*s / (2**b - 1)``. For positive half-width ``s``, zero is
+            between the two central levels.
 
         coeff_range: Half-width of each coefficient's range, in units of
             ``||f(z) - z|| / sqrt(num_basis)``.
