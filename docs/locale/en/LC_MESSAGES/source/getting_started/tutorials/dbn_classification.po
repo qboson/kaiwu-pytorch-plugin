@@ -430,17 +430,22 @@ msgstr ""
 "Fine-Tuning Utilities"
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:152
-msgid "`classifier_type`：支持多种分类器（默认逻辑回归）"
+msgid "`classifier_type`：可选 `logistic`（默认）、`svm` 或 `random_forest`。随机森林使用 100 棵树。"
 msgstr ""
-"``classifier_type``: choice of classifier (default logistic regression)"
+"`classifier_type` selects `logistic` (default), `svm`, or `random_forest`. "
+"The random forest uses 100 trees."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:153
-msgid "`clf_C`：正则化强度（默认 1.0）"
-msgstr "``clf_C``: regularization strength (default 1.0)"
+msgid "`clf_C`：逻辑回归和支持向量机的 `C` 参数（默认 1.0）。较小的值对应更强的正则化。"
+msgstr ""
+"`clf_C` sets `C` for logistic regression and SVM (default 1.0). Smaller "
+"values give stronger regularization."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:154
-msgid "`clf_iter`：迭代次数（默认 100）"
-msgstr "``clf_iter``: iterations (default 100)"
+msgid "`clf_iter`：仅设置逻辑回归的最大迭代次数（默认 100）。"
+msgstr ""
+"`clf_iter` sets the maximum iteration count for logistic regression only "
+"(default 100)."
 
 #: ../../source/getting_started/tutorials/dbn_classification.md:156
 msgid "4. SupervisedDBNClassification 具体分类实现"
