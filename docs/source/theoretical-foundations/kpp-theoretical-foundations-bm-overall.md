@@ -21,7 +21,7 @@ Crucially, the classic Boltzmann machine is **fully connected**: every unit is s
 
 $$w_{ij} = w_{ji}, \quad \text{for all } i, j$$
 
-is essential because it guarantees the existence of a well-defined energy function and ensures that the stochastic dynamics converge to an equilibrium distribution. Self-connections are prohibited (\( w_{ii} = 0 \)), as they would merely add a constant offset to the energy without affecting the conditional distributions that drive sampling.
+is essential because it guarantees the existence of a well-defined energy function and ensures that the stochastic dynamics converge to an equilibrium distribution. Self-connections are set to zero ($w_{ii} = 0$). For these binary units, $x_i^2 = x_i$, so a diagonal energy term can be absorbed into the corresponding bias.
 
 Each unit also has a **bias** $b_i$, which can be interpreted as a connection from an always-active unit or as an external field acting on that unit.
 
