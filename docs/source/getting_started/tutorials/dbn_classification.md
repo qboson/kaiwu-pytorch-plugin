@@ -149,9 +149,9 @@ $$
 
 - **关键参数**：
 
-  - `classifier_type`：支持多种分类器（默认逻辑回归）
-  - `clf_C`：正则化强度（默认 1.0）
-  - `clf_iter`：迭代次数（默认 100）
+  - `classifier_type`：可选 `logistic`（默认）、`svm` 或 `random_forest`。随机森林使用 100 棵树。
+  - `clf_C`：逻辑回归和支持向量机的 `C` 参数（默认 1.0）。较小的值对应更强的正则化。
+  - `clf_iter`：仅设置逻辑回归的最大迭代次数（默认 100）。
 
 ### 4. SupervisedDBNClassification 具体分类实现
 
