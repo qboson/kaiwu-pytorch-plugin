@@ -334,13 +334,15 @@ msgstr "4.1 Learning-Rate Scheduler"
 
 #: ../../source/getting_started/tutorials/bm_generation.md:122
 msgid ""
-"`CosineScheduleWithWarmup` 是一个自定义的学习率调度器，继承自 PyTorch 的 `LambdaLR`。 "
-"它在训练初期采用线性 warmup 策略逐步提升学习率，随后应用余弦退火策略平滑地衰减学习率至零。"
+"`CosineScheduleWithWarmup` 继承自 PyTorch 的 "
+"`LambdaLR`。线性热身后，默认的半个余弦周期使学习率逐步降至零。 "
+"训练器在每次优化器更新后推进调度器，所以调度器在最后一次参数更新后才达到零。更改 `num_cycles` 会改变曲线，也可能改变终点。"
 msgstr ""
-"``CosineScheduleWithWarmup`` is a custom learning-rate scheduler inheriting "
-"from PyTorch’s ``LambdaLR``. It first applies a linear warmup to gradually "
-"increase the learning rate, then uses cosine annealing to smoothly decay it "
-"to zero."
+"`CosineScheduleWithWarmup` extends PyTorch's `LambdaLR`. After linear "
+"warmup, the default half cosine cycle decays the learning rate to zero. "
+"The trainer steps the scheduler after each optimizer update, so the "
+"scheduler reaches zero after the final parameter update. Changing "
+"`num_cycles` changes the curve and can change its endpoint."
 
 #: ../../source/getting_started/tutorials/bm_generation.md:125
 msgid ""
