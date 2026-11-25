@@ -134,6 +134,29 @@ class UnsupervisedDBN(nn.Module):
         rbm = self.rbm_layers[layer_index]
         return self.reconstruct_with_rbm(rbm, data_in, self.device)
 
+    def reconstruct_stack(self, data_in):
+        """Reconstruct original input through the entire trained RBM stack.
+
+        Args:
+            data_in (numpy.ndarray): Input samples in the original feature space.
+
+        Returns:
+            tuple[numpy.ndarray, numpy.ndarray]: Reconstructed input and one
+                mean squared reconstruction error per sample.
+
+        Raises:
+            ValueError: If the input is not a matrix or the DBN is untrained.
+        """
+        inputs = np.asarray(data_in, dtype=np.float32)
+        if inputs.ndim != 2:
+            raise ValueError("Expected a 2D input feature matrix")
+        encoded = self.transform(inputs)
+        reconstructed = torch.as_tensor(encoded, device=self.device)
+        for rbm in reversed(self.rbm_layers):
+            reconstructed = rbm.get_visible(reconstructed)[:, :rbm.num_visible]
+        values = reconstructed.cpu().numpy()
+        return values, np.mean((inputs - values) ** 2, axis=1)
+
     def mark_as_trained(self):
         """Marks the model as trained.
 
