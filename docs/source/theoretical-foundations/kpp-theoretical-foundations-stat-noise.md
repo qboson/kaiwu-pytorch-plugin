@@ -79,7 +79,7 @@ The annealing schedule typically starts with a high temperature $T_{\text{high}}
 
 $$T_{k+1} = \alpha T_k, \quad 0 < \alpha < 1$$
 
-As $T \to 0$, the stochastic dynamics approach the deterministic Hopfield limit, and the network freezes into the nearest local minimum. If the annealing is sufficiently slow, the system converges to the **global minimum** with high probability, which is a result formally guaranteed by the theory of Markov chain Monte Carlo (MCMC).
+At low temperatures, uphill moves become rare, and geometric cooling can leave the network trapped in a nonglobal minimum. Under the conditions in [Hajek (1988)](https://doi.org/10.1287/moor.13.2.311), a logarithmic schedule $T_k = c/\log(1+k)$ gives convergence in probability to the set of global minima when $c$ is at least the escape depth of the deepest nonglobal local minimum.
 
 In practice, true global optimization is rarely achievable for large networks due to the exponential slowdown of mixing times at low temperatures (critical slowing down). Nonetheless, simulated annealing provides a powerful heuristic for finding deep, low-energy states that correspond to likely configurations under the model's learned distribution.
 
