@@ -397,9 +397,3 @@ msgstr ""
 
 #~ msgid "按顺序完成所有教程，全面掌握 Kaiwu-PyTorch-Plugin 的功能。"
 #~ msgstr "按顺序完成所有教程，全面掌握 Kaiwu-PyTorch-Plugin 的功能。"
-
-msgid "Equilibrium Propagation"
-msgstr "均衡传播"
-
-msgid "[MNIST equilibrium propagation](equilibrium_propagation.md): Completed training, reproducible configuration and learning curves."
-msgstr "[MNIST 均衡传播](equilibrium_propagation.md)：已完成的训练、复现配置与训练曲线。"

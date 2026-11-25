@@ -408,9 +408,3 @@ enable_usage_stats()
  ![](imgs/qrcode.png) ![](imgs/qrcode3.png)  
 ![communication group](https://github.com/user-attachments/assets/fa03e122-df41-41ae-8497-7052470792f8)
 
-
-## MNIST 均衡传播训练结果
-
-完整 MNIST 的三轮单种子训练已完成，测试准确率为 **90.30%**（BP 对照：**96.20%**）。配置、复现命令、训练曲线及局限见 [EP 示例](example/ep_mnist/README_ZH.md)。
-
-![EP 与 BP 训练曲线](docs/_static/ep-mnist/training_curves.png)

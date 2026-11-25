@@ -65,17 +65,6 @@ qvae_mnist
 
 - [Q-VAE: Quantum Variational Autoencoder](qvae_mnist.md): Replacing the Gaussian prior with a quantum RBM for image generation and representation learning. Example: `example/qvae_mnist/run_pipeline.py`.
 
-## Equilibrium Propagation
-
-```{toctree}
-:maxdepth: 1
-:hidden:
-
-equilibrium_propagation
-```
-
-- [MNIST equilibrium propagation](equilibrium_propagation.md): Completed training, reproducible configuration and learning curves.
-
 ## Coming Soon
 
 Planned tutorials, following the same structure as Tutorial 1–3:
