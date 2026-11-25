@@ -20,6 +20,7 @@ from .._kaiwu_compat import normalize_task_mode
 
 AVAILABLE_SOLVERS = (
     "local_search",
+    "exact",
     "sa",
     "kaiwu_cim",
 )
@@ -757,6 +758,29 @@ def _binary_from_solver_solution(
     return binary.astype(int)
 
 
+def _solve_ising_exact(ising_matrix: np.ndarray) -> np.ndarray:
+    """Enumerate a small Ising model with the auxiliary spin fixed to +1."""
+    num_variables = ising_matrix.shape[0] - 1
+    if num_variables > 16:
+        raise ValueError("The exact solver supports at most 16 binary variables")
+    if not np.isfinite(ising_matrix).all():
+        raise ValueError("The exact solver requires a finite Ising matrix")
+    matrix = ising_matrix / max(1.0, float(np.abs(ising_matrix).max()))
+    shifts = np.arange(num_variables, dtype=np.uint32)
+    total = 1 << num_variables
+    best_energy = np.inf
+    best_spin = np.ones(num_variables + 1, dtype=float)
+    for start in range(0, total, 1024):
+        states = np.arange(start, min(start + 1024, total), dtype=np.uint32)
+        spins = np.ones((len(states), num_variables + 1), dtype=float)
+        spins[:, :-1] = 2.0 * ((states[:, None] >> shifts) & 1) - 1.0
+        energies = ((spins @ matrix) * spins).sum(axis=1)
+        best = int(energies.argmin())
+        if energies[best] < best_energy:
+            best_energy, best_spin = energies[best], spins[best].copy()
+    return best_spin
+
+
 def solve_qubo(
     quadratic_matrix: np.ndarray,
     linear_vector: np.ndarray,
@@ -801,6 +825,10 @@ def solve_qubo(
                 initial_binary=initial_state,
                 max_iter=int(solver_kwargs.get("max_iter", 2000)),
             )
+        elif solver_name == "exact":
+            if solver_kwargs:
+                raise ValueError("The exact solver does not take solver-specific arguments")
+            spin_solutions = _solve_ising_exact(ising_matrix)
         elif solver_name == "sa":
             sa_kwargs = dict(solver_kwargs)
             max_iter = int(sa_kwargs.pop("max_iter", 2000))

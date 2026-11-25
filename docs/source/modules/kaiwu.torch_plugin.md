@@ -19,6 +19,10 @@ spin objective `s.T @ M @ s` equals the QUBO objective up to an additive constan
 where `x = (s[:-1] * s[-1] + 1) / 2`. Both global spin gauges encode the same
 binary state. The local-search backend minimizes this positive objective.
 
+Use `solver="exact"` to obtain a reference for a QUBO with up to 16 binary
+variables. This backend enumerates the search space locally, so the result
+is useful for checking other solvers on small problems.
+
 Kaiwu SDK 1.3.1 evaluates its Hamiltonian as `-s.T @ J @ s`. MAIFS therefore
 submits `J = -(M + M.T) / 2` to SA and CIM. This preserves the QUBO energy
 differences and supplies the symmetric matrix required by SA's single-spin
