@@ -37,6 +37,11 @@ sampler = PrecisionReducer(
 )
 ```
 
+When sampler results are stored as unique states with occurrence counts,
+pass those counts as `negative_weights` to `objective`. Use
+`positive_weights` for counts in the observed data. Each phase computes
+its own weighted mean before the subtraction.
+
 ## A Minimal Training Iteration
 
 The loop mirrors the [Quick Start](../quickstart.md) example: positive phase from data, negative phase from `sample(sampler)`. Swap in `SimulatedAnnealingOptimizer()` to run the same loop locally.
