@@ -7,6 +7,12 @@
 
 Both scripts showcase the complete steps of model initialization, sampling, objective function calculation, gradient descent, and parameter updating. They can serve as quick-start references for working with Boltzmann Machine-related models.
 
+Run `python example/rbm_bars_and_stripes.py --seed 42` from the repository
+root after installing the plugin. This CPU example trains an RBM on synthetic
+binary bars and stripes using an enumerating sampler. It reports the exact
+probability mass on valid images and the mean negative log probability before
+and after training. Use `--side 3` for the larger pattern set.
+
 ---
 
 ### Q-Diffusion
