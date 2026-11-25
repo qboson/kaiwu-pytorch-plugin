@@ -24,7 +24,7 @@ These methods are practical, but they should not be confused with exact sampling
 
 ## The Quantum Alternative: Sampling by Physical Evolution
 
-Instead of simulating a Markov chain, the energy function is encoded into a physical quantum system that evolves toward its low-energy states. Devices such as quantum annealers and Coherent Ising Machines (CIMs) realize this: model variables are mapped to qubits or optical pulses, and measurements yield samples from a distribution approximating the Boltzmann distribution at the hardware's effective temperature:
+Physical Ising devices encode the energy function in hardware and return measured spin configurations. KPP decodes the spin solutions supplied by its configured optimizer into model states. Whether those solutions follow an effective-temperature Boltzmann distribution depends on the hardware and operating protocol. When this model is appropriate, the distribution has the following form.
 
 ```{math}
 :label: eq-effective-boltzmann
@@ -38,7 +38,7 @@ The main promises are:
 - **Direct physical sampling**: quantum tunneling may escape local minima more efficiently than thermal hopping.
 - **Inherent parallelism**: thousands of optical pulses interact simultaneously, versus sequential Gibbs updates.
 - **Hardware-scale sampling**: problem sizes that would be prohibitively slow to simulate classically.
-- **Avoiding CD bias**: near-equilibrium samples without data-dependent initialization, giving less biased gradient estimates.
+- **Reducing CD bias**: Samples validated against the target distribution can reduce the bias associated with short chains initialized at the data.
 
 ## From Boltzmann Machines to Ising Hamiltonians
 
@@ -67,6 +67,6 @@ quantum_sampler = CIMOptimizer(task_name="my_experiment", wait=True)
 
 - Sampling from the model distribution is the central computational bottleneck of Boltzmann machine training (Eq. {eq}`eq-nll-gradient`).
 - Classical MCMC suffers from slow mixing times, and practical approximations such as CD introduce bias and can cause mode collapse.
-- Quantum sampling encodes the energy as an Ising Hamiltonian and samples by physical evolution, promising better mixing, parallelism, and less bias.
+- Physical Ising sampling returns spin configurations. An effective-temperature Boltzmann model requires separate validation for the chosen hardware and operating protocol.
 - KPP converts model parameters into an Ising problem and connects classical and quantum backends through a unified sampling interface.
 - The next chapter establishes the classical baseline, [Simulated Annealing for Ising Models](simulated_annealing.md), before the quantum integration in [Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md).
