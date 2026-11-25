@@ -26,3 +26,9 @@ energy updates. CIM receives this conversion before precision adaptation and
 variable splitting, so splitting penalties retain their intended sign.
 Precision settings still control quantization; the conversion does not make a
 heuristic solver exact.
+
+For a loader ordered by class or time, pass `sample_seed=42` and a positive
+`max_samples` to `compute_mask_derivatives()` or `update_mask()`. This
+chooses a uniform subset across the complete loader while keeping at most the
+sample budget between batches. Repeating the same seed on the same row
+order selects the same observations across batch sizes.
