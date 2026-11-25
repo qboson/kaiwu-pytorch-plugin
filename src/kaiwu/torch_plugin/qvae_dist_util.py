@@ -227,9 +227,9 @@ class FactorialBernoulliUtil(DistUtil):
 class MixtureGeneric(FactorialBernoulliUtil):
     """Mixture distribution class.
 
-    Creates a mixture of two overlapping distributions by setting the logits of
-    the factorial Bernoulli distribution defined on the z component.
-    Can work with any smoothing distribution inheriting from SmoothingDist.
+    A factorial Bernoulli variable selects a truncated exponential density
+    on [0, 1] for z = 0 or its reflection for z = 1. The constructor creates
+    the exponential component using ``smoothing_dist_beta``.
     """
 
     num_param = 1
