@@ -9,6 +9,13 @@
    :show-inheritance:
 ```
 
+## Initializing Gaussian–Bernoulli RBMs
+
+Call `initialize_gaussian_from_data(training_rows)` to start with each
+Gaussian unit's empirical mean and population variance. Use the Gaussian
+partition in its model order. The variance floor keeps constant training
+features usable and the learned couplings can be initialized separately.
+
 ## MAIFS QUBO and SDK energy conventions
 
 `QuadraticLinearSolver.solve(Q, l)` represents the binary objective
