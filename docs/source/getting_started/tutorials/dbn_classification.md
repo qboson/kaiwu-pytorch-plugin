@@ -140,7 +140,7 @@ $$
 
   - `fine_tuning`：模式选择（默认 False）
   - `learning_rate`：微调学习率（默认 0.1）
-  - `n_iter_backprop`：反向传播迭代次数（默认 100）
+  - `n_iter_backprop`：微调训练轮数（默认 100），每轮遍历一次微调训练集。
   - `l2_regularization`：L2 正则化（默认 1e-4）
   - `activation_function`：激活函数（默认 `'sigmoid'`）
   - `dropout_p`：Dropout 概率（默认 0.0）

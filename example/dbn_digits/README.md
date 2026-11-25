@@ -56,7 +56,8 @@ batch_size                Batch size (default: 32; notebook demo: 64)
 fine_tuning               True: end-to-end fine-tuning mode;
                           False: classifier mode
 learning_rate             Fine-tuning learning rate (default: 0.1)
-n_iter_backprop           Fine-tuning iterations (default: 100)
+n_iter_backprop           Fine-tuning epochs (default: 100), one pass over
+                          the fine-tuning training set per epoch
 l2_regularization         L2 weight decay for fine-tuning (default: 1e-4)
 activation_function       sigmoid or relu (default: sigmoid)
 dropout_p                 Dropout probability (default: 0.0)
