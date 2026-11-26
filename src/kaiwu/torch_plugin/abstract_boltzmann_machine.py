@@ -42,10 +42,26 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             AbstractBoltzmannMachine: The moved module.
         """
         module = super()._apply(fn, recurse)
+        self._sync_device()
+        return module
+
+    def _load_from_state_dict(
+        self, state_dict, prefix, local_metadata, strict,
+        missing_keys, unexpected_keys, error_msgs,
+    ):
+        """Track parameter replacement when this machine is loaded by a parent."""
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs,
+        )
+        if local_metadata.get("assign_to_params_buffers", False):
+            self._sync_device()
+
+    def _sync_device(self):
+        """Refresh the cached device from the model parameters."""
         parameter = next(self.parameters(), None)
         if parameter is not None:
             self.device = parameter.device
-        return module
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
