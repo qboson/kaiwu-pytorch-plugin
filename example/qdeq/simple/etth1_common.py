@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
@@ -272,8 +273,17 @@ def build_config() -> QDEQConfig:
 
 
 @torch.no_grad()
-def evaluate(model: DEQForecaster, loader: DataLoader) -> dict[str, float]:
-    """Returns scaled-space MSE and MAE plus the mean forward solver steps."""
+def evaluate(
+    model: DEQForecaster,
+    loader: DataLoader,
+    *,
+    on_first_window: Callable[[torch.Tensor, torch.Tensor], None] | None = None,
+) -> dict[str, float]:
+    """Returns scaled-space MSE and MAE plus the mean forward solver steps.
+
+    If supplied, ``on_first_window`` receives the first scored forecast and its
+    target. The callback should treat the tensors as read-only.
+    """
     model.eval()
     squared, absolute, count, steps = 0.0, 0.0, 0, []
     for history, target in loader:
@@ -282,4 +292,7 @@ def evaluate(model: DEQForecaster, loader: DataLoader) -> dict[str, float]:
         absolute += torch.sum(torch.abs(forecast - target)).item()
         count += target.numel()
         steps.append(model.deq.get_last_stats()["forward_nstep"])
+        if on_first_window is not None:
+            on_first_window(forecast[0], target[0])
+            on_first_window = None
     return {"mse": squared / count, "mae": absolute / count, "steps": float(np.mean(steps))}

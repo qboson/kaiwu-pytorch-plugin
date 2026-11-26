@@ -41,17 +41,22 @@ def main() -> None:
     model = DEQForecaster(96, 96, sampler, build_config())
     model.load_state_dict(torch.load(args.checkpoint)["state_dict"])
 
-    test = evaluate(model, loaders["test"])
+    preview = None
+
+    def save_preview(forecast: torch.Tensor, target: torch.Tensor) -> None:
+        nonlocal preview
+        preview = (forecast[:8, -1].tolist(), target[:8, -1].tolist())
+
+    test = evaluate(model, loaders["test"], on_first_window=save_preview)
     print(
         f"{args.sampler}: test mse {test['mse']:.4f} mae {test['mae']:.4f} "
         f"(mean forward steps {test['steps']:.1f})"
     )
-    history, target = next(iter(loaders["test"]))
-    with torch.no_grad():
-        forecast = model(history[:1])
-    print("first test window, variable OT, next 8 hours (scaled):")
-    print("  forecast", [round(v, 3) for v in forecast[0, :8, -1].tolist()])
-    print("  actual  ", [round(v, 3) for v in target[0, :8, -1].tolist()])
+    if preview is not None:
+        forecast, target = preview
+        print("first test window, variable OT, next 8 hours (scaled):")
+        print("  forecast", [round(v, 3) for v in forecast])
+        print("  actual  ", [round(v, 3) for v in target])
 
 
 if __name__ == "__main__":
