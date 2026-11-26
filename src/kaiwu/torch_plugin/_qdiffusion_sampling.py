@@ -66,6 +66,8 @@ def topk_masking(
 def sample_from_categorical(
     logits: torch.Tensor,
     temperature: float = 1.0,
+    *,
+    editable_token_mask: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Samples tokens from categorical logits.
 
@@ -73,6 +75,8 @@ def sample_from_categorical(
         logits: Unnormalized categorical logits.
         temperature: Sampling temperature. A falsy value switches to greedy
             argmax decoding.
+        editable_token_mask: Positions whose logits supply a proposal. Samples
+            and scores outside this mask are placeholders for the caller.
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
@@ -80,7 +84,14 @@ def sample_from_categorical(
         the associated log-probability-style scores.
     """
     if temperature:
-        dist = torch.distributions.Categorical(logits=logits.div(temperature))
+        logits = logits.div(temperature)
+    if editable_token_mask is not None:
+        # Keep the sampling shape and random draws while isolating fixed logits.
+        logits = logits.masked_fill(~editable_token_mask.unsqueeze(-1), 0.0)
+        if not logits.amax(dim=-1).isfinite().all():
+            raise ValueError("Every editable proposal position needs a finite maximum logit.")
+    if temperature:
+        dist = torch.distributions.Categorical(logits=logits)
         tokens = dist.sample()
         scores = dist.log_prob(tokens)
     else:
@@ -92,6 +103,8 @@ def stochastic_sample_from_categorical(
     logits: torch.Tensor,
     temperature: float = 1.0,
     noise_scale: float = 1.0,
+    *,
+    editable_token_mask: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Applies Gumbel noise before categorical sampling.
 
@@ -100,6 +113,7 @@ def stochastic_sample_from_categorical(
         temperature: Sampling temperature forwarded to
             :func:`sample_from_categorical`.
         noise_scale: Multiplicative scale for the sampled Gumbel noise.
+        editable_token_mask: Positions whose logits supply a proposal.
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
@@ -107,7 +121,9 @@ def stochastic_sample_from_categorical(
     """
     gumbel_noise = -torch.log(-torch.log(torch.rand_like(logits) + 1e-8) + 1e-8)
     noisy_logits = logits + noise_scale * gumbel_noise
-    return sample_from_categorical(noisy_logits, temperature)
+    return sample_from_categorical(
+        noisy_logits, temperature, editable_token_mask=editable_token_mask,
+    )
 
 
 def stochastic_sample_from_categorical_n(
@@ -115,6 +131,8 @@ def stochastic_sample_from_categorical_n(
     temperature: float = 1.0,
     noise_scale: float = 1.0,
     n: int = 1,
+    *,
+    editable_token_mask: torch.Tensor | None = None,
 ) -> tuple[torch.Tensor, torch.Tensor]:
     """Samples multiple noisy categorical candidates.
 
@@ -125,6 +143,7 @@ def stochastic_sample_from_categorical_n(
             :func:`sample_from_categorical`.
         noise_scale: Multiplicative scale for the sampled Gumbel noise.
         n: Number of independent noisy candidate sets to draw.
+        editable_token_mask: Positions whose logits supply a proposal.
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
@@ -135,7 +154,9 @@ def stochastic_sample_from_categorical_n(
         -torch.log(torch.rand_like(expanded_logits) + 1e-8) + 1e-8
     )
     noisy_logits = expanded_logits + noise_scale * gumbel_noise
-    return sample_from_categorical(noisy_logits, temperature)
+    return sample_from_categorical(
+        noisy_logits, temperature, editable_token_mask=editable_token_mask,
+    )
 
 
 # Logit filtering helpers.
