@@ -65,6 +65,8 @@ The Q-ELBO still provides the reconstruction loss and KL divergence; the free-en
 
 ## Quick Start
 
+The commands in this section use the example checkout from [PR #169](https://github.com/qboson/kaiwu-pytorch-plugin/pull/169).
+
 The steps below are the two command-line entry points of `example/qvae_anomaly`; `qvae_anomaly_demo.ipynb` provides the interactive equivalent, and `run_public_ad.sh` runs both steps in one command.
 
 **1. Train.** `train_public_ad.py` trains `CleanEnergyQVAE` with the energy-supervised loss on a public anomaly benchmark. `--dataset` selects the tabular benchmark (e.g., `thyroid`, `creditcard`); `--lambda-anom` sets the weight of the anomaly energy term relative to the Q-ELBO objective.
