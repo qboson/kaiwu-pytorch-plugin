@@ -375,13 +375,11 @@ class QDiffusion(nn.Module):
 
         with torch.no_grad():
             logits = self.forward(noisy_tokens).detach()
-
+        editable_mask = self.get_non_special_symbol_mask(noisy_tokens)
         negative_tokens, _ = self._sample_candidates(
-            self._mask_logits(logits), self.config.num_candidates
+            self._mask_logits(logits), self.config.num_candidates, editable_mask=editable_mask,
         )
-        negative_tokens = restore_candidate_context(
-            noisy_tokens, negative_tokens, self.get_non_special_symbol_mask(noisy_tokens)
-        )
+        negative_tokens = restore_candidate_context(noisy_tokens, negative_tokens, editable_mask)
         positive_energy = self.energy(noisy_tokens, target, target.ne(self.pad_id))
         positive_stats = self._collect_energy_model_stats()
         negative_energy = self._score_candidates(noisy_tokens, negative_tokens).mean(
@@ -718,13 +716,14 @@ class QDiffusion(nn.Module):
         raise ValueError(f"Unexpected candidate tensor shape {tuple(tensor.shape)}.")
 
     def _sample_candidates(
-        self, logits: torch.Tensor, num_candidates: int
+        self, logits: torch.Tensor, num_candidates: int, editable_mask: torch.Tensor | None = None
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Samples proposal candidates from logits.
 
         Args:
             logits: Proposal logits for the current decode step.
             num_candidates: Number of candidates to sample per sequence.
+            editable_mask: Positions whose logits supply a proposal.
 
         Returns:
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)`` shaped as
@@ -734,7 +733,7 @@ class QDiffusion(nn.Module):
             logits,
             temperature=self.config.proposal_temperature,
             noise_scale=self.config.proposal_noise_scale,
-            n=num_candidates,
+            n=num_candidates, editable_token_mask=editable_mask,
         )
         batch_size = logits.size(0)
         return (
@@ -851,9 +850,10 @@ class QDiffusion(nn.Module):
         resample_scores = torch.stack(resample_scores, dim=0).type_as(scores)
         resample_masks = torch.stack(resample_masks, dim=0).bool()
         logits = self._mask_logits(self.forward(resample_input))
+        logits.masked_fill_(~resample_masks.unsqueeze(-1), 0.0)
         logits = top_k_top_p_filtering(logits, top_p=self.config.resample_top_p)
         new_tokens, new_scores = stochastic_sample_from_categorical(
-            logits, temperature=0.0
+            logits, temperature=0.0, editable_token_mask=resample_masks,
         )
         resample_input.masked_scatter_(resample_masks, new_tokens[resample_masks])
         resample_scores.masked_scatter_(resample_masks, new_scores[resample_masks])
@@ -883,7 +883,7 @@ class QDiffusion(nn.Module):
             logits = logits.type_as(output_scores)
 
         candidate_tokens, candidate_scores = self._sample_candidates(
-            logits, self.config.num_candidates
+            logits, self.config.num_candidates, editable_mask=output_masks,
         )
         candidate_tokens = restore_candidate_context(
             output_tokens, candidate_tokens, output_masks
