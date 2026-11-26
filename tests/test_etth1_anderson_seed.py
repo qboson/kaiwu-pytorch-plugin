@@ -23,11 +23,18 @@ def anderson_deq():
 
 @pytest.mark.parametrize("stop_mode", ["abs", "rel"])
 def test_anderson_keeps_seed_when_acceleration_increases_residual(anderson_deq, stop_mode):
-    solver = anderson_deq(torch.nn.Identity(), QDEQConfig(f_thres=3, stop_mode=stop_mode))
+    config = QDEQConfig(f_thres=3, stop_mode=stop_mode, anderson_lam=1e-4)
+    solver = anderson_deq(torch.nn.Identity(), config)
     initial = torch.zeros((1, 1), dtype=torch.float64)
+    evaluations = 0
 
     def fixed_point_map(guess):
+        nonlocal evaluations
+        evaluations += 1
         return 0.9 * torch.tanh(guess) + 0.5
+
+    result, stats = solver.solve_fixed_point(fixed_point_map, initial)
+    assert evaluations == 3
 
     # The second seed is closer than the first. The only accelerated update
     # overshoots both, even though the fixed-point map is contractive.
@@ -36,8 +43,6 @@ def test_anderson_keeps_seed_when_acceleration_increases_residual(anderson_deq, 
     expected_residual = (seed_image - better_seed).norm().item()
     if stop_mode == "rel":
         expected_residual /= seed_image.norm().item() + 1e-9
-
-    result, stats = solver.solve_fixed_point(fixed_point_map, initial)
 
     torch.testing.assert_close(result, better_seed)
     assert stats["residual"] == pytest.approx(expected_residual)
