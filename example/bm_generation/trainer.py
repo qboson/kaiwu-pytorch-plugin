@@ -166,6 +166,9 @@ class Trainer:
             max_steps (int): 最大训练步数。
             save_path (str): 模型和日志的保存路径。
             num_processes (int): 并行采样的进程数。默认为 1。
+
+        Raises:
+            ValueError: 未达到最大训练步数时，数据源的单次遍历未产出任何批次。
         """
         optimizer = torch.optim.Adam(
             self.bm_net.parameters(),
@@ -187,10 +190,8 @@ class Trainer:
         pool = mp.Pool(processes=num_processes)
 
         while step < max_steps:
+            epoch_start_step = step
             for batch_data in self.data:
-                if step >= max_steps:
-                    break
-
                 optimizer.zero_grad()
                 step += 1
 
@@ -270,6 +271,15 @@ class Trainer:
                 if step % 10 == 0:
                     t_now = time.time()
                     self.saver.save_info(self.bm_net, save_path, step, t_now - t_start)
+                if step >= max_steps:
+                    break
+
+            if step == epoch_start_step:
+                pool.close()
+                pool.join()
+                raise ValueError(
+                    "Training data yielded no batches before reaching max_steps."
+                )
 
         pool.close()
         pool.join()
