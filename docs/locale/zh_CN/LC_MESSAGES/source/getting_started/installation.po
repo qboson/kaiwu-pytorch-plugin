@@ -321,19 +321,21 @@ msgid ""
 "SDK wheel from the QBoson platform:"
 msgstr "如果您需要特定版本或有网络限制，请从 QBoson 平台下载 SDK wheel："
 
-#: ../../source/getting_started/installation.md:190
-msgid "Visit the <u>Kaiwu SDK download page</u> on the QBoson platform"
-msgstr "访问 QBoson 平台上的 <u>Kaiwu SDK 下载页面</u>"
+#: ../../source/getting_started/installation.md:210
+msgid ""
+"Visit the [Kaiwu SDK download page]"
+"(https://platform.qboson.com/sdkDownload) on the QBoson platform"
+msgstr ""
+"访问 QBoson 平台上的 [Kaiwu SDK 下载页面]"
+"(https://platform.qboson.com/sdkDownload)"
 
 #: ../../source/getting_started/installation.md:191
-msgid ""
-"Download the wheel package suitable for your system (e.g., "
-"`kaiwu-1.3.1-py3-none-any.whl`)"
-msgstr "下载适合您系统的 wheel 包（例如 `kaiwu-1.3.1-py3-none-any.whl`）"
+msgid "Download the wheel that matches your Python version and platform."
+msgstr "下载与 Python 版本和平台匹配的 wheel。"
 
 #: ../../source/getting_started/installation.md:192
-msgid "Install the wheel:"
-msgstr "安装 wheel："
+msgid "Replace the path below with the downloaded wheel’s actual path and filename:"
+msgstr "将下方的路径替换为下载的 wheel 的实际路径和文件名："
 
 #: ../../source/getting_started/installation.md:198
 msgid "Step 2: Set Environment Variables"
