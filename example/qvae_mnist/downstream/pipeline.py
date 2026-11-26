@@ -10,6 +10,7 @@ from datetime import datetime
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from sklearn.base import BaseEstimator
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
@@ -42,7 +43,7 @@ def get_full_pipeline(config):
     clf = MLPClassifier(save_path=config.output_dir, **classifier_kwargs)
     return Pipeline([('qvae', qvae_transformer), ('classifier', clf)])
 
-class PipelineTransformer:
+class PipelineTransformer(BaseEstimator):
     """
     A transformer that trains a QVAE and extracts features using the trained model.
 
@@ -82,14 +83,21 @@ class PipelineTransformer:
         # y_val = np.zeros(len(X_val), dtype=int)
 
         # Create Trainer with config - now passing config directly
-        self.trainer = Trainer(
+        trainer = Trainer(
             config=self.config,
             custom_train_data=(X_train, y_train),
             custom_test_data=(X_val, y_val)
         )
-        # Train QVAE
-        self.model, _, _ = self.trainer.train(run_tsne=self.config.run_tsne, compute_energy=self.config.compute_energy)
+        self.model, _, _ = trainer.train(
+            run_tsne=self.config.run_tsne,
+            compute_energy=self.config.compute_energy,
+        )
+        self.trainer = trainer
         return self
+
+    def __sklearn_is_fitted__(self):
+        """Return whether QVAE training completed."""
+        return self.model is not None
 
     def transform(self, X):
         """
