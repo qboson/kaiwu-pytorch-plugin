@@ -17,11 +17,22 @@ Before installation, ensure your system meets the following requirements:
 | Dependency | Required Version | Role |
 |------------|-----------------|------|
 | Python | 3.10 | Base runtime (tested against 3.10 specifically) |
-| PyTorch | 2.7 | Tensor operations & automatic differentiation |
+| PyTorch | 2.3–2.14 | Tensor operations & automatic differentiation |
 | NumPy | 2.2.6 | Linear algebra & SDK interfacing |
 | Kaiwu SDK | 1.3.1–1.4.3 | Ising optimization backend (classical SA + quantum CIM) |
 
-> **Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK releases 1.3.1 through 1.4.3 are supported; a fresh installation selects 1.4.3.
+> **Note:** PyTorch is accepted in the range 2.3–2.14 (`torch>=2.3,<2.15` in `requirements/requirements.txt`); a fresh installation selects the newest matching release. NumPy is pinned at 2.2.6 by the Kaiwu SDK. Kaiwu SDK releases 1.3.1 through 1.4.3 are supported; a fresh installation selects 1.4.3.
+
+### PyTorch compatibility
+
+Any torch from 2.3 through 2.14 works with the plugin, and CI checks 2.3, 2.7,
+and 2.14 on Python 3.10. The upper bound is a packaging constraint rather than
+a plugin limitation: torch 2.15.0 no longer publishes cp310 wheels, while the
+Kaiwu SDK installs only on Python 3.10. The lower bound follows from the NumPy
+pairing — torch 2.3.1 is the first release compatible with the numpy 2.x wheels
+the SDK pins. Example code that loads checkpoints passes `weights_only`
+explicitly to `torch.load`, so checkpoints behave identically across the whole
+range (the default flipped in torch 2.6).
 
 ### Kaiwu SDK compatibility
 

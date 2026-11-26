@@ -1,6 +1,8 @@
 scikit-learn
 matplotlib
 scipy
-torchvision==0.22.0
+# torchvision minors pair one-to-one with torch minors:
+# 0.18 -> torch 2.3 ... 0.22 -> torch 2.7 ... 0.23 -> torch 2.14
+torchvision>=0.18,<0.24
 torchmetrics[image]
 seaborn

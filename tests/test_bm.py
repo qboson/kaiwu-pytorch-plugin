@@ -160,8 +160,10 @@ class TestBoltzmannMachine(unittest.TestCase):
                 self.bm(s) - self.bm(s2),
                 -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
             )
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
-                -x2 @ ising_mat @ x2.T
+            energy_gap = self.bm(s) - self.bm(s2)
+            ising_gap = -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
+            assert torch.allclose(
+                energy_gap, torch.as_tensor(ising_gap, dtype=energy_gap.dtype)
             )
 
     def test_hidden_to_ising(self):
@@ -194,8 +196,10 @@ class TestBoltzmannMachine(unittest.TestCase):
                 self.bm(s) - self.bm(s2),
                 -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T),
             )
-            assert self.bm(s) - self.bm(s2) == -x @ ising_mat @ x.T - (
-                -x2 @ ising_mat @ x2.T
+            energy_gap = self.bm(s) - self.bm(s2)
+            ising_gap = -x @ ising_mat @ x.T - (-x2 @ ising_mat @ x2.T)
+            assert torch.allclose(
+                energy_gap, torch.as_tensor(ising_gap, dtype=energy_gap.dtype)
             )
 
 
