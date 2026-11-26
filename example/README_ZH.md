@@ -150,3 +150,27 @@ scgraph
 ```
 pandas
 ```
+
+---
+
+### 组合优化任务：量子启发式金融投资组合优化
+
+该示例演示如何基于 `kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix` 与 `RestrictedBoltzmannMachine` 实现带基数约束的 Markowitz 均值-方差投资组合优化与 RBM 市场情景协方差增强，并在严格按时间顺序切分（零未来函数泄漏）的样本外窗口上进行定量评测。
+
+* **零未来函数数据管线**：内置确定性多行业牛熊机制收益生成器（离线零下载一键可跑）与可选本地 CSV 收益/价格加载器，严格按时间划分训练期与样本外测试期。
+* **精确 QUBO/Ising 映射与 RBM 情景增强**：将均值-方差与基数惩罚 $\lambda(\sum_i x_i - K)^2$ 转为等价 Ising 哈密顿量（误差 `< 1e-14`），统一支持 `local_sa`（离线免授权）、Kaiwu `sa` 与光量子 `cim` 后端，并结合 RBM 生成联合市场状态增强协方差估计。
+* **精确最优性间隙评测**：统一对比 Equal-Weight (`1/N`)、Greedy Top-K Sharpe、Exact Brute-Force 精确最优解、QUBO-Ising 与 QUBO-Ising + RBM 的年化收益、波动率、夏普比率、最大回撤、基数可行性与最优性间隙。
+
+运行方式：
+
+```bash
+python example/financial_portfolio/run_portfolio.py
+```
+
+详细说明请参见 [example/financial_portfolio/README_ZH.md](financial_portfolio/README_ZH.md)。
+
+**依赖项**
+
+```
+仅依赖插件核心库（torch、numpy、kaiwu）
+```
