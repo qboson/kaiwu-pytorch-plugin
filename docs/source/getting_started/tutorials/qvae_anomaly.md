@@ -13,6 +13,8 @@ By the end of this case study you will be able to:
 
 ## Running the Example
 
+The runnable example is under review in [PR #169](https://github.com/qboson/kaiwu-pytorch-plugin/pull/169). Use the example checkout from that PR for the commands below.
+
 **Dependencies**:
 
 ```{code-block} bash
@@ -86,9 +88,7 @@ The result is the anomaly-detection report: a clear low/high free-energy separat
 The `CleanEnergyQVAE` model combines a standard Q-VAE with an RBM free-energy
 scoring head:
 
-```{literalinclude} ../../../../example/qvae_anomaly/model/model.py
-:pyobject: CleanEnergyQVAE
-```
+View the [CleanEnergyQVAE model source](https://github.com/cwu137/kaiwu-pytorch-plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/model/model.py).
 
 Key model details:
 - Encoder/Decoder: `CleanEncoder` / `CleanDecoder` — standard Q-VAE architecture
@@ -101,9 +101,7 @@ Key model details:
 The `losses.py` implements energy-supervised loss to separate normal from
 anomalous samples:
 
-```{literalinclude} ../../../../example/qvae_anomaly/model/losses.py
-:pyobject: _compose_energy_supervised_qvae_loss_terms
-```
+View the [energy-supervised loss source](https://github.com/cwu137/kaiwu-pytorch-plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/model/losses.py).
 
 Key loss details:
 - Normal samples: pulled toward QBM prior (low free energy)
@@ -115,9 +113,7 @@ Key loss details:
 The `optimize_threshold_rbm` function implements best-F1 threshold search
 over a candidate grid:
 
-```{literalinclude} ../../../../example/qvae_anomaly/utils/evaluate.py
-:pyobject: optimize_threshold_rbm
-```
+View the [threshold search and evaluation source](https://github.com/cwu137/kaiwu-pytorch-plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/utils/evaluate.py).
 
 ## Training and Evaluation
 
