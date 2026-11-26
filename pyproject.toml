@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
@@ -7,7 +7,8 @@ build-backend = "setuptools.build_meta"
 name = "kaiwu-torch-plugin"
 description = "A PyTorch plugin for training and evaluating Restricted Boltzmann Machines (RBM) and Boltzmann Machines (BM) with quantum computing support"
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 
 
 authors = [
