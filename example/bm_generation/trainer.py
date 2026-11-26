@@ -47,10 +47,13 @@ def process_solve_graph_worker(params):
     """子进程执行的具体采样逻辑。
 
     Args:
-        params (tuple): 包含共享模型、采样器、可见层数据分片、输出维度、起始索引的元组。
+        params (tuple): 四元组 (bm_shared, sampler, s_visible_chunk, num_output)，
+            依次为共享模型、采样器、可见层数据分片和末尾的输出列数。
 
     Returns:
-        tuple: (state_v_chunk, state_vi_chunk) 采样后的张量结果。
+        tuple: (state_v_chunk, state_vi_chunk)。两个张量均包含模型的全部节点列，
+        每个条件输入行可对应多个采样结果。state_v_chunk 以全部可见列为条件；
+        当 num_output > 0 时，state_vi_chunk 仅以去掉末尾输出列后的输入列为条件。
     """
     bm_shared, sampler, s_visible_chunk, num_output = params
     kw.common.set_log_level("ERROR")
