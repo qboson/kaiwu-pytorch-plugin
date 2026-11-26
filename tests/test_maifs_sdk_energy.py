@@ -129,6 +129,49 @@ def test_public_symbolic_conversion_keeps_its_positive_upper_triangular_conventi
         qubo.QuadraticLinearSolver.qubo_matrix_to_ising_matrix(upper), matrix)
 
 
+@pytest.mark.parametrize("sign", (-1.0, 1.0))
+def test_qubo_conversion_accepts_extreme_finite_quadratic_coefficients(sign):
+    largest = sign * np.finfo(np.float64).max
+    quadratic = np.array([[largest, largest], [largest / 2, 0.0]])
+    pair = 0.1875 * largest
+    expected = np.array([[0.0, pair, largest / 4 + pair],
+                         [0.0, 0.0, pair],
+                         [0.0, 0.0, 0.0]])
+
+    with np.errstate(over="raise"):
+        result = qubo.QuadraticLinearSolver().solve(quadratic, np.zeros(2))
+
+    np.testing.assert_array_equal(result, expected)
+
+
+def test_sdk_matrix_conversion_preserves_large_and_subnormal_entries():
+    largest = np.finfo(np.float64).max
+    smallest = np.nextafter(0.0, 1.0)
+    matrix = np.array([[largest, largest, largest, 2.0],
+                       [largest / 2, -largest, -2.0, smallest],
+                       [-largest, 6.0, 0.0, 0.0],
+                       [6.0, smallest, 0.0, smallest]])
+    expected = np.array([[-largest, -0.75 * largest, 0.0, -4.0],
+                         [-0.75 * largest, largest, -2.0, -smallest],
+                         [0.0, -2.0, 0.0, 0.0],
+                         [-4.0, -smallest, 0.0, -smallest]])
+
+    with np.errstate(over="raise"):
+        result = qubo._to_kaiwu_ising_matrix(matrix)
+
+    np.testing.assert_array_equal(result, expected)
+
+
+@pytest.mark.parametrize("invalid", (np.nan, np.inf, -np.inf))
+def test_qubo_conversion_still_rejects_nonfinite_terms(invalid):
+    solver = qubo.QuadraticLinearSolver()
+
+    with pytest.raises(ValueError, match="must contain only finite values"):
+        solver.solve(np.array([[invalid]]), np.zeros(1))
+    with pytest.raises(ValueError, match="must contain only finite values"):
+        solver.solve(np.zeros((1, 1)), np.array([invalid]))
+
+
 @pytest.mark.parametrize("coefficients, linear", MATH_CASES)
 def test_sa_submission_sdk_energy_matches_original_qubo_for_all_states_and_gauges(
     offline_sa, coefficients, linear

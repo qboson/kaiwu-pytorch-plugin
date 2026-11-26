@@ -416,6 +416,18 @@ def _restore_kaiwu_split_solution(
     return restore_without_vote(solution, last_var_idx)
 
 
+def _symmetric_mean(matrix: np.ndarray) -> np.ndarray:
+    """Average a float64 matrix with its transpose without losing subnormals."""
+    with np.errstate(over="ignore"):
+        mean = matrix + matrix.T
+    overflowed = np.isinf(mean)
+    mean *= 0.5
+    if overflowed.any():
+        # Halve before adding only where the original sum could not fit.
+        mean[overflowed] = 0.5 * matrix[overflowed] + 0.5 * matrix.T[overflowed]
+    return mean
+
+
 class QuadraticLinearSolver:
     """Convert QUBO quadratic and linear terms to an Ising matrix."""
 
@@ -498,7 +510,7 @@ class QuadraticLinearSolver:
                 "quadratic_matrix and linear_vector must contain only finite values"
             )
 
-        symmetric_quadratic = 0.5 * (quadratic_matrix + quadratic_matrix.T)
+        symmetric_quadratic = _symmetric_mean(quadratic_matrix)
         qubo_matrix = np.triu(symmetric_quadratic, 1)
         np.fill_diagonal(
             qubo_matrix,
@@ -510,7 +522,7 @@ class QuadraticLinearSolver:
 def _to_kaiwu_ising_matrix(ising_matrix: np.ndarray) -> np.ndarray:
     """Map the positive spin objective to the SDK's symmetric negative Hamiltonian."""
     matrix = np.asarray(ising_matrix, dtype=float)
-    return -(matrix + matrix.T) / 2
+    return -_symmetric_mean(matrix)
 
 
 def _solve_ising_local_search(
