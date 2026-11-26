@@ -9,6 +9,12 @@
 
 ---
 
+### 深度玻尔兹曼机（DBM）
+
+`example/dbm/run_dbm.py` 演示如何使用 `DeepBoltzmannMachine` 配合变分均值场正相推断与多层联合 Ising 采样（本地 SA、Kaiwu SA 或 CIM）完成多模态二值模式学习与去噪重建，无需额外依赖即可在 CPU 离线快速运行。详细说明请参见 [example/dbm/README_ZH.md](dbm/README_ZH.md)。
+
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` 现在分为：
