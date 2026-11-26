@@ -9,6 +9,12 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 ---
 
+### Conditional Restricted Boltzmann Machine (CRBM)
+
+`example/crbm/run_crbm.py` demonstrates conditional binary pattern generation and completion using `ConditionalRestrictedBoltzmannMachine` with Kaiwu simulated annealing (or CIM). It runs completely offline on CPU with no extra dependencies. See [example/crbm/README.md](crbm/README.md) for details.
+
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:
