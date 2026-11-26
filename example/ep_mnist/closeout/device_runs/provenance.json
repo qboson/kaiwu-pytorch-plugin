@@ -1,0 +1,44 @@
+{
+  "source_snapshot_sha256": {
+    "gpu_run_device.py": "7997885f36f13aed064e2eef28712aed5284e673f5f43f29d4b6308b1214b520",
+    "train_mnist_before_device.py": "efbd6c159096a6e018b683d78d214ce9f45453d9a051547d4382d86da805317b",
+    "train_mnist_cpu_full.py": "79cc44d0c5edb75bc5ca0b26eddcbfd773250fd87bb18c8e61feb9945e3f468d",
+    "device_timing_cpu_full.py": "e470f53e57e01ccaba4e12e3b4d51607c4159684e56f9b1efca86bdbccfccb7e",
+    "run_experiments_before_device.py": "e73eff43468928abf9bf4dd58bc87cd33a134e44700dc10e2b0e16f014c478d6"
+  },
+  "runs": {
+    "ep-full-cuda": {
+      "summary.json": "3271af3e718ae156b07bd7365da84ac47f56a88876d619eb47257efc5366385e",
+      "device_report.json": "13c96af16dd59595d0ea175860cd4840f70cc32fd07b5ba6adcfcbe4030ebe79"
+    },
+    "bp-full-cpu": {
+      "summary.json": "c4140389298006315cfd9649072e29ce09ce4d07fdc47a3decb2105debcd0ef7",
+      "device_report.json": "022739d4e17fc676113f57d115ca00f15e5a1670555b2f7d8708f2f42d264422"
+    },
+    "bp-full-cuda": {
+      "summary.json": "ca32c2be4365f7ea21c33be5fe5a29e97cd236d79e7e3ce9a7c0fbcd4c3ef538",
+      "device_report.json": "11e2055dd4d929611e2f14aa76a922ca11c91051599b1dd9a74aa7f953a1cfb6"
+    },
+    "ep-full-cpu": {
+      "summary.json": "c6f951b0070f191be6e737a3441e9d0e2f33d27c6c74b9415ce4df2aa182e35b"
+    }
+  },
+  "published_sha256": {
+    "bp-full-cpu/device_report.json": "c683535b27fa8bd8b95c1bf2940436d43b91a042ee8cfe1179e7acac371c6ed5",
+    "bp-full-cpu/summary.json": "c4140389298006315cfd9649072e29ce09ce4d07fdc47a3decb2105debcd0ef7",
+    "bp-full-cuda/device_report.json": "1e91b36c63d36ac5685887b235432f54ea2cb2a205c24fabe7d340696d92f6da",
+    "bp-full-cuda/summary.json": "ca32c2be4365f7ea21c33be5fe5a29e97cd236d79e7e3ce9a7c0fbcd4c3ef538",
+    "ep-full-cpu/device_report.json": "dd97e463c8afafad767ef18ae48911560b5baf2d6a106051d17b68ca15e05aaf",
+    "ep-full-cpu/summary.json": "c6f951b0070f191be6e737a3441e9d0e2f33d27c6c74b9415ce4df2aa182e35b",
+    "ep-full-cuda/device_report.json": "a6e7d9bbf0e888f4d1d68ecb29079f03524b040d6f2d9af1b1be7c75f848b52f",
+    "ep-full-cuda/summary.json": "3271af3e718ae156b07bd7365da84ac47f56a88876d619eb47257efc5366385e",
+    "comparison.json": "ab1a6a8ee00bd81f55702693272a58a94495d3e77103db27cb97a62913fef4e5",
+    "comparison.csv": "49ffd3531f94b4e01843da6a24b0ae7b649cb306fd462ba938c4b24cd6f1b4e2",
+    "validation_main_candidate.json": "7dffb4e8f80baeb095ec88c451c30c5138e2baa7cce91cbc6ca46558a28212ab",
+    "validation.json": "0601570bdb1f848332c0bcd6370f0f35f227e5a3701d7eae8f4f01d40d6286bb"
+  },
+  "historical_source_mapping": {
+    "example/ep_mnist/train_mnist.py": "../source_snapshots/train_mnist_before_device.py",
+    "example/ep_mnist/closeout/run_experiments.py": "../source_snapshots/run_experiments_before_device.py"
+  }
+}

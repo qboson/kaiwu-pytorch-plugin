@@ -1,0 +1,44 @@
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Equilibrium propagation on MNIST"
+msgstr "MNIST 上的均衡传播"
+
+msgid "Training setup"
+msgstr "训练配置"
+
+msgid "This example trains a 784-128-10 network with EPLinear layers and discrete spins. Kaiwu simulated annealing solves the free and nudged phases; PyTorch differentiates their energy difference to update the parameters."
+msgstr "本示例使用 EPLinear 层和离散自旋训练 784-128-10 网络。Kaiwu 模拟退火求解自由相与微扰相，PyTorch 对两相能量差求导并更新参数。"
+
+msgid "Use Python 3.10.11, Kaiwu 1.3.1, PyTorch 2.7.0 and torchvision 0.22.0. Initialize the local SDK license if required. Run the following command from the repository root, using a fresh output directory and an existing MNIST data directory."
+msgstr "使用 Python 3.10.11、Kaiwu 1.3.1、PyTorch 2.7.0 和 torchvision 0.22.0。若 SDK 要求授权，请先初始化本地授权。从仓库根目录执行以下命令，使用新的输出目录和已有的 MNIST 数据目录。"
+
+msgid "The official MNIST dataset contains 60,000 training and 10,000 test images. The project reserves 5,000 of the training images for validation, leaving 55,000 for training. Training and split seeds are both 0. SGD uses learning rate 0.05 and batch size 20; beta is 2 and the first-layer initialization scale is 2. The annealer uses initial temperature 10, alpha 0.9, cutoff 0.01, 50 iterations per temperature and four candidates."
+msgstr "官方 MNIST 提供 60,000 张训练图和 10,000 张测试图。项目从训练部分留出 5,000 张验证图，剩余 55,000 张用于训练。训练与划分种子均为 0。SGD 学习率为 0.05，批大小为 20；beta 为 2，第一层初始化缩放为 2。退火初始温度为 10，alpha 为 0.9，截止温度为 0.01，每温度迭代 50 次，候选数为 4。"
+
+msgid "Completed results"
+msgstr "已完成的训练结果"
+
+msgid "After three epochs, EP reaches 90.06% training, 89.54% validation and 90.30% test accuracy. The test set is evaluated only after the final epoch. These are single-seed results. The historical one-epoch linear result is 88.72%; the historical one-epoch convolutional result remains 71.55%."
+msgstr "三轮结束后，EP 的训练、验证、测试准确率分别为 90.06%、89.54%、90.30%。测试集只在最后一轮结束后评估。这些是单种子结果。历史一轮全连接结果为 88.72%，历史一轮卷积结果仍为 71.55%。"
+
+msgid "The BP comparison reaches 96.20% test accuracy with the same split, seed, layer widths, batch size, learning rate and epoch count. BP uses ReLU, cross entropy and default PyTorch initialization, whereas EP uses discrete spins and its own initialization. The accuracy gap is 5.90 percentage points."
+msgstr "BP 对照在相同划分、种子、层宽、批大小、学习率和轮数下达到 96.20% 测试准确率。BP 使用 ReLU、交叉熵和 PyTorch 默认初始化，EP 使用离散自旋及自身的初始化方式。准确率差距为 5.90 个百分点。"
+
+msgid "Training curves and interpretation"
+msgstr "训练曲线与解释"
+
+msgid "The curves show training and validation classification error, equal to one minus accuracy. No per-epoch test curve is available. The EP energy-difference objective can be negative and is not comparable in magnitude to BP cross entropy."
+msgstr "曲线展示训练和验证分类错误率，即 1 减准确率，没有逐轮测试曲线。EP 能量差目标可以为负值，其数值大小不能与 BP 交叉熵直接比较。"
+
+msgid "EP averages 10,422.09 seconds per training epoch and 5,653.59 seconds for train/validation evaluation; BP averages 5.16 and 2.72 seconds. Final test time is separate. These measured wall times describe the recorded environment, not a general performance guarantee."
+msgstr "EP 平均每轮训练耗时 10,422.09 秒，训练集与验证集评估耗时 5,653.59 秒；BP 分别为 5.16 秒和 2.72 秒。最终测试耗时另计。这些实测墙钟耗时仅描述记录环境，不代表通用性能保证。"
+
+msgid "The beta and annealing-budget comparisons use 2,000 training and 1,000 validation images, three epochs and seeds 0/1/2. They are validation-only experiments, not additional full-MNIST test results."
+msgstr "beta 与退火预算对照使用 2,000 张训练图、1,000 张验证图、三轮训练及种子 0/1/2。这些实验仅使用验证集，不是额外的完整 MNIST 测试结果。"
+
+msgid "MNIST classification error"
+msgstr "MNIST 分类错误率"

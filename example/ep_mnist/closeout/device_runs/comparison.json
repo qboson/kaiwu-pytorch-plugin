@@ -1,0 +1,151 @@
+{
+  "units": "seconds",
+  "scope": "single seed, three epochs; phase totals exclude initialization and file output",
+  "gpu_timing_source": "device_report phases, not rounded or independently timed summary fields",
+  "rows": [
+    {
+      "run": "ep-full-cpu",
+      "phase": "train",
+      "total_seconds": 12383.692632999999,
+      "sa_seconds": 11963.179475700206,
+      "non_sa_seconds": 420.5131572997925,
+      "sa_calls": 330000,
+      "test_accuracy": 0.903
+    },
+    {
+      "run": "ep-full-cpu",
+      "phase": "eval",
+      "total_seconds": 8556.462880300001,
+      "sa_seconds": 8310.764977599252,
+      "non_sa_seconds": 245.69790270074918,
+      "sa_calls": 180000,
+      "test_accuracy": 0.903
+    },
+    {
+      "run": "ep-full-cpu",
+      "phase": "test",
+      "total_seconds": 240.0793928000021,
+      "sa_seconds": 229.53539630008527,
+      "non_sa_seconds": 10.54399649991683,
+      "sa_calls": 10000,
+      "test_accuracy": 0.903
+    },
+    {
+      "run": "ep-full-cpu",
+      "phase": "all",
+      "total_seconds": 21180.234906100002,
+      "sa_seconds": 20503.479849599546,
+      "non_sa_seconds": 676.7550565004585,
+      "sa_calls": 520000,
+      "test_accuracy": 0.903
+    },
+    {
+      "run": "ep-full-cuda",
+      "phase": "train",
+      "total_seconds": 17442.407504500006,
+      "sa_seconds": 14792.72023941204,
+      "non_sa_seconds": 2649.687265087967,
+      "sa_calls": 330000,
+      "test_accuracy": 0.8906
+    },
+    {
+      "run": "ep-full-cuda",
+      "phase": "eval",
+      "total_seconds": 9459.257855200092,
+      "sa_seconds": 8193.005418129964,
+      "non_sa_seconds": 1266.2524370701285,
+      "sa_calls": 180000,
+      "test_accuracy": 0.8906
+    },
+    {
+      "run": "ep-full-cuda",
+      "phase": "test",
+      "total_seconds": 298.06633239996154,
+      "sa_seconds": 230.15513109532185,
+      "non_sa_seconds": 67.91120130463969,
+      "sa_calls": 10000,
+      "test_accuracy": 0.8906
+    },
+    {
+      "run": "ep-full-cuda",
+      "phase": "all",
+      "total_seconds": 27199.73169210006,
+      "sa_seconds": 23215.880788637325,
+      "non_sa_seconds": 3983.850903462735,
+      "sa_calls": 520000,
+      "test_accuracy": 0.8906
+    },
+    {
+      "run": "bp-full-cpu",
+      "phase": "train",
+      "total_seconds": 8.448818099917844,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 8.448818099917844,
+      "sa_calls": 0,
+      "test_accuracy": 0.962
+    },
+    {
+      "run": "bp-full-cpu",
+      "phase": "eval",
+      "total_seconds": 3.438844900112599,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 3.438844900112599,
+      "sa_calls": 0,
+      "test_accuracy": 0.962
+    },
+    {
+      "run": "bp-full-cpu",
+      "phase": "test",
+      "total_seconds": 0.175719799939543,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 0.175719799939543,
+      "sa_calls": 0,
+      "test_accuracy": 0.962
+    },
+    {
+      "run": "bp-full-cpu",
+      "phase": "all",
+      "total_seconds": 12.063382799969986,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 12.063382799969986,
+      "sa_calls": 0,
+      "test_accuracy": 0.962
+    },
+    {
+      "run": "bp-full-cuda",
+      "phase": "train",
+      "total_seconds": 18.176727599930018,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 18.176727599930018,
+      "sa_calls": 0,
+      "test_accuracy": 0.9623
+    },
+    {
+      "run": "bp-full-cuda",
+      "phase": "eval",
+      "total_seconds": 14.622601899900474,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 14.622601899900474,
+      "sa_calls": 0,
+      "test_accuracy": 0.9623
+    },
+    {
+      "run": "bp-full-cuda",
+      "phase": "test",
+      "total_seconds": 1.0461914000334218,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 1.0461914000334218,
+      "sa_calls": 0,
+      "test_accuracy": 0.9623
+    },
+    {
+      "run": "bp-full-cuda",
+      "phase": "all",
+      "total_seconds": 33.845520899863914,
+      "sa_seconds": 0.0,
+      "non_sa_seconds": 33.845520899863914,
+      "sa_calls": 0,
+      "test_accuracy": 0.9623
+    }
+  ]
+}

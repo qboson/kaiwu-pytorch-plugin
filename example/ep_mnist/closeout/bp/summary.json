@@ -1,0 +1,45 @@
+{
+  "model": "784-128-10 ReLU MLP",
+  "epochs": 3,
+  "seed": 0,
+  "split_seed": 0,
+  "n_train": 55000,
+  "n_val": 5000,
+  "n_test": 10000,
+  "batch_size": 20,
+  "lr": 0.05,
+  "objective": "cross entropy",
+  "history": [
+    {
+      "epoch": 1,
+      "train_seconds": 5.303589499962982,
+      "eval_seconds": 2.731995999987703,
+      "train_loss": 0.38246405355632307,
+      "train_accuracy": 0.9369454545454545,
+      "val_accuracy": 0.9332,
+      "train_error": 0.06305454545454547,
+      "val_error": 0.06679999999999997
+    },
+    {
+      "epoch": 2,
+      "train_seconds": 5.071740699990187,
+      "eval_seconds": 2.8266242999816313,
+      "train_loss": 0.18766884855926036,
+      "train_accuracy": 0.9591454545454545,
+      "val_accuracy": 0.9504,
+      "train_error": 0.04085454545454548,
+      "val_error": 0.04959999999999998
+    },
+    {
+      "epoch": 3,
+      "train_seconds": 5.09546899999259,
+      "eval_seconds": 2.598480099986773,
+      "train_loss": 0.13380560550974174,
+      "train_accuracy": 0.968709090909091,
+      "val_accuracy": 0.9584,
+      "train_error": 0.031290909090909036,
+      "val_error": 0.04159999999999997
+    }
+  ],
+  "test_accuracy": 0.962
+}

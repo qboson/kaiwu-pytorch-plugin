@@ -1,0 +1,46 @@
+{
+  "model": "784-128-10 ReLU MLP",
+  "device": "cuda",
+  "epochs": 3,
+  "seed": 0,
+  "split_seed": 0,
+  "batch_size": 20,
+  "lr": 0.05,
+  "n_train": 55000,
+  "n_val": 5000,
+  "n_test": 10000,
+  "history": [
+    {
+      "epoch": 1,
+      "train_seconds": 3.1997132999822497,
+      "eval_seconds": 3.6243267999961972,
+      "train_loss": 0.3824640568427064,
+      "train_accuracy": 0.9369454545454545,
+      "val_accuracy": 0.9332,
+      "train_error": 0.06305454545454547,
+      "val_error": 0.06679999999999997
+    },
+    {
+      "epoch": 2,
+      "train_seconds": 8.563962299958803,
+      "eval_seconds": 6.227616999996826,
+      "train_loss": 0.18765765375711702,
+      "train_accuracy": 0.9589818181818182,
+      "val_accuracy": 0.9496,
+      "train_error": 0.04101818181818184,
+      "val_error": 0.0504
+    },
+    {
+      "epoch": 3,
+      "train_seconds": 6.413051999988966,
+      "eval_seconds": 4.787999900057912,
+      "train_loss": 0.1338054731801491,
+      "train_accuracy": 0.9690363636363636,
+      "val_accuracy": 0.9592,
+      "train_error": 0.030963636363636415,
+      "val_error": 0.04079999999999995
+    }
+  ],
+  "test_accuracy": 0.9623,
+  "test_seconds": 1.0461914000334218
+}

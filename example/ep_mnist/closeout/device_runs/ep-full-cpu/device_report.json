@@ -1,0 +1,26 @@
+{
+  "status": "completed",
+  "returncode": 0,
+  "started_at_utc": "2026-11-25T13:40:30.285378+00:00",
+  "finished_at_utc": "2026-11-25T19:33:41.722634+00:00",
+  "source_sha256": {
+    "example/ep_mnist/train_mnist.py": "79cc44d0c5edb75bc5ca0b26eddcbfd773250fd87bb18c8e61feb9945e3f468d",
+    "example/ep_mnist/device_timing.py": "e470f53e57e01ccaba4e12e3b4d51607c4159684e56f9b1efca86bdbccfccb7e",
+    "src/kaiwu/torch_plugin/equilibrium_propagation.py": "6a87a16f64da0d09cd8e0f02dff4e2d731560396c7cdb4392218a37ba6317b26"
+  },
+  "execution": {
+    "torch": "2.7.0+cu126",
+    "cuda_runtime": "12.6",
+    "model_device": "cpu",
+    "sampler_device": "cpu",
+    "threads": 1,
+    "tf32": false
+  },
+  "source_snapshots": {
+    "example/ep_mnist/train_mnist.py": "train_mnist_cpu_full.py",
+    "example/ep_mnist/device_timing.py": "device_timing_cpu_full.py"
+  },
+  "command": "python example/ep_mnist/train_mnist.py --device cpu --threads 1 --data-dir data --output-dir runs/ep-cpu --epochs 3 --seed 0 --split-seed 0",
+  "timing": "phase wall time; evaluation includes train and validation accuracy; non-SA = total - SA",
+  "note": "Executed source retained in source_snapshots; final entrypoint only changes sibling-helper import isolation."
+}

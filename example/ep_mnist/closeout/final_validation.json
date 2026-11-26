@@ -1,0 +1,197 @@
+{
+  "date": "2026-11-25",
+  "baseline_commit": "91dd171dcb3d70b1fea049bb1984eb29faa999cf",
+  "source_state": "Implementation and reproduction tools at validated_code_commit; final documentation is added afterward.",
+  "environment": {
+    "python": "3.10.11",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "packages": {
+      "kaiwu": "1.3.1",
+      "torch": "2.7.0",
+      "numpy": "2.2.6",
+      "torchvision": "0.22.0",
+      "pytest": "8.3.5",
+      "pylint": "3.3.7",
+      "matplotlib": "3.10.3",
+      "sphinx": "8.1.3"
+    },
+    "threads": {
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1
+    }
+  },
+  "source_sha256": {
+    "src/kaiwu/torch_plugin/equilibrium_propagation.py": "e69e8b76878836ae863239d690e852a07fa648e913c98badc48b99fdfe8eea40",
+    "example/ep_mnist/train_mnist.py": "efbd6c159096a6e018b683d78d214ce9f45453d9a051547d4382d86da805317b",
+    "example/ep_mnist/closeout/run_experiments.py": "fefee3a68f292cf82fb3d3f8e5f4f3f5ef0fbbc742365595e0638390d36735f3",
+    "example/ep_mnist/closeout/summarize.py": "82a6fb858dc587a969d7c50a5b6f5cf78cfee755a7580fa10e9d072d94c1a350",
+    "example/ep_mnist/closeout/bp_mnist.py": "e0dd1846539dcd4d7a47a9fe492cbfd5abae6ab49d4a77082c7e4ad0b16694a7",
+    "tests/test_equilibrium_propagation.py": "f9becb2c3a80e62457bcaf60aae7913fc35ccd94cc30f85c242beb737e8a12f2",
+    "tests/test_ep_mnist.py": "629e6aaa1d3d1dd21829f7925e762b0d1150d9b55f283d6698378ee778e6d30c",
+    "tests/test_closeout.py": "bab390dc3291149cd4c875bfb2b97d840cbf4514573b9371199319431f0d0dca"
+  },
+  "regression": {
+    "baseline": {
+      "passed": 84,
+      "skipped": 4
+    },
+    "final": {
+      "passed": 103,
+      "skipped": 4
+    },
+    "unchanged_skips": [
+      "two CUDA device tests",
+      "two native SDK statistics-context tests"
+    ],
+    "deselected": 0,
+    "plugin_source": "this checkout/src/kaiwu/torch_plugin",
+    "source_pylint": "10.00/10"
+  },
+  "smoke": {
+    "sampler": "real Kaiwu 1.3.1 simulated annealing",
+    "test_split_access_blocked": true,
+    "runs": {
+      "linear": {
+        "summary": {
+          "limit_train": 200,
+          "limit_eval": 100,
+          "n_val": 100,
+          "epochs": 1,
+          "batch_size": 20,
+          "lr": 0.05,
+          "beta": 2.0,
+          "hidden": 128,
+          "conv": false,
+          "channels": 4,
+          "input_scale": 2.0,
+          "sa_iterations": 50,
+          "seed": 0,
+          "split_seed": 0,
+          "validation_only": true,
+          "layer_sizes": [
+            784,
+            128,
+            10
+          ],
+          "n_train": 200,
+          "n_test": 0,
+          "train_sampler": {
+            "initial_temperature": 10.0,
+            "alpha": 0.9,
+            "cutoff_temperature": 0.01,
+            "iterations_per_t": 50,
+            "size_limit": 4,
+            "rand_seed": 0,
+            "process_num": 1
+          },
+          "eval_sampler": {
+            "initial_temperature": 10.0,
+            "alpha": 0.9,
+            "cutoff_temperature": 0.01,
+            "iterations_per_t": 50,
+            "size_limit": 4,
+            "rand_seed": 0,
+            "process_num": 1
+          },
+          "history": [
+            {
+              "epoch": 1,
+              "ep_objective": 0.7838921815156936,
+              "train_seconds": 10.563506200094707,
+              "train_accuracy": 0.16,
+              "train_error": 0.84,
+              "val_accuracy": 0.12,
+              "val_error": 0.88,
+              "eval_seconds": 7.735008899937384
+            }
+          ]
+        },
+        "restored_metrics_match": true
+      },
+      "conv": {
+        "summary": {
+          "limit_train": 2,
+          "limit_eval": 2,
+          "n_val": 2,
+          "epochs": 1,
+          "batch_size": 2,
+          "lr": 0.05,
+          "beta": 2.0,
+          "hidden": 128,
+          "conv": true,
+          "channels": 1,
+          "input_scale": 2.0,
+          "sa_iterations": 5,
+          "seed": 0,
+          "split_seed": 0,
+          "validation_only": true,
+          "layer_sizes": [
+            784,
+            64,
+            10
+          ],
+          "n_train": 2,
+          "n_test": 0,
+          "train_sampler": {
+            "initial_temperature": 10.0,
+            "alpha": 0.9,
+            "cutoff_temperature": 0.01,
+            "iterations_per_t": 5,
+            "size_limit": 4,
+            "rand_seed": 0,
+            "process_num": 1
+          },
+          "eval_sampler": {
+            "initial_temperature": 10.0,
+            "alpha": 0.9,
+            "cutoff_temperature": 0.01,
+            "iterations_per_t": 5,
+            "size_limit": 4,
+            "rand_seed": 0,
+            "process_num": 1
+          },
+          "history": [
+            {
+              "epoch": 1,
+              "ep_objective": 1.1087050437927246,
+              "train_seconds": 0.029054000042378902,
+              "train_accuracy": 0.5,
+              "train_error": 0.5,
+              "val_accuracy": 0.0,
+              "val_error": 1.0,
+              "eval_seconds": 0.023785999976098537
+            }
+          ]
+        },
+        "restored_metrics_match": true
+      }
+    }
+  },
+  "historical_artifacts": {
+    "manifest_hashes_verified": 33,
+    "csv_byte_identical": [
+      "training_curves.csv",
+      "sweep_seeds.csv",
+      "sweep_summary.csv"
+    ],
+    "figures": "Regenerated PNG plots visually inspected; original published artifacts retained.",
+    "full_experiments_rerun": false
+  },
+  "documentation": {
+    "strict_html_builds": [
+      "en",
+      "zh_CN"
+    ],
+    "config_attribute_index_counts": {
+      "en": 23,
+      "zh_CN": 23
+    }
+  },
+  "limits": [
+    "Small runs verify execution and restoration, not full-data accuracy.",
+    "No new CIM or CUDA validation.",
+    "GitHub CI is tracked separately."
+  ],
+  "source_hash_normalization": "UTF-8 source bytes with CRLF normalized to LF",
+  "validated_code_commit": "0ab8cf5aadcee7e73ab2e115bb30a29c84ac8055"
+}
