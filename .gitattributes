@@ -1,9 +1,6 @@
 imgs/* filter=lfs diff=lfs merge=lfs -text
 
-# Keep bytes covered by the EP closeout SHA-256 manifest portable across checkouts.
+# Preserve reference result bytes covered by provenance hashes.
+example/ep_mnist/reference_results/**/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/_static/ep-mnist/*.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-example/ep_mnist/closeout/**/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-example/ep_mnist/closeout/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-example/ep_mnist/closeout/source_snapshots/*.py -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
-example/ep_mnist/closeout/device_runs/*.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 example/ep_mnist/train_mnist.py eol=lf

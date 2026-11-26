@@ -1,35 +1,38 @@
 # Equilibrium propagation on MNIST
 
-## Training setup
+EPLinear trains a 784-128-10 network using ±1 spins. Kaiwu SA solves free and
+nudged phases; PyTorch differentiates their energy difference. Use Python 3.10,
+Kaiwu 1.3.1 and PyTorch 2.7.0, with the SDK license initialized locally.
 
-This example trains a 784-128-10 network with EPLinear layers and discrete spins. Kaiwu simulated annealing solves the free and nudged phases; PyTorch differentiates their energy difference to update the parameters.
-
-Use Python 3.10.11, Kaiwu 1.3.1, PyTorch 2.7.0 and torchvision 0.22.0. Initialize the local SDK license if required. Run the following command from the repository root, using a fresh output directory and an existing MNIST data directory.
-
-```bash
-python example/ep_mnist/train_mnist.py --epochs 3 --seed 0 --split-seed 0 --data-dir data --output-dir runs/ep-mnist-final
+```sh
+python example/ep_mnist/train_mnist.py --epochs 3 --device cpu --threads 1 --seed 0 --split-seed 0 --data-dir data --output-dir runs/ep-mnist
 ```
 
-The official MNIST dataset contains 60,000 training and 10,000 test images. The project reserves 5,000 of the training images for validation, leaving 55,000 for training. Training and split seeds are both 0. SGD uses learning rate 0.05 and batch size 20; beta is 2 and the first-layer initialization scale is 2. The annealer uses initial temperature 10, alpha 0.9, cutoff 0.01, 50 iterations per temperature and four candidates.
+Use `--device cuda` for CUDA model tensors; SA stays on CPU. The split is
+55000 train / 5000 validation / 10000 test. The final test runs after epoch 3.
+Beta is 2, initialization scale 2, batch size 20, learning rate 0.05 and SA
+iterations per temperature 50. `--validation-only` excludes the test set.
+`--evaluate` restores a checkpoint for evaluation, not training resume.
 
-## Completed results
+## Reference observations
 
-After three epochs, EP reaches 90.06% training, 89.54% validation and 90.30% test accuracy. The test set is evaluated only after the final epoch. These are single-seed results. The historical one-epoch linear result is 88.72%; the historical one-epoch convolutional result remains 71.55%.
+| Execution | Test accuracy | Total (min) | SA (min) | Non-SA (min) |
+| --- | ---: | ---: | ---: | ---: |
+| CPU EP | 90.30% | 353.004 | 341.725 | 11.279 |
+| CUDA EP + CPU SA | 89.06% | 453.329 | 386.931 | 66.398 |
 
-The BP comparison reaches 96.20% test accuracy with the same split, seed, layer widths, batch size, learning rate and epoch count. BP uses ReLU, cross entropy and default PyTorch initialization, whereas EP uses discrete spins and its own initialization. The accuracy gap is 5.90 percentage points.
+CPU BP reaches 96.20% with matching split, seed, widths and training schedule,
+but uses ReLU/cross entropy and different initialization. These are single-seed
+results, not a controlled speedup comparison. Totals include training,
+train/validation evaluation and final testing. Non-SA includes transfers and
+Python overhead. Full training was not repeated after this cleanup.
 
-## Training curves and interpretation
+![CPU EP/BP classification error](../../../_static/ep-mnist/training_curves.png)
 
-![MNIST classification error](../../../_static/ep-mnist/training_curves.png)
+[Per-epoch CSV](../../../_static/ep-mnist/training_curves.csv)
 
-The curves show training and validation classification error, equal to one minus accuracy. No per-epoch test curve is available. The EP energy-difference objective can be negative and is not comparable in magnitude to BP cross entropy.
-
-In the historical CPU run, EP averages 10,422.09 seconds per training epoch and 5,653.59 seconds for train/validation evaluation; BP averages 5.16 and 2.72 seconds. Final test time is separate. These measured wall times describe the recorded environment, not a general performance guarantee.
-
-The beta and annealing-budget comparisons use 2,000 training and 1,000 validation images, three epochs and seeds 0/1/2. They are validation-only experiments, not additional full-MNIST test results.
-
-[PDF](../../../_static/ep-mnist/training_curves.pdf) · [CSV](../../../_static/ep-mnist/training_curves.csv)
-
-## Later device measurements
-
-A separate three-epoch CPU rerun achieved 90.30% test accuracy; the CUDA model / CPU SA run achieved 89.06%. Total measured phases / SA / non-SA time were 353.004 / 341.725 / 11.279 minutes on CPU and 453.329 / 386.931 / 66.398 minutes on CUDA. These single-seed runs used different execution times and entrypoints, so they do not establish a controlled speedup. Non-SA includes transfers and Python overhead. Executed sources, per-phase data and provenance are available in example/ep_mnist/closeout/device_runs/.
+Curves show training and validation error, not per-epoch test accuracy. EP's
+energy objective is not numerically comparable to BP cross entropy. Compact
+summaries and source links are in `example/ep_mnist/reference_results/`.
+Regenerate the image and CSV with `python example/ep_mnist/plot_reference_results.py
+--output-dir runs/ep-reference-figures` from the repository root.
