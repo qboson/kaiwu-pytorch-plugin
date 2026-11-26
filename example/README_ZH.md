@@ -1,5 +1,15 @@
 **语言版本**：[中文](README_ZH.md) | [English](README.md)
 
+### 传感器通道选择
+
+[传感器通道选择示例](feature_selection/sensor_channels.py) 在六路合成时间序列上训练回归模型，再用 MAIFS 的本地搜索选出两路传感器。每个掩码位同时作用于该通道的全部 12 个时间步。安装插件后，在仓库根目录运行：
+
+```sh
+python example/feature_selection/sensor_channels.py
+```
+
+目标值由第 1、4 号通道的斜率决定（从 0 编号）。示例在独立测试集上比较全部通道、选中通道和使用训练集均值预测时的均方误差。使用插件标准的 Python 3.10 环境即可在 CPU 上运行，数据在本地生成。
+
 ### BoltzmannMachine 与 RestrictedBoltzmannMachine 的使用示例
 
 * `run_bm.py`：演示如何使用 `BoltzmannMachine` 类进行模型实例化、采样、目标函数计算和参数优化。适用于理解玻尔兹曼机（Boltzmann Machine）的基本训练流程，包括采样和梯度反向传播。
