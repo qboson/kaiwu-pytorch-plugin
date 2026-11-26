@@ -92,7 +92,24 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
         Returns:
             torch.Tensor: Scalar difference between data and model average energy.
+
+        Raises:
+            TypeError: If a state argument is not a torch tensor.
+            ValueError: If a state tensor is not (batch, num_nodes) or empty.
         """
+        for name, states in (
+            ("s_positive", s_positive),
+            ("s_negative", s_negative),
+        ):
+            if not isinstance(states, torch.Tensor):
+                raise TypeError(f"{name} must be a torch.Tensor")
+            if states.ndim != 2 or states.shape[1] != self.num_nodes:
+                raise ValueError(
+                    f"{name} must have shape (batch, {self.num_nodes}), "
+                    f"got {tuple(states.shape)}"
+                )
+            if states.size(0) == 0:
+                raise ValueError(f"{name} must contain at least one sample")
         return self(s_positive).mean() - self(s_negative).mean()
 
     def sample(self, sampler) -> torch.Tensor:
