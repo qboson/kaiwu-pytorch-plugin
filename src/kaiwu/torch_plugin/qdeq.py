@@ -42,7 +42,7 @@ __all__ = ["QDEQ", "QDEQConfig"]
 class QDEQConfig:
     """Configuration for ``QDEQ``.
 
-    Attributes:
+    Args:
 
         f_thres: Maximum number of forward solver steps.
 
