@@ -219,8 +219,12 @@ def _ising_fixed_point_solver(
             break
 
         # z <- z + sum_i a_i v_i, then record the step for the next search directions.
-        coeff = torch.as_tensor(coeff, dtype=z.dtype, device=z.device)
-        delta = (coeff.view(-1, *[1] * z.ndim) * basis).sum(0)
+        # A coefficient may exceed the state dtype range even if the step does not.
+        step_basis = (
+            basis.float() if z.dtype in (torch.float16, torch.bfloat16) else basis
+        )
+        coeff = torch.as_tensor(coeff, dtype=step_basis.dtype, device=z.device)
+        delta = (coeff.view(-1, *[1] * z.ndim) * step_basis).sum(0).to(z.dtype)
         next_residual = func(z + delta) - (z + delta)
         history_r = (history_r + [residual])[-config.history_size :]
         history_dz = (history_dz + [delta])[-config.history_size :]
