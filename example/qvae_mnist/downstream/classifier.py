@@ -15,7 +15,7 @@ from utils.helpers import plot_training_curves
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class MLPClassifier(BaseEstimator, ClassifierMixin):
+class MLPClassifier(ClassifierMixin, BaseEstimator):
     def __init__(
         self, 
         input_dim=None, 
