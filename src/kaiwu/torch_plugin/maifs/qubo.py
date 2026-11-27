@@ -604,7 +604,8 @@ def _solve_ising_sa(
         max_iter: Backward-compatible positive iteration hint from the previous
             local SA solver. Kaiwu-specific schedule options should be passed
             through ``optimizer_kwargs``.
-        random_state: Seed applied to NumPy before invoking Kaiwu SA.
+        random_state: Seed used for Kaiwu SA without changing the caller's
+            NumPy random state.
         **optimizer_kwargs: Keyword arguments passed to
             ``kw.classical.SimulatedAnnealingOptimizer``.
 
@@ -632,10 +633,14 @@ def _solve_ising_sa(
 
     resolved_kwargs = {"size_limit": 1}
     resolved_kwargs.update(optimizer_kwargs)
-    optimizer = kw.classical.SimulatedAnnealingOptimizer(**resolved_kwargs)
-
-    np.random.seed(int(random_state))
-    result = optimizer.solve(_to_kaiwu_ising_matrix(matrix))
+    caller_random_state = np.random.get_state()
+    try:
+        # Kaiwu's constructor and solve may both use NumPy's global generator.
+        np.random.seed(int(random_state))
+        optimizer = kw.classical.SimulatedAnnealingOptimizer(**resolved_kwargs)
+        result = optimizer.solve(_to_kaiwu_ising_matrix(matrix))
+    finally:
+        np.random.set_state(caller_random_state)
 
     if result is None:
         raise RuntimeError("SimulatedAnnealingOptimizer did not return a solution.")

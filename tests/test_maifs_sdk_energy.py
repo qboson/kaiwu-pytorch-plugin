@@ -143,6 +143,34 @@ def test_sa_submission_sdk_energy_matches_original_qubo_for_all_states_and_gauge
     assert polynomial([result], coefficients, linear)[0] == pytest.approx(expected.min())
 
 
+@pytest.mark.parametrize("raises", [False, True])
+def test_sa_preserves_caller_numpy_state(monkeypatch, raises):
+    observed = []
+
+    def solve(instance, matrix):
+        observed.append(np.random.rand())
+        if raises:
+            raise RuntimeError("annealing failed")
+        return np.ones((1, len(matrix)), dtype=int)
+
+    monkeypatch.setattr(kw.classical.SimulatedAnnealingOptimizer, "solve", solve)
+    np.random.seed(1234)
+    before = np.random.get_state()
+    args = (np.zeros((1, 1)), np.array([1.]), np.array([0]))
+    for _ in range(2):
+        if raises:
+            with pytest.raises(RuntimeError, match="annealing failed"):
+                qubo.solve_qubo(*args, solver="sa", random_state=17)
+        else:
+            qubo.solve_qubo(*args, solver="sa", random_state=17)
+
+    after = np.random.get_state()
+    assert before[0] == after[0]
+    np.testing.assert_array_equal(before[1], after[1])
+    assert before[2:] == after[2:]
+    assert observed[0] == observed[1]
+
+
 @pytest.mark.parametrize("coefficients, linear", MATH_CASES)
 def test_actual_sdk_flip_delta_matches_submitted_energy_changes(
     offline_sa, coefficients, linear
