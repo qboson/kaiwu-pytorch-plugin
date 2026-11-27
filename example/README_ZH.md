@@ -13,6 +13,12 @@
 
 ---
 
+### 条件受限玻尔兹曼机（CRBM）
+
+`example/crbm/run_crbm.py` 演示如何使用 `ConditionalRestrictedBoltzmannMachine` 配合 Kaiwu 模拟退火（或 CIM）完成条件二值模式生成与补全任务，无需额外依赖即可在 CPU 离线快速运行。详细说明请参见 [example/crbm/README_ZH.md](crbm/README_ZH.md)。
+
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` 现在分为：
