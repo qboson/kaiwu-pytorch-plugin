@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from math import ceil
+import operator
 
 import numpy as np
 import torch
@@ -49,6 +50,8 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
+        required_feature_indices: Zero-based feature indices kept selected
+            during every mask update, including feature-count projection.
 
     Returns:
         FeatureSelectionWrapper: Initialized PyTorch feature-selection wrapper.
@@ -92,6 +95,8 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: int | None = None,
         input_feature_axis: int = -1,
         solver_kwargs: dict[str, object] | None = None,
+        *,
+        required_feature_indices: Iterable[int] = (),
     ) -> None:
 
         super().__init__()
@@ -123,6 +128,29 @@ class FeatureSelectionWrapper(nn.Module):
         self._min_selected_features_explicit = explicit_min
         self._trained_epochs = 0
         self.register_buffer("mask", torch.ones(self.feature_dim))
+        required = torch.zeros(self.feature_dim, dtype=torch.bool)
+        try:
+            indices = tuple(operator.index(item) for item in required_feature_indices)
+        except TypeError as error:
+            raise ValueError("required_feature_indices must contain integers") from error
+        if len(set(indices)) != len(indices) or any(
+            item < 0 or item >= self.feature_dim for item in indices
+        ):
+            raise ValueError("required_feature_indices must be distinct valid feature indices")
+        if indices and (
+            len(indices) > self.max_selected_features
+            or self.cardinality_k is not None and len(indices) > self.cardinality_k
+        ):
+            raise ValueError("Required features exceed the configured feature count")
+        required[list(indices)] = True
+        self.register_buffer("_required_features", required, persistent=False)
+        if indices:
+            self.register_load_state_dict_post_hook(self._restore_required_features)
+
+    def _restore_required_features(self, _module, _incompatible_keys):
+        """Apply configured constraints after loading a previous mask."""
+        with torch.no_grad():
+            self.mask.masked_fill_(self._required_features.to(self.mask.device), 1)
 
     def _mask_view(
         self,
@@ -432,9 +460,10 @@ class FeatureSelectionWrapper(nn.Module):
                 + linear_vector @ changed
             )
 
+        required = _tensor_to_numpy(self._required_features, dtype=bool)
         selected_count = int(projected.sum())
         while selected_count > self.max_selected_features:
-            selected_indices = np.flatnonzero(projected)
+            selected_indices = np.flatnonzero(projected & ~required)
             drop_index = min(
                 selected_indices,
                 key=lambda index: (
@@ -483,6 +512,12 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If derivative computation or projection validation fails.
             RuntimeError: If the configured QUBO solver fails.
         """
+        required = _tensor_to_numpy(self._required_features, dtype=bool)
+        if required.size and required.all():
+            with torch.no_grad():
+                self.mask.fill_(1)
+            return required.astype(int)
+
         gradient, hessian = self.compute_mask_derivatives(
             data_loader,
             loss_fn,
@@ -491,13 +526,7 @@ class FeatureSelectionWrapper(nn.Module):
         )
         quadratic_matrix, linear_vector = self._build_qubo(gradient, hessian)
         current_mask = _tensor_to_numpy(self.mask, dtype=int)
-        selected = solve_qubo(
-            quadratic_matrix,
-            linear_vector,
-            current_mask,
-            self.solver,
-            **self.solver_kwargs,
-        )
+        selected = self._solve_mask(quadratic_matrix, linear_vector, current_mask, required)
         selected = self._project_selected_feature_count(
             selected,
             quadratic_matrix,
@@ -511,6 +540,23 @@ class FeatureSelectionWrapper(nn.Module):
         with torch.no_grad():
             self.mask.copy_(value)
         return selected.copy()
+
+    def _solve_mask(self, quadratic, linear, current_mask, required):
+        """Substitute required bits into the objective before solving."""
+        if not required.any():
+            return solve_qubo(quadratic, linear, current_mask, self.solver, **self.solver_kwargs)
+
+        free = ~required
+        free_required = quadratic[np.ix_(free, required)]
+        required_free = quadratic[np.ix_(required, free)].T
+        reduced_linear = linear[free] + 0.5 * (free_required + required_free).sum(axis=1)
+        solution = solve_qubo(
+            quadratic[np.ix_(free, free)], reduced_linear, current_mask[free],
+            self.solver, **self.solver_kwargs,
+        )
+        selected = np.ones_like(current_mask)
+        selected[free] = solution
+        return selected
 
     def get_support(self) -> np.ndarray:
         """Return the current feature mask as booleans.
