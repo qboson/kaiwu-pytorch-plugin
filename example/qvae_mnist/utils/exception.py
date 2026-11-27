@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Modified: preserve messages on the exception objects while retaining logging.
 """
 Exceptions.
 """
@@ -11,7 +12,7 @@ logger = get_logger(__name__)
 class Error(Exception):
     """A generic Error class derived from Exception.
 
-    Essentially, it gets the class and message and logs the error to the logger.
+    Preserves the message on the exception and logs it with the class identifier.
 
     """
 
@@ -24,7 +25,7 @@ class Error(Exception):
 
         """
 
-        super(Error, self).__init__()
+        super(Error, self).__init__(msg)
 
         logger.error("%s: %s.", cls, msg)
 
