@@ -9,11 +9,22 @@ import numpy as np
 import torch
 from torch import nn
 
-from .qubo import solve_qubo
+from .qubo import AVAILABLE_SOLVERS, solve_qubo
 
 Batch = tuple[torch.Tensor, torch.Tensor]
 LossFunction = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
 _CARDINALITY_PENALTY = 10.0
+
+
+def _feature_count(value: object, name: str) -> int:
+    """Resolve an integer-valued count without silently truncating fractions."""
+    try:
+        count = int(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+    if not isinstance(value, (str, bytes)) and value != count:
+        raise ValueError(f"{name} must be an integer")
+    return count
 
 
 def _tensor_to_numpy(
@@ -38,13 +49,21 @@ def _tensor_to_numpy(
 class FeatureSelectionWrapper(nn.Module):
     """Wrap a PyTorch model with a hard 0/1 feature-selection mask.
 
+    Feature counts accept integer-valued scalars and integer strings; fractional
+    and non-finite values are rejected. Count limits apply during mask updates;
+    the initial mask selects all features.
+
     Args:
         model: PyTorch model that receives masked inputs.
-        feature_dim: Number of input features controlled by the mask.
+        feature_dim: Positive number of input features controlled by the mask.
         lambda_reg: Linear penalty applied to selected features.
-        cardinality_k: Optional target number of selected features.
-        min_selected_features: Optional lower bound for selected features.
-        max_selected_features: Optional upper bound for selected features.
+        cardinality_k: Optional soft target number of selected features, between
+            the resolved lower and upper bounds. Zero permits an empty selection.
+        min_selected_features: Optional hard lower bound for selected features.
+            When omitted, the empty-mask fallback is 20% of ``feature_dim`` rounded
+            up, at least one, and capped by the upper bound and any cardinality target.
+        max_selected_features: Optional hard upper bound for selected features,
+            between zero and ``feature_dim``. Defaults to ``feature_dim``.
         solver: Built-in solver name, such as ``"local_search","sa","kaiwu_cim"``.
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
@@ -95,18 +114,44 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> None:
 
         super().__init__()
+        if not isinstance(model, nn.Module):
+            raise TypeError("model must be an nn.Module")
         explicit_min = min_selected_features is not None
-        feature_dim = int(feature_dim)
+        feature_dim = _feature_count(feature_dim, "feature_dim")
+        if feature_dim <= 0:
+            raise ValueError("feature_dim must be positive")
+        if cardinality_k is not None:
+            cardinality_k = _feature_count(cardinality_k, "cardinality_k")
+            if not 0 <= cardinality_k <= feature_dim:
+                raise ValueError("cardinality_k must lie between zero and feature_dim")
         max_selected_features = (
             feature_dim
             if max_selected_features is None
-            else int(max_selected_features)
+            else _feature_count(max_selected_features, "max_selected_features")
         )
+        if not 0 <= max_selected_features <= feature_dim:
+            raise ValueError("max_selected_features must lie between zero and feature_dim")
         min_selected_features = (
             min(max(1, ceil(0.2 * feature_dim)), max_selected_features)
             if min_selected_features is None
-            else int(min_selected_features)
+            else _feature_count(min_selected_features, "min_selected_features")
         )
+        if not explicit_min and cardinality_k is not None:
+            min_selected_features = min(min_selected_features, cardinality_k)
+        if not 0 <= min_selected_features <= max_selected_features:
+            raise ValueError(
+                "min_selected_features must lie between zero and max_selected_features"
+            )
+        if cardinality_k is not None and not (
+            min_selected_features <= cardinality_k <= max_selected_features
+        ):
+            raise ValueError(
+                "cardinality_k must lie between min_selected_features and max_selected_features"
+            )
+        solver = str(solver)
+        if solver not in AVAILABLE_SOLVERS:
+            choices = ", ".join(AVAILABLE_SOLVERS)
+            raise ValueError(f"Unsupported solver {solver!r}. Available solvers: {choices}")
 
         self.model = model
         self.feature_dim = feature_dim
@@ -114,7 +159,7 @@ class FeatureSelectionWrapper(nn.Module):
         self.cardinality_k = cardinality_k
         self.min_selected_features = min_selected_features
         self.max_selected_features = max_selected_features
-        self.solver = str(solver)
+        self.solver = solver
         self.solver_kwargs = {} if solver_kwargs is None else dict(solver_kwargs)
         self.mask_update_epochs = (
             None if mask_update_epochs is None else int(mask_update_epochs)
