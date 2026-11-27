@@ -91,21 +91,32 @@ msgid "Kaiwu SDK"
 msgstr "Kaiwu SDK"
 
 #: ../../source/getting_started/installation.md
-msgid "v1.3.1+"
-msgstr "v1.3.1+"
+msgid "1.3.1–1.4.3"
+msgstr "1.3.1–1.4.3"
 
 #: ../../source/getting_started/installation.md
 msgid "Ising optimization backend (classical SA + quantum CIM)"
 msgstr "伊辛优化后端（经典 SA + 量子 CIM）"
 
 #: ../../source/getting_started/installation.md:24
-msgid ""
-"**Note:** Exact versions of PyTorch and NumPy are pinned in "
-"`requirements/requirements.txt`. Kaiwu SDK v1.3.1 is the current recommended"
-" release."
-msgstr ""
-"**注意：** PyTorch 和 NumPy 的精确版本在 `requirements/requirements.txt` 中固定。Kaiwu SDK"
-" v1.3.1 是当前推荐版本。"
+msgid "**Note:** Exact versions of PyTorch and NumPy are pinned in `requirements/requirements.txt`. Kaiwu SDK releases 1.3.1 through 1.4.3 are supported; a fresh installation selects 1.4.3."
+msgstr "**注意：** PyTorch 和 NumPy 的精确版本固定在 `requirements/requirements.txt` 中。支持 Kaiwu SDK 1.3.1 至 1.4.3。全新安装时会选择 1.4.3。"
+
+#: ../../source/getting_started/installation.md:26
+msgid "Kaiwu SDK compatibility"
+msgstr "Kaiwu SDK 兼容性"
+
+#: ../../source/getting_started/installation.md:28
+msgid "The supported published SDK releases are 1.3.1, 1.4.0, 1.4.1, 1.4.2, and 1.4.3. Their official wheels require Python 3.10. Select one in the same installation command as the plugin, for example:"
+msgstr "支持的已发布 SDK 版本包括 1.3.1、1.4.0、1.4.1、1.4.2 和 1.4.3。这些版本的官方 wheel 需要 Python 3.10。请在安装插件的同一条命令中指定 SDK 版本，例如："
+
+#: ../../source/getting_started/installation.md:36
+msgid "Use an isolated environment for each SDK version. Use regular installation rather than `pip install -e .` for SDK 1.3.1: its regular `kaiwu` package otherwise hides the editable plugin. The shared compatibility module handles the `PrecisionReducer` move from `kaiwu.cim` to `kaiwu.preprocess` and translates both old and new CIM mode names. Model algorithms are shared across versions."
+msgstr "请为每个 SDK 版本使用独立的环境。SDK 1.3.1 请使用常规安装，避免使用 `pip install -e .`。该版本的常规 `kaiwu` 包会隐藏以可编辑方式安装的插件。共享兼容模块处理 `PrecisionReducer` 从 `kaiwu.cim` 移到 `kaiwu.preprocess` 的变化，并转换新旧 CIM 模式名称。各版本共用同一套模型算法。"
+
+#: ../../source/getting_started/installation.md:42
+msgid "Regular SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10. The manual `all-kaiwu-versions` CI option also checks 1.4.1 and 1.4.2. These interface checks do not submit licensed or cloud tasks."
+msgstr "常规 SDK CI 在 Python 3.10 上检查 1.3.1、1.4.0 和 1.4.3。手动运行的 `all-kaiwu-versions` CI 选项还会检查 1.4.1 和 1.4.2。这些接口检查不会提交需要授权许可的任务或云端任务。"
 
 #: ../../source/getting_started/installation.md:26
 msgid "Check the Python version:"
