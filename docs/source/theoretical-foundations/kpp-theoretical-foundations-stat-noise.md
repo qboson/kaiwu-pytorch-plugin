@@ -20,7 +20,7 @@ This update rule has a crucial property: it never increases the energy of the ne
 
 $$\Delta E = E(\mathbf{x}') - E(\mathbf{x}) = -(x_i' - x_i)\left( \sum_{j \neq i} w_{ij} x_j + b_i \right)$$
 
-If the sign of the input matches the new state, the energy decreases; if it matches the old state, the energy remains unchanged. The dynamics therefore implements a strict **gradient descent** on the energy landscape: the network state slides inexorably downhill toward the nearest local minimum, where it remains indefinitely.
+When the local field is zero, keep the current spin. A spin aligned with a nonzero field also stays put. A flip occurs only when the field opposes the spin, giving $\Delta E < 0$. With repeated sweeps over all units, only finitely many flips can occur. A full sweep with no flips identifies a fixed point.
 
 ## Memories as Energy Minima
 The Hopfield network was originally proposed as a model of **associative memory**. By storing a set of patterns $\{\boldsymbol{\xi}^1, \boldsymbol{\xi}^2, \ldots, \boldsymbol{\xi}^P\}$ using the Hebbian learning rule (Eq. {eq}`eq-hebbian`, Section 1.1):

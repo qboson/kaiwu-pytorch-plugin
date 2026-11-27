@@ -351,13 +351,17 @@ msgstr "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:75
 msgid ""
-"This dynamics is equivalent to moving strictly downhill in the energy "
-"landscape. The network will converge to the nearest local minimum, but it "
-"may get stuck in a spurious state rather than the intended memory."
+"With symmetric weights and no self-connections, each step updates one spin "
+"with state $-1$ or $+1$. When its local field is zero, the spin keeps its "
+"current state. Every flip strictly lowers the energy. With repeated sweeps "
+"over all units, the finite network reaches a state in which no single-spin "
+"flip lowers the energy. This fixed point can be a spurious state."
 msgstr ""
-"This dynamics is equivalent to moving strictly downhill in the energy "
-"landscape. The network will converge to the nearest local minimum, but it "
-"may get stuck in a spurious state rather than the intended memory."
+"With symmetric weights and no self-connections, each step updates one spin "
+"with state $-1$ or $+1$. When its local field is zero, the spin keeps its "
+"current state. Every flip strictly lowers the energy. With repeated sweeps "
+"over all units, the finite network reaches a state in which no single-spin "
+"flip lowers the energy. This fixed point can be a spurious state."
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:77
 msgid ""

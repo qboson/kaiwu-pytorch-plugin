@@ -304,10 +304,14 @@ msgstr "x_i \\leftarrow \\text{sign}\\left( \\sum_{j} w_{ij} x_j + b_i \\right)"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:75
 msgid ""
-"This dynamics is equivalent to moving strictly downhill in the energy "
-"landscape. The network will converge to the nearest local minimum, but it "
-"may get stuck in a spurious state rather than the intended memory."
-msgstr "这种动力学等价于沿着能量景观严格下坡移动。网络会收敛到最近的局部极小值，但这个极小值可能是伪状态，而不是目标记忆。"
+"With symmetric weights and no self-connections, each step updates one spin "
+"with state $-1$ or $+1$. When its local field is zero, the spin keeps its "
+"current state. Every flip strictly lowers the energy. With repeated sweeps "
+"over all units, the finite network reaches a state in which no single-spin "
+"flip lowers the energy. This fixed point can be a spurious state."
+msgstr ""
+"权重对称且无自连接时，每一步更新一个取值为 $-1$ 或 $+1$ "
+"的自旋。局部场为零时，自旋保持当前状态。每次翻转都会严格降低能量。反复扫过所有单元后，有限网络会达到一个固定点，此时翻转任一自旋都无法降低能量。这个固定点可能是伪状态。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-spinglass.md:77
 msgid ""
