@@ -296,9 +296,12 @@ class MixtureGeneric(FactorialBernoulliUtil):
             torch.Tensor: Log probability matrix, shape (num_samples, num_vars).
         """
         q = torch.sigmoid(self.logit_mu)
-        pdf_0 = self.smoothing_dist.pdf(samples)
-        pdf_1 = self.smoothing_dist.pdf(1.0 - samples)
-        log_prob = torch.log(q * pdf_1 + (1 - q) * pdf_0)
+        log_pdf_0 = self.smoothing_dist.log_pdf(samples)
+        log_pdf_1 = self.smoothing_dist.log_pdf(1.0 - samples)
+        log_prob = torch.logaddexp(
+            torch.log(q) + log_pdf_1,
+            torch.log1p(-q) + log_pdf_0,
+        )
         return log_prob
 
     def log_ratio(self, zeta: torch.Tensor) -> torch.Tensor:
