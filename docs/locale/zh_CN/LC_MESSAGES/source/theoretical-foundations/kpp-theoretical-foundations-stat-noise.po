@@ -341,14 +341,16 @@ msgstr "T_{k+1} = \\alpha T_k, \\quad 0 < \\alpha < 1"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:82
 msgid ""
-"As $T \\to 0$, the stochastic dynamics approach the deterministic Hopfield "
-"limit, and the network freezes into the nearest local minimum. If the "
-"annealing is sufficiently slow, the system converges to the **global "
-"minimum** with high probability, which is a result formally guaranteed by "
-"the theory of Markov chain Monte Carlo (MCMC)."
+"At low temperatures, uphill moves become rare, and geometric cooling can "
+"leave the network trapped in a nonglobal minimum. Under the conditions in "
+"[Hajek (1988)](https://doi.org/10.1287/moor.13.2.311), a logarithmic "
+"schedule $T_k = c/\\log(1+k)$ gives convergence in probability to the set "
+"of global minima when $c$ is at least the escape depth of the deepest "
+"nonglobal local minimum."
 msgstr ""
-"当 $T \\to 0$ 时，随机动力学接近确定性 Hopfield 极限，网络冻结到最近的局部极小值。如果退火足够缓慢，系统将以高概率收敛到 "
-"**全局最小值**，这一点由马尔可夫链蒙特卡洛（MCMC）理论形式化保证。"
+"在低温下，能量上升的转移很少发生，几何降温可能使网络困在非全局极小值。在 [Hajek "
+"(1988)](https://doi.org/10.1287/moor.13.2.311) 给定的条件下，当 $c$ "
+"不小于最深的非全局局部极小值的逃逸深度时，对数降温方案 $T_k = c/\\log(1+k)$ 可使系统依概率收敛到全局极小值集合。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:84
 msgid ""
