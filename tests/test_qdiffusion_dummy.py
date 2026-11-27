@@ -151,6 +151,35 @@ class TestQDiffusionDummy(unittest.TestCase):
         generated = self.model.generate(self.targets, max_steps=1)
         self.assertEqual(generated.shape, self.targets.shape)
 
+    def test_frozen_proposal_stays_in_eval_during_training(self):
+        """train() on the wrapper must not unfreeze the proposal model."""
+        frozen = QDiffusion(
+            proposal_model=DummyProposalModel(vocab_size=8, hidden_size=12),
+            energy_model=DummyEnergyModel(vocab_size=8, hidden_size=12),
+            token_spec=self.token_spec,
+            config=self.config,
+            freeze_proposal=True,
+        )
+        self.assertFalse(frozen.proposal_model.training)
+        self.assertFalse(
+            next(frozen.proposal_model.parameters()).requires_grad
+        )
+
+        frozen.train()
+        self.assertTrue(frozen.training)
+        self.assertTrue(frozen.energy_model.training)
+        self.assertFalse(frozen.proposal_model.training)
+
+        frozen.eval()
+        self.assertFalse(frozen.proposal_model.training)
+
+    def test_unfrozen_proposal_follows_wrapper_mode(self):
+        """Without freeze_proposal the proposal tracks the wrapper mode."""
+        self.model.train()
+        self.assertTrue(self.model.proposal_model.training)
+        self.model.eval()
+        self.assertFalse(self.model.proposal_model.training)
+
     def test_removed_dplm_entrypoints(self):
         self.assertFalse(hasattr(QDiffusion, "from_pretrained"))
         self.assertFalse(hasattr(QDiffusion, "build"))
