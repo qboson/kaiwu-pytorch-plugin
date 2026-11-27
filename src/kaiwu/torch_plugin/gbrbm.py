@@ -145,6 +145,34 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             init.normal_(self.linear_bias, 0, std)
             self.linear_bias.data.clip_(-bound, bound)
 
+    @torch.no_grad()
+    def initialize_gaussian_from_data(self, samples: torch.Tensor) -> None:
+        """Set Gaussian means and variances from training samples.
+
+        Args:
+            samples: Gaussian observations shaped ``(batch_size, num_gaussian)``.
+                Supply the Gaussian partition even when configured as hidden.
+
+        Variance uses the population estimate, with a floor based on
+        ``eps`` and the parameter dtype. Couplings and Bernoulli biases
+        retain their current values.
+        """
+        stats_dtype = torch.promote_types(self.mu.dtype, torch.float32)
+        samples = torch.as_tensor(samples, device=self.mu.device, dtype=stats_dtype)
+        if samples.ndim != 2 or samples.size(0) == 0 or samples.size(1) != self.num_gaussian:
+            raise ValueError("Expected a nonempty batch of shape (batch_size, num_gaussian)")
+        if not torch.isfinite(samples).all():
+            raise ValueError("Gaussian observations must be finite")
+
+        variance, mean = torch.var_mean(samples, dim=0, correction=0)
+        floor = max(self.eps, torch.finfo(self.log_var.dtype).tiny)
+        mean = mean.to(self.mu)
+        log_var = variance.clamp_min(floor).log().to(self.log_var)
+        if not torch.isfinite(mean).all() or not torch.isfinite(log_var.exp()).all():
+            raise ValueError("Gaussian moments must be representable in the model dtype")
+        self.mu.copy_(mean)
+        self.log_var.copy_(log_var)
+
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Compute the Hamiltonian.
 
