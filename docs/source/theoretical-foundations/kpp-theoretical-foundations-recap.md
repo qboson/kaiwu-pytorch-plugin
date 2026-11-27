@@ -40,12 +40,12 @@ However, SA still relies on **thermal activation** to escape local minima, which
 
 ## Beyond Classical Sampling: Quantum Sampling
 
-**Quantum sampling** offers a physically grounded alternative that can overcome the limitations of classical MCMC and simulated annealing. Instead of simulating a Markov chain, one can encode the energy function as an Ising Hamiltonian and let a quantum physical system evolve toward its low‑energy states. Devices such as **quantum annealers**, i.e. Coherent Ising Machines (CIMs), realize this principle in hardware.
+**Quantum sampling** offers a physically grounded alternative that can overcome the limitations of classical MCMC and simulated annealing. Instead of simulating a Markov chain, one can encode the energy function as an Ising Hamiltonian and let a quantum physical system evolve toward its low‑energy states. Devices such as **quantum annealers** and Coherent Ising Machines (CIMs) realize this principle in hardware, through different physical mechanisms.
 
 The full details of quantum sampling, including its physical implementation, integration with PyTorch, and practical performance benefits, are **covered in the hands‑on tutorials of Part II**. You will learn how to replace the classical `SimulatedAnnealingOptimizer` with a quantum sampler (e.g., `CIMOptimizer`) and observe the potential speed‑up and improved sample quality.
 
 ## Part II Preview: Quantum‑Enhanced Hands‑on Tutorials
-Part II [KPP Hands-on Tutorials](../getting_started/tutorials/index.md) shifts from theory to practice. you will use the **Kaiwu-PyTorch-Plugin** to replace classical sampling (Gibbs, CD, and simulated annealing) with quantum‑enhanced sampling. The plugin abstracts away the hardware details, allowing you to switch between classical and quantum samplers with minimal code changes.
+Part II [KPP Hands-on Tutorials](../getting_started/tutorials/index.md) shifts from theory to practice. You will use the **Kaiwu-PyTorch-Plugin** to replace classical sampling (Gibbs, CD, and simulated annealing) with quantum‑enhanced sampling. The plugin abstracts away the hardware details, allowing you to switch between classical and quantum samplers with minimal code changes.
 
 Moreover, four sophisticated tasks will be covered:
 
