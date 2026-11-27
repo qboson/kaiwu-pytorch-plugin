@@ -24,7 +24,6 @@ import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
-from qc_mol_design.config import CFG, PROP_BINS
 from qc_mol_design.models.crbm import CRBM
 from qc_mol_design.models.graph_conv import NeuralFingerprint
 from qc_mol_design.models.predictors import MultiPropertyPredictor
@@ -45,34 +44,33 @@ def compute_prediction_mae(
 
     Returns dict: {'qed': mae_qed, 'logp': mae_logp, 'sas': mae_sas}.
     """
-    gcn.eval(); crbm.eval(); pred.eval()
-    dev = CFG.device
-
-    all_preds:  Dict[str, List[float]] = {p: [] for p in ("qed", "logp", "sas")}
-    all_truths: Dict[str, List[float]] = {p: [] for p in ("qed", "logp", "sas")}
+    gcn.eval()
+    crbm.eval()
+    pred.eval()
+    gcn_param = next(gcn.parameters())
+    crbm_param = next(crbm.parameters())
+    pred_param = next(pred.parameters())
+    properties = ("qed", "logp", "sas")
+    total_error = torch.zeros(len(properties), dtype=torch.float64)
+    count = 0
 
     with torch.no_grad():
-        for X, adj, deg, y_vec, props in loader:
-            X, adj, deg = (t.to(dev) for t in (X, adj, deg))
-            y_vec = y_vec.to(dev)
-            props = props.to(dev)   # (B, 3): [qed, logp, sas]
-
-            f    = gcn(X, adj, deg)
+        for atoms, adj, deg, _labels, props in loader:
+            fingerprint = gcn(
+                atoms.to(gcn_param), adj.to(gcn_param), deg.to(device=gcn_param.device)
+            )
             # Methods p.12: for unknown targets first find
             # y*=argmax_y p(y|f), then compute the latent representation.
-            h    = crbm.encode_unknown(f)
-            phat = pred(h)          # dict: prop → (B,)
+            hidden = crbm.encode_unknown(fingerprint.to(crbm_param))
+            predicted = pred(hidden.to(pred_param))
+            values = torch.stack([predicted[prop] for prop in properties], dim=1)
+            if props.shape != values.shape:
+                raise ValueError("Expected one QED, LogP, and SAS target per prediction")
+            error = values.cpu().double() - props.cpu().double()
+            total_error += error.abs().sum(dim=0)
+            count += props.shape[0]
 
-            for i, p in enumerate(("qed", "logp", "sas")):
-                all_preds[p].extend(phat[p].cpu().tolist())
-                all_truths[p].extend(props[:, i].cpu().tolist())
-
-    maes = {}
-    for p in ("qed", "logp", "sas"):
-        phat_arr = np.array(all_preds[p])
-        true_arr = np.array(all_truths[p])
-        maes[p]  = float(np.abs(phat_arr - true_arr).mean())
-    return maes
+    return dict(zip(properties, (total_error / count).tolist()))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
