@@ -4,9 +4,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Deep Belief Network (DBN) model.
 
-This module contains the DBN class and functions for training the DBN+model
-or only the model. Training the DBN+model will save the likelihood values
-and prediction accuracy during the training process.
+This module contains the UnsupervisedDBN class: a layer-wise pretrained
+stack of RBMs with forward, transform (feature extraction) and
+layer-wise reconstruction. Training is unsupervised (energy-based
+layer-wise pretraining); the class does not track likelihood or
+prediction accuracy.
 """
 import numpy as np
 
