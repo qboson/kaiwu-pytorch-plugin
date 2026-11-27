@@ -149,11 +149,12 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Compute the Hamiltonian.
 
         Args:
-            s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,
-                and N is the number of variables in the model.
+            s_all (torch.Tensor): Joint states of shape (batch, num_nodes).
+                The Gaussian columns come first, followed by the Bernoulli
+                columns, for either setting of ``is_visible_gaussian``.
 
         Returns:
-            torch.tensor: Hamiltonian of shape (B,).
+            torch.Tensor: Hamiltonian of shape (batch,).
         """
         return self.energy(s_all, enable_grad=True)
 
@@ -161,13 +162,14 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Compute the Hamiltonian.
 
         Args:
-            s_all (torch.tensor): Tensor of shape (B, N), where B is the batch size,
-                and N is the number of variables in the model.
+            s_all (torch.Tensor): Joint states of shape (batch, num_nodes).
+                The Gaussian columns come first, followed by the Bernoulli
+                columns, for either setting of ``is_visible_gaussian``.
             enable_grad (bool, optional): Whether to enable gradient computation.
                 Defaults to False.
 
         Returns:
-            torch.tensor: Hamiltonian of shape (B,).
+            torch.Tensor: Hamiltonian of shape (batch,).
 
         """
         with torch.set_grad_enabled(enable_grad):
@@ -243,7 +245,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 results with randomness. Defaults to False.
 
         Returns:
-            torch.tensor: Complete state tensor with both Gaussian and Bernoulli nodes.
+            torch.Tensor: Joint states of shape (batch, num_nodes). The
+                Gaussian columns come first, followed by the Bernoulli
+                columns, for either setting of ``is_visible_gaussian``.
 
         """
         with torch.no_grad():
@@ -278,7 +282,9 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 results with randomness. Defaults to False.
 
         Returns:
-            torch.tensor: Complete state tensor with both Gaussian and Bernoulli nodes.
+            torch.Tensor: Joint states of shape (batch, num_nodes). The
+                Gaussian columns come first, followed by the Bernoulli
+                columns, for either setting of ``is_visible_gaussian``.
 
         """
         with torch.no_grad():
