@@ -45,7 +45,7 @@ class FeatureSelectionWrapper(nn.Module):
         cardinality_k: Optional target number of selected features.
         min_selected_features: Optional lower bound for selected features.
         max_selected_features: Optional upper bound for selected features.
-        solver: Built-in solver name, such as ``"local_search","sa","kaiwu_cim"``.
+        solver: Built-in solver name, such as ``"local_search","sa","kaiwu_cim","exact"``.
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
