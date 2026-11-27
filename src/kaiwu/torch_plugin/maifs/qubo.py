@@ -518,7 +518,13 @@ def _solve_ising_local_search(
     initial_binary: np.ndarray | None = None,
     max_iter: int = 2000,
 ) -> np.ndarray:
-    """Solve an Ising matrix with local greedy spin flips.
+    """Solve an Ising matrix with greedy single and pair spin flips.
+
+    Each step applies the single spin flip that lowers the objective most.
+    When no single flip helps, it applies the best simultaneous flip of two
+    spins instead. Pair flips let the search swap one selected feature for
+    another, which a cardinality penalty otherwise blocks because every single
+    flip changes the selected count.
 
     Args:
         ising_matrix: Square Ising matrix with an auxiliary spin.
@@ -548,38 +554,29 @@ def _solve_ising_local_search(
             raise ValueError("initial_binary must contain only 0/1 values")
         spins = np.r_[2 * binary - 1, 1].astype(int)
 
-    weights = np.triu(matrix)
-
-    def objective(candidate: np.ndarray) -> float:
-        """Evaluate the Ising objective for a candidate spin vector.
-
-        Args:
-            candidate: Candidate spin vector encoded with ``-1`` and ``1``.
-
-        Returns:
-            Ising objective value for ``candidate``.
-        """
-        return float(np.sum(weights * np.outer(candidate, candidate)))
-
-    current_value = objective(spins)
+    # The objective is sum(triu(M) * outer(s, s)). Its diagonal is constant for
+    # spins, so only the symmetric off-diagonal coupling changes with a flip.
+    upper = np.triu(matrix, 1)
+    coupling = upper + upper.T
+    tolerance = 1e-12
 
     for _ in range(int(max_iter)):
-        best_delta = 0.0
-        best_index = -1
-        best_value = current_value
-        for index in range(spins.size):
-            candidate = spins.copy()
-            candidate[index] *= -1
-            candidate_value = objective(candidate)
-            delta = candidate_value - current_value
-            if delta < best_delta:
-                best_delta = float(delta)
-                best_index = int(index)
-                best_value = float(candidate_value)
-        if best_index < 0:
+        single_delta = -2.0 * spins * (coupling @ spins)
+        index = int(np.argmin(single_delta))
+        if single_delta[index] < -tolerance:
+            spins[index] *= -1
+            continue
+        pair_delta = (
+            single_delta[:, None]
+            + single_delta[None, :]
+            + 4.0 * coupling * np.outer(spins, spins)
+        )
+        np.fill_diagonal(pair_delta, 0.0)
+        first, second = divmod(int(np.argmin(pair_delta)), spins.size)
+        if pair_delta[first, second] >= -tolerance:
             break
-        spins[best_index] *= -1
-        current_value = best_value
+        spins[first] *= -1
+        spins[second] *= -1
 
     return spins.reshape(1, -1).astype(int)
 

@@ -222,3 +222,37 @@ def test_local_search_keeps_correct_existing_results_from_every_initial_state(
     for initial in states:
         result = qubo.solve_qubo(2 * coefficients, linear, initial, solver="local_search")
         assert polynomial([result], coefficients, linear)[0] == pytest.approx(expected.min())
+
+
+def test_local_search_swaps_a_selected_feature_under_the_cardinality_penalty():
+    torch.manual_seed(0)
+    features = torch.randn(256, 3)
+    target = 2. * features[:, 1:2]
+    model = torch.nn.Linear(3, 1, bias=False)
+    with torch.no_grad():
+        model.weight.copy_(torch.tensor([[.5, 2., 0.]]))
+    selector = FeatureSelectionWrapper(model, 3, cardinality_k=1, solver="local_search")
+    selector.mask.copy_(torch.tensor([1., 0., 0.]))
+    # Linear model and MSE: the MAIFS Taylor model is exact and feature 1 alone fits.
+    # Every single flip changes the selected count, so only a swap can reach it.
+    result = selector.update_mask([(features, target)], torch.nn.MSELoss())
+    np.testing.assert_array_equal(result, [0, 1, 0])
+
+
+@pytest.mark.parametrize("seed", range(5))
+def test_local_search_leaves_no_improving_flip_or_swap_under_a_cardinality_penalty(seed):
+    rng = np.random.default_rng(seed)
+    size, selected, penalty = 6, 2, 10.
+    # penalty * (sum(x) - selected) ** 2 plus small loss terms, as in MAIFS.
+    coefficients = .1 * rng.normal(size=(size, size)) + penalty * np.ones((size, size))
+    linear = .1 * rng.normal(size=size) - 2. * penalty * selected
+    initial = np.r_[np.ones(selected, dtype=int), np.zeros(size - selected, dtype=int)]
+    result = qubo.solve_qubo(2 * coefficients, linear, initial, solver="local_search")
+    value = polynomial([result], coefficients, linear)[0]
+    for i in range(size):
+        for j in range(i, size):
+            neighbour = result.copy()
+            neighbour[i] ^= 1
+            if j != i:
+                neighbour[j] ^= 1
+            assert polynomial([neighbour], coefficients, linear)[0] >= value - 1e-9
