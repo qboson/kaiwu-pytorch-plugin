@@ -6,16 +6,15 @@
 示例使用数据可以在https://www.kaggle.com/datasets/redwoodz/immune-data下载
 
 ## 依赖
+
+请在仓库根目录运行安装命令。如果已安装与示例兼容的 KPP，可以跳过第一条命令。
+
+```bash
+python -m pip install .
+python -m pip install anndata scanpy leidenalg scib-metrics scgraph-eval scikit-learn seaborn tqdm
 ```
-kaiwu==1.3.1
-kaiwu-torch-plugin==0.1.0
-torch==2.7.0
-anndata
-scanpy
-leidenalg
-scib_metrics
-scgraph
-```
+
+Apple Silicon Mac 用户运行示例前，请先执行 `export NUMBA_THREADING_LAYER=workqueue`。
 
 ## 文件结构
 

@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -105,21 +105,17 @@ graph TD
 
 ### 环境要求
 
-- python == 3.10
-- kaiwu >= 1.3.1, <= 1.4.3
-- torch == 2.7.0
-- numpy == 2.2.6
+| Python | Kaiwu SDK | NumPy | PyTorch |
+| --- | --- | --- | --- |
+| 3.10 | 1.3.1–1.4.4（不含 1.4.2） | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
-Kaiwu 兼容范围包括已发布的 1.3.1、1.4.0、1.4.1、1.4.2、1.4.3。
-同一套模型代码兼容降精度工具的位置变化，并按所装 SDK 转换计算模式；
-旧写法 `quota` / `sample` 和新写法 `optimization` / `sampling` 均可使用，
-不区分大小写。这些正式 SDK 安装包仅提供 Python 3.10 版本。
+上表是安装约束。实际能组合安装的版本还取决于各依赖提供的安装包和它们各自的依赖约束。
+CI 运行的具体组合见[兼容性矩阵](.github/compatibility-matrix.json)，安装步骤见
+[安装说明](docs/source/getting_started/installation.md)。
 
-SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口变化前后
-及最新支持版本。手动运行 CI 时开启 `all-kaiwu-versions` 可检查全部五版。
-检查使用本地求解和云端求解器构造，不会提交云端任务。
-跨 SDK 检查使用普通的 `pip install .`；1.3.1 的包结构不能通过可编辑安装
-自动发现插件。
+示例依赖见[示例索引](example/README_ZH.md)。
 
 ### 代码风格
 
@@ -127,7 +123,7 @@ SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口�
 
 ### 安装步骤
 
-你可以选择 **本地环境配置（conda/pip）** 或 **Docker 配置**（推荐用于可复现性和隔离环境）。
+日常使用可以直接从 PyPI 安装 KPP。如需 Jupyter 环境，请参考 Docker 配置。
 
 #### 方式一：本地环境配置（conda/pip）
 
@@ -139,26 +135,13 @@ SDK 自动测试在 Python 3.10 下检查 1.3.1、1.4.0、1.4.3，覆盖接口�
    conda activate quantum_env
    ```
 
-2. **克隆仓库**
+2. **从 PyPI 安装 KPP**
 
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
+   python -m pip install kaiwu-torch-plugin
    ```
 
-3. **安装依赖**
-
-   ```bash
-   pip install -r requirements/requirements.txt
-   ```
-
-   Kaiwu SDK 需要单独安装，见下方说明。
-
-4. **安装插件**
-
-   ```bash
-   pip install .
-   ```
+   pip 会同时安装兼容的 Kaiwu SDK。Python 3.12 和 3.14 需要 KPP 0.4.0 或更新版本。
 
 #### 方式二：Docker 配置（无需本地配适环境）
 
@@ -169,14 +152,13 @@ Docker 配置会构建一个预先配置好的 Jupyter Notebook 环境，所有�
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # 已包含 Kaiwu SDK
-├── kaiwu-1.3.1-py3-none-any.whl   # 或从 Qboson 平台下载
 └── docker/
     └── Dockerfile
 ```
 
 1. **克隆仓库**  
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
@@ -201,11 +183,11 @@ requirements/
    docker compose down
    ```
 
-### Kaiwu SDK 安装说明（必需）
+### Kaiwu SDK 安装与授权
 
-现在kaiwu版本1.3.1可以直接通过`pip install kaiwu==1.3.1`来安装
+pip 会随 KPP 安装兼容的 Kaiwu SDK。KPP 0.4.0 在 Python 3.12 和 3.14 上使用 Kaiwu 1.4.4。Python 3.10 如需选装 Kaiwu 1.3.1，可以运行 `python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin`。
 
-其他版本的Kaiwu SDK 的下载和安装步骤如下：
+如需下载 SDK 安装包或配置授权，请参考以下步骤。
 
 ![](imgs/image.png)
 

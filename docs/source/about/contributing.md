@@ -16,27 +16,14 @@
 
 ## 开始开发
 
-请按项目安装文档使用 Python 3.10 和 conda 环境：
+请按[安装指南](../getting_started/installation.md)选择 Python 版本，再从源码安装 KPP 和开发依赖。下面以 Python 3.10 为例。
 
 ```bash
 conda create -n quantum_env python=3.10
 conda activate quantum_env
-git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-cd Kaiwu-pytorch-plugin
-pip install -r requirements/requirements.txt
-pip install .
-```
-
-Kaiwu SDK 为必需依赖。可直接安装 1.3.1 版本：
-
-```bash
-pip install kaiwu==1.3.1
-```
-
-其他版本的安装方式请参阅[安装指南](../getting_started/installation.md)。参与开发时，额外安装开发依赖：
-
-```bash
-pip install -r requirements/devel.txt
+git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
+cd kaiwu-pytorch-plugin
+python -m pip install . -r requirements/devel.txt
 ```
 
 ## 代码、测试与文档

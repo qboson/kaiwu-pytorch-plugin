@@ -18,7 +18,7 @@ The concrete example behind this page is small-sample **RNA-sequence data augmen
 **Dependencies**:
 
 ```{code-block} bash
-pip install kaiwu==1.3.1 pandas matplotlib
+python -m pip install kaiwu-torch-plugin pandas matplotlib
 ```
 
 **Run**:

@@ -1,5 +1,9 @@
 **Language Versions**: [中文](README_ZH.md) | [English](README.md)
 
+### Setup
+
+From the repository root, run `python -m pip install .` to use the KPP version that ships with these examples. If you already have a compatible KPP version, keep it and follow the individual example’s instructions for any extra dependencies.
+
 ### Examples of BoltzmannMachine and RestrictedBoltzmannMachine
 
 * `run_bm.py`: Demonstrates how to use the `BoltzmannMachine` class for model instantiation, sampling, objective function calculation, and parameter optimization. This is suitable for understanding the basic training workflow of a Boltzmann Machine, including sampling and gradient backpropagation.
@@ -92,7 +96,7 @@ Run the training script via `example/bm_generation/train_bm.ipynb`, and execute 
 
 **Dependencies**:
 ```text
-kaiwu==1.3.0
+kaiwu
 pandas
 matplotlib
 ```
@@ -110,14 +114,7 @@ This example demonstrates how to train and evaluate a Quantum Variational Autoen
 
 Run the example via `example/qvae_mnist/train_qvae.ipynb`.
 
-For details, see `example/qvae_mnist/README.md`.
-
-**Dependencies**
-
-```
-torchvision==0.22.0
-torchmetrics[image]
-```
+See the [MNIST example](qvae_mnist/README.md#dependencies) for installation.
 
 ---
 
@@ -132,12 +129,7 @@ This extended example demonstrates how pre-trained Q-VAE representations can be 
 
 Run the example via `example/qvae_mnist/train_qvae_classifier.ipynb`.
 
-For details, see `example/qvae_mnist/README.md`.
-
-**Dependencies**
-```
-torchvision==0.22.0
-```
+See the [MNIST example](qvae_mnist/README.md#dependencies) for installation.
 
 ---
 

@@ -13,11 +13,7 @@ By the end of this tutorial you will be able to:
 
 ## Running the Example
 
-**Dependencies**:
-
-```{code-block} bash
-pip install torchvision==0.22.0 torchmetrics[image]
-```
+See the [MNIST example installation instructions](https://github.com/qboson/kaiwu-pytorch-plugin/tree/main/example/qvae_mnist#dependencies).
 
 **Run**:
 
