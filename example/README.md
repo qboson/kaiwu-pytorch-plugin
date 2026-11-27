@@ -13,6 +13,12 @@ Both scripts showcase the complete steps of model initialization, sampling, obje
 
 ---
 
+### Deep Boltzmann Machine (DBM)
+
+`example/dbm/run_dbm.py` demonstrates multi-modal binary pattern learning and denoising reconstruction using `DeepBoltzmannMachine` with variational mean-field positive-phase inference and joint multi-layer Ising sampling (local SA, Kaiwu SA, or CIM). It runs completely offline on CPU with no extra dependencies. See [example/dbm/README.md](dbm/README.md) for details.
+
+---
+
 ### Q-Diffusion
 
 `example/qdiffusion/` now splits into:

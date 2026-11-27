@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Kaiwu-PyTorch-Plugin public API."""
 
+from .dbm import DeepBoltzmannMachine
 from .dbn import UnsupervisedDBN
 from .full_boltzmann_machine import BoltzmannMachine
 from .maifs import FeatureSelectionWrapper, QuadraticLinearSolver
@@ -18,6 +19,7 @@ from .usage_stats import (
 __version__ = "0.4.0"
 
 __all__ = [
+    "DeepBoltzmannMachine",
     "RestrictedBoltzmannMachine",
     "BoltzmannMachine",
     "EnergyModel",
