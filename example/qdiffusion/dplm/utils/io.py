@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import gzip
 import json
 from pathlib import Path
 from typing import Any
@@ -34,13 +35,25 @@ def save_markdown(path: Path, lines: list[str]) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
-    """Reads all FASTA records from one file."""
+def read_fasta_records(
+    fasta_path: Path, *, max_records: int | None = None
+) -> list[tuple[str, str]]:
+    """Read a plain or gzip FASTA, optionally stopping after a prefix of records."""
+    if max_records is not None and max_records < 0:
+        raise ValueError("max_records must be non-negative")
+    if max_records == 0:
+        return []
+
     records: list[tuple[str, str]] = []
     header = ""
     sequence_parts: list[str] = []
 
-    with fasta_path.open("r", encoding="utf-8") as handle:
+    stream = (
+        gzip.open(fasta_path, "rt", encoding="utf-8")
+        if fasta_path.suffix.lower() == ".gz"
+        else fasta_path.open("r", encoding="utf-8")
+    )
+    with stream as handle:
         for line in handle:
             line = line.strip()
             if not line:
@@ -48,6 +61,8 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
             if line.startswith(">"):
                 if header:
                     records.append((header, "".join(sequence_parts)))
+                    if len(records) == max_records:
+                        return records
                 header = line[1:]
                 sequence_parts = []
             else:

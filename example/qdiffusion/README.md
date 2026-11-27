@@ -50,6 +50,10 @@ the larger experiment workflow.
 
 ## dplm
 
+The full DPLM training and ESM2 evaluation workflows accept plain FASTA and
+gzip-compressed FASTA (`.gz`). When `EvalConfig.max_records` is set, the
+evaluator reads only that prefix of the reference records from disk.
+
 `dplm/` contains the protein-case adapter layer and larger workflows:
 
 - `dplm/utils/dplm_builder.py`: protein-case `Q-Diffusion` assembly helper

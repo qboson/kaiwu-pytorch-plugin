@@ -60,6 +60,9 @@ factory helper 间接接入。
 
 ## dplm
 
+完整 DPLM 训练和 ESM2 评估流程支持普通 FASTA 和 gzip 压缩的 FASTA（`.gz`）。
+设置 `EvalConfig.max_records` 后，评估只读取参考文件开头指定数量的记录。
+
 `dplm/` 目录包含蛋白案例相关的适配层和完整工作流：
 
 - `dplm/utils/dplm_builder.py`：蛋白案例到 `Q-Diffusion` 的组装工具
