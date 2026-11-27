@@ -38,7 +38,11 @@ def get_full_pipeline(config):
     qvae_transformer = PipelineTransformer(config)
 
     # Create MLPClassifier (using config.classifier_kwargs if present)
-    classifier_kwargs = getattr(config, 'classifier_kwargs', {})
+    classifier_kwargs = dict(getattr(config, 'classifier_kwargs', {}))
+    if "device" not in classifier_kwargs:
+        classifier_kwargs["device"] = torch.device(
+            "cuda" if config.use_cuda and torch.cuda.is_available() else "cpu"
+        )
     clf = MLPClassifier(save_path=config.output_dir, **classifier_kwargs)
     return Pipeline([('qvae', qvae_transformer), ('classifier', clf)])
 
