@@ -280,7 +280,7 @@ opt = SimulatedAnnealingOptimizer()
 mat = np.array([[1, -1], [-1, 1]])
 result = opt.solve(mat)
 print(f"Kaiwu SDK version: {kaiwu.__version__}")
-print(result)
+print("Solver result:", result)
 
 # Verify Kaiwu-PyTorch-Plugin
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
@@ -292,10 +292,10 @@ print(f"RBM created with {rbm.num_visible} visible and {rbm.num_hidden} hidden u
 
 ### Expected Output
 
-```bash
-PyTorch version: 2.7.0
-Kaiwu SDK version: 1.3.1
-Solver result: [array([1, -1]), array([-1, 1])]
+```text
+PyTorch version: <installed PyTorch version>
+Kaiwu SDK version: <installed Kaiwu SDK version>
+Solver result: <solver output>
 Kaiwu-PyTorch-Plugin imported successfully!
 RBM created with 10 visible and 5 hidden units
 ```
