@@ -1,6 +1,8 @@
 CHECK_DIRS=src
 
-all_tests: test_install pylint pytest
+all_tests: test_install
+	$(MAKE) pylint
+	$(MAKE) pytest
 
 test_install:
 	pip3 install -i https://mirrors.aliyun.com/pypi/simple -r requirements/devel.txt
