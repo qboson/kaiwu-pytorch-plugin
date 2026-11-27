@@ -2,7 +2,7 @@
 
 ## 安装与运行
 
-使用 Python 3.10、Kaiwu 1.3.1、PyTorch 2.7.0 和 torchvision 0.22.0。
+保留的实验使用 Python 3.10、Kaiwu 1.3.1、PyTorch 2.7.0 和 torchvision 0.22.0。复现记录中的环境时请使用这些版本；插件当前的兼容范围见[仓库 README](../../README_ZH.md)。
 实际调用模拟退火前，在本地初始化 SDK 授权。
 
 ```sh

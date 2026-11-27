@@ -2,7 +2,7 @@
 
 ## Setup and execution
 
-Use Python 3.10, Kaiwu 1.3.1, PyTorch 2.7.0 and torchvision 0.22.0.
+The retained experiments used Python 3.10, Kaiwu 1.3.1, PyTorch 2.7.0 and torchvision 0.22.0. Use these versions to reproduce the recorded environment; the plugin's current compatibility ranges are documented in the [repository README](../../README.md).
 Initialize your SDK license locally before real SA execution.
 
 ```sh
