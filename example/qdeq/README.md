@@ -89,6 +89,10 @@ deq.get_last_stats()       # forward/backward steps, residuals, sampler time
 `simple_train_example.py` with default arguments (2 epochs) finishes in a few
 minutes on a CPU and reaches a test MSE of about 0.43 in the standardised space.
 
+Add `--horizon-metrics results/horizons.csv` to the forecast command to
+export scaled MSE and MAE for each hourly forecast lead. Each row averages
+all test windows and variables for that lead.
+
 ## Results: Kaiwu CIM vs Anderson
 
 To check the Ising solver on physical hardware, the same trained QDEQ

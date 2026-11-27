@@ -8,6 +8,7 @@ compared under Kaiwu SA, CIM and Anderson.
 from __future__ import annotations
 
 import argparse
+import csv
 from pathlib import Path
 
 import torch
@@ -30,6 +31,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--sampler", choices=["sa", "anderson", "cim"], default="sa")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--horizon-metrics", type=Path, help="Write scaled MSE and MAE per lead to CSV")
     return parser.parse_args()
 
 
@@ -41,11 +43,23 @@ def main() -> None:
     model = DEQForecaster(96, 96, sampler, build_config())
     model.load_state_dict(torch.load(args.checkpoint)["state_dict"])
 
-    test = evaluate(model, loaders["test"])
+    horizon_path = getattr(args, "horizon_metrics", None)
+    options = {"by_horizon": True} if horizon_path is not None else {}
+    test = evaluate(model, loaders["test"], **options)
     print(
         f"{args.sampler}: test mse {test['mse']:.4f} mae {test['mae']:.4f} "
         f"(mean forward steps {test['steps']:.1f})"
     )
+    if horizon_path is not None:
+        horizon_path.parent.mkdir(parents=True, exist_ok=True)
+        with horizon_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(["lead_hours", "mse", "mae"])
+            for lead, (mse, mae) in enumerate(
+                zip(test["mse_by_horizon"], test["mae_by_horizon"]), start=1
+            ):
+                writer.writerow([lead, mse, mae])
+        print(f"saved {horizon_path}")
     history, target = next(iter(loaders["test"]))
     with torch.no_grad():
         forecast = model(history[:1])
