@@ -105,15 +105,12 @@ msgstr "w_{ij} = \\frac{1}{N} \\sum_{\\mu=1}^P \\xi_i^\\mu \\xi_j^\\mu"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:30
 msgid ""
-"each stored pattern becomes a local minimum of the energy function. When "
-"presented with a corrupted or partial version of a memory as the initial "
-"state, the deterministic dynamics naturally flow downhill and restore the "
-"complete pattern. This is **content-addressable memory**: retrieval is "
-"driven by similarity to the stored patterns rather than by an explicit "
-"address."
-msgstr ""
-"每个存储模式都会成为能量函数的一个局部极小值。当以某个记忆的损坏版本或部分版本作为初始状态时，确定性动力学会自然向下流动并恢复完整模式。这就是 "
-"**内容寻址记忆**：检索由与存储模式的相似性驱动，而不是由显式地址驱动。"
+"Hebbian weights can create stable memories. Interference among patterns "
+"can make a stored pattern unstable. If the initial state lies in a "
+"memory's basin of attraction, the updates recover that pattern. This is "
+"**content-addressable memory**, in which the starting state serves as the "
+"query."
+msgstr "赫布权重可以形成稳定的记忆。模式之间的干扰可能使已存储的模式失稳。当初始状态位于某个记忆的吸引盆地内时，更新过程会恢复该模式。这就是**内容寻址记忆**，初始状态本身就是查询。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:32
 msgid "The Curse of Spurious Minima"
@@ -150,9 +147,10 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:38
 msgid ""
-"**Spin-reversed states**: For every stored pattern, its global negation (all"
-" spins flipped) is also an energy minimum."
-msgstr "**自旋反转状态**：对于每个存储模式，它的全局取反（所有自旋翻转）也可能成为能量极小值。"
+"**Spin-reversed states**: With zero biases, reversing all spins preserves "
+"the energy. The global negation of a local minimum is therefore also a "
+"local minimum."
+msgstr "**自旋反转状态**：偏置为零时，翻转全部自旋会保持能量不变。因此，局部极小值的全局取反也是局部极小值。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-stat-noise.md:39
 msgid ""

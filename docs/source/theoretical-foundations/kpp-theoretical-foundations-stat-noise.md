@@ -27,7 +27,7 @@ The Hopfield network was originally proposed as a model of **associative memory*
 
 $$w_{ij} = \frac{1}{N} \sum_{\mu=1}^P \xi_i^\mu \xi_j^\mu$$
 
-each stored pattern becomes a local minimum of the energy function. When presented with a corrupted or partial version of a memory as the initial state, the deterministic dynamics naturally flow downhill and restore the complete pattern. This is **content-addressable memory**: retrieval is driven by similarity to the stored patterns rather than by an explicit address.
+Hebbian weights can create stable memories. Interference among patterns can make a stored pattern unstable. If the initial state lies in a memory's basin of attraction, the updates recover that pattern. This is **content-addressable memory**, in which the starting state serves as the query.
 
 ## The Curse of Spurious Minima
 The Hebbian learning rule, however, is imperfect. The weight matrix $\mathbf{W}$ contains not only the intended contributions from the stored patterns but also unwanted **cross-talk** terms arising from overlaps between different memories. These cross-talk terms create additional local minima in the energy landscape—states that are stable under the deterministic dynamics but do not correspond to any stored pattern. Such states are called **spurious minima** (or *spurious memories*).
@@ -35,7 +35,7 @@ The Hebbian learning rule, however, is imperfect. The weight matrix $\mathbf{W}$
 Spurious minima manifest in several forms:
 
 - **Mixture states**: Linear combinations of an odd number of stored patterns (e.g., $ \text{sign}(\xi^1 + \xi^2 + \xi^3)$) often form stable attractors.
-- **Spin-reversed states**: For every stored pattern, its global negation (all spins flipped) is also an energy minimum.
+- **Spin-reversed states**: With zero biases, reversing all spins preserves the energy. The global negation of a local minimum is therefore also a local minimum.
 - **Random valleys**: Even random weight matrices produce numerous local minima purely due to quenched disorder.
 
 As the number of stored patterns $P$ increases relative to the number of neurons $N$, the density of spurious minima grows catastrophically. Beyond a critical **storage capacity** of approximately $0.14 N$, the network undergoes a phase transition: the intended memories are no longer stable, and the landscape becomes dominated by spurious attractors. Retrieval fails entirely.
