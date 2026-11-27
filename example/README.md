@@ -149,3 +149,26 @@ leidenalg
 scib_metrics
 scgraph
 ```
+
+---
+
+### Combinatorial Optimization: Quantum-Inspired Financial Portfolio Optimization
+
+This example demonstrates cardinality-constrained Markowitz portfolio optimization using QUBO-to-Ising mapping (`kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix`) and RBM market-regime scenario enhancement (`RestrictedBoltzmannMachine`), evaluated strictly out-of-sample under a chronological train/test split.
+
+* **Zero Look-Ahead Data Pipeline**: Includes a deterministic multi-sector regime return generator (offline, zero downloads) and an optional local CSV returns/prices loader with strict chronological splitting.
+* **Exact QUBO/Ising & RBM Enhancement**: Encodes Markowitz mean-variance plus cardinality penalty $\lambda(\sum_i x_i - K)^2$ into an equivalent Ising Hamiltonian (verified to `< 1e-14`), supports `local_sa` (offline), Kaiwu `sa`, and photonic `cim` backends, and optionally regularizes covariance via RBM scenario sampling.
+* **Exact Optimality-Gap Benchmarking**: Compares Equal-Weight (`1/N`), Greedy Top-K Sharpe, Exact Brute-Force Optimal, QUBO-Ising, and QUBO-Ising + RBM on annualized return, volatility, Sharpe ratio, max drawdown, cardinality feasibility, and optimality gap.
+
+Run the benchmark via:
+
+```bash
+python example/financial_portfolio/run_portfolio.py
+```
+
+For details, see [example/financial_portfolio/README.md](financial_portfolio/README.md).
+
+**Dependencies**
+```
+Core plugin dependencies only (torch, numpy, kaiwu)
+```
