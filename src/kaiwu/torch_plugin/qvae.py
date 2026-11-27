@@ -139,6 +139,13 @@ class QVAE(AutoEncoderBase):
     """
     Quantum Variational Autoencoder integrated into AutoEncoderBase framework.
 
+    The KL surrogate is weighted by ``kl_beta``. While that weight is zero the
+    term cannot influence the gradient yet still costs one Boltzmann machine
+    sampling step, so it is skipped by default. Set the public attribute
+    ``skip_zero_kl_beta`` to ``False`` to keep evaluating it anyway -- the
+    previous behaviour, where every loss call samples -- for example to measure
+    what that sampling costs.
+
     Args:
         input_dimension (int or list of int): Dimensionality of input features.
         activation_fct (callable, optional): Activation function for hidden layers.
@@ -181,6 +188,9 @@ class QVAE(AutoEncoderBase):
         self.decoder = decoder
         self.bm = bm
         self.sampler = sampler
+
+        # Public diagnostic switch, documented on the class; read by _kl_dist_from.
+        self.skip_zero_kl_beta = True
 
         # Bernoulli reconstruction bias is model state, but not a trainable parameter.
         self.register_buffer("_train_bias", torch.zeros(self._input_dimension))
@@ -387,12 +397,22 @@ class QVAE(AutoEncoderBase):
     def _kl_dist_from(self, posterior):
         """Compute KL divergence: cross_entropy - entropy.
 
+        While ``kl_beta`` is zero the divergence is scaled away by :meth:`loss`,
+        so the surrogate and the Boltzmann machine sampling it triggers are
+        skipped entirely unless ``skip_zero_kl_beta`` was set to ``False`` on
+        this model.
+
         Args:
             posterior (MixtureGeneric): Posterior distribution.
 
         Returns:
-            torch.Tensor: KL divergence per sample (batch_size,).
+            torch.Tensor: KL divergence per sample (batch_size,). All zeros when
+                the term was skipped; that constant tensor carries no gradient of
+                its own, which is harmless only because the weight multiplying it
+                is zero and the term is not backpropagated in isolation.
         """
+        if self.kl_beta == 0 and self.skip_zero_kl_beta:
+            return posterior.logit_mu.new_zeros(posterior.logit_mu.shape[0])
         entropy = torch.sum(posterior.entropy(), dim=1)
         logit_q = posterior.logit_mu
         cross_entropy = self._cross_entropy(logit_q)
