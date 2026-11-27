@@ -209,6 +209,10 @@ class FeatureSelectionWrapper(nn.Module):
                 not return a scalar tensor.
         """
         train_epochs = int(train_epochs)
+        # Iterators cannot be restarted for a mask refresh or a later epoch.
+        # Keep their original batches so both operations see the same data.
+        if iter(data_loader) is data_loader:
+            data_loader = list(data_loader)
         self.train()
         total_loss = 0.0
         batch_count = 0
