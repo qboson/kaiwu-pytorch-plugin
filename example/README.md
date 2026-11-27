@@ -149,3 +149,22 @@ leidenalg
 scib_metrics
 scgraph
 ```
+
+
+### Minimal Q-Diffusion: A Custom Energy Model
+
+`example/qdiffusion_minimal/` demonstrates the `QDiffusion` extension point that
+the bundled DPLM example hides behind checkpoints and Hugging Face downloads: a
+custom `EnergyModel` subclass that reranks proposal candidates.
+
+```bash
+python example/qdiffusion_minimal/qdiffusion_minimal.py
+```
+
+The script builds a toy proposal model and a `BagOfTokensEnergy` energy model over
+a six-token vocabulary, then decodes a partially masked sequence and reports how
+often the energy model was consulted (`energy-model calls`) and that every mask
+position was decoded. Pure PyTorch: no checkpoint, no download, no Kaiwu SDK
+credentials. See `example/qdiffusion_minimal/README.md` for the `EnergyModel`
+contract.
+
