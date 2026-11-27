@@ -70,7 +70,10 @@ class UnsupervisedDBN(nn.Module):
         return self
 
     def forward(self, data_in):
-        """Performs a forward pass to transform the input data.
+        """Extracts features from the trained RBM stack.
+
+        Each RBM passes hidden-unit probabilities to the next layer. This
+        inference pass runs without autograd and returns a NumPy array.
 
         Args:
             data_in (numpy.ndarray): The input data.
@@ -101,6 +104,8 @@ class UnsupervisedDBN(nn.Module):
 
     def transform(self, data_in):
         """An sklearn-compatible transform method.
+
+        Uses :meth:`forward` to extract features without autograd.
 
         Args:
             data_in (numpy.ndarray): The input data.
