@@ -216,7 +216,7 @@ def evaluate_scgraph(
 
     Args:
         adata: AnnData object to evaluate.
-        rep_key: Embedding key used for labeling the result rows.
+        rep_key: Embedding key to evaluate and label in the result rows.
         batch_key: ``adata.obs`` column with batch labels.
         label_key: ``adata.obs`` column with cell-type labels.
         output_dir: Directory for the temporary h5ad file.
@@ -253,7 +253,7 @@ def evaluate_scgraph(
             thres_celltype=thres_celltype,
             only_umap=only_umap,
         )
-        result = analyzer.main()
+        result = analyzer.main(_obsm_list=[rep_key])
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
@@ -339,7 +339,7 @@ def run_dpt(adata, rep_key, root_cell_type, label_key, n_neighbors, out_key):
     Args:
         adata: AnnData object modified in place.
         rep_key: Representation used to build the neighbor graph.
-        root_cell_type: Cell type used as the DPT root.
+        root_cell_type: Cell type whose first matching row is used as the DPT root.
         label_key: ``adata.obs`` column with cell-type labels.
         n_neighbors: Number of neighbors used for graph construction.
         out_key: ``adata.obs`` column where pseudotime is stored.
@@ -354,8 +354,9 @@ def run_dpt(adata, rep_key, root_cell_type, label_key, n_neighbors, out_key):
     if root_cell_type not in set(adata.obs[label_key].astype(str)):
         raise ValueError(f"{root_cell_type!r} not found in adata.obs[{label_key!r}]")
 
-    root_cells = adata.obs_names[adata.obs[label_key].astype(str) == root_cell_type]
-    adata.uns["iroot"] = int(np.flatnonzero(adata.obs_names == root_cells[0])[0])
+    # Scanpy expects a row position; observation names can repeat across batches.
+    root_cells = np.flatnonzero(adata.obs[label_key].astype(str) == root_cell_type)
+    adata.uns["iroot"] = int(root_cells[0])
     sc.tl.diffmap(adata)
     sc.tl.dpt(adata)
     adata.obs[out_key] = adata.obs["dpt_pseudotime"].to_numpy()
