@@ -35,6 +35,11 @@ The main assembly path is:
 4. the builder constructs one generic `Q-Diffusion(...)`
 5. the script calls `objective(...)` for training or `generate(...)` for inference
 
+Set `QDiffusionConfig(energy_batch_size=...)` to cap the number of candidate
+sequences per energy forward when decoding. Use this with an energy model that
+scores each row independently. For example, with four sequences and eight
+candidates each, a limit of eight uses four scorer calls per decode step.
+
 ## Simple
 
 `simple/` is the smallest runnable surface:
