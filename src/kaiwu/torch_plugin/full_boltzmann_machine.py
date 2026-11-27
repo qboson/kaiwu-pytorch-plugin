@@ -197,12 +197,14 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             # Return sampled states of all units
             return s_all
 
-    def condition_sample(self, sampler, s_visible, dtype=torch.float32) -> torch.Tensor:
+    def condition_sample(self, sampler, s_visible, dtype=None) -> torch.Tensor:
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
             sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
             s_visible: State of the visible layer.
+            dtype (torch.dtype, optional): Output dtype. Defaults to the model
+                parameter dtype; pass a value to override it.
 
         Returns:
             torch.Tensor: Spins sampled from the model
@@ -210,15 +212,16 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         """
         solutions = []
         for i in range(s_visible.size(0)):
-            ising_mat = self._hidden_to_ising_matrix(s_visible[i])
+            visible = self._to_model_tensor(s_visible[i], dtype=dtype)
+            ising_mat = self._hidden_to_ising_matrix(visible)
 
             with kpp_caller_context():
                 solution = sampler.solve(ising_mat)
 
             solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
-            solution = torch.tensor(solution, dtype=dtype, device=self.device)
+            solution = self._to_model_tensor(solution, dtype=dtype)
             solution = torch.cat(
-                [s_visible[i].unsqueeze(0).expand(solution.shape[0], -1), solution],
+                [visible.unsqueeze(0).expand(solution.shape[0], -1), solution],
                 dim=-1,
             )
             solutions.append(solution)

@@ -45,7 +45,39 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         parameter = next(self.parameters(), None)
         if parameter is not None:
             self.device = parameter.device
+            # Gaussian-Bernoulli sampling stores its dtype separately for
+            # work buffers. Parent-initiated moves only pass through _apply,
+            # so leaving this stale would make sample() cast correct float64
+            # states back to the constructor's original float32 dtype.
+            if hasattr(self, "dtype"):
+                self.dtype = parameter.dtype
         return module
+
+    def _to_model_tensor(self, value, dtype=None) -> torch.Tensor:
+        """Build a tensor using the model parameter dtype and device.
+
+        Samplers commonly return NumPy arrays. Deriving dtype and device from
+        the parameters keeps sampled states compatible with the model after
+        ``.double()`` or device moves instead of silently forcing float32.
+
+        Args:
+            value: Array-like sampler output or model state.
+            dtype (torch.dtype, optional): Explicit dtype that overrides the
+                model parameter dtype.
+
+        Returns:
+            torch.Tensor: Tensor on the model device with the requested dtype.
+        """
+        parameter = getattr(self, "linear_bias", None)
+        if parameter is None:
+            parameter = next(self.parameters(), None)
+        if parameter is None:
+            return torch.as_tensor(value, dtype=dtype, device=self.device)
+        return torch.as_tensor(
+            value,
+            dtype=parameter.dtype if dtype is None else dtype,
+            device=parameter.device,
+        )
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
         """Computes the Hamiltonian.
@@ -114,7 +146,4 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             solution = sampler.solve(ising_mat)
 
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
-        solution = torch.FloatTensor(solution)
-        solution = solution.to(self.device)
-
-        return solution
+        return self._to_model_tensor(solution)

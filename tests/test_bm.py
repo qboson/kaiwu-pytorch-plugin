@@ -132,6 +132,40 @@ class TestBoltzmannMachine(unittest.TestCase):
             self.assertEqual(result.shape, (2, self.num_nodes))
             self.assertIsInstance(result, torch.Tensor)
 
+    def test_sample_preserves_model_dtype(self):
+        """A float64 model must return samples that its own forward() accepts."""
+        bm = BM(self.num_nodes, device="cpu").double()
+
+        class DummySampler:
+            def solve(self, ising_mat):
+                return np.ones((1, ising_mat.shape[0]))
+
+        samples = bm.sample(DummySampler())
+
+        self.assertEqual(samples.dtype, bm.linear_bias.dtype)
+        self.assertEqual(samples.device, bm.linear_bias.device)
+        self.assertEqual(samples.shape, (1, self.num_nodes))
+        self.assertEqual(bm(samples).dtype, torch.float64)
+        s_positive = torch.ones(1, self.num_nodes, dtype=torch.float64)
+        self.assertEqual(bm.objective(s_positive, samples).dtype, torch.float64)
+
+    def test_condition_sample_preserves_model_dtype(self):
+        """Conditional sampling must also follow a migrated model dtype."""
+        bm = BM(self.num_nodes, device="cpu").double()
+
+        class DummySampler:
+            def solve(self, ising_mat):
+                return np.ones((2, ising_mat.shape[0]))
+
+        s_visible = torch.ones(1, 2, dtype=torch.float64)
+        samples = bm.condition_sample(DummySampler(), s_visible)
+
+        self.assertEqual(samples.dtype, torch.float64)
+        self.assertEqual(samples.device, bm.linear_bias.device)
+        self.assertEqual(samples.shape, (2, self.num_nodes))
+        torch.testing.assert_close(samples[:, :2], s_visible.expand(2, -1))
+        self.assertEqual(bm(samples).dtype, torch.float64)
+
     def test_get_ising_matrix(self):
         with self.subTest("Unbounded weight range"):
             h_true = torch.FloatTensor([-3, 0, 1, 2])
