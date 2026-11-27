@@ -1,7 +1,5 @@
 include README.md
 include LICENSE
-include CHANGELOG.md
-include CONTRIBUTING.md
 include requirements/requirements.txt
 include requirements/devel.txt
 include requirements/requirements_example.txt
@@ -10,9 +8,9 @@ include pyproject.toml
 include pytest.ini
 include pylintrc
 
-recursive-include kaiwu *.py
+recursive-include src/kaiwu *.py
 recursive-include tests *.py
-recursive-include example *.py *.ipynb
+recursive-include example *.py *.ipynb *.npy
 
 global-exclude *.pyc
 global-exclude __pycache__
