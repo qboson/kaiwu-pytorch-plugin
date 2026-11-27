@@ -321,6 +321,50 @@ msgid ""
 "objective are added."
 msgstr "Q-ELBO 框架保持不变；仅新增了评分头与损失目标。"
 
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:16
+msgid ""
+"The runnable example is under review in [PR "
+"#169](https://github.com/qboson/kaiwu-pytorch-plugin/pull/169). Use the "
+"example checkout from that PR for the commands below."
+msgstr ""
+"可运行的示例正在 [PR #169](https://github.com/qboson/kaiwu-pytorch-"
+"plugin/pull/169) 中审阅。请在该 PR 的代码检出目录中运行下述命令。"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:91
+msgid ""
+"View the [CleanEnergyQVAE model source](https://github.com/cwu137/kaiwu-"
+"pytorch-"
+"plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/model/model.py)."
+msgstr ""
+"查看 [CleanEnergyQVAE 模型源码](https://github.com/cwu137/kaiwu-pytorch-"
+"plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/model/model.py)。"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:104
+msgid ""
+"View the [energy-supervised loss source](https://github.com/cwu137/kaiwu-"
+"pytorch-"
+"plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/model/losses.py)."
+msgstr ""
+"查看 [能量监督损失源码](https://github.com/cwu137/kaiwu-pytorch-"
+"plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/model/losses.py)。"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:116
+msgid ""
+"View the [threshold search and evaluation "
+"source](https://github.com/cwu137/kaiwu-pytorch-"
+"plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/utils/evaluate.py)."
+msgstr ""
+"查看 [阈值搜索与评估源码](https://github.com/cwu137/kaiwu-pytorch-"
+"plugin/blob/c5c11aa8f9a9a72d75685b1e51f006c4965c42de/example/qvae_anomaly/utils/evaluate.py)。"
+
+#: ../../source/getting_started/tutorials/qvae_anomaly.md:68
+msgid ""
+"The commands in this section use the example checkout from [PR "
+"#169](https://github.com/qboson/kaiwu-pytorch-plugin/pull/169)."
+msgstr ""
+"本节命令使用 [PR #169](https://github.com/qboson/kaiwu-pytorch-plugin/pull/169)"
+" 的示例代码检出目录。"
+
 #~ msgid ""
 #~ "**Status**: Coming soon — placeholder page; will be expanded into a full "
 #~ "tutorial."

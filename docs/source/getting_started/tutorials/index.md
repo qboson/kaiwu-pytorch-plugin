@@ -97,7 +97,7 @@ qdiffusion
 ```
 
 - [Q-VAE for Single-Cell Transcriptomics](qvae_cell.md): single-cell representation learning with a QVAE; UMAP and clustering evaluation (Leiden, classification, scIB, scGraph, DPT). Example: `example/qvae_cell/`.
-- [Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): CleanEnergyQVAE with a free-energy scoring head and NCE-style contrastive objective on thyroid / creditcard benchmarks. Example: `example/qvae_anomaly/`.
+- [Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md): CleanEnergyQVAE with a free-energy scoring head and NCE-style contrastive objective on thyroid / creditcard benchmarks. The example is under review in [PR #169](https://github.com/qboson/kaiwu-pytorch-plugin/pull/169).
 - [Q-Diffusion for Protein Sequence Generation](qdiffusion.md): discrete diffusion with a quantum-accelerated energy reranker and a DPLM backbone. Example: `example/qdiffusion/`.
 
 ## Coming Soon
