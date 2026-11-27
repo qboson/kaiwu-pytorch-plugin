@@ -1,3 +1,4 @@
+<!-- Modified: use standard Python indentation in the CIM sampler example. -->
 <!-- ```YAML
 title: Kaiwu-PyTorch-Plugin (KPP)
 slug: kpp-getting-started-intro
@@ -251,11 +252,11 @@ from kaiwu.cim import CIMOptimizer
 from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 sampler = CIMOptimizer(task_name="test_rbm", wait=True)
 sampler = PrecisionReducer(
-    sampler,
-    precision=8,
-    truncated_precision=10,
-    target_bits=550,
-    only_feasible_solution=False,
+    sampler,
+    precision=8,
+    truncated_precision=10,
+    target_bits=550,
+    only_feasible_solution=False,
 )
 ```
 - **Extension mechanisms:** Decoupled energy function, swappable samplers, custom energy terms.

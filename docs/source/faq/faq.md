@@ -1,3 +1,5 @@
+<!-- Modified to remove unintended indentation from the Python example. -->
+
 # 常见问题
 
 本章汇总了使用 Kaiwu-PyTorch-Plugin 时的常见问题和解决方案。
@@ -96,13 +98,13 @@ A: `SimulatedAnnealingOptimizer` 的主要参数：
 
 ```{code-block} python
 
- from kaiwu.classical import SimulatedAnnealingOptimizer
+from kaiwu.classical import SimulatedAnnealingOptimizer
 
- # Fast sampling (lower quality)
- sampler = SimulatedAnnealingOptimizer(alpha=0.9, size_limit=5)
+# Fast sampling (lower quality)
+sampler = SimulatedAnnealingOptimizer(alpha=0.9, size_limit=5)
 
- # High-quality sampling (slower)
- sampler = SimulatedAnnealingOptimizer(alpha=0.995, size_limit=100)
+# High-quality sampling (slower)
+sampler = SimulatedAnnealingOptimizer(alpha=0.995, size_limit=100)
 
 ```
 ## 性能相关
