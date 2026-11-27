@@ -6,6 +6,8 @@ This module implements a restricted Boltzmann machine with one Gaussian
 partition and one Bernoulli partition.
 """
 
+from __future__ import annotations
+
 import numpy as np
 import torch
 import torch.nn.functional as F
