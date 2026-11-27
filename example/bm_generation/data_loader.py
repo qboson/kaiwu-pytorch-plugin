@@ -9,7 +9,8 @@ class CSVDataset(Dataset):
     数据集
 
     Args:
-        data: 输入数据，形状为 (numcol, numrow)
+        data: 已加载的二维样本数据，形状为 (num_samples, num_features)。
+            每行对应一个样本，每列对应一个特征。
     """
 
     def __init__(self, data):
