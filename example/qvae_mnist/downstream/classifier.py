@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 from utils.helpers import plot_training_curves
+from utils.checkpoint import save_checkpoint
 
 # 设置日志配置
 logging.basicConfig(level=logging.INFO)
@@ -206,7 +207,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
                 best_state = self.model.state_dict()
                 if self.save_path is not None:
                     model_save_path = os.path.join(self.save_path, "best_mlp_classifier.pth")
-                    torch.save(best_state, model_save_path)
+                    save_checkpoint(best_state, model_save_path)
 
         # 加载最佳模型
         self.model.load_state_dict(best_state)

@@ -4,6 +4,7 @@ import numpy as np
 
 from utils.logging import get_logger
 from utils.exception import ValueError, TypeError
+from utils.checkpoint import save_checkpoint
 
 logger = get_logger(__name__)
 logger.setLevel("WARNING")
@@ -26,9 +27,8 @@ class ModelTuner(object):
 
 	def save_model(self,config_string='test'):
 		logger.info("Saving Model")
-		f=open(os.path.join(self.outpath,"model_{0}.pt".format(config_string)),'wb')
-		torch.save(self._model.state_dict(),f)
-		f.close()
+		path = os.path.join(self.outpath, "model_{0}.pt".format(config_string))
+		save_checkpoint(self._model.state_dict(), path)
 		return
 
 	def save_rbm(self,config_string='test'):
