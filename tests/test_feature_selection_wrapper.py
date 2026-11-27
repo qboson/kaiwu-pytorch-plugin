@@ -58,6 +58,20 @@ def test_wrapper_applies_mask_before_base_model() -> None:
     )
 
 
+def test_update_mask_with_finite_fp16_hessian() -> None:
+    """测试半精度 Hessian 对称化不会使掩码更新失败。"""
+    selector = FeatureSelectionWrapper(nn.Identity(), feature_dim=2)
+    features = torch.tensor([[192.0, 1.0]], dtype=torch.float16)
+    targets = torch.tensor([[192.0, 0.0]], dtype=torch.float32)
+
+    def loss_fn(prediction: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        return (prediction.float() - target).square().mean()
+
+    mask = selector.update_mask([(features, targets)], loss_fn)
+
+    np.testing.assert_array_equal(mask, [1, 0])
+
+
 def test_fit_weights_updates_mask_with_solver_kwargs(monkeypatch) -> None:
     """测试训练周期到达时会调用 QUBO 求解器并写回新的 mask。"""
     calls: list[dict[str, object]] = []

@@ -320,10 +320,10 @@ class FeatureSelectionWrapper(nn.Module):
                 parameter.requires_grad_(requires_grad)
             self.train(was_training)
 
-        hessian = 0.5 * (hessian + hessian.T)
+        hessian_array = _tensor_to_numpy(hessian, dtype=float)
         return (
             _tensor_to_numpy(gradient, dtype=float),
-            _tensor_to_numpy(hessian, dtype=float),
+            0.5 * (hessian_array + hessian_array.T),
         )
 
     @staticmethod
