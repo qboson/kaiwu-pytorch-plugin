@@ -173,6 +173,7 @@ class CDTrainer:
         valid_batches = self.precompute_batches(valid_loader)
         print(f"[{tag}] Training CRBM for {CFG.epochs} epochs ...")
 
+        n_validation = sum(len(batch[0]) for batch in valid_batches)
         best_val_difference = float("inf")
         best_state = None
         patience_counter = 0
@@ -204,10 +205,10 @@ class CDTrainer:
                     f = fp_batch.to(CFG.device)
                     y = y_batch.to(CFG.device)
                     val_differences.append(
-                        _reconstruction_free_energy_difference(self.crbm, y, f)
+                        _reconstruction_free_energy_difference(self.crbm, y, f) * len(y)
                     )
                 val_difference = float(
-                    sum(val_differences) / max(len(val_differences), 1)
+                    sum(val_differences) / max(n_validation, 1)
                 )
             epoch_info["val_free_energy_difference"] = val_difference
 
@@ -279,6 +280,7 @@ def _train_property_predictor(
 ) -> List[Dict]:
     """Train the paper's separate predictor after freezing the energy model."""
     crbm.eval()
+    n_validation = sum(len(batch[0]) for batch in valid_batches)
     best_validation = float("inf")
     best_state = None
     patience_counter = 0
@@ -318,11 +320,11 @@ def _train_property_predictor(
                 validation_losses.append(float(sum(
                     F.mse_loss(predictions[name], properties[:, index])
                     for index, name in enumerate(("qed", "logp", "sas"))
-                ).item()))
+                ).item()) * len(f))
 
         train_loss = float(sum(train_losses) / max(len(train_losses), 1))
         validation_loss = float(
-            sum(validation_losses) / max(len(validation_losses), 1)
+            sum(validation_losses) / max(n_validation, 1)
         )
         history.append({
             "epoch": epoch,
