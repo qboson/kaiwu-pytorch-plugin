@@ -1,6 +1,7 @@
 """QDEQ public interface, solver and gradient tests."""
 
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import torch
@@ -186,6 +187,79 @@ class TestHooksAndRegulariser(unittest.TestCase):
         """For J = I / 2 the estimate is close to 0.25."""
         z = torch.randn(4, 64, dtype=torch.float64, requires_grad=True)
         self.assertAlmostEqual(QDEQ.jacobian_loss(0.5 * z, z, vecs=50).item(), 0.25, delta=0.02)
+
+    def test_zero_jacobian_preserves_input_and_parameter_gradients(self):
+        """A layer independent of z has zero regularisation and ordinary gradients."""
+
+        class InputOnlyLayer(torch.nn.Module):
+            """The fixed point is scale * x without a recurrent dependency."""
+
+            def __init__(self):
+                super().__init__()
+                self.scale = torch.nn.Parameter(torch.tensor(2.0, dtype=torch.float64))
+
+            def forward(self, z, x):
+                """Returns the input projection, ignoring the equilibrium state."""
+                return self.scale * x
+
+        layer = InputOnlyLayer()
+        x = torch.tensor([[1.0, -2.0], [3.0, 0.5]], dtype=torch.float64, requires_grad=True)
+        deq = QDEQ(layer, LocalSearchSampler(), solve_config(jac_loss_vecs=2))
+        # Start at the exact fixed point to isolate regularisation and backward.
+        out = deq(x, z0=(layer.scale * x).detach())
+        torch.testing.assert_close(out, layer.scale * x)
+        self.assertEqual(deq.last_jac_loss.item(), 0.0)
+        self.assertTrue(deq.last_jac_loss.requires_grad)
+        (out.square().mean() + deq.last_jac_loss).backward()
+        torch.testing.assert_close(x.grad, 8.0 * x.detach() / x.numel())
+        torch.testing.assert_close(layer.scale.grad, 4.0 * x.detach().square().mean())
+
+    def test_constant_output_needs_no_backward_hook(self):
+        """A constant fixed-point map remains usable in training mode."""
+
+        class ConstantLayer(torch.nn.Module):
+            """A valid contraction with an identically zero fixed point."""
+
+            def forward(self, z, x):
+                """Returns zeros without any autograd dependency."""
+                return torch.zeros_like(z)
+
+        for vecs in (0, 2):
+            with self.subTest(jac_loss_vecs=vecs):
+                x = torch.ones(2, 3, dtype=torch.float64, requires_grad=True)
+                deq = QDEQ(ConstantLayer(), LocalSearchSampler(), solve_config(jac_loss_vecs=vecs))
+                out = deq(x)
+                torch.testing.assert_close(out, torch.zeros_like(x))
+                self.assertFalse(out.requires_grad)
+                self.assertNotIn("backward_nstep", deq.get_last_stats())
+                if vecs:
+                    self.assertEqual(deq.last_jac_loss.item(), 0.0)
+                    deq.last_jac_loss.backward()
+                    self.assertIsNone(x.grad)
+
+    def test_zero_jacobian_regulariser_is_differentiable(self):
+        """An unused equilibrium state gives a backward-safe zero on its device."""
+        z = torch.ones(2, 3, dtype=torch.float64, requires_grad=True)
+        x = torch.ones_like(z, requires_grad=True)
+        loss = QDEQ.jacobian_loss(2.0 * x, z, vecs=2)
+        self.assertEqual(loss.item(), 0.0)
+        self.assertEqual(loss.dtype, z.dtype)
+        self.assertEqual(loss.device, z.device)
+        loss.backward()
+        torch.testing.assert_close(z.grad, torch.zeros_like(z))
+        self.assertIsNone(x.grad)
+
+    def test_nonzero_jacobian_regulariser_keeps_analytic_gradients(self):
+        """Handling zero Jacobians preserves the nonlinear regulariser's graph."""
+        z = torch.tensor([[1.0, -2.0], [0.5, 3.0]], dtype=torch.float64, requires_grad=True)
+        scale = torch.tensor(0.25, dtype=torch.float64, requires_grad=True)
+        with patch("torch.randn_like", return_value=torch.ones_like(z)):
+            loss = QDEQ.jacobian_loss(scale * z.square(), z, vecs=2)
+        expected = 4.0 * scale.detach().square() * z.detach().square().mean()
+        torch.testing.assert_close(loss, expected)
+        loss.backward()
+        torch.testing.assert_close(scale.grad, 8.0 * scale.detach() * z.detach().square().mean())
+        torch.testing.assert_close(z.grad, 8.0 * scale.detach().square() * z.detach() / z.numel())
 
 
 class TestCustomForwardSolver(unittest.TestCase):
