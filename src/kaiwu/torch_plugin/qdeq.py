@@ -141,7 +141,9 @@ def _anderson_solver(
     rhs[:, 0] = 1
 
     best_z, best_res, nstep = z0, float("inf"), 0
-    for k in range(2, max(threshold, 3)):
+    # ``threshold`` counts solver steps; the first iterate is produced at k=2,
+    # so the loop must reach k = threshold + 1 to spend the documented budget.
+    for k in range(2, max(threshold, 1) + 2):
         n = min(k, m)
         # alpha = argmin ||sum_i alpha_i (f(x_i) - x_i)||^2  s.t.  sum_i alpha_i = 1.
         g_mat = f_hist[:, :n] - x_hist[:, :n]
