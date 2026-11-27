@@ -107,11 +107,14 @@ The unified evaluation entry point is `evaluate_benchmark.py`. Use `--metrics` t
 | dpt               | DPT pseudotime and trajectory consistency, assessing whether the representation can produce a reasonable ordering of cell development or state transitions.             |
 | all               | Run all of the above evaluation items.                                                                                                                                  |
 
+The commands below use the quick check output. If you used another output
+directory for training, point `--h5ad` to the generated file in that directory.
+
 Run clustering evaluation only:
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --metrics clustering
@@ -121,7 +124,7 @@ Run classification evaluation:
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --metrics classification
@@ -131,7 +134,7 @@ Run multiple evaluation items:
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --batch-key batch \
@@ -142,7 +145,7 @@ Run DPT:
 
 ```bash
 python evaluate_benchmark.py \
-  --h5ad ./outputs/immune_kpp_qvae.h5ad \
+  --h5ad ./outputs_smoke/immune_kpp_qvae.h5ad \
   --rep-key X_qvae \
   --label-key final_annotation \
   --metrics dpt \
