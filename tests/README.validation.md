@@ -29,8 +29,11 @@ Configure the two secrets in the fork's **Settings > Secrets and variables >
 Actions > New repository secret**, not in Variables. Values come from the Kaiwu
 platform SDK page. Never commit credentials or license files. The branch push
 trigger works without updating the fork's older default-branch workflow.
-Re-run a failed **push** run after correcting credentials; a manual dispatch
-uses the ordinary, unlicensed mode and is not licensed acceptance evidence.
+Re-run a failed **push** run after correcting credentials. A manual dispatch on
+`feat/ep-energy-qubo` must set `run_licensed_tests=true`; its default is the
+ordinary, unlicensed mode and does not count as licensed acceptance evidence.
+For example: `gh workflow run ci.yml --repo yuke2027/kaiwu-pytorch-plugin
+--ref feat/ep-energy-qubo -f scope=default -f run_licensed_tests=true` (one line).
 
 The Python 3.10 / Kaiwu 1.4.4 / PyTorch 2.7.0 Linux lint combination installs
 CPU torchvision 0.22.0 plus the EP example requirements. `pip check`, import

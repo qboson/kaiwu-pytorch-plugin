@@ -8,6 +8,10 @@ on:
         default: default
   workflow_dispatch:
     inputs:
+      run_licensed_tests:
+        description: Run real SDK tests with repository secrets on the EP branch
+        type: boolean
+        default: false
       scope:
         description: Run the baseline or full compatibility matrix
         type: choice
@@ -55,7 +59,7 @@ jobs:
       REPORT_COVERAGE: ${{ github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/') && matrix.runner == 'ubuntu-24.04' && 'true' || 'false' }}
       # Fork PRs have no secrets. A push to the reviewed EP branch runs all tests
       # in the fork, on the exact head SHA, with its own license credentials.
-      KAIWU_REQUIRE_LICENSE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feat/ep-energy-qubo' && '1' || '0' }}
+      KAIWU_REQUIRE_LICENSE: ${{ github.ref == 'refs/heads/feat/ep-energy-qubo' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.run_licensed_tests)) && '1' || '0' }}
       RUN_MNIST_EXAMPLE: ${{ matrix.lint && matrix.python == '3.10' && matrix.kaiwu == '1.4.4' && matrix.torch == '2.7.0' && matrix.runner == 'ubuntu-24.04' && '1' || '0' }}
     defaults:
       run:
