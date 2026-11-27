@@ -43,6 +43,14 @@ class UnsupervisedDBN(nn.Module):
         self.input_dim = None
         self._is_trained = False
 
+    def _apply(self, fn):
+        super()._apply(fn)
+        if self.rbm_layers:
+            # PyTorch moves parameters without updating this plain attribute;
+            # forward and reconstruction both use it for their input tensors.
+            self.device = self.rbm_layers[0].quadratic_coef.device
+        return self
+
     def create_rbm_layer(self, input_dim):
         """Creates the layers of RBMs for the DBN.
 
@@ -91,8 +99,9 @@ class UnsupervisedDBN(nn.Module):
         data_in = data_in.astype(np.float32)
         for rbm in self.rbm_layers:
             with torch.no_grad():
+                # A layer may be moved independently of its DBN parent.
                 hidden_output = rbm.get_hidden(
-                    torch.FloatTensor(data_in).to(self.device)
+                    torch.FloatTensor(data_in).to(rbm.quadratic_coef.device)
                 )
                 data_in = (
                     hidden_output[:, rbm.num_visible :].cpu().numpy()
@@ -132,7 +141,7 @@ class UnsupervisedDBN(nn.Module):
             raise ValueError(f"Layer index {layer_index} out of range.")
 
         rbm = self.rbm_layers[layer_index]
-        return self.reconstruct_with_rbm(rbm, data_in, self.device)
+        return self.reconstruct_with_rbm(rbm, data_in, rbm.quadratic_coef.device)
 
     def mark_as_trained(self):
         """Marks the model as trained.
