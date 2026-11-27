@@ -34,11 +34,15 @@ kpp_qvae/
 
 ## 训练
 
-默认数据为：
+请在 `example/qvae_cell` 目录中运行训练命令。将准备好的 AnnData 文件移到
+`train_qvae_cell.py` 所在目录，并命名为 `immune_processed.h5ad`。默认数据路径为：
 
 ```text
-../immune_processed.h5ad
+./immune_processed.h5ad
 ```
+
+如果文件放在其他目录或使用其他文件名，请按下方示例直接运行
+`python train_qvae_cell.py`，并用 `--data-path` 指定文件路径。
 
 默认观测字段：
 
