@@ -54,7 +54,7 @@ The enthusiasm was short-lived. In 1969, Marvin Minsky and Seymour Papert publis
 
 Consider two binary inputs $x_1, x_2 \in \{0,1\}$ and the desired outputs:
 
-|$$x_1$$|$$x_2$$|**XOR Output**|
+|$x_1$|$x_2$|**XOR Output**|
 |---|---|---|
 |0|0|0|
 |0|1|1|
@@ -63,7 +63,7 @@ Consider two binary inputs $x_1, x_2 \in \{0,1\}$ and the desired outputs:
 
 Plotting these four points in the 2D input plane reveals the difficulty. The positive examples, (0,1) and (1,0), are diagonally opposite; the negative examples, (0,0) and (1,1), occupy the other diagonal. **No single straight line can separate the two classes.** The XOR function is not linearly separable.
 
-Minsky and Papert proved that this limitation extends far beyond XOR. Linear threshold units fail on any function that requires a *non-convex* decision boundary or one with disconnected regions. Many seemingly simple logical functions, i.e. parity, connectedness in visual patterns are beyond the reach of a single perceptron.
+Minsky and Papert proved that this limitation extends far beyond XOR. Linear threshold units fail on any function that requires a *non-convex* decision boundary or one with disconnected regions. Many seemingly simple logical functions, e.g. parity or connectedness in visual patterns, are beyond the reach of a single perceptron.
 
 ## The Historical Impact: The First AI Winter
 The rigorous demonstration of the perceptron's limitations had a chilling effect on neural network research throughout the 1970s. Funding dried up, and many researchers abandoned connectionist approaches in favor of symbolic artificial intelligence. This period is often referred to as the **first AI winter**.
@@ -89,7 +89,7 @@ $$E(\mathbf{x}, y) = -y (\mathbf{w}^\top \mathbf{x} + b)$$
 
 The perceptron outputs $y=1$ when this energy is negative (i.e., low), and $y=0$ when it is zero (i.e., higher). The learning rule adjusts weights to lower the energy of correct classifications and raises the energy of incorrect ones.
 
-This energy-based perspective, while rudimentary in the perceptron, becomes the central organizing principle in Boltzmann machines. The difference is that Boltzmann machines define energy over *all* units, both visible and hidden and use stochastic, rather than deterministic, state transitions to explore the energy landscape. The following sections will develop this energy-based viewpoint in full mathematical detail.
+This energy-based perspective, while rudimentary in the perceptron, becomes the central organizing principle in Boltzmann machines. The difference is that Boltzmann machines define energy over *all* units, both visible and hidden, and use stochastic, rather than deterministic, state transitions to explore the energy landscape. The following sections will develop this energy-based viewpoint in full mathematical detail.
 
 ## Summary
 - A **linear neuron** computes a weighted sum of inputs and applies a threshold, partitioning the input space with a hyperplane.
