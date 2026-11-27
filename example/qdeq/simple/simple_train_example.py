@@ -37,7 +37,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-train-batches", type=int, default=60)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--seed", type=int, default=0)
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.epochs <= 0:
+        parser.error("--epochs must be a positive integer")
+    if args.max_train_batches <= 0:
+        parser.error("--max-train-batches must be a positive integer")
+    return args
 
 
 def main() -> None:
