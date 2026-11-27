@@ -33,6 +33,40 @@ constraints, for example forecasting on edge devices:
   gradient-carrying layer call are separate stages, so the shared layer can be
   quantized in either stage. See [Use with quantized models](#use-with-quantized-models).
 
+## Reproducible QDEQ random streams
+
+Pass a caller-owned generator to isolate QDEQ's random search directions and
+Jacobian-regularizer probes from unrelated Torch draws:
+
+```python
+rng = torch.Generator(device="cpu").manual_seed(17)
+model = QDEQ(layer, sampler, config, generator=rng)
+```
+
+The generator advances on each draw; reusing the same object continues its
+stream instead of repeating one seed on every call. For checkpoint continuation,
+save both `model.state_dict()` and `rng.get_state()`, then restore them with
+`model.load_state_dict(...)` and `rng.set_state(...)`. Generator state is not
+automatically included in the model state dictionary. A failed solve can consume
+draws too; restore a saved generator state if a retry must replay them.
+
+The generator must match the tensors' device. Moving the model does not move
+the generator. With `generator=None` (the default), existing global-RNG behavior
+is unchanged. This option does not seed the Kaiwu optimizer, random operations
+inside the supplied layer, or a subclass's custom forward solver. Those need
+their own reproducibility controls; cross-device bitwise equivalence is not
+promised. Direct calls to `QDEQ.jacobian_loss` also accept `generator=`.
+
+Run the CPU checkpoint/replay example after installing the plugin:
+
+```bash
+python example/qdeq/simple/reproducible_cpu.py
+```
+
+It verifies replayed outputs and regularizer probes, an unchanged global Torch
+stream, and finite training gradients. It uses exhaustive enumeration of a tiny
+Ising problem, with no dataset, quantum hardware, or cloud task.
+
 ## Data
 
 The example uses the ETTh1 electricity transformer dataset
