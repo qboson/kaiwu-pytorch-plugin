@@ -71,7 +71,10 @@ class QDEQConfig:
         anderson_lam: Regularisation of the backward Anderson mixing problem.
 
         jac_loss_vecs: Probe vectors for the Jacobian regulariser stored in
-            ``QDEQ.last_jac_loss``; ``0`` disables it.
+            ``QDEQ.last_jac_loss``; ``0`` disables it. When enabled during
+            training, the final layer call uses mathematical scaled dot-product
+            attention so that the regulariser supports higher-order gradients.
+            The fixed-point solve retains the caller's attention backend.
     """
 
     f_thres: int = 12
@@ -398,7 +401,14 @@ class QDEQ(nn.Module):
             if not (self.training and torch.is_grad_enabled()):
                 return self.layer(z_star, x)
             z_star = z_star.detach().requires_grad_()
-            new_z = self.layer(z_star, x)
+            # Fused SDPA kernels may lack the double backward required by the
+            # Jacobian regulariser. Select the backend when building its graph.
+            attention_context = (
+                torch.nn.attention.sdpa_kernel(torch.nn.attention.SDPBackend.MATH)
+                if cfg.jac_loss_vecs > 0 else contextlib.nullcontext()
+            )
+            with attention_context:
+                new_z = self.layer(z_star, x)
         if cfg.jac_loss_vecs > 0:
             self.last_jac_loss = self.jacobian_loss(new_z, z_star, cfg.jac_loss_vecs)
         # 3. Replace the one-step gradient with the implicit-function gradient.
