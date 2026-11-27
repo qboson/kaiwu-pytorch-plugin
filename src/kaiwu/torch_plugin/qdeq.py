@@ -72,6 +72,10 @@ class QDEQConfig:
 
         jac_loss_vecs: Probe vectors for the Jacobian regulariser stored in
             ``QDEQ.last_jac_loss``; ``0`` disables it.
+
+        b_solver: Backward linear solver. ``"auto"`` runs Anderson acceleration and
+            falls back to matrix-free GMRES if it misses ``b_eps``;
+            ``"anderson"`` and ``"gmres"`` force one solver.
     """
 
     f_thres: int = 12
@@ -87,6 +91,7 @@ class QDEQConfig:
     anderson_m: int = 6
     anderson_lam: float = 1e-4
     jac_loss_vecs: int = 0
+    b_solver: str = "auto"
 
 
 def _residual_norms(residual: torch.Tensor, f_value: torch.Tensor) -> tuple[float, float]:
@@ -101,6 +106,86 @@ def _residual_norms(residual: torch.Tensor, f_value: torch.Tensor) -> tuple[floa
     """
     abs_res = residual.norm().item()
     return abs_res, abs_res / (f_value.norm().item() + 1e-9)
+
+
+def _gmres_solve(
+    matvec: Callable[[torch.Tensor], torch.Tensor],
+    rhs: torch.Tensor,
+    stop_mode: str,
+    max_iter: int,
+    eps: float,
+) -> tuple[torch.Tensor, dict[str, float]]:
+    """Solves ``matvec(y) = rhs`` with restarted, matrix-free GMRES.
+
+    Args:
+        matvec: Linear operator; takes and returns tensors shaped like ``rhs``.
+        rhs: Right-hand side of the linear system.
+        stop_mode: ``"rel"`` stops on ``||residual|| / ||rhs||`` and ``"abs"``
+            on ``||residual||``.
+        max_iter: Maximum number of matrix-vector products.
+        eps: Stopping tolerance.
+
+    Returns:
+        tuple: The solution and a dict with ``"nstep"`` and ``"residual"``.
+    """
+    work_dtype = (
+        torch.float32
+        if rhs.dtype in (torch.float16, torch.bfloat16)
+        else rhs.dtype
+    )
+    b = rhs.reshape(-1).to(work_dtype)
+    size = b.numel()
+    if size == 0:
+        return rhs.clone(), {"nstep": 0, "residual": 0.0}
+    b_norm = float(b.norm())
+    if b_norm == 0.0:
+        return torch.zeros_like(rhs), {"nstep": 0, "residual": 0.0}
+
+    def apply(vector: torch.Tensor) -> torch.Tensor:
+        shaped = vector.reshape(rhs.shape).to(rhs.dtype)
+        return matvec(shaped).reshape(-1).to(work_dtype)
+
+    tolerance = eps * b_norm if stop_mode == "rel" else eps
+    x = torch.zeros_like(b)
+    nstep = 0
+    residual = b_norm
+    while nstep < max_iter and residual > tolerance:
+        residual_vector = b - apply(x)
+        beta = float(residual_vector.norm())
+        residual = beta
+        if residual <= tolerance:
+            break
+        cycle = min(size, max_iter - nstep)
+        basis = torch.zeros(size, cycle + 1, dtype=work_dtype, device=rhs.device)
+        hessenberg = torch.zeros(cycle + 1, cycle, dtype=work_dtype, device=rhs.device)
+        basis[:, 0] = residual_vector / beta
+        used = 0
+        for column in range(cycle):
+            vector = apply(basis[:, column])
+            for _ in range(2):
+                for row in range(column + 1):
+                    projection = torch.dot(vector, basis[:, row])
+                    hessenberg[row, column] += projection
+                    vector = vector - projection * basis[:, row]
+            hessenberg[column + 1, column] = vector.norm()
+            used = column + 1
+            nstep += 1
+            if float(hessenberg[column + 1, column]) <= 1e-14:
+                break
+            basis[:, column + 1] = vector / hessenberg[column + 1, column]
+            if nstep >= max_iter:
+                break
+        small_rhs = torch.zeros(used + 1, dtype=work_dtype, device=rhs.device)
+        small_rhs[0] = beta
+        least_squares = hessenberg[: used + 1, :used]
+        try:
+            coefficients = torch.linalg.lstsq(least_squares, small_rhs).solution
+        except RuntimeError:
+            coefficients = torch.linalg.pinv(least_squares) @ small_rhs
+        x = x + basis[:, :used] @ coefficients
+        residual = float((b - apply(x)).norm())
+    tracked = residual / b_norm if stop_mode == "rel" else residual
+    return x.reshape_as(rhs).to(rhs.dtype), {"nstep": nstep, "residual": tracked}
 
 
 def _anderson_solver(
@@ -353,7 +438,9 @@ class QDEQ(nn.Module):
         config: Solver configuration. Defaults to ``QDEQConfig()``.
 
     Raises:
-        ValueError: If ``config.stop_mode`` is not ``"rel"`` or ``"abs"``.
+        ValueError: If ``config.stop_mode`` is not ``"rel"`` or ``"abs"``, or
+            ``config.b_solver`` is not ``"auto"``, ``"anderson"`` or
+            ``"gmres"``.
     """
 
     def __init__(
@@ -368,6 +455,8 @@ class QDEQ(nn.Module):
         self.config = config or QDEQConfig()
         if self.config.stop_mode not in ("rel", "abs"):
             raise ValueError("stop_mode must be 'rel' or 'abs'")
+        if self.config.b_solver not in ("auto", "anderson", "gmres"):
+            raise ValueError("b_solver must be 'auto', 'anderson' or 'gmres'")
         self.last_jac_loss = None
         self._last_stats: dict[str, float] = {}
 
@@ -410,7 +499,9 @@ class QDEQ(nn.Module):
 
         ``J = d new_z / d z_star``; this is the implicit function theorem
         gradient of Bai et al. (2019), Theorem 1. The linear fixed point is
-        solved by Anderson acceleration with ``b_thres`` and ``b_eps``.
+        solved by ``b_solver`` with ``b_thres`` and ``b_eps``: Anderson
+        acceleration first, then matrix-free GMRES when ``"auto"`` misses the
+        tolerance or ``"gmres"`` is selected.
 
         Args:
             new_z: Layer output at the fixed point.
@@ -427,9 +518,24 @@ class QDEQ(nn.Module):
                 vjp = torch.autograd.grad(new_z, z_star, y, retain_graph=True, allow_unused=True)[0]
                 return grad if vjp is None else vjp + grad
 
-            solution, stats = _anderson_solver(
-                backward_map, torch.zeros_like(grad), cfg, cfg.b_thres, cfg.b_eps
-            )
+            # Solve (I - J^T) y = g instead of the equivalent fixed point.
+            def linear_map(y):
+                return y + grad - backward_map(y)
+
+            if cfg.b_solver == "gmres":
+                solution, stats = _gmres_solve(
+                    linear_map, grad, cfg.stop_mode, cfg.b_thres, cfg.b_eps
+                )
+            else:
+                solution, stats = _anderson_solver(
+                    backward_map, torch.zeros_like(grad), cfg, cfg.b_thres, cfg.b_eps
+                )
+                if cfg.b_solver == "auto" and stats["residual"] > cfg.b_eps:
+                    fallback, fallback_stats = _gmres_solve(
+                        linear_map, grad, cfg.stop_mode, cfg.b_thres, cfg.b_eps
+                    )
+                    if fallback_stats["residual"] < stats["residual"]:
+                        solution, stats = fallback, fallback_stats
             self._last_stats.update({f"backward_{key}": value for key, value in stats.items()})
             # Autograd continues from new_z with the solved gradient.
             return solution
