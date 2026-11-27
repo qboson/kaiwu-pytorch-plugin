@@ -31,6 +31,11 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             Defaults to 1e-8.
         dtype (torch.dtype, optional): Data type for tensor construction.
             Defaults to torch.float32.
+        linear_bias (torch.Tensor, optional): Biases for the Bernoulli nodes,
+            shaped (num_bernoulli,).
+        quadratic_coef (torch.Tensor, optional): Couplings with Gaussian nodes
+            in rows and Bernoulli nodes in columns, shaped
+            (num_gaussian, num_bernoulli) for either visibility orientation.
         device (torch.device, optional): Device to construct tensors.
     """
 
