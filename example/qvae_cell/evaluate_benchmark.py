@@ -288,14 +288,33 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
     encoder = LabelEncoder()
     y = encoder.fit_transform(labels)
 
-    stratify = y if np.min(np.bincount(y)) >= 2 else None
-    x_train, x_test, y_train, y_test = train_test_split(
-        x,
-        y,
+    if len(encoder.classes_) < 2:
+        raise ValueError("Classification requires at least two cell types")
+
+    # A singleton cannot be stratified and must remain in the training set.
+    # Splitting all cells without stratification can otherwise leave a class
+    # absent from training, making LogisticRegression.fit fail.
+    counts = np.bincount(y)
+    singleton_idx = np.flatnonzero(counts[y] == 1)
+    eligible_idx = np.flatnonzero(counts[y] > 1)
+    if len(eligible_idx) < 2:
+        raise ValueError("Classification requires cells available for a test split")
+    n_test = int(np.ceil(test_size * len(eligible_idx)))
+    n_eligible_classes = len(np.unique(y[eligible_idx]))
+    stratify = (
+        y[eligible_idx]
+        if min(n_test, len(eligible_idx) - n_test) >= n_eligible_classes
+        else None
+    )
+    train_idx, test_idx = train_test_split(
+        eligible_idx,
         test_size=test_size,
         random_state=random_state,
         stratify=stratify,
     )
+    train_idx = np.concatenate((train_idx, singleton_idx))
+    x_train, x_test = x[train_idx], x[test_idx]
+    y_train, y_test = y[train_idx], y[test_idx]
     scaler = StandardScaler()
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
