@@ -20,7 +20,7 @@ def flatten_dataloader(dataloader):
     """Convert a DataLoader to flattened numpy arrays."""
     X_list, y_list = [], []
     for data, labels in dataloader:
-        X_list.append(data.view(data.size(0), -1).numpy())
+        X_list.append(data.reshape(data.size(0), -1).numpy())
         y_list.append(labels.numpy())
     X = np.vstack(X_list)
     y = np.concatenate(y_list)
