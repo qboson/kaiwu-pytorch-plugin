@@ -141,3 +141,27 @@ scgraph
 ```
 pandas
 ```
+
+---
+
+### 推荐系统任务：基于 RBM 的协同过滤推荐
+
+该示例演示如何基于 `RestrictedBoltzmannMachine` 与 Kaiwu 模拟退火（`SimulatedAnnealingOptimizer`）或相干光量子真机（`CIMOptimizer` + `PrecisionReducer`）负相采样实现稀疏矩阵协同过滤与 Top-K 推荐，并在严格按用户留出（零数据泄漏）的同一评测协议下与经典 Popularity、TruncatedSVD 基线进行定量对比。
+
+* **离线基准与真实数据兼容**：内置带潜在偏好簇、物品类别与评分偏置的确定性合成基准生成器（离线零下载一键运行），同时支持加载本地 MovieLens-100K（`u.data`）并执行严格按用户切分的 train/val/test 划分。
+* **面向稀疏交互的 RBM 训练**：结合仅来自训练集的物品先验填充、面向观测掩码的对比散度（Masked CD），以及基于 `rbm.sample(sampler)` 与 `rbm.objective(...)` 的 Kaiwu SA/CIM 全局玻尔兹曼正则化采样。
+* **严谨定量评测**：在严格屏蔽已交互物品的前提下，统一评测 `RMSE`、`MAE`、`Precision@K`、`Recall@K`、`NDCG@K`。
+
+运行方式：
+
+```bash
+python example/collaborative_filtering/train_cf.py
+```
+
+详细说明请参见 [example/collaborative_filtering/README_ZH.md](collaborative_filtering/README_ZH.md)。
+
+**依赖项**
+
+```
+仅依赖插件核心库（torch、numpy、kaiwu）
+```

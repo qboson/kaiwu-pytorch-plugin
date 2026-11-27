@@ -149,3 +149,26 @@ leidenalg
 scib_metrics
 scgraph
 ```
+
+---
+
+### Recommendation Task: RBM Collaborative Filtering
+
+This example demonstrates sparse collaborative filtering and top-K recommendation using `RestrictedBoltzmannMachine` with Kaiwu simulated annealing (`SimulatedAnnealingOptimizer`) or photonic quantum CIM (`CIMOptimizer` + `PrecisionReducer`) negative-phase sampling, benchmarked against classical Popularity and TruncatedSVD baselines under a strict per-user holdout split.
+
+* **Offline & Real-Data Support**: Includes a deterministic latent-factor synthetic benchmark generator (zero external downloads) and an optional local MovieLens-100K (`u.data`) loader with leakage-free train/validation/test splitting.
+* **Sparsity-Aware RBM Training**: Combines training-prior imputation for well-scaled hidden inference, observed-only masked Contrastive Divergence, and Kaiwu SA/CIM global Boltzmann sampling (`rbm.sample(sampler)` + `rbm.objective(...)`).
+* **Fair Quantitative Benchmarking**: Evaluates rating prediction (`RMSE`, `MAE`) and unseen-item ranking (`Precision@K`, `Recall@K`, `NDCG@K`) across Popularity, TruncatedSVD, and RBM-CF using the identical split and exclusion mask.
+
+Run the benchmark via:
+
+```bash
+python example/collaborative_filtering/train_cf.py
+```
+
+For details, see [example/collaborative_filtering/README.md](collaborative_filtering/README.md).
+
+**Dependencies**
+```
+Core plugin dependencies only (torch, numpy, kaiwu)
+```
