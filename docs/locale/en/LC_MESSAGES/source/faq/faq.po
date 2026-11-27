@@ -220,14 +220,18 @@ msgid "A: `SimulatedAnnealingOptimizer` 的主要参数："
 msgstr "A: Parameters of ``SimulatedAnnealingOptimizer``:"
 
 #: ../../source/faq/faq.md:94
-msgid "`alpha`：退火系数（0.9-0.999），越接近 1 收敛越慢但结果越优"
-msgstr ""
-"``alpha``: annealing coefficient (0.9–0.999); closer to 1 gives slower "
-"but better convergence"
+msgid "`alpha`：降温系数。初始温度和截止温度相同时，`alpha` 越接近 1，降温越慢。"
+msgstr "`alpha`: cooling coefficient. With the same initial and cutoff temperatures, cooling is slower as `alpha` approaches 1."
+
+msgid "`iterations_per_t`：每个温度下的迭代次数。"
+msgstr "`iterations_per_t`: iterations at each temperature."
 
 #: ../../source/faq/faq.md:95
-msgid "`size_limit`：每次采样返回的样本数"
-msgstr "``size_limit``: number of samples returned per call"
+msgid "`size_limit`：输出解的个数。"
+msgstr "`size_limit`: number of output solutions."
+
+msgid "模拟退火的结果具有随机性。可用下面两组配置作为起点，在实际问题上比较耗时和解的质量。"
+msgstr "Simulated annealing produces stochastic results. Try these two settings as starting points and compare runtime and solution quality on your problem."
 
 #: ../../source/faq/faq.md:108
 msgid "性能相关"
@@ -246,10 +250,8 @@ msgid "**增大批大小**：在 GPU 内存允许的情况下增大 batch_size"
 msgstr "**Larger batch size**: increase ``batch_size`` within GPU memory limits"
 
 #: ../../source/faq/faq.md:116
-msgid "**减少采样次数**：可以适当减少采样的部署（如调整SimulatedAnnealingOptimizer的alpha参数等）"
-msgstr ""
-"**Fewer sampling steps**: reduce sampling overhead (e.g. tune ``alpha`` "
-"of ``SimulatedAnnealingOptimizer``)"
+msgid "**调整退火计算量**：用 `alpha` 调整降温速度，用 `iterations_per_t` 调整每个温度的迭代次数。"
+msgstr "**Adjust the annealing workload**: use `alpha` to adjust cooling speed and `iterations_per_t` to set the number of iterations at each temperature."
 
 #: ../../source/faq/faq.md:118
 msgid "Q: 显存不足怎么办？"
