@@ -83,6 +83,7 @@ source .venv/bin/activate
 
 ```bash
 pip install -r requirements/devel.txt
+python -m pip install .
 ```
 
 ### 2. 构建 HTML 文档
