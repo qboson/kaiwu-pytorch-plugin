@@ -91,7 +91,7 @@ $$E_\theta(\mathbf{x}) = -\sum_i b_i x_i - \sum_{i<j} w_{ij} x_i x_j$$
 Here we have set $k_B T = 1$ for notational simplicity; the temperature can be reintroduced as a scaling factor on the energy or, equivalently, as an inverse temperature parameter $\beta = 1/T$. In practice, the temperature is often treated as a hyperparameter controlling the stochasticity of sampling.
 
 ## The Meaning of Equilibrium in a Neural Context
-When we say a Boltzmann machine samples from its **equilibrium distribution**, we mean that after running the stochastic update dynamics for a sufficiently long time, the probability of observing any particular configuration $\mathbf{x}$ converges to $P_\theta(\mathbf{x})$. This property is guaranteed by the fact that the update rule satisfies **detailed balance,** a condition ensuring that, in equilibrium, the flow of probability from state $\mathbf{x}$ to state $\mathbf{x}'$ exactly balances the reverse flow:
+The **detailed balance** condition makes $P_\theta$ a stationary distribution of the update rule. At stationarity, the probability flow between two configurations is equal in both directions.
 
 $$P_\theta(\mathbf{x}) \, P(\mathbf{x} \to \mathbf{x}') = P_\theta(\mathbf{x}') \, P(\mathbf{x}' \to \mathbf{x})$$
 
@@ -99,7 +99,7 @@ The stochastic neuron update rule introduced in Eq. {eq}`eq-stoch-update` (Secti
 
 $$P(x_i = 1) = \sigma\left( \sum_j w_{ij} x_j + b_i \right)$$
 
-where $\sigma(z) = 1/(1+\exp(-z))$, is precisely designed to satisfy detailed balance with respect to the energy function $E_\theta$. Consequently, if we run the network long enough, which allowing it to "forget" its initial state, the configurations it generates will be distributed according to $P_\theta$.
+where $\sigma(z) = 1/(1+\exp(-z))$. Consider a finite Boltzmann machine with finite parameters at positive temperature. At each step, choose one unit at random with a fixed positive probability for each unit and resample it from its conditional distribution. This Gibbs chain satisfies detailed balance with respect to $P_\theta$. Every single-bit flip has positive probability, and the chain can also stay in place. The chain is therefore irreducible and aperiodic, so it converges to $P_\theta$ from any initial configuration.
 
 ## From Physics to Learning
 The Boltzmann distribution reframes the learning problem in probabilistic terms. Instead of asking "how do we compute a function from inputs to outputs?", we ask **"how do we adjust the parameters** $\theta$ **so that the equilibrium distribution** $P_\theta$ **matches the empirical distribution of the observed data?"** This shift in perspective is profound. The energy function $E_\theta(\mathbf{x})$ becomes a **scoring function**: data points that are typical of the training set should be assigned low energy (high probability), while atypical or impossible configurations should reside at high energy (low probability). Learning, then, consists of **sculpting the energy landscape** by adjusting the weights and biases so that the valleys of low energy coincide with regions of high data density.
