@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import pandas as pd
 import torch
 
 from etth1_common import (
@@ -49,9 +50,12 @@ def main() -> None:
     history, target = next(iter(loaders["test"]))
     with torch.no_grad():
         forecast = model(history[:1])
-    print("first test window, variable OT, next 8 hours (scaled):")
-    print("  forecast", [round(v, 3) for v in forecast[0, :8, -1].tolist()])
-    print("  actual  ", [round(v, 3) for v in target[0, :8, -1].tolist()])
+    columns = pd.read_csv(args.data_path, nrows=0).drop(columns=["date"]).columns
+    variable = "OT" if "OT" in columns else columns[-1]
+    variable_index = columns.get_loc(variable)
+    print(f"first test window, variable {variable}, next 8 hours (scaled):")
+    print("  forecast", [round(v, 3) for v in forecast[0, :8, variable_index].tolist()])
+    print("  actual  ", [round(v, 3) for v in target[0, :8, variable_index].tolist()])
 
 
 if __name__ == "__main__":
