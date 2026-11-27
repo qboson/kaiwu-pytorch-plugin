@@ -253,7 +253,9 @@ class MixtureGeneric(FactorialBernoulliUtil):
         parameters of the smoothing transformation.
 
         Args:
-            is_training (bool): Whether in training mode.
+            is_training (bool): Accepted for compatibility with the shared
+                distribution interface. Both settings draw random samples
+                and follow the caller's PyTorch autograd context.
 
         Returns:
             torch.Tensor: Sample result.
