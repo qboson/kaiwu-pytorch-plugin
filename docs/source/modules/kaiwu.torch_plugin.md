@@ -11,6 +11,11 @@
 
 ## MAIFS QUBO and SDK energy conventions
 
+`FeatureSelectionWrapper.build_mask_qubo(loader, loss_fn)` exposes the quadratic
+and linear terms used by a mask update. Use it to inspect the objective or
+export it to an external solver before applying a selection. The method
+computes derivatives at the current mask and includes configured penalties.
+
 `QuadraticLinearSolver.solve(Q, l)` represents the binary objective
 `0.5 * x.T @ Q @ x + l @ x`. Its public
 `qubo_matrix_to_ising_matrix(U)` helper takes an upper-triangular QUBO coefficient

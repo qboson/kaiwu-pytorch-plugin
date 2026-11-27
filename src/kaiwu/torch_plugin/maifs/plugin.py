@@ -460,6 +460,30 @@ class FeatureSelectionWrapper(nn.Module):
 
         return projected
 
+    def build_mask_qubo(
+        self,
+        data_loader: Iterable[Batch],
+        loss_fn: LossFunction,
+        hessian_mode: str = "full",
+        max_samples: int | None = 1000,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Build the binary objective for the current feature mask.
+
+        Args:
+            data_loader: Batches of inputs and targets used for derivatives.
+            loss_fn: Loss function returning one scalar.
+            hessian_mode: Full or diagonal Hessian.
+            max_samples: Maximum number of samples used for derivatives.
+
+        Returns:
+            Quadratic and linear terms for ``0.5 * x.T @ Q @ x + l @ x``.
+            The current feature mask is unchanged.
+        """
+        gradient, hessian = self.compute_mask_derivatives(
+            data_loader, loss_fn, hessian_mode, max_samples
+        )
+        return self._build_qubo(gradient, hessian)
+
     def update_mask(
         self,
         data_loader: Iterable[Batch],
@@ -483,13 +507,12 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If derivative computation or projection validation fails.
             RuntimeError: If the configured QUBO solver fails.
         """
-        gradient, hessian = self.compute_mask_derivatives(
+        quadratic_matrix, linear_vector = self.build_mask_qubo(
             data_loader,
             loss_fn,
             hessian_mode,
             max_samples,
         )
-        quadratic_matrix, linear_vector = self._build_qubo(gradient, hessian)
         current_mask = _tensor_to_numpy(self.mask, dtype=int)
         selected = solve_qubo(
             quadratic_matrix,
