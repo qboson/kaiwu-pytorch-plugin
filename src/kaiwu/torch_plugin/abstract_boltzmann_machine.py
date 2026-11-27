@@ -61,7 +61,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Converts the model to Ising format.
 
         Returns:
-            torch.Tensor: Ising matrix.
+            numpy.ndarray: Ising coefficient matrix in CPU memory.
         """
         return self._to_ising_matrix()
 
@@ -69,7 +69,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         """Converts the model to Ising format.
 
         Returns:
-            torch.Tensor: Ising matrix.
+            numpy.ndarray: Ising coefficient matrix in CPU memory.
 
         Raises:
             NotImplementedError: If not implemented in subclass.
