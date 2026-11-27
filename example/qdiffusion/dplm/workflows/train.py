@@ -48,15 +48,6 @@ try:
         seed_torch,
         summarize_trainable_parameters,
     )
-    from .workflow_helpers import (
-        build_data_loader_from_records,
-        run_epoch,
-        run_generation_over_records,
-        run_structural_validation,
-        select_records,
-        split_train_val_test,
-        write_markdown_report,
-    )
 except ImportError:  # pragma: no cover - direct script-path compatibility
     from utils.dplm_builder import build_qdiffusion
     from utils.io import (
@@ -77,6 +68,18 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         seed_torch,
         summarize_trainable_parameters,
     )
+
+try:
+    from .workflow_helpers import (
+        build_data_loader_from_records,
+        run_epoch,
+        run_generation_over_records,
+        run_structural_validation,
+        select_records,
+        split_train_val_test,
+        write_markdown_report,
+    )
+except ImportError:  # pragma: no cover - direct script-path compatibility
     from workflow_helpers import (
         build_data_loader_from_records,
         run_epoch,

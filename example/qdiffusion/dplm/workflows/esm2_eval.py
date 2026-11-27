@@ -42,6 +42,18 @@ try:
         save_json,
     )
     from ..utils.runtime import load_trained_energy_weights
+except ImportError:  # pragma: no cover - direct script-path compatibility
+    from utils.dplm_builder import build_qdiffusion
+    from utils.io import (
+        default_fasta_path,
+        default_outputs_root,
+        normalize_sequence,
+        read_fasta_records,
+        save_json,
+    )
+    from utils.runtime import load_trained_energy_weights
+
+try:
     from .esm2_eval_helpers import (
         DistanceSummary,
         embed_sequences,
@@ -54,15 +66,6 @@ try:
         write_summary_json,
     )
 except ImportError:  # pragma: no cover - direct script-path compatibility
-    from utils.dplm_builder import build_qdiffusion
-    from utils.io import (
-        default_fasta_path,
-        default_outputs_root,
-        normalize_sequence,
-        read_fasta_records,
-        save_json,
-    )
-    from utils.runtime import load_trained_energy_weights
     from esm2_eval_helpers import (
         DistanceSummary,
         embed_sequences,
