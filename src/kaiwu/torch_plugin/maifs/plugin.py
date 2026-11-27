@@ -139,11 +139,17 @@ class FeatureSelectionWrapper(nn.Module):
             The mask reshaped and typed for broadcasting with ``input_feature``.
 
         Raises:
-            ValueError: If ``input_feature`` has no dimensions or the configured
-                feature axis does not match ``feature_dim``.
+            ValueError: If ``input_feature`` has no dimensions, the configured
+                ``input_feature_axis`` is outside the input rank, or the feature
+                axis does not match ``feature_dim``.
         """
         if input_feature.ndim == 0:
             raise ValueError("input_feature must have at least one dimension")
+        if not -input_feature.ndim <= self.input_feature_axis < input_feature.ndim:
+            raise ValueError(
+                f"input_feature_axis={self.input_feature_axis} is out of range for a "
+                f"{input_feature.ndim}-dimensional input"
+            )
         axis = self.input_feature_axis % input_feature.ndim
         axis_size = input_feature.shape[axis]
         if axis_size != self.feature_dim:
