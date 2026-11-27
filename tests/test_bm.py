@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 import torch
 import numpy as np
 
@@ -115,6 +116,34 @@ class TestBoltzmannMachine(unittest.TestCase):
             # 隐含层数量为2，输出应为(3, 3)
             self.assertEqual(ising_submat.shape, (3, 3))
             self.assertIsInstance(ising_submat, np.ndarray)
+
+    def test_condition_sample_with_all_nodes_observed(self):
+        """A complete observation is the sole possible state for its row."""
+        model = BM(4, device="cpu")
+        observed = torch.tensor([[1.0, 0.0, 1.0, 0.0], [0.0, 1.0, 0.0, 1.0]])
+        sampler = Mock()
+        sampler.solve.side_effect = AssertionError("no hidden nodes to sample")
+
+        dtype_cases = (
+            (torch.float32, torch.float32),
+            (torch.float64, torch.float64),
+            (None, torch.float32),
+        )
+        for dtype, expected_dtype in dtype_cases:
+            with self.subTest(dtype=dtype):
+                result = model.condition_sample(sampler, observed, dtype=dtype)
+
+                torch.testing.assert_close(result, observed.to(expected_dtype))
+                sampler.solve.assert_not_called()
+                self.assertNotEqual(result.data_ptr(), observed.data_ptr())
+
+    def test_fully_observed_condition_rejects_device_mismatch(self):
+        """Clamping all nodes still requires an observation on the model device."""
+        observed = torch.ones(1, self.num_nodes, device="meta")
+        sampler = Mock()
+        with self.assertRaisesRegex(ValueError, "same device"):
+            self.bm.condition_sample(sampler, observed)
+        sampler.solve.assert_not_called()
 
     def test_condition_sample(self):
         """测试condition_sample功能"""
