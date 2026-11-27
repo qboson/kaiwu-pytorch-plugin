@@ -344,10 +344,9 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
     def _initialize_layer_with_pretrained(self, layer, rbm):
         """使用预训练权重初始化层"""
         with torch.no_grad():
-            weights = rbm.quadratic_coef.detach().cpu().numpy()
-            h_bias = rbm.linear_bias[rbm.num_visible :].detach().cpu().numpy()
-            layer.weight.data = torch.FloatTensor(weights.T)
-            layer.bias.data = torch.FloatTensor(h_bias)
+            # Keep the supervised parameters independent of the pretrained RBM.
+            layer.weight.copy_(rbm.quadratic_coef.T)
+            layer.bias.copy_(rbm.hidden_bias)
 
     def _get_activation_layer(self):
         """获取激活函数层"""
