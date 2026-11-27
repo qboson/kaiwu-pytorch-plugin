@@ -84,6 +84,7 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
                 device=self.device,
+                dtype=self.quadratic_coef.dtype,
             )
             s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
@@ -101,8 +102,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Propagate hidden spins to the visible layer."""
         with torch.no_grad():
             s_all = torch.zeros(
-                s_hidden.size(0), self.num_hidden + self.num_visible
-            ).to(self.device)
+                s_hidden.size(0),
+                self.num_hidden + self.num_visible,
+                device=self.device,
+                dtype=self.quadratic_coef.dtype,
+            )
             s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
                 s_hidden @ self.quadratic_coef.t()
@@ -134,7 +138,11 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Convert the Restricted Boltzmann Machine to Ising format."""
         num_nodes = self.linear_bias.shape[-1]
         with torch.no_grad():
-            ising_mat = torch.zeros((num_nodes + 1, num_nodes + 1), device=self.device)
+            ising_mat = torch.zeros(
+                (num_nodes + 1, num_nodes + 1),
+                device=self.device,
+                dtype=self.linear_bias.dtype,
+            )
             # Restricted Boltzmann Machine: only connections between visible and hidden layers
             ising_mat[: self.num_visible, self.num_visible : -1] = (
                 self.quadratic_coef / 8
