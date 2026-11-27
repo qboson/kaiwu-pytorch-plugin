@@ -6,6 +6,7 @@ This module provides the Trainer class that handles data loading, model creation
 training loop, and result saving for QVAE models.
 """
 
+import builtins
 import os
 from datetime import datetime
 import torch
@@ -45,7 +46,14 @@ class Trainer:
             config (Config): Configuration object containing all parameters.
             custom_train_data (tuple, optional): (X, y) for custom training data.
             custom_test_data (tuple, optional): (X, y) for custom test data.
+
+        Supply both custom splits together, or omit both to use the configured dataset.
         """
+        if (custom_train_data is None) != (custom_test_data is None):
+            raise builtins.ValueError(
+                "custom_train_data and custom_test_data must be provided together"
+            )
+
         self.config = config
         self.custom_train_data = custom_train_data
         self.custom_test_data = custom_test_data
