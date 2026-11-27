@@ -70,7 +70,7 @@ def load_zinc12k(path: Optional[str] = None) -> pd.DataFrame:
     Load and validate the ZINC-12k molecular dataset.
 
     Returns a DataFrame with columns: smiles, qed, logp, sas.
-    Rows with invalid SMILES or NaN properties are dropped.
+    Rows with invalid SMILES or nonnumeric/nonfinite properties are dropped.
     """
     from rdkit import Chem
 
@@ -109,6 +109,11 @@ def load_zinc12k(path: Optional[str] = None) -> pd.DataFrame:
         print("[LOADER] Computing molecular properties via RDKit...")
         prop_df = _compute_properties(df["smiles"])
         data = pd.concat([df[["smiles"]], prop_df], axis=1)
+
+    # Precomputed CSV properties need the same finite numeric contract as computed ones.
+    for prop in ("qed", "logp", "sas"):
+        data[prop] = pd.to_numeric(data[prop], errors="coerce")
+    data = data.replace([np.inf, -np.inf], np.nan)
 
     # Validate SMILES and drop bad rows
     valid_mask = data["smiles"].apply(
