@@ -68,7 +68,21 @@ def build_loaders(
         raise FileNotFoundError(
             f"{data_path} not found. Download ETTh1.csv as described in example/qdeq/README.md."
         )
-    values = pd.read_csv(data_path).drop(columns=["date"]).to_numpy(dtype=np.float32)
+    frame = pd.read_csv(data_path)
+    required_rows = TRAIN_ROWS + VAL_ROWS + TEST_ROWS
+    if len(frame) < required_rows:
+        raise ValueError(f"ETTh1 requires at least {required_rows} rows, got {len(frame)}")
+    if "date" not in frame or len(frame.columns) < 2:
+        raise ValueError("ETTh1 requires a 'date' column and at least one observation column")
+    observations = frame.iloc[:required_rows].drop(columns="date")
+    values = observations.to_numpy(dtype=np.float32)
+    invalid = ~np.isfinite(values)
+    if invalid.any():
+        row, column = np.unravel_index(invalid.argmax(), invalid.shape)
+        raise ValueError(
+            f"ETTh1 has a non-finite value in {observations.columns[column]!r} "
+            f"at data row {row + 1}"
+        )
     train = values[:TRAIN_ROWS]
     mean, std = train.mean(axis=0), train.std(axis=0) + 1e-8
     scaled = (values - mean) / std
