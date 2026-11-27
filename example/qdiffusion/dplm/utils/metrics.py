@@ -210,10 +210,19 @@ def compare_generation_sets(
     baseline_records: list[tuple[str, str]],
     guided_records: list[tuple[str, str]],
 ) -> dict[str, float]:
-    """Compares baseline and guided generations against each other."""
+    """Compares baseline and guided generations against each other.
+
+    Raises:
+        ValueError: If there is no aligned reference/baseline/guided triple.
+    """
     paired_count = min(
         len(reference_records), len(baseline_records), len(guided_records)
     )
+    if paired_count == 0:
+        raise ValueError(
+            "Need at least one aligned reference/baseline/guided triple "
+            "for comparison."
+        )
     changed_count = 0
     baseline_identity_sum = 0.0
     guided_identity_sum = 0.0
