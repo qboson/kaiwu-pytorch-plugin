@@ -9,6 +9,13 @@
    :show-inheritance:
 ```
 
+## Restricted Boltzmann machine free energy
+
+`RestrictedBoltzmannMachine.free_energy(visible)` scores a batch of visible
+states by marginalizing the hidden units exactly. The result is differentiable
+and uses the same sign convention as the model's Hamiltonian. It omits the
+model-wide normalization constant shared by all visible states.
+
 ## MAIFS QUBO and SDK energy conventions
 
 `QuadraticLinearSolver.solve(Q, l)` represents the binary objective
