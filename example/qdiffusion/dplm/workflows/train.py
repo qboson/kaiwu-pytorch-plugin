@@ -178,6 +178,14 @@ class TrainConfig:
     early_stop_patience: int = 4
     require_cuda: bool = True
 
+    def __post_init__(self) -> None:
+        """Reject budgets that would skip the training loop entirely."""
+        if self.epochs < 1:
+            raise ValueError(
+                "epochs must be at least 1; a zero-epoch workflow would skip "
+                "training and then fail while reading its empty history."
+            )
+
 
 @dataclass
 class GenerateConfig:
