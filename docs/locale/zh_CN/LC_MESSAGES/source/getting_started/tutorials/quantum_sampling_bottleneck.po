@@ -88,14 +88,15 @@ msgstr "量子替代方案：通过物理演化采样"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:27
 msgid ""
-"Instead of simulating a Markov chain, the energy function is encoded into a "
-"physical quantum system that evolves toward its low-energy states. Devices "
-"such as quantum annealers and Coherent Ising Machines (CIMs) realize this: "
-"model variables are mapped to qubits or optical pulses, and measurements "
-"yield samples from a distribution approximating the Boltzmann distribution "
-"at the hardware's effective temperature:"
+"Physical Ising devices encode the energy function in hardware and return "
+"measured spin configurations. KPP decodes the spin solutions supplied by "
+"its configured optimizer into model states. Whether those solutions follow "
+"an effective-temperature Boltzmann distribution depends on the hardware "
+"and operating protocol. When this model is appropriate, the distribution "
+"has the following form."
 msgstr ""
-"与模拟马尔可夫链不同，能量函数被编码进一个向低能态演化的物理量子系统。量子退火机与相干伊辛机（CIM）等设备即此思路的实现：模型变量映射到量子比特或光脉冲上，测量结果给出近似硬件有效温度下玻尔兹曼分布的样本："
+"物理伊辛设备将能量函数编码到硬件中，并返回测得的自旋构型。KPP "
+"将所配置求解器返回的自旋解解码为模型状态。这些解是否服从有效温度下的玻尔兹曼分布，取决于硬件和运行方案。适用时，这一分布可写成下式。"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:29
 msgid "P(\\mathbf{s}) \\propto \\exp\\left(-\\beta_{\\mathrm{eff}} H(\\mathbf{s})\\right),"
@@ -125,9 +126,9 @@ msgstr "**硬件级采样规模**：支持经典模拟难以企及的问题规�
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:41
 msgid ""
-"**Avoiding CD bias**: near-equilibrium samples without data-dependent "
-"initialization, giving less biased gradient estimates."
-msgstr "**避免 CD 偏差**：无需依赖数据初始化即可获得接近平衡的样本，梯度估计偏差更小。"
+"**Reducing CD bias**: Samples validated against the target distribution "
+"can reduce the bias associated with short chains initialized at the data."
+msgstr "**减小 CD 偏差**：经比对验证符合目标分布的样本，有助于减小从数据出发的短链所带来的偏差。"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:43
 msgid "From Boltzmann Machines to Ising Hamiltonians"
@@ -186,9 +187,10 @@ msgstr "经典 MCMC 混合缓慢，CD 等实用近似会引入偏差并可能导
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:70
 msgid ""
-"Quantum sampling encodes the energy as an Ising Hamiltonian and samples by "
-"physical evolution, promising better mixing, parallelism, and less bias."
-msgstr "量子采样将能量编码为 Ising 哈密顿量并通过物理演化采样，有望带来更好的混合、并行性与更小偏差。"
+"Physical Ising sampling returns spin configurations. An "
+"effective-temperature Boltzmann model requires separate validation for the "
+"chosen hardware and operating protocol."
+msgstr "物理伊辛采样返回自旋构型。有效温度下的玻尔兹曼模型需要针对所用硬件和运行方案单独验证。"
 
 #: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/quantum_sampling_bottleneck.md:71
 msgid ""
