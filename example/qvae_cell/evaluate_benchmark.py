@@ -19,6 +19,7 @@ import anndata
 import numpy as np
 import pandas as pd
 import scanpy as sc
+from scipy import sparse
 from scipy.stats import kendalltau
 from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
@@ -296,7 +297,7 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
         random_state=random_state,
         stratify=stratify,
     )
-    scaler = StandardScaler()
+    scaler = StandardScaler(with_mean=not sparse.issparse(x_train))
     x_train = scaler.fit_transform(x_train)
     x_test = scaler.transform(x_test)
 
