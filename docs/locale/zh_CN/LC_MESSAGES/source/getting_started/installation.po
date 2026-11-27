@@ -177,6 +177,10 @@ msgid ""
 "all dependencies (including the Kaiwu SDK) already installed."
 msgstr "Docker 安装构建一个预配置的 Jupyter notebook 环境，所有依赖（包括 Kaiwu SDK）均已安装。"
 
+#: ../../source/getting_started/installation.md:102
+msgid "The Compose service targets `linux/amd64`. On an ARM64 or other non-amd64 host, Docker must be able to emulate amd64 to build and run this service."
+msgstr "此 Compose 服务使用 `linux/amd64`。在 ARM64 或其他非 amd64 主机上，Docker 需要支持 amd64 模拟，才能构建并运行该服务。"
+
 #: ../../source/getting_started/installation.md:82
 msgid "Required Project Structure"
 msgstr "所需项目结构"
