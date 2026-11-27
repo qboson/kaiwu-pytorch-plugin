@@ -243,7 +243,7 @@ class RBMRunner(TransformerMixin, BaseEstimator):
     # 在RBMRunner类中添加特征提取方法
     def transform(self, X):
         """
-        提取隐藏层特征
+        按 batch_size 分批提取隐藏层特征。
         Args:
             X: 输入数据，形状为 (n_samples, n_features)
         Returns:
@@ -251,11 +251,16 @@ class RBMRunner(TransformerMixin, BaseEstimator):
         """
         if self.rbm is None:
             raise ValueError("RBM model not trained yet. Call fit first.")
-        X_torch = torch.FloatTensor(X).to(self.device)
+        inputs = torch.as_tensor(X)
+        weight = self.rbm.quadratic_coef
+        features = []
         with torch.no_grad():
-            hidden_output = self.rbm.get_hidden(X_torch)
-            features = hidden_output[:, self.rbm.num_visible :]
-        return features.cpu().numpy()
+            for batch in inputs.split(self.batch_size):
+                hidden_output = self.rbm.get_hidden(batch.to(weight))
+                features.append(
+                    hidden_output[:, self.rbm.num_visible :].to(device="cpu", copy=True)
+                )
+        return torch.cat(features, dim=0).numpy()
 
     # 绘制原始和重构图像
     def plot_images(
