@@ -187,14 +187,14 @@ class EnergyModel(nn.Module):
             raise RuntimeError("BM visible-logit scoring requires bm_num_visible.")
         visible_state = self.discretize_visible_state(visible_logits)
         full_states, split_sizes = self.sample_hidden_state(visible_state)
-        hidden_state = full_states[:, self.bm_num_visible :]
+        splits = split_sizes.tolist()
+        mean_states = torch.stack([s.mean(0) for s in torch.split(full_states.detach(), splits)])
         self._set_last_stats(
-            visible_state=full_states[:, : self.bm_num_visible],
-            hidden_state=hidden_state,
+            visible_state=mean_states[:, : self.bm_num_visible],
+            hidden_state=mean_states[:, self.bm_num_visible :],
         )
         flat_energy = self.energy_bm(full_states).unsqueeze(-1)
-        split_energy = torch.split(flat_energy, split_sizes.tolist())
-        return torch.stack([energy.mean(dim=0) for energy in split_energy], dim=0)
+        return torch.stack([e.mean(dim=0) for e in torch.split(flat_energy, splits)], dim=0)
 
 
 class QDiffusion(nn.Module):
