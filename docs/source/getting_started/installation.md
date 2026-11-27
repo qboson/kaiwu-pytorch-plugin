@@ -44,6 +44,8 @@ The exact cases are listed in
 The Linux matrix tests on CPU.
 Pushing a release tag runs the full matrix before publishing to PyPI.
 
+> **PyPI wheel platforms:** The listed versions of PyTorch and NumPy, together with Kaiwu SDK 1.3.1 or 1.4.3, have matching CPython 3.10 wheels for Linux x86-64 with glibc 2.28 or later, Windows x86-64, and macOS 12 or later on Apple silicon.
+
 Check the Python version:
 ```bash
 python --version
