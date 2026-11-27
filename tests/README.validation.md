@@ -2,10 +2,72 @@
 
 Validated locally on 2026-11-27 after merging PR #1247 head `5396704` with
 upstream `main` at `393a5f1`. Merge commit `e26bf07` identifies the runtime
-source tested below; the following closeout edits only change documentation.
-The upstream 0.4.0 version, dependency ranges and CI matrix are retained.
+source tested in the historical comparison below. Commit `0178090` then updated
+the closeout documentation. The subsequent CI repair changes test setup and
+workflow coverage, not the plugin runtime or retained training results.
+The upstream 0.4.0 version, dependency ranges and six default CI combinations
+are retained.
 
-## Environment and results
+## CI repair and acceptance
+
+The second attempt of [upstream run 45954647458](https://github.com/qboson/kaiwu-pytorch-plugin/actions/runs/45954647458)
+tested `0178090`: each of six jobs reported 216 passed, 2 failed and 25 skipped.
+Both failures were real SDK solver tests attempting interactive license input.
+The nine EP MNIST entrypoint tests were skipped because torchvision was absent.
+
+The repaired workflow has two complementary execution paths:
+
+- Upstream PR jobs select `-m 'not kaiwu_license'`. These jobs do not receive
+  fork credentials. Their success alone does not verify the real solver.
+- A push to `feat/ep-energy-qubo` runs the complete six-combination matrix in
+  the fork, including both real solver tests. `KAIWU_REQUIRE_LICENSE=1` requires
+  explicit `KAIWU_USER_ID` and `KAIWU_SDK_CODE` repository Actions secrets.
+  Initialization uses `kaiwu.license.init` inside the test process. Missing or
+  rejected credentials fail the run; interactive prompts are prohibited.
+
+Configure the two secrets in the fork's **Settings > Secrets and variables >
+Actions > New repository secret**, not in Variables. Values come from the Kaiwu
+platform SDK page. Never commit credentials or license files. The branch push
+trigger works without updating the fork's older default-branch workflow.
+Re-run a failed **push** run after correcting credentials; a manual dispatch
+uses the ordinary, unlicensed mode and is not licensed acceptance evidence.
+
+The Python 3.10 / Kaiwu 1.4.4 / PyTorch 2.7.0 Linux lint combination installs
+CPU torchvision 0.22.0 plus the EP example requirements. `pip check`, import
+checks and version assertions run after installation. Other matrix combinations
+retain their existing dependencies; optional-example skips outside this baseline
+remain visible with `-rs`.
+
+Each job uploads JUnit and environment metadata even when tests fail. The result
+checker requires both real solver test IDs to pass in every licensed job and all
+nine EP MNIST test IDs to pass in the example baseline. Missing, skipped,
+duplicated, failed and errored acceptance cases fail verification. Solver energy
+and trajectory assertions are unchanged. Artifact metadata records the tested
+SHA, versions and validation mode, never secret values.
+
+Before merging, require all six ordinary PR jobs and all six licensed fork jobs
+to pass. The fork run's head SHA must equal the PR head SHA; the ordinary PR run
+may test GitHub's synthetic merge commit. Link both runs in the PR and retain
+their reports. A new PR head requires fresh licensed evidence. Maintainer review
+and upstream required checks still apply; a green fork run does not bypass them.
+
+Local repair checks on Windows / Python 3.10.11 / Kaiwu 1.3.1 / pytest 8.3.5:
+46 targeted tests passed, including both real solver cases and all nine EP MNIST
+cases; the CPU full suite passed 256 tests, skipped 16 CUDA-only cases, and
+deselected the same two SDK statistics cases excluded from closeout acceptance.
+The 22 new regression cases cover license prerequisites, safe error reporting,
+and rejection of incomplete JUnit evidence. The targeted and full-suite JUnit
+reports pass the 11-case solver-plus-MNIST acceptance checker. These local results
+do not replace the pending Linux / SDK 1.4.x / Python 3.12 and 3.14 CI rerun.
+The CUDA acceptance subset plus the new CI regression cases passed all 52 tests
+without skips. The unlicensed targeted run passed 44 tests and deselected exactly
+the two licensed cases, even when credentials were required but absent. Conversely,
+selecting the two licensed cases with missing credentials produced the expected
+two setup errors without prompting. Actionlint 1.7.12 and `pip check` passed.
+Installing pytest 9.1.1 locally was blocked by a PyPI TLS connection error; its
+behavior remains part of the remote CI verification rather than a local claim.
+
+## Historical environment and results
 
 Windows, Python 3.10.11, Kaiwu 1.3.1, NumPy 2.2.6 and pytest 8.3.5 were used.
 CPU: PyTorch 2.7.0 and torchvision 0.22.0. CUDA: PyTorch 2.7.0+cu126,

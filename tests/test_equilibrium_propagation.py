@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -309,17 +310,6 @@ class TestEquilibriumPropagation(unittest.TestCase):
             self.assertIn(name, plugin.__all__)
 
 
-def _has_kaiwu_annealer():
-    """Whether the installed Kaiwu SDK provides the classical annealer."""
-    try:
-        from kaiwu.classical import (  # pylint: disable=import-outside-toplevel,unused-import
-            SimulatedAnnealingOptimizer,
-        )
-    except ImportError:
-        return False
-    return True
-
-
 def annealing_traces():
     """Record seeded SDK trajectories, with explicit starts where supported."""
     import inspect  # pylint: disable=import-outside-toplevel
@@ -359,7 +349,7 @@ def annealing_traces():
     return records
 
 
-@unittest.skipUnless(_has_kaiwu_annealer(), "Kaiwu simulated annealing is not installed")
+@pytest.mark.kaiwu_license
 class TestKaiwuAnnealer(unittest.TestCase):
     """The real SDK annealer on a problem small enough to check exactly."""
 
