@@ -32,6 +32,9 @@ On Python 3.10, install a specific SDK version in the same command as the plugin
 python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin
 ```
 
+This SDK compatibility range applies when installing the plugin from this checkout.
+A plugin release installed from PyPI uses the dependency metadata published with that release.
+
 Use an isolated environment for each SDK version. Use regular installation
 for SDK 1.3.1 because its regular `kaiwu` package hides the editable plugin.
 KPP handles the `PrecisionReducer` move from `kaiwu.cim` to
