@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
+
 import torch
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
@@ -56,6 +57,21 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Return the visible bias."""
         return self.linear_bias[: self.num_visible]
 
+    def _parameter_device(self) -> torch.device:
+        """Return the device the RBM parameters live on.
+
+        ``self.device`` is refreshed when the module is moved, but parameters can
+        be relocated through ``_apply`` without updating the cache. Propagation
+        buffers must follow the parameters so mixed-device assignments cannot
+        occur.
+
+        Returns:
+            torch.device: Device of the first parameter, or ``self.device`` when
+            the module has no parameters.
+        """
+        parameter = next(self.parameters(), None)
+        return parameter.device if parameter is not None else self.device
+
     def clip_parameters(self, h_range, j_range) -> None:
         """Clip linear and quadratic bias weights in-place.
 
@@ -78,12 +94,19 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             s_visible: Visible layer tensor.
             requires_grad: Whether to allow gradient backpropagation.
         """
+        device = self._parameter_device()
+        s_visible = torch.as_tensor(
+            s_visible,
+            device=device,
+            dtype=self.quadratic_coef.dtype,
+        )
         context = torch.enable_grad if requires_grad else torch.no_grad
         with context():
             s_all = torch.zeros(
                 s_visible.size(0),
                 self.num_hidden + self.num_visible,
-                device=self.device,
+                device=device,
+                dtype=self.quadratic_coef.dtype,
             )
             s_all[:, : self.num_visible] = s_visible
             prob = torch.sigmoid(
@@ -99,10 +122,19 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         self, s_hidden: torch.Tensor, bernoulli: bool = False
     ) -> torch.Tensor:
         """Propagate hidden spins to the visible layer."""
+        device = self._parameter_device()
+        s_hidden = torch.as_tensor(
+            s_hidden,
+            device=device,
+            dtype=self.quadratic_coef.dtype,
+        )
         with torch.no_grad():
             s_all = torch.zeros(
-                s_hidden.size(0), self.num_hidden + self.num_visible
-            ).to(self.device)
+                s_hidden.size(0),
+                self.num_hidden + self.num_visible,
+                device=device,
+                dtype=self.quadratic_coef.dtype,
+            )
             s_all[:, self.num_visible :] = s_hidden
             prob = torch.sigmoid(
                 s_hidden @ self.quadratic_coef.t()
