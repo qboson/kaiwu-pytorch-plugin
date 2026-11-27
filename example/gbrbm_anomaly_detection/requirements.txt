@@ -1,0 +1,5 @@
+# Install PyTorch, the Kaiwu SDK and kaiwu-torch-plugin first (see repository README), then:
+#   pip install -r example/gbrbm_anomaly_detection/requirements.txt
+
+scikit-learn>=1.3
+matplotlib>=3.7

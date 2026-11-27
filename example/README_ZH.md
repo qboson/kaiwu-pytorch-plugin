@@ -141,3 +141,26 @@ scgraph
 ```
 pandas
 ```
+
+---
+### 异常检测：基于 GBRBM 的连续特征无监督异常检测
+
+该示例在 Breast Cancer Wisconsin 数据集（569 条样本、30 维连续特征）上，只用正常类样本
+训练高斯-伯努利受限玻尔兹曼机（GBRBM），再基于现有公开 API
+（`marginal_energy` / `infer_from_gaussian` / `infer_from_bernoulli`）封装自由能与确定性
+重构误差两种异常评分，并与 `IsolationForest` 在相同划分、相同阈值协议下逐项对比。
+
+* **零核心改动**：不修改 `src/kaiwu/torch_plugin/`，全部逻辑位于 `example/gbrbm_anomaly_detection/`；
+* **严格防泄漏**：先划分 train/val/test，`StandardScaler` 仅在正常训练集上拟合；
+* **采样器双入口**：默认本地 `SimulatedAnnealingOptimizer`，另提供兼容 Kaiwu 1.3.1–1.4.3 的 `CIMOptimizer` 入口；
+* **非阻塞绘图**：只用 `FigureCanvasAgg` 保存评分直方图与 ROC 对比曲线。
+
+运行入口为 `example/gbrbm_anomaly_detection/run_anomaly_detection.py`（加 `--quick` 可数秒跑通）。
+详细说明与参考指标见 `example/gbrbm_anomaly_detection/README_ZH.md`。
+
+**依赖项**
+
+```
+scikit-learn
+matplotlib
+```
