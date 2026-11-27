@@ -100,7 +100,11 @@ def _residual_norms(residual: torch.Tensor, f_value: torch.Tensor) -> tuple[floa
         tuple: ``||residual||`` and ``||residual|| / ||f_value||``.
     """
     abs_res = residual.norm().item()
-    return abs_res, abs_res / (f_value.norm().item() + 1e-9)
+    if abs_res == 0.0:
+        return 0.0, 0.0
+    f_norm = f_value.norm().item()
+    denom = f_norm if f_norm > 0.0 else abs_res
+    return abs_res, abs_res / denom
 
 
 def _anderson_solver(
@@ -145,8 +149,13 @@ def _anderson_solver(
         n = min(k, m)
         # alpha = argmin ||sum_i alpha_i (f(x_i) - x_i)||^2  s.t.  sum_i alpha_i = 1.
         g_mat = f_hist[:, :n] - x_hist[:, :n]
+        gram = g_mat @ g_mat.transpose(1, 2)
         eye = torch.eye(n, dtype=z0.dtype, device=z0.device)[None]
-        h_mat[:, 1 : n + 1, 1 : n + 1] = g_mat @ g_mat.transpose(1, 2) + config.anderson_lam * eye
+        diag_scale = gram.diagonal(dim1=1, dim2=2).mean(dim=-1, keepdim=True).unsqueeze(-1)
+        damping = config.anderson_lam * torch.where(
+            diag_scale > 0, diag_scale, torch.ones_like(diag_scale)
+        )
+        h_mat[:, 1 : n + 1, 1 : n + 1] = gram + damping * eye
         alpha = torch.linalg.solve(h_mat[:, : n + 1, : n + 1], rhs[:, : n + 1])[:, 1 : n + 1, 0]
         # The next iterate mixes the stored images and overwrites the oldest slot.
         x_hist[:, k % m] = (alpha[:, None] @ f_hist[:, :n])[:, 0]
@@ -209,9 +218,11 @@ def _ising_fixed_point_solver(
 
         # G[i] = (r(z + h v_i) - r(z)) / h approximates J v_i for each direction v_i.
         basis = _search_directions(residual, history_r, history_dz, history_dr, config.num_basis)
-        shifted = z + config.fd_eps * basis
+        step_scale = max(z.norm().item(), abs_res)
+        fd_step = config.fd_eps * (step_scale if step_scale > 0.0 else 1.0)
+        shifted = z + fd_step * basis
         g_mat = torch.stack([(func(zs) - zs - residual).reshape(-1) for zs in shifted])
-        g_mat = (g_mat / config.fd_eps).double()
+        g_mat = (g_mat / fd_step).double()
         start = time.perf_counter()
         coeff = _sample_coefficients(g_mat, residual.reshape(-1).double(), abs_res, sampler, config)
         sampler_time += time.perf_counter() - start
@@ -254,7 +265,11 @@ def _search_directions(residual, history_r, history_dz, history_dr, num_basis) -
     directions = directions[:num_basis]
     while len(directions) < num_basis:
         directions.append(torch.randint_like(residual, 0, 2) * 2 - 1)
-    return torch.stack([v / (v.norm() + 1e-9) for v in directions])
+    unit_dirs = []
+    for v in directions:
+        norm = v.norm()
+        unit_dirs.append(v / norm if norm > 0 else torch.zeros_like(v))
+    return torch.stack(unit_dirs)
 
 
 def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
