@@ -33,6 +33,26 @@ constraints, for example forecasting on edge devices:
   gradient-carrying layer call are separate stages, so the shared layer can be
   quantized in either stage. See [Use with quantized models](#use-with-quantized-models).
 
+## Verify a scalar equilibrium before training on ETTh1
+
+From the repository root with the plugin installed, run:
+
+```bash
+python example/qdeq/scalar_equilibrium.py
+```
+
+The example uses the shared map `f(z, x) = a*z + x` with a trainable
+coefficient `a = 0.5`. For `x = 1.5`, the equilibrium is `z* = x/(1-a) = 3`.
+The script compares QDEQ's result and the gradient from one training step with
+their closed-form values. A small local sampler enumerates the two coefficient
+bits. You need the installed SDK for QUBO conversion, with no license
+initialization, dataset, or remote solver call in this example.
+
+Set `jac_loss_vecs` above zero to compute a Jacobian penalty during training.
+QDEQ exposes it as `model.last_jac_loss` after the forward call. Add it to
+the task loss before `backward()` with a coefficient chosen for your model.
+The example checks the gradient of this combined loss and the optimizer update.
+
 ## Data
 
 The example uses the ETTh1 electricity transformer dataset

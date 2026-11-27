@@ -27,6 +27,9 @@ whose encoder is one `QDEQ` layer, with the fixed point solved by Kaiwu
 simulated annealing, CIM or the Anderson baseline. See
 [example/qdeq/README.md](qdeq/README.md) for data and commands.
 
+[Scalar equilibrium check](qdeq/scalar_equilibrium.py) verifies QDEQ's
+forward result and training gradient on CPU with an exact local solver.
+
 **Dependencies**
 
 ```
