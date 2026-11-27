@@ -123,6 +123,9 @@ python scripts/run_sqa_cim_matched.py \
 
 `--workers` 按可用 CPU 数调整；当前并行控制器使用 Linux 的 fork／文件锁。上述命令生成新的 SQA 轨迹，输出到 `results/new_sqa`。CIM／SA 的生成入口位于各自源码目录中，单次新运行不能重建已经完成的混合预算 CIM 轨迹。
 
+`--reference-ids` 和 `--bands` 接受 `all` 或非空、无重复的逗号分隔列表。
+每个参考分子与区间组合只执行一次，显式选择时按给定顺序处理。
+
 单个 SA 条件的生成示例（100 步、每步 50 个候选）：
 
 ```bash
