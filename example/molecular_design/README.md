@@ -32,6 +32,10 @@ molecular_design/
 
 入口、控制器与测试的路径已适配上述目录。完整运行所需的外部文件及其放置位置见下文。
 
+在新实验中，可以使用两套后端的 `split_dataset(data, deduplicate_smiles=True)` 生成数据划分。
+程序会按保留立体化学的 canonical SMILES 去重，再用指定的种子打乱。每组保留输入中的第一行。
+各集合的大小应以去重后的分子总数为准。
+
 ### KPP RBM／BM 复用
 
 `models/crbm.py` 直接导入 `kaiwu.torch_plugin.RestrictedBoltzmannMachine` 和 `BoltzmannMachine`。本次适配核对的上游版本为 [KPP dca313e](https://github.com/qboson/kaiwu-pytorch-plugin/tree/dca313e29c4f6b0b96f406cee3c919eea1114973/src/kaiwu/torch_plugin)。
