@@ -200,10 +200,14 @@ class FactorialBernoulliUtil(DistUtil):
         return z
 
     def entropy(self):
-        """Compute entropy of Bernoulli distribution.
+        """Compute entropy for each Bernoulli variable.
+
+        For vectors of independent Bernoulli variables, sum along the
+        variable dimension to get the joint entropy of each vector.
 
         Returns:
-            torch.Tensor: Entropy value.
+            torch.Tensor: Elementwise entropy in nats, with the same
+            shape as the logits.
         """
         mu = torch.sigmoid(self.logit_mu)
         ent = sigmoid_cross_entropy_with_logits(logits=self.logit_mu, labels=mu)
