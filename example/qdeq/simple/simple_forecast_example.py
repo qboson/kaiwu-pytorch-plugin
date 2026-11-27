@@ -39,7 +39,9 @@ def main() -> None:
     loaders = build_loaders(args.data_path)
     sampler = build_sampler(args.sampler, args.seed)
     model = DEQForecaster(96, 96, sampler, build_config())
-    model.load_state_dict(torch.load(args.checkpoint)["state_dict"])
+    model.load_state_dict(
+        torch.load(args.checkpoint, weights_only=True)["state_dict"]
+    )
 
     test = evaluate(model, loaders["test"])
     print(

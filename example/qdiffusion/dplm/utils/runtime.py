@@ -89,7 +89,9 @@ def load_trained_energy_weights(
     generator, checkpoint_path: str, device: str
 ) -> dict[str, Any]:
     """Loads a compact energy-side checkpoint into one generator."""
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(
+        checkpoint_path, map_location=device, weights_only=True
+    )
     state_dict = checkpoint["state_dict"]
     # Rebuild exactly the energy-side modules we saved during training so rerun
     # and evaluation use the same scorer weights as the best checkpoint.

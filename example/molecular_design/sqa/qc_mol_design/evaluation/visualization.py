@@ -45,16 +45,22 @@ def plot_tsne(
     prop_name:        str   = "QED",
     save_path:        str   = "fig2_tsne.png",
     max_points:       int   = 2000,
+    seed:             int   = 0,
 ) -> None:
-    """Reproduce Figure 2: t-SNE visualisation of chemical space."""
+    """Reproduce Figure 2: t-SNE visualisation of chemical space.
+
+    Point sub-sampling draws from a dedicated generator seeded with
+    ``seed`` so repeated runs produce identical figures.
+    """
     _require_mpl()
     from sklearn.manifold import TSNE
 
     # Sub-sample for speed
     n_tr  = min(max_points, len(latent_train))
     n_gen = min(max_points // 2, len(latent_generated))
-    lat_tr  = latent_train[np.random.choice(len(latent_train), n_tr, replace=False)]
-    lat_gen = latent_generated[np.random.choice(len(latent_generated), n_gen, replace=False)]
+    rng = np.random.default_rng(seed)
+    lat_tr  = latent_train[rng.choice(len(latent_train), n_tr, replace=False)]
+    lat_gen = latent_generated[rng.choice(len(latent_generated), n_gen, replace=False)]
     gen_col = gen_props[:n_gen] if len(gen_props) >= n_gen else gen_props
 
     combined = np.vstack([lat_tr, lat_gen])
