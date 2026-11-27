@@ -81,6 +81,29 @@ class TestQDEQConstruction(unittest.TestCase):
         with self.assertRaises(ValueError):
             QDEQ(LinearLayer(), LocalSearchSampler(), QDEQConfig(stop_mode="max"))
 
+    def test_custom_solver_cannot_mutate_the_callers_warm_start(self):
+        """A writable solver buffer must not invalidate the caller's graph."""
+        class InPlaceSolver(QDEQ):
+            """Small solver that reuses the storage provided for its initial guess."""
+
+            def solve_fixed_point(self, func, z0):
+                z0.copy_(func(z0))
+                return z0, {}
+
+        class ConstantMap(torch.nn.Module):
+            def forward(self, _state, x):
+                return x
+
+        initial = torch.tensor([[1.0, -2.0]], requires_grad=True)
+        caller_loss = initial.square().sum()
+        data = torch.tensor([[3.0, 4.0]])
+        model = InPlaceSolver(ConstantMap(), None).eval()
+
+        torch.testing.assert_close(model(data, z0=initial), data)
+        caller_loss.backward()
+        torch.testing.assert_close(initial, torch.tensor([[1.0, -2.0]]))
+        torch.testing.assert_close(initial.grad, torch.tensor([[2.0, -4.0]]))
+
 
 class TestIsingForward(unittest.TestCase):
     """The Ising forward solver reaches the analytic fixed point."""
