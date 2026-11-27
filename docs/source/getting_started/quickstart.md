@@ -62,7 +62,7 @@ graph TB
     end
     subgraph External_SDK ["External SDK"]
         G["kaiwu.cim.CIMOptimizer"]
-        H["kaiwu.cim.PrecisionReducer"]
+        H["PrecisionReducer (via plugin _kaiwu_compat)"]
         I["kaiwu.classical.SimulatedAnnealingOptimizer"]
     end
     B -->|"implements"| E
