@@ -43,6 +43,7 @@ def main():
     parser.add_argument("--data-path", type=str, default="./data")
     parser.add_argument("--num-train-samples", type=int, default=60000)
     parser.add_argument("--num-test-samples", type=int, default=10000)
+    parser.add_argument("--subset-seed", type=int, help="Seed for selecting train and test subsets")
 
     # Training parameters
     parser.add_argument("--batch-size", type=int, default=256)
@@ -82,6 +83,7 @@ def main():
         compute_energy=args.compute_energy,
         num_train_samples=args.num_train_samples,
         num_test_samples=args.num_test_samples,
+        subset_seed=args.subset_seed,
         output_dir=args.output_dir,
         classifier_kwargs={
             "hidden_dims": args.mlp_hidden_dims,
@@ -108,6 +110,7 @@ def main():
         batch_size=config.batch_size,
         num_evts_train=config.num_train_samples,
         num_evts_test=config.num_test_samples,
+        subset_seed=config.subset_seed,
         use_cuda=config.use_cuda,
     )
     X_train_raw, y_train_raw = flatten_dataloader(train_loader)
