@@ -9,6 +9,9 @@ isort==9.0.2; python_version >= "3.14"
 pip-licenses==5.5.0
 pylint==4.1.4
 
+# DPLM attention regression tests; match the example's Transformers version.
+transformers==4.39.2
+
 # 文档相关依赖
 sphinx==8.1.3
 pydata-sphinx-theme==0.15.4
