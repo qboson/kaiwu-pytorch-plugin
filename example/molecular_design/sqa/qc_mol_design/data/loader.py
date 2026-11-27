@@ -37,9 +37,11 @@ def _compute_properties(smiles_series: pd.Series) -> pd.DataFrame:
 
     try:
         from rdkit.Contrib.SA_Score import sascorer
-        _has_sas = True
-    except Exception:
-        _has_sas = False
+    except ImportError as exc:
+        raise ImportError(
+            "SAS scoring requires RDKit Contrib SA_Score; "
+            "install RDKit with SA_Score support."
+        ) from exc
 
     records = []
     for smi in tqdm(smiles_series, desc="Computing properties", leave=False):
@@ -50,8 +52,7 @@ def _compute_properties(smiles_series: pd.Series) -> pd.DataFrame:
         try:
             qed  = float(rdkit_qed(mol))
             logp = float(MolLogP(mol))
-            sas  = (float(sascorer.calculateScore(mol)) if _has_sas
-                    else float(mol.GetNumHeavyAtoms()) / 10.0 + 1.0)
+            sas  = float(sascorer.calculateScore(mol))
             records.append({"qed": qed, "logp": logp, "sas": sas})
         except Exception:
             records.append(None)
