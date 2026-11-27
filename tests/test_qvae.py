@@ -138,6 +138,25 @@ class TestQVAE(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.qvae.energy(x, loss_type="mse")
 
+    def test_energy_without_dataset_mean_matches_forward(self):
+        """Bernoulli energy works without centering when no dataset mean is set.
+
+        forward() accepts uncentered Bernoulli input when set_dataset_mean()
+        was never called; energy() must accept the same configuration instead
+        of raising a contradictory "Unsupported loss type: bernoulli" error.
+        """
+        self.assertIsNone(self.qvae._dataset_mean)
+        x = torch.ones(2, self.input_dim)
+
+        energy = self.qvae.energy(x)
+        self.assertEqual(energy.shape, (x.size(0),))
+        torch.testing.assert_close(self.encoder.inputs[-1], x)
+
+        # Unsupported loss types must still be rejected.
+        self.config.loss_type = "unsupported"
+        with self.assertRaises(ValueError):
+            self.qvae.energy(x)
+
     def test_mse_forward_and_loss(self):
         """The MSE configuration bypasses Bernoulli centering and bias."""
         self.config.loss_type = "mse"
