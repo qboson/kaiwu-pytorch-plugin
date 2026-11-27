@@ -252,7 +252,10 @@ class FeatureSelectionWrapper(nn.Module):
 
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
-            loss_fn: Loss function returning a scalar tensor.
+            loss_fn: Loss function returning a scalar tensor. It is called
+                once on the selected samples concatenated across batches.
+                Its reduction determines the scale of the gradient and
+                Hessian.
             hessian_mode: ``"full"`` for the full Hessian or ``"diagonal"`` for
                 diagonal-only Hessian rows.
             max_samples: Optional maximum number of samples used for derivatives.
