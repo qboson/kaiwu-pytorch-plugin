@@ -315,9 +315,27 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
             n_sample (int, optional): Number of randomly initialized samples.
 
         Returns:
-            torch.tensor: Samples generated through Gibbs sampling.
+            torch.tensor: Samples generated through Gibbs sampling, the
+            ``n_step - n_burnin`` kept steps concatenated along the batch axis.
+
+        Raises:
+            ValueError: If ``n_burnin`` is negative or leaves no step to keep,
+                or if no initial state, sampler or ``n_sample`` is given.
         """
-        n_burnin_ = n_burnin - 1
+        if n_burnin < 0 or n_burnin >= n_step:
+            raise ValueError(
+                f"n_burnin must be in [0, n_step), got n_burnin={n_burnin} "
+                f"with n_step={n_step}"
+            )
+        if (
+            s_gaussian is None
+            and s_bernoulli is None
+            and sampler is None
+            and n_sample is None
+        ):
+            raise ValueError(
+                "One of s_gaussian, s_bernoulli, sampler or n_sample must be provided."
+            )
         with torch.no_grad():
             if s_gaussian is not None:
                 n_sample = s_gaussian.shape[0]
@@ -365,7 +383,7 @@ class GaussianBernoulliRestrictedBoltzmannMachine(AbstractBoltzmannMachine):
                     s_all = self.infer_from_bernoulli(s_bernoulli)
                     s_gaussian = s_all[:, : self.num_gaussian]
                     s_all = self.infer_from_gaussian(s_gaussian)
-                if no_step >= n_burnin_:
+                if no_step >= n_burnin:
                     samples.append(s_all)
             return torch.concat(samples)
 
