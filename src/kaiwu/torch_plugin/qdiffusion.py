@@ -212,7 +212,7 @@ class QDiffusion(nn.Module):
 
     Args:
         proposal_model: Backbone used to predict proposal logits.
-        energy_model: Energy-side model used to encode and score candidates.
+        energy_model: Candidate scorer. Use ``None`` for single-candidate proposal-only generation.
         token_spec: Special-token metadata required by the generator.
         config: Optional generation/training configuration.
         dtype: Floating point dtype tracked by the wrapper.
@@ -223,7 +223,7 @@ class QDiffusion(nn.Module):
     def __init__(
         self,
         proposal_model: nn.Module,
-        energy_model: EnergyModel,
+        energy_model: EnergyModel | None,
         token_spec: SequenceTokenSpec,
         config: QDiffusionConfig | None = None,
         dtype: torch.dtype = torch.float32,
@@ -235,6 +235,8 @@ class QDiffusion(nn.Module):
         self.energy_model = energy_model
         self.token_spec = token_spec
         self.config = config or QDiffusionConfig()
+        if energy_model is None and self.config.num_candidates != 1:
+            raise ValueError("Proposal-only QDiffusion requires num_candidates=1")
         self.dtype = dtype
 
         if freeze_proposal:
@@ -278,18 +280,7 @@ class QDiffusion(nn.Module):
         return module
 
     def forward(self, noisy_tokens: torch.Tensor, **kwargs: Any) -> torch.Tensor:
-        """Runs the proposal model on the current noisy state.
-
-        Args:
-            noisy_tokens: Current noisy token tensor.
-            ``**kwargs``: Additional keyword arguments forwarded to the proposal model.
-
-        Returns:
-            torch.Tensor: Proposal logits over the token vocabulary.
-
-        Raises:
-            TypeError: If the proposal model does not implement ``forward``.
-        """
+        """Returns proposal logits for the current noisy tokens and model kwargs."""
         if hasattr(self.proposal_model, "forward"):
             return self.proposal_model.forward(noisy_tokens, **kwargs)
         raise TypeError("proposal_model must implement forward().")
@@ -324,6 +315,8 @@ class QDiffusion(nn.Module):
         Returns:
             torch.Tensor: A tensor of scalar energies with shape ``[batch, 1]``.
         """
+        if self.energy_model is None:
+            raise RuntimeError("QDiffusion energy scoring requires an energy model")
         if attention_mask is None:
             attention_mask = candidate_tokens.ne(self.pad_id)
 
@@ -787,6 +780,8 @@ class QDiffusion(nn.Module):
             tuple[torch.Tensor, torch.Tensor]: A tuple ``(tokens, scores)``
             for the selected candidate per sample.
         """
+        if self.energy_model is None and candidate_tokens.size(1) == 1:
+            return candidate_tokens[:, 0].clone(), candidate_scores[:, 0].clone()
         energies = self._score_candidates(noisy_tokens, candidate_tokens)
         neg_energies = -energies
         neg_energies = neg_energies - neg_energies.max(dim=-1, keepdim=True)[0]
