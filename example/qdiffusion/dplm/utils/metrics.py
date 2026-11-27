@@ -1,5 +1,7 @@
 """Sequence-quality metrics for Q-Diffusion DPLM examples."""
 
+# Modified to distinguish one-sided zero-total count distributions.
+
 from __future__ import annotations
 
 import math
@@ -47,15 +49,17 @@ def kmer_distribution(sequences: Iterable[str], k: int) -> dict[str, int]:
 def jsd_from_counts(
     reference_counts: dict[str, int], candidate_counts: dict[str, int]
 ) -> float:
-    """Computes Jensen-Shannon divergence from two count dictionaries."""
+    """Computes JSD, using 0 for two zero totals and ln(2) for only one."""
     vocabulary = sorted(set(reference_counts) | set(candidate_counts))
     if not vocabulary:
         return 0.0
 
     reference_total = sum(reference_counts.values())
     candidate_total = sum(candidate_counts.values())
-    if reference_total == 0 or candidate_total == 0:
+    if reference_total == 0 and candidate_total == 0:
         return 0.0
+    if reference_total == 0 or candidate_total == 0:
+        return math.log(2.0)
 
     reference_probs = [
         reference_counts.get(token, 0) / reference_total for token in vocabulary
