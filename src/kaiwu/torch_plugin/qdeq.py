@@ -332,8 +332,8 @@ def _sample_coefficients(g_mat, residual, residual_norm, sampler, config):
 class QDEQ(nn.Module):
     """Deep equilibrium wrapper that turns a weight-tied layer into a fixed-point layer.
 
-    ``layer(z, x)`` must return a tensor shaped like ``z``. ``QDEQ(x)`` finds
-    ``z*`` with ``layer(z*, x) = z*`` and returns ``layer(z*, x)``. In training
+    ``layer(z, x)`` must return a tensor shaped like ``z``. ``QDEQ(x)`` selects
+    an approximate fixed point ``z*`` and returns ``layer(z*, x)``. In training
     mode gradients reach the layer's parameters and ``x`` through the implicit
     function theorem; the solver steps are never backpropagated through.
 
@@ -372,14 +372,19 @@ class QDEQ(nn.Module):
         self._last_stats: dict[str, float] = {}
 
     def forward(self, x: torch.Tensor, z0: torch.Tensor | None = None) -> torch.Tensor:
-        """Returns the layer output at its fixed point.
+        """Evaluates the layer at the state selected by the solver.
+
+        The default solver uses the iterate with the smallest tracked
+        residual. It can reach the step limit before meeting the tolerance.
+        ``get_last_stats()["forward_residual"]`` reports the residual at
+        the selected state.
 
         Args:
             x: Input injected into every layer call.
             z0: Initial guess for the fixed point. Defaults to zeros shaped like ``x``.
 
         Returns:
-            torch.Tensor: ``layer(z*, x)``.
+            torch.Tensor: ``layer(z*, x)``, evaluated at the selected state.
         """
         z0 = torch.zeros_like(x) if z0 is None else z0
         cfg = self.config
