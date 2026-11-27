@@ -376,11 +376,11 @@ class FIDCalculator:
         self.preprocessor = FIDImagePreprocessor()
     
     def update_batch(self, images: torch.Tensor, real: bool):
-        """处理并更新单一批次"""
-        # 输入假定为 [0,1] float，先缩放至 [0,255] uint8
-        images_uint8 = (images * 255).clamp(0, 255).to(torch.uint8)
+        """处理 [0, 1] 浮点图像或 [0, 255] uint8 图像。"""
+        if images.dtype != torch.uint8:
+            images = (images * 255).clamp(0, 255).to(torch.uint8)
         # 预处理（形状、通道、尺寸）
-        processed = self.preprocessor(images_uint8)
+        processed = self.preprocessor(images)
         # 移动到设备并更新
         self.fid.update(processed.to(self.device), real=real)
     
@@ -397,12 +397,9 @@ def compute_fid_in_batches(
     device: torch.device,
     batch_size: int = 64
 ) -> float:
-    """计算 FID"""
-    # 确保输入为 Tensor，并转为 float 类型（便于缩放）
-    if not isinstance(fake_imgs, torch.Tensor):
-        fake_imgs = torch.tensor(fake_imgs, dtype=torch.float32)
-    if not isinstance(real_imgs, torch.Tensor):
-        real_imgs = torch.tensor(real_imgs, dtype=torch.float32)
+    """按批计算 FID，保留输入数组的 uint8 像素编码。"""
+    fake_imgs = torch.as_tensor(fake_imgs)
+    real_imgs = torch.as_tensor(real_imgs)
     
     # 创建计算器
     calculator = FIDCalculator(device)

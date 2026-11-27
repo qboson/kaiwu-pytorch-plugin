@@ -125,7 +125,8 @@ results.json                     # Config + losses, or test accuracy (CLI)
 
 - **Generation quality (FID)**: `train_qvae.ipynb` computes the FID score
   between generated and real test images (flattened 28x28 inputs) using
-  `torchmetrics` and writes the result to `fid_results.txt`.
+  `torchmetrics` and writes the result to `fid_results.txt`. The helper accepts
+  normalized float images in `[0, 1]` or byte tensors and arrays in `[0, 255]`.
 - **Classification accuracy**: `train_qvae_classifier.ipynb` and
   `run_pipeline.py` report the test accuracy of the MLP classifier trained
   on Q-VAE latent features.
