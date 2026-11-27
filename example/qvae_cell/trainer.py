@@ -26,6 +26,27 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 
+def _can_extract_without_decoding(model):
+    """Preserve extension and instrumentation behavior outside the native factory."""
+    if (type(model) is not CellQVAE or type(model.encoder) is not QVAEEncoder
+            or type(model.decoder) is not QVAEDecoder):
+        return False
+    native_types = (QVAEEncoder, QVAEDecoder, torch.nn.Linear, torch.nn.LayerNorm,
+                    torch.nn.BatchNorm1d, torch.nn.Dropout)
+    parts = list(model.encoder.modules()) + list(model.decoder.modules())
+    if any(type(part) not in native_types or part.training for part in parts):
+        return False
+    if any(name in model.__dict__ for name in ("_encode", "_decoder_input", "posterior")):
+        return False
+    if any("forward" in part.__dict__ or getattr(part, "_compiled_call_impl", None)
+           or getattr(part, "_forward_hooks") or getattr(part, "_forward_pre_hooks")
+           for part in model.modules()):
+        return False
+    module_api = torch.nn.modules.module
+    return not (getattr(module_api, "_global_forward_hooks")
+                or getattr(module_api, "_global_forward_pre_hooks"))
+
+
 class Trainer:
     """封装数据准备、模型创建、训练循环和表示提取。"""
 
@@ -283,9 +304,13 @@ class Trainer:
         reps = []
         with torch.no_grad():
             for x, batch_idx in eval_loader:
-                _, _, q, zeta = model(
-                    x.to(self.device), batch_idx.to(self.device)
-                )
+                if _can_extract_without_decoding(model):
+                    # Preserve posterior sampling and RNG while skipping reconstruction.
+                    q, _, zeta = model._encode(x.to(self.device))
+                else:
+                    _, _, q, zeta = model(
+                        x.to(self.device), batch_idx.to(self.device)
+                    )
                 # q 是 encoder logits，zeta 是后验采样/松弛后的潜变量表示。
                 rep = q if self.args.representation == "q" else zeta
                 reps.append(rep.cpu().numpy())
