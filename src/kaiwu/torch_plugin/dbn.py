@@ -113,6 +113,10 @@ class UnsupervisedDBN(nn.Module):
     def reconstruct(self, data_in, layer_index=0):
         """Reconstructs the input from a specified RBM layer.
 
+        Each input row must have the selected RBM's visible width. For
+        layers after the first, supply the preceding layer's hidden-unit
+        representations as inputs to the selected RBM.
+
         Args:
             data_in (numpy.ndarray): The input data to be reconstructed.
 
