@@ -379,6 +379,8 @@ class AbstractSupervisedDBNClassifier(AbstractSupervisedDBN):
         if not self.fine_tuning and hasattr(self.classifier, "coef_"):
             return np.abs(self.classifier.coef_[0])
         else:
+            if not self.fine_tuning and hasattr(self.classifier, "feature_importances_"):
+                return self.classifier.feature_importances_
             print("Feature importance is only available in classifier mode")
             return None
 
