@@ -72,10 +72,15 @@ def previous_batch(Q, prepared, context, repeats, encoding, seed):
 
 def solve_tuning(Q, num_reads=10, num_sweeps=1000, initial_states=None, cim_prepared=None,
                  valid_sample=None):
-    backend = os.environ["QC_QUBO_SOLVER"]
+    backend = os.environ.get("QC_QUBO_SOLVER", "").lower()
     if backend == "sqa":
         from .sqa_solver import solve_budgeted
         return solve_budgeted(Q, num_reads, num_sweeps, cim_prepared)
+    if backend in ("", "neal"):
+        # Matched-budget tuning only applies to the Kaiwu arms.  The "sqa"
+        # comparison arm above is a real SQA run and stays on sqa_solver;
+        # the unset / Neal arms must keep using qubo.solve_qubo().
+        return solve_qubo(Q, num_reads, num_sweeps, initial_states=initial_states)
     repeats = int(os.environ.get("QC_SOLVER_REPEATS", "1"))
     encoding = os.environ.get("QC_SPIN_ENCODING", "none")
     max_batches = int(os.environ.get("QC_MAX_FEASIBILITY_BATCHES", "1"))
