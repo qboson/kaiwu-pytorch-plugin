@@ -35,6 +35,32 @@ def _tensor_to_numpy(
     return array
 
 
+def _seeded_mask_samples(data_loader, max_samples, seed):
+    """Retain the rows with the smallest random priorities across all batches."""
+    if max_samples <= 0:
+        raise ValueError("max_samples must be positive for seeded mask sampling")
+    rng = np.random.default_rng(seed)
+    priorities = np.empty(0)
+    inputs, targets = torch.empty(0), torch.empty(0)
+    for input_batch, target_batch in data_loader:
+        if len(input_batch) == 0:
+            continue
+        previous = len(priorities)
+        combined = np.concatenate((priorities, rng.random(len(input_batch))))
+        chosen = np.sort(np.argsort(combined, kind="stable")[:max_samples])
+        priorities = combined[chosen]
+        old_rows = chosen[chosen < previous].tolist()
+        batch_rows = (chosen[chosen >= previous] - previous).tolist()
+        current_inputs, current_targets = input_batch[batch_rows], target_batch[batch_rows]
+        if old_rows:
+            current_inputs = torch.cat((inputs[old_rows], current_inputs))
+            current_targets = torch.cat((targets[old_rows], current_targets))
+        inputs, targets = current_inputs, current_targets
+    if priorities.size == 0:
+        raise ValueError("data_loader produced no observations")
+    return inputs, targets
+
+
 class FeatureSelectionWrapper(nn.Module):
     """Wrap a PyTorch model with a hard 0/1 feature-selection mask.
 
@@ -247,6 +273,8 @@ class FeatureSelectionWrapper(nn.Module):
         loss_fn: LossFunction,
         hessian_mode: str = "full",
         max_samples: int | None = 1000,
+        *,
+        sample_seed: int | None = None,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the loss gradient and Hessian with respect to a soft mask.
 
@@ -256,6 +284,8 @@ class FeatureSelectionWrapper(nn.Module):
             hessian_mode: ``"full"`` for the full Hessian or ``"diagonal"`` for
                 diagonal-only Hessian rows.
             max_samples: Optional maximum number of samples used for derivatives.
+            sample_seed: With a sample limit, select a uniform subset from
+                the complete loader using this seed. The default takes a prefix.
 
         Returns:
             A tuple containing the mask gradient and Hessian as NumPy arrays.
@@ -267,23 +297,20 @@ class FeatureSelectionWrapper(nn.Module):
         if hessian_mode not in {"full", "diagonal"}:
             raise ValueError("hessian_mode must be 'full' or 'diagonal'")
 
-        input_batches: list[torch.Tensor] = []
-        target_batches: list[torch.Tensor] = []
-        count = 0
-        for input_batch, target_batch in data_loader:
-            input_batches.append(input_batch)
-            target_batches.append(target_batch)
-            count += len(input_batch)
-            if max_samples is not None and count >= max_samples:
-                break
-
-        if not input_batches:
-            raise ValueError("data_loader produced no batches")
-        input_all = torch.cat(input_batches, dim=0)
-        target_all = torch.cat(target_batches, dim=0)
-        if max_samples is not None:
-            input_all = input_all[:max_samples]
-            target_all = target_all[:max_samples]
+        if sample_seed is not None and max_samples is not None:
+            input_all, target_all = _seeded_mask_samples(data_loader, max_samples, sample_seed)
+        else:
+            input_batches, target_batches, count = [], [], 0
+            for input_batch, target_batch in data_loader:
+                input_batches.append(input_batch)
+                target_batches.append(target_batch)
+                count += len(input_batch)
+                if max_samples is not None and count >= max_samples:
+                    break
+            if not input_batches:
+                raise ValueError("data_loader produced no batches")
+            input_all = torch.cat(input_batches, dim=0)[:max_samples]
+            target_all = torch.cat(target_batches, dim=0)[:max_samples]
         input_all = input_all.to(self.mask.device)
         target_all = target_all.to(self.mask.device)
         was_training = self.training
@@ -466,6 +493,8 @@ class FeatureSelectionWrapper(nn.Module):
         loss_fn: LossFunction,
         hessian_mode: str = "full",
         max_samples: int | None = 1000,
+        *,
+        sample_seed: int | None = None,
     ) -> np.ndarray:
         """Compute and store one updated feature mask.
 
@@ -475,6 +504,7 @@ class FeatureSelectionWrapper(nn.Module):
             hessian_mode: ``"full"`` for the full Hessian or ``"diagonal"`` for
                 diagonal-only Hessian rows.
             max_samples: Optional maximum number of samples used for derivatives.
+            sample_seed: Optional seed for selecting a uniform subset when a limit is set.
 
         Returns:
             The newly selected binary mask as a NumPy array.
@@ -483,11 +513,13 @@ class FeatureSelectionWrapper(nn.Module):
             ValueError: If derivative computation or projection validation fails.
             RuntimeError: If the configured QUBO solver fails.
         """
+        sample_options = {} if sample_seed is None else {"sample_seed": sample_seed}
         gradient, hessian = self.compute_mask_derivatives(
             data_loader,
             loss_fn,
             hessian_mode,
             max_samples,
+            **sample_options,
         )
         quadratic_matrix, linear_vector = self._build_qubo(gradient, hessian)
         current_mask = _tensor_to_numpy(self.mask, dtype=int)
