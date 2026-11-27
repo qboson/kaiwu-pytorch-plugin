@@ -1,4 +1,7 @@
-"""Fixed reference-molecule manifest support for strict generation runs."""
+"""Fixed reference-molecule manifest support for strict generation runs.
+
+Modified to support list-form reference manifests.
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -38,10 +41,10 @@ def load_reference_manifest(
     test_df: Optional[pd.DataFrame] = None,
     expected_count: int = 25,
 ) -> List[ReferenceMolecule]:
-    """Load and fully validate the immutable reference set."""
+    """Load and fully validate the reference set from a list or an object."""
     manifest_path = Path(path)
     payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-    raw_refs = payload.get("references", payload)
+    raw_refs = payload if isinstance(payload, list) else payload.get("references", payload)
     refs = [ReferenceMolecule(**item) for item in raw_refs]
 
     if len(refs) != expected_count:
