@@ -58,6 +58,47 @@ def test_wrapper_applies_mask_before_base_model() -> None:
     )
 
 
+def test_hard_mask_excludes_nonfinite_values_on_a_feature_axis() -> None:
+    """Excluded sensor values must reach the wrapped model as exact zeros."""
+    selector = FeatureSelectionWrapper(nn.Identity(), 3, input_feature_axis=1)
+    selector.mask.copy_(torch.tensor([1.0, 0.0, 1.0]))
+    data = torch.tensor(
+        [[[1.0, 2.0, 3.0], [float("nan"), float("inf"), -float("inf")], [4.0, 5.0, 6.0]]],
+        requires_grad=True,
+    )
+    result = selector(data)
+    torch.testing.assert_close(
+        result, torch.tensor([[[1.0, 2.0, 3.0], [0.0, 0.0, 0.0], [4.0, 5.0, 6.0]]]),
+    )
+    result.sum().backward()
+    torch.testing.assert_close(data.grad, torch.ones_like(data).mul_(selector.mask.view(1, 3, 1)))
+
+    # A nonfinite selected feature is still visible to the wrapped model.
+    selected_nonfinite = data.detach().clone()
+    selected_nonfinite[0, 2, 0] = float("nan")
+    assert torch.isnan(selector(selected_nonfinite)[0, 2, 0])
+
+
+def test_explicit_soft_mask_retains_gradient_at_zero() -> None:
+    """A zero in a differentiable mask can move during derivative evaluation."""
+    selector = FeatureSelectionWrapper(nn.Identity(), 3)
+    data = torch.tensor([[2.0, 3.0, 4.0]])
+    mask = torch.tensor([1.0, 0.0, 0.5], requires_grad=True)
+    result = selector.apply_mask(data, mask)
+    torch.testing.assert_close(result, torch.tensor([[2.0, 0.0, 2.0]]))
+    result.sum().backward()
+    torch.testing.assert_close(mask.grad, data[0])
+
+
+def test_hard_mask_keeps_sparse_inputs_sparse() -> None:
+    """Sparse inputs can still be multiplied by the selected feature mask."""
+    selector = FeatureSelectionWrapper(nn.Identity(), 2)
+    selector.mask.copy_(torch.tensor([0.0, 1.0]))
+    result = selector(torch.eye(2).to_sparse())
+    assert result.layout == torch.sparse_coo
+    torch.testing.assert_close(result.to_dense(), torch.diag(torch.tensor([0.0, 1.0])))
+
+
 def test_fit_weights_updates_mask_with_solver_kwargs(monkeypatch) -> None:
     """测试训练周期到达时会调用 QUBO 求解器并写回新的 mask。"""
     calls: list[dict[str, object]] = []

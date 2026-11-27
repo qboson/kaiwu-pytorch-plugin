@@ -165,6 +165,10 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> torch.Tensor:
         """Apply the current or provided feature mask to an input tensor.
 
+        With the stored hard mask, excluded entries in a dense input are
+        replaced by zero even when they contain NaN or infinity. Explicit
+        masks multiply the input, including when differentiating a soft mask.
+
         Args:
             input_feature: Input tensor to mask.
             mask: Optional mask to use instead of ``self.mask``.
@@ -173,7 +177,10 @@ class FeatureSelectionWrapper(nn.Module):
             The masked input tensor.
         """
         resolved_mask = self.mask if mask is None else mask
-        return input_feature * self._mask_view(input_feature, resolved_mask)
+        broadcast_mask = self._mask_view(input_feature, resolved_mask)
+        if mask is None and input_feature.layout == torch.strided:
+            return input_feature.masked_fill(broadcast_mask == 0, 0)
+        return input_feature * broadcast_mask
 
     def forward(self, input_feature: torch.Tensor) -> torch.Tensor:
         """Run a forward pass with the feature-selection mask applied.
