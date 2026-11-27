@@ -93,6 +93,13 @@ def plot_training_curves(
         plt.close()  # 不显示时关闭图像，节省内存
 
 #@title t-SNE Visualization for QVAE
+def _tsne_perplexity(n_samples: int) -> float:
+    """Choose a TSNE perplexity that is strictly below the sample count."""
+    if n_samples < 2:
+        raise ValueError("t-SNE requires at least two samples")
+    return min(30.0, max(1.0, float(n_samples) - 1.0))
+
+
 def t_SNE(
     test_loader,
     qvae_model,
@@ -135,6 +142,9 @@ def t_SNE(
                 labels.append(example_targets[idx].item())
 
     # 创建DataFrame
+    if not features:
+        raise ValueError("t-SNE requires at least one sample")
+
     feat_cols = [f"dim_{i}" for i in range(zeta_np.shape[1])]
     df = pd.DataFrame(features, columns=feat_cols)
     df["label"] = labels
@@ -144,7 +154,14 @@ def t_SNE(
 
     # 执行t-SNE
     logger.info("Running t-SNE...")
-    tsne = TSNE(n_components=2, verbose=1, perplexity=30, max_iter=500, random_state=42)
+    perplexity = _tsne_perplexity(len(features))
+    tsne = TSNE(
+        n_components=2,
+        verbose=1,
+        perplexity=perplexity,
+        max_iter=500,
+        random_state=42,
+    )
     tsne_results = tsne.fit_transform(df[feat_cols].values)
 
     df_tsne = df.copy()
@@ -181,9 +198,11 @@ def t_SNE(
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         save_path = f"results/t-SNE_QVAE_{training_status}_{timestamp}.png"
 
+    parent = os.path.dirname(save_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     logger.info(f"t-SNE plot saved to: {save_path}")
-    plt.show()
 
     if show:
         plt.show()
