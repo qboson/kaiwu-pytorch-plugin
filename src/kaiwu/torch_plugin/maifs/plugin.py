@@ -124,6 +124,30 @@ class FeatureSelectionWrapper(nn.Module):
         self._trained_epochs = 0
         self.register_buffer("mask", torch.ones(self.feature_dim))
 
+    def get_extra_state(self) -> dict[str, int]:
+        """Save completed epochs so periodic mask updates survive checkpoints."""
+        return {"trained_epochs": self._trained_epochs}
+
+    def set_extra_state(self, state: dict[str, int]) -> None:
+        """Restore the completed-epoch count used by periodic mask updates."""
+        epochs = state["trained_epochs"]
+        if isinstance(epochs, bool) or not isinstance(epochs, int) or epochs < 0:
+            raise ValueError("trained_epochs must be a non-negative integer")
+        self._trained_epochs = epochs
+
+    def _load_from_state_dict(
+        self, state_dict, prefix, local_metadata, strict,
+        missing_keys, unexpected_keys, error_msgs,
+    ):
+        """Accept legacy checkpoints, which begin a fresh mask-update schedule."""
+        extra_key = prefix + "_extra_state"
+        if extra_key not in state_dict:
+            state_dict[extra_key] = {"trained_epochs": 0}
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict,
+            missing_keys, unexpected_keys, error_msgs,
+        )
+
     def _mask_view(
         self,
         input_feature: torch.Tensor,

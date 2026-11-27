@@ -119,3 +119,50 @@ def test_fit_weights_updates_mask_with_solver_kwargs(monkeypatch) -> None:
     assert np.array_equal(selector.get_support().astype(int), np.array([1, 0, 1, 0]))
     assert selector.selected_indices().tolist() == [0, 2]
     assert selector.num_selected() == 2
+
+
+def test_checkpoint_preserves_periodic_mask_update(tmp_path, monkeypatch) -> None:
+    """Resuming after two epochs still refreshes the mask on epoch three."""
+    calls = []
+
+    def solve(*args, **kwargs):
+        calls.append(1)
+        return np.array([1, 0])
+
+    monkeypatch.setattr(plugin, "solve_qubo", solve)
+    data = [(torch.tensor([[1., 2.], [3., 4.]]), torch.tensor([[1.], [2.]]))]
+    selector = FeatureSelectionWrapper(nn.Linear(2, 1), 2, mask_update_epochs=3)
+    optimizer = torch.optim.SGD(selector.parameters(), lr=0.01)
+    selector.fit_weights(data, nn.MSELoss(), optimizer, train_epochs=2)
+    assert not calls
+    checkpoint = tmp_path / "selector.pt"
+    torch.save(selector.state_dict(), checkpoint)
+
+    resumed = FeatureSelectionWrapper(nn.Linear(2, 1), 2, mask_update_epochs=3)
+    resumed.load_state_dict(torch.load(checkpoint, weights_only=True))
+    resumed.fit_weights(
+        data, nn.MSELoss(), torch.optim.SGD(resumed.parameters(), lr=0.01)
+    )
+    assert len(calls) == 1
+    assert resumed.selected_indices().tolist() == [0]
+
+
+def test_legacy_checkpoint_resets_schedule_under_parent_module() -> None:
+    """Strict legacy loads work with prefixes and do not keep unrelated progress."""
+    parent = nn.Sequential(
+        FeatureSelectionWrapper(nn.Linear(2, 1), 2, mask_update_epochs=3)
+    )
+    state = parent.state_dict()
+    state.pop("0._extra_state", None)
+    parent[0].set_extra_state({"trained_epochs": 8})
+    parent.load_state_dict(state, strict=True)
+    assert parent[0].get_extra_state() == {"trained_epochs": 0}
+    assert "0._extra_state" not in state
+
+
+def test_checkpoint_schedule_snapshot_does_not_follow_training() -> None:
+    """The checkpoint epoch count is a snapshot, not a mutable counter alias."""
+    selector = FeatureSelectionWrapper(nn.Linear(2, 1), 2)
+    state = selector.state_dict()
+    selector.set_extra_state({"trained_epochs": 2})
+    assert state["_extra_state"] == {"trained_epochs": 0}
