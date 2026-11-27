@@ -51,8 +51,8 @@ msgid "Total number of nodes in the model."
 msgstr "Total number of nodes in the model."
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:5 of
-msgid "quadratic coefficent,"
-msgstr "quadratic coefficent,"
+msgid "quadratic coefficient,"
+msgstr "quadratic coefficient,"
 
 #: kaiwu.torch_plugin.full_boltzmann_machine.BoltzmannMachine:8 of
 msgid "shape is [num_nodes, num_nodes]"
@@ -756,8 +756,8 @@ msgstr "Create a Restricted Boltzmann Machine."
 
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:7
 #: of
-msgid "quadratic coefficent, shape is [num_visible, num_hidden]"
-msgstr "quadratic coefficent, shape is [num_visible, num_hidden]"
+msgid "quadratic coefficient, shape is [num_visible, num_hidden]"
+msgstr "quadratic coefficient, shape is [num_visible, num_hidden]"
 
 #: kaiwu.torch_plugin.restricted_boltzmann_machine.RestrictedBoltzmannMachine:10
 #: of
