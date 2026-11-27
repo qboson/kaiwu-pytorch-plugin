@@ -7,6 +7,7 @@ import torch
 
 import kaiwu.torch_plugin as plugin
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
+from kaiwu.torch_plugin.qdeq import _anderson_solver
 
 
 class LocalSearchSampler:
@@ -119,6 +120,34 @@ class TestImplicitGradient(unittest.TestCase):
         torch.testing.assert_close(self.x.grad, self.expected, rtol=1e-5, atol=1e-5)
         self.assertIsNotNone(self.layer.weight.grad)
         self.assertGreater(deq.get_last_stats()["backward_nstep"], 0)
+
+    def test_short_backward_budget_keeps_nonzero_gradients(self):
+        """One or two updates solve a constant backward map exactly."""
+        class InputLayer(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.scale = torch.nn.Parameter(torch.tensor(2.0, dtype=torch.float64))
+
+            def forward(self, z, x):
+                return self.scale * x + 0 * z
+
+        for budget in (1, 2):
+            with self.subTest(b_thres=budget):
+                layer = InputLayer()
+                x = torch.tensor([[3.0]], dtype=torch.float64, requires_grad=True)
+                deq = QDEQ(layer, LocalSearchSampler(), solve_config(b_thres=budget))
+                deq(x).sum().backward()
+                torch.testing.assert_close(x.grad, torch.tensor([[2.0]], dtype=torch.float64))
+                torch.testing.assert_close(layer.scale.grad, torch.tensor(3.0, dtype=torch.float64))
+                self.assertLessEqual(deq.get_last_stats()["backward_nstep"], budget)
+
+    def test_converged_initial_guess_is_selected(self):
+        """A fixed initial guess needs no updates and has zero residual."""
+        initial = torch.ones(1, 1, dtype=torch.float64)
+        solution, stats = _anderson_solver(lambda z: z, initial, solve_config(), 2, 1e-11)
+        torch.testing.assert_close(solution, initial)
+        self.assertEqual(stats["nstep"], 0)
+        self.assertEqual(stats["residual"], 0.0)
 
     def test_eval_mode_builds_no_implicit_graph(self):
         """Evaluation without gradients attaches no backward hook."""
