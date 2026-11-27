@@ -3,17 +3,21 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+from contextlib import nullcontext
 from math import ceil
+from threading import RLock
 
 import numpy as np
 import torch
 from torch import nn
+from torch.nn.attention import SDPBackend, sdpa_kernel
 
 from .qubo import solve_qubo
 
 Batch = tuple[torch.Tensor, torch.Tensor]
 LossFunction = Callable[[torch.Tensor, torch.Tensor], torch.Tensor]
 _CARDINALITY_PENALTY = 10.0
+_MASK_DERIVATIVE_LOCK = RLock()
 
 
 def _tensor_to_numpy(
@@ -250,6 +254,16 @@ class FeatureSelectionWrapper(nn.Module):
     ) -> tuple[np.ndarray, np.ndarray]:
         """Compute the loss gradient and Hessian with respect to a soft mask.
 
+        Use mathematical attention for this second-order calculation because
+        fused scaled-dot-product attention may lack a double backward.
+        ``fit_weights`` does not itself change attention backends. PyTorch backend
+        flags are process-global: these derivative calls serialize one another,
+        but other concurrent PyTorch work can observe the temporary mathematical
+        backend. CUDA models with registered recurrent modules also temporarily
+        disable cuDNN, whose recurrent kernels do not support these derivatives.
+        Other cuDNN settings are preserved. Unrelated backend contexts require
+        caller coordination.
+
         Args:
             data_loader: Iterable that yields ``(input_batch, target_batch)``.
             loss_fn: Loss function returning a scalar tensor.
@@ -286,39 +300,52 @@ class FeatureSelectionWrapper(nn.Module):
             target_all = target_all[:max_samples]
         input_all = input_all.to(self.mask.device)
         target_all = target_all.to(self.mask.device)
-        was_training = self.training
-        original_requires_grad = [p.requires_grad for p in self.model.parameters()]
-        self.eval()
-        for parameter in self.model.parameters():
-            parameter.requires_grad_(False)
+        with _MASK_DERIVATIVE_LOCK:
+            was_training = self.training
+            original_requires_grad = [p.requires_grad for p in self.model.parameters()]
+            self.eval()
+            for parameter in self.model.parameters():
+                parameter.requires_grad_(False)
 
-        try:
-            continuous_mask = (
-                self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
-            )
-            loss = loss_fn(
-                self.model(self.apply_mask(input_all, continuous_mask)),
-                target_all,
-            )
-            if loss.ndim != 0:
-                raise ValueError("loss_fn must return a scalar tensor")
-            gradient = torch.autograd.grad(
-                loss,
-                continuous_mask,
-                create_graph=True,
-            )[0]
-            rows = [
-                self._hessian_row(gradient, continuous_mask, index, hessian_mode)
-                for index in range(self.feature_dim)
-            ]
-            hessian = torch.stack(rows)
-        finally:
-            for parameter, requires_grad in zip(
-                self.model.parameters(),
-                original_requires_grad,
-            ):
-                parameter.requires_grad_(requires_grad)
-            self.train(was_training)
+            try:
+                recurrent_backend = nullcontext()
+                if input_all.is_cuda and any(
+                    isinstance(module, nn.RNNBase) for module in self.model.modules()
+                ):
+                    recurrent_backend = torch.backends.cudnn.flags(
+                        enabled=False,
+                        benchmark=torch.backends.cudnn.benchmark,
+                        benchmark_limit=torch.backends.cudnn.benchmark_limit,
+                        deterministic=torch.backends.cudnn.deterministic,
+                        allow_tf32=torch.backends.cudnn.allow_tf32,
+                    )
+                with sdpa_kernel(SDPBackend.MATH), recurrent_backend:
+                    continuous_mask = (
+                        self.mask.detach().clone().to(dtype=input_all.dtype).requires_grad_(True)
+                    )
+                    loss = loss_fn(
+                        self.model(self.apply_mask(input_all, continuous_mask)),
+                        target_all,
+                    )
+                    if loss.ndim != 0:
+                        raise ValueError("loss_fn must return a scalar tensor")
+                    gradient = torch.autograd.grad(
+                        loss,
+                        continuous_mask,
+                        create_graph=True,
+                    )[0]
+                    rows = [
+                        self._hessian_row(gradient, continuous_mask, index, hessian_mode)
+                        for index in range(self.feature_dim)
+                    ]
+                    hessian = torch.stack(rows)
+            finally:
+                for parameter, requires_grad in zip(
+                    self.model.parameters(),
+                    original_requires_grad,
+                ):
+                    parameter.requires_grad_(requires_grad)
+                self.train(was_training)
 
         hessian = 0.5 * (hessian + hessian.T)
         return (
