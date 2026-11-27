@@ -28,6 +28,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 VALID_METRICS = ("clustering", "classification", "scib", "scgraph", "dpt")
 
 
+# Modified: reject empty resolution lists with a parameter-specific error.
 def parse_resolutions(value):
     """Parse a comma-separated list of Leiden resolutions.
 
@@ -36,8 +37,14 @@ def parse_resolutions(value):
 
     Returns:
         A list of floating-point resolution values.
+
+    Raises:
+        ValueError: If no values are supplied or a value cannot be parsed as a float.
     """
-    return [float(item.strip()) for item in value.split(",") if item.strip()]
+    resolutions = [float(item.strip()) for item in value.split(",") if item.strip()]
+    if not resolutions:
+        raise ValueError("--resolutions cannot be empty")
+    return resolutions
 
 
 def parse_metrics(value):
