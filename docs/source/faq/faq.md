@@ -146,3 +146,12 @@ A: 您可以通过以下渠道获取帮助：
 1. **GitHub Issues**：[提交问题](https://github.com/QBoson/Kaiwu-pytorch-plugin/issues)
 2. **开发者社区**：玻色量子开发者社区
 3. **联系邮箱**：developer@boseq.com
+
+## MAIFS 导数计算可以在 `torch.no_grad()` 中调用吗？
+
+`FeatureSelectionWrapper.compute_mask_derivatives` 会在计算掩码梯度和 Hessian
+时临时启用自动求导，返回或异常退出后恢复调用者的梯度模式，不改写已有的参数梯度。
+此行为不包括 `torch.inference_mode()`。
+
+损失必须是有限标量，梯度和 Hessian 也必须全部有限。遇到 NaN 或无穷值会抛出
+`ValueError`，应先检查数据或损失函数，再执行特征选择，避免把无效导数传入 QUBO 求解器。
