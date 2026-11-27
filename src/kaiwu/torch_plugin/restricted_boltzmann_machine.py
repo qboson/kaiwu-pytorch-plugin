@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 """Restricted Boltzmann Machine"""
+from numbers import Integral
 import torch
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
 
@@ -129,6 +130,56 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         return -s_all @ self.linear_bias - torch.sum(
             tmp * s_all[:, self.num_visible :], dim=-1
         )
+
+    def exact_log_partition(
+        self, max_enumerated_units: int = 20, enable_grad: bool = False
+    ) -> torch.Tensor:
+        """Compute the exact binary-state log partition function for a small RBM.
+
+        Enumerate the smaller layer and sum the other layer analytically. The
+        number of enumerated states is exponential in ``min(num_visible,
+        num_hidden)``; this is a small-model reference, not an approximation for
+        large models. All states and calculations use the current parameters'
+        dtype and device. Floating-point rounding still applies.
+
+        Args:
+            max_enumerated_units (int): Nonnegative limit on the smaller layer.
+                Exceeding this limit raises ValueError before allocating states.
+            enable_grad (bool): Enable autograd explicitly, including inside a
+                no_grad context. The default returns a tensor without a graph.
+
+        Returns:
+            torch.Tensor: Scalar ``log(sum_{v,h} exp(-E(v,h)))``.
+        """
+        if isinstance(max_enumerated_units, bool) or not isinstance(
+            max_enumerated_units, Integral
+        ):
+            raise TypeError("max_enumerated_units must be a nonnegative integer")
+        if max_enumerated_units < 0:
+            raise ValueError("max_enumerated_units must be nonnegative")
+        num_enumerated = min(self.num_visible, self.num_hidden)
+        if num_enumerated > max_enumerated_units:
+            raise ValueError("The smaller layer exceeds max_enumerated_units")
+
+        with torch.set_grad_enabled(enable_grad):
+            indices = torch.arange(
+                2 ** num_enumerated, device=self.quadratic_coef.device
+            )[:, None]
+            bits = torch.arange(num_enumerated, device=self.quadratic_coef.device)
+            states = ((indices >> bits) & 1).to(self.quadratic_coef.dtype)
+            if self.num_visible <= self.num_hidden:
+                logits = states @ self.quadratic_coef + self.hidden_bias
+                linear_term = states @ self.visible_bias
+            else:
+                logits = states @ self.quadratic_coef.t() + self.visible_bias
+                linear_term = states @ self.hidden_bias
+            # Sum each binary unit's two states without softplus's linear threshold.
+            # logsumexp also preserves finite second derivatives at extreme logits.
+            log_terms = torch.logsumexp(
+                torch.stack((torch.zeros_like(logits), logits), dim=-1), dim=-1
+            )
+            log_weights = linear_term + log_terms.sum(-1)
+            return torch.logsumexp(log_weights, dim=0)
 
     def _to_ising_matrix(self):
         """Convert the Restricted Boltzmann Machine to Ising format."""
