@@ -60,8 +60,8 @@ class RestrictedBoltzmannMachine(AbstractBoltzmannMachine):
         """Clip linear and quadratic bias weights in-place.
 
         Args:
-            h_range (tuple[float, float]): Range for quadratic weights. for example, [-1, 1]
-            j_range (tuple[float, float]): Range for linear weights. for example, [-1, 1]
+            h_range (tuple[float, float]): Range for linear weights. For example, [-1, 1]
+            j_range (tuple[float, float]): Range for quadratic weights. For example, [-1, 1]
         """
         self.get_parameter("linear_bias").data.clamp_(*h_range)
         self.get_parameter("quadratic_coef").data.clamp_(*j_range)
