@@ -168,6 +168,7 @@ class TrainConfig:
     epochs: int = 20
     min_epochs: int = 3
     batch_size: int = 4
+    length_bucket_batches: int | None = field(default=None, kw_only=True)
     learning_rate: float = 5e-5
     weight_decay: float = 1e-2
     grad_clip_norm: float = 1.0
@@ -329,6 +330,7 @@ def main() -> None:
         train_records,
         batch_size=config.train.batch_size,
         shuffle=True,
+        length_bucket_batches=config.train.length_bucket_batches,
     )
     val_loader = build_data_loader_from_records(
         train_generator,

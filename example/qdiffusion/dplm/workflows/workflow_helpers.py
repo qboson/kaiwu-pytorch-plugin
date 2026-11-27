@@ -11,7 +11,7 @@ from typing import Any
 
 import torch
 from torch.optim import AdamW
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Sampler
 from tqdm import tqdm
 
 try:
@@ -87,8 +87,38 @@ class FastaSequenceDataset(Dataset[dict[str, str]]):
         return {"header": header, "sequence": sequence}
 
 
+class LengthBucketBatchSampler(Sampler[list[int]]):
+    """Shuffle record indices and batch similar lengths inside random windows."""
+
+    def __init__(self, lengths: list[int], batch_size: int, bucket_batches: int):
+        if any(
+            isinstance(value, bool) or not isinstance(value, int) or value < 1
+            for value in (batch_size, bucket_batches)
+        ):
+            raise ValueError("batch_size and length_bucket_batches must be positive integers")
+        self.lengths = lengths
+        self.batch_size = batch_size
+        self.bucket_size = batch_size * bucket_batches
+
+    def __iter__(self):
+        indices = torch.randperm(len(self.lengths)).tolist()
+        batches = []
+        for start in range(0, len(indices), self.bucket_size):
+            window = sorted(indices[start : start + self.bucket_size], key=self.lengths.__getitem__)
+            batches.extend(
+                window[offset : offset + self.batch_size]
+                for offset in range(0, len(window), self.batch_size)
+            )
+        for index in torch.randperm(len(batches)).tolist():
+            yield batches[index]
+
+    def __len__(self):
+        return (len(self.lengths) + self.batch_size - 1) // self.batch_size
+
+
 def build_data_loader_from_records(
-    generator, records, *, batch_size: int, shuffle: bool
+    generator, records, *, batch_size: int, shuffle: bool,
+    length_bucket_batches: int | None = None,
 ) -> DataLoader:
     def collate(batch: list[dict[str, str]]) -> dict[str, Any]:
         sequences = [item["sequence"] for item in batch]
@@ -104,8 +134,16 @@ def build_data_loader_from_records(
             "targets": encoded["input_ids"].to(generator.device),
         }
 
+    dataset = FastaSequenceDataset(records)
+    if length_bucket_batches is not None:
+        if not shuffle:
+            raise ValueError("length_bucket_batches applies to shuffled training batches")
+        sampler = LengthBucketBatchSampler(
+            [len(sequence) for _, sequence in records], batch_size, length_bucket_batches
+        )
+        return DataLoader(dataset, batch_sampler=sampler, collate_fn=collate)
     return DataLoader(
-        FastaSequenceDataset(records),
+        dataset,
         batch_size=batch_size,
         shuffle=shuffle,
         collate_fn=collate,
