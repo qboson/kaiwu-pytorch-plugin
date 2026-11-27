@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 import torch
@@ -194,8 +194,7 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
 
     def score(self, X, y):
         """评分"""
-        y_pred = self.predict(X)
-        return np.mean(y_pred == y)
+        return accuracy_score(y, self.predict(X))
 
     # 抽象方法 - 需要在子类中实现
     @abstractmethod
