@@ -417,6 +417,7 @@ class QDEQ(nn.Module):
             z_star: Fixed point with ``requires_grad`` set.
         """
         cfg = self.config
+        forward_stats = self._last_stats
 
         def backward_hook(grad):
             # The solver's vector-Jacobian products start at new_z again.
@@ -430,7 +431,7 @@ class QDEQ(nn.Module):
             solution, stats = _anderson_solver(
                 backward_map, torch.zeros_like(grad), cfg, cfg.b_thres, cfg.b_eps
             )
-            self._last_stats.update({f"backward_{key}": value for key, value in stats.items()})
+            forward_stats.update({f"backward_{key}": value for key, value in stats.items()})
             # Autograd continues from new_z with the solved gradient.
             return solution
 
@@ -497,6 +498,8 @@ class QDEQ(nn.Module):
 
     def get_last_stats(self) -> dict[str, float]:
         """Returns solver statistics from the last forward and backward pass.
+
+        Backward statistics belong to the graph built by the most recent forward call.
 
         Returns:
             dict[str, float]: A copy with ``forward_nstep``, ``forward_residual``
