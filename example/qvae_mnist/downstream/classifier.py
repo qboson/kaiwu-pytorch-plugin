@@ -1,3 +1,5 @@
+# Modified: encode class labels and require an explicit matching output width.
+# Modified: raise NotFittedError when prediction is requested before fitting.
 import os
 from tqdm import tqdm
 import logging
@@ -6,6 +8,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
@@ -128,7 +131,16 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return val_acc, avg_val_loss
 
     def fit(self, X, y, validation_split=0.2):
-        """训练MLP模型"""
+        """Train with original labels; output_dim must equal their class count.
+
+        Raises:
+            ValueError: If output_dim differs from the number of classes in y.
+        """
+        classes = np.unique(y)
+        if self.output_dim != len(classes):
+            raise ValueError(
+                f"output_dim={self.output_dim} must match the {len(classes)} observed classes"
+            )
         if self.input_dim is None:
             self.input_dim = X.shape[1]
             logger.info(f"Auto-detected input_dim: {self.input_dim}")
@@ -141,11 +153,11 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         )
         # 转为 Tensor
         X_train = torch.FloatTensor(X_train).to(self.device)
-        y_train = torch.LongTensor(y_train).to(self.device)
+        y_train = torch.LongTensor(np.searchsorted(classes, y_train)).to(self.device)
         X_val = torch.FloatTensor(X_val).to(self.device)
-        y_val = torch.LongTensor(y_val).to(self.device)
+        y_val = torch.LongTensor(np.searchsorted(classes, y_val)).to(self.device)
 
-        self.classes_ = np.unique(y)
+        self.classes_ = classes
 
         # 创建数据加载器
         train_dataset = TensorDataset(X_train, y_train)
@@ -230,14 +242,18 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return self
 
     def predict(self, X):
+        if self.model is None:
+            raise NotFittedError("MLPClassifier is not fitted. Call fit before using predict.")
         self.model.eval()
         X_tensor = torch.FloatTensor(X).to(self.device)
         with torch.no_grad():
             out = self.model(X_tensor)
             _, pred = out.max(1)
-        return pred.cpu().numpy()
+        return self.classes_[pred.cpu().numpy()]
 
     def predict_proba(self, X):
+        if self.model is None:
+            raise NotFittedError("MLPClassifier is not fitted. Call fit before using predict_proba.")
         self.model.eval()
         X_tensor = torch.FloatTensor(X).to(self.device)
         with torch.no_grad():
