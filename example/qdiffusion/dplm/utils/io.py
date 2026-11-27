@@ -1,4 +1,5 @@
 """I/O helpers for Q-Diffusion DPLM example workflows."""
+# Modified to preserve supplied FASTA headers when writing records.
 
 from __future__ import annotations
 
@@ -59,11 +60,11 @@ def read_fasta_records(fasta_path: Path) -> list[tuple[str, str]]:
 
 
 def write_fasta_records(path: Path, records: list[tuple[str, str]]) -> None:
-    """Writes FASTA records to disk."""
+    """Writes FASTA records to disk without changing their headers."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
-        for index, (header, sequence) in enumerate(records, start=1):
-            handle.write(f">seq_{index} {header}\n")
+        for header, sequence in records:
+            handle.write(f">{header}\n")
             handle.write(sequence + "\n")
 
 
