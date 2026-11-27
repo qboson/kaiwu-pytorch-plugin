@@ -10,6 +10,7 @@ import argparse
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
 
 from model import Config
 from downstream import get_full_pipeline
@@ -119,13 +120,21 @@ def main():
     pipeline.fit(X_train_raw, y_train_raw)
 
     # Evaluate
-    accuracy = pipeline.score(X_test_raw, y_test_raw)
+    predicted = pipeline.predict(X_test_raw)
+    accuracy = float(accuracy_score(y_test_raw, predicted))
     print(f"Test accuracy: {accuracy * 100:.2f}%")
 
     # Optional: save results
     if config.output_dir:
-        results = {"test_accuracy": accuracy}
-        with open(os.path.join(config.output_dir, "results.json"), "w") as f:
+        labels = np.union1d(y_test_raw, predicted)
+        results = {
+            "test_accuracy": accuracy,
+            "test_macro_f1": float(f1_score(y_test_raw, predicted, average="macro", zero_division=0)),
+            "class_labels": labels.tolist(),
+            "confusion_matrix": confusion_matrix(y_test_raw, predicted, labels=labels).tolist(),
+        }
+        os.makedirs(config.output_dir, exist_ok=True)
+        with open(os.path.join(config.output_dir, "results.json"), "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2)
         print(f"Results saved to {config.output_dir}")
 

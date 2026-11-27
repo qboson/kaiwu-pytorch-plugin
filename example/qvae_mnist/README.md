@@ -106,6 +106,11 @@ python run_pipeline.py \
 
 ## Outputs
 
+`run_pipeline.py --output-dir <directory>` writes `results.json` with
+test accuracy, macro F1 and a confusion matrix. The `class_labels`
+array gives the row and column order. Rows are true labels and columns
+are predictions.
+
 Results are written under `--output-dir` (or
 `./output/<TYPE>_<timestamp>` by default):
 
