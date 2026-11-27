@@ -177,6 +177,14 @@ requirements/
 4. **直接访问插件源码**  
    容器的 `/home/jovyan/work` 已挂载为项目根目录（`../`），因此您可以在 JupyterLab 左侧文件浏览器中直接看到并编辑 `src/`、`setup.py` 等所有文件，**无需在容器内额外执行 `git clone`**。
 
+   **安装插件**
+
+   打开示例前，请在 JupyterLab 终端运行以下命令。构建插件需要对挂载的仓库有写权限。
+
+   ```bash
+   python -m pip install /home/jovyan/work
+   ```
+
 5. **停止服务器**  
    按下 `Ctrl+C`，然后运行：  
    ```bash

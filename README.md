@@ -181,6 +181,14 @@ The notebook will be available at http://localhost:8888 (no token required).
 4. **Directly access the plugin source code**  
    The container's `/home/jovyan/work` is mounted to the project root (`../`), so you can directly view and edit `src/`, `setup.py`, and all other files in the JupyterLab file browser — **no additional `git clone` inside the container is required**.
 
+   **Install the plugin**
+
+   In JupyterLab Terminal, run the command below before opening the examples. The mounted checkout must be writable to build the plugin.
+
+   ```bash
+   python -m pip install /home/jovyan/work
+   ```
+
 5. **Stop the server**:
 Press `Ctrl+C`, then run:
    ```bash
