@@ -52,8 +52,11 @@ class QDEQConfig:
 
         b_eps: Backward stopping tolerance.
 
-        stop_mode: ``"rel"`` tracks ``||f(z) - z|| / ||f(z)||``;
-            ``"abs"`` tracks ``||f(z) - z||``.
+        stop_mode: For fixed-point iterations, ``"rel"`` tracks
+            ``||f(z) - z|| / (||f(z)|| + 1e-9)``, and ``"abs"`` tracks
+            ``||f(z) - z||``. The norms reduce all tensor elements,
+            including the batch dimension, so the tolerance applies to
+            one residual for the entire batch.
 
         num_basis: Search directions per Ising step.
 
