@@ -149,3 +149,23 @@ leidenalg
 scib_metrics
 scgraph
 ```
+
+
+
+---
+
+### Injecting Custom Components into QVAE
+
+`QVAE` builds missing components through its factory methods; components passed
+to the constructor take precedence. This example wires a toy encoder, decoder,
+Boltzmann machine, and sampler into a small subclass, then checks that the
+constructor keeps them and that forward, loss, and energy all work.
+
+Run the example via `python example/qvae_custom_components/custom_qvae.py`.
+
+**Dependencies**
+
+```
+torch
+numpy
+```
