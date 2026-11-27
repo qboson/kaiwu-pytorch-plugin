@@ -153,6 +153,10 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
+        # 独立调用时也准备输出目录，checkpoint 会先于训练曲线写入。
+        if self.save_path is not None:
+            os.makedirs(self.save_path or ".", exist_ok=True)
+
         # 创建模型
         self.model = self._create_model()
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
