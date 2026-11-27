@@ -123,6 +123,10 @@ def _anderson_solver(
         tuple: The iterate with the lowest tracked residual, and a dict with
         ``"nstep"`` and ``"residual"``.
     """
+    if threshold <= 0:
+        # No map evaluation is permitted, so the initial guess is the only candidate.
+        return z0, {"nstep": 0, "residual": float("inf")}
+
     # Ring buffers of the last m iterates x_i and their images f(x_i), one row
     # per sample; each sample is mixed independently.
     bsz, m = z0.shape[0], max(config.anderson_m, 2)
@@ -131,8 +135,20 @@ def _anderson_solver(
     # Two plain fixed-point steps seed the history.
     x_hist[:, 0] = z0.reshape(bsz, -1)
     f_hist[:, 0] = func(z0).reshape(bsz, -1)
+    abs_res, rel_res = _residual_norms(f_hist[:, 0] - x_hist[:, 0], f_hist[:, 0])
+    best_z = z0.clone()
+    best_res = rel_res if config.stop_mode == "rel" else abs_res
+    if threshold == 1 or best_res < eps:
+        return best_z, {"nstep": 1, "residual": best_res}
+
     x_hist[:, 1] = f_hist[:, 0]
     f_hist[:, 1] = func(f_hist[:, 0].reshape_as(z0)).reshape(bsz, -1)
+    abs_res, rel_res = _residual_norms(f_hist[:, 1] - x_hist[:, 1], f_hist[:, 1])
+    tracked = rel_res if config.stop_mode == "rel" else abs_res
+    if tracked < best_res:
+        best_res, best_z = tracked, x_hist[:, 1].reshape_as(z0).clone()
+    if threshold == 2 or tracked < eps:
+        return best_z, {"nstep": 2, "residual": best_res}
 
     # Bordered system whose solution gives mixing weights summing to one.
     h_mat = torch.zeros(bsz, m + 1, m + 1, dtype=z0.dtype, device=z0.device)
@@ -140,8 +156,8 @@ def _anderson_solver(
     rhs = torch.zeros(bsz, m + 1, 1, dtype=z0.dtype, device=z0.device)
     rhs[:, 0] = 1
 
-    best_z, best_res, nstep = z0, float("inf"), 0
-    for k in range(2, max(threshold, 3)):
+    nstep = 2
+    for k in range(2, threshold):
         n = min(k, m)
         # alpha = argmin ||sum_i alpha_i (f(x_i) - x_i)||^2  s.t.  sum_i alpha_i = 1.
         g_mat = f_hist[:, :n] - x_hist[:, :n]
@@ -152,7 +168,7 @@ def _anderson_solver(
         x_hist[:, k % m] = (alpha[:, None] @ f_hist[:, :n])[:, 0]
         f_hist[:, k % m] = func(x_hist[:, k % m].reshape_as(z0)).reshape(bsz, -1)
 
-        nstep = k - 1
+        nstep = k + 1
         abs_res, rel_res = _residual_norms(f_hist[:, k % m] - x_hist[:, k % m], f_hist[:, k % m])
         tracked = rel_res if config.stop_mode == "rel" else abs_res
         # Iterations are not monotone, so the best iterate seen is returned.

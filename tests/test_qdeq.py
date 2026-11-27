@@ -7,6 +7,7 @@ import torch
 
 import kaiwu.torch_plugin as plugin
 from kaiwu.torch_plugin import QDEQ, QDEQConfig
+from kaiwu.torch_plugin.qdeq import _anderson_solver
 
 
 class LocalSearchSampler:
@@ -111,6 +112,36 @@ class TestImplicitGradient(unittest.TestCase):
         self.weight = torch.linspace(-1, 1, 18, dtype=torch.float64).view(3, 6)
         eye = torch.eye(6, dtype=torch.float64)
         self.expected = torch.linalg.solve(eye - self.layer.weight.detach().T, self.weight.T).T
+
+    def test_backward_map_budget(self):
+        """The backward map runs no more often than the configured budget."""
+        for limit in (0, 1, 2, 3):
+            with self.subTest(limit=limit):
+                calls = []
+
+                def backward_map(y):
+                    calls.append(y.clone())
+                    return 0.5 * y + 1
+
+                z, stats = _anderson_solver(
+                    backward_map, torch.zeros(1, 1, dtype=torch.float64),
+                    solve_config(stop_mode="abs"), limit, 0.0,
+                )
+                self.assertEqual(len(calls), limit)
+                self.assertEqual(stats["nstep"], limit)
+                if limit == 0:
+                    self.assertTrue(torch.isinf(torch.tensor(stats["residual"])))
+                elif limit == 1:
+                    torch.testing.assert_close(z, torch.zeros_like(z))
+                elif limit == 2:
+                    torch.testing.assert_close(z, torch.ones_like(z))
+
+    def test_backward_hook_respects_zero_budget(self):
+        """A zero budget leaves the incoming gradient unsolved without a VJP."""
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config(b_thres=0))
+        (deq(self.x) * self.weight).sum().backward()
+        self.assertEqual(deq.get_last_stats()["backward_nstep"], 0)
+        torch.testing.assert_close(self.x.grad, torch.zeros_like(self.x.grad))
 
     def test_gradient_matches_implicit_function_theorem(self):
         """Input and parameter gradients come from the implicit backward pass."""
