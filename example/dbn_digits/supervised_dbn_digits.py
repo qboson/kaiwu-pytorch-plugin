@@ -476,7 +476,10 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         output_layer = nn.Linear(input_size, len(self.classes_))
         layers.append(output_layer)
 
-        self.fine_tune_network = nn.Sequential(*layers)
+        # 训练与预测都会把输入移动到 DBN 的设备上，网络必须放在同一设备
+        self.fine_tune_network = nn.Sequential(*layers).to(
+            self.unsupervised_dbn.device
+        )
 
         if self.verbose:
             print(f"Built fine-tuning network with {len(layers)} layers")
