@@ -154,6 +154,11 @@ class QVAE(AutoEncoderBase):
         sampler (object, optional): Pre-created sampler. Created by the subclass
             factory when omitted.
         sampler_type (str): Type of sampler for BM ('sa' or 'cim').
+
+    Raises:
+        AssertionError: If ``config.num_latent_units`` is not positive.
+        ValueError: If the Boltzmann machine exposes a ``num_nodes`` that
+            differs from ``config.num_latent_units``.
     """
 
     def __init__(
@@ -189,13 +194,41 @@ class QVAE(AutoEncoderBase):
         self.create_networks()
 
     def create_networks(self):
-        """Create components that were not supplied to the constructor."""
+        """Create components that were not supplied to the constructor.
+
+        Raises:
+            ValueError: If the Boltzmann machine exposes ``num_nodes`` and it
+                disagrees with the configured number of latent units.
+
+        Note:
+            A machine that does not expose ``num_nodes`` (for example a custom
+            implementation) is accepted, and the skipped check is logged at
+            ``DEBUG`` level.
+        """
         if self.encoder is None:
             self.encoder = self._create_encoder()
         if self.decoder is None:
             self.decoder = self._create_decoder()
         if self.bm is None:
             self.bm = self._create_bm()
+        # Both the latent width and the Boltzmann machine are available here, so
+        # this is the only place where the invariant can be checked up front.
+        num_nodes = getattr(self.bm, "num_nodes", None)
+        if num_nodes is None:
+            # A custom machine may describe its size some other way. Skipping the
+            # check keeps such machines usable, but the skip must not be silent:
+            # it is the one case where a typo in ``num_latent_units`` survives.
+            logger.debug(
+                "Boltzmann machine %s exposes no num_nodes; skipping the latent "
+                "dimension check.",
+                type(self.bm).__name__,
+            )
+        elif num_nodes != self._latent_dimensions:
+            raise ValueError(
+                "The number of variables in the Boltzmann machine "
+                f"({num_nodes}) does not match the latent dimension "
+                f"({self._latent_dimensions})."
+            )
         if self.sampler is None:
             self.sampler = self._create_sampler(self.sampler_type)
         if self._dataset_mean is not None:
@@ -308,8 +341,6 @@ class QVAE(AutoEncoderBase):
             x (torch.Tensor): Input tensor (batch_size, input_dim).
             recon_x (torch.Tensor): Reconstructed logits (batch_size, input_dim).
             posterior (MixtureGeneric): Posterior distribution object.
-            q (torch.Tensor): Encoder logits (batch_size, latent_dim).
-            zeta (torch.Tensor): Latent sample (batch_size, latent_dim).
 
         Returns:
             torch.Tensor: Total loss scalar.
