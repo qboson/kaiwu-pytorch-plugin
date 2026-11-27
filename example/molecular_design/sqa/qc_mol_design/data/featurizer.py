@@ -74,7 +74,10 @@ def mol_to_graph(smiles: str) -> Optional[GraphTuple]:
     n = mol.GetNumAtoms()
     X = np.zeros((n, CFG.atom_feat_dim), dtype=np.float32)
     for i, atom in enumerate(mol.GetAtoms()):
-        feat = atom_features(atom)
+        try:
+            feat = atom_features(atom)
+        except ValueError:
+            return None
         X[i, : len(feat)] = feat
 
     adj = np.zeros((n, n), dtype=np.float32)
