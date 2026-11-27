@@ -7,11 +7,11 @@
 - **文档框架**: Sphinx 8.1.3
 - **主题**: PyData Sphinx Theme 0.15.4
 - **语言**: 中文 (zh_CN)
-- **支持格式**: Markdown、TXT
+- **支持格式**: Markdown（含按 Markdown 解析的 TXT）、reStructuredText
 - **扩展功能**:
   - 自动生成 API 文档 (sphinx.ext.autodoc)
   - 查看源代码 (sphinx.ext.viewcode)
-  - 数学公式支持 (sphinx.ext.imgmath)
+  - HTML 数学公式渲染 (sphinxcontrib.katex)
   - Markdown 支持 (myst-parser)
   - 中文搜索支持 (jieba)
   - Mermaid 流程图 (mermaid)
@@ -132,6 +132,7 @@ make clean
 支持以下格式：
 - **Markdown**: 通过 myst-parser 支持
 - **TXT**: 作为 Markdown 处理
+- **reStructuredText**: 通过 Sphinx 的 reStructuredText 解析器支持（.rst）
 
 ### API 文档
 
