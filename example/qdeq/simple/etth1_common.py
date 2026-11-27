@@ -161,6 +161,20 @@ class AndersonDEQ(QDEQ):
         rhs[:, 0] = 1
 
         best_z, best_res, nstep = z0, float("inf"), 0
+
+        def track_iterate(slot: int) -> float:
+            nonlocal best_z, best_res
+            point, image = x_hist[:, slot], f_hist[:, slot]
+            residual = (image - point).norm().item()
+            if cfg.stop_mode == "rel":
+                residual /= image.norm().item() + 1e-9
+            if residual < best_res:
+                best_res, best_z = residual, point.reshape_as(z0).clone()
+            return residual
+
+        # The seed images are already available from filling the history.
+        track_iterate(0)
+        track_iterate(1)
         for k in range(2, max(cfg.f_thres, 3)):
             n = min(k, m)
             g_mat = f_hist[:, :n] - x_hist[:, :n]
@@ -171,12 +185,7 @@ class AndersonDEQ(QDEQ):
             f_hist[:, k % m] = func(x_hist[:, k % m].reshape_as(z0)).reshape(bsz, -1)
 
             nstep = k - 1
-            residual = (f_hist[:, k % m] - x_hist[:, k % m]).norm().item()
-            if cfg.stop_mode == "rel":
-                residual /= f_hist[:, k % m].norm().item() + 1e-9
-            if residual < best_res:
-                best_res, best_z = residual, x_hist[:, k % m].reshape_as(z0).clone()
-            if residual < cfg.f_eps:
+            if track_iterate(k % m) < cfg.f_eps:
                 break
         return best_z, {"nstep": nstep, "residual": best_res}
 
