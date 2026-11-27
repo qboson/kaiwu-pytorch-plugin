@@ -26,3 +26,10 @@ energy updates. CIM receives this conversion before precision adaptation and
 variable splitting, so splitting penalties retain their intended sign.
 Precision settings still control quantization; the conversion does not make a
 heuristic solver exact.
+
+## Boltzmann machine pseudo-log-likelihood
+
+Use `BoltzmannMachine.pseudo_log_likelihood(states)` to compare how well the
+same set of complete binary states fits a model during training. The score sums
+the log conditional probability of each unit given the others. Higher values
+indicate better conditional fit. It is differentiable and needs no sampler.

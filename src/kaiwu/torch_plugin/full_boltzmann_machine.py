@@ -3,6 +3,7 @@
 
 import numpy as np
 import torch
+from torch.nn.functional import logsigmoid
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
 from .abstract_boltzmann_machine import AbstractBoltzmannMachine
@@ -88,6 +89,23 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         return -s_all @ self.linear_bias - 0.5 * torch.sum(
             s_all.matmul(self.symmetrized_quadratic_coef()) * s_all, dim=-1
         )
+
+    def pseudo_log_likelihood(self, states: torch.Tensor) -> torch.Tensor:
+        """Compute the sum of each unit's log conditional probability.
+
+        Args:
+            states: Binary states with ``num_nodes`` entries on the last axis.
+
+        Returns:
+            One differentiable pseudo-log-likelihood score per state.
+        """
+        if states.ndim == 0 or states.shape[-1] != self.num_nodes:
+            raise ValueError("states must have num_nodes entries on the last axis")
+        if states.is_complex() or not ((states == 0) | (states == 1)).all():
+            raise ValueError("states must contain binary 0/1 values")
+        states = states.to(self.linear_bias)
+        logits = states @ self.symmetrized_quadratic_coef() + self.linear_bias
+        return logsigmoid((2 * states - 1) * logits).sum(dim=-1)
 
     def _to_ising_matrix(self):
         """Convert Boltzmann Machine to Ising matrix."""
