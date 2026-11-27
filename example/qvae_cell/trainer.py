@@ -39,14 +39,19 @@ class Trainer:
     def adata_to_array(self, adata):
         """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
         x = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
-        x = np.asarray(x, dtype=np.float32)
+        with np.errstate(over="ignore"):
+            x = np.asarray(x, dtype=np.float32)
+        if not np.isfinite(x).all():
+            raise ValueError("AnnData.X must contain only finite float32 expression values")
         if self.args.loss_type == "mse":
             return x
 
         # Bernoulli 重构要求输入接近概率值；若原始数据超出 [0, 1]，先做 min-max 归一化。
-        x_min = float(np.nanmin(x))
-        x_max = float(np.nanmax(x))
+        x_min = float(x.min())
+        x_max = float(x.max())
         if x_min < 0.0 or x_max > 1.0:
+            if x_max - x_min > float(np.finfo(x.dtype).max):
+                x = x.astype(np.float64)
             x = (x - x_min) / (x_max - x_min + 1e-8)
         return np.clip(x, 0.0, 1.0).astype(np.float32, copy=False)
 

@@ -8,6 +8,9 @@ The example dataset can be downloaded from:
 
 https://www.kaggle.com/datasets/redwoodz/immune-data
 
+The expression matrix `AnnData.X` can be dense or sparse. Its values must be
+finite and representable as `float32` for either reconstruction loss.
+
 ## Dependencies
 
 Run the install commands from the repository root. If you already have a compatible version of KPP, skip the first command.
