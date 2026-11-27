@@ -8,16 +8,12 @@ Figure 5 – Learning curves, annealing times, success rates
 """
 from __future__ import annotations
 
-import warnings
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
-
-warnings.filterwarnings("ignore")
-
 try:
     import matplotlib
     matplotlib.use("Agg")   # non-interactive backend

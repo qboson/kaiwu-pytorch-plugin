@@ -12,7 +12,6 @@ This module:
 """
 from __future__ import annotations
 
-import warnings
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -21,9 +20,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from qc_mol_design.config import CFG, PROP_BINS, N_BINS_PER_PROP
-
-warnings.filterwarnings("ignore")
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Property computation helpers

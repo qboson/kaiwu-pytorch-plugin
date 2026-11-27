@@ -9,7 +9,6 @@ for a trained feedforward (PropertyMLP) network, reproducing the
 """
 from __future__ import annotations
 
-import warnings
 from typing import List, Optional
 
 import numpy as np
@@ -21,9 +20,6 @@ from tqdm import tqdm
 
 from qc_mol_design.config import CFG
 from qc_mol_design.models.predictors import DirectPropertyMLP
-
-warnings.filterwarnings("ignore")
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # RDKit fingerprint computation
