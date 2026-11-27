@@ -103,7 +103,10 @@ class AbstractBoltzmannMachine(torch.nn.Module):
                 The sampler can be kaiwuSDK's CIM or other solvers.
 
         Returns:
-            torch.Tensor: Spins sampled from the model.
+            torch.Tensor: Decoded binary states, one row per solver solution.
+                The last spin of each solution is the auxiliary reference.
+                Each variable is 1 if its spin matches the reference and 0
+                otherwise. The auxiliary spin is omitted from the output.
         """
         ising_mat = self.get_ising_matrix()
 
