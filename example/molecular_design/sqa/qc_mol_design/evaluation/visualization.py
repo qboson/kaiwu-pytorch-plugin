@@ -54,8 +54,9 @@ def plot_tsne(
     n_tr  = min(max_points, len(latent_train))
     n_gen = min(max_points // 2, len(latent_generated))
     lat_tr  = latent_train[np.random.choice(len(latent_train), n_tr, replace=False)]
-    lat_gen = latent_generated[np.random.choice(len(latent_generated), n_gen, replace=False)]
-    gen_col = gen_props[:n_gen] if len(gen_props) >= n_gen else gen_props
+    generated_indices = np.random.choice(len(latent_generated), n_gen, replace=False)
+    lat_gen = latent_generated[generated_indices]
+    gen_col = gen_props[generated_indices]
 
     combined = np.vstack([lat_tr, lat_gen])
     labels   = np.array([0] * n_tr + [1] * n_gen)
