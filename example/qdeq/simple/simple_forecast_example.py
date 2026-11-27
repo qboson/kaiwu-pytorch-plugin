@@ -29,13 +29,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--data-path", type=Path, default=DEFAULT_DATA_PATH)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--sampler", choices=["sa", "anderson", "cim"], default="sa")
-    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument(
+        "--seed", type=int, default=0, help="Seed for PyTorch search directions and the sampler."
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     """Runs the example."""
     args = parse_args()
+    torch.manual_seed(args.seed)
     loaders = build_loaders(args.data_path)
     sampler = build_sampler(args.sampler, args.seed)
     model = DEQForecaster(96, 96, sampler, build_config())
