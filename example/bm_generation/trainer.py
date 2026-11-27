@@ -12,6 +12,11 @@ import kaiwu as kw
 from kaiwu.torch_plugin import BoltzmannMachine
 import matplotlib.pyplot as plt
 
+if __package__:
+    from .cost_parameters import validate_cost_parameters
+else:
+    from cost_parameters import validate_cost_parameters
+
 
 class CosineScheduleWithWarmup(LambdaLR):
     """带有warmup的余弦退火学习率调度器"""
@@ -128,8 +133,12 @@ class Trainer:
         Args:
             alpha (float): KL 散度的权重系数。
             beta (float): 其他惩罚项（如 NCL）的权重系数。
+
+        Raises:
+            ValueError: If either weight cannot become a finite, non-negative float.
         """
-        self.cost_param = {"alpha": alpha, "beta": beta}
+        # Modified 2026-11-12: validate both weights before replacing state.
+        self.cost_param = validate_cost_parameters(alpha, beta)
 
     def _sync_gpu_to_cpu(self):
         """将主模型的权重原地拷贝到 CPU 共享副本中。
