@@ -127,6 +127,11 @@ python evaluate_benchmark.py \
   --metrics classification
 ```
 
+Use `--classifier-group-key donor` with a donor column in `adata.obs` to
+evaluate on entirely held-out donors. In this mode, `--classifier-test-size`
+sets the fraction of groups held out. The classification CSV records the
+group column and the number of groups in each split.
+
 Run multiple evaluation items:
 
 ```bash

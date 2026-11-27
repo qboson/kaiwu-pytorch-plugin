@@ -124,6 +124,10 @@ python evaluate_benchmark.py \
   --metrics classification
 ```
 
+如果 `adata.obs` 中有 `donor` 列，使用 `--classifier-group-key donor`
+可用完整留出的供体做分类评估。此时 `--classifier-test-size` 表示留出的
+供体比例，分类 CSV 会记录分组字段以及训练和测试各自包含的组数。
+
 跑多个评估项：
 
 ```bash
