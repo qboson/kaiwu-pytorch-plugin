@@ -1,0 +1,54 @@
+{
+  "description": "Synthetic finite upper-triangular three-variable matrix and scalar/index metadata only; no chemistry/model/solver output.",
+  "matrix": [
+    [
+      0.25,
+      -0.5,
+      0.75
+    ],
+    [
+      0.0,
+      0.5,
+      -0.25
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "shape": [
+    3,
+    3
+  ],
+  "max_abs": 1.0,
+  "num_reads": 1,
+  "num_sweeps": 1,
+  "flip_index": 0,
+  "initial_energy_metadata": {
+    "warm": 0.5,
+    "random": 2.0
+  },
+  "config": {
+    "sa_initial_temp_scale": 0.1,
+    "sa_cooling_rate": 0.9
+  },
+  "warm_binary": [
+    0,
+    1,
+    0
+  ],
+  "random_binary": [
+    1,
+    0,
+    1
+  ],
+  "optional_modules": {
+    "dwave": null,
+    "dwave.samplers": null,
+    "neal": null
+  },
+  "backend_default": "",
+  "backend_explicit_control": "sqa",
+  "energy_metadata_qualification": "Read-only audited initial scalars for this exactmatrix and two initialstates; runtime never evaluates a matrix energy or solver result."
+}

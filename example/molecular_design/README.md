@@ -32,6 +32,10 @@ molecular_design/
 
 入口、控制器与测试的路径已适配上述目录。完整运行所需的外部文件及其放置位置见下文。
 
+### 独立 QUBO 辅助接口
+
+`qc_mol_design.optimization.solve_qubo` 是独立导出的辅助 API。未显式选择后端且可选 SQA／Neal 依赖不可用时，它使用内置本地后备实现；浮点表示的 0/1 状态通过数值补值正常翻转。显式后端选择不会改走这条默认后备路径。该独立 API 的默认行为不代表严格生成入口或匹配预算控制器使用了内置后备实现。
+
 ### KPP RBM／BM 复用
 
 `models/crbm.py` 直接导入 `kaiwu.torch_plugin.RestrictedBoltzmannMachine` 和 `BoltzmannMachine`。本次适配核对的上游版本为 [KPP dca313e](https://github.com/qboson/kaiwu-pytorch-plugin/tree/dca313e29c4f6b0b96f406cee3c919eea1114973/src/kaiwu/torch_plugin)。
