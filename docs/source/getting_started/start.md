@@ -2,7 +2,7 @@
 :format: html
 
 ```
-[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/) [![License](https://img.shields.io/badge/License-Apache%202.0-green)](https://opensource.org/licenses/Apache-2.0)
+[![Python Version](https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue)](https://www.python.org/) [![License](https://img.shields.io/badge/License-Apache%202.0-green)](https://opensource.org/licenses/Apache-2.0)
 
 # Kaiwu-PyTorch-Plugin
 
@@ -58,10 +58,8 @@ The above diagram shows the project file structure:
 
 # Requirements
 
-- Python == 3.10
-- kaiwu == v1.2.0
-- torch == 2.7.0
-- numpy == 2.2.6
+Use Python 3.10, 3.12, or 3.14. See the [installation guide](installation.md)
+for the Kaiwu SDK, NumPy, and PyTorch requirements for each Python version.
 
 # Code Style
 
@@ -78,33 +76,17 @@ Follows PEP 8 standards.
    conda activate quantum_env
 
    ```
-2. **Clone this repository locally**:
+2. **Install KPP from PyPI**
 
    ```{code-block} bash
-
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
-
+   python -m pip install kaiwu-torch-plugin
    ```
-3. **Install dependencies**:
 
-   ```{code-block} bash
+   Pip installs a compatible Kaiwu SDK. Python 3.12 and 3.14 require KPP 0.4.0 or later.
 
-   pip install -r requirements/requirements.txt
+# Kaiwu SDK Configuration
 
-   ```
-   Kaiwu SDK needs to be installed separately, see the installation instructions below.
-
-4. **Install the plugin**:
-
-   ```{code-block} bash
-
-   pip install .
-
-   ```
-# Kaiwu SDK Installation Instructions (Required)
-
-Download link and installation steps for Kaiwu SDK:
+See the SDK download page for manual installation and authorization.
 
 ```{image} ../../../imgs/image.png
 :alt: Kaiwu SDK Download Page
@@ -170,7 +152,7 @@ Below is a simple example of calling RBM. This example demonstrates how to use t
      # Compute the objective---this objective yields the same gradient as the negative
      # log likelihood of the model
      objective = rbm.objective(x, s)
-     # Backpropgate gradients
+     # Backpropagate gradients
      objective.backward()
      # Update model weights with a step of stochastic gradient descent
      opt_rbm.step()

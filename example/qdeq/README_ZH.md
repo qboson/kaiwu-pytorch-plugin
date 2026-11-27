@@ -36,8 +36,10 @@ example/qdeq/data/ETTh1.csv
 
 ## 快速开始
 
+请在仓库根目录运行以下命令。如果已安装与示例兼容的 KPP，可以跳过第一条命令。
+
 ```bash
-pip install -e .        # 在仓库根目录安装插件
+python -m pip install .
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
@@ -120,5 +122,5 @@ iTransformer 示例会在后续补充。
 2. 取 `num_basis` 个搜索方向 `V`（`-r`、历史残差与历史更新）
 3. 有限差分估计 `G = J V`
 4. 把 `min_a ||r + G a||^2` 中的系数 `a` 用 `coeff_bits` 位二进制编码，
-   经 `kaiwu.conversion.qubo_matrix_to_ising_matrix` 转成带辅助自旋的 Ising 矩阵后交给 `sampler.solve`
+   经 `kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix` 转成带辅助自旋的 Ising 矩阵后交给 `sampler.solve`
 5. 解码最优解，更新 `z ← z + V a`

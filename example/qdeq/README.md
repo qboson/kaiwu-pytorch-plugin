@@ -47,8 +47,10 @@ Use `--data-path` for another location.
 
 ## Quick start
 
+Run these commands from the repository root. If you already have a compatible version of KPP, skip the first command.
+
 ```bash
-pip install -e .        # install the plugin from the repository root
+python -m pip install .
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
@@ -141,5 +143,5 @@ Each forward step:
 3. estimates `G = J V` by finite differences
 4. encodes the coefficients `a` of `min_a ||r + G a||^2` with `coeff_bits` bits
    each, converts the QUBO to an Ising matrix with one auxiliary spin through
-   `kaiwu.conversion.qubo_matrix_to_ising_matrix`, and calls `sampler.solve`
+   `kaiwu.torch_plugin._kaiwu_compat.qubo_matrix_to_ising_matrix`, and calls `sampler.solve`
 5. decodes the best solution and updates `z ← z + V a`

@@ -1,71 +1,130 @@
 name: CI
 
 on:
+  workflow_call:
+    inputs:
+      scope:
+        type: string
+        default: default
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: Run the baseline or full compatibility matrix
+        type: choice
+        options: [default, all]
+        default: default
   push:
-    branches: [ main, develop ]
+    branches: [main, develop, kaiwu-sdk-compat, python-dependency-compat]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
+  matrix:
+    runs-on: ubuntu-24.04
+    outputs:
+      include: ${{ steps.select.outputs.include }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Select compatibility combinations
+        id: select
+        env:
+          SCOPE: ${{ inputs.scope || 'default' }}
+        run: |
+          include=$(jq -ce --arg scope "$SCOPE" '
+            .defaults as $defaults | .python as $python | del(.defaults, .python) |
+            .numpy = [$python | to_entries[] | .key as $py |
+              .value.numpy_versions[] | {python: $py, numpy: .}] |
+            (if $scope == "all" then add else .default end) |
+            map(
+              $defaults + ($python[.python] | del(.numpy_versions)) + . |
+              .id = "py\(.python)-\(.runner)-kaiwu\(.kaiwu)-np\(.numpy)-torch\(.torch)"
+            )
+          ' .github/compatibility-matrix.json)
+          echo "include=$include" >> "$GITHUB_OUTPUT"
+
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.id }}
+    needs: matrix
+    runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: [ 3.10.8]
+        include: ${{ fromJSON(needs.matrix.outputs.include) }}
+    env:
+      REPORT_COVERAGE: ${{ github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/') && matrix.runner == 'ubuntu-24.04' && 'true' || 'false' }}
+    defaults:
+      run:
+        shell: bash
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: |
+            .github/compatibility-matrix.json
+            requirements/*.txt
+            example/**/requirements.txt
+            pyproject.toml
 
-      - name: Cache pip dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install dependencies
+      - name: Install and check dependencies
+        env:
+          KAIWU_VERSION: ${{ matrix.kaiwu }}
+          NUMPY_VERSION: ${{ matrix.numpy }}
+          TORCH_VERSION: ${{ matrix.torch }}
+          SCIPY_VERSION: ${{ matrix.scipy }}
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements/devel.txt
-          pip install -e .
+          python -m pip install "torch==$TORCH_VERSION" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install . "numpy==$NUMPY_VERSION" "kaiwu==$KAIWU_VERSION" "scipy==$SCIPY_VERSION" \
+            scikit-learn==1.7.2 seaborn==0.13.2 tqdm==4.67.1 \
+            pytest==9.1.1 pytest-cov==7.1.0 pip-licenses==5.5.0
+          python -m pip check
+          python -I - <<'PY'
+          import os
+          import sys
+          from importlib.metadata import version
+          from pathlib import Path
 
-      # 新增：依赖许可证检查步骤（核心）
+          import kaiwu.torch_plugin as plugin
+
+          assert Path(plugin.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
+          for package in ("kaiwu", "numpy", "torch"):
+              assert version(package).split("+", 1)[0] == os.environ[f"{package.upper()}_VERSION"]
+          PY
+
       - name: Check dependency licenses
         run: |
-          pip-licenses \
-            -p numpy torch \
-            --from=mixed \
-            --format=json \
-            --with-authors \
-            --with-urls \
-            --allow-only "MIT;LGPL;BSD;MPL;Apache;Unlicense;PSF" \
-            --partial-match \
-            --output-file dependency-licenses-${{ matrix.python-version }}.json  # 按 Python 版本保存结果（多版本矩阵场景）
+          pip-licenses -p numpy torch --from=mixed --format=json --with-authors --with-urls \
+            --allow-only "MIT;LGPL;BSD;MPL;Apache;Unlicense;PSF" --partial-match \
+            --output-file dependency-licenses.json
 
-      # 可选：上传许可证检查结果（便于归档查看）
       - name: Upload license report
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-licenses-${{ matrix.python-version }}
-          path: dependency-licenses-${{ matrix.python-version }}.json
-          retention-days: 7  # 结果保留 7 天（可调整）
+          name: dependency-licenses-${{ matrix.id }}
+          path: dependency-licenses.json
+          retention-days: 7
 
       - name: Lint with pylint
+        if: matrix.lint
         run: |
-          pylint src/ --disable=C0114,C0116
+          python -m pip install "$(grep '^pylint==' requirements/devel.txt)"
+          python -m pylint src/
 
       - name: Test with pytest
         run: |
-          pytest tests/ -v --cov=src --cov-report=xml
+          args=(tests/ -v)
+          if [[ "$REPORT_COVERAGE" == 'true' ]]; then
+            installed=$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')
+            args+=(--cov=src --cov="$installed" --cov-report=term --cov-report=xml)
+          fi
+          python -I -m pytest "${args[@]}"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        if: env.REPORT_COVERAGE == 'true'
+        uses: codecov/codecov-action@v7
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: false
