@@ -182,8 +182,14 @@ class PrecisionSplitExplorer:
 
         Returns:
             Minimum increment passed to Kaiwu splitting.
+
+        Raises:
+            ValueError: If ``min_increment`` is not a finite positive number.
         """
         if min_increment is not None:
+            min_increment = float(min_increment)
+            if not np.isfinite(min_increment) or min_increment <= 0:
+                raise ValueError("min_increment must be a positive number")
             return min_increment
         params = np.unique(ising_matrix)
         if params.shape[0] < 2:
@@ -238,7 +244,15 @@ class PrecisionSplitExplorer:
 
         Raises:
             ImportError: If the Kaiwu splitting helper is unavailable.
+            ValueError: If ``penalty`` is not finite and non-negative.
+            TypeError: If ``round_to_increment`` is not a boolean.
         """
+        if self.penalty is not None:
+            penalty = float(self.penalty)
+            if not np.isfinite(penalty) or penalty < 0:
+                raise ValueError("penalty must be a non-negative number")
+        if not isinstance(self.round_to_increment, bool):
+            raise TypeError("round_to_increment must be a boolean")
         perform_precision_adaption_split = _get_kaiwu_split_helper()
         adjusted_matrix, precision_info = self._adjust_to_precision(
             ising_matrix,
