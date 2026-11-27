@@ -67,6 +67,10 @@ python train_qvae_cell.py \
   --output-dir ./outputs_smoke
 ```
 
+Use `--loss-type bernoulli --fit-bernoulli-on-train` to estimate the expression
+range on training cells and apply it to validation and export. Use the same
+flag and split settings when loading the resulting weights.
+
 Specify another dataset:
 
 ```bash

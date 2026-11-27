@@ -64,6 +64,9 @@ python train_qvae_cell.py \
   --output-dir ./outputs_smoke
 ```
 
+使用 `--loss-type bernoulli --fit-bernoulli-on-train` 可在训练细胞上拟合表达值范围，
+并用同一范围处理验证集和导出数据。加载对应权重时，请沿用该选项和数据划分设置。
+
 指定其他数据：
 
 ```bash
