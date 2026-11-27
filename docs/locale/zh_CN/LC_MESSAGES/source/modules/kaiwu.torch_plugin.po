@@ -895,6 +895,32 @@ msgstr "兼容 sklearn 的 transform 方法。"
 msgid "The transformed data."
 msgstr "转换后的数据。"
 
+msgid "MAIFS feature-count settings"
+msgstr "MAIFS 特征数量设置"
+
+msgid ""
+"`FeatureSelectionWrapper` starts with every feature selected. The wrapper "
+"applies the feature-count bounds when it updates the mask. An update can "
+"be triggered with `update_mask()` or scheduled during `fit_weights()`."
+msgstr ""
+"`FeatureSelectionWrapper` 初始选中全部特征，在更新掩码时应用特征数量的上下限。可以调用 `update_mask()` "
+"立即更新，也可以在 `fit_weights()` 过程中定期更新。"
+
+msgid ""
+"`cardinality_k` is a soft target in the QUBO objective, so an updated mask "
+"may contain a different number of features. To require exactly `k` "
+"features after each mask update, set both `min_selected_features` and "
+"`max_selected_features` to `k`."
+msgstr ""
+"`cardinality_k` 是 QUBO 目标函数中的软目标，更新后的掩码可能选中不同数量的特征。如果要求每次更新后恰好选中 `k` "
+"个特征，请将 `min_selected_features` 和 `max_selected_features` 都设为 `k`。"
+
+msgid ""
+"An explicit minimum applies to every updated mask. If the minimum is "
+"omitted, the wrapper uses its default minimum only when the mask is empty "
+"after applying the upper bound."
+msgstr "显式设置的最小值适用于每次更新后的掩码。如果省略最小值，包装器仅在应用上限后掩码为空时使用默认最小值。"
+
 #~ msgid "Kaiwu-PyTorch-Plugin public API."
 #~ msgstr "开物 PyTorch 插件公共 API。"
 
