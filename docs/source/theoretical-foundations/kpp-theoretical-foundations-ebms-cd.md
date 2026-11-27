@@ -65,11 +65,11 @@ Crucially, CD does **not** attempt to raise the energy of *all* other configurat
 The empirical success of CD, especially CD-1, initially surprised many researchers. Several lines of reasoning help explain its effectiveness:
 
 1. **Initialization at Data**: By starting the Markov chain at data points, we are sampling from regions of high data density. If the model distribution is already close to the data distribution, the chain will mix quickly, and a few steps suffice. If the model is far from the data, the chain moves away rapidly, providing a strong contrast signal.
-2. **Gradient of the KL Divergence**: It can be shown that CD-k minimizes a different objective function: the difference between two Kullback-Leibler divergences:
+2. **Difference of KL Divergences**. The CD-k update is motivated by the difference of two Kullback-Leibler divergences.
 
 $$\text{CD}_k = \text{KL}(P_{\text{data}} \| P_\theta) - \text{KL}(P_\theta^{(k)} \| P_\theta)$$
 
-where $P_\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting from the data. Minimizing this **contrastive divergence** encourages the model distribution to be close to the data distribution while simultaneously being far from the $k$ step distribution. This formulation justifies the name and provides a more principled foundation than a mere heuristic.
+Here $P_\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting from the data. The standard CD-k update uses the negative derivative of this expression with $P_\theta^{(k)}$ held fixed. This drops the derivative through the $k$-step sampling distribution, which also depends on $\theta$.
 
 - **Persistent Contrastive Divergence (PCD)**: An important variant, **persistent contrastive divergence**, maintains a persistent set of Markov chains whose states are retained across weight updates. Instead of reinitializing from data each time, the chains continue to evolve. PCD yields samples that are closer to the true model distribution and can improve the quality of the learned model, especially for deeper architectures.
 
@@ -77,7 +77,7 @@ where $P_\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting from
 Contrastive divergence is a pragmatic approximation, not an exact algorithm. It has several known limitations:
 
 1. **Bias**: CD does not produce an unbiased estimate of the true log-likelihood gradient. The bias can be large for small $k$, and the resulting parameter estimates are not maximum likelihood estimates. The learned model may not assign the highest possible likelihood to the data.
-2. **Not a Proper Gradient of Any Function**: For $k > 1$, the CD update is not the gradient of any fixed objective function. This makes theoretical analysis difficult and complicates convergence monitoring.
+2. **Gradient Approximation**. The CD update can be a nonconservative vector field even for CD-1 on binary RBMs, as shown by [Sutskever and Tieleman (2010)](https://proceedings.mlr.press/v9/sutskever10a.html).
 3. **Mixing and Mode Collapse**: If the model distribution has widely separated modes, short MCMC runs starting from data may fail to explore the full landscape, leading to mode collapse—the model learns only a subset of the data distribution.
 4. **Dependence on k**: Larger values of $k$ reduce bias but increase computational cost. In practice, CD-1 or CD-5 are common compromises.
 
@@ -107,8 +107,8 @@ where $\mathbf{v}^{(m)}_k, \mathbf{h}^{(m)}_k$ are the final states after $k$ Gi
 - CD replaces the model expectation with an expectation over a **short Markov chain** initialized at the data, typically running for only $k$ steps (often $k=1$).
 - The CD-k algorithm alternates between a **positive phase** (clamped to data) and a **negative phase** (brief free-running reconstruction).
 - Geometrically, CD deepens the energy basin at data points while raising energy in their immediate MCMC-accessible neighborhood.
-- CD minimizes a **difference of KL divergences** rather than the negative log-likelihood directly.
-- Limitations include **bias**, lack of a proper objective function for $ k>1$, and potential **mode collapse**.
+- CD-k uses a partial derivative of a **difference of KL divergences**, holding the $k$-step distribution fixed during differentiation.
+- Limitations include **bias**, a potentially nonconservative update, and potential **mode collapse**.
 - **Persistent contrastive divergence (PCD)** improves sampling quality by maintaining persistent Markov chains across updates.
 - **Mini-batch training** and **vectorization** are key practical considerations for efficient implementation.
 - CD enabled the practical training of RBMs and deep belief networks, playing a pivotal role in the deep learning renaissance of the 2000s.

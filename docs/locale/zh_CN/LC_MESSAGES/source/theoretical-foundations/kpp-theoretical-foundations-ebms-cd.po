@@ -288,10 +288,9 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:68
 msgid ""
-"**Gradient of the KL Divergence**: It can be shown that CD-k minimizes a "
-"different objective function: the difference between two Kullback-Leibler "
-"divergences:"
-msgstr "**KL 散度的梯度**：可以证明 CD-k 最小化一个不同的目标函数，即两个 Kullback-Leibler 散度之差："
+"**Difference of KL Divergences**. The CD-k update is motivated by the "
+"difference of two Kullback-Leibler divergences."
+msgstr "**KL 散度之差**。CD-k 更新的出发点是两个 Kullback-Leibler 散度之差。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:70
 msgid ""
@@ -304,14 +303,14 @@ msgstr ""
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:72
 #, python-brace-format
 msgid ""
-"where $P_\\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting"
-" from the data. Minimizing this **contrastive divergence** encourages the "
-"model distribution to be close to the data distribution while simultaneously"
-" being far from the $k$ step distribution. This formulation justifies the "
-"name and provides a more principled foundation than a mere heuristic."
+"Here $P_\\theta^{(k)}$ is the distribution after $k$ steps of MCMC starting "
+"from the data. The standard CD-k update uses the negative derivative of "
+"this expression with $P_\\theta^{(k)}$ held fixed. This drops the "
+"derivative through the $k$-step sampling distribution, which also depends "
+"on $\\theta$."
 msgstr ""
-"其中 $P_\\theta^{(k)}$ 是从数据出发经过 $k$ 步 MCMC 后的分布。最小化这个 **对比散度** "
-"会促使模型分布既接近数据分布，又同时远离 $k$ 步分布。这一表述为名称提供了依据，也提供了比单纯启发式更原则化的基础。"
+"其中 $P_\\theta^{(k)}$ 是从数据出发经过 $k$ 步 MCMC 后的分布。标准 CD-k 更新将 $P_\\theta^{(k)}$ "
+"视为常量，并取该式对参数的负导数。这一做法省略了 $k$ 步采样分布随参数 $\\theta$ 变化产生的导数项。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:74
 msgid ""
@@ -347,11 +346,13 @@ msgstr ""
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:80
 msgid ""
-"**Not a Proper Gradient of Any Function**: For $k > 1$, the CD update is not"
-" the gradient of any fixed objective function. This makes theoretical "
-"analysis difficult and complicates convergence monitoring."
+"**Gradient Approximation**. The CD update can be a nonconservative vector "
+"field even for CD-1 on binary RBMs, as shown by [Sutskever and Tieleman "
+"(2010)](https://proceedings.mlr.press/v9/sutskever10a.html)."
 msgstr ""
-"**不是某个固定函数的严格梯度**：当 $k > 1$ 时，CD 更新通常不是任何固定目标函数的梯度。这使理论分析困难，也使收敛监控更复杂。"
+"**梯度近似**。[Sutskever 和 "
+"Tieleman（2010）](https://proceedings.mlr.press/v9/sutskever10a.html)表明，二值 "
+"RBM 上的 CD-1 更新也可能形成非保守向量场。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:81
 msgid ""
@@ -506,15 +507,15 @@ msgstr "从几何上看，CD 加深数据点处的能量盆地，同时抬高其
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:110
 msgid ""
-"CD minimizes a **difference of KL divergences** rather than the negative "
-"log-likelihood directly."
-msgstr "CD 最小化的是 **KL 散度之差**，而不是直接最小化负对数似然。"
+"CD-k uses a partial derivative of a **difference of KL divergences**, "
+"holding the $k$-step distribution fixed during differentiation."
+msgstr "CD-k 对 **KL 散度之差** 求偏导时，将 $k$ 步采样分布视为常量。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:111
 msgid ""
-"Limitations include **bias**, lack of a proper objective function for $ "
-"k>1$, and potential **mode collapse**."
-msgstr "局限包括 **偏差**、$k>1$ 时缺少严格目标函数，以及潜在 **模态塌缩**。"
+"Limitations include **bias**, a potentially nonconservative update, and "
+"potential **mode collapse**."
+msgstr "局限包括 **偏差**、更新方向可能形成非保守向量场，以及潜在的 **模态塌缩**。"
 
 #: ../../source/theoretical-foundations/kpp-theoretical-foundations-ebms-cd.md:112
 msgid ""
