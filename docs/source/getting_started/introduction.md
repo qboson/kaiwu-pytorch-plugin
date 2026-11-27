@@ -103,7 +103,7 @@ graph TD
 * - **Application Layer**
   - `rbm_digits`, `dbn_digits`, `bm_generation`, `qvae_mnist`, `qvae_cell`, `qdiffusion`
 * - **KPP Layer**
-  - `AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, `BoltzmannMachine`, `DBN`, `GBRBM`, `QVAE`, `QDiffusion`; `_to_ising_matrix()`, `sample()`, `objective()`
+  - `AbstractBoltzmannMachine`, `RestrictedBoltzmannMachine`, `BoltzmannMachine`, `UnsupervisedDBN`, `GaussianBernoulliRestrictedBoltzmannMachine`, `QVAE`, `QDiffusion`; `_to_ising_matrix()`, `sample()`, `objective()`
 * - **Kaiwu SDK Layer**
   - Classical (SA) & Quantum (CIM) optimizers
 ```
