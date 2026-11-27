@@ -47,6 +47,8 @@ class FeatureSelectionWrapper(nn.Module):
         max_selected_features: Optional upper bound for selected features.
         solver: Built-in solver name, such as ``"local_search","sa","kaiwu_cim"``.
         mask_update_epochs: Optional number of epochs between mask updates.
+            The count accumulates across :meth:`fit_weights` calls on the
+            same wrapper.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
 
