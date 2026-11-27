@@ -30,6 +30,8 @@ molecular_design/
 
 源码中的 `data/`、`models/`、`optimization/`、`evaluation/` 分别负责分子特征、模型、采样生成与指标计算。CIM／SA 使用 `cim_sa/run_generation_strict.py` 的 `--solver kaiwu_cim`／`--solver kaiwu`；SQA 控制器调用 `sqa/run_generation_strict.py`。两组代码各自保留 `qc_mol_design/` 包名和内部导入结构，运行和测试时使用独立进程。
 
+`sqa/run_generation_strict.py --solver sqa` 在加载数据与模型前要求 `QC_SQA_BUDGET_FILE` 指向可读文件；其他 solver 忽略该变量，`run_meta.json` 中的 SQA 调度与预算哈希为 `null`。
+
 入口、控制器与测试的路径已适配上述目录。完整运行所需的外部文件及其放置位置见下文。
 
 ### KPP RBM／BM 复用
