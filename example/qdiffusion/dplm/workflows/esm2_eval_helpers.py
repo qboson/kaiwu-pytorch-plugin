@@ -17,7 +17,7 @@ try:
         write_csv_rows,
         write_fasta_records,
     )
-    from ..utils.runtime import seed_torch
+    from ..utils.runtime import parameter_device, seed_torch
 except ImportError:  # pragma: no cover - direct script-path compatibility
     from utils.io import (
         normalize_sequence,
@@ -26,7 +26,7 @@ except ImportError:  # pragma: no cover - direct script-path compatibility
         write_csv_rows,
         write_fasta_records,
     )
-    from utils.runtime import seed_torch
+    from utils.runtime import parameter_device, seed_torch
 
 try:
     import esm
@@ -83,7 +83,7 @@ def build_full_mask_input(generator, sequence_length: int) -> torch.Tensor:
         padding="longest",
         return_tensors="pt",
     )
-    return encoded["input_ids"].to(generator.device)
+    return encoded["input_ids"].to(parameter_device(generator))
 
 
 def run_generation_over_records(
