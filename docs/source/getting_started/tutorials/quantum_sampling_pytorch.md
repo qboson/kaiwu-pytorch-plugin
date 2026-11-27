@@ -19,6 +19,11 @@ The interfaces most used in training are:
 
 Note that `sample()` does **not** take a data state as input, nor does it return separate visible and hidden tensors; `objective()` takes exactly the two phase tensors.
 
+For a full Boltzmann machine, `bm.condition_sample(sampler, observations)`
+conditions on the leading nodes. Supply `visible_indices=[3, 0]` to associate
+the two columns of `observations` with nodes 3 and 0. The returned binary
+states always follow the machine's original node order.
+
 ## Creating a CIM Sampler
 
 Real hardware quantum sampling requires configured Kaiwu SDK credentials and real-machine access. `PrecisionReducer` adapts the Ising parameters to hardware precision constraints:
