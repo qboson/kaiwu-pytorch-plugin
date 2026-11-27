@@ -54,6 +54,9 @@ python example/qdeq/simple/simple_forecast_example.py --sampler sa
 
 ## Simple
 
+在预测命令中添加 `--original-units`，即可用训练集拟合的尺度还原每个变量的
+MAE 和 MSE，按 CSV 中的原始单位报告。
+
 `simple/` 是 ETTh1 上的最小可运行示例（回看 96 步，预测 96 步）：
 
 - `simple/etth1_common.py`：数据切分、模型、sampler 构建和 Anderson 对照组

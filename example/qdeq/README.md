@@ -65,6 +65,9 @@ python example/qdeq/simple/simple_forecast_example.py --sampler sa
 
 ## Simple
 
+Add `--original-units` to the forecast command to also report MAE and MSE for
+each CSV variable, using the scales fitted on the training split.
+
 `simple/` is a minimal runnable example on ETTh1 (96-step look-back, 96-step horizon):
 
 - `simple/etth1_common.py`: data split, model, sampler construction and the Anderson baseline
