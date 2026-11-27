@@ -120,6 +120,17 @@ class TestImplicitGradient(unittest.TestCase):
         self.assertIsNotNone(self.layer.weight.grad)
         self.assertGreater(deq.get_last_stats()["backward_nstep"], 0)
 
+    def test_retained_graph_repeats_implicit_backward(self):
+        """Each backward through a retained output uses the implicit gradient."""
+        deq = QDEQ(self.layer, LocalSearchSampler(), solve_config())
+        loss = (deq(self.x) * self.weight).sum()
+        loss.backward(retain_graph=True)
+        torch.testing.assert_close(self.x.grad, self.expected, rtol=1e-5, atol=1e-5)
+
+        self.x.grad = None
+        loss.backward()
+        torch.testing.assert_close(self.x.grad, self.expected, rtol=1e-5, atol=1e-5)
+
     def test_eval_mode_builds_no_implicit_graph(self):
         """Evaluation without gradients attaches no backward hook."""
         deq = QDEQ(self.layer, LocalSearchSampler(), solve_config()).eval()

@@ -417,24 +417,31 @@ class QDEQ(nn.Module):
             z_star: Fixed point with ``requires_grad`` set.
         """
         cfg = self.config
+        solving_backward = False
 
         def backward_hook(grad):
-            # The solver's vector-Jacobian products start at new_z again.
-            handle.remove()
+            nonlocal solving_backward
+            # Internal VJPs revisit new_z; only the outer backward needs the implicit solve.
+            if solving_backward:
+                return grad
 
             # y -> J^T y + g, evaluated with one vector-Jacobian product per call.
             def backward_map(y):
                 vjp = torch.autograd.grad(new_z, z_star, y, retain_graph=True, allow_unused=True)[0]
                 return grad if vjp is None else vjp + grad
 
-            solution, stats = _anderson_solver(
-                backward_map, torch.zeros_like(grad), cfg, cfg.b_thres, cfg.b_eps
-            )
+            solving_backward = True
+            try:
+                solution, stats = _anderson_solver(
+                    backward_map, torch.zeros_like(grad), cfg, cfg.b_thres, cfg.b_eps
+                )
+            finally:
+                solving_backward = False
             self._last_stats.update({f"backward_{key}": value for key, value in stats.items()})
             # Autograd continues from new_z with the solved gradient.
             return solution
 
-        handle = new_z.register_hook(backward_hook)
+        new_z.register_hook(backward_hook)
 
     def solve_fixed_point(
         self, func: Callable[[torch.Tensor], torch.Tensor], z0: torch.Tensor
