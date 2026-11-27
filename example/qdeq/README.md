@@ -75,6 +75,8 @@ The model follows iTransformer: the history of each variable is embedded as one
 token and the encoder is one `QDEQ` layer around a weight-tied
 variable-attention block. To finish within minutes, training windows are taken
 with stride 4 and each epoch trains on 60 batches.
+The training log averages squared error across the target values processed in
+each epoch, so a shorter final batch contributes in proportion to its size.
 
 ```python
 from kaiwu.classical import SimulatedAnnealingOptimizer

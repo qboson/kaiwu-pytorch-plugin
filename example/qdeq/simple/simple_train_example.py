@@ -51,7 +51,8 @@ def main() -> None:
 
     for epoch in range(1, args.epochs + 1):
         model.train()
-        start, losses = time.perf_counter(), []
+        start = time.perf_counter()
+        squared_error_sum, target_count = 0.0, 0
         for batch, (history, target) in enumerate(loaders["train"]):
             if batch >= args.max_train_batches:
                 break
@@ -59,11 +60,14 @@ def main() -> None:
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            losses.append(loss.item())
+            batch_elements = target.numel()
+            squared_error_sum += loss.item() * batch_elements
+            target_count += batch_elements
+        train_mse = squared_error_sum / target_count
         stats = model.deq.get_last_stats()
         val = evaluate(model, loaders["val"])
         print(
-            f"epoch {epoch}: train mse {sum(losses) / len(losses):.4f} | val mse {val['mse']:.4f} "
+            f"epoch {epoch}: train mse {train_mse:.4f} | val mse {val['mse']:.4f} "
             f"mae {val['mae']:.4f} | forward steps {stats['forward_nstep']} "
             f"backward steps {stats['backward_nstep']} | {time.perf_counter() - start:.0f}s"
         )

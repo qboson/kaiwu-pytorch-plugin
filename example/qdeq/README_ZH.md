@@ -63,6 +63,7 @@ python example/qdeq/simple/simple_forecast_example.py --sampler sa
 模型参照 iTransformer：每个变量的历史序列嵌入为一个 token，编码器是一个 `QDEQ`
 层，层内为一个权重共享的变量间注意力块。为了几分钟内跑完，训练窗口按步长 4 抽样，
 每个 epoch 只训练 60 个 batch。
+训练日志按参与该轮训练的目标元素数计算 MSE，较短的末批按实际大小计入。
 
 ```python
 from kaiwu.classical import SimulatedAnnealingOptimizer
