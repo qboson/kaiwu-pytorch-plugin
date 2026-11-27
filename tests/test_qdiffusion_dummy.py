@@ -151,6 +151,45 @@ class TestQDiffusionDummy(unittest.TestCase):
         generated = self.model.generate(self.targets, max_steps=1)
         self.assertEqual(generated.shape, self.targets.shape)
 
+    def test_generate_with_non_float32_proposal_and_resampling(self):
+        """Resampling must not crash when the proposal model runs in other precisions.
+
+        _resample() feeds the proposal output to masked_scatter_ against a
+        float32 score buffer; without the same dtype alignment _decode_step()
+        applies, float64/bfloat16 proposal models crash with
+        "masked_scatter: expected self and source to have same dtypes".
+        """
+        token_spec = SequenceTokenSpec(
+            pad_id=0,
+            bos_id=1,
+            eos_id=2,
+            mask_id=3,
+            x_id=4,
+            tokenizer=DummyTokenizer(),
+        )
+        for dtype in (torch.float64, torch.bfloat16):
+            with self.subTest(dtype=dtype):
+                proposal = DummyProposalModel(
+                    vocab_size=8, hidden_size=12
+                ).to(dtype)
+                energy = DummyEnergyModel(vocab_size=8, hidden_size=12).to(dtype)
+                model = QDiffusion(
+                    proposal_model=proposal,
+                    energy_model=energy,
+                    token_spec=token_spec,
+                    config=QDiffusionConfig(
+                        num_diffusion_timesteps=8,
+                        num_candidates=2,
+                        proposal_temperature=0.0,
+                    ),
+                    freeze_proposal=False,
+                )
+                model.eval()
+                seeds = torch.full((4, 6), 3, dtype=torch.long)
+                seeds[:, 0] = 1
+                generated = model.generate(seeds)
+                self.assertEqual(generated.shape, seeds.shape)
+
     def test_removed_dplm_entrypoints(self):
         self.assertFalse(hasattr(QDiffusion, "from_pretrained"))
         self.assertFalse(hasattr(QDiffusion, "build"))
