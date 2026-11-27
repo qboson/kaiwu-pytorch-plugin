@@ -203,7 +203,12 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             # 选择最佳模型
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
-                best_state = self.model.state_dict()
+                # state_dict() returns live tensors; snapshot the best epoch
+                # before later optimizer steps mutate them.
+                best_state = {
+                    key: value.detach().cpu().clone()
+                    for key, value in self.model.state_dict().items()
+                }
                 if self.save_path is not None:
                     model_save_path = os.path.join(self.save_path, "best_mlp_classifier.pth")
                     torch.save(best_state, model_save_path)
