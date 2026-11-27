@@ -147,6 +147,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
     ) -> torch.Tensor:
         """Sample from the Boltzmann Machine.
 
+        Clamped nodes are filtered from each full random scan before updates.
+        This preserves the update order and random draws for the free nodes.
+
         Args:
             num_steps (int): Number of Gibbs sampling steps.
 
@@ -178,17 +181,18 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
             # Number of visible units
             n_vis = s_visible.shape[-1] if s_visible is not None else 0
-            q_coef = self.symmetrized_quadratic_coef()
+            # Select original columns from one shared transpose view without copying.
+            q_columns = self.symmetrized_quadratic_coef().t()
             for _ in range(num_steps):
                 # Random update order (Gibbs sampling)
                 update_order = torch.randperm(self.num_nodes, device=self.device)
+                # Keep the same random scan and draws while skipping clamped nodes.
+                if n_vis:
+                    update_order = update_order[update_order >= n_vis]
                 for unit in update_order:
-                    if unit < n_vis:
-                        # Skip visible units (only sample hidden units)
-                        continue
                     # Compute activation value (logit of conditional probability)
                     activation = (
-                        torch.matmul(s_all, q_coef[:, unit]) + self.linear_bias[unit]
+                        torch.matmul(s_all, q_columns[unit]) + self.linear_bias[unit]
                     )
                     # Get activation probability via sigmoid
                     prob = torch.sigmoid(activation)
