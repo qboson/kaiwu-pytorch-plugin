@@ -25,6 +25,11 @@ Run from inside `example/dbn_digits/`. The notebook (`supervised_dbn_digits.ipyn
 1. **Fine-tuning mode** (`fine_tuning=True`): pre-train each RBM layer greedily with `DBNPretrainer`, initialize a feed-forward network with the pre-trained weights, then train it end-to-end with backpropagation (`CrossEntropyLoss`, SGD, optional dropout).
 2. **Classifier mode** (`fine_tuning=False`): extract features from the pre-trained DBN and train a traditional classifier (`classifier_type`: `logistic`, `svm`, or `random_forest`).
 
+When reusing a pre-trained DBN with `fit(X, y, pre_train=False)`, set
+`random_state` for repeatable supervised initialization, batch order, and
+dropout on the same setup. Seeded fine-tuning restores the caller's PyTorch
+random state when it returns.
+
 The DBN pretraining uses `UnsupervisedDBN` from `kaiwu.torch_plugin.dbn` with a `SimulatedAnnealingOptimizer` (or `CIMOptimizer` when `use_cim=True`, requiring real-machine access).
 
 ## Outputs

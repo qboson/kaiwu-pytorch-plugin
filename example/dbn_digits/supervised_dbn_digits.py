@@ -440,14 +440,21 @@ class SupervisedDBNClassification(AbstractSupervisedDBNClassifier, ClassifierMix
         if self.verbose:
             print("Starting fine-tuning...")
 
-        self._build_fine_tune_network()
-
-        # 转换为PyTorch张量
-        X_tensor = torch.FloatTensor(X).to(self.unsupervised_dbn.device)
-        y_tensor = torch.LongTensor(y).to(self.unsupervised_dbn.device)
-
-        # 训练微调网络
-        self._train_fine_tune_network(X_tensor, y_tensor)
+        device = torch.device(self.unsupervised_dbn.device)
+        cuda_devices = [device] if device.type == "cuda" else []
+        with torch.random.fork_rng(
+            devices=cuda_devices, enabled=self.random_state is not None
+        ):
+            if self.random_state is not None:
+                # Seed only the generators whose states fork_rng will restore.
+                torch.random.default_generator.manual_seed(self.random_state)
+                if cuda_devices:
+                    with torch.cuda.device(device):
+                        torch.cuda.manual_seed(self.random_state)
+            self._build_fine_tune_network()
+            X_tensor = torch.FloatTensor(X).to(device)
+            y_tensor = torch.LongTensor(y).to(device)
+            self._train_fine_tune_network(X_tensor, y_tensor)
 
     def _build_fine_tune_network(self):
         """构建微调网络"""
