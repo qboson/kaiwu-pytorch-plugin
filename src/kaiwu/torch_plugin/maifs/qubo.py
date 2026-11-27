@@ -31,6 +31,8 @@ DEFAULT_CIM_PRECISION_STEP = 4
 DEFAULT_CIM_SAMPLE_NUMBER = 1
 DEFAULT_CIM_TASK_MODE = "optimization"
 
+QUBOSolver = Callable[..., np.ndarray]
+
 
 def _get_kaiwu_precision_helpers() -> tuple[Any, Any]:
     """Return Kaiwu precision helpers from the available module path."""
@@ -416,6 +418,29 @@ def _restore_kaiwu_split_solution(
     return restore_without_vote(solution, last_var_idx)
 
 
+def _as_qubo_terms(
+    quadratic_matrix: np.ndarray, linear_vector: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Normalize the quadratic and linear terms of the binary objective."""
+    quadratic_matrix = np.asarray(quadratic_matrix, dtype=float)
+    linear_vector = np.asarray(linear_vector, dtype=float)
+    if quadratic_matrix.ndim != 2 or (
+        quadratic_matrix.shape[0] != quadratic_matrix.shape[1]
+    ):
+        raise ValueError("quadratic_matrix must be a square matrix")
+    if linear_vector.shape != (quadratic_matrix.shape[0],):
+        raise ValueError(
+            "linear_vector must be a vector with length matching quadratic_matrix"
+        )
+    if not np.all(np.isfinite(quadratic_matrix)) or not np.all(
+        np.isfinite(linear_vector)
+    ):
+        raise ValueError(
+            "quadratic_matrix and linear_vector must contain only finite values"
+        )
+    return quadratic_matrix, linear_vector
+
+
 class QuadraticLinearSolver:
     """Convert QUBO quadratic and linear terms to an Ising matrix."""
 
@@ -478,25 +503,7 @@ class QuadraticLinearSolver:
         Raises:
             ValueError: If terms have incompatible shapes or non-finite values.
         """
-        quadratic_matrix = np.asarray(quadratic_matrix, dtype=float)
-        linear_vector = np.asarray(linear_vector, dtype=float)
-        if quadratic_matrix.ndim != 2 or (
-            quadratic_matrix.shape[0] != quadratic_matrix.shape[1]
-        ):
-            raise ValueError("quadratic_matrix must be a square matrix")
-        if (
-            linear_vector.ndim != 1
-            or linear_vector.shape[0] != quadratic_matrix.shape[0]
-        ):
-            raise ValueError(
-                "linear_vector must be a vector with length matching quadratic_matrix"
-            )
-        if not np.all(np.isfinite(quadratic_matrix)) or not np.all(
-            np.isfinite(linear_vector)
-        ):
-            raise ValueError(
-                "quadratic_matrix and linear_vector must contain only finite values"
-            )
+        quadratic_matrix, linear_vector = _as_qubo_terms(quadratic_matrix, linear_vector)
 
         symmetric_quadratic = 0.5 * (quadratic_matrix + quadratic_matrix.T)
         qubo_matrix = np.triu(symmetric_quadratic, 1)
@@ -757,21 +764,58 @@ def _binary_from_solver_solution(
     return binary.astype(int)
 
 
+def _as_binary_state(state: np.ndarray, size: int, name: str) -> np.ndarray:
+    """Validate a binary vector before casting its exact 0/1 values to integers."""
+    state = np.asarray(state)
+    if state.shape != (size,):
+        raise ValueError(f"{name} must have shape ({size},)")
+    if state.dtype.kind not in "buif" or not np.all((state == 0) | (state == 1)):
+        raise ValueError(f"{name} must contain only binary 0/1 values")
+    return state.astype(int)
+
+
+def _solve_qubo_with_callback(
+    quadratic_matrix: np.ndarray,
+    linear_vector: np.ndarray,
+    initial_state: np.ndarray,
+    solver: QUBOSolver,
+    **solver_kwargs: object,
+) -> np.ndarray:
+    """Pass the original binary objective to a user-provided solver."""
+    quadratic_matrix, linear_vector = _as_qubo_terms(quadratic_matrix, linear_vector)
+    size = linear_vector.size
+    initial_state = _as_binary_state(initial_state, size, "initial_state")
+    try:
+        result = solver(quadratic_matrix.copy(), linear_vector.copy(), initial_state,
+                        **solver_kwargs)
+    except (ImportError, ValueError):
+        raise
+    except Exception as exc:
+        raise RuntimeError(f"Custom MAIFS solver failed: {exc}") from exc
+    try:
+        return _as_binary_state(result, size, "custom solver result")
+    except ValueError as exc:
+        raise RuntimeError(str(exc)) from exc
+
+
 def solve_qubo(
     quadratic_matrix: np.ndarray,
     linear_vector: np.ndarray,
     initial_state: np.ndarray,
-    solver: str = "local_search",
+    solver: str | QUBOSolver = "local_search",
     **solver_kwargs: object,
 ) -> np.ndarray:
-    """Solve one QUBO problem with a built-in optimization backend.
+    """Solve one QUBO problem with a built-in or user-provided backend.
 
     Args:
         quadratic_matrix: QUBO quadratic term.
         linear_vector: QUBO linear term.
-        initial_state: Initial binary state used by local solvers.
-        solver: Built-in solver name. Supported values are listed in
-            ``AVAILABLE_SOLVERS``.
+        initial_state: Initial binary state used by local and custom solvers.
+        solver: A name from ``AVAILABLE_SOLVERS`` or a callable that receives
+            copies of ``(quadratic_matrix, linear_vector, initial_state)`` and
+            ``**solver_kwargs``. A callable minimizes
+            ``0.5 * x.T @ quadratic_matrix @ x + linear_vector @ x`` and returns
+            a single binary vector with the initial state's shape.
         **solver_kwargs: Solver-specific keyword arguments.
 
     Returns:
@@ -782,6 +826,10 @@ def solve_qubo(
         ImportError: If ``solver="kaiwu_cim"`` is requested without Kaiwu.
         RuntimeError: If solver execution fails or returns an invalid solution.
     """
+    if callable(solver):
+        return _solve_qubo_with_callback(
+            quadratic_matrix, linear_vector, initial_state, solver, **solver_kwargs
+        )
     initial_state = np.asarray(initial_state, dtype=int)
     solver_name = str(solver)
 
