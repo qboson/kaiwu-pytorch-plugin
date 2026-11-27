@@ -1,7 +1,9 @@
 #!/bin/bash
 # Example script to run run_pipeline.py with arguments
 
-python run_pipeline.py \
+script_dir=$(dirname -- "${BASH_SOURCE[0]}")
+
+python "$script_dir/run_pipeline.py" \
   --model-type QVAE \
   --name mnist \
   --data-path ./data \
