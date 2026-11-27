@@ -9,6 +9,14 @@
    :show-inheritance:
 ```
 
+## Exact likelihood for small Gaussian–Bernoulli RBMs
+
+`gaussian_log_prob(samples)` returns one normalized log density per Gaussian
+sample, including when the Gaussian partition is hidden. `log_partition()`
+computes the joint log normalizer separately. Both evaluate the model without
+sampling and support up to 16 Bernoulli units, so they can serve as references
+for checking approximate methods on small models.
+
 ## MAIFS QUBO and SDK energy conventions
 
 `QuadraticLinearSolver.solve(Q, l)` represents the binary objective
