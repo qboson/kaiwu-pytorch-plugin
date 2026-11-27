@@ -20,6 +20,7 @@ import os
 import sys
 import types
 import unittest
+import unittest.mock
 
 import numpy as np
 import pytest
@@ -227,6 +228,65 @@ class TestModelTunerBatchPlacement(unittest.TestCase):
         model_device = next(self.model.parameters()).device
         self.assertTrue(seen_devices)
         self.assertTrue(all(device == model_device for device in seen_devices))
+
+    def test_load_model_passes_model_device_map_location(self):
+        tuner = ModelTuner(config=self.config)
+        tuner.register_model(self.model)
+        tuner.outpath = self._tmpdir.name
+        tuner.save_model(config_string="unit")
+        tuner.infile = os.path.join(self._tmpdir.name, "model_unit.pt")
+
+        seen_map_locations: list = []
+        original_load = torch.load
+
+        def recording_load(path, *args, **kwargs):
+            seen_map_locations.append(kwargs.get("map_location"))
+            return original_load(path, *args, **kwargs)
+
+        with unittest.mock.patch("torch.load", side_effect=recording_load):
+            tuner.load_model(set_eval=True)
+
+        expected_device = next(self.model.parameters()).device
+        self.assertEqual(seen_map_locations, [expected_device])
+        self.assertFalse(self.model.training)
+
+    def test_train_and_test_report_sample_weighted_mean_loss(self):
+        class ConstantLossQVAE(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.weight = torch.nn.Parameter(torch.ones(1))
+                self.batch_values = iter([2.0, 4.0, 10.0])
+
+            def forward(self, x):
+                logits = x * self.weight
+                return logits, None, logits, logits
+
+            def loss(self, x, recon_x, posterior):
+                del x, posterior
+                val = next(self.batch_values)
+                return recon_x.sum() * 0.0 + val
+
+        # 5 samples with batch_size=2 -> batches of sizes 2, 2, 1.
+        # Sample-weighted mean = (2*2.0 + 2*4.0 + 1*10.0) / 5 = 22.0 / 5 = 4.4.
+        features, labels = _tiny_features(5, 4)
+        dataset = TensorDataset(
+            torch.FloatTensor(features),
+            torch.LongTensor(labels),
+        )
+        loader = DataLoader(dataset, batch_size=2, shuffle=False)
+
+        train_model = ConstantLossQVAE()
+        tuner = ModelTuner(config=self.config)
+        tuner.register_model(train_model)
+        tuner.register_dataLoaders(loader, loader)
+        tuner.register_optimiser(torch.optim.SGD(train_model.parameters(), lr=0.0))
+
+        train_loss = tuner.train(epoch=1)
+        self.assertAlmostEqual(train_loss, 4.4, places=6)
+
+        train_model.batch_values = iter([2.0, 4.0, 10.0])
+        test_loss, _, _, _ = tuner.test()
+        self.assertAlmostEqual(test_loss, 4.4, places=6)
 
 
 @unittest.skipUnless(torch.cuda.is_available(), "requires CUDA")

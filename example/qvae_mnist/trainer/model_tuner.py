@@ -89,7 +89,11 @@ class ModelTuner(object):
 	def load_model(self,set_eval=True):
 		logger.info("Loading Model")
 		#attention: model must be defined already
-		self._model.load_state_dict(torch.load(self.infile))
+		parameter = next(self._model.parameters(), None)
+		map_location = parameter.device if parameter is not None else "cpu"
+		self._model.load_state_dict(
+			torch.load(self.infile, map_location=map_location)
+		)
 		#training of model
 		if set_eval:
 			self._model.eval()
@@ -101,9 +105,11 @@ class ModelTuner(object):
 		self._model.train()
 		device = next(self._model.parameters()).device
 
-		total_train_loss = 0
+		total_train_loss = 0.0
+		total_samples = 0
 		for batch_idx, (inputData, label) in enumerate(self.train_loader):
 			inputData = inputData.to(device)
+			batch_size = len(inputData)
 			# set gradients to zero before backprop. Needed in pytorch
 			# self._optimiser.zero_grad()
 
@@ -139,23 +145,25 @@ class ModelTuner(object):
 				)
 				bm_loss.backward()
 				self._bm_optimiser.step()
-				total_train_loss += train_loss.item() + bm_loss.item()  # 记录总损失
+				total_train_loss += (train_loss.item() + bm_loss.item()) * batch_size  # 记录总损失
 			else:
-				total_train_loss += train_loss.item()
+				total_train_loss += train_loss.item() * batch_size
+			total_samples += batch_size
 
 			# Output logging
 			if batch_idx % 100 == 0:
 				logger.info(
 					"Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}".format(
 						epoch,
-						batch_idx * len(inputData),
+						batch_idx * batch_size,
 						len(self.train_loader.dataset),
 						100.0 * batch_idx / len(self.train_loader),
-						train_loss.data.item() / len(inputData),
+						train_loss.item(),
 					)
 				)
 
-		total_train_loss /= len(self.train_loader.dataset)
+		if total_samples > 0:
+			total_train_loss /= total_samples
 		logger.info("Train Loss: {0}".format(total_train_loss))
 		return total_train_loss
 
@@ -163,9 +171,12 @@ class ModelTuner(object):
 		logger.info("Testing Model")
 		self._model.eval()
 
-		test_loss = 0
+		test_loss = 0.0
+		total_samples = 0
 		zeta_list = None
 		label_list = None
+		inputData = None
+		outputData = None
 
 		device = next(self._model.parameters()).device
 		with torch.no_grad():
@@ -174,13 +185,17 @@ class ModelTuner(object):
 				if self._config.type == "QVAE":
 					# forward 返回: output_logits, posterior, q, zeta
 					output_logits, posterior, q, zeta = self._model(inputData)
-					test_loss += self._model.loss(inputData, output_logits, posterior)
+					batch_loss = self._model.loss(inputData, output_logits, posterior)
+					batch_size = len(inputData)
+					test_loss += batch_loss.item() * batch_size
+					total_samples += batch_size
 
 					# 设置 outputData 为概率值（用于绘图）
 					outputData = torch.sigmoid(output_logits)
 					# # 记录 label_list
 					# label_list = label.detach().numpy() if label_list is None else np.append(label_list, label.detach().numpy(), axis=0)
 
-		test_loss /= len(self.test_loader.dataset)
+		if total_samples > 0:
+			test_loss /= total_samples
 		logger.info("Test Loss: {0}".format(test_loss))
 		return test_loss, inputData, outputData, label_list
