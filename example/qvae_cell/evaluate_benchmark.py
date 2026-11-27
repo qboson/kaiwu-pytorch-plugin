@@ -333,7 +333,25 @@ def evaluate_classifier(adata, rep_key, label_key, test_size, random_state, max_
     )
 
 
-def run_dpt(adata, rep_key, root_cell_type, label_key, n_neighbors, out_key):
+def _dpt_root_position(adata, label_key, root_cell_type, root_cell):
+    """Resolve a DPT root to one observation position."""
+    if root_cell is None:
+        labels = adata.obs[label_key].astype(str)
+        matches = np.flatnonzero(labels.to_numpy() == root_cell_type)
+        if not len(matches):
+            raise ValueError(f"{root_cell_type!r} not found in adata.obs[{label_key!r}]")
+        return int(matches[0])
+
+    matches = np.flatnonzero(adata.obs_names == root_cell)
+    if len(matches) != 1:
+        raise ValueError(f"DPT root {root_cell!r} must match exactly one observation name")
+    position = int(matches[0])
+    if root_cell_type is not None and str(adata.obs[label_key].iloc[position]) != root_cell_type:
+        raise ValueError(f"DPT root {root_cell!r} does not have cell type {root_cell_type!r}")
+    return position
+
+
+def run_dpt(adata, rep_key, root_cell_type, label_key, n_neighbors, out_key, *, root_cell=None):
     """Run diffusion pseudotime on a representation.
 
     Args:
@@ -343,26 +361,24 @@ def run_dpt(adata, rep_key, root_cell_type, label_key, n_neighbors, out_key):
         label_key: ``adata.obs`` column with cell-type labels.
         n_neighbors: Number of neighbors used for graph construction.
         out_key: ``adata.obs`` column where pseudotime is stored.
+        root_cell: Optional exact observation name to use as the root.
 
     Returns:
         Pseudotime values as a pandas Series.
 
     Raises:
-        ValueError: If ``root_cell_type`` is not present in ``label_key``.
+        ValueError: If the requested root cannot be resolved.
     """
+    position = _dpt_root_position(adata, label_key, root_cell_type, root_cell)
     sc.pp.neighbors(adata, use_rep=rep_key, n_neighbors=n_neighbors)
-    if root_cell_type not in set(adata.obs[label_key].astype(str)):
-        raise ValueError(f"{root_cell_type!r} not found in adata.obs[{label_key!r}]")
-
-    root_cells = adata.obs_names[adata.obs[label_key].astype(str) == root_cell_type]
-    adata.uns["iroot"] = int(np.flatnonzero(adata.obs_names == root_cells[0])[0])
+    adata.uns["iroot"] = position
     sc.tl.diffmap(adata)
     sc.tl.dpt(adata)
     adata.obs[out_key] = adata.obs["dpt_pseudotime"].to_numpy()
     return adata.obs[out_key]
 
 
-def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors):
+def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors, *, root_cell=None):
     """Evaluate DPT pseudotime and optional trajectory agreement.
 
     This metric group answers: does the embedding produce a pseudotime ordering
@@ -375,6 +391,7 @@ def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors):
         label_key: ``adata.obs`` column with cell-type labels.
         root_cell_type: Cell type used as the DPT root.
         n_neighbors: Number of neighbors used for graph construction.
+        root_cell: Optional exact observation name shared between the two embeddings.
 
     Returns:
         One-row DataFrame with DPT cell count and optional trajectory scores.
@@ -387,13 +404,16 @@ def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors):
         label_key,
         n_neighbors,
         f"{rep_key}_dpt_pseudotime",
+        root_cell=root_cell,
     )
 
+    root_position = integrated.uns["iroot"]
     row = {
         "metric_group": "dpt",
         "rep_key": rep_key,
         "label_key": label_key,
-        "root_cell_type": root_cell_type,
+        "root_cell_type": str(integrated.obs[label_key].iloc[root_position]),
+        "root_cell": str(integrated.obs_names[root_position]),
         "n_cells_with_dpt": int(integrated_pt.notna().sum()),
     }
 
@@ -406,6 +426,7 @@ def evaluate_dpt(adata, rep_key, label_key, root_cell_type, n_neighbors):
             label_key,
             n_neighbors,
             "X_pca_dpt_pseudotime",
+            root_cell=root_cell,
         )
         common = integrated.obs_names.intersection(baseline.obs_names)
         left = integrated_pt.loc[common]
@@ -454,7 +475,7 @@ def make_long_summary(results, label_key):
         if column not in summary:
             summary[column] = np.nan
 
-    parameter_columns = {"n_neighbors", "test_size", "root_cell_type"}
+    parameter_columns = {"n_neighbors", "test_size", "root_cell_type", "root_cell"}
     metric_columns = [
         column
         for column in summary.columns
@@ -507,6 +528,7 @@ def main():
         ),
     )
     parser.add_argument("--root-cell-type", default=None)
+    parser.add_argument("--root-cell", default=None, help="Exact DPT root observation name")
     parser.add_argument("--classifier-test-size", type=float, default=0.2)
     parser.add_argument("--classifier-max-iter", type=int, default=1000)
     parser.add_argument("--scib-n-jobs", type=int, default=6)
@@ -516,6 +538,8 @@ def main():
     parser.add_argument("--scgraph-only-umap", action="store_true")
     args = parser.parse_args()
     selected_metrics = parse_metrics(args.metrics)
+    if "dpt" in selected_metrics and args.root_cell_type is None and args.root_cell is None:
+        raise ValueError("DPT requires --root-cell-type or --root-cell")
 
     output_dir = args.output_dir or os.path.dirname(args.h5ad) or "."
     os.makedirs(output_dir, exist_ok=True)
@@ -605,14 +629,13 @@ def main():
             print(f"Skipping scGraph: {exc}")
 
     if "dpt" in selected_metrics:
-        if args.root_cell_type is None:
-            raise ValueError("--root-cell-type is required when --metrics includes dpt")
         dpt_df = evaluate_dpt(
             adata,
             args.rep_key,
             args.label_key,
             args.root_cell_type,
             args.n_neighbors,
+            root_cell=args.root_cell,
         )
         save_result(
             dpt_df,
