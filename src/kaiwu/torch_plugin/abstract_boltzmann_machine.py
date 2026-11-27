@@ -80,6 +80,9 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         self,
         s_positive: torch.Tensor,
         s_negative: torch.Tensor,
+        *,
+        positive_weights=None,
+        negative_weights=None,
     ) -> torch.Tensor:
         """Objective function whose gradient is equivalent to the gradient of
         negative log-likelihood.
@@ -89,11 +92,38 @@ class AbstractBoltzmannMachine(torch.nn.Module):
                             where b1 is batch size and N is the number of variables.
             s_negative (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N),
                             where b2 is batch size and N is the number of variables.
+            positive_weights (array-like, optional): Per-row weights for the data phase.
+            negative_weights (array-like, optional): Per-row weights for the model phase.
+                Each supplied vector must be finite and nonnegative with positive total
+                weight. Weights are treated as constants and normalized per phase.
 
         Returns:
             torch.Tensor: Scalar difference between data and model average energy.
         """
-        return self(s_positive).mean() - self(s_negative).mean()
+        positive = self._phase_mean(self(s_positive), positive_weights)
+        negative = self._phase_mean(self(s_negative), negative_weights)
+        return positive - negative
+
+    @staticmethod
+    def _phase_mean(energies, weights):
+        """Reduce one energy vector using optional observation counts."""
+        if weights is None:
+            return energies.mean()
+        weights = torch.as_tensor(weights, device=energies.device).detach()
+        if weights.shape != energies.shape or weights.ndim != 1 or weights.numel() == 0:
+            raise ValueError("Phase weights must provide one weight per energy row")
+        if weights.is_complex():
+            raise ValueError("Phase weights must be real")
+        common_dtype = torch.promote_types(energies.dtype, weights.dtype)
+        weights = weights.to(dtype=torch.promote_types(common_dtype, torch.float32))
+        if not torch.isfinite(weights).all() or (weights < 0).any():
+            raise ValueError("Phase weights must be finite and nonnegative")
+        scale = weights.max()
+        if scale == 0:
+            raise ValueError("Phase weights must have positive total weight")
+        # Scale before summing to keep the reduction safe with large counts.
+        weights = weights / scale
+        return (energies * weights).sum() / weights.sum()
 
     def sample(self, sampler) -> torch.Tensor:
         """Samples from the Boltzmann Machine.
