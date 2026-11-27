@@ -20,7 +20,6 @@ import torch
 import torch.nn as nn
 from torch.optim import SGD
 from torch.utils.data import DataLoader, TensorDataset
-from dbn_trainer import DBNPretrainer
 
 
 def translate_image(image, direction):
@@ -109,6 +108,9 @@ class AbstractSupervisedDBN(BaseEstimator, ABC):
         dropout_p=0.0,  # Dropout概率
         use_cim=False,
     ):
+        # Modified 2026-11-12: load training dependencies when constructing a DBN.
+        from dbn_trainer import DBNPretrainer
+
         # 无监督网络配置
         self.hidden_layers_structure = hidden_layers_structure
         self.learning_rate_rbm = learning_rate_rbm
@@ -575,7 +577,7 @@ class RBMVisualizer:
     def plot_weights(
         self,
         rbm,
-        n_visible=64,
+        n_visible=None,
         grid_shape=(8, 16),
         figsize=(16, 7),
         title_suffix="RBM Weights",
@@ -586,7 +588,7 @@ class RBMVisualizer:
 
         Args:
             rbm: RBM模型
-            n_visible (int): 可见单元数量
+            n_visible (int, optional): 可见单元数量，默认从权重矩阵推断
             grid_shape (tuple): 网格形状 (rows, cols)
             figsize (tuple): 图形大小
             title_suffix (str): 标题后缀
@@ -594,6 +596,9 @@ class RBMVisualizer:
             save_pdf (bool): 是否保存为PDF
         """
         weights = rbm.quadratic_coef.detach().cpu().numpy()
+        # Modified 2026-11-12: infer the visible width only when it is omitted.
+        if n_visible is None:
+            n_visible = weights.shape[0]
 
         fig, axes = plt.subplots(
             grid_shape[0],
@@ -698,6 +703,11 @@ class RBMVisualizer:
             img_size = int(np.sqrt(n_features))
             if img_size * img_size == n_features:
                 img_shape = (img_size, img_size)
+            else:
+                # Modified 2026-11-12: include every feature in a rectangular layout.
+                while n_features % img_size:
+                    img_size -= 1
+                img_shape = (img_size, n_features // img_size)
 
         # 创建图形
         fig, axes = plt.subplots(2, n_images, figsize=(2 * n_images, 4))
@@ -741,7 +751,8 @@ class RBMVisualizer:
         # 保存结果
         if save_pdf:
             plt.savefig(
-                f"results/reconstructed_images_{title_suffix}.pdf",
+                # Modified 2026-11-12: honor the visualizer's output directory.
+                os.path.join(self.result_dir, f"reconstructed_images_{title_suffix}.pdf"),
                 dpi=300,
                 bbox_inches="tight",
                 format="pdf",
