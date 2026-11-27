@@ -600,6 +600,7 @@ class RBMVisualizer:
             grid_shape[1],
             gridspec_kw={"wspace": 0.1, "hspace": 0.1},
             figsize=figsize,
+            squeeze=False,
         )
         fig.suptitle(
             f"{rbm.num_hidden} components extracted by RBM - {title_suffix}",
