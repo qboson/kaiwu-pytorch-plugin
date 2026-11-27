@@ -8,10 +8,11 @@
 
 import os
 import sys
+from pathlib import Path
 
 from sphinx import addnodes
 
-sys.path.insert(0, os.path.abspath("../src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from kaiwu.torch_plugin import __version__
 
 project = "Kaiwu-PyTorch-Plugin"
