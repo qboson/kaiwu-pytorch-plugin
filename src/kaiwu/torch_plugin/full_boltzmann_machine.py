@@ -5,7 +5,11 @@ import numpy as np
 import torch
 
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
-from .abstract_boltzmann_machine import AbstractBoltzmannMachine
+from .abstract_boltzmann_machine import (
+    AbstractBoltzmannMachine,
+    _validated_parameter,
+    _validated_size,
+)
 
 
 class BoltzmannMachine(AbstractBoltzmannMachine):
@@ -21,6 +25,11 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         device (torch.device, optional): Device for tensor construction; uses
             CPU when ``None``.
+
+    Raises:
+        ValueError: If ``num_nodes`` is not an integer or not positive, or
+            if a supplied parameter tensor has the wrong shape.
+        TypeError: If a supplied parameter is not a ``torch.Tensor``.
     """
 
     def __init__(
@@ -31,6 +40,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         device=None,
     ):
         super().__init__(device=device)
+        num_nodes = _validated_size("num_nodes", num_nodes)
+        _validated_parameter("quadratic_coef", quadratic_coef, (num_nodes, num_nodes))
+        _validated_parameter("linear_bias", linear_bias, (num_nodes,))
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
             quadratic_coef

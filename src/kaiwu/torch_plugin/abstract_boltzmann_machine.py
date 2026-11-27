@@ -10,6 +10,64 @@ import torch
 from kaiwu.torch_plugin.usage_stats import kpp_caller_context
 
 
+def _validated_size(name, value):
+    """Resolve a positive model size without silently truncating fractions.
+
+    Accepts integer-valued scalars such as ``int`` or ``numpy.integer``
+    (the natural result of ``array.shape[0]``); fractional values,
+    non-numeric values, and non-positive sizes are rejected.
+
+    Args:
+        name (str): Argument name used in error messages.
+        value: Candidate size.
+
+    Returns:
+        int: The validated size.
+
+    Raises:
+        ValueError: If ``value`` is not an integer or not positive.
+    """
+    try:
+        size = int(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{name} must be an integer") from exc
+    if not isinstance(value, (str, bytes)) and value != size:
+        raise ValueError(f"{name} must be an integer")
+    if size <= 0:
+        raise ValueError(f"{name} must be positive, got {size}")
+    return size
+
+
+def _validated_parameter(name, value, expected_shape):
+    """Validate an optional parameter tensor against an exact shape.
+
+    Args:
+        name (str): Argument name used in error messages.
+        value: Candidate tensor, or ``None`` to skip validation.
+        expected_shape (tuple[int, ...]): Required shape.
+
+    Returns:
+        torch.Tensor or None: The validated tensor.
+
+    Raises:
+        TypeError: If ``value`` is neither ``None`` nor a ``torch.Tensor``.
+        ValueError: If the tensor shape differs from ``expected_shape``.
+    """
+    if value is None:
+        return None
+    if not isinstance(value, torch.Tensor):
+        raise TypeError(
+            f"{name} must be a torch.Tensor, got {type(value).__name__}; "
+            "convert with torch.as_tensor(...) first"
+        )
+    if tuple(value.shape) != tuple(expected_shape):
+        raise ValueError(
+            f"{name} must have shape {tuple(expected_shape)}, "
+            f"got {tuple(value.shape)}"
+        )
+    return value
+
+
 class AbstractBoltzmannMachine(torch.nn.Module):
     """Abstract base class for Boltzmann Machines.
 
