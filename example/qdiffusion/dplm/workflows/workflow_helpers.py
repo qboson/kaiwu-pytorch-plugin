@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 import random
 from typing import Any
@@ -144,9 +145,15 @@ def run_epoch(
 
     context = torch.enable_grad if training else torch.no_grad
     with context():
-        for batch in tqdm(data_loader, desc=description, unit="batch"):
+        progress = tqdm(data_loader, desc=description, unit="batch")
+        for batch_index, batch in enumerate(progress, start=1):
             outputs = generator.objective({"targets": batch["targets"]})
             loss = outputs["energy_objective"].mean()
+            loss_value = loss.item()
+            if not math.isfinite(loss_value):
+                raise FloatingPointError(
+                    f"{description}, batch {batch_index} has a non-finite energy objective"
+                )
 
             if training:
                 optimizer.zero_grad(set_to_none=True)
@@ -159,7 +166,7 @@ def run_epoch(
                 optimizer.step()
 
             batch_size = int(batch["targets"].shape[0])
-            total_loss += float(loss.item()) * batch_size
+            total_loss += loss_value * batch_size
             total_examples += batch_size
             for key in tracked_keys:
                 if key in outputs:
