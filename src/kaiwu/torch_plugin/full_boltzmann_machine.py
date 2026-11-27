@@ -19,6 +19,9 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
 
         linear_bias (torch.FloatTensor, optional): linear bias, shape is [num_nodes]
 
+        dtype (torch.dtype, optional): Data type for tensor construction.
+            Defaults to torch.float32.
+
         device (torch.device, optional): Device for tensor construction; uses
             CPU when ``None``.
     """
@@ -28,19 +31,24 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
         num_nodes: int,
         quadratic_coef: torch.FloatTensor = None,
         linear_bias: torch.FloatTensor = None,
+        dtype: torch.dtype = torch.float32,
         device=None,
     ):
-        super().__init__(device=device)
+        super().__init__(device=device, dtype=dtype)
         self.num_nodes = num_nodes
         self.quadratic_coef = torch.nn.Parameter(
-            quadratic_coef
-            if quadratic_coef is not None
-            else torch.randn((self.num_nodes, self.num_nodes)).to(self.device) * 0.01
+            (
+                quadratic_coef
+                if quadratic_coef is not None
+                else torch.randn((self.num_nodes, self.num_nodes)) * 0.01
+            ).to(dtype=self.dtype, device=self.device)
         )
         self.linear_bias = torch.nn.Parameter(
-            linear_bias
-            if linear_bias is not None
-            else torch.zeros(self.num_nodes).to(self.device)
+            (
+                linear_bias
+                if linear_bias is not None
+                else torch.zeros(self.num_nodes)
+            ).to(dtype=self.dtype, device=self.device)
         )
 
     def symmetrized_quadratic_coef(self):
@@ -165,7 +173,10 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                 # Initialize all units (visible + hidden) with Bernoulli(0.5)
                 s_all = torch.bernoulli(
                     torch.full(
-                        (s_visible.size(0), self.num_nodes), 0.5, device=self.device
+                        (s_visible.size(0), self.num_nodes),
+                        0.5,
+                        device=self.device,
+                        dtype=self.dtype,
                     )
                 )
                 # Replace visible part with given visible unit state
@@ -173,7 +184,12 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             else:
                 # If no visible units, initialize all randomly
                 s_all = torch.bernoulli(
-                    torch.full((num_sample, self.num_nodes), 0.5, device=self.device)
+                    torch.full(
+                        (num_sample, self.num_nodes),
+                        0.5,
+                        device=self.device,
+                        dtype=self.dtype,
+                    )
                 )
 
             # Number of visible units
@@ -193,21 +209,25 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
                     # Get activation probability via sigmoid
                     prob = torch.sigmoid(activation)
                     # Sample current unit state according to probability
-                    s_all[:, unit] = (prob > torch.rand_like(prob)).float()
+                    s_all[:, unit] = (prob > torch.rand_like(prob)).to(self.dtype)
             # Return sampled states of all units
             return s_all
 
-    def condition_sample(self, sampler, s_visible, dtype=torch.float32) -> torch.Tensor:
+    def condition_sample(self, sampler, s_visible, dtype=None) -> torch.Tensor:
         """Sample from the Boltzmann Machine given some nodes.
 
         Args:
             sampler (kaiwu.core.Optimizer): Optimizer used for sampling from the model.
             s_visible: State of the visible layer.
+            dtype (torch.dtype, optional): Data type of the returned samples.
+                Defaults to the model data type.
 
         Returns:
             torch.Tensor: Spins sampled from the model
                 (shape determined by ``sampler`` and ``sample_params``).
         """
+        if dtype is None:
+            dtype = self.dtype
         solutions = []
         for i in range(s_visible.size(0)):
             ising_mat = self._hidden_to_ising_matrix(s_visible[i])
@@ -218,7 +238,13 @@ class BoltzmannMachine(AbstractBoltzmannMachine):
             solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
             solution = torch.tensor(solution, dtype=dtype, device=self.device)
             solution = torch.cat(
-                [s_visible[i].unsqueeze(0).expand(solution.shape[0], -1), solution],
+                [
+                    s_visible[i]
+                    .unsqueeze(0)
+                    .expand(solution.shape[0], -1)
+                    .to(dtype=dtype),
+                    solution,
+                ],
                 dim=-1,
             )
             solutions.append(solution)

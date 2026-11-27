@@ -15,24 +15,28 @@ class AbstractBoltzmannMachine(torch.nn.Module):
 
     Args:
         device (torch.device, optional): Device for tensor construction.
+        dtype (torch.dtype, optional): Data type for tensor construction.
+            Defaults to torch.float32.
     """
 
-    def __init__(self, device=None) -> None:
+    def __init__(self, device=None, dtype=torch.float32) -> None:
         super().__init__()
         if device is None:
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = device
+        self.dtype = dtype
 
     def _apply(self, fn, recurse=True):
-        """Applies ``fn`` to parameters and keeps ``self.device`` in sync.
+        """Applies ``fn`` to parameters and keeps ``self.device``/``self.dtype``
+        in sync.
 
         ``nn.Module`` moves child modules through ``_apply`` without calling a
         child's ``.to()`` override, so a Boltzmann machine nested inside
         another module would otherwise keep a stale plain-attribute device
         after its parameters were moved. Syncing here covers every move path:
-        direct ``.to()``/``.cpu()`` calls and moves initiated by parent
-        modules.
+        direct ``.to()``/``.cpu()``/``.double()`` calls and moves initiated by
+        parent modules.
 
         Args:
             fn: Function applied to each parameter and buffer.
@@ -45,6 +49,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         parameter = next(self.parameters(), None)
         if parameter is not None:
             self.device = parameter.device
+            self.dtype = parameter.dtype
         return module
 
     def forward(self, s_all: torch.Tensor) -> torch.Tensor:
@@ -114,7 +119,7 @@ class AbstractBoltzmannMachine(torch.nn.Module):
             solution = sampler.solve(ising_mat)
 
         solution = (solution[:, :-1] * solution[:, [-1]] + 1) / 2
-        solution = torch.FloatTensor(solution)
-        solution = solution.to(self.device)
+        solution = torch.as_tensor(solution, device=self.device)
+        solution = solution.to(dtype=getattr(self, "dtype", torch.float32))
 
         return solution
