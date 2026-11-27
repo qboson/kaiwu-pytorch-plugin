@@ -33,6 +33,8 @@ def parse_args():
     )
     parser.add_argument("--dataset", default="immune", choices=sorted(DATASET_PARAMS))
     parser.add_argument("--data-path", default=None)
+    parser.add_argument("--batch-key", help="Observation column for the decoder's batch covariate")
+    parser.add_argument("--label-key", help="Observation column for cell-type plots")
     parser.add_argument("--output-dir", default="./outputs_immune_sa")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--seed", type=int, default=42)
@@ -86,12 +88,19 @@ def main():
     params = DATASET_PARAMS[args.dataset].copy()
     if args.data_path is not None:
         params["file_path"] = args.data_path
+    if args.batch_key is not None:
+        params["batch_key"] = args.batch_key
+    if args.label_key is not None:
+        params["labels_key"] = args.label_key
 
     # 读取 AnnData，并统一处理 obs_names，避免 scanpy 后续邻接图/UMAP 步骤出现重复索引。
     print(f"Using device: {args.device_obj}")
     print(f"Loading data from: {params['file_path']}")
     adata = anndata.read_h5ad(params["file_path"])
     adata.obs_names_make_unique()
+    for flag, key in (("--batch-key", args.batch_key), ("--label-key", args.label_key)):
+        if key is not None and key not in adata.obs:
+            raise ValueError(f"Column {key!r} for {flag} is missing from adata.obs")
     print(f"Dataset '{args.dataset}': {adata.n_obs} cells, {adata.n_vars} features")
 
     x = trainer.adata_to_array(adata)

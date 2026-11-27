@@ -73,6 +73,9 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+如果 `adata.obs` 使用 `donor` 和 `cell_type` 保存批次及细胞类型，可通过
+`--batch-key donor --label-key cell_type` 指定这两列。
+
 ## 输出
 
 训练脚本会在 `--output-dir` 下生成：

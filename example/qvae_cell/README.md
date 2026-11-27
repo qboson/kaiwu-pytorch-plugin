@@ -76,6 +76,9 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+Pass `--batch-key donor --label-key cell_type` when a dataset stores the batch
+covariate and cell labels under those names in `adata.obs`.
+
 ## Outputs
 
 The training script will generate the following files under `--output-dir`:
