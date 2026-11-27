@@ -37,18 +37,9 @@ class Trainer:
         self.n_batches = 0
 
     def adata_to_array(self, adata):
-        """把 AnnData.X 转为 float32 矩阵，并按损失函数准备输入范围。"""
+        """把 AnnData.X 转为原始 float32 矩阵；范围转换在 make_loaders 划分后完成。"""
         x = adata.X.toarray() if hasattr(adata.X, "toarray") else adata.X
-        x = np.asarray(x, dtype=np.float32)
-        if self.args.loss_type == "mse":
-            return x
-
-        # Bernoulli 重构要求输入接近概率值；若原始数据超出 [0, 1]，先做 min-max 归一化。
-        x_min = float(np.nanmin(x))
-        x_max = float(np.nanmax(x))
-        if x_min < 0.0 or x_max > 1.0:
-            x = (x - x_min) / (x_max - x_min + 1e-8)
-        return np.clip(x, 0.0, 1.0).astype(np.float32, copy=False)
+        return np.asarray(x, dtype=np.float32)
 
     def batch_indices(self, adata, batch_key):
         """把 obs 中的 batch 分类列编码为整数索引，供 decoder 拼接 one-hot 使用。"""
@@ -57,13 +48,20 @@ class Trainer:
         return batch_categories.cat.codes.to_numpy()
 
     def make_loaders(self, x, batch_indices):
-        """构造训练、验证和全量评估 DataLoader。"""
+        """划分原始矩阵，只用训练集拟合 Bernoulli 范围，并构造三个 DataLoader。"""
         # 训练/验证只划分细胞索引，保证表达矩阵和 batch 索引保持同步。
         train_idx, val_idx = train_test_split(
             np.arange(x.shape[0]),
             test_size=self.args.val_percentage,
             random_state=self.args.seed,
         )
+        if self.args.loss_type != "mse":
+            # 验证集不能影响训练输入或 train_bias；三个 loader 共享训练集拟合的范围。
+            x_min = float(np.nanmin(x[train_idx]))
+            x_max = float(np.nanmax(x[train_idx]))
+            if x_min < 0.0 or x_max > 1.0:
+                x = (x - x_min) / (x_max - x_min + 1e-8)
+            x = np.clip(x, 0.0, 1.0).astype(np.float32, copy=False)
         x_tensor = torch.tensor(x, dtype=torch.float32)
         batch_tensor = torch.tensor(batch_indices, dtype=torch.long)
         return (
