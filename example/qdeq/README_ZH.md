@@ -45,6 +45,10 @@ python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
 ```
 
+运行 `python example/qdeq/simple/simple_forecast_example.py --persistence`
+可在相同测试窗口评估持久性基线。该基线在每个预测步重复各变量的最后一个
+观测值，无需训练权重或采样器。
+
 `--sampler` 可选：
 
 - `sa`：Kaiwu 模拟退火（`kaiwu.classical.SimulatedAnnealingOptimizer`），本地运行
