@@ -219,7 +219,9 @@ class DEQForecaster(nn.Module):
         # Normalise each window per variable, embed each variable's series as
         # one token, solve the equilibrium over tokens and project to the horizon.
         mean = history.mean(dim=1, keepdim=True)
-        std = history.std(dim=1, keepdim=True) + 1e-5
+        # A one-point window has zero variation and no sample variance.
+        correction = 0 if history.size(1) == 1 else 1
+        std = history.std(dim=1, keepdim=True, correction=correction) + 1e-5
         tokens = self.embed(((history - mean) / std).transpose(1, 2))
         forecast = self.head(self.deq(tokens)).transpose(1, 2)
         return forecast * std + mean
