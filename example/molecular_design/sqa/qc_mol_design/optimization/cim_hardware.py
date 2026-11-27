@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import os
 import time
@@ -9,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 from .spin_encoding import physical_matrix, logical_spins
+from kaiwu.torch_plugin._kaiwu_compat import qubo_matrix_to_ising_matrix
 
 LAST_CALL = {}
 _LICENSE_READY = False
@@ -30,10 +32,16 @@ def initialize_license():
     private = Path(os.environ["KAIWU_CREDENTIALS_FILE"])
     credentials = json.loads(private.read_text())
     import kaiwu.license._license_utils as license_utils
-    import kaiwu.cim._optimizer_adapter as adapter
+    try:
+        import kaiwu.cim._optimizer_adapter as adapter
+    except ImportError:
+        # Kaiwu 1.4.x no longer ships this private adapter; the shared
+        # license-utils path is the one the compiled optimizer reads.
+        adapter = None
     license_path = private.with_name("cim_license.lic")
     license_utils.LICENSE_FILE_PATH = str(license_path)
-    adapter.LICENSE_FILE_PATH = str(license_path)
+    if adapter is not None:
+        adapter.LICENSE_FILE_PATH = str(license_path)
     try:
         payload, code = license_utils._read_license()
         matches = (str(payload["user_id"]) == str(credentials["user_id"])
@@ -94,10 +102,7 @@ def solve_hardware(Q, num_reads=50, prepared=None, context_override=None, return
     Q = np.ascontiguousarray(Q, dtype=np.float64)
     if Q.ndim != 2 or Q.shape[0] != Q.shape[1] or not np.isfinite(Q).all():
         raise ValueError("QUBO must be finite and square")
-    converter = getattr(kw.qubo, "qubo_matrix_to_ising_matrix", None)
-    if converter is None:
-        converter = kw.core.qubo_matrix_to_ising_matrix
-    ising, offset = converter(Q)
+    ising, offset = qubo_matrix_to_ising_matrix(Q)
     if prepared is None:
         submitted, precision = quantize_ising(ising, bits)
     else:
@@ -184,11 +189,16 @@ def solve_hardware(Q, num_reads=50, prepared=None, context_override=None, return
             raw = np.load(raw_path, allow_pickle=False)
             cached = True
         else:
-            optimizer = ObservedCIM(
+            cim_kwargs = dict(
                 task_name=task_name, project_no=project, task_mode=mode,
-                sample_number=num_reads, sample_sort_mode=2,
-                wait=False, interval=10,
+                sample_number=num_reads, wait=False, interval=10,
             )
+            # Kaiwu 1.4.x dropped the sample_sort_mode constructor option.
+            if "sample_sort_mode" in inspect.signature(
+                kw.cim.CIMOptimizer.__init__
+            ).parameters:
+                cim_kwargs["sample_sort_mode"] = 2
+            optimizer = ObservedCIM(**cim_kwargs)
             deadline = time.monotonic() + float(os.environ.get("KAIWU_CIM_TIMEOUT", "86400"))
             network_failures = 0
             while True:
