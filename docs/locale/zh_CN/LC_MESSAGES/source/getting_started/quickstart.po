@@ -345,13 +345,9 @@ msgstr ""
 "**KPP GitHub：** [https://github.com/QBoson/Kaiwu-pytorch-"
 "plugin](https://github.com/QBoson/Kaiwu-pytorch-plugin)"
 
-#: ../../source/getting_started/quickstart.md:245
-msgid ""
-"**KPP Docs:** [https://kaiwu-pytorch-plugin-"
-"docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
-msgstr ""
-"**KPP 文档：** [https://kaiwu-pytorch-plugin-"
-"docs.readthedocs.io](https://kaiwu-pytorch-plugin-docs.readthedocs.io/)"
+#: ../../source/getting_started/quickstart.md:246
+msgid "**KPP Docs:** [Documentation home](../../index.md)"
+msgstr "**KPP 文档：** [文档首页](../../index.md)"
 
 #: ../../source/getting_started/quickstart.md:246
 msgid ""
