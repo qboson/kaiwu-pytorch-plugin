@@ -231,13 +231,16 @@ class Trainer:
                 # 计算 KL 散度项
                 kl_divergence = self.bm_net.objective(combined_v, state_all)
 
-                # 计算 NCL (Non-Contrastive Loss) 类似项
-                # 保持原逻辑：将输出部分置零后计算 objective
-                v_ncl = combined_v.clone()
-                vi_ncl = combined_vi.clone()
-                v_ncl[:, -self.num_output :] = 0.0
-                vi_ncl[:, -self.num_output :] = 0.0
-                ncl = self.bm_net.objective(v_ncl, vi_ncl)
+                # 输出位于可见节点末尾，后面还有隐藏节点。
+                if self.num_output:
+                    output_columns = slice(
+                        self.num_visible - self.num_output, self.num_visible
+                    )
+                    v_ncl = combined_v.clone()
+                    vi_ncl = combined_vi.clone()
+                    v_ncl[:, output_columns] = 0.0
+                    vi_ncl[:, output_columns] = 0.0
+                    ncl = self.bm_net.objective(v_ncl, vi_ncl)
 
                 # 组合目标函数
                 obj = (
