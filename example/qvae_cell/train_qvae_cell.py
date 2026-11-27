@@ -33,6 +33,7 @@ def parse_args():
     )
     parser.add_argument("--dataset", default="immune", choices=sorted(DATASET_PARAMS))
     parser.add_argument("--data-path", default=None)
+    parser.add_argument("--input-layer", help="Use this AnnData layer as the expression matrix")
     parser.add_argument("--output-dir", default="./outputs_immune_sa")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--seed", type=int, default=42)
@@ -95,6 +96,10 @@ def main():
     print(f"Dataset '{args.dataset}': {adata.n_obs} cells, {adata.n_vars} features")
 
     x = trainer.adata_to_array(adata)
+    adata.uns["qvae_input"] = (
+        {"matrix": "X"} if args.input_layer is None
+        else {"matrix": "layers", "layer": args.input_layer}
+    )
     batch_indices = trainer.batch_indices(adata, params["batch_key"])
     train_loader, val_loader, eval_loader = trainer.make_loaders(x, batch_indices)
     # 模型维度依赖输入基因数和 batch 类别数，因此在数据加载后创建。
