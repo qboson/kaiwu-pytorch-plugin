@@ -24,7 +24,7 @@ The process of coarse-graining is repeated iteratively:
 This defines a **flow** in the space of Hamiltonians.
 
 ## Fixed Points and Universality
-As the RG flow is iterated, the parameters $(J, h, \ldots)$ move through the parameter space. The system may eventually reach a **fixed point**– a point where further coarse-graining leaves the Hamiltonian unchanged. Fixed points correspond to **critical points** of the system, where the correlation length diverges and the system becomes scale-invariant.
+As the RG flow is iterated, the parameters $(J, h, \ldots)$ move through the parameter space. The system may eventually reach a **fixed point** – a point where further coarse-graining leaves the Hamiltonian unchanged. A **nontrivial** fixed point, where the correlation length diverges and the system becomes scale-invariant, corresponds to a **critical point**. The flow also has trivial fixed points: the infinite-temperature fixed point describes the disordered phase (zero correlation length), while the zero-temperature fixed point describes the ordered phase. These trivial fixed points are not critical points, although they still organize the phase diagram.
 
 The profound consequence is **universality**: many different microscopic systems (different metals, different liquids) flow to the same fixed point. This is why we can compute properties of a liquid without knowing every detail of the molecules – the relevant physics at the macroscopic scale is determined by the fixed point, not by the microscopic details.
 
@@ -48,7 +48,7 @@ To fully appreciate the RG analogy, we must distinguish between **extensive** an
 - **Extensive variables** (e.g., volume $V$, energy $E$, entropy $S$, number of particles $N$) scale with the size of the system.
 - **Intensive variables** (e.g., temperature $T$, pressure $p$, chemical potential $\mu$) are independent of system size.
 
-In the RG flow, the coarse-graining operation reduces the effective number of degrees of freedom—the "system size" decreases. Intensive variables like temperature and pressure remain invariant under scaling, while extensive variables like energy and entropy scale linearly with the number of effective spins.
+In the RG flow, coarse-graining reduces the effective number of degrees of freedom, so the system size decreases. Thermodynamic extensive variables such as energy and entropy are defined to scale with that size. Temperature and pressure are intensive in the thermodynamic sense: they do not scale with system size at fixed density. They are not frozen under RG, however: the effective temperature and couplings generally flow with the scale, and only the dimensionless couplings at a fixed point stop changing.
 
 This distinction is mirrored in deep learning: high-level representations are **intensive**—they capture invariant features of the data (e.g., "catness") that are independent of the input's spatial resolution or pixel count—while lower-level features are **extensive**, requiring more units to represent fine-grained details.
 
