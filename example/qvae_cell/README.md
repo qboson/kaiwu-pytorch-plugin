@@ -76,6 +76,11 @@ python train_qvae_cell.py \
   --output-dir ./outputs_custom
 ```
 
+Use `--load-weights` with the matching model arguments, dataset and output directory
+to export representations and energies from `immune_kpp_qvae_best.pth`. This mode
+runs on the requested PyTorch device without creating a sampler or requiring a CIM
+license.
+
 ## Outputs
 
 The training script will generate the following files under `--output-dir`:

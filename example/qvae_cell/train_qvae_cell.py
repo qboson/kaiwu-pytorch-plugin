@@ -99,7 +99,7 @@ def main():
     train_loader, val_loader, eval_loader = trainer.make_loaders(x, batch_indices)
     # 模型维度依赖输入基因数和 batch 类别数，因此在数据加载后创建。
     model, vae_optimizer, bm_optimizer = trainer.create_model(
-        adata.n_vars, train_loader
+        adata.n_vars, train_loader, inference=args.load_weights
     )
 
     weights_path = os.path.join(args.output_dir, f"{args.dataset}_kpp_qvae_best.pth")
