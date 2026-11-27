@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Sequence
 from math import ceil
 
 import numpy as np
@@ -49,6 +49,8 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: Optional number of epochs between mask updates.
         input_feature_axis: Axis that contains the selectable features.
         solver_kwargs: Optional keyword arguments passed to the solver.
+        feature_costs: Optional nonnegative cost for selecting each feature.
+            These costs are added to the uniform ``lambda_reg`` penalty.
 
     Returns:
         FeatureSelectionWrapper: Initialized PyTorch feature-selection wrapper.
@@ -92,6 +94,8 @@ class FeatureSelectionWrapper(nn.Module):
         mask_update_epochs: int | None = None,
         input_feature_axis: int = -1,
         solver_kwargs: dict[str, object] | None = None,
+        *,
+        feature_costs: Sequence[float] | np.ndarray | None = None,
     ) -> None:
 
         super().__init__()
@@ -111,6 +115,14 @@ class FeatureSelectionWrapper(nn.Module):
         self.model = model
         self.feature_dim = feature_dim
         self.lambda_reg = float(lambda_reg)
+        self.feature_costs = None
+        if feature_costs is not None:
+            costs = np.asarray(feature_costs, dtype=float)
+            if costs.shape != (feature_dim,) or not np.all(np.isfinite(costs) & (costs >= 0)):
+                raise ValueError(
+                    "feature_costs must contain one finite nonnegative cost per feature"
+                )
+            self.feature_costs = costs.copy()
         self.cardinality_k = cardinality_k
         self.min_selected_features = min_selected_features
         self.max_selected_features = max_selected_features
@@ -382,6 +394,8 @@ class FeatureSelectionWrapper(nn.Module):
             - quadratic_matrix @ current_mask
             + self.lambda_reg
         )
+        if self.feature_costs is not None:
+            linear_vector += self.feature_costs
         if self.cardinality_k is not None:
             quadratic_matrix += (
                 2.0 * _CARDINALITY_PENALTY * np.ones_like(quadratic_matrix)
