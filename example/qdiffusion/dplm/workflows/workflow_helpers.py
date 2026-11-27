@@ -269,6 +269,18 @@ def run_generation_over_records(
     return generated_records, rows
 
 
+def _markdown_table_cell(value: object) -> str:
+    """Keep literal report text inside one Markdown table cell."""
+    return (
+        str(value)
+        .replace("\\", "\\\\")
+        .replace("|", "\\|")
+        .replace("\r\n", " ")
+        .replace("\r", " ")
+        .replace("\n", " ")
+    )
+
+
 def write_markdown_report(
     path: Path,
     *,
@@ -300,11 +312,11 @@ def write_markdown_report(
         "",
         "| Item | Value |",
         "|---|---|",
-        f"| header | {validation_summary['header']} |",
+        f"| header | {_markdown_table_cell(validation_summary['header'])} |",
         f"| raw_length | {validation_summary['raw_length']} |",
         f"| token_length | {validation_summary['token_length']} |",
         f"| generated_length | {validation_summary['generated_length']} |",
-        f"| objective_summary | {validation_summary['objective_summary']} |",
+        f"| objective_summary | {_markdown_table_cell(validation_summary['objective_summary'])} |",
         "",
         "## 3. Training History",
         "",
@@ -343,7 +355,10 @@ def write_markdown_report(
         "",
         "| Item | Value |",
         "|---|---|",
-        f"| best_checkpoint | {best_checkpoint_path if best_checkpoint_path is not None else 'N/A'} |",
+        "| best_checkpoint | "
+        f"""{_markdown_table_cell(
+            best_checkpoint_path if best_checkpoint_path is not None else 'N/A'
+        )} |""",
         f"| train_num_candidates | {config.train.num_candidates} |",
         f"| guided_num_candidates | {config.generate.num_candidates} |",
         f"| generation_steps | {config.generate.steps} |",
