@@ -16,6 +16,7 @@ from etth1_common import (
     DEFAULT_CHECKPOINT,
     DEFAULT_DATA_PATH,
     DEQForecaster,
+    ETTh1Scaling,
     build_config,
     build_loaders,
     build_sampler,
@@ -36,10 +37,13 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     """Runs the example."""
     args = parse_args()
-    loaders = build_loaders(args.data_path)
+    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
+    saved_scaling = checkpoint.get("scaling")
+    scaling = ETTh1Scaling(**saved_scaling) if saved_scaling is not None else None
+    loaders = build_loaders(args.data_path, scaling=scaling)
     sampler = build_sampler(args.sampler, args.seed)
     model = DEQForecaster(96, 96, sampler, build_config())
-    model.load_state_dict(torch.load(args.checkpoint)["state_dict"])
+    model.load_state_dict(checkpoint["state_dict"])
 
     test = evaluate(model, loaders["test"])
     print(
@@ -49,9 +53,12 @@ def main() -> None:
     history, target = next(iter(loaders["test"]))
     with torch.no_grad():
         forecast = model(history[:1])
-    print("first test window, variable OT, next 8 hours (scaled):")
-    print("  forecast", [round(v, 3) for v in forecast[0, :8, -1].tolist()])
-    print("  actual  ", [round(v, 3) for v in target[0, :8, -1].tolist()])
+    columns = loaders["test"].dataset.scaling.columns
+    column = "OT" if "OT" in columns else columns[-1]
+    index = columns.index(column)
+    print(f"first test window, variable {column}, next 8 hours (scaled):")
+    print("  forecast", [round(v, 3) for v in forecast[0, :8, index].tolist()])
+    print("  actual  ", [round(v, 3) for v in target[0, :8, index].tolist()])
 
 
 if __name__ == "__main__":

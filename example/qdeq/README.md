@@ -71,6 +71,10 @@ python example/qdeq/simple/simple_forecast_example.py --sampler sa
 - `simple/simple_train_example.py`: trains and saves a checkpoint
 - `simple/simple_forecast_example.py`: loads the checkpoint and evaluates the test split with the chosen solver
 
+New checkpoints store the training column order, means and standard deviations.
+Forecasts use these statistics even when the CSV columns are reordered. Older
+checkpoints compute scaling from the training rows in the supplied CSV.
+
 The model follows iTransformer: the history of each variable is embedded as one
 token and the encoder is one `QDEQ` layer around a weight-tied
 variable-attention block. To finish within minutes, training windows are taken
