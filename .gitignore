@@ -181,3 +181,5 @@ example/qvae_cell/output*/
 example/qdiffusion/graph/
 *.h5ad
 article.md
+# Kaiwu SDK authorization file generated on first use
+license.lic
