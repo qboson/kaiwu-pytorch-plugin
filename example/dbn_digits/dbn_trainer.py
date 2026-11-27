@@ -107,7 +107,7 @@ class DBNTrainer:
         input_data = data_in.astype(np.float32)
 
         # Create RBM layers if they don't exist
-        if dbn.num_layers == 0:
+        if dbn.rbm_layers is None or dbn.num_layers == 0:
             dbn.create_rbm_layer(data_in.shape[1])
 
         for idx in range(dbn.num_layers):  # Use num_layers and get_rbm_layer
