@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+# Modified: validate dataset names and subset counts before accessing data.
 """
 MNIST Data Loader
 """
+import operator
 import torch
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
@@ -25,9 +27,11 @@ def loadMNIST(
         name: dataset name ('mnist', 'fashion-mnist', 'kmnist')
         data_path: path to store/load MNIST data
         batch_size: batch size for data loaders
-        num_evts_train: number of training samples to use
-        num_evts_test: number of test samples to use  
+        num_evts_train: positive integer count of training samples to use
+        num_evts_test: positive integer count of test samples to use
         use_cuda: whether to use CUDA (affects DataLoader settings)
+
+    Counts above the available dataset size use all samples.
     
     Returns:
         train_loader, test_loader: PyTorch DataLoader objects
@@ -40,7 +44,21 @@ def loadMNIST(
     }
 
     # Select dataset class
+    if name not in dataset_map:
+        choices = ", ".join(sorted(dataset_map))
+        raise ValueError(f"Unsupported dataset {name!r}. Choose from: {choices}")
     dataset_class = dataset_map[name]
+
+    for parameter, count in (
+        ("num_evts_train", num_evts_train),
+        ("num_evts_test", num_evts_test),
+    ):
+        try:
+            positive_count = operator.index(count) > 0
+        except TypeError:
+            positive_count = False
+        if not positive_count:
+            raise ValueError(f"{parameter} must be a positive integer")
 
     # Define transform to normalize data
     transform = transforms.Compose([
