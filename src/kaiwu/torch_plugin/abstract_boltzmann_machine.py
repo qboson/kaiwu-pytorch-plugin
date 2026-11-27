@@ -81,14 +81,19 @@ class AbstractBoltzmannMachine(torch.nn.Module):
         s_positive: torch.Tensor,
         s_negative: torch.Tensor,
     ) -> torch.Tensor:
-        """Objective function whose gradient is equivalent to the gradient of
-        negative log-likelihood.
+        """Compute the difference between positive- and negative-phase mean energies.
+
+        With the supplied states held fixed, the model-parameter gradient
+        estimates the negative log-likelihood gradient when the positive
+        states follow the data-conditioned distribution and the negative
+        states follow the model distribution.
 
         Args:
-            s_positive (torch.Tensor): Tensor of observed spins (data), shape (b1, N),
-                            where b1 is batch size and N is the number of variables.
-            s_negative (torch.Tensor): Tensor of spins sampled from the model, shape (b2, N),
-                            where b2 is batch size and N is the number of variables.
+            s_positive (torch.Tensor): Full states with observed units clamped
+                to data and hidden units drawn conditionally. Shape
+                (positive_batch_size, num_units).
+            s_negative (torch.Tensor): Full states drawn from the model
+                without clamping. Shape (negative_batch_size, num_units).
 
         Returns:
             torch.Tensor: Scalar difference between data and model average energy.
