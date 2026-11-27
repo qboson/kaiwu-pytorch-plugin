@@ -8,13 +8,17 @@ on:
         default: default
   workflow_dispatch:
     inputs:
+      run_licensed_tests:
+        description: Run real SDK tests with repository secrets on the EP branch
+        type: boolean
+        default: false
       scope:
         description: Run the baseline or full compatibility matrix
         type: choice
         options: [default, all]
         default: default
   push:
-    branches: [main, develop, kaiwu-sdk-compat, python-dependency-compat]
+    branches: [main, develop, kaiwu-sdk-compat, python-dependency-compat, feat/ep-energy-qubo]
   pull_request:
     branches: [main]
 
@@ -46,18 +50,34 @@ jobs:
     name: ${{ matrix.id }}
     needs: matrix
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
         include: ${{ fromJSON(needs.matrix.outputs.include) }}
     env:
       REPORT_COVERAGE: ${{ github.event_name != 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/') && matrix.runner == 'ubuntu-24.04' && 'true' || 'false' }}
+      # Fork PRs have no secrets. A push to the reviewed EP branch runs all tests
+      # in the fork, on the exact head SHA, with its own license credentials.
+      KAIWU_REQUIRE_LICENSE: ${{ github.ref == 'refs/heads/feat/ep-energy-qubo' && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.run_licensed_tests)) && '1' || '0' }}
+      RUN_MNIST_EXAMPLE: ${{ matrix.lint && matrix.python == '3.10' && matrix.kaiwu == '1.4.4' && matrix.torch == '2.7.0' && matrix.runner == 'ubuntu-24.04' && '1' || '0' }}
     defaults:
       run:
         shell: bash
 
     steps:
       - uses: actions/checkout@v7
+
+      - name: Check required license secrets
+        if: env.KAIWU_REQUIRE_LICENSE == '1'
+        env:
+          KAIWU_USER_ID: ${{ secrets.KAIWU_USER_ID }}
+          KAIWU_SDK_CODE: ${{ secrets.KAIWU_SDK_CODE }}
+        run: |
+          if [[ -z "$KAIWU_USER_ID" || -z "$KAIWU_SDK_CODE" ]]; then
+            echo '::error::Licensed CI requires KAIWU_USER_ID and KAIWU_SDK_CODE in this repository Actions secrets.'
+            exit 1
+          fi
 
       - uses: actions/setup-python@v7
         with:
@@ -80,6 +100,10 @@ jobs:
           python -m pip install . "numpy==$NUMPY_VERSION" "kaiwu==$KAIWU_VERSION" "scipy==$SCIPY_VERSION" \
             scikit-learn==1.7.2 seaborn==0.13.2 tqdm==4.67.1 \
             pytest==9.1.1 pytest-cov==7.1.0 pip-licenses==5.5.0
+          if [[ "$RUN_MNIST_EXAMPLE" == '1' ]]; then
+            python -m pip install 'torchvision==0.22.0' --index-url https://download.pytorch.org/whl/cpu
+            python -m pip install -r example/ep_mnist/requirements.txt
+          fi
           python -m pip check
           python -I - <<'PY'
           import os
@@ -92,6 +116,10 @@ jobs:
           assert Path(plugin.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
           for package in ("kaiwu", "numpy", "torch"):
               assert version(package).split("+", 1)[0] == os.environ[f"{package.upper()}_VERSION"]
+          if os.environ["RUN_MNIST_EXAMPLE"] == "1":
+              import torchvision
+              assert torchvision.__version__.split("+", 1)[0] == "0.22.0"
+              assert not __import__("torch").cuda.is_available()
           PY
 
       - name: Check dependency licenses
@@ -113,14 +141,63 @@ jobs:
           python -m pip install "$(grep '^pylint==' requirements/devel.txt)"
           python -m pylint src/
 
-      - name: Test with pytest
+      - name: Record test environment
         run: |
-          args=(tests/ -v)
+          mkdir -p test-results
+          python -I - <<'PY'
+          import json
+          import os
+          import platform
+          from importlib.metadata import PackageNotFoundError, version
+          from pathlib import Path
+          report = {
+              "sha": os.environ["GITHUB_SHA"],
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "event": os.environ["GITHUB_EVENT_NAME"],
+              "python": platform.python_version(),
+              "licensed": os.environ["KAIWU_REQUIRE_LICENSE"] == "1",
+              "mnist_required": os.environ["RUN_MNIST_EXAMPLE"] == "1",
+          }
+          for name in ("kaiwu", "numpy", "torch", "torchvision", "pytest"):
+              try:
+                  report[name] = version(name)
+              except PackageNotFoundError:
+                  report[name] = None
+          Path("test-results/environment.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+          PY
+
+      - name: Test with pytest
+        id: pytest
+        env:
+          KAIWU_USER_ID: ${{ env.KAIWU_REQUIRE_LICENSE == '1' && secrets.KAIWU_USER_ID || '' }}
+          KAIWU_SDK_CODE: ${{ env.KAIWU_REQUIRE_LICENSE == '1' && secrets.KAIWU_SDK_CODE || '' }}
+        run: |
+          args=(tests/ -v -rs --tb=short --strict-markers --junitxml=test-results/tests.xml)
+          if [[ "$KAIWU_REQUIRE_LICENSE" != '1' ]]; then
+            args+=(-m 'not kaiwu_license')
+            echo 'Real SDK tests are delegated to the licensed fork CI for the PR head SHA.'
+          fi
           if [[ "$REPORT_COVERAGE" == 'true' ]]; then
             installed=$(python -I -c 'from importlib.metadata import distribution; print(distribution("kaiwu-torch-plugin").locate_file("kaiwu/torch_plugin"))')
             args+=(--cov=src --cov="$installed" --cov-report=term --cov-report=xml)
           fi
           python -I -m pytest "${args[@]}"
+
+      - name: Verify required test results
+        if: always() && steps.pytest.outcome != 'skipped'
+        run: |
+          args=(test-results/tests.xml)
+          if [[ "$KAIWU_REQUIRE_LICENSE" == '1' ]]; then args+=(--licensed); fi
+          if [[ "$RUN_MNIST_EXAMPLE" == '1' ]]; then args+=(--mnist); fi
+          python .github/scripts/check_ci_results.py "${args[@]}"
+
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.id }}
+          path: test-results/
+          retention-days: 14
 
       - name: Upload coverage to Codecov
         if: env.REPORT_COVERAGE == 'true'

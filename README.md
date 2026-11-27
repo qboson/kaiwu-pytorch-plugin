@@ -455,3 +455,9 @@ If you are interested in this work, please check out our paper:
 
 
 
+
+## Equilibrium propagation on MNIST
+
+The completed three-epoch, single-seed full-MNIST run reaches **90.30%** test accuracy (BP comparison: **96.20%**). See the [EP example](example/ep_mnist/README.md) for configuration, reproducible commands, training curves and limitations.
+
+![EP and BP training curves](docs/_static/ep-mnist/training_curves.png)

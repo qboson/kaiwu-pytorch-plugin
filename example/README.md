@@ -33,6 +33,22 @@ simulated annealing, CIM or the Anderson baseline. See
 pandas
 ```
 
+### Equilibrium Propagation
+
+`example/ep_mnist/` trains a 784-128-10 equilibrium-propagation network on the
+full original MNIST, with a convolutional variant whose first layer is an
+`EPConv2d`. Every unit is a ±1 spin, and the model's Ising matrix is relaxed by
+Kaiwu simulated annealing. For a quick check, use `--limit-train 20
+--limit-eval 20` with a separate `--output-dir`. See
+[example/ep_mnist/README.md](ep_mnist/README.md) for commands, results, and run
+time.
+
+**Dependencies**
+
+```
+torchvision
+```
+
 ---
 
 ### Classification Task: Handwritten Digit Recognition

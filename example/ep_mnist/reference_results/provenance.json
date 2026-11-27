@@ -1,0 +1,44 @@
+{
+  "archive_commit": "e108eb347fd70ed40652a20f22ae3ded951437d6",
+  "note": "Historical single-seed runs, not rerun after cleanup. CPU uses train_mnist_cpu_full.py and device_timing_cpu_full.py; CUDA EP and CPU BP use gpu_run_device.py and train_mnist_before_device.py. Executed source hashes are linked below.",
+  "files": {
+    "ep-full-cpu/summary.json": {
+      "sha256": "c6f951b0070f191be6e737a3441e9d0e2f33d27c6c74b9415ce4df2aa182e35b",
+      "original_url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/device_runs/ep-full-cpu/summary.json"
+    },
+    "ep-full-cpu/device_report.json": {
+      "sha256": "dd97e463c8afafad767ef18ae48911560b5baf2d6a106051d17b68ca15e05aaf",
+      "original_url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/device_runs/ep-full-cpu/device_report.json"
+    },
+    "ep-full-cuda/summary.json": {
+      "sha256": "3271af3e718ae156b07bd7365da84ac47f56a88876d619eb47257efc5366385e",
+      "original_url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/device_runs/ep-full-cuda/summary.json"
+    },
+    "ep-full-cuda/device_report.json": {
+      "sha256": "a6e7d9bbf0e888f4d1d68ecb29079f03524b040d6f2d9af1b1be7c75f848b52f",
+      "original_url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/device_runs/ep-full-cuda/device_report.json"
+    },
+    "bp-full-cpu/summary.json": {
+      "sha256": "c4140389298006315cfd9649072e29ce09ce4d07fdc47a3decb2105debcd0ef7",
+      "original_url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/device_runs/bp-full-cpu/summary.json"
+    }
+  },
+  "executed_sources": {
+    "gpu_run_device.py": {
+      "sha256": "7997885f36f13aed064e2eef28712aed5284e673f5f43f29d4b6308b1214b520",
+      "url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/source_snapshots/gpu_run_device.py"
+    },
+    "train_mnist_before_device.py": {
+      "sha256": "efbd6c159096a6e018b683d78d214ce9f45453d9a051547d4382d86da805317b",
+      "url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/source_snapshots/train_mnist_before_device.py"
+    },
+    "train_mnist_cpu_full.py": {
+      "sha256": "79cc44d0c5edb75bc5ca0b26eddcbfd773250fd87bb18c8e61feb9945e3f468d",
+      "url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/source_snapshots/train_mnist_cpu_full.py"
+    },
+    "device_timing_cpu_full.py": {
+      "sha256": "e470f53e57e01ccaba4e12e3b4d51607c4159684e56f9b1efca86bdbccfccb7e",
+      "url": "https://github.com/yuke2027/kaiwu-pytorch-plugin/blob/e108eb347fd70ed40652a20f22ae3ded951437d6/example/ep_mnist/closeout/source_snapshots/device_timing_cpu_full.py"
+    }
+  }
+}

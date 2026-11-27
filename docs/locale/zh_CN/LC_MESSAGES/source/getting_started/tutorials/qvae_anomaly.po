@@ -260,8 +260,11 @@ msgstr "3\\. 阈值搜索与评估"
 #: ../../source/getting_started/tutorials/qvae_anomaly.md:117
 msgid ""
 "The `optimize_threshold_rbm` function implements best-F1 threshold search "
-"over a candidate grid:"
-msgstr "`optimize_threshold_rbm` 函数在候选网格上实现最佳 F1 阈值搜索："
+"over a candidate grid."
+msgstr "`optimize_threshold_rbm` 函数在候选网格上实现最佳 F1 阈值搜索。"
+
+msgid "The `example/qvae_anomaly/` implementation is not included in this repository revision. The commands, filenames and model descriptions below describe the reference workflow and cannot be run from this checkout. For a runnable Q-VAE example, use the [Q-VAE MNIST tutorial](qvae_mnist.md)."
+msgstr "当前仓库版本未包含 `example/qvae_anomaly/` 的实现。下文中的命令、文件名和模型说明用于描述参考流程，无法在当前工作副本中直接运行。如需可运行的 Q-VAE 示例，请参阅 [Q-VAE MNIST 教程](qvae_mnist.md)。"
 
 #: ../../source/getting_started/tutorials/qvae_anomaly.md:124
 msgid "Training and Evaluation"

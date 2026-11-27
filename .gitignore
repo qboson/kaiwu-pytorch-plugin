@@ -177,6 +177,9 @@ data
 tmp*
 example/rbm_digits/results/
 example/dbn_digits/results/
+example/ep_digits/results/
+example/ep_mnist/results/
+/runs/
 example/qvae_cell/output*/
 example/qdiffusion/graph/
 *.h5ad

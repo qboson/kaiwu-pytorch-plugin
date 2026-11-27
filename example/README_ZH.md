@@ -141,3 +141,13 @@ scgraph
 ```
 pandas
 ```
+
+### 均衡传播：MNIST 分类
+
+`example/ep_mnist/` 在完整的原版 MNIST 上训练 784-128-10 的均衡传播网络，并提供把第一层换成 `EPConv2d` 的卷积版本。每个单元都是 ±1 自旋，模型给出的 Ising 矩阵由 Kaiwu 模拟退火求解。快速验证可使用 `--limit-train 20 --limit-eval 20`，并用 `--output-dir` 指定独立输出目录。命令、结果和耗时见 [example/ep_mnist/README_ZH.md](ep_mnist/README_ZH.md)。
+
+**依赖项**
+
+```
+torchvision
+```

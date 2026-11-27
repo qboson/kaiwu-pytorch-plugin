@@ -2,6 +2,7 @@
 """Kaiwu-PyTorch-Plugin public API."""
 
 from .dbn import UnsupervisedDBN
+from .equilibrium_propagation import EPConv2d, EPLinear, EquilibriumPropagation
 from .full_boltzmann_machine import BoltzmannMachine
 from .maifs import FeatureSelectionWrapper, QuadraticLinearSolver
 from .qdeq import QDEQ, QDEQConfig
@@ -25,6 +26,9 @@ __all__ = [
     "UnsupervisedDBN",
     "QDEQ",
     "QDEQConfig",
+    "EquilibriumPropagation",
+    "EPLinear",
+    "EPConv2d",
     "QDiffusion",
     "QDiffusionConfig",
     "FeatureSelectionWrapper",

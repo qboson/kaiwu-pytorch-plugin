@@ -1,0 +1,7 @@
+msgid ""
+msgstr ""
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Equilibrium propagation on MNIST"
+msgstr "MNIST 均衡传播"

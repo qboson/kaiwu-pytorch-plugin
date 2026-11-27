@@ -13,6 +13,10 @@ By the end of this case study you will be able to:
 
 ## Running the Example
 
+```{note}
+The `example/qvae_anomaly/` implementation is not included in this repository revision. The commands, filenames and model descriptions below describe the reference workflow and cannot be run from this checkout. For a runnable Q-VAE example, use the [Q-VAE MNIST tutorial](qvae_mnist.md).
+```
+
 **Dependencies**:
 
 ```{code-block} bash
@@ -86,10 +90,6 @@ The result is the anomaly-detection report: a clear low/high free-energy separat
 The `CleanEnergyQVAE` model combines a standard Q-VAE with an RBM free-energy
 scoring head:
 
-```{literalinclude} ../../../../example/qvae_anomaly/model/model.py
-:pyobject: CleanEnergyQVAE
-```
-
 Key model details:
 - Encoder/Decoder: `CleanEncoder` / `CleanDecoder` — standard Q-VAE architecture
 - Free-energy head: RBM on latent space for anomaly scoring
@@ -101,10 +101,6 @@ Key model details:
 The `losses.py` implements energy-supervised loss to separate normal from
 anomalous samples:
 
-```{literalinclude} ../../../../example/qvae_anomaly/model/losses.py
-:pyobject: _compose_energy_supervised_qvae_loss_terms
-```
-
 Key loss details:
 - Normal samples: pulled toward QBM prior (low free energy)
 - Anomalies: pushed away from QBM prior (high free energy)
@@ -113,11 +109,7 @@ Key loss details:
 ### 3. Threshold Search and Evaluation
 
 The `optimize_threshold_rbm` function implements best-F1 threshold search
-over a candidate grid:
-
-```{literalinclude} ../../../../example/qvae_anomaly/utils/evaluate.py
-:pyobject: optimize_threshold_rbm
-```
+over a candidate grid.
 
 ## Training and Evaluation
 
