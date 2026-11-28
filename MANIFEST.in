@@ -4,6 +4,8 @@ include CHANGELOG.md
 include CONTRIBUTING.md
 include requirements/requirements.txt
 include requirements/devel.txt
+include requirements/requirements_example.txt
+include example/qdiffusion/requirements.txt
 include pyproject.toml
 include pytest.ini
 include pylintrc
@@ -15,4 +17,4 @@ recursive-include example *.py *.ipynb
 global-exclude *.pyc
 global-exclude __pycache__
 global-exclude .DS_Store
-global-exclude *.egg-info 
+global-exclude *.egg-info

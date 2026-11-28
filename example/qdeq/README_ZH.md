@@ -36,10 +36,11 @@ example/qdeq/data/ETTh1.csv
 
 ## 快速开始
 
-安装 Kaiwu SDK 后，可先用 Anderson 对照组在 CPU 上完成训练和预测，无需激活许可证。
+请在仓库根目录运行以下命令。如果已安装与示例兼容的 KPP，可以跳过第一条命令。
 
+安装 Kaiwu SDK 后，可先用 Anderson 对照组在 CPU 上完成训练和预测，无需激活许可证。
 ```bash
-pip install -e .        # 在仓库根目录安装插件
+python -m pip install .
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler anderson
 python example/qdeq/simple/simple_forecast_example.py --sampler anderson

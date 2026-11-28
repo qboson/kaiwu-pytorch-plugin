@@ -1,5 +1,9 @@
 **语言版本**：[中文](README_ZH.md) | [English](README.md)
 
+### 环境准备
+
+在仓库根目录运行 `python -m pip install .`，即可安装与这份示例配套的 KPP。如果已安装兼容版本，按各示例的说明补装额外依赖即可。
+
 ### BoltzmannMachine 与 RestrictedBoltzmannMachine 的使用示例
 
 * `run_bm.py`：演示如何使用 `BoltzmannMachine` 类进行模型实例化、采样、目标函数计算和参数优化。适用于理解玻尔兹曼机（Boltzmann Machine）的基本训练流程，包括采样和梯度反向传播。
@@ -71,7 +75,7 @@ scipy
 通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
 **依赖**
 ```
-kaiwu==1.3.0
+kaiwu
 pandas
 matplotlib
 ```
@@ -89,14 +93,7 @@ matplotlib
 
 请通过 `example/qvae_mnist/train_qvae.ipynb` 运行该示例。
 
-详细说明请参见 `example/qvae_mnist/README.md`。
-
-**依赖项**
-
-```
-torchvision==0.22.0
-torchmetrics[image]
-```
+安装步骤见 [MNIST 示例](qvae_mnist/README.md#dependencies)。
 
 ---
 
@@ -111,13 +108,7 @@ torchmetrics[image]
 
 请通过 `example/qvae_mnist/train_qvae_classifier.ipynb` 运行该示例。
 
-详细说明请参见 `example/qvae_mnist/README.md`。
-
-**依赖项**
-
-```
-torchvision==0.22.0
-```
+安装步骤见 [MNIST 示例](qvae_mnist/README.md#dependencies)。
 ---
 
 ### 表征学习：基于 QVAE 的单细胞数据

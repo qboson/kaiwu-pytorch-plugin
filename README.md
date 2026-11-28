@@ -1,4 +1,4 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
@@ -111,30 +111,27 @@ The diagram above shows the main code structure of the project:
 ## Quick Start
 
 ### Requirements
-- python == 3.10
-- kaiwu >= 1.3.1, <= 1.4.3
-- torch == 2.7.0
-- numpy == 2.2.6
 
-Kaiwu compatibility covers the published releases 1.3.1, 1.4.0, 1.4.1,
-1.4.2, and 1.4.3. The same model code handles the precision-reducer location
-change and translates CIM mode names (`quota` / `sample` and
-`optimization` / `sampling`, case-insensitive) for the installed SDK.
-The published SDK wheels in this range require Python 3.10.
+| Python | Kaiwu SDK | NumPy | PyTorch |
+| --- | --- | --- | --- |
+| 3.10 | 1.3.1–1.4.4 (excluding 1.4.2) | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
 
-SDK CI checks 1.3.1, 1.4.0, and 1.4.3 on Python 3.10, covering the interface
-change and the newest supported release. Run CI manually with
-`all-kaiwu-versions` enabled to include 1.4.1 and 1.4.2. These jobs test local
-solving and CIM construction without submitting cloud tasks. Use a regular
-`pip install .` for cross-SDK checks: SDK 1.3.1 uses a regular package whose
-namespace does not discover the plugin through an editable installation.
+These are the installation constraints. The dependencies' available wheels and
+their own constraints determine which versions can be installed together.
+See the [compatibility matrix](.github/compatibility-matrix.json) for the exact
+combinations exercised by CI and the [installation guide](docs/source/getting_started/installation.md)
+for details.
+
+See the [examples index](example/README.md) for example dependencies.
 
 ### Code Style
 
 - Follows PEP 8 standards
 
 ### Installation Steps
-You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
+Install KPP from PyPI for regular use. The Docker option provides a Jupyter environment.
 
 #### Option 1: Local Setup (conda/pip)
 1. **Create and activate an environment**:
@@ -144,22 +141,12 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    conda activate quantum_env
    ```
 
-2. **Clone this repository locally**:
+2. **Install KPP from PyPI**
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
+   python -m pip install kaiwu-torch-plugin
    ```
 
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements/requirements.txt
-   ```
-   Kaiwu SDK 1.3.1 through 1.4.3 is supported; install a specific version with `pip install "kaiwu==1.3.1" .`.
-
-4. **Install the plugin**:
-   ```bash
-   pip install .
-   ```
+   Pip installs a compatible Kaiwu SDK. Python 3.12 and 3.14 require KPP 0.4.0 or later.
 
 #### Option 2: Docker Setup (no local environment required)
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
@@ -169,14 +156,13 @@ Project structure required:
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
 
 1. **Clone the repository:**:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
@@ -201,11 +187,11 @@ Press `Ctrl+C`, then run:
    docker compose down
    ```
 
-### Kaiwu SDK Installation Instructions (Required)
+### Kaiwu SDK Installation and Authorization
 
-Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+Pip selects a compatible Kaiwu SDK when you install KPP. KPP 0.4.0 uses Kaiwu 1.4.4 on Python 3.12 and 3.14. To select Kaiwu 1.3.1 on Python 3.10, run `python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin`.
 
-The download and installation steps for other versions of the Kaiwu SDK are as follows:
+If you need to download an SDK wheel or configure authorization, follow these steps:
 ![](imgs/image.png)
 
 1. **Get the SDK**:

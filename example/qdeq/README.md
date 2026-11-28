@@ -47,11 +47,11 @@ Use `--data-path` for another location.
 
 ## Quick start
 
-Use the Anderson baseline for a first CPU run with the Kaiwu SDK installed and
-without activating a license.
+Run these commands from the repository root. If you already have a compatible version of KPP, skip the first command.
 
+Use the Anderson baseline for a first CPU run with the Kaiwu SDK installed. This path runs without activating a license.
 ```bash
-pip install -e .        # install the plugin from the repository root
+python -m pip install .
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler anderson
 python example/qdeq/simple/simple_forecast_example.py --sampler anderson
