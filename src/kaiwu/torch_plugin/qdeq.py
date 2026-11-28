@@ -486,12 +486,17 @@ class QDEQ(nn.Module):
 
         Returns:
             torch.Tensor: Differentiable scalar to add to the training loss.
+                FP16 and BF16 vector-Jacobian products use FP32 norms and
+                accumulation, returning an FP32 penalty.
         """
         # E_p ||J^T p||^2 = ||J||_F^2 for standard normal probes p.
         total = 0
         for _ in range(vecs):
             probe = torch.randn_like(z_star)
             vjp = torch.autograd.grad(new_z, z_star, probe, retain_graph=True, create_graph=True)[0]
+            # The squared norm can overflow FP16 before the final normalization.
+            if vjp.dtype in (torch.float16, torch.bfloat16):
+                vjp = vjp.float()
             total = total + vjp.norm() ** 2
         return total / vecs / z_star.numel()
 

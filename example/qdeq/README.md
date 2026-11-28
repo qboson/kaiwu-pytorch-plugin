@@ -109,6 +109,17 @@ The two solvers give the same forecasts to within 0.01% in MSE, so the fixed
 points found through CIM match the classical solver. The iTransformer example
 used here will be added in a follow-up.
 
+## Jacobian regularization
+
+Set `QDEQConfig(jac_loss_vecs=1)` to compute a Jacobian penalty during training.
+After the forward call, add `deq.last_jac_loss` to the external training loss
+with the desired regularization weight. The estimate is normalized by the
+number of state elements and averaged over the probe vectors.
+
+For FP16 and BF16 states, `jacobian_loss()` computes vector-Jacobian product
+norms and accumulates probe energies in FP32, returning an FP32 penalty. This
+avoids FP16 overflow before normalization. The state tensor keeps its dtype.
+
 ## Use with quantized models
 
 `QDEQ` provides two hooks that a subclass can override to switch the state of
