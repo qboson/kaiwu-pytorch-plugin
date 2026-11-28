@@ -361,6 +361,28 @@ class FeatureSelectionWrapper(nn.Module):
             return diagonal_row
         return row
 
+    @staticmethod
+    def _cardinality_penalty_scale(
+        quadratic_matrix: np.ndarray,
+        linear_vector: np.ndarray,
+    ) -> float:
+        """Scale the cardinality penalty to dominate single-bit objective flips."""
+        if linear_vector.size == 0:
+            return _CARDINALITY_PENALTY
+        sym_quad = 0.5 * quadratic_matrix + 0.5 * quadratic_matrix.T
+        diag = np.diag(sym_quad)
+        off_diag_abs = np.abs(sym_quad) - np.diag(np.abs(diag))
+        max_flip_gain = float(
+            np.max(
+                np.abs(linear_vector + 0.5 * diag) + np.sum(off_diag_abs, axis=1)
+            )
+        )
+        if np.isfinite(max_flip_gain) and max_flip_gain > 0.0:
+            scaled_penalty = _CARDINALITY_PENALTY * max_flip_gain
+            if np.isfinite(scaled_penalty):
+                return scaled_penalty
+        return _CARDINALITY_PENALTY
+
     def _build_qubo(
         self,
         gradient: np.ndarray,
@@ -383,10 +405,11 @@ class FeatureSelectionWrapper(nn.Module):
             + self.lambda_reg
         )
         if self.cardinality_k is not None:
-            quadratic_matrix += (
-                2.0 * _CARDINALITY_PENALTY * np.ones_like(quadratic_matrix)
+            penalty = self._cardinality_penalty_scale(
+                quadratic_matrix, linear_vector
             )
-            linear_vector -= 2.0 * _CARDINALITY_PENALTY * self.cardinality_k
+            quadratic_matrix += 2.0 * penalty * np.ones_like(quadratic_matrix)
+            linear_vector -= 2.0 * penalty * self.cardinality_k
         return quadratic_matrix, linear_vector
 
     def _project_selected_feature_count(
