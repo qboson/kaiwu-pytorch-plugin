@@ -70,7 +70,8 @@ def solve_budgeted(Q, num_reads, num_sweeps, cim_prepared):
         raise ValueError("Frozen SQA configuration requires 10 reads and 1000 sweeps")
     if os.environ.get("QC_SPIN_ENCODING") != "gauge":
         raise ValueError("CIM-matched SQA requires gauge encoding")
-    path = Path(os.environ["QC_SQA_BUDGET_FILE"])
+    # Resolve before lookup: separate experiments can use the same relative name.
+    path = Path(os.environ["QC_SQA_BUDGET_FILE"]).resolve()
     if str(path) not in _BUDGETS:
         _BUDGETS[str(path)] = json.loads(path.read_text())
     budget = _BUDGETS[str(path)]
