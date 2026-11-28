@@ -163,9 +163,19 @@ def summarise_generation(
         row for row in valid
         if bool(row.get("target_hit", row.get("in_range", False)))
     ]
-    unique_valid = {
-        str(row.get("smiles", "")) for row in valid if row.get("smiles")
-    }
+    # Different SMILES traversals can describe the same molecule. Use the
+    # same canonical identity as generation_quality_metrics, keeping stereo.
+    from rdkit import Chem
+
+    unique_valid = set()
+    for row in valid:
+        if not row.get("smiles"):
+            continue
+        smiles = str(row["smiles"])
+        mol = Chem.MolFromSmiles(smiles)
+        # Preserve the recorded-validity policy for legacy/unparseable rows.
+        unique_valid.add(Chem.MolToSmiles(mol, canonical=True)
+                         if mol is not None else smiles)
     duplicates = max(len(valid) - len(unique_valid), 0)
     train_ref = train_df[(train_df[prop] >= lo) & (train_df[prop] < hi)]
 
