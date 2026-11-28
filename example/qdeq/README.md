@@ -49,19 +49,23 @@ Use `--data-path` for another location.
 
 Run these commands from the repository root. If you already have a compatible version of KPP, skip the first command.
 
+Use the Anderson baseline for a first CPU run with the Kaiwu SDK installed. This path runs without activating a license.
 ```bash
 python -m pip install .
 pip install -r example/qdeq/requirements.txt
-python example/qdeq/simple/simple_train_example.py --sampler sa
-python example/qdeq/simple/simple_forecast_example.py --sampler sa
+python example/qdeq/simple/simple_train_example.py --sampler anderson
+python example/qdeq/simple/simple_forecast_example.py --sampler anderson
 ```
 
 `--sampler` accepts:
 
-- `sa`: Kaiwu simulated annealing (`kaiwu.classical.SimulatedAnnealingOptimizer`), runs locally
-- `cim`: Kaiwu CIM (`CIMOptimizer` + `PrecisionReducer`), requires a licensed Kaiwu account
+- `sa`: Kaiwu simulated annealing (`kaiwu.classical.SimulatedAnnealingOptimizer`), the default local solver
+- `cim`: Kaiwu CIM (`CIMOptimizer` + `PrecisionReducer`)
 - `anderson`: classical baseline, `AndersonDEQ` in `etth1_common.py`, which
   subclasses `QDEQ` and overrides `solve_fixed_point` with Anderson acceleration
+
+Activate a Kaiwu SDK license before using `sa` or `cim`. See the
+[SDK installation instructions](https://kaiwu-sdk-docs.qboson.com/en/latest/source/getting_started/sdk_installation_instructions.html).
 
 ## Simple
 
