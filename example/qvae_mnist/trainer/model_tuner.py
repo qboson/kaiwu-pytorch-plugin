@@ -1,4 +1,6 @@
 import os
+from itertools import chain
+
 import torch
 import numpy as np
 
@@ -89,7 +91,9 @@ class ModelTuner(object):
 	def load_model(self,set_eval=True):
 		logger.info("Loading Model")
 		#attention: model must be defined already
-		self._model.load_state_dict(torch.load(self.infile))
+		device_tensor = next(chain(self._model.parameters(), self._model.buffers()), None)
+		device = device_tensor.device if device_tensor is not None else "cpu"
+		self._model.load_state_dict(torch.load(self.infile, map_location=device))
 		#training of model
 		if set_eval:
 			self._model.eval()

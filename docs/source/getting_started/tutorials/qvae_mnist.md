@@ -36,6 +36,12 @@ jupyter notebook train_qvae_classifier.ipynb  # representation learning + classi
 - `trainer/trainer.py`: `Trainer.train` — Q-ELBO optimization loop
 - `downstream/classifier.py`: `MLPClassifier.fit` — downstream classifier on learned representations
 
+When loading a `ModelTuner` checkpoint, first register the destination model with
+`register_model(model)` and set `infile` to the checkpoint path. `load_model()`
+loads the weights onto the model's current device, so a CPU model can restore a
+CUDA checkpoint. Loading switches the model to evaluation mode by default. Pass
+`set_eval=False` to retain the model's current mode.
+
 ## How It Works
 
 A standard VAE uses a Gaussian prior $p(\mathbf{z})$ and an encoder $q_\phi(\mathbf{z}|\mathbf{x})$. A Q-VAE replaces the Gaussian prior with a QBM:
