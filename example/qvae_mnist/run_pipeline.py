@@ -27,6 +27,14 @@ def flatten_dataloader(dataloader):
     return X, y
 
 
+def positive_sample_count(value):
+    """Parse a positive number of dataset samples."""
+    count = int(value)
+    if count < 1:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return count
+
+
 def main():
     parser = argparse.ArgumentParser(description="Train QVAE + MLP pipeline")
     # Model hyperparameters
@@ -41,8 +49,8 @@ def main():
     # Data parameters
     parser.add_argument("--name", type=str, default="mnist", help="Dataset name")
     parser.add_argument("--data-path", type=str, default="./data")
-    parser.add_argument("--num-train-samples", type=int, default=60000)
-    parser.add_argument("--num-test-samples", type=int, default=10000)
+    parser.add_argument("--num-train-samples", type=positive_sample_count, default=60000)
+    parser.add_argument("--num-test-samples", type=positive_sample_count, default=10000)
 
     # Training parameters
     parser.add_argument("--batch-size", type=int, default=256)
@@ -110,6 +118,8 @@ def main():
         num_evts_test=config.num_test_samples,
         use_cuda=config.use_cuda,
     )
+    if not test_loader:
+        parser.error("evaluation data must contain at least one test sample")
     X_train_raw, y_train_raw = flatten_dataloader(train_loader)
     X_test_raw, y_test_raw = flatten_dataloader(test_loader)
 
