@@ -1,11 +1,25 @@
 **语言版本**：[中文](README_ZH.md) | [English](README.md)
 
+### 环境准备
+
+在仓库根目录运行 `python -m pip install .`，即可安装与这份示例配套的 KPP。如果已安装兼容版本，按各示例的说明补装额外依赖即可。
+
 ### BoltzmannMachine 与 RestrictedBoltzmannMachine 的使用示例
 
 * `run_bm.py`：演示如何使用 `BoltzmannMachine` 类进行模型实例化、采样、目标函数计算和参数优化。适用于理解玻尔兹曼机（Boltzmann Machine）的基本训练流程，包括采样和梯度反向传播。
 * `run_rbm.py`：演示如何使用 `RestrictedBoltzmannMachine` 类进行训练，包括隐藏特征提取、采样、目标函数计算和参数优化。适用于理解受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）的典型应用流程。
 
 这两个脚本均完整展示了模型初始化、采样、目标函数计算、梯度下降和参数更新的全过程，可作为快速上手玻尔兹曼机相关模型的参考示例。
+
+---
+
+### Q-Diffusion
+
+`example/qdiffusion/` 现在分为：
+- `simple/`：最小化的训练与生成脚本
+- `dplm/`：蛋白质案例工作流工具与适配代码
+
+详细说明请参见 `example/qdiffusion/README_ZH.md`。
 
 ---
 
@@ -17,12 +31,14 @@
 
 该示例演示了如何在手写数字数据集（Digits）上使用受限玻尔兹曼机（RBM）进行特征学习与分类。适合初学者理解 RBM 在图像特征提取与分类中的应用流程，并可作为后续进阶实验与扩展的基础。主要内容包括：
 
-* **数据增强与预处理**：将原始 8×8 手写数字图像分别向上、下、左、右平移以扩充数据集，并使用 MinMaxScaler 对特征进行归一化；
+* **数据增强与预处理**：先划分原始 8×8 手写数字图像，再仅将训练图像向上、下、左、右平移以扩充训练集。MinMaxScaler 仅拟合增强后的训练集，测试原图使用相同参数归一化；
 * **RBM 模型训练**：实现 `RBMRunner` 类以封装 RBM 的训练过程，支持在训练过程中可视化生成样本和权重矩阵；
 * **特征提取与分类**：训练完成后，利用 RBM 隐藏层的表示作为特征，输入逻辑回归模型进行分类；
 * **可视化与分析**：支持在训练过程中生成样本并可视化权重，有助于观察和评估模型的学习效果。
 
 请通过 `example/rbm_digits/rbm_digits.ipynb` 运行该示例。
+
+详细说明请参见 `example/rbm_digits/README.md`。
 
 #### 基于 DBN 的分类方法
 
@@ -36,6 +52,10 @@
 * **高级架构设计**：基于 PyTorch 实现，并通过 `AbstractSupervisedDBN` 基类提供与 scikit-learn 的兼容性。
 
 请通过 `example/dbn_digits/supervised_dbn_digits.ipynb` 运行该示例。
+
+两个 Digits 示例均先用 `random_state=42` 留出 20% 原始图像，再增强训练集。内置数据集得到 7,185 个训练样本和 360 张测试原图，训练图像的平移版本不会进入测试集。
+
+详细说明请参见 `example/dbn_digits/README.md`。
 
 **依赖项**
 
@@ -55,7 +75,7 @@ scipy
 通过`example/bm_generation/train_bm.ipynb`运行训练代码，通过`example/bm_generation/sample_bm.ipynb`运行测试代码
 **依赖**
 ```
-kaiwu==1.3.0
+kaiwu
 pandas
 matplotlib
 ```
@@ -73,12 +93,7 @@ matplotlib
 
 请通过 `example/qvae_mnist/train_qvae.ipynb` 运行该示例。
 
-**依赖项**
-
-```
-torchvision==0.22.0
-torchmetrics[image]
-```
+安装步骤见 [MNIST 示例](qvae_mnist/README.md#dependencies)。
 
 ---
 
@@ -93,8 +108,36 @@ torchmetrics[image]
 
 请通过 `example/qvae_mnist/train_qvae_classifier.ipynb` 运行该示例。
 
+安装步骤见 [MNIST 示例](qvae_mnist/README.md#dependencies)。
+---
+
+### 表征学习：基于 QVAE 的单细胞数据
+
+该示例演示了基于 QVAE 的单细胞表征学习。流程包括读取单细胞表达矩阵、训练 QVAE、提取低维表征、计算 UMAP、分析能量分布，并使用细胞类型标签评估聚类质量。支持多种下游评估（Leiden 聚类、分类、scIB、scGraph、DPT）。
+
+通过 `example/qvae_cell/scripts/train.sh`（或带 CLI 参数的 `train_qvae_cell.py`）运行训练，通过 `example/qvae_cell/evaluate_benchmark.py --metrics clustering,classification,scib,scgraph` 运行评估。
+
+详细说明请参见 `example/qvae_cell/README.md`。
+
+**依赖项**
+```
+anndata
+scanpy
+leidenalg
+scib_metrics
+scgraph
+### 时间序列预测：基于QDEQ的ETTh1预测
+
+该示例在 ETTh1 数据集上训练一个参照 iTransformer 的小型预测模型，其编码器是一个 `QDEQ` 深度均衡层，不动点由 Kaiwu 模拟退火、CIM 或经典 Anderson 方法求解。主要内容包括：
+
+* **深度均衡层**：权重共享的变量间注意力块通过 `QDEQ` 求不动点，反向使用隐函数定理；
+* **Ising 求解器**：每一步更新的系数编码为 QUBO，交由传入的 Kaiwu 优化器求解；
+* **求解器对比**：同一份权重可分别用 SA、CIM、Anderson 评估。
+
+数据准备与运行命令见 `example/qdeq/README_ZH.md`，入口为 `example/qdeq/simple/simple_train_example.py`。
+
 **依赖项**
 
 ```
-torchvision==0.22.0
+pandas
 ```

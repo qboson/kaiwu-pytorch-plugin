@@ -3,6 +3,12 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 on: push
 
 jobs:
+  test-release:
+    if: startsWith(github.ref, 'refs/tags/')
+    uses: ./.github/workflows/ci.yml
+    with:
+      scope: all
+
   build:
     name: Build distribution 📦
     runs-on: ubuntu-latest
@@ -35,6 +41,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
     - build
+    - test-release
     runs-on: ubuntu-latest
     environment:
       name: pypi

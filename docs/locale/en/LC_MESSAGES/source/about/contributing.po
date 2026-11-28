@@ -35,6 +35,22 @@ msgstr ""
 "requests to avoid duplicate work."
 
 #: ../../source/about/contributing.md:5
+msgid "第一次参与开源贡献？欢迎查看[开物量子开发者社区](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)的「开源贡献社区」栏目，了解社区活动、开源项目和参与方式。"
+msgstr "New to open source? Visit the Open Source Contributions section of the [Kaiwu developer community](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community) to find community events, open-source projects, and ways to get involved."
+
+#: ../../source/about/contributing.md:7
+msgid "科研算力激励"
+msgstr "Research Computing Incentives"
+
+#: ../../source/about/contributing.md:9
+msgid "使用 KPP 和 Kaiwu SDK 做开发或科研，需要量子真机算力的开发者和科研人员可申请 **算力五折优惠（买 N 送 N）**。"
+msgstr "Developers and researchers who need access to real quantum hardware for work with KPP and Kaiwu SDK can apply for a **50% discount on computing resources (buy N, get N free)**."
+
+#: ../../source/about/contributing.md:11
+msgid "申请者需在科研成果中引用或致谢 KPP 或 Kaiwu SDK，并通过[社区页面](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community)底部的问卷提交申请。审核通过后，团队会在 3 个工作日内对接。如有疑问，请联系 [developer@boseq.com](mailto:developer@boseq.com)。"
+msgstr "Cite or acknowledge KPP or Kaiwu SDK in your research outputs and apply using the questionnaire at the bottom of the [community page](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community). The team will get in touch within 3 business days of approval. For questions, email [developer@boseq.com](mailto:developer@boseq.com)."
+
+#: ../../source/about/contributing.md:13
 msgid "报告问题与提出建议"
 msgstr "Report Issues and Suggest Enhancements"
 

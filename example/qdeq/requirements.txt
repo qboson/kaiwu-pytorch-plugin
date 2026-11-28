@@ -1,0 +1,6 @@
+# Install PyTorch and the Kaiwu SDK first (see the project installation guide), then:
+# pip install -r requirements.txt
+
+numpy>=1.24,<3
+pandas>=1.5
+torch>=2.0

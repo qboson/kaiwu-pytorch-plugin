@@ -89,6 +89,21 @@ class TestMNISTCheckpointDevice(unittest.TestCase):
                 actual, torch.tensor([[5.5]], dtype=torch.float64)
             )
 
+    def test_load_restores_buffers_in_a_model_without_parameters(self):
+        """A model can store checkpoint state solely in registered buffers."""
+        with tempfile.TemporaryDirectory() as directory:
+            source = nn.BatchNorm1d(2, affine=False)
+            source.running_mean.copy_(torch.tensor([2.0, 3.0]))
+            destination = nn.BatchNorm1d(2, affine=False)
+            tuner = ModelTuner()
+            tuner.register_model(destination)
+            tuner.infile = str(Path(directory) / "model.pt")
+            torch.save(source.state_dict(), tuner.infile)
+
+            tuner.load_model()
+
+            torch.testing.assert_close(destination.running_mean, source.running_mean)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,7 +12,8 @@ from torch.utils.data import DataLoader, TensorDataset
 import kaiwu as kw
 from kaiwu.classical import SimulatedAnnealingOptimizer
 from kaiwu.torch_plugin.dbn import UnsupervisedDBN
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 
 # =================== Unsupervised DBN Trainer =====================

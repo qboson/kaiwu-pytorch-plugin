@@ -8,22 +8,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaiwu-PyTorch-Plugin 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-09 14:45+0800\n"
+"POT-Creation-Date: 2026-10-13 14:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: en <LL@li.org>\n"
 "Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:12
+#: ../../source/getting_started/tutorials/index.md:12
 msgid "Tutorials"
 msgstr "Tutorials"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:14
+#: ../../source/getting_started/tutorials/index.md:14
 msgid ""
 "This chapter provides detailed hands-on tutorials to help you gain an in-"
 "depth understanding of various application scenarios of Kaiwu-PyTorch-"
@@ -33,21 +33,32 @@ msgstr ""
 "depth understanding of various application scenarios of Kaiwu-PyTorch-"
 "Plugin."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:16
+#: ../../source/getting_started/tutorials/index.md:16
 msgid ""
-"Before you start, make sure you have KPP installed and have gone through the"
-" [Quick Start](../quickstart.md). For theoretical background, see "
+"Before you start, make sure you have KPP installed and have gone through "
+"the [Quick Start](../quickstart.md). For theoretical background, see "
 "[Theoretical Foundations](../../theoretical-foundations/index.md)."
 msgstr ""
-"Before you start, make sure you have KPP installed and have gone through the"
-" [Quick Start](../quickstart.md). For theoretical background, see "
+"Before you start, make sure you have KPP installed and have gone through "
+"the [Quick Start](../quickstart.md). For theoretical background, see "
 "[Theoretical Foundations](../../theoretical-foundations/index.md)."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:18
+#: ../../source/getting_started/tutorials/index.md:18
+#, fuzzy
+msgid "Hands-on Tutorials"
+msgstr "Tutorials"
+
+#: ../../source/getting_started/tutorials/index.md:20
+msgid ""
+"Start from the sampling bottleneck and work through end-to-end "
+"applications that introduce one new concept at a time."
+msgstr ""
+
+#: ../../source/getting_started/tutorials/index.md:22
 msgid "Quantum Sampling for Energy-Based Models"
 msgstr "Quantum Sampling for Energy-Based Models"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:29
+#: ../../source/getting_started/tutorials/index.md:33
 msgid ""
 "[Why Quantum? Revisiting the Sampling "
 "Bottleneck](quantum_sampling_bottleneck.md): The intractable partition "
@@ -57,7 +68,7 @@ msgstr ""
 "Bottleneck](quantum_sampling_bottleneck.md): The intractable partition "
 "function, slow MCMC mixing, and the quantum alternative."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:30
+#: ../../source/getting_started/tutorials/index.md:34
 msgid ""
 "[Simulated Annealing for Ising Models](simulated_annealing.md): Mapping "
 "energy functions to Ising Hamiltonians and building a local sampling "
@@ -67,120 +78,149 @@ msgstr ""
 "energy functions to Ising Hamiltonians and building a local sampling "
 "baseline."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:31
+#: ../../source/getting_started/tutorials/index.md:35
 msgid ""
-"[Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md): "
-"Swapping the local SA sampler for the CIM sampler within the KPP training "
-"loop, with the core interfaces explained."
+"[Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md):"
+" Swapping the local SA sampler for the CIM sampler within the KPP "
+"training loop, with the core interfaces explained."
 msgstr ""
-"[Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md): "
-"Swapping the local SA sampler for the CIM sampler within the KPP training "
-"loop, with the core interfaces explained."
+"[Integrating Quantum Samplers into PyTorch](quantum_sampling_pytorch.md):"
+" Swapping the local SA sampler for the CIM sampler within the KPP "
+"training loop, with the core interfaces explained."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:33
+#: ../../source/getting_started/tutorials/index.md:37
 msgid "Tutorial 1: Generative Modeling with a Full Boltzmann Machine"
 msgstr "Tutorial 1: Generative Modeling with a Full Boltzmann Machine"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:42
+#: ../../source/getting_started/tutorials/index.md:46
 msgid ""
-"[BM Generation](bm_generation.md): Unsupervised data generation with a fully"
-" connected Boltzmann Machine. Example: `example/bm_generation/`."
+"[BM Generation](bm_generation.md): Unsupervised data generation with a "
+"fully connected Boltzmann Machine. Example: `example/bm_generation/`."
 msgstr ""
-"[BM Generation](bm_generation.md): Unsupervised data generation with a fully"
-" connected Boltzmann Machine. Example: `example/bm_generation/`."
+"[BM Generation](bm_generation.md): Unsupervised data generation with a "
+"fully connected Boltzmann Machine. Example: `example/bm_generation/`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:44
+#: ../../source/getting_started/tutorials/index.md:48
 msgid "Tutorial 2: Feature Learning and Classification with RBMs and DBNs"
 msgstr "Tutorial 2: Feature Learning and Classification with RBMs and DBNs"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:54
+#: ../../source/getting_started/tutorials/index.md:58
 msgid ""
-"[RBM Classification: Handwritten Digit Recognition](rbm_classification.md): "
-"Feature learning and classification with a single RBM. Example: "
-"`example/rbm_digits/rbm_digits.ipynb`."
+"[RBM Classification: Handwritten Digit "
+"Recognition](rbm_classification.md): Feature learning and classification "
+"with a single RBM. Example: `example/rbm_digits/rbm_digits.ipynb`."
 msgstr ""
-"[RBM Classification: Handwritten Digit Recognition](rbm_classification.md): "
-"Feature learning and classification with a single RBM. Example: "
-"`example/rbm_digits/rbm_digits.ipynb`."
+"[RBM Classification: Handwritten Digit "
+"Recognition](rbm_classification.md): Feature learning and classification "
+"with a single RBM. Example: `example/rbm_digits/rbm_digits.ipynb`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:55
+#: ../../source/getting_started/tutorials/index.md:59
 msgid ""
-"[DBN Classification: Deep Belief Networks](dbn_classification.md): Stacking "
-"RBMs into a Deep Belief Network for hierarchical features. Example: "
-"`example/dbn_digits/supervised_dbn_digits.ipynb`."
+"[DBN Classification: Deep Belief Networks](dbn_classification.md): "
+"Stacking RBMs into a Deep Belief Network for hierarchical features. "
+"Example: `example/dbn_digits/supervised_dbn_digits.ipynb`."
 msgstr ""
-"[DBN Classification: Deep Belief Networks](dbn_classification.md): Stacking "
-"RBMs into a Deep Belief Network for hierarchical features. Example: "
-"`example/dbn_digits/supervised_dbn_digits.ipynb`."
+"[DBN Classification: Deep Belief Networks](dbn_classification.md): "
+"Stacking RBMs into a Deep Belief Network for hierarchical features. "
+"Example: `example/dbn_digits/supervised_dbn_digits.ipynb`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:57
+#: ../../source/getting_started/tutorials/index.md:61
 msgid "Tutorial 3: Quantum Variational Autoencoder (Q-VAE)"
 msgstr "Tutorial 3: Quantum Variational Autoencoder (Q-VAE)"
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:66
+#: ../../source/getting_started/tutorials/index.md:70
 msgid ""
 "[Q-VAE: Quantum Variational Autoencoder](qvae_mnist.md): Replacing the "
-"Gaussian prior with a quantum RBM for image generation and representation "
-"learning. Example: `example/qvae_mnist/run_pipeline.py`."
+"Gaussian prior with a quantum RBM for image generation and representation"
+" learning. Example: `example/qvae_mnist/run_pipeline.py`."
 msgstr ""
 "[Q-VAE: Quantum Variational Autoencoder](qvae_mnist.md): Replacing the "
-"Gaussian prior with a quantum RBM for image generation and representation "
-"learning. Example: `example/qvae_mnist/run_pipeline.py`."
+"Gaussian prior with a quantum RBM for image generation and representation"
+" learning. Example: `example/qvae_mnist/run_pipeline.py`."
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:68
-msgid "Coming Soon"
-msgstr "Coming Soon"
+#: ../../source/getting_started/tutorials/index.md:72
+msgid "Case Studies"
+msgstr ""
 
-#: ../../../../Users/chang137/Documents/kaiwu_torch_plugin_docs/docs/source/getting_started/tutorials/index.md:70
-msgid "Planned tutorials, following the same structure as Tutorial 1–3:"
-msgstr "Planned tutorials, following the same structure as Tutorial 1–3:"
-
+#: ../../source/getting_started/tutorials/index.md:74
 msgid ""
-"**Q-VAE for Single-Cell Transcriptomics**: single-cell representation "
-"learning with a QVAE: expression matrix → low-dimensional representations → "
-"UMAP → clustering evaluation. Example: "
-"`example/qvae_cell/train_qvae_cell.ipynb`."
+"Case studies build directly on the hands-on tutorials and show how KPP is"
+" used on larger-scale public datasets. Each study packages a complete "
+"pipeline — data loading, model definition, training, and evaluation — and"
+" lives alongside a runnable example under `example/`. Pages marked "
+"*Coming soon* will be expanded in follow-up PRs."
+msgstr ""
+
+#: ../../source/getting_started/tutorials/index.md:85
+#, fuzzy
+msgid ""
+"[Q-VAE for Single-Cell Transcriptomics](qvae_cell.md) *Coming soon*: "
+"single-cell representation learning with a QVAE; UMAP and clustering "
+"evaluation (Leiden, classification, scIB, scGraph, DPT). Example: "
+"`example/qvae_cell/`."
 msgstr ""
 "**Q-VAE for Single-Cell Transcriptomics**: single-cell representation "
-"learning with a QVAE: expression matrix → low-dimensional representations → "
-"UMAP → clustering evaluation. Example: "
+"learning with a QVAE: expression matrix → low-dimensional representations"
+" → UMAP → clustering evaluation. Example: "
 "`example/qvae_cell/train_qvae_cell.ipynb`."
 
+#: ../../source/getting_started/tutorials/index.md:86
 msgid ""
-"**Q-Diffusion for Protein Sequence Generation**: discrete diffusion "
-"generation for proteins with the generic Q-Diffusion core and a DPLM "
-"backbone. Example: `example/qdiffusion/simple/simple_train_example.py`."
+"[Q-VAE for Energy-Supervised Anomaly Detection](qvae_anomaly.md) *Coming "
+"soon*: CleanEnergyQVAE with a free-energy scoring head and NCE-style "
+"contrastive objective on thyroid / creditcard benchmarks. Example: "
+"`example/qvae_anomaly/`."
+msgstr ""
+
+#: ../../source/getting_started/tutorials/index.md:87
+#, fuzzy
+msgid ""
+"[Q-Diffusion for Protein Sequence Generation](qdiffusion.md) *Coming "
+"soon*: discrete diffusion with the generic `Q-Diffusion` core and a DPLM "
+"backbone. Example: `example/qdiffusion/`."
 msgstr ""
 "**Q-Diffusion for Protein Sequence Generation**: discrete diffusion "
 "generation for proteins with the generic Q-Diffusion core and a DPLM "
 "backbone. Example: `example/qdiffusion/simple/simple_train_example.py`."
 
 #~ msgid ""
-#~ "**Q-VAE for Single-Cell Transcriptomics** — single-cell representation "
-#~ "learning with a QVAE: expression matrix → low-dimensional representations → "
-#~ "UMAP → clustering evaluation. Example: "
+#~ "**Q-VAE for Single-Cell Transcriptomics** "
+#~ "— single-cell representation learning "
+#~ "with a QVAE: expression matrix → "
+#~ "low-dimensional representations → UMAP →"
+#~ " clustering evaluation. Example: "
 #~ "`example/qvae_cell/train_qvae_cell.ipynb`."
 #~ msgstr ""
-#~ "**Q-VAE for Single-Cell Transcriptomics** — single-cell representation "
-#~ "learning with a QVAE: expression matrix → low-dimensional representations → "
-#~ "UMAP → clustering evaluation. Example: "
+#~ "**Q-VAE for Single-Cell Transcriptomics** "
+#~ "— single-cell representation learning "
+#~ "with a QVAE: expression matrix → "
+#~ "low-dimensional representations → UMAP →"
+#~ " clustering evaluation. Example: "
 #~ "`example/qvae_cell/train_qvae_cell.ipynb`."
 
 #~ msgid ""
-#~ "**Q-Diffusion for Protein Sequence Generation** — discrete diffusion "
-#~ "generation for proteins with the generic Q-Diffusion core and a DPLM "
-#~ "backbone. Example: `example/qdiffusion/simple/simple_train_example.py`."
+#~ "**Q-Diffusion for Protein Sequence "
+#~ "Generation** — discrete diffusion generation"
+#~ " for proteins with the generic "
+#~ "Q-Diffusion core and a DPLM backbone."
+#~ " Example: "
+#~ "`example/qdiffusion/simple/simple_train_example.py`."
 #~ msgstr ""
-#~ "**Q-Diffusion for Protein Sequence Generation** — discrete diffusion "
-#~ "generation for proteins with the generic Q-Diffusion core and a DPLM "
-#~ "backbone. Example: `example/qdiffusion/simple/simple_train_example.py`."
+#~ "**Q-Diffusion for Protein Sequence "
+#~ "Generation** — discrete diffusion generation"
+#~ " for proteins with the generic "
+#~ "Q-Diffusion core and a DPLM backbone."
+#~ " Example: "
+#~ "`example/qdiffusion/simple/simple_train_example.py`."
 
 #~ msgid "Tutorial Overview"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "The following table provides a quick reference to all tutorials, including "
-#~ "the task type and a concise description."
+#~ "The following table provides a quick "
+#~ "reference to all tutorials, including "
+#~ "the task type and a concise "
+#~ "description."
 #~ msgstr ""
 
 #~ msgid "Tutorial"
@@ -192,7 +232,6 @@ msgstr ""
 #~ msgid "Description"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`quantum_sampling_bottleneck`"
 #~ msgstr ""
 
@@ -200,65 +239,65 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Understanding the sampling bottleneck in Boltzmann machine training, and how"
-#~ " KPP lets classical (SA) and quantum (CIM) samplers share one training loop."
+#~ "Understanding the sampling bottleneck in "
+#~ "Boltzmann machine training, and how KPP"
+#~ " lets classical (SA) and quantum "
+#~ "(CIM) samplers share one training loop."
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`simulated_annealing`"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Establishing a locally runnable classical sampling baseline for finding low-"
-#~ "energy configurations and approximate sampling."
+#~ "Establishing a locally runnable classical "
+#~ "sampling baseline for finding low-energy"
+#~ " configurations and approximate sampling."
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`quantum_sampling_pytorch`"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Swapping the local SA sampler for a Coherent Ising Machine (CIM) sampler "
-#~ "inside the standard PyTorch workflow, with the core KPP interfaces "
-#~ "explained."
+#~ "Swapping the local SA sampler for "
+#~ "a Coherent Ising Machine (CIM) sampler"
+#~ " inside the standard PyTorch workflow, "
+#~ "with the core KPP interfaces explained."
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`rbm_classification`"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Classification"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Feature learning and classification on handwritten digit datasets using a "
+#~ "Feature learning and classification on "
+#~ "handwritten digit datasets using a "
 #~ "Restricted Boltzmann Machine (RBM)."
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`dbn_classification`"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Stacking multiple RBMs into a Deep Belief Network (DBN) for hierarchical "
+#~ "Stacking multiple RBMs into a Deep "
+#~ "Belief Network (DBN) for hierarchical "
 #~ "feature learning and classification."
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`bm_generation`"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Generation"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Unsupervised training and data generation with a fully connected Boltzmann "
-#~ "Machine, ideal for fast, small-scale sample generation."
+#~ "Unsupervised training and data generation "
+#~ "with a fully connected Boltzmann "
+#~ "Machine, ideal for fast, small-scale "
+#~ "sample generation."
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "{doc}`qvae_mnist`"
 #~ msgstr ""
 
@@ -266,8 +305,9 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Combining a variational autoencoder with a quantum Boltzmann machine for "
-#~ "image generation and representation learning."
+#~ "Combining a variational autoencoder with "
+#~ "a quantum Boltzmann machine for image"
+#~ " generation and representation learning."
 #~ msgstr ""
 
 #~ msgid "Recommended Learning Paths"
@@ -276,43 +316,38 @@ msgstr ""
 #~ msgid "Beginner Path"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Complete {doc}`../quickstart` first to understand the basic API"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid ""
-#~ "Study {doc}`quantum_sampling_bottleneck` to understand the sampling "
-#~ "bottleneck in model training"
+#~ "Study {doc}`quantum_sampling_bottleneck` to "
+#~ "understand the sampling bottleneck in "
+#~ "model training"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Explore {doc}`simulated_annealing` to establish the sampling baseline"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Learn {doc}`quantum_sampling_pytorch` to integrate the CIM sampler"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid ""
-#~ "Apply {doc}`rbm_classification` to understand the RBM application workflow"
+#~ "Apply {doc}`rbm_classification` to understand "
+#~ "the RBM application workflow"
 #~ msgstr ""
 
 #~ msgid "Advanced Path"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Study {doc}`dbn_classification` to extend RBM into deep architectures"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid ""
-#~ "Explore {doc}`bm_generation` to understand the generative capabilities of "
-#~ "Boltzmann Machines"
+#~ "Explore {doc}`bm_generation` to understand the"
+#~ " generative capabilities of Boltzmann "
+#~ "Machines"
 #~ msgstr ""
 
-#, python-brace-format
 #~ msgid "Advance to {doc}`qvae_mnist` to learn more powerful generative models"
 #~ msgstr ""
 
@@ -320,7 +355,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Complete all tutorials in order, to gain comprehensive mastery of Kaiwu-"
+#~ "Complete all tutorials in order, to "
+#~ "gain comprehensive mastery of Kaiwu-"
 #~ "PyTorch-Plugin."
 #~ msgstr ""
 
@@ -329,8 +365,10 @@ msgstr ""
 
 #~ msgid "本章提供详细的实践教程，帮助您深入了解 Kaiwu-PyTorch-Plugin 的各种应用场景。"
 #~ msgstr ""
-#~ "This chapter provides hands-on tutorials to help you explore various use-"
-#~ "cases of Kaiwu-PyTorch-Plugin in depth."
+#~ "This chapter provides hands-on tutorials"
+#~ " to help you explore various use-"
+#~ "cases of Kaiwu-PyTorch-Plugin in "
+#~ "depth."
 
 #~ msgid "教程概览"
 #~ msgstr "Tutorial Overview"
@@ -349,13 +387,15 @@ msgstr ""
 
 #~ msgid "使用受限玻尔兹曼机（RBM）在手写数字数据集上进行特征学习与分类"
 #~ msgstr ""
-#~ "Feature learning and classification on handwritten digits with Restricted "
-#~ "Boltzmann Machines (RBMs)"
+#~ "Feature learning and classification on "
+#~ "handwritten digits with Restricted Boltzmann"
+#~ " Machines (RBMs)"
 
 #~ msgid "使用深度信念网络（DBN）构建层次化特征表示并进行分类"
 #~ msgstr ""
-#~ "Building hierarchical feature representations and performing classification "
-#~ "with Deep Belief Networks (DBNs)"
+#~ "Building hierarchical feature representations "
+#~ "and performing classification with Deep "
+#~ "Belief Networks (DBNs)"
 
 #~ msgid "生成"
 #~ msgstr "Generation"
@@ -368,8 +408,9 @@ msgstr ""
 
 #~ msgid "使用量子变分自编码器（Q-VAE）进行图像生成与表征学习"
 #~ msgstr ""
-#~ "Image generation and representation learning with Quantum Variational Auto-"
-#~ "Encoders (Q-VAEs)"
+#~ "Image generation and representation learning"
+#~ " with Quantum Variational Auto-Encoders "
+#~ "(Q-VAEs)"
 
 #~ msgid "推荐学习顺序"
 #~ msgstr "Recommended Learning Path"
@@ -388,7 +429,8 @@ msgstr ""
 
 #~ msgid "学习 {doc}`bm_generation` 了解玻尔兹曼机的生成能力"
 #~ msgstr ""
-#~ "Study {doc}`bm_generation` to see the generative power of Boltzmann Machines"
+#~ "Study {doc}`bm_generation` to see the "
+#~ "generative power of Boltzmann Machines"
 
 #~ msgid "进阶到 {doc}`qvae_mnist` 学习更强大的生成模型"
 #~ msgstr "Advance to {doc}`qvae_mnist` for more powerful generative models"
@@ -398,5 +440,13 @@ msgstr ""
 
 #~ msgid "按顺序完成所有教程，全面掌握 Kaiwu-PyTorch-Plugin 的功能。"
 #~ msgstr ""
-#~ "Work through every tutorial in order to master all features of Kaiwu-"
+#~ "Work through every tutorial in order "
+#~ "to master all features of Kaiwu-"
 #~ "PyTorch-Plugin."
+
+#~ msgid "Coming Soon"
+#~ msgstr "Coming Soon"
+
+#~ msgid "Planned tutorials, following the same structure as Tutorial 1–3:"
+#~ msgstr "Planned tutorials, following the same structure as Tutorial 1–3:"
+

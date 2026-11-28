@@ -1,10 +1,14 @@
-<img src="https://img.shields.io/badge/Python-3.10%2B-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
+<img src="https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.14-blue" alt="Python Version"> <img src="https://img.shields.io/badge/License-Apache%202.0-green" alt="License"> <img src="https://img.shields.io/badge/x86__64-supported-6C8CD5" alt="x86_64"> <img src="https://img.shields.io/badge/ARM64-supported-6C8CD5" alt="ARM64"> <img src="https://img.shields.io/badge/RISC--V-supported-6C8CD5" alt="RISC-V">
 
 # Kaiwu-PyTorch-Plugin
 
 **Language Versions**: [Chinese](README_ZH.md) | [English](README.md)
 
 For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://kaiwu-pytorch-plugin.readthedocs.io/en/latest/).
+
+**First contribution to KPP?** Start with the [Kaiwu developer community](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community) to explore its open-source programs, then pick a small change to the documentation or an example.
+
+If KPP helps with your development work, consider giving it a [Star on GitHub](https://github.com/qboson/kaiwu-pytorch-plugin).
 
 ## Project Overview
 
@@ -13,50 +17,82 @@ For using Kaiwu-PyTorch-Plugin, please refer to the [**documentation**](https://
 A Restricted Boltzmann Machine is an energy-based unsupervised learning model consisting of a visible layer and a hidden layer, with full connections between layers but no connections within a layer. Its core idea is to model the probability distribution of data through an energy function and train weights using algorithms such as Contrastive Divergence (CD), allowing the model to learn hidden features of input data. RBMs are commonly used for feature extraction, dimensionality reduction, or collaborative filtering, and are also the foundation for building more complex models. A Boltzmann Machine is a fully connected stochastic neural network where all neurons can be interconnected (including within the visible and hidden layers). Traditional sampling methods for BMs are inefficient, and quantum computing provides a new approach.
 
 ```mermaid
-flowchart TD
-    torch[PyTorch tensors, modules, autograd]
-    kaiwu[Kaiwu SDK samplers<br/>SA / CIM backend]
+graph TD
+    %% 定义子图样式（可选）
+    classDef subGraph fill:#f8f9fa,stroke:#ddd,stroke-width:1px,rx:5,ry:5;
 
-    subgraph plugin["src/kaiwu/torch_plugin"]
-        abm["abstract_boltzmann_machine.py<br/>AbstractBoltzmannMachine"]
-        bm["full_boltzmann_machine.py<br/>BoltzmannMachine"]
-        rbm["restricted_boltzmann_machine.py<br/>RestrictedBoltzmannMachine"]
-        qvae["qvae.py<br/>QVAE"]
-        qdiff["qdiffusion.py<br/>QDiffusion"]
-        dist["qvae_dist_util.py<br/>Bernoulli / mixture utilities"]
-        dbn["dbn.py<br/>UnsupervisedDBN"]
+    subgraph Classical_Framework ["Classical Framework"]
+        PyTorch["PyTorch<br>(Autograd/Tensors)"]:::node
     end
 
-    torch --> abm
-    kaiwu --> abm
-    abm --> bm
-    abm --> rbm
-    abm --> qvae
-    abm --> qdiff
-    dist --> qvae
-    rbm --> dbn
-
-    subgraph examples["example"]
-        rbm_digits["rbm_digits<br/>RBM feature learning and classification"]
-        dbn_digits["dbn_digits<br/>stacked RBM pretraining and supervised DBN"]
-        bm_generation["bm_generation<br/>BM distribution learning and sampling"]
-        qdiffusion["qdiffusion<br/>protein discrete diffusion workflows"]
-        qvae_mnist["qvae_mnist<br/>QVAE image generation and latent classification"]
-        qvae_cell["qvae_cell<br/>single-cell QVAE representation learning"]
+    %% 1. 右上模块名字只需要保留 Kaiwu SDK
+    subgraph Kaiwu_SDK ["Kaiwu SDK"]
+        SA["SimulatedAnnealingOptimizer"]:::node
+        CIM["CIMOptimizer"]:::node
     end
 
-    rbm --> rbm_digits
-    dbn --> dbn_digits
-    bm --> bm_generation
-    qdiff --> qdiffusion
-    qvae --> qvae_mnist
-    qvae --> qvae_cell
-    bm --> qvae_cell
+    %% 2. 中间模块名字显示完整：Kaiwu Torch Plugin
+    subgraph Torch_Plugin ["Kaiwu Torch Plugin"]
+        Abstract["abstract_boltzmann_machine.py"]:::node
+        RBM["restricted_boltzmann_machine.py"]:::node
+        GBRBM["gbrbm.py<br>GaussianBernoulliRestricte"]:::node
+        FullBM["full_boltzmann_machine.py<br>BoltzmannMachine"]:::node
+        QDiff["qdiffusion.py<br>QDDiffusion"]:::node
+        QVAE["qvae.py<br>QVAE"]:::node
+        
+        %% 3. dbn.py 作为 RBM 的下链，且保持在 Kaiwu Torch Plugin 层中
+        DBN["dbn.py<br>UnsupervisedDBN"]:::node
+    end
+
+    %% 4. 最下面模块名字为 Examples，不需要 "[]"
+    subgraph Examples
+        rbm_digits["rbm_digits"]:::node
+        dbn_digits["dbn_digits"]:::node
+        bm_generation["bm_generation"]:::node
+        qdiffusion["qdiffusion"]:::node
+        qvae_mnist["qvae_mnist"]:::node
+        qvae_cell["qvae_cell"]:::node
+    end
+
+    %% -------- 连线逻辑 --------
+    %% 上层框架指向插件
+    PyTorch --> Abstract
+    SA -.-> Abstract
+    CIM -.-> Abstract
+
+    %% 插件层内部的继承/实现关系
+    Abstract --> RBM
+    Abstract --> GBRBM
+    Abstract --> FullBM
+    Abstract --> QDiff
+    Abstract --> QVAE
+
+    RBM --> DBN
+
+    %% 插件层指向示例层
+    RBM --> rbm_digits
+    DBN --> dbn_digits
+    FullBM --> bm_generation
+    QDiff --> qdiffusion
+    QVAE --> qvae_mnist
+    QVAE --> qvae_cell
+
+    %% 应用子图背景样式
+    class Classical_Framework,Kaiwu_SDK,Torch_Plugin,Examples subGraph;
 ```
-The above image shows the project file structure:
-- The Kaiwu-torch-plugin section of the code includes base class, Restricted Boltzmann Machine, and Boltzmann Machine.
-- The example section of the code includes examples: qvae for generating digits, digits for digit recognition etc.
-- The test section contains unit tests.
+
+The diagram above shows the main code structure of the project:
+
+- The `kaiwu-torch-plugin` package (`src/kaiwu/torch_plugin`) provides the core
+  modules: the abstract base class `AbstractBoltzmannMachine`,
+  `RestrictedBoltzmannMachine` / `BoltzmannMachine`, `QVAE` (with Bernoulli /
+  mixture utilities), `QDiffusion`, and `UnsupervisedDBN`. All modules are
+  built on PyTorch and sample via the Kaiwu SDK samplers (SA / CIM backends).
+- The `example` directory contains runnable examples: digit recognition
+  (RBM / DBN), image generation and latent classification (QVAE on MNIST),
+  protein sequence generation (Q-Diffusion), and single-cell representation
+  learning (QVAE on cell data).
+- The `tests` directory contains the corresponding basic tests.
 
 ### Main Features
 - Quantum Support: Inherits from Kaiwu SDK, supports calling photonic quantum computers
@@ -75,17 +111,27 @@ The above image shows the project file structure:
 ## Quick Start
 
 ### Requirements
-- python == 3.10
-- kaiwu == 1.3.1
-- torch == 2.7.0
-- numpy == 2.2.6
+
+| Python | Kaiwu SDK | NumPy | PyTorch |
+| --- | --- | --- | --- |
+| 3.10 | 1.3.1–1.4.4 (excluding 1.4.2) | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.12 | 1.4.4 | >=1.26.4, <3 | >=2.6, <2.16 |
+| 3.14 | 1.4.4 | >=2.3.2, <3 | >=2.9, <2.16 |
+
+These are the installation constraints. The dependencies' available wheels and
+their own constraints determine which versions can be installed together.
+See the [compatibility matrix](.github/compatibility-matrix.json) for the exact
+combinations exercised by CI and the [installation guide](docs/source/getting_started/installation.md)
+for details.
+
+See the [examples index](example/README.md) for example dependencies.
 
 ### Code Style
 
 - Follows PEP 8 standards
 
 ### Installation Steps
-You can choose either local setup (conda/pip) or Docker setup (recommended for reproducibility and isolation).
+Install KPP from PyPI for regular use. The Docker option provides a Jupyter environment.
 
 #### Option 1: Local Setup (conda/pip)
 1. **Create and activate an environment**:
@@ -95,22 +141,12 @@ You can choose either local setup (conda/pip) or Docker setup (recommended for r
    conda activate quantum_env
    ```
 
-2. **Clone this repository locally**:
+2. **Install KPP from PyPI**
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
-   cd kaiwu-pytorch-plugin
+   python -m pip install kaiwu-torch-plugin
    ```
 
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements/requirements.txt
-   ```
-   Kaiwu SDK needs to be installed separately, see the installation instructions below.
-
-4. **Install the plugin**:
-   ```bash
-   pip install .
-   ```
+   Pip installs a compatible Kaiwu SDK. Python 3.12 and 3.14 require KPP 0.4.0 or later.
 
 #### Option 2: Docker Setup (no local environment required)
 The Docker setup builds a pre‑configured Jupyter notebook environment with all dependencies (including the Kaiwu SDK) already installed.
@@ -120,14 +156,13 @@ Project structure required:
 requirements/
 ├── docker-compose.yml
 ├── requirements.txt               # Kaiwu SDK included
-├── kaiwu-1.3.1-py3-none-any.whl   # Or download from Qboson platform
 └── docker/
     └── Dockerfile
 ```
 
 1. **Clone the repository:**:
    ```bash
-   git clone https://github.com/QBoson/Kaiwu-pytorch-plugin.git
+   git clone https://github.com/qboson/kaiwu-pytorch-plugin.git
    cd kaiwu-pytorch-plugin/requirements
    ```
 
@@ -152,11 +187,11 @@ Press `Ctrl+C`, then run:
    docker compose down
    ```
 
-### Kaiwu SDK Installation Instructions (Required)
+### Kaiwu SDK Installation and Authorization
 
-Kaiwu version 1.3.1 can now be installed directly via `pip install kaiwu==1.3.1`. 
+Pip selects a compatible Kaiwu SDK when you install KPP. KPP 0.4.0 uses Kaiwu 1.4.4 on Python 3.12 and 3.14. To select Kaiwu 1.3.1 on Python 3.10, run `python -m pip install "kaiwu==1.3.1" kaiwu-torch-plugin`.
 
-The download and installation steps for other versions of the Kaiwu SDK are as follows:
+If you need to download an SDK wheel or configure authorization, follow these steps:
 ![](imgs/image.png)
 
 1. **Get the SDK**:
@@ -175,6 +210,20 @@ The download and installation steps for other versions of the Kaiwu SDK are as f
 
 To experience real quantum computing, please register an account on the [Qboson Platform](https://platform.qboson.com/) and contact the official staff via the contact information provided in the documentation to obtain a real-machine quota.  
 
+## Community Research Incentive Program
+
+> For AI developers and researchers who need computing resources on real quantum hardware.
+
+Kaiwu-PyTorch-Plugin (KPP) supports research and engineering in quantum-native AI and energy-based neural networks.
+
+Our **Research Computing Incentive Program** offers a **50% discount on computing resources (provided as a buy-N-get-N-free offer)** when using KPP and Kaiwu SDK for development and research.
+
+[View eligibility requirements and fill out the application form](https://kaiwu.qboson.com/plugin.php?id=quantumAI&type=community) (the questionnaire is at the bottom of the page).
+
+Eligibility in brief: cite or acknowledge KPP or Kaiwu SDK in your research outputs and submit an application through the questionnaire. Coordination will be completed within 3 business days after approval.
+
+Contact: [developer@boseq.com](mailto:developer@boseq.com)
+
 ## Example Cases
 
 ### Simple Example
@@ -185,7 +234,8 @@ import torch
 from torch.optim import SGD
 from kaiwu.torch_plugin import RestrictedBoltzmannMachine
 from kaiwu.classical import SimulatedAnnealingOptimizer
-from kaiwu.cim import CIMOptimizer, PrecisionReducer
+from kaiwu.cim import CIMOptimizer
+from kaiwu.torch_plugin._kaiwu_compat import PrecisionReducer
 
 if __name__ == "__main__":
     SAMPLE_SIZE = 17
@@ -223,7 +273,7 @@ if __name__ == "__main__":
     # Compute the objective---this objective yields the same gradient as the negative
     # log likelihood of the model
     objective = rbm.objective(x, s)
-    # Backpropgate gradients
+    # Backpropagate gradients
     objective.backward()
     # Update model weights with a step of stochastic gradient descent
     opt_rbm.step()
@@ -335,7 +385,9 @@ For a more focused walkthrough of the example tree and its data flow, see
 
 ## Usage Statistics
 
-kpp implicitly tracks `SimulatedAnnealingOptimizer` and `CIMOptimizer` call counts in the background to help improve product quality. **This is enabled by default and fully transparent — no changes to user code are required.**
+Kaiwu 1.4.3 does not expose the caller-context hook used for KPP attribution, so KPP-specific statistics are inactive with this release. The controls below apply only to SDK releases that provide that hook; they do not control the SDK's own statistics.
+
+When the hook is available, kpp attributes `SimulatedAnnealingOptimizer` and `CIMOptimizer` calls to KPP in the background. **This attribution is enabled by default and requires no changes to user code.**
 
 Statistics are only collected within the kpp call path (i.e., triggered via `AbstractBoltzmannMachine.sample()`); calling kaiwu SDK optimizers directly is never tracked.
 
@@ -384,7 +436,7 @@ In single-cell transcriptomics analysis (a technique revealing cellular heteroge
 Based on this representation, we successfully integrated millions of single-cell transcriptomic data points and achieved superior performance in downstream tasks (e.g., cell clustering, classification, trajectory inference) compared to existing methods, validating the excellence of this latent representation.  
 
 If you are interested in this work, please check out our paper:  
-[**Quantum-Boosted High-Fidelity Deep Learning**](ttps://arxiv.org/pdf/2508.11190)
+[**Quantum-Boosted High-Fidelity Deep Learning**](https://arxiv.org/pdf/2508.11190)
 
 <img width="832" height="663" alt="1" src="https://github.com/user-attachments/assets/bc6097b3-6da8-4154-8aad-f749b4549fe1" />
 

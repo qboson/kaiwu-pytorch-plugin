@@ -92,14 +92,14 @@ class TestStatsSwitch(unittest.TestCase):
     def setUp(self):
         """Reset switch state before each test."""
         us = _get_us()
-        us._stats_enabled = None
-        us._env_stats_cache = None
+        us._STATS_ENABLED = None
+        us._ENV_STATS_CACHE = None
 
     def tearDown(self):
         """Reset after each test to avoid pollution."""
         us = _get_us()
-        us._stats_enabled = None
-        us._env_stats_cache = None
+        us._STATS_ENABLED = None
+        us._ENV_STATS_CACHE = None
         os.environ.pop("KPP_STATS_ENABLED", None)
 
     def test_default_enabled(self):
@@ -139,7 +139,7 @@ class TestStatsSwitch(unittest.TestCase):
         for val in ("true", "1", "yes", "on"):
             os.environ["KPP_STATS_ENABLED"] = val
             us = _get_us()
-            us._env_stats_cache = None
+            us._ENV_STATS_CACHE = None
             self.assertTrue(us.is_usage_stats_enabled(), f"Failed for value: {val}")
 
     def test_env_var_false_values(self):
@@ -147,7 +147,7 @@ class TestStatsSwitch(unittest.TestCase):
         for val in ("false", "0", "no", "off", "anything"):
             os.environ["KPP_STATS_ENABLED"] = val
             us = _get_us()
-            us._env_stats_cache = None
+            us._ENV_STATS_CACHE = None
             self.assertFalse(us.is_usage_stats_enabled(), f"Failed for value: {val}")
 
 
