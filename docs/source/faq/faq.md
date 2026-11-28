@@ -6,7 +6,7 @@
 
 ### Q: 安装时提示 Python 版本不兼容？
 
-A: Kaiwu-PyTorch-Plugin 目前仅支持 **Python 3.10**。请使用 conda 创建对应版本的环境：
+A: KPP 0.4.0 支持 Python 3.10、3.12 和 3.14。可以用 conda 创建对应版本的环境，下面以 Python 3.10 为例。
 
 ```{code-block} bash
 
@@ -18,7 +18,7 @@ A: Kaiwu-PyTorch-Plugin 目前仅支持 **Python 3.10**。请使用 conda 创建
 
 A: 请检查以下几点：
 
-1. 确认已安装 Kaiwu-PyTorch-Plugin：`pip install .`
+1. 运行 `python -m pip show kaiwu-torch-plugin` 检查当前环境中的 KPP。
 2. 确认当前环境已激活：`conda activate quantum_env`
 3. 确认 Kaiwu SDK 已正确安装
 
@@ -26,13 +26,13 @@ A: 请检查以下几点：
 
 ```{code-block} bash
 
- pip uninstall kaiwu-torch-plugin
- pip install .
+ python -m pip uninstall kaiwu-torch-plugin
+ python -m pip install kaiwu-torch-plugin
 
 ```
 ### Q: Kaiwu SDK 安装失败？
 
-A: Kaiwu SDK 需要单独安装。请：
+A: pip 会随 KPP 安装兼容的 Kaiwu SDK。如果安装失败，请按安装指南检查 Python 版本和平台。需要手动安装时，按以下步骤操作。
 
 1. 访问 [Kaiwu SDK 下载页面](https://platform.qboson.com/sdkDownload)
 2. 下载对应系统的安装包

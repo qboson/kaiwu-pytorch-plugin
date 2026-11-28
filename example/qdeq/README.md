@@ -47,8 +47,10 @@ Use `--data-path` for another location.
 
 ## Quick start
 
+Run these commands from the repository root. If you already have a compatible version of KPP, skip the first command.
+
 ```bash
-pip install -e .        # install the plugin from the repository root
+python -m pip install .
 pip install -r example/qdeq/requirements.txt
 python example/qdeq/simple/simple_train_example.py --sampler sa
 python example/qdeq/simple/simple_forecast_example.py --sampler sa
